@@ -1,0 +1,241 @@
+.patient-select-card {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e8e2dd;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.patient-select-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    border-color: #c9a84c;
+}
+
+.patient-select-card-body {
+    padding: 16px;
+}
+
+.patient-select-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dark .patient-select-name {
+    color: #f3f4f6;
+}
+
+.patient-select-meta {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dark .patient-select-meta {
+    color: #9ca3af;
+}
+
+.patient-select-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: #fef3c7;
+    color: #92400e;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.patient-select-details {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.patient-select-tag {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #4b5563;
+    background: #f3f4f6;
+    padding: 3px 8px;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.dark .patient-select-tag {
+    color: #d1d5db;
+    background: #1f2937;
+}
+
+.patient-select-actions {
+    padding: 10px 16px 14px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.dark .patient-select-actions {
+    border-top-color: #1f2937;
+}
+
+.select-patient-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    justify-content: center;
+    padding: 8px 14px;
+    border-radius: 10px;
+    background: #8B0000;
+    color: white;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+
+.select-patient-btn:hover {
+    background: #660000;
+    color: white;
+}
+
+[data-theme="dark"] #mainContent.existing-record-page .existing-record-title,
+.dark #mainContent.existing-record-page .existing-record-title {
+    color: #fecaca !important;
+}
+
+[data-theme="dark"] #mainContent.existing-record-page .existing-record-title i,
+.dark #mainContent.existing-record-page .existing-record-title i {
+    color: #fca5a5 !important;
+}
+
+[data-theme="dark"] #mainContent.existing-record-page .existing-record-chip,
+.dark #mainContent.existing-record-page .existing-record-chip {
+    color: #d1d5db !important;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(17, 24, 39, 0.95)) !important;
+    border-color: rgba(59, 130, 246, 0.14) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme="dark"] #mainContent.existing-record-page .existing-record-search-card,
+.dark #mainContent.existing-record-page .existing-record-search-card {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.88), rgba(17, 24, 39, 0.96)) !important;
+    border: 1px solid rgba(59, 130, 246, 0.12) !important;
+    box-shadow:
+        0 18px 32px rgba(0, 0, 0, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+[data-theme="dark"] #mainContent.existing-record-page .existing-record-search-input,
+.dark #mainContent.existing-record-page .existing-record-search-input {
+    color: #e5e7eb !important;
+    background: rgba(17, 24, 39, 0.92) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+[data-theme="dark"] #mainContent.existing-record-page .existing-record-search-input::placeholder,
+.dark #mainContent.existing-record-page .existing-record-search-input::placeholder {
+    color: #9ca3af !important;
+}
+
+[data-theme="dark"] #mainContent.existing-record-page .existing-record-search-input:focus,
+.dark #mainContent.existing-record-page .existing-record-search-input:focus {
+    border-color: rgba(248, 113, 113, 0.45) !important;
+    box-shadow:
+        0 0 0 3px rgba(127, 29, 29, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+[data-theme="dark"] #mainContent.existing-record-page .existing-record-search-icon,
+[data-theme="dark"] #mainContent.existing-record-page .existing-record-clear-btn,
+.dark #mainContent.existing-record-page .existing-record-search-icon,
+.dark #mainContent.existing-record-page .existing-record-clear-btn {
+    color: #9ca3af !important;
+}
+
+[data-theme="dark"] #mainContent.existing-record-page .existing-record-clear-btn:hover,
+.dark #mainContent.existing-record-page .existing-record-clear-btn:hover {
+    color: #fca5a5 !important;
+}
+
+[data-theme="dark"] #mainContent.existing-record-page .patient-select-card,
+.dark #mainContent.existing-record-page .patient-select-card {
+    background: linear-gradient(180deg, #111827 0%, #0f172a 100%);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow:
+        0 10px 26px rgba(0, 0, 0, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="dark"] #mainContent.existing-record-page .patient-select-card:hover,
+.dark #mainContent.existing-record-page .patient-select-card:hover {
+    border-color: rgba(248, 113, 113, 0.4);
+    box-shadow:
+        0 16px 32px rgba(0, 0, 0, 0.32),
+        0 0 0 1px rgba(248, 113, 113, 0.08);
+}
+
+[data-theme="dark"] #mainContent.existing-record-page .patient-select-name,
+.dark #mainContent.existing-record-page .patient-select-name {
+    color: #f3f4f6;
+}
+
+[data-theme="dark"] #mainContent.existing-record-page .patient-select-meta,
+.dark #mainContent.existing-record-page .patient-select-meta {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] #mainContent.existing-record-page .patient-select-badge,
+.dark #mainContent.existing-record-page .patient-select-badge {
+    background: rgba(254, 240, 138, 0.18);
+    color: #fcd34d;
+}
+
+[data-theme="dark"] #mainContent.existing-record-page .patient-select-tag,
+.dark #mainContent.existing-record-page .patient-select-tag {
+    color: #d1d5db;
+    background: rgba(31, 41, 55, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] #mainContent.existing-record-page .patient-select-actions,
+.dark #mainContent.existing-record-page .patient-select-actions {
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] #mainContent.existing-record-page .select-patient-btn,
+.dark #mainContent.existing-record-page .select-patient-btn {
+    background: linear-gradient(135deg, #991b1b, #b00000);
+    box-shadow: 0 10px 22px rgba(127, 29, 29, 0.28);
+}
+
+[data-theme="dark"] #mainContent.existing-record-page .select-patient-btn:hover,
+.dark #mainContent.existing-record-page .select-patient-btn:hover {
+    background: linear-gradient(135deg, #b91c1c, #8b0000);
+}
+
+[data-theme="dark"] #mainContent.existing-record-page .empty-state p,
+[data-theme="dark"] #mainContent.existing-record-page #noResults p,
+.dark #mainContent.existing-record-page .empty-state p,
+.dark #mainContent.existing-record-page #noResults p {
+    color: #9ca3af !important;
+}
+
+[data-theme="dark"] #mainContent.existing-record-page .empty-state i,
+[data-theme="dark"] #mainContent.existing-record-page #noResults i,
+.dark #mainContent.existing-record-page .empty-state i,
+.dark #mainContent.existing-record-page #noResults i {
+    color: rgba(252, 165, 165, 0.4) !important;
+}

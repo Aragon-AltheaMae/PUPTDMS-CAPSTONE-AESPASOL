@@ -1,0 +1,2331 @@
+.active-banner {
+    background: #fff;
+    border-radius: 12px;
+    border-left: 4px solid #8B0000;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, .06);
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.active-banner-inner {
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+@media (min-width:1024px) {
+    .active-banner-inner {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.25rem;
+    }
+}
+
+.progress-track {
+    height: 6px;
+    border-radius: 99px;
+    background: #f3f4f6;
+    overflow: hidden;
+}
+
+.ap-add-form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+}
+
+.ap-add-body {
+    flex: 1;
+    min-height: 0;
+    padding: 0.72rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 1.1rem;
+    align-content: start;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+}
+
+.ap-col-span-2 {
+    grid-column: span 2;
+}
+
+.ap-panel {
+    border: 1px solid #e9eef5;
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 1rem;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+    min-width: 0;
+}
+
+.ap-panel-soft {
+    background: linear-gradient(180deg, #fcfdff 0%, #ffffff 100%);
+    border: 1px solid #e9eef5;
+}
+
+.ap-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    margin-bottom: .5rem;
+}
+
+.ap-label-text {
+    font-size: 11px;
+    font-weight: 800;
+    color: #4b5563;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+.ap-label-hint {
+    font-size: 10px;
+    font-weight: 800;
+    color: #9ca3af;
+    text-transform: uppercase;
+}
+
+.ap-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.ap-input-wrap.voice-input-wrap {
+    position: relative;
+    width: 100%;
+}
+
+.ap-input-wrap .ap-input,
+.ap-input-wrap .voice-input-wrap .ap-input,
+.ap-input-wrap[data-voice-field] .ap-input {
+    width: 100%;
+    padding-left: 42px;
+    padding-right: 48px;
+}
+
+.ap-input-wrap .ap-input-icon,
+.ap-input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    font-size: 14px;
+    line-height: 1;
+    color: #9ca3af;
+    pointer-events: none;
+    z-index: 3;
+    flex-shrink: 0;
+}
+
+.ap-input-wrap .ap-input-icon i,
+.ap-input-icon i {
+    display: block;
+    line-height: 1;
+    margin: 0;
+}
+
+.ap-textarea-wrap {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+}
+
+.ap-textarea-wrap .ap-textarea-inner {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+.ap-textarea-wrap .ap-placeholder {
+    position: absolute;
+    top: 14px;
+    left: 15px;
+    right: 15px;
+    font-size: 14px;
+    line-height: 1.35;
+    color: #9ca3af;
+    pointer-events: none;
+    white-space: normal;
+    word-break: keep-all;
+    overflow: visible;
+    z-index: 2;
+}
+
+.ap-textarea-wrap.has-value .ap-placeholder,
+.ap-textarea-wrap.is-focused .ap-placeholder {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.ap-textarea-wrap .ap-textarea {
+    width: 100%;
+    padding-right: 16px;
+}
+
+.ap-textarea {
+    min-height: 140px;
+    height: 140px;
+    max-height: 140px;
+    font-size: 14px;
+    padding: 14px 15px;
+}
+
+.ap-input,
+.ap-textarea {
+    width: 100%;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    color: #0c111b;
+    font-size: 14px;
+    font-weight: 600;
+    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.ap-input {
+    height: 52px;
+    border-radius: 14px;
+    padding: 0 16px 0 42px;
+}
+
+.ap-textarea {
+    display: block;
+    width: 100% !important;
+    min-width: 100%;
+    max-width: 100%;
+    height: 160px;
+    resize: none;
+    border-radius: 16px;
+    padding: 16px 18px;
+    font-size: 14px;
+    line-height: 1.4;
+    box-sizing: border-box;
+}
+
+.ap-input:focus,
+.ap-textarea:focus {
+    outline: none;
+    border-color: #8B0000;
+    box-shadow: 0 0 0 4px rgba(139, 0, 0, 0.10);
+}
+
+.ap-semester-grid-redesign {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .75rem;
+}
+
+.ap-semester-item {
+    position: relative;
+}
+
+.ap-semester-item input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.ap-semester-card {
+    min-height: 92px;
+    border-radius: 18px;
+    border: 1.5px solid #e5e7eb;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .45rem;
+    text-align: center;
+    padding: .85rem;
+    cursor: pointer;
+    transition: all .2s ease;
+    color: #64748b;
+}
+
+.ap-semester-card i {
+    font-size: 18px;
+}
+
+.ap-semester-card span {
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.ap-semester-item input:checked+.ap-semester-card {
+    border-color: var(--active-color, #8B0000);
+    background: linear-gradient(180deg, #fffefe 0%, #eafaff 100%);
+    color: var(--active-color, #8B0000);
+}
+
+.ap-semester-card:hover {
+    border-color: var(--active-color, #8B0000);
+    color: var(--active-color, #8B0000);
+}
+
+.ap-date-grid-redesign {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .9rem;
+}
+
+.ap-active-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border: 1px solid #f3d4d4;
+    border-radius: 18px;
+    background: linear-gradient(90deg, #fff7f7 0%, #ffffff 100%);
+    padding: 1rem 1.05rem;
+}
+
+.ap-active-card-left {
+    display: flex;
+    align-items: center;
+    gap: .85rem;
+    min-width: 0;
+}
+
+.ap-active-badge {
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    color: #8B0000;
+    box-shadow: 0 4px 14px rgba(139, 0, 0, 0.08);
+    flex-shrink: 0;
+}
+
+.ap-active-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #0c111b;
+    margin: 0 0 2px;
+}
+
+.ap-active-desc {
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.ap-desc-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.ap-desc-panel .field-error {
+    margin-top: .45rem;
+}
+
+@media (max-width: 991px) {
+    .ap-add-body {
+        gap: 1rem;
+    }
+
+    .ap-semester-grid-redesign {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 767px) {
+
+    .ap-add-form {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .ap-add-body {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        grid-template-columns: 1fr;
+        padding: .95rem 1rem 1rem;
+        gap: .8rem;
+        align-content: start;
+    }
+
+    .ap-col-span-2 {
+        grid-column: span 1;
+    }
+
+    .ap-panel,
+    .ap-panel-soft {
+        padding: .9rem;
+        border-radius: 16px;
+        min-width: 0;
+    }
+
+    .ap-label {
+        margin-bottom: .45rem;
+    }
+
+    .ap-label-text,
+    .ap-label-hint {
+        font-size: 10px;
+    }
+
+    .ap-input-wrap,
+    .ap-textarea-wrap {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .ap-input {
+        height: 48px;
+        border-radius: 13px;
+        font-size: 14px;
+    }
+
+    .ap-date-grid-redesign,
+    .ap-semester-grid-redesign {
+        grid-template-columns: 1fr;
+        gap: .7rem;
+    }
+
+    .ap-semester-card {
+        min-height: 70px;
+        border-radius: 15px;
+        padding: .8rem;
+    }
+
+    .ap-semester-card span {
+        font-size: 12px;
+    }
+
+    .ap-textarea {
+        min-height: 140px;
+        height: 140px;
+        max-height: 140px;
+        font-size: 12px;
+        padding: 14px 15px;
+    }
+
+    .ap-active-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: .8rem;
+        padding: .95rem;
+    }
+
+    .ap-active-card-left {
+        gap: .7rem;
+    }
+
+    .ap-active-badge {
+        width: 38px;
+        height: 38px;
+    }
+
+    .ap-active-title {
+        font-size: 13px;
+    }
+
+    .ap-active-desc {
+        font-size: 11px;
+        line-height: 1.45;
+    }
+}
+
+[data-theme="dark"] .ap-panel,
+[data-theme="dark"] .ap-panel-soft,
+[data-theme="dark"] .ap-active-card {
+    background: #161b22 !important;
+    border-color: #2b313a !important;
+}
+
+[data-theme="dark"] .ap-active-title {
+    color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .ap-active-desc,
+[data-theme="dark"] .ap-label-text,
+[data-theme="dark"] .ap-label-hint {
+    color: #9ca3af !important;
+}
+
+[data-theme="dark"] .ap-input,
+[data-theme="dark"] .ap-textarea,
+[data-theme="dark"] .ap-semester-card {
+    background: #0d1117 !important;
+    border-color: #2b313a !important;
+    color: #e5e7eb !important;
+}
+
+.ap-date-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .75rem;
+}
+
+.reset-btn {
+    height: 38px;
+    padding: 0 16px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.reset-btn:hover {
+    background: #f9fafb;
+}
+
+[data-theme="dark"] .academic-period-page .border-gray-100 {
+    border-color: #21262d !important;
+}
+
+[data-theme="dark"] .academic-period-page .border-gray-200 {
+    border-color: #21262d !important;
+}
+
+[data-theme="dark"] .academic-period-page .text-gray-800 {
+    color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .academic-period-page .text-gray-600 {
+    color: #9ca3af !important;
+}
+
+[data-theme="dark"] .academic-period-page .text-gray-500 {
+    color: #9ca3af !important;
+}
+
+[data-theme="dark"] .academic-period-page .text-\[\#333333\] {
+    color: #E5E7EB !important;
+}
+
+[data-theme="dark"] .academic-period-page thead tr {
+    background: #0d1117 !important;
+}
+
+[data-theme="dark"] .academic-period-page tr {
+    border-color: #21262d !important;
+}
+
+[data-theme="dark"] .active-banner {
+    background: #161b22 !important;
+}
+
+[data-theme="dark"] .progress-track {
+    background: #21262d;
+}
+
+[data-theme="dark"] .cal-card {
+    background: #161b22 !important;
+    border-color: #21262d !important;
+}
+
+@media (max-width: 767px) {
+    .active-banner-inner {
+        padding: 1rem;
+    }
+
+    .reset-btn {
+        width: 100% !important;
+    }
+
+    .ap-voice-toggle {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .reset-btn {
+        justify-content: center;
+    }
+
+    .ap-date-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+[data-theme="dark"] #mainContent.academic-period-page,
+.dark #mainContent.academic-period-page {
+    background: #020c16 !important;
+}
+
+[data-theme="dark"] .academic-period-page .bg-white.rounded-xl.shadow.border.border-gray-100,
+[data-theme="dark"] .cal-card,
+[data-theme="dark"] .active-banner {
+    background: linear-gradient(145deg, rgba(22, 27, 34, .90), rgba(13, 17, 23, .82)) !important;
+    border-color: rgba(255, 255, 255, .10) !important;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, .32) !important;
+}
+
+[data-theme="dark"] .academic-period-page .bg-gray-50,
+[data-theme="dark"] .border-t.bg-gray-50 {
+    background: rgba(13, 17, 23, .90) !important;
+    border-color: rgba(255, 255, 255, .08) !important;
+}
+
+[data-theme="dark"] .reset-btn {
+    background: rgba(255, 255, 255, .06) !important;
+    border-color: rgba(255, 255, 255, .12) !important;
+    color: #d1d5db !important;
+}
+
+[data-theme="dark"] .academic-period-page h2.text-gray-800,
+[data-theme="dark"] .cal-card h2 {
+    color: #FCA5A5 !important;
+}
+
+[data-theme="dark"] #liveClock {
+    color: #fef6f6 !important;
+}
+
+[data-theme="dark"] .academic-period-page .group>div:first-child {
+    background: rgba(255, 255, 255, .07) !important;
+    border-color: rgba(255, 255, 255, .12) !important;
+}
+
+[data-theme="dark"] #calendarList>div {
+    border-color: rgba(255, 255, 255, .10) !important;
+}
+
+[data-theme="dark"] #calendarList div[style*="background"] {
+    background: rgba(255, 255, 255, .08) !important;
+    border-color: rgba(255, 255, 255, .12) !important;
+}
+
+[data-theme="dark"] #openAddPeriodQuickBtn .font-bold,
+[data-theme="dark"] #openEditPeriodQuickBtn .font-bold {
+    color: #FCA5A5 !important;
+}
+
+[data-theme="dark"] #calendarList div {
+    color: #FCA5A5 !important;
+}
+
+[data-theme="dark"] #calendarList div>div:first-child {
+    color: #E5E7EB !important;
+}
+
+[data-theme="dark"] #calendarList div>div:nth-child(2) {
+    color: #FCA5A5 !important;
+}
+
+[data-theme="dark"] .ap-add-body,
+[data-theme="dark"] .ap-panel,
+[data-theme="dark"] .ap-panel-soft,
+[data-theme="dark"] .ap-active-card,
+[data-theme="dark"] .ap-semester-card,
+[data-theme="dark"] .ap-input,
+[data-theme="dark"] .ap-textarea {
+    background: #161b22 !important;
+    border-color: #2b313a !important;
+    color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .ap-active-title {
+    color: #e5e7eb !important;
+}
+
+[data-theme="dark"] .ap-active-desc,
+[data-theme="dark"] .ap-label-text,
+[data-theme="dark"] .ap-label-hint {
+    color: #9ca3af !important;
+}
+
+#mainContent.academic-period-page {
+    overflow-x: hidden;
+    background: var(--admin-page-bg, #f6f7f9);
+}
+
+.academic-period-page .admin-page-container {
+    max-width: 100%;
+}
+
+#filterModal.academic-filter-modal .filter-drawer-panel {
+    max-width: 520px !important;
+}
+
+#filterModal.academic-filter-modal .filter-chip-remove {
+    border: 0 !important;
+    background: transparent !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page,
+.dark #mainContent.academic-period-page {
+    background: #0d0f12 !important;
+    color: #E5E7EB !important;
+}
+
+[data-theme="dark"] .academic-period-page .bg-white.rounded-xl,
+[data-theme="dark"] .academic-period-page .active-banner,
+[data-theme="dark"] .academic-period-page .cal-card,
+.dark .academic-period-page .bg-white.rounded-xl,
+.dark .academic-period-page .active-banner,
+.dark .academic-period-page .cal-card {
+    background:
+        radial-gradient(circle at top left, rgba(139, 0, 0, .14), transparent 38%),
+        linear-gradient(145deg, rgba(13, 17, 23, .94), rgba(22, 27, 34, .88)) !important;
+    border-color: rgba(255, 255, 255, .10) !important;
+    box-shadow: 0 18px 38px rgba(0, 0, 0, .34), inset 0 1px 0 rgba(255, 255, 255, .06) !important;
+}
+
+[data-theme="dark"] .academic-period-page .bg-gray-50,
+[data-theme="dark"] .academic-period-page .border-t.bg-gray-50,
+.dark .academic-period-page .bg-gray-50,
+.dark .academic-period-page .border-t.bg-gray-50 {
+    background: rgba(13, 17, 23, .82) !important;
+    border-color: rgba(255, 255, 255, .10) !important;
+}
+
+[data-theme="dark"] .academic-period-page .text-gray-900,
+[data-theme="dark"] .academic-period-page .text-gray-800,
+[data-theme="dark"] .academic-period-page .text-gray-700,
+[data-theme="dark"] .academic-period-page .text-gray-600,
+[data-theme="dark"] .academic-period-page #liveDate,
+.dark .academic-period-page .text-gray-900,
+.dark .academic-period-page .text-gray-800,
+.dark .academic-period-page .text-gray-700,
+.dark .academic-period-page .text-gray-600,
+.dark .academic-period-page #liveDate {
+    color: #F3F4F6 !important;
+}
+
+[data-theme="dark"] .academic-period-page h2.text-gray-800,
+[data-theme="dark"] .academic-period-page .cal-card h2,
+.dark .academic-period-page h2.text-gray-800,
+.dark .academic-period-page .cal-card h2,
+.dark .academic-period-page #liveClock {
+    color: #FCA5A5 !important;
+}
+
+[data-theme="dark"] #filterModal.academic-filter-modal .filter-drawer-panel,
+.dark #filterModal.academic-filter-modal .filter-drawer-panel,
+[data-theme="dark"] #filterModal.academic-filter-modal .filter-drawer-header,
+[data-theme="dark"] #filterModal.academic-filter-modal .filter-drawer-body,
+[data-theme="dark"] #filterModal.academic-filter-modal .filter-drawer-footer,
+.dark #filterModal.academic-filter-modal .filter-drawer-header,
+.dark #filterModal.academic-filter-modal .filter-drawer-body,
+.dark #filterModal.academic-filter-modal .filter-drawer-footer {
+    background: var(--filter-panel-bg, #0c111b) !important;
+    color: var(--filter-panel-text, #E5E7EB) !important;
+    border-color: var(--filter-panel-border, rgba(255, 255, 255, .10)) !important;
+}
+
+@media (max-width: 767px) {
+
+    .academic-period-page .global-filter-btn,
+    .academic-period-page .global-filter-reset-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+#mainContent.academic-period-page .bg-white.rounded-xl.shadow.border.border-gray-100,
+#mainContent.academic-period-page .active-banner,
+#mainContent.academic-period-page .cal-card {
+    border-color: #F0EAEA !important;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .045) !important;
+}
+
+#mainContent.academic-period-page .progress-track {
+    position: relative !important;
+    width: 100% !important;
+    height: 8px !important;
+    border-radius: 999px !important;
+    background: #F1F5F9 !important;
+    border: 1px solid #E5E7EB !important;
+    overflow: hidden !important;
+    box-shadow: inset 0 1px 2px rgba(15, 23, 42, .06) !important;
+}
+
+#mainContent.academic-period-page .progress-fill {
+    display: block !important;
+    height: 100% !important;
+    min-width: 4px;
+    border-radius: inherit !important;
+    background: linear-gradient(90deg, #8B0000, #C1121F) !important;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, .22) inset,
+        0 0 18px rgba(139, 0, 0, .22) !important;
+    transition: width .35s ease !important;
+}
+
+#mainContent.academic-period-page .ap-add-period-btn {
+    min-height: 48px !important;
+    padding: 0 1.1rem !important;
+    border: 1px solid rgba(255, 255, 255, .18) !important;
+    border-radius: 14px !important;
+    background: #FFFFFF !important;
+    color: var(--crimson, #8B0000) !important;
+    font-weight: 800 !important;
+    font-size: .92rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: .6rem !important;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .12) !important;
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease !important;
+}
+
+#mainContent.academic-period-page .ap-add-period-btn:hover,
+#mainContent.academic-period-page .ap-add-period-btn:focus-visible {
+    transform: translateY(-1px) !important;
+    background: #FFF8F8 !important;
+    color: #6B0000 !important;
+    box-shadow: 0 14px 26px rgba(0, 0, 0, .16) !important;
+    outline: none !important;
+}
+
+#mainContent.academic-period-page .ap-add-period-btn i {
+    color: currentColor !important;
+}
+
+#filterModal.academic-filter-modal .filter-drawer-footer {
+    background: var(--filter-panel-bg, #FFFFFF) !important;
+    border-top: 1px solid var(--filter-panel-border, #F1ECE7) !important;
+}
+
+#filterModal.academic-filter-modal .filter-clear-btn {
+    min-height: 42px !important;
+    padding: 0 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: var(--filter-danger-text, #D97706) !important;
+    font-weight: 900 !important;
+    border-radius: 12px !important;
+}
+
+#filterModal.academic-filter-modal .filter-clear-btn:hover {
+    color: var(--filter-primary-bg-hover, #660000) !important;
+    background: transparent !important;
+}
+
+#filterModal.academic-filter-modal .filter-cancel-btn {
+    min-height: 42px !important;
+    border-radius: 10px !important;
+}
+
+#mainContent.academic-period-page #externalClearFilterBtn.hidden {
+    display: none !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .progress-track,
+.dark #mainContent.academic-period-page .progress-track {
+    background: rgba(255, 255, 255, .055) !important;
+    border-color: rgba(255, 255, 255, .10) !important;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .30) !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .progress-fill,
+.dark #mainContent.academic-period-page .progress-fill {
+    background: linear-gradient(90deg, #8B0000, #F87171) !important;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, .10) inset,
+        0 0 20px rgba(248, 113, 113, .22) !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .ap-add-period-btn,
+.dark #mainContent.academic-period-page .ap-add-period-btn {
+    background: #FFFFFF !important;
+    color: #8B0000 !important;
+    border-color: rgba(255, 255, 255, .24) !important;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, .24) !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .ap-add-period-btn:hover,
+.dark #mainContent.academic-period-page .ap-add-period-btn:hover {
+    background: #FFF5F5 !important;
+    color: #660000 !important;
+}
+
+#mainContent.academic-period-page .ap-content-layout {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(390px, 420px) !important;
+    gap: 1.5rem !important;
+}
+
+#mainContent.academic-period-page .ap-periods-column {
+    min-width: 0 !important;
+}
+
+@media (max-width: 1023px) {
+    #mainContent.academic-period-page .ap-content-layout {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    #mainContent.academic-period-page .grid.grid-cols-1.lg\:grid-cols-3 {
+        grid-template-columns: minmax(0, 1fr) minmax(390px, 420px) !important;
+    }
+
+    #mainContent.academic-period-page .lg\:col-span-2 {
+        grid-column: auto !important;
+        min-width: 0 !important;
+    }
+}
+
+#mainContent.academic-period-page .bg-white.rounded-xl.shadow.border.border-gray-100,
+#mainContent.academic-period-page .active-banner,
+#mainContent.academic-period-page .cal-card {
+    box-shadow: 0 8px 24px rgba(16, 17, 20, 0.094) !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .bg-white.rounded-xl,
+.dark #mainContent.academic-period-page .bg-white.rounded-xl {
+    background: #161B22 !important;
+    border-color: #21262D !important;
+    box-shadow: 0 16px 34px rgba(0, 0, 0, .32) !important;
+}
+
+#addModal,
+#editModal,
+#deleteModal {
+    z-index: 99999 !important;
+}
+
+#addModal .ap-add-form,
+#editModal .ap-add-form {
+    min-height: 0 !important;
+    height: auto !important;
+}
+
+#addModal .ap-add-body,
+#editModal .ap-add-body {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    background: #F8FAFC !important;
+}
+
+[data-theme="dark"] #addModal .ap-add-body,
+[data-theme="dark"] #editModal .ap-add-body,
+.dark #addModal .ap-add-body,
+.dark #editModal .ap-add-body {
+    background: #0c111b !important;
+}
+
+#addModal .js-flatpickr-date,
+#editModal .js-flatpickr-date {
+    cursor: pointer !important;
+    caret-color: transparent !important;
+}
+
+#addModal .js-flatpickr-date::placeholder,
+#editModal .js-flatpickr-date::placeholder {
+    color: #9CA3AF !important;
+}
+
+[data-theme="dark"] #addModal .js-flatpickr-date,
+[data-theme="dark"] #editModal .js-flatpickr-date,
+.dark #addModal .js-flatpickr-date,
+.dark #editModal .js-flatpickr-date {
+    background: #0D1117 !important;
+    border-color: #30363D !important;
+    color: #E5E7EB !important;
+}
+
+@media (max-width: 768px) {
+
+    #addModal,
+    #editModal {
+        align-items: flex-end !important;
+        padding: 0 !important;
+    }
+}
+
+#addModal.ui-modal:not(.open):not(.closing),
+#editModal.ui-modal:not(.open):not(.closing) {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+#addModal.ui-modal.open,
+#editModal.ui-modal.open,
+#addModal.ui-modal.closing,
+#editModal.ui-modal.closing{
+    display: flex !important;
+    visibility: visible !important;
+}
+
+#addModal.ui-modal.open,
+#editModal.ui-modal.open {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+#addModal .modal-box,
+#editModal .modal-box,
+#deleteModal .modal-box {
+    pointer-events: auto !important;
+}
+
+#filterModal.filter-drawer-wrapper:not(.open):not(.closing) {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+#filterModal.filter-drawer-wrapper.open,
+#filterModal.filter-drawer-wrapper.closing {
+    visibility: visible !important;
+}
+
+#filterModal.filter-drawer-wrapper.open {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .ap-periods-column>.bg-white,
+.dark #mainContent.academic-period-page .ap-periods-column>.bg-white,
+[data-theme="dark"] #mainContent.academic-period-page .bg-white.rounded-xl,
+.dark #mainContent.academic-period-page .bg-white.rounded-xl {
+    background: #161B22 !important;
+    border-color: #21262D !important;
+    box-shadow:
+        0 18px 38px rgba(0, 0, 0, .34),
+        inset 0 1px 0 rgba(255, 255, 255, .055) !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .border-t.bg-gray-50,
+.dark #mainContent.academic-period-page .border-t.bg-gray-50 {
+    background: #0D1117 !important;
+    border-color: #21262D !important;
+    color: #8B949E !important;
+}
+
+[data-theme="dark"] #addModal.modal-overlay,
+[data-theme="dark"] #editModal.modal-overlay,
+[data-theme="dark"] #deleteModal.modal-overlay,
+.dark #addModal.modal-overlay,
+.dark #editModal.modal-overlay,
+.dark #deleteModal.modal-overlay {
+    background:
+        radial-gradient(circle at 15% 12%, rgba(139, 0, 0, .24), transparent 32%),
+        rgba(2, 6, 23, .74) !important;
+    backdrop-filter: blur(8px) saturate(130%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
+}
+
+[data-theme="dark"] #addModal .ap-add-body,
+[data-theme="dark"] #editModal .ap-add-body,
+.dark #addModal .ap-add-body,
+.dark #editModal .ap-add-body {
+    background: #0c111b !important;
+}
+
+[data-theme="dark"] #addModal .ap-panel,
+[data-theme="dark"] #editModal .ap-panel,
+[data-theme="dark"] #addModal .ap-panel-soft,
+[data-theme="dark"] #editModal .ap-panel-soft,
+.dark #addModal .ap-panel,
+.dark #editModal .ap-panel,
+.dark #addModal .ap-panel-soft,
+.dark #editModal .ap-panel-soft {
+    background:
+        radial-gradient(circle at top right, rgba(252, 165, 165, .055), transparent 45%),
+        #161B22 !important;
+    border-color: #21262D !important;
+    box-shadow:
+        0 14px 30px rgba(0, 0, 0, .26),
+        inset 0 1px 0 rgba(255, 255, 255, .04) !important;
+}
+
+[data-theme="dark"] #addModal .ap-label-text,
+[data-theme="dark"] #editModal .ap-label-text,
+[data-theme="dark"] #addModal .ap-label-hint,
+[data-theme="dark"] #editModal .ap-label-hint,
+.dark #addModal .ap-label-text,
+.dark #editModal .ap-label-text,
+.dark #addModal .ap-label-hint,
+.dark #editModal .ap-label-hint {
+    color: #9CA3AF !important;
+}
+
+[data-theme="dark"] #addModal .ap-input,
+[data-theme="dark"] #editModal .ap-input,
+[data-theme="dark"] #addModal .ap-textarea,
+[data-theme="dark"] #editModal .ap-textarea,
+.dark #addModal .ap-input,
+.dark #editModal .ap-input,
+.dark #addModal .ap-textarea,
+.dark #editModal .ap-textarea {
+    background: #0D1117 !important;
+    border-color: #30363D !important;
+    color: #E5E7EB !important;
+}
+
+#mainContent.academic-period-page .ap-banner-add-btn:hover,
+#mainContent.academic-period-page .um-hero-btn.ap-banner-add-btn:hover {
+    transform: translateY(-1px) !important;
+    background: #FFF8F8 !important;
+    color: #6B0000 !important;
+    box-shadow: 0 14px 26px rgba(0, 0, 0, .16) !important;
+}
+
+#mainContent.academic-period-page .ap-banner-add-btn i,
+#mainContent.academic-period-page .um-hero-btn.ap-banner-add-btn i {
+    color: currentColor !important;
+}
+
+#mainContent.academic-period-page .ap-banner-add-btn,
+#mainContent.academic-period-page .um-hero-btn.ap-banner-add-btn {
+    min-height: 42px !important;
+    padding: 0 1rem !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(255, 255, 255, .18) !important;
+    background: rgba(255, 255, 255, .96) !important;
+    color: var(--crimson, #8B0000) !important;
+    font-size: .78rem !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: .5rem !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .12) !important;
+    transition:
+        transform .18s ease,
+        background .18s ease,
+        border-color .18s ease,
+        color .18s ease,
+        box-shadow .18s ease !important;
+}
+
+#mainContent.academic-period-page .ap-banner-add-btn i,
+#mainContent.academic-period-page .um-hero-btn.ap-banner-add-btn i {
+    color: currentColor !important;
+    font-size: .82rem !important;
+    line-height: 1 !important;
+}
+
+#mainContent.academic-period-page .ap-banner-add-btn:hover,
+#mainContent.academic-period-page .um-hero-btn.ap-banner-add-btn:hover {
+    background: #fff8f8 !important;
+    color: #6B0000 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, .16) !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .ap-banner-add-btn,
+[data-theme="dark"] #mainContent.academic-period-page .um-hero-btn.ap-banner-add-btn,
+.dark #mainContent.academic-period-page .ap-banner-add-btn,
+.dark #mainContent.academic-period-page .um-hero-btn.ap-banner-add-btn {
+    background: rgba(255, 255, 255, .08) !important;
+    border-color: rgba(255, 255, 255, .14) !important;
+    color: #fff5f5 !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .08),
+        0 10px 22px rgba(0, 0, 0, .22) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .ap-banner-add-btn:hover,
+[data-theme="dark"] #mainContent.academic-period-page .um-hero-btn.ap-banner-add-btn:hover,
+.dark #mainContent.academic-period-page .ap-banner-add-btn:hover,
+.dark #mainContent.academic-period-page .um-hero-btn.ap-banner-add-btn:hover {
+    background: rgba(255, 255, 255, .14) !important;
+    border-color: rgba(255, 255, 255, .22) !important;
+    color: #ffffff !important;
+    transform: translateY(-1px) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .12),
+        0 14px 28px rgba(0, 0, 0, .28) !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .ap-banner-add-btn:hover,
+[data-theme="dark"] #mainContent.academic-period-page .um-hero-btn.ap-banner-add-btn:hover,
+.dark #mainContent.academic-period-page .ap-banner-add-btn:hover,
+.dark #mainContent.academic-period-page .um-hero-btn.ap-banner-add-btn:hover {
+    background: #FFF5F5 !important;
+    color: #660000 !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page,
+.dark #mainContent.academic-period-page {
+    background: #0d0f12 !important;
+    color: #E5E7EB !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .ap-periods-column>.bg-white,
+[data-theme="dark"] #mainContent.academic-period-page .bg-white.rounded-xl,
+[data-theme="dark"] #mainContent.academic-period-page .active-banner,
+[data-theme="dark"] #mainContent.academic-period-page .cal-card,
+.dark #mainContent.academic-period-page .ap-periods-column>.bg-white,
+.dark #mainContent.academic-period-page .bg-white.rounded-xl,
+.dark #mainContent.academic-period-page .active-banner,
+.dark #mainContent.academic-period-page .cal-card {
+    background:
+        radial-gradient(circle at top left, rgba(247, 227, 227, 0.101), transparent 40%),
+        linear-gradient(180deg, #0D1117 0%, #0D1117 100%) !important;
+    box-shadow:
+        0 14px 30px rgba(0, 0, 0, .30),
+        inset 0 1px 0 rgba(255, 255, 255, .055) !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page #liveAmPm,
+[data-theme="dark"] #mainContent.academic-period-page #liveDay,
+[data-theme="dark"] #mainContent.academic-period-page .text-gray-400,
+.dark #mainContent.academic-period-page #liveAmPm,
+.dark #mainContent.academic-period-page #liveDay,
+.dark #mainContent.academic-period-page .text-gray-400 {
+    color: #8B949E !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page #liveDate,
+.dark #mainContent.academic-period-page #liveDate {
+    color: #E5E7EB !important;
+}
+
+[data-theme="dark"] #addModal .ap-add-body,
+[data-theme="dark"] #editModal .ap-add-body,
+.dark #addModal .ap-add-body,
+.dark #editModal .ap-add-body {
+    background: #0c111b !important;
+}
+
+[data-theme="dark"] #addModal .ap-panel,
+[data-theme="dark"] #editModal .ap-panel,
+[data-theme="dark"] #addModal .ap-panel-soft,
+[data-theme="dark"] #editModal .ap-panel-soft,
+.dark #addModal .ap-panel,
+.dark #editModal .ap-panel,
+.dark #addModal .ap-panel-soft,
+.dark #editModal .ap-panel-soft {
+    background:
+        radial-gradient(circle at top right, rgba(252, 165, 165, .055), transparent 45%),
+        #161B22 !important;
+    border-color: #21262D !important;
+    box-shadow:
+        0 14px 30px rgba(0, 0, 0, .26),
+        inset 0 1px 0 rgba(255, 255, 255, .04) !important;
+}
+
+#addModal .ap-semester-card,
+#editModal .ap-semester-card {
+    position: relative !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .academic-quick-actions-panel,
+[data-theme="dark"] #mainContent.academic-period-page .academic-quick-actions-panel.table-card,
+.dark #mainContent.academic-period-page .academic-quick-actions-panel,
+.dark #mainContent.academic-period-page .academic-quick-actions-panel.table-card {
+    background: #0D1117 !important;
+    border-color: rgba(255, 255, 255, .10) !important;
+    box-shadow:
+        0 18px 38px rgba(0, 0, 0, .34),
+        inset 0 1px 0 rgba(255, 255, 255, .055) !important;
+}
+
+#addModal .ap-semester-card:hover,
+#editModal .ap-semester-card:hover {
+    border-color: var(--active-color, #8B0000) !important;
+    color: var(--active-color, #8B0000) !important;
+    background:
+        radial-gradient(circle at 100% 100%, rgba(139, 0, 0, .08), transparent 42%),
+        linear-gradient(180deg, #FFFFFF 0%, #FFF7F7 100%) !important;
+    box-shadow:
+        0 10px 22px rgba(139, 0, 0, .10),
+        inset 0 1px 0 rgba(255, 255, 255, .75) !important;
+    transform: translateY(-1px) !important;
+}
+
+#editModal .ap-semester-card:hover {
+    border-color: #2563EB !important;
+    color: #2563EB !important;
+    background:
+        radial-gradient(circle at 100% 100%, rgba(37, 99, 235, .08), transparent 42%),
+        linear-gradient(180deg, #FFFFFF 0%, #EFF6FF 100%) !important;
+    box-shadow:
+        0 10px 22px rgba(37, 99, 235, .10),
+        inset 0 1px 0 rgba(255, 255, 255, .75) !important;
+}
+
+#addModal .ap-active-card,
+#editModal .ap-active-card {
+    background: linear-gradient(90deg, #FFF7F7 0%, #FFFFFF 100%) !important;
+    border: 1px solid #F3D4D4 !important;
+}
+
+#addModal .ap-active-badge,
+#editModal .ap-active-badge {
+    background: #FFFFFF !important;
+    color: #8B0000 !important;
+    border: 1px solid rgba(139, 0, 0, .10) !important;
+}
+
+[data-theme="dark"] #addModal .ap-semester-card:hover,
+.dark #addModal .ap-semester-card:hover {
+    background:
+        radial-gradient(circle at 100% 100%, rgba(139, 0, 0, .24), transparent 44%),
+        linear-gradient(145deg, rgba(139, 0, 0, .18), rgba(13, 17, 23, .92)) !important;
+    border-color: rgba(252, 165, 165, .42) !important;
+    color: #FCA5A5 !important;
+    box-shadow:
+        0 14px 26px rgba(0, 0, 0, .26),
+        0 0 0 4px rgba(252, 165, 165, .055),
+        inset 0 1px 0 rgba(255, 255, 255, .075) !important;
+}
+
+[data-theme="dark"] #editModal .ap-semester-card:hover,
+.dark #editModal .ap-semester-card:hover {
+    background:
+        radial-gradient(circle at 100% 100%, rgba(37, 99, 235, .24), transparent 44%),
+        linear-gradient(145deg, rgba(37, 99, 235, .18), rgba(13, 17, 23, .92)) !important;
+    border-color: rgba(147, 197, 253, .42) !important;
+    color: #93C5FD !important;
+    box-shadow:
+        0 14px 26px rgba(0, 0, 0, .26),
+        0 0 0 4px rgba(147, 197, 253, .055),
+        inset 0 1px 0 rgba(255, 255, 255, .075) !important;
+}
+
+[data-theme="dark"] #addModal .ap-semester-item input:checked+.ap-semester-card,
+.dark #addModal .ap-semester-item input:checked+.ap-semester-card {
+    background:
+        radial-gradient(circle at 100% 100%, rgba(139, 0, 0, .30), transparent 44%),
+        linear-gradient(145deg, rgba(139, 0, 0, .22), rgba(13, 17, 23, .92)) !important;
+    border-color: rgba(252, 165, 165, .46) !important;
+    color: #FCA5A5 !important;
+    box-shadow:
+        0 14px 28px rgba(0, 0, 0, .28),
+        inset 0 1px 0 rgba(255, 255, 255, .08) !important;
+}
+
+[data-theme="dark"] #editModal .ap-semester-item input:checked+.ap-semester-card,
+.dark #editModal .ap-semester-item input:checked+.ap-semester-card {
+    background:
+        radial-gradient(circle at 100% 100%, rgba(37, 99, 235, .30), transparent 44%),
+        linear-gradient(145deg, rgba(37, 99, 235, .22), rgba(13, 17, 23, .92)) !important;
+    border-color: rgba(147, 197, 253, .46) !important;
+    color: #93C5FD !important;
+    box-shadow:
+        0 14px 28px rgba(0, 0, 0, .28),
+        inset 0 1px 0 rgba(255, 255, 255, .08) !important;
+}
+
+[data-theme="dark"] #addModal .ap-active-card,
+[data-theme="dark"] #editModal .ap-active-card,
+.dark #addModal .ap-active-card,
+.dark #editModal .ap-active-card {
+    background:
+        radial-gradient(circle at top right, rgba(252, 165, 165, .065), transparent 44%),
+        linear-gradient(145deg, rgba(22, 27, 34, .98), rgba(13, 17, 23, .92)) !important;
+    border-color: rgba(255, 255, 255, .10) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .055),
+        0 12px 26px rgba(0, 0, 0, .22) !important;
+}
+
+[data-theme="dark"] #addModal .ap-active-badge,
+[data-theme="dark"] #editModal .ap-active-badge,
+.dark #addModal .ap-active-badge,
+.dark #editModal .ap-active-badge {
+    background: rgba(255, 255, 255, .075) !important;
+    border-color: rgba(255, 255, 255, .12) !important;
+    color: #FCA5A5 !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .06),
+        0 10px 18px rgba(0, 0, 0, .18) !important;
+}
+
+[data-theme="dark"] #editModal .ap-active-badge,
+.dark #editModal .ap-active-badge {
+    color: #93C5FD !important;
+}
+
+[data-theme="dark"] #addModal .ap-active-title,
+[data-theme="dark"] #editModal .ap-active-title,
+.dark #addModal .ap-active-title,
+.dark #editModal .ap-active-title {
+    color: #F3F4F6 !important;
+}
+
+[data-theme="dark"] #addModal .ap-active-desc,
+[data-theme="dark"] #editModal .ap-active-desc,
+.dark #addModal .ap-active-desc,
+.dark #editModal .ap-active-desc {
+    color: #9CA3AF !important;
+}
+
+#mainContent.academic-period-page .ap-pup-calendar-link {
+    background: #FFFFFF !important;
+    border-color: #E5E7EB !important;
+    color: #6B7280 !important;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, .035) !important;
+}
+
+#mainContent.academic-period-page .ap-pup-calendar-link i {
+    color: currentColor !important;
+}
+
+#mainContent.academic-period-page .ap-pup-calendar-link:hover {
+    background: #FEF2F2 !important;
+    border-color: #8B0000 !important;
+    color: #8B0000 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 10px 20px rgba(139, 0, 0, .10) !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .ap-pup-calendar-link,
+.dark #mainContent.academic-period-page .ap-pup-calendar-link {
+    background: rgba(255, 255, 255, .055) !important;
+    border-color: rgba(255, 255, 255, .12) !important;
+    color: #CBD5E1 !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .055),
+        0 10px 20px rgba(0, 0, 0, .20) !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .ap-pup-calendar-link:hover,
+.dark #mainContent.academic-period-page .ap-pup-calendar-link:hover {
+    background: rgba(252, 165, 165, .13) !important;
+    border-color: rgba(252, 165, 165, .28) !important;
+    color: #FCA5A5 !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .075),
+        0 12px 24px rgba(0, 0, 0, .26) !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .active-banner .progress-fill,
+.dark #mainContent.academic-period-page .active-banner .progress-fill {
+    background: linear-gradient(90deg, #8B0000, #F87171) !important;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, .10) inset,
+        0 0 20px rgba(248, 113, 113, .22) !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .active-banner .text-\[\#8B0000\],
+[data-theme="dark"] #mainContent.academic-period-page .active-banner .text-red-600,
+[data-theme="dark"] #mainContent.academic-period-page .active-banner .text-red-700,
+.dark #mainContent.academic-period-page .active-banner .text-\[\#8B0000\],
+.dark #mainContent.academic-period-page .active-banner .text-red-600,
+.dark #mainContent.academic-period-page .active-banner .text-red-700 {
+    color: #FCA5A5 !important;
+    text-shadow: 0 0 12px rgba(252, 165, 165, .20) !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .active-banner .progress-track,
+.dark #mainContent.academic-period-page .active-banner .progress-track {
+    background: rgba(255, 255, 255, .055) !important;
+    border-color: rgba(255, 255, 255, .10) !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .cal-card h2,
+.dark #mainContent.academic-period-page .cal-card h2 {
+    color: #F3F4F6 !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .cal-card h2 i,
+.dark #mainContent.academic-period-page .cal-card h2 i {
+    color: #FCA5A5 !important;
+    text-shadow: 0 0 14px rgba(252, 165, 165, .22) !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .cal-card .border-b span,
+.dark #mainContent.academic-period-page .cal-card .border-b span {
+    background: rgba(252, 165, 165, .12) !important;
+    border: 1px solid rgba(252, 165, 165, .22) !important;
+    color: #FCA5A5 !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .06),
+        0 8px 18px rgba(0, 0, 0, .18) !important;
+}
+
+#mainContent.academic-period-page #activeBannerWrap.active-banner {
+    border-left: 0 !important;
+    border-radius: 22px !important;
+    overflow: hidden !important;
+    background: #FFFFFF !important;
+    border: 1px solid #F0EAEA !important;
+    box-shadow: 0 10px 26px rgba(15, 23, 42, .055) !important;
+}
+
+#mainContent.academic-period-page #activeBannerWrap .active-banner-inner {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 330px) !important;
+    align-items: stretch !important;
+    gap: 1rem !important;
+    padding: 1rem !important;
+}
+
+#mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1 {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: .85rem !important;
+    min-width: 0 !important;
+}
+
+#mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div {
+    min-height: 104px !important;
+    padding: 1rem !important;
+    border-radius: 18px !important;
+    background:
+        radial-gradient(circle at top right, rgba(139, 0, 0, .055), transparent 44%),
+        linear-gradient(145deg, #FFFFFF 0%, #FFF8F8 100%) !important;
+    border: 1px solid rgba(139, 0, 0, .10) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .85),
+        0 8px 20px rgba(15, 23, 42, .045) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: .45rem !important;
+    min-width: 0 !important;
+}
+
+#mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div>.flex {
+    margin-bottom: 0 !important;
+    gap: .55rem !important;
+}
+
+#mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div i {
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    border-radius: 11px !important;
+    background: #FEF2F2 !important;
+    border: 1px solid rgba(139, 0, 0, .12) !important;
+    color: #8B0000 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: .82rem !important;
+    line-height: 1 !important;
+}
+
+#mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div p:first-of-type {
+    color: #8B0000 !important;
+    font-size: .64rem !important;
+    font-weight: 900 !important;
+    letter-spacing: .09em !important;
+    line-height: 1.1 !important;
+}
+
+#mainContent.academic-period-page #activeBannerWrap #bannerSem,
+#mainContent.academic-period-page #activeBannerWrap #bannerYear,
+#mainContent.academic-period-page #activeBannerWrap #bannerEnd {
+    color: #111827 !important;
+    font-size: 1rem !important;
+    font-weight: 900 !important;
+    line-height: 1.15 !important;
+    letter-spacing: -.015em !important;
+    word-break: break-word !important;
+}
+
+#mainContent.academic-period-page #activeBannerWrap .active-banner-inner>div:last-child {
+    width: auto !important;
+    min-width: 0 !important;
+    padding: 1rem !important;
+    border-radius: 18px !important;
+    background:
+        radial-gradient(circle at top right, rgba(139, 0, 0, .07), transparent 44%),
+        linear-gradient(145deg, #FFFFFF 0%, #FFF8F8 100%) !important;
+    border: 1px solid rgba(139, 0, 0, .10) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .85),
+        0 8px 20px rgba(15, 23, 42, .045) !important;
+    justify-content: space-between !important;
+}
+
+#mainContent.academic-period-page #activeBannerWrap #bannerPct {
+    color: #8B0000 !important;
+    font-size: .78rem !important;
+    font-weight: 900 !important;
+}
+
+#mainContent.academic-period-page #activeBannerWrap .progress-track {
+    height: 8px !important;
+}
+
+#mainContent.academic-period-page #activeBannerWrap .active-banner-inner>div:last-child>button {
+    width: 100% !important;
+    min-height: 46px !important;
+    border-radius: 14px !important;
+    font-size: .88rem !important;
+    font-weight: 900 !important;
+    box-shadow: 0 12px 24px rgba(139, 0, 0, .18) !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page #activeBannerWrap.active-banner,
+.dark #mainContent.academic-period-page #activeBannerWrap.active-banner {
+    background: #0D1117 !important;
+    border-color: #21262D !important;
+    box-shadow:
+        0 18px 38px rgba(0, 0, 0, .34),
+        inset 0 1px 0 rgba(255, 255, 255, .055) !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div,
+[data-theme="dark"] #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>div:last-child,
+.dark #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div,
+.dark #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>div:last-child {
+    background:
+        radial-gradient(circle at top right, rgba(252, 165, 165, .065), transparent 44%),
+        linear-gradient(145deg, rgba(22, 27, 34, .98), rgba(13, 17, 23, .94)) !important;
+    border-color: rgba(255, 255, 255, .10) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .055),
+        0 12px 26px rgba(0, 0, 0, .24) !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div i,
+.dark #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div i {
+    background: rgba(252, 165, 165, .10) !important;
+    border-color: rgba(252, 165, 165, .20) !important;
+    color: #FCA5A5 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06) !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div p:first-of-type,
+.dark #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div p:first-of-type {
+    color: #FCA5A5 !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page #activeBannerWrap #bannerSem,
+[data-theme="dark"] #mainContent.academic-period-page #activeBannerWrap #bannerYear,
+[data-theme="dark"] #mainContent.academic-period-page #activeBannerWrap #bannerEnd,
+.dark #mainContent.academic-period-page #activeBannerWrap #bannerSem,
+.dark #mainContent.academic-period-page #activeBannerWrap #bannerYear,
+.dark #mainContent.academic-period-page #activeBannerWrap #bannerEnd {
+    color: #F3F4F6 !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page #activeBannerWrap #bannerPct,
+.dark #mainContent.academic-period-page #activeBannerWrap #bannerPct {
+    color: #FCA5A5 !important;
+    text-shadow: 0 0 12px rgba(252, 165, 165, .18) !important;
+}
+
+@media (max-width: 1180px) {
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner {
+        grid-template-columns: 1fr !important;
+    }
+
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>div:last-child {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 767px) {
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner {
+        padding: .85rem !important;
+        gap: .75rem !important;
+    }
+
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1 {
+        grid-template-columns: 1fr !important;
+        gap: .75rem !important;
+    }
+
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div {
+        min-height: 86px !important;
+        padding: .85rem !important;
+    }
+
+    #mainContent.academic-period-page #activeBannerWrap #bannerSem,
+    #mainContent.academic-period-page #activeBannerWrap #bannerYear,
+    #mainContent.academic-period-page #activeBannerWrap #bannerEnd {
+        font-size: .92rem !important;
+    }
+}
+
+#mainContent.academic-period-page #activeBannerWrap .active-banner-inner {
+    padding: 1.15rem 1.25rem !important;
+    gap: 1rem !important;
+}
+
+#mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1 {
+    gap: 1rem !important;
+}
+
+#mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div {
+    min-height: 118px !important;
+    padding: 1.1rem 1.25rem !important;
+    justify-content: center !important;
+}
+
+#mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div>.flex {
+    display: flex !important;
+    align-items: center !important;
+    gap: .7rem !important;
+    min-height: 28px !important;
+    margin-bottom: .35rem !important;
+}
+
+#mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div i {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    border-radius: 10px !important;
+    font-size: .78rem !important;
+}
+
+#mainContent.academic-period-page #activeBannerWrap #bannerSem,
+#mainContent.academic-period-page #activeBannerWrap #bannerYear,
+#mainContent.academic-period-page #activeBannerWrap #bannerEnd {
+    padding-left: calc(28px + .7rem) !important;
+    margin: 0 !important;
+    font-size: 1rem !important;
+    line-height: 1.15 !important;
+}
+
+#mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div p:first-of-type {
+    margin: 0 !important;
+    font-size: .66rem !important;
+    line-height: 1.1 !important;
+    letter-spacing: .08em !important;
+}
+
+#mainContent.academic-period-page #activeBannerWrap .active-banner-inner>div:last-child {
+    min-height: 118px !important;
+    padding: 1.1rem 1.25rem !important;
+}
+
+@media (max-width: 767px) {
+
+    #mainContent.academic-period-page #activeBannerWrap #bannerSem,
+    #mainContent.academic-period-page #activeBannerWrap #bannerYear,
+    #mainContent.academic-period-page #activeBannerWrap #bannerEnd {
+        padding-left: calc(28px + .65rem) !important;
+    }
+}
+
+#mainContent.academic-period-page .ap-calendar-title-icon {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    border-radius: 10px !important;
+    background: #FEF2F2 !important;
+    border: 1px solid rgba(139, 0, 0, .12) !important;
+    color: #8B0000 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: .78rem !important;
+    line-height: 1 !important;
+}
+
+[data-theme="dark"] #mainContent.academic-period-page .ap-calendar-title-icon,
+.dark #mainContent.academic-period-page .ap-calendar-title-icon {
+    background: rgba(252, 165, 165, .10) !important;
+    border-color: rgba(252, 165, 165, .20) !important;
+    color: #FCA5A5 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06) !important;
+}
+
+#deleteModal #deletePeriodLabel {
+    display: inline-flex !important;
+    padding: .14rem .42rem !important;
+    border-radius: 8px !important;
+    background: rgba(255, 255, 255, .82) !important;
+    color: #111827 !important;
+    font-weight: 950 !important;
+}
+
+#deleteModal .modal-btn-ghost {
+    min-height: 44px !important;
+    padding: 0 1.15rem !important;
+    border-radius: 12px !important;
+    font-size: .86rem !important;
+    font-weight: 900 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: .55rem !important;
+}
+
+#deleteModal .modal-btn-ghost {
+    border: 1px solid #e5e7eb !important;
+    background: #ffffff !important;
+    color: #4b5563 !important;
+}
+
+#deleteModal .modal-btn-ghost:hover {
+    background: #f9fafb !important;
+    border-color: #cbd5e1 !important;
+    transform: translateY(-1px) !important;
+}
+
+[data-theme="dark"] #deleteModal #deletePeriodLabel,
+.dark #deleteModal #deletePeriodLabel {
+    background: rgba(255, 255, 255, .08) !important;
+    color: #ffffff !important;
+}
+
+@media (max-width: 767px) {
+
+    #deleteModal .modal-btn-ghost {
+        width: 100% !important;
+    }
+}
+
+#syncFlssModal i {
+    color: currentColor !important;
+}
+
+@media (max-width: 767px) {
+    #mainContent.academic-period-page {
+        overflow-x: hidden !important;
+        padding-inline: clamp(1rem, 4.5vw, 1.4rem) !important;
+        padding-bottom: 7.5rem !important;
+    }
+
+    #mainContent.academic-period-page .admin-page-container {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    #mainContent.academic-period-page .admin-page-container>.relative,
+    #mainContent.academic-period-page .relative.z-10 {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    #mainContent.academic-period-page .page-banner {
+        border-radius: 18px !important;
+        margin-bottom: 1rem !important;
+        overflow: hidden !important;
+    }
+
+    #mainContent.academic-period-page .page-banner-inner {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        justify-content: flex-start !important;
+        gap: .85rem !important;
+        text-align: left !important;
+        padding: 1rem !important;
+    }
+
+    #mainContent.academic-period-page .page-title {
+        width: 100% !important;
+        text-align: left !important;
+        font-size: 1.55rem !important;
+        line-height: 1.1 !important;
+        margin: 0 !important;
+    }
+
+    #mainContent.academic-period-page .page-actions,
+    #mainContent.academic-period-page .ap-banner-add-btn,
+    #mainContent.academic-period-page .um-hero-btn.ap-banner-add-btn {
+        width: 100% !important;
+    }
+
+    #mainContent.academic-period-page .ap-banner-add-btn,
+    #mainContent.academic-period-page .um-hero-btn.ap-banner-add-btn {
+        min-height: 42px !important;
+        border-radius: 999px !important;
+        justify-content: center !important;
+    }
+
+
+    #mainContent.academic-period-page .ap-content-layout,
+    #mainContent.academic-period-page .grid.grid-cols-1.lg\:grid-cols-3 {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+        width: 100% !important;
+    }
+
+    #mainContent.academic-period-page .ap-periods-column,
+    #mainContent.academic-period-page .lg\:col-span-2 {
+        width: 100% !important;
+        min-width: 0 !important;
+        grid-column: auto !important;
+    }
+
+    #mainContent.academic-period-page #activeBannerWrap.active-banner {
+        margin-bottom: 1rem !important;
+        border-radius: 18px !important;
+    }
+
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: .75rem !important;
+        padding: .75rem !important;
+    }
+
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1 {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: .65rem !important;
+    }
+
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div:nth-child(3) {
+        grid-column: 1 / -1 !important;
+    }
+
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div,
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>div:last-child {
+        min-height: 82px !important;
+        padding: .75rem !important;
+        border-radius: 15px !important;
+    }
+
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div>.flex {
+        gap: .45rem !important;
+        margin-bottom: .25rem !important;
+        min-height: 24px !important;
+    }
+
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div i {
+        width: 24px !important;
+        height: 24px !important;
+        min-width: 24px !important;
+        border-radius: 9px !important;
+        font-size: .68rem !important;
+    }
+
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div p:first-of-type {
+        font-size: .56rem !important;
+        line-height: 1.1 !important;
+    }
+
+    #mainContent.academic-period-page #activeBannerWrap #bannerSem,
+    #mainContent.academic-period-page #activeBannerWrap #bannerYear,
+    #mainContent.academic-period-page #activeBannerWrap #bannerEnd {
+        padding-left: 0 !important;
+        font-size: .82rem !important;
+        line-height: 1.15 !important;
+        word-break: break-word !important;
+    }
+
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>div:last-child>button {
+        min-height: 40px !important;
+        font-size: .76rem !important;
+        border-radius: 12px !important;
+    }
+
+    #mainContent.academic-period-page .global-filter-btn,
+    #mainContent.academic-period-page .global-filter-reset-btn,
+    #mainContent.academic-period-page .reset-btn {
+        width: 100% !important;
+        min-height: 42px !important;
+        justify-content: center !important;
+        border-radius: 13px !important;
+    }
+
+    #mainContent.academic-period-page .academic-quick-actions-panel,
+    #mainContent.academic-period-page .cal-card,
+    #mainContent.academic-period-page .bg-white.rounded-xl {
+        border-radius: 18px !important;
+        overflow: hidden !important;
+    }
+
+    #addModal,
+    #editModal {
+        align-items: flex-end !important;
+        padding: 0 !important;
+    }
+
+    #addModal .ap-add-body,
+    #editModal .ap-add-body {
+        grid-template-columns: 1fr !important;
+        gap: .7rem !important;
+        padding: .8rem !important;
+    }
+
+    #addModal .ap-panel,
+    #editModal .ap-panel,
+    #addModal .ap-panel-soft,
+    #editModal .ap-panel-soft {
+        padding: .75rem !important;
+        border-radius: 15px !important;
+    }
+
+    #addModal .ap-date-grid-redesign,
+    #editModal .ap-date-grid-redesign {
+        grid-template-columns: 1fr !important;
+        gap: .65rem !important;
+    }
+
+    #addModal .ap-semester-grid-redesign,
+    #editModal .ap-semester-grid-redesign {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: .5rem !important;
+    }
+
+    #addModal .ap-semester-card,
+    #editModal .ap-semester-card {
+        min-height: 68px !important;
+        padding: .55rem .35rem !important;
+        border-radius: 13px !important;
+    }
+
+    #addModal .ap-semester-card span,
+    #editModal .ap-semester-card span {
+        font-size: .68rem !important;
+        line-height: 1.1 !important;
+    }
+
+    #addModal .ap-input,
+    #editModal .ap-input {
+        height: 44px !important;
+        border-radius: 12px !important;
+        font-size: .78rem !important;
+    }
+
+    #addModal .ap-textarea,
+    #editModal .ap-textarea {
+        min-height: 110px !important;
+        height: 110px !important;
+        max-height: 110px !important;
+        font-size: .78rem !important;
+        border-radius: 13px !important;
+    }
+
+    #addModal .ap-active-card,
+    #editModal .ap-active-card {
+        padding: .75rem !important;
+        border-radius: 14px !important;
+        gap: .6rem !important;
+    }
+}
+
+@media (max-width: 767px) {
+
+    #mainContent.academic-period-page,
+    #mainContent.academic-period-page * {
+        box-sizing: border-box !important;
+    }
+
+    #mainContent.academic-period-page {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        overflow-x: hidden !important;
+    }
+
+    #mainContent.academic-period-page>.admin-page-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-left: .85rem !important;
+        padding-right: .85rem !important;
+        overflow-x: hidden !important;
+    }
+
+    #mainContent.academic-period-page .admin-page-container>.relative.z-10 {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin: 0 !important;
+        overflow-x: hidden !important;
+    }
+
+    #mainContent.academic-period-page .ap-content-layout,
+    #mainContent.academic-period-page .ap-periods-column,
+    #mainContent.academic-period-page .ap-periods-column>.bg-white {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
+    }
+
+    #mainContent.academic-period-page .voice-input-toggle {
+        width: 40px !important;
+        min-width: 40px !important;
+        max-width: 40px !important;
+        display: flex !important;
+        justify-content: center !important;
+    }
+
+    #mainContent.academic-period-page .voice-search-mic.external {
+        position: static !important;
+        transform: none !important;
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+        margin: 0 !important;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1280px) {
+
+    #mainContent.academic-period-page {
+        overflow-x: hidden !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    #mainContent.academic-period-page .admin-page-container,
+    #mainContent.academic-period-page .content-lift {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        overflow-x: hidden !important;
+    }
+
+    #mainContent.academic-period-page .page-banner {
+        border-radius: 22px !important;
+        overflow: hidden !important;
+        margin-bottom: 1rem !important;
+    }
+
+    #mainContent.academic-period-page .page-banner-inner {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 1rem !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        text-align: left !important;
+    }
+
+    #mainContent.academic-period-page .page-title {
+        text-align: left !important;
+        line-height: 1.08 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    #mainContent.academic-period-page .page-actions {
+        flex: 0 0 auto !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: .65rem !important;
+        margin-left: auto !important;
+        flex-wrap: wrap !important;
+    }
+
+    #mainContent.academic-period-page .ap-banner-add-btn,
+    #mainContent.academic-period-page .um-hero-btn.ap-banner-add-btn,
+    #mainContent.academic-period-page .ap-add-period-btn {
+        min-height: 40px !important;
+        height: 40px !important;
+        padding: 0 .95rem !important;
+        border-radius: 999px !important;
+        font-size: .74rem !important;
+        white-space: nowrap !important;
+    }
+
+    #mainContent.academic-period-page #activeBannerWrap.active-banner {
+        border-radius: 20px !important;
+        margin-bottom: 1rem !important;
+        overflow: hidden !important;
+    }
+
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: .85rem !important;
+        padding: 1rem !important;
+    }
+
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1 {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: .75rem !important;
+        min-width: 0 !important;
+    }
+
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1>div,
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>div:last-child {
+        min-height: 104px !important;
+        padding: .95rem !important;
+        border-radius: 16px !important;
+        min-width: 0 !important;
+    }
+
+    #mainContent.academic-period-page #activeBannerWrap #bannerSem,
+    #mainContent.academic-period-page #activeBannerWrap #bannerYear,
+    #mainContent.academic-period-page #activeBannerWrap #bannerEnd {
+        font-size: .92rem !important;
+        line-height: 1.15 !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    #mainContent.academic-period-page .ap-content-layout,
+    #mainContent.academic-period-page .grid.grid-cols-1.lg\:grid-cols-3 {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(300px, 360px) !important;
+        gap: 1rem !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    #mainContent.academic-period-page .ap-periods-column,
+    #mainContent.academic-period-page .lg\:col-span-2,
+    #mainContent.academic-period-page .cal-card,
+    #mainContent.academic-period-page .academic-quick-actions-panel {
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+
+    #mainContent.academic-period-page .global-filter-btn {
+        min-height: 40px !important;
+        height: 40px !important;
+        padding: 0 .85rem !important;
+        font-size: .72rem !important;
+        white-space: nowrap !important;
+    }
+
+    #mainContent.academic-period-page .global-filter-reset-btn {
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+    }
+
+    #mainContent.academic-period-page .cal-card {
+        border-radius: 18px !important;
+        overflow: hidden !important;
+    }
+
+    #mainContent.academic-period-page .ap-calendar-title-icon {
+        width: 26px !important;
+        height: 26px !important;
+        min-width: 26px !important;
+    }
+
+    #addModal .ap-add-body,
+    #editModal .ap-add-body {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: .85rem !important;
+        padding: .9rem !important;
+        max-height: calc(100dvh - 180px) !important;
+    }
+
+    #addModal .ap-panel,
+    #editModal .ap-panel,
+    #addModal .ap-panel-soft,
+    #editModal .ap-panel-soft {
+        padding: .85rem !important;
+        border-radius: 16px !important;
+    }
+
+    #addModal .ap-semester-grid-redesign,
+    #editModal .ap-semester-grid-redesign {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: .6rem !important;
+    }
+
+    #addModal .ap-semester-card,
+    #editModal .ap-semester-card {
+        min-height: 74px !important;
+        padding: .7rem .55rem !important;
+        border-radius: 14px !important;
+    }
+
+    #addModal .ap-semester-card span,
+    #editModal .ap-semester-card span {
+        font-size: .7rem !important;
+    }
+
+    #addModal .ap-date-grid-redesign,
+    #editModal .ap-date-grid-redesign {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: .7rem !important;
+    }
+
+    #addModal .ap-input,
+    #editModal .ap-input {
+        height: 46px !important;
+        border-radius: 12px !important;
+        font-size: .78rem !important;
+    }
+
+    #addModal .ap-textarea,
+    #editModal .ap-textarea {
+        height: 130px !important;
+        min-height: 130px !important;
+        max-height: 130px !important;
+        font-size: .78rem !important;
+    }
+
+    #addModal .ap-active-card,
+    #editModal .ap-active-card {
+        padding: .85rem !important;
+        border-radius: 16px !important;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 900px) {
+
+    #mainContent.academic-period-page .page-banner-inner {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+
+    #mainContent.academic-period-page .page-actions {
+        width: 100% !important;
+        justify-content: flex-start !important;
+        margin-left: 0 !important;
+    }
+
+    #mainContent.academic-period-page .ap-banner-add-btn,
+    #mainContent.academic-period-page .um-hero-btn.ap-banner-add-btn,
+    #mainContent.academic-period-page .ap-add-period-btn {
+        width: auto !important;
+        flex: 0 0 auto !important;
+    }
+
+    #mainContent.academic-period-page #activeBannerWrap .active-banner-inner>.flex-1 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    #mainContent.academic-period-page .ap-content-layout,
+    #mainContent.academic-period-page .grid.grid-cols-1.lg\:grid-cols-3 {
+        grid-template-columns: 1fr !important;
+    }
+
+    #addModal .ap-add-body,
+    #editModal .ap-add-body {
+        grid-template-columns: 1fr !important;
+    }
+
+    #addModal .ap-col-span-2,
+    #editModal .ap-col-span-2 {
+        grid-column: span 1 !important;
+    }
+
+    #addModal .ap-semester-grid-redesign,
+    #editModal .ap-semester-grid-redesign {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    #deleteModal .modal-btn-ghost,
+    #syncFlssModal .modal-btn-ghost {
+        width: 100% !important;
+    }
+}

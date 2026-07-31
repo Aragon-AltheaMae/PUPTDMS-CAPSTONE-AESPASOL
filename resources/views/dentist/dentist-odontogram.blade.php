@@ -1,0 +1,3792 @@
+@extends('layouts.app')
+
+@section('layout-role', 'dentist')
+
+@section('title', 'Patient Odontogram')
+
+@section('content')
+
+@php
+use Carbon\Carbon;
+$patientName = $patient->name ?? 'Unknown Patient';
+$today = Carbon::now()->format('F d, Y');
+$historicalMode = (bool) ($historicalMode ?? false);
+$pageEyebrow = $historicalMode ? 'Historical Appointment Import' : 'Dental Procedure Workspace';
+$pageTitle = $historicalMode ? 'Add Existing Appointment' : 'Patient Odontogram';
+$pageSubtitle = $historicalMode
+    ? 'Record previous manual appointments with notes, duration, and odontogram'
+    : '2D / 3D Treatment &amp; Condition Mapping';
+@endphp
+
+<main id="mainContent" class="odontogram-page pt-[100px] px-3 md:px-6 pb-6">
+    <div class="w-full fade-in">
+        <div class="odontogram-hero mb-6">
+            <div class="odontogram-hero-main">
+                <div class="odontogram-hero-left">
+                    <button type="button" id="cancelProcedureBtn" class="hero-danger-btn"
+                        data-tooltip="{{ $historicalMode ? 'Cancel Entry' : 'Cancel Procedure' }}"
+                        aria-label="{{ $historicalMode ? 'Cancel Entry' : 'Cancel Procedure' }}">
+                        <i class="fa-solid fa-xmark"></i>
+                        <span>{{ $historicalMode ? 'Cancel Entry' : 'Cancel Procedure' }}</span>
+                    </button>
+
+                    <div class="hero-title-card">
+                        <div class="hero-title-icon">
+                            <i class="fa-solid fa-tooth"></i>
+                        </div>
+                        <div>
+                            <p class="hero-eyebrow">{{ $pageEyebrow }}</p>
+                            <h1 class="hero-title">{{ $pageTitle }}</h1>
+                            <p class="hero-subtitle">{!! $pageSubtitle !!}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-patient-card">
+                    <div class="hero-patient-meta">
+                        <p class="hero-patient-label">Patient</p>
+                        <h2 class="hero-patient-name">{{ $patientName }}</h2>
+                    </div>
+
+                    <div class="hero-procedure-meta">
+                        <div class="hero-stat">
+                            <span class="hero-stat-label">{{ $historicalMode ? 'Session Timer' : 'Procedure Time' }}</span>
+                            <span id="procedureTimer" class="hero-stat-value">00:00:00</span>
+                        </div>
+                        <div class="hero-stat">
+                            <span class="hero-stat-label">{{ $historicalMode ? 'Entry Date' : 'Date' }}</span>
+                            <span class="hero-stat-date">{{ $today }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="odontogram-toolbar" id="odontogramToolbar">
+                <div class="toolbar-group toolbar-group-tools">
+                    <span class="toolbar-label">Selection Tools</span>
+                    <div class="toolbar-actions">
+                        <button type="button" id="clearSelectionBtn" class="toolbar-soft-btn"
+                            data-tooltip="Clear Selection" title="Clear Selection" disabled>
+                            <i class="fa-solid fa-arrow-pointer"></i>
+                            <span>Clear Selection</span>
+                        </button>
+
+                        <button type="button" id="undoBtn" class="toolbar-soft-btn" data-tooltip="Undo" title="Undo"
+                            disabled>
+                            <span>Undo</span>
+                        </button>
+
+                        <button type="button" id="redoBtn" class="toolbar-soft-btn" data-tooltip="Redo" title="Redo"
+                            disabled>
+                            <i class="fa-solid fa-rotate-right"></i>
+                            <span>Redo</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="toolbar-group toolbar-group-view">
+                    <span class="toolbar-label">View Mode</span>
+                    <div class="toolbar-actions">
+                        <button type="button" id="view2dBtn" class="view-toggle-btn active" data-tooltip="2D View"
+                            title="2D View">
+                            <i class="fa-regular fa-image"></i>
+                            <span>2D View</span>
+                        </button>
+
+                        <button type="button" id="view3dBtn" class="view-toggle-btn" data-tooltip="3D View"
+                            title="3D View">
+                            <i class="fa-solid fa-cube"></i>
+                            <span>3D View</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="odontogramToolbarSentinel" class="odontogram-toolbar-sentinel" aria-hidden="true"></div>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 odontogram-layout">
+            <div class="xl:col-span-8 glass-panel p-4 odontogram-left-panel">
+                <div class="flex items-center justify-between gap-3 mb-4">
+                    <div>
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                            <i class="fa-solid fa-arrows-rotate"></i>
+                            Click a tooth surface in 2D or switch to 3D view
+                        </p>
+                    </div>
+                </div>
+
+                <div class="soft-card p-4 left-view-shell">
+                    <div class="w-full flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-4 px-2">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                            <i class="fa-solid fa-tooth"></i>
+                            <span id="viewInstructionText">Click a tooth surface to assign a treatment legend</span>
+                        </p>
+
+                        <div
+                            class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100 shadow-inner">
+                            <i class="fa-solid fa-tooth text-[#8B0000]"></i>
+                            <p id="toothHoverLabel" class="text-sm font-extrabold text-[#8B0000]">Select a tooth</p>
+                        </div>
+                    </div>
+
+                    <div id="odontogram2DPanel" class="mode-panel active">
+                        <div class="odontogram2d-shell custom-scrollbar">
+                            <div id="odontogram2DBoard" class="odontogram-board"></div>
+                        </div>
+                    </div>
+
+                    <div id="odontogram3DPanel" class="mode-panel">
+                        <div id="canvas-container" class="relative">
+                            <div id="loadingOverlay"
+                                class="absolute inset-0 bg-white flex flex-col gap-3 items-center justify-center z-10 rounded-xl transition-opacity duration-500">
+                                <i class="fa-solid fa-circle-notch fa-spin text-4xl text-[#8B0000]"></i>
+                                <p class="text-sm font-semibold text-gray-600">Generating 3D Model...</p>
+                            </div>
+
+                            <div class="three-mouse-guide" aria-label="3D model mouse controls">
+                                <div class="three-mouse-guide-item">
+                                    <span class="mouse-button-key">L</span>
+                                    <span><strong>Left mouse:</strong> Navigate and select a tooth</span>
+                                </div>
+                                <div class="three-mouse-guide-item">
+                                    <span class="mouse-button-key">R</span>
+                                    <span><strong>Right mouse:</strong> Move the model</span>
+                                </div>
+                                <div class="three-mouse-guide-item">
+                                    <span class="mouse-button-key mouse-wheel-key"><i class="fa-solid fa-arrows-up-down"></i></span>
+                                    <span><strong>Scroll:</strong> Zoom in/out</span>
+                                </div>
+                            </div>
+
+                            <div id="toothTooltip" class="tooth-tooltip">
+                                <div id="toothTooltipContent"></div>
+                            </div>
+
+                            <div id="surfacePicker3D"
+                                class="hidden absolute right-4 bottom-4 z-20 w-[320px] max-w-[calc(100%-2rem)] rounded-2xl border border-red-100 bg-white/95 backdrop-blur shadow-2xl p-4">
+                                <div class="flex items-start justify-between gap-3 mb-4">
+                                    <div class="min-w-0">
+                                        <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">3D
+                                            Surface Picker</p>
+                                        <h4 id="surfacePickerToothLabel"
+                                            class="text-base font-extrabold text-[#8B0000] leading-tight">No tooth
+                                            selected</h4>
+                                        <p id="surfacePickerHelperText"
+                                            class="text-xs text-gray-500 mt-1 leading-relaxed">
+                                            Step 1: Click a tooth in the 3D model. The camera will zoom in
+                                            automatically.
+                                        </p>
+                                    </div>
+                                    <div class="flex items-center gap-2 shrink-0">
+                                        <span
+                                            class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-red-50 text-[#8B0000]">
+                                            <i class="fa-solid fa-cube text-lg"></i>
+                                        </span>
+                                        <button type="button" id="close3DSurfacePickerBtn"
+                                            class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 transition"
+                                            title="Hide surface picker" aria-label="Hide surface picker">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="rounded-2xl bg-gray-50 border border-gray-100 p-3 mb-3">
+                                    <div class="grid grid-cols-3 gap-3">
+                                        <div></div>
+                                        <button type="button" data-surface="top"
+                                            class="surface-picker-btn min-h-[44px] inline-flex items-center justify-center px-3 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 text-xs font-extrabold transition hover:border-red-200 hover:bg-red-50">
+                                            Top
+                                        </button>
+                                        <div></div>
+
+                                        <button type="button" data-surface="left"
+                                            class="surface-picker-btn min-h-[44px] inline-flex items-center justify-center px-3 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 text-xs font-extrabold transition hover:border-red-200 hover:bg-red-50">
+                                            Left
+                                        </button>
+                                        <button type="button" data-surface="center"
+                                            class="surface-picker-btn min-h-[50px] inline-flex items-center justify-center px-3 py-2 rounded-full border border-gray-200 bg-white text-gray-700 text-xs font-extrabold transition hover:border-red-200 hover:bg-red-50">
+                                            Center
+                                        </button>
+                                        <button type="button" data-surface="right"
+                                            class="surface-picker-btn min-h-[44px] inline-flex items-center justify-center px-3 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 text-xs font-extrabold transition hover:border-red-200 hover:bg-red-50">
+                                            Right
+                                        </button>
+
+                                        <div></div>
+                                        <button type="button" data-surface="bottom"
+                                            class="surface-picker-btn min-h-[44px] inline-flex items-center justify-center px-3 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 text-xs font-extrabold transition hover:border-red-200 hover:bg-red-50">
+                                            Bottom
+                                        </button>
+                                        <div></div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between gap-2">
+                                    <p class="text-[11px] text-gray-500 leading-snug">
+                                        Pick a large surface button, choose a legend, then click Apply Treatment.
+                                    </p>
+                                    <button type="button" id="reset3DViewBtn"
+                                        class="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition">
+                                        <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
+                                        Full View
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="xl:col-span-4 glass-panel p-6 odontogram-right-shell">
+                <div class="odontogram-right-top">
+                    <div class="selected-tooth-card rounded-2xl p-4">
+                        <div class="flex items-center justify-between gap-3 mb-2">
+                            <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                Selected Target
+                            </label>
+                            <span id="selectedViewBadge"
+                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-50 text-[#8B0000] text-[11px] font-bold border border-red-100">
+                                2D View
+                            </span>
+                        </div>
+
+                        <div id="selectedToothDisplay"
+                            class="w-full bg-white border border-red-100 text-[#8B0000] text-base font-extrabold rounded-2xl px-4 py-3">
+                            Click a tooth on the chart
+                        </div>
+
+                        <p id="selectedToothName" class="mt-2 text-sm font-bold text-gray-700">
+                            No tooth selected
+                        </p>
+
+                        <div class="mt-3">
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                                Current Treatment
+                            </p>
+                            <div id="selectedToothLegendList" class="flex flex-wrap gap-2">
+                                <span class="text-[11px] text-gray-400 italic">No treatment assigned yet.</span>
+                            </div>
+                        </div>
+
+                        <div id="legendStatusNote"
+                            class="hidden mt-3 rounded-xl px-3 py-2 text-xs font-semibold legend-status-note">
+                            Choose a treatment legend below, then click Apply Treatment.
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3">
+                            <button type="button" id="applyTreatmentBtn"
+                                class="primary-action-btn w-full text-sm font-semibold py-2.5 rounded-xl shadow-sm"
+                                disabled>
+                                <i class="fa-solid fa-stethoscope mr-2"></i>
+                                Apply Treatment
+                            </button>
+
+                            <button type="button" id="clearCurrentToothBtn"
+                                class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold py-2.5 rounded-xl transition"
+                                disabled>
+                                <i class="fa-solid fa-eraser mr-2"></i>
+                                Clear Target
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="odontogram-right-scroll">
+                    <div class="right-panel-sections">
+                        <section class="right-section-card">
+                            <div class="right-section-head">
+                                <div>
+                                    <p class="right-section-eyebrow">Treatment Legend</p>
+                                    <h3 class="right-section-title">Legend Selection</h3>
+                                </div>
+
+                                <button type="button" id="openLegendDrawerBtn"
+                                    class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-[#8B0000] text-sm font-semibold border border-red-100 transition">
+                                    <i class="fa-solid fa-layer-group"></i>
+                                    Open Legend
+                                </button>
+                            </div>
+
+                            <div class="right-section-body">
+                                <p id="selectedLegendPreview" class="text-sm text-[#8B0000] font-bold">
+                                    No legend selected yet.
+                                </p>
+                            </div>
+                        </section>
+
+                        <section class="right-section-card">
+                            @if ($historicalMode)
+                            <div class="right-section-head">
+                                <div>
+                                    <p class="right-section-eyebrow">Historical Appointment</p>
+                                    <h3 class="right-section-title">Old Appointment Details</h3>
+                                </div>
+                            </div>
+
+                            <div class="right-section-body space-y-4">
+                                <div class="historical-intro-card">
+                                    Review the imported patient history details below. When you save this odontogram, the old appointment will be stored as a completed visit in the system.
+                                </div>
+
+                                <div class="historical-grid">
+                                    <div>
+                                        <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Service Type</p>
+                                        <div class="historical-summary-card">{{ data_get($historicalDraft ?? [], 'service_type', '—') }}</div>
+                                    </div>
+
+                                    <div>
+                                        <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Appointment Date</p>
+                                        <div class="historical-summary-card">{{ data_get($historicalDraft ?? [], 'appointment_date', '—') }}</div>
+                                    </div>
+
+                                    <div>
+                                        <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Appointment Time</p>
+                                        <div class="historical-summary-card">{{ data_get($historicalDraft ?? [], 'appointment_time', '—') }}</div>
+                                    </div>
+
+                                    <div>
+                                        <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Procedure Duration</p>
+                                        <div class="historical-summary-card">{{ data_get($historicalDraft ?? [], 'procedure_duration_hms', '—') }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        @endif
+
+                        <section class="right-section-card">
+                            <div class="right-section-head">
+                                <div>
+                                    <p class="right-section-eyebrow">Clinical Documentation</p>
+                                    <h3 class="right-section-title">Oral Examination Notes</h3>
+                                </div>
+                            </div>
+
+                            <div class="right-section-body space-y-4">
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                                        Oral Examination Notes
+                                    </label>
+                                    <textarea id="oralExaminationNotes" rows="5"
+                                        class="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm focus:ring-2 focus:ring-[#8B0000] focus:border-[#8B0000] resize-none transition"
+                                        placeholder="Add examination notes here..."></textarea>
+                                </div>
+
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                                        Diagnosis
+                                    </label>
+                                    <textarea id="diagnosisNotes" rows="5"
+                                        class="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm focus:ring-2 focus:ring-[#8B0000] focus:border-[#8B0000] resize-none transition"
+                                        placeholder="Add diagnosis here..."></textarea>
+                                </div>
+
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                                        Prescriptions <span class="normal-case text-gray-400">(Optional)</span>
+                                    </label>
+                                    <textarea id="prescriptionsNotes" rows="5"
+                                        class="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm focus:ring-2 focus:ring-[#8B0000] focus:border-[#8B0000] resize-none transition"
+                                        placeholder="Add prescriptions here..."></textarea>
+                                </div>
+                            </div>
+                        </section>
+
+                        <input type="hidden" id="odontogramData" name="odontogram_data" value="[]">
+                    </div>
+                </div>
+
+                <div class="odontogram-right-bottom space-y-3">
+                    @unless ($historicalMode)
+                    <button type="button" id="followUpBtn"
+                        class="w-full flex justify-center items-center gap-2 bg-amber-100 hover:bg-amber-200 text-amber-800 text-sm font-semibold py-2.75 rounded-xl transition shadow-sm border border-amber-200">
+                        <i class="fa-solid fa-calendar-plus"></i>
+                        Follow-Up Appointment
+                    </button>
+                    @endunless
+
+                    <button type="button" id="finishProcedureBtn"
+                        class="w-full flex justify-center items-center gap-2 bg-[#8B0000] hover:bg-[#660000] text-white text-sm font-semibold py-2.75 rounded-xl transition shadow-md">
+                        <i class="fa-solid fa-check"></i>
+                        {{ $historicalMode ? 'Save Existing Appointment' : 'Finish Procedure' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div id="legendDrawerBackdrop" class="fixed inset-0 bg-black/30 z-[60]"></div>
+
+<div id="legendDrawer"
+    class="fixed top-0 right-0 h-full w-full sm:w-[460px] bg-white z-[61] shadow-2xl border-l border-gray-200 transition-transform duration-300 flex flex-col">
+
+    <div class="legend-drawer-header px-5 py-4 border-b border-gray-100 bg-white">
+        <div class="flex items-start justify-between gap-4">
+            <div class="min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-red-50 text-[#8B0000]">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </span>
+                    <div>
+                        <h3 class="text-lg font-extrabold text-[#8B0000] leading-tight">Treatment Legend</h3>
+                        <p class="text-xs text-gray-500">Choose a legend and apply it to the selected target.</p>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" id="closeLegendDrawerBtn"
+                class="w-10 h-10 inline-flex items-center justify-center rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition shrink-0">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="mt-4">
+            <div class="soft-card px-4 py-3 border border-red-100 bg-red-50/40">
+                <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1">Selected Legend</p>
+                <p id="drawerSelectedLegendPreview" class="text-sm font-semibold text-[#8B0000]">
+                    No legend selected yet.
+                </p>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+                <input type="text" id="legendSearchInput"
+                    class="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-[#8B0000] focus:border-[#8B0000]"
+                    placeholder="Search legend code or label...">
+                <button type="button" id="clearLegendSearchBtn"
+                    class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="mt-3 flex items-center justify-between">
+            <p class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Legend Categories</p>
+            <p id="legendResultCount" class="text-xs font-semibold text-gray-500">0 results</p>
+        </div>
+    </div>
+
+    <div class="p-5 overflow-y-auto custom-scrollbar flex-1">
+        <div id="legendContainer" class="space-y-5"></div>
+        <div id="legendEmptyState" class="hidden soft-card p-5 text-center">
+            <div class="w-12 h-12 mx-auto rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mb-3">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <p class="text-sm font-semibold text-gray-700">No matching legend found.</p>
+            <p class="text-xs text-gray-500 mt-1">Try a different keyword or clear the search.</p>
+        </div>
+    </div>
+</div>
+
+<div id="resetTreatmentModal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 modal-backdrop"></div>
+
+    <div class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gray-100 p-6">
+        <div class="flex items-start gap-4">
+            <div
+                class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xl shrink-0">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+
+            <div class="flex-1">
+                <h3 class="text-lg font-extrabold text-gray-900 mb-2">Reset Tooth Treatment</h3>
+                <p id="resetTreatmentMessage" class="text-sm text-gray-600 leading-relaxed">
+                    Are you sure you want to reset the treatment for this tooth?
+                </p>
+            </div>
+        </div>
+
+        <div class="mt-6 flex flex-col sm:flex-row gap-3">
+            <button type="button" id="confirmResetTreatmentBtn"
+                class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition">
+                Yes, Reset
+            </button>
+
+            <button type="button" id="cancelResetTreatmentBtn"
+                class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-xl transition">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="cancelProcedureModal" class="fixed inset-0 z-[80] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 modal-backdrop"></div>
+
+    <div class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gray-100 p-6">
+        <div class="flex items-start gap-4">
+            <div
+                class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xl shrink-0">
+                <i class="fa-solid fa-circle-xmark"></i>
+            </div>
+
+            <div class="flex-1">
+                <h3 class="text-lg font-extrabold text-gray-900 mb-2">Cancel Procedure?</h3>
+                <p class="text-sm text-gray-600 leading-relaxed">
+                    Are you sure you want to cancel this procedure? Any unsaved progress in this session may be lost.
+                </p>
+            </div>
+        </div>
+
+        <div class="mt-6 flex flex-col sm:flex-row gap-3">
+            <button type="button" id="confirmCancelProcedureBtn"
+                class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition">
+                Yes, Cancel
+            </button>
+
+            <button type="button" id="dismissCancelProcedureBtn"
+                class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-xl transition">
+                No, Stay
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="finishProcedureModal"
+    class="procedure-confirm-modal fixed inset-0 z-[90] hidden items-center justify-center p-4"
+    role="dialog" aria-modal="true" aria-labelledby="finishProcedureModalTitle">
+    <div class="procedure-confirm-backdrop absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+
+    <div
+        class="procedure-confirm-card relative w-[calc(100vw-2rem)] max-w-[480px] overflow-hidden rounded-2xl bg-[#8B0000] px-8 py-10 text-center shadow-[0_25px_60px_rgba(0,0,0,0.25)]">
+        <div
+            class="w-16 h-16 rounded-full bg-white/15 flex items-center justify-center mx-auto mb-6">
+            <i id="finishProcedureModalIcon" class="fa-solid fa-clipboard-check text-white text-2xl"></i>
+        </div>
+
+        <h2 id="finishProcedureModalTitle" class="text-2xl font-extrabold text-white mb-4">
+            Procedure Completed!
+        </h2>
+
+        <p id="finishProcedureModalMessage" class="text-white/85 text-sm leading-7 mb-6"></p>
+
+        <div id="finishProcedureConfirmActions" class="hidden flex-col sm:flex-row justify-center gap-3">
+            <button type="button" id="confirmFinishProcedureBtn"
+                class="bg-white text-[#8B0000] border-0 px-8 py-2.5 rounded-xl font-bold text-sm cursor-pointer transition hover:scale-[1.03] hover:shadow-lg active:scale-[0.98]">
+                Yes, Finish Procedure
+            </button>
+
+            <button type="button" id="dismissFinishProcedureBtn"
+                class="bg-white/10 hover:bg-white/20 text-white border border-white/30 px-8 py-2.5 rounded-xl font-bold text-sm cursor-pointer transition">
+                No, Review
+            </button>
+        </div>
+
+        <button type="button" id="finishProcedureModalActionBtn"
+            class="hidden bg-white text-[#8B0000] border-0 px-8 py-2.5 rounded-xl font-bold text-sm cursor-pointer transition hover:scale-[1.03] hover:shadow-lg active:scale-[0.98]">
+            Back to Appointments
+        </button>
+    </div>
+</div>
+
+@unless ($historicalMode)
+<div id="followUpModal"
+    class="fixed inset-0 bg-black/50 hidden items-end sm:items-center justify-center backdrop-blur-sm z-[9999] p-0 sm:p-4">
+
+    <div
+        class="reschedule-modal-panel follow-up-modal-panel bg-white w-full rounded-t-2xl sm:rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+
+        <div class="relative bg-gradient-to-r from-[#8B0000] via-[#A00000] to-[#C1121F] px-5 sm:px-6 py-4">
+            <button type="button" onclick="closeFollowUpModal()"
+                class="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 text-white/90 hover:text-white flex items-center justify-center transition text-sm">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-start gap-3 pr-10">
+                <div
+                    class="w-11 h-11 rounded-2xl bg-white/20 border border-white/25 shadow-sm flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
+                    <i class="fa-solid fa-calendar-plus text-white text-lg"></i>
+                </div>
+
+                <div class="min-w-0">
+                    <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-white/75 mb-1">
+                        Follow-up Schedule
+                    </p>
+                    <h2 class="text-white font-bold text-lg leading-tight">
+                        Set Follow-Up Appointment
+                    </h2>
+                    <p class="text-white/85 text-[12px] mt-1 leading-relaxed">
+                        Choose the follow-up date, time, and reason before completing this procedure.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="reschedule-modal-body follow-up-modal-body px-5 sm:px-6 py-4 sm:py-5 bg-gray-50 overflow-y-auto">
+            <div
+                class="bg-white border border-[#f1ece7] rounded-2xl px-4 sm:px-5 py-4 mb-4 shadow-[0_4px_18px_rgba(0,0,0,0.04)]">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <div class="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-1">
+                            <i class="fa-solid fa-user fa-xs mr-1"></i>Patient
+                        </div>
+                        <div class="text-[14px] font-bold text-gray-800 truncate">
+                            {{ $patientName }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-1">
+                            <i class="fa-regular fa-calendar fa-xs mr-1"></i>Current Date
+                        </div>
+                        <div class="text-[13px] font-medium text-gray-700">
+                            {{ $today }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-1">
+                            <i class="fa-solid fa-tooth fa-xs mr-1"></i>Procedure
+                        </div>
+                        <div class="text-[13px] font-medium text-gray-700">
+                            Odontogram
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form id="followUpForm" method="POST"
+                action="{{ route('dentist.dentist.appointments.follow-up.store', $appointment->id) }}">
+                @csrf
+
+                <input type="hidden" id="followup_appointment_date" name="followup_appointment_date" required>
+                <input type="hidden" id="followup_appointment_time" name="followup_appointment_time" required>
+
+                <div class="section-label">
+                    <i class="fa-regular fa-calendar fa-xs"></i> Follow-up Date & Time
+                </div>
+
+                <div id="followUpDateError" class="error-msg" style="display:none;">
+                    <i class="fa-solid fa-circle-exclamation"></i> Please select a follow-up date.
+                </div>
+
+                <div class="two-col mb-2 sm:mb-3">
+                    <div class="cal-wrap follow-up-cal-wrap">
+                        <div id="followUpCalendarWrap"></div>
+                    </div>
+
+                    <div class="slots-wrap follow-up-slots-wrap">
+                        <div class="section-label follow-up-slot-title">
+                            <i class="fa-regular fa-clock fa-xs"></i> Pick a Time Slot
+                        </div>
+                        <p class="follow-up-slot-helper">
+                            Choose your preferred schedule for the selected date.
+                        </p>
+
+                        <div class="slots-date-pill" id="followUpDatePill"></div>
+
+                        <div id="followUpSlotPlaceholder" class="slots-placeholder follow-up-empty-slot-placeholder">
+                            <div class="follow-up-empty-icon">
+                                <i class="fa-regular fa-calendar"></i>
+                            </div>
+                            <h4>Choose a date</h4>
+                            <p>Select an available day to see time slots.</p>
+                        </div>
+
+                        <div id="followUpSlotContainer" class="hidden">
+                            <div id="followUpSlotGrid" class="slots-grid" style="display:none;"></div>
+                            <button type="button" id="followUpClearTimeBtn" class="follow-up-clear-time-btn hidden">
+                                <i class="fa-solid fa-xmark"></i>
+                                Clear selection
+                            </button>
+                        </div>
+
+                        <div id="followUpSelectedTimePill" class="hidden follow-up-selected-time-pill">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>Selected: <strong id="followUpSelectedTimeText"></strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="followUpTimeError" class="error-msg" style="display:none;">
+                    <i class="fa-solid fa-circle-exclamation"></i> Please select a follow-up time slot.
+                </div>
+
+                <div class="section-label mt-5 sm:mt-6">
+                    <i class="fa-regular fa-message fa-xs"></i>
+                    Reason for Follow-up
+                    <span style="font-weight:400;text-transform:none;letter-spacing:0;">(required)</span>
+                </div>
+
+                <div class="reason-wrap w-full">
+                    <textarea id="followup_reason" name="followup_reason" rows="3"
+                        placeholder="e.g. Check healing progress after extraction..."
+                        class="reason-textarea w-full min-h-[92px] resize-none" required></textarea>
+                </div>
+
+                <div class="btn-row flex flex-col-reverse sm:flex-row gap-3">
+                    <button type="button" class="btn btn-cancel" onclick="closeFollowUpModal()">
+                        <i class="fa-solid fa-xmark"></i> Cancel
+                    </button>
+
+                    <button type="submit" class="btn btn-confirm follow-up-confirm-btn" id="confirmFollowUpBtn">
+                        <i class="fa-solid fa-check"></i> Save Procedure & Schedule Follow-up
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endunless
+
+@endsection
+
+@section('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+@unless ($historicalMode)
+@include('components.appointment-calendar-script', [
+'mode' => 'booking',
+'calendarContainerId' => 'followUpCalendarWrap',
+'calGridId' => 'followUpCalGrid',
+'calMonthLabelId' => 'followUpCalMonthLabel',
+'calYearLabelId' => 'followUpCalYearLabel',
+
+'dateInputId' => 'followup_appointment_date',
+'timeInputId' => 'followup_appointment_time',
+
+'dateBannerId' => 'followUpDatePill',
+'slotPlaceholderId' => 'followUpSlotPlaceholder',
+'slotContainerId' => 'followUpSlotContainer',
+'slotGridId' => 'followUpSlotGrid',
+
+'selectedSlotDisplayId' => 'followUpSelectedTimePill',
+'selectedSlotTextId' => 'followUpSelectedTimeText',
+'selectedTimePillId' => 'followUpSelectedTimePill',
+'selectedTimeTextId' => 'followUpSelectedTimeText',
+
+'datePillId' => null,
+'dateErrorId' => 'followUpDateError',
+'timeErrorId' => 'followUpTimeError',
+
+'calendarWrapSelector' => '.follow-up-cal-wrap',
+'slotsWrapSelector' => '.follow-up-slots-wrap',
+
+'slotEndpoint' => route('dentist.appointment.slots'),
+
+'scheduleRules' => $schedules ?? [],
+'blockedDates' => $blockedDates ?? [],
+'appointmentCountsPerDay' => $appointmentCountsPerDay ?? [],
+'philippineHolidays' => $philippineHolidays ?? [],
+'personalAppointments' => [],
+
+'disallowToday' => true,
+'allowToggleOffDate' => true,
+'useDynamicScheduleRules' => true,
+'renderStyle' => 'patient',
+])
+@endunless
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const cancelProcedureBtn = document.getElementById('cancelProcedureBtn');
+        const cancelProcedureModal = document.getElementById('cancelProcedureModal');
+        const confirmCancelProcedureBtn = document.getElementById('confirmCancelProcedureBtn');
+        const dismissCancelProcedureBtn = document.getElementById('dismissCancelProcedureBtn');
+        const finishProcedureModal = document.getElementById('finishProcedureModal');
+        const finishProcedureModalTitle = document.getElementById('finishProcedureModalTitle');
+        const finishProcedureModalMessage = document.getElementById('finishProcedureModalMessage');
+        const finishProcedureModalIcon = document.getElementById('finishProcedureModalIcon');
+        const finishProcedureConfirmActions = document.getElementById('finishProcedureConfirmActions');
+        const confirmFinishProcedureBtn = document.getElementById('confirmFinishProcedureBtn');
+        const dismissFinishProcedureBtn = document.getElementById('dismissFinishProcedureBtn');
+        const finishProcedureModalActionBtn = document.getElementById('finishProcedureModalActionBtn');
+        const historicalMode = @json($historicalMode);
+        const cancelProcedureRedirectUrl = @json(route('dentist.dentist.patient.profile', $patient -> id ?? 1));
+        let finishProcedureModalRedirectUrl = null;
+        let finishProcedureModalCloseTimer = null;
+
+        const legendSearchInput = document.getElementById('legendSearchInput');
+        const clearLegendSearchBtn = document.getElementById('clearLegendSearchBtn');
+        const legendResultCount = document.getElementById('legendResultCount');
+        const legendEmptyState = document.getElementById('legendEmptyState');
+        const drawerSelectedLegendPreview = document.getElementById('drawerSelectedLegendPreview');
+
+        const procedureTimer = document.getElementById('procedureTimer');
+        const container = document.getElementById('canvas-container');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const openLegendDrawerBtn = document.getElementById('openLegendDrawerBtn');
+        const closeLegendDrawerBtn = document.getElementById('closeLegendDrawerBtn');
+        const legendDrawer = document.getElementById('legendDrawer');
+        const legendDrawerBackdrop = document.getElementById('legendDrawerBackdrop');
+
+        const view2dBtn = document.getElementById('view2dBtn');
+        const view3dBtn = document.getElementById('view3dBtn');
+        const panel2d = document.getElementById('odontogram2DPanel');
+        const panel3d = document.getElementById('odontogram3DPanel');
+        const board2d = document.getElementById('odontogram2DBoard');
+        const viewInstructionText = document.getElementById('viewInstructionText');
+        const selectedViewBadge = document.getElementById('selectedViewBadge');
+
+        const selectedToothDisplay = document.getElementById('selectedToothDisplay');
+        const selectedToothName = document.getElementById('selectedToothName');
+        const toothHoverLabel = document.getElementById('toothHoverLabel');
+        const legendContainer = document.getElementById('legendContainer');
+        const odontogramDataInput = document.getElementById('odontogramData');
+        const selectedLegendPreview = document.getElementById('selectedLegendPreview');
+        const selectedToothLegendList = document.getElementById('selectedToothLegendList');
+        const legendStatusNote = document.getElementById('legendStatusNote');
+        const applyTreatmentBtn = document.getElementById('applyTreatmentBtn');
+        const clearCurrentToothBtn = document.getElementById('clearCurrentToothBtn');
+
+        const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+        const undoBtn = document.getElementById('undoBtn');
+        const redoBtn = document.getElementById('redoBtn');
+
+        const toothTooltip = document.getElementById('toothTooltip');
+        const toothTooltipContent = document.getElementById('toothTooltipContent');
+        const surfacePicker3D = document.getElementById('surfacePicker3D');
+        const surfacePickerToothLabel = document.getElementById('surfacePickerToothLabel');
+        const surfacePickerHelperText = document.getElementById('surfacePickerHelperText');
+        const surfacePickerButtons = Array.from(document.querySelectorAll('.surface-picker-btn'));
+        const reset3DViewBtn = document.getElementById('reset3DViewBtn');
+        const close3DSurfacePickerBtn = document.getElementById('close3DSurfacePickerBtn');
+
+        const resetTreatmentModal = document.getElementById('resetTreatmentModal');
+        const resetTreatmentMessage = document.getElementById('resetTreatmentMessage');
+        const confirmResetTreatmentBtn = document.getElementById('confirmResetTreatmentBtn');
+        const cancelResetTreatmentBtn = document.getElementById('cancelResetTreatmentBtn');
+
+        let currentView = '2d';
+        let selectedTooth = null;
+        let selectedLegend = null;
+        let selectedTargetType = null;
+        let selectedSurfaceKey = null;
+        let selectedMesh = null;
+        let hoveredMesh = null;
+        let pendingResetPayload = null;
+        let hasAppliedTreatmentThisSession = false;
+
+        let historyStack = [];
+        let redoStack = [];
+        const HISTORY_LIMIT = 50;
+
+        let scene = null;
+        let camera = null;
+        let renderer = null;
+        let controls = null;
+        let raycaster = null;
+        let mouse = null;
+        let teethMeshes = [];
+        let threeSceneInitialized = false;
+        let cameraAnimationFrame = null;
+        let initialCameraPosition = null;
+        let initialControlsTarget = null;
+
+        const legends = [{
+            code: 'D',
+            label: 'Decayed (Caries indicated for Filling)'
+        },
+        {
+            code: 'M',
+            label: 'Missing due to Caries'
+        },
+        {
+            code: 'F',
+            label: 'Filled'
+        },
+        {
+            code: 'I',
+            label: 'Caries Indicated for Extraction'
+        },
+        {
+            code: 'RF',
+            label: 'Root Fragment'
+        },
+        {
+            code: 'MO',
+            label: 'Missing due to Other Causes'
+        },
+        {
+            code: 'IM',
+            displayCode: 'Im',
+            label: 'Impacted Tooth'
+        },
+        {
+            code: 'J',
+            label: 'Jacket Crown'
+        },
+        {
+            code: 'A',
+            label: 'Amalgam Filling'
+        },
+        {
+            code: 'AB',
+            label: 'Abutment'
+        },
+        {
+            code: 'P',
+            label: 'Pontic'
+        },
+        {
+            code: 'IN',
+            displayCode: 'In',
+            label: 'Inlay'
+        },
+        {
+            code: 'LC',
+            label: 'Light Cure Composite'
+        },
+        {
+            code: 'RM',
+            displayCode: 'Rm',
+            label: 'Removable Denture'
+        },
+        {
+            code: 'X',
+            label: 'Extraction due to Caries'
+        },
+        {
+            code: 'XO',
+            label: 'Extraction due to Other Causes'
+        },
+        {
+            code: '✓',
+            label: 'Present Teeth'
+        },
+        {
+            code: 'CM',
+            displayCode: 'Cm',
+            label: 'Congenitally Missing'
+        },
+        {
+            code: 'SP',
+            displayCode: 'Sp',
+            label: 'Supernumerary'
+        }
+        ];
+
+        const legendColors = {
+            D: '#ef4444',
+            M: '#111827',
+            F: '#2563eb',
+            I: '#ef4444',
+            RF: '#ef4444',
+            MO: '#111827',
+            IM: '#111827',
+            J: '#2563eb',
+            A: '#2563eb',
+            AB: '#2563eb',
+            P: '#2563eb',
+            IN: '#2563eb',
+            LC: '#2563eb',
+            RM: '#2563eb',
+            X: '#2563eb',
+            XO: '#2563eb',
+            '✓': '#111827',
+            CM: '#111827',
+            SP: '#111827'
+        };
+
+        const legendIcons = {
+            D: 'fa-solid fa-bug',
+            M: 'fa-solid fa-ban',
+            F: 'fa-solid fa-square-check',
+            I: 'fa-solid fa-syringe',
+            RF: 'fa-solid fa-teeth-open',
+            MO: 'fa-solid fa-circle-xmark',
+            IM: 'fa-solid fa-triangle-exclamation',
+            J: 'fa-solid fa-crown',
+            A: 'fa-solid fa-fill-drip',
+            AB: 'fa-solid fa-anchor',
+            P: 'fa-solid fa-link',
+            IN: 'fa-solid fa-puzzle-piece',
+            LC: 'fa-solid fa-wand-magic-sparkles',
+            RM: 'fa-solid fa-teeth',
+            X: 'fa-solid fa-xmark',
+            XO: 'fa-solid fa-skull-crossbones',
+            '✓': 'fa-solid fa-check',
+            CM: 'fa-solid fa-question',
+            SP: 'fa-solid fa-plus'
+        };
+
+        const legendCategories = [{
+            key: 'conditions',
+            title: 'Legend Condition',
+            icon: 'fa-solid fa-heart-pulse',
+            items: ['D', 'M', 'F', 'I', 'RF', 'MO', 'IM']
+        },
+        {
+            key: 'restoration-prosthetics',
+            title: 'Restoration and Prosthetics',
+            icon: 'fa-solid fa-screwdriver-wrench',
+            items: ['J', 'A', 'AB', 'P', 'IN', 'LC', 'RM']
+        },
+        {
+            key: 'surgery',
+            title: 'Surgery',
+            icon: 'fa-solid fa-user-doctor',
+            items: ['X', 'XO', '✓', 'CM', 'SP']
+        }
+        ];
+
+        const rawSavedOdontogramData = @json($savedOdontogramData ?? []);
+        const savedOdontogramData = Array.isArray(rawSavedOdontogramData) ?
+            rawSavedOdontogramData :
+            Object.values(rawSavedOdontogramData || {});
+
+        const odontogramState = {};
+
+        function createDefaultToothState(toothNumber) {
+            return {
+                tooth: Number(toothNumber),
+                toothName: getToothName(Number(toothNumber)),
+                status: null,
+                surfaces: {
+                    top: null,
+                    left: null,
+                    center: null,
+                    right: null,
+                    bottom: null
+                },
+                threeD: null,
+                lastSelectedSurface: null
+            };
+        }
+
+        function normalizeOdontogramEntry(entry) {
+            if (!entry) return null;
+
+            const toothNumber = Number(entry.tooth || entry.tooth_number || 0);
+
+            if (!toothNumber) return null;
+
+            const defaultState = createDefaultToothState(toothNumber);
+
+            const surfaces =
+                entry.surfaces &&
+                    typeof entry.surfaces === 'object' &&
+                    !Array.isArray(entry.surfaces) ?
+                    entry.surfaces : {};
+
+            const normalizeLegendRecord = function (record) {
+                if (!record || !record.code) return null;
+
+                const rawCode = String(record.code).trim();
+                const normalizedCode = ['PT', '+'].includes(rawCode.toUpperCase())
+                    ? '✓'
+                    : rawCode.toUpperCase();
+                const currentLegend = getLegendByCode(normalizedCode);
+
+                return {
+                    ...record,
+                    code: normalizedCode,
+                    label: currentLegend?.label || record.label || normalizedCode,
+                    colorHex: legendColors[normalizedCode] || record.colorHex || '#111827'
+                };
+            };
+
+            return {
+                ...defaultState,
+                ...entry,
+                tooth: toothNumber,
+                toothName: entry.toothName || entry.tooth_name || defaultState.toothName,
+                status: normalizeLegendRecord(entry.status),
+                threeD: normalizeLegendRecord(entry.threeD || entry.three_d),
+                lastSelectedSurface: ['top', 'left', 'center', 'right', 'bottom'].includes(
+                    entry.lastSelectedSurface || entry.last_selected_surface
+                )
+                    ? (entry.lastSelectedSurface || entry.last_selected_surface)
+                    : null,
+                surfaces: {
+                    top: normalizeLegendRecord(surfaces.top),
+                    left: normalizeLegendRecord(surfaces.left),
+                    center: normalizeLegendRecord(surfaces.center),
+                    right: normalizeLegendRecord(surfaces.right),
+                    bottom: normalizeLegendRecord(surfaces.bottom)
+                }
+            };
+        }
+
+        savedOdontogramData.forEach(function (entry) {
+            const normalizedEntry = normalizeOdontogramEntry(entry);
+
+            if (normalizedEntry) {
+                odontogramState[normalizedEntry.tooth] = normalizedEntry;
+            }
+        });
+
+        const primaryUpperRight = [55, 54, 53, 52, 51];
+        const primaryUpperLeft = [61, 62, 63, 64, 65];
+
+        const adultUpperRight = [18, 17, 16, 15, 14, 13, 12, 11];
+        const adultUpperLeft = [21, 22, 23, 24, 25, 26, 27, 28];
+
+        const adultLowerRight = [48, 47, 46, 45, 44, 43, 42, 41];
+        const adultLowerLeft = [31, 32, 33, 34, 35, 36, 37, 38];
+
+        const primaryLowerRight = [85, 84, 83, 82, 81];
+        const primaryLowerLeft = [71, 72, 73, 74, 75];
+
+        const adultUpper = [...adultUpperRight, ...adultUpperLeft];
+        const adultLower = [...adultLowerRight, ...adultLowerLeft];
+
+        function getLegendByCode(code) {
+            return legends.find(item => item.code === code) || null;
+        }
+
+        function getLegendDisplayCode(code) {
+            const legend = getLegendByCode(code);
+            return legend?.displayCode || legend?.code || code;
+        }
+
+        function getToothName(toothNumber) {
+            const names = {
+                18: 'Upper Right Third Molar',
+                17: 'Upper Right Second Molar',
+                16: 'Upper Right First Molar',
+                15: 'Upper Right Second Premolar',
+                14: 'Upper Right First Premolar',
+                13: 'Upper Right Canine',
+                12: 'Upper Right Lateral Incisor',
+                11: 'Upper Right Central Incisor',
+                21: 'Upper Left Central Incisor',
+                22: 'Upper Left Lateral Incisor',
+                23: 'Upper Left Canine',
+                24: 'Upper Left First Premolar',
+                25: 'Upper Left Second Premolar',
+                26: 'Upper Left First Molar',
+                27: 'Upper Left Second Molar',
+                28: 'Upper Left Third Molar',
+                48: 'Lower Right Third Molar',
+                47: 'Lower Right Second Molar',
+                46: 'Lower Right First Molar',
+                45: 'Lower Right Second Premolar',
+                44: 'Lower Right First Premolar',
+                43: 'Lower Right Canine',
+                42: 'Lower Right Lateral Incisor',
+                41: 'Lower Right Central Incisor',
+                31: 'Lower Left Central Incisor',
+                32: 'Lower Left Lateral Incisor',
+                33: 'Lower Left Canine',
+                34: 'Lower Left First Premolar',
+                35: 'Lower Left Second Premolar',
+                36: 'Lower Left First Molar',
+                37: 'Lower Left Second Molar',
+                38: 'Lower Left Third Molar',
+
+                55: 'Upper Right Second Molar (Primary)',
+                54: 'Upper Right First Molar (Primary)',
+                53: 'Upper Right Canine (Primary)',
+                52: 'Upper Right Lateral Incisor (Primary)',
+                51: 'Upper Right Central Incisor (Primary)',
+                61: 'Upper Left Central Incisor (Primary)',
+                62: 'Upper Left Lateral Incisor (Primary)',
+                63: 'Upper Left Canine (Primary)',
+                64: 'Upper Left First Molar (Primary)',
+                65: 'Upper Left Second Molar (Primary)',
+
+                85: 'Lower Right Second Molar (Primary)',
+                84: 'Lower Right First Molar (Primary)',
+                83: 'Lower Right Canine (Primary)',
+                82: 'Lower Right Lateral Incisor (Primary)',
+                81: 'Lower Right Central Incisor (Primary)',
+                71: 'Lower Left Central Incisor (Primary)',
+                72: 'Lower Left Lateral Incisor (Primary)',
+                73: 'Lower Left Canine (Primary)',
+                74: 'Lower Left First Molar (Primary)',
+                75: 'Lower Left Second Molar (Primary)',
+            };
+
+            return names[toothNumber] || `Tooth #${toothNumber}`;
+        }
+
+        function openCancelProcedureModal() {
+            cancelProcedureModal.classList.remove('hidden');
+            cancelProcedureModal.classList.add('flex');
+        }
+
+        function closeCancelProcedureModal() {
+            cancelProcedureModal.classList.add('hidden');
+            cancelProcedureModal.classList.remove('flex');
+        }
+
+        function openFinishProcedureModal({
+            title,
+            message,
+            icon = 'fa-clipboard-check',
+            buttonText = 'Back to Appointments',
+            redirectUrl = null,
+            confirmation = false,
+        }) {
+            if (finishProcedureModalCloseTimer) {
+                clearTimeout(finishProcedureModalCloseTimer);
+                finishProcedureModalCloseTimer = null;
+            }
+
+            finishProcedureModalTitle.textContent = title;
+            finishProcedureModalMessage.textContent = message;
+            finishProcedureModalIcon.className = `fa-solid ${icon} text-white text-2xl`;
+            finishProcedureModalActionBtn.textContent = buttonText;
+            finishProcedureModalRedirectUrl = redirectUrl;
+
+            finishProcedureConfirmActions.classList.toggle('hidden', !confirmation);
+            finishProcedureConfirmActions.classList.toggle('flex', confirmation);
+            finishProcedureModalActionBtn.classList.toggle('hidden', confirmation);
+
+            finishProcedureModal.classList.remove('hidden');
+            finishProcedureModal.classList.add('flex');
+
+            requestAnimationFrame(() => {
+                finishProcedureModal.classList.add('is-open');
+                (confirmation ? confirmFinishProcedureBtn : finishProcedureModalActionBtn).focus();
+            });
+        }
+
+        function closeFinishProcedureModal() {
+            finishProcedureModal.classList.remove('is-open');
+            const redirectUrl = finishProcedureModalRedirectUrl;
+            finishProcedureModalRedirectUrl = null;
+
+            finishProcedureModalCloseTimer = setTimeout(() => {
+                finishProcedureModal.classList.add('hidden');
+                finishProcedureModal.classList.remove('flex');
+                finishProcedureModalCloseTimer = null;
+
+                if (redirectUrl) {
+                    window.location.href = redirectUrl;
+                    return;
+                }
+
+                finishProcedureBtn?.focus();
+            }, 220);
+        }
+
+        function getSurfaceLabel(surface) {
+            const map = {
+                top: 'Top Surface',
+                bottom: 'Bottom Surface',
+                left: 'Left Surface',
+                right: 'Right Surface',
+                center: 'Center Surface',
+                status: 'Status Box',
+                whole: 'Whole Tooth'
+            };
+            return map[surface] || surface;
+        }
+
+        function update3DSurfacePicker() {
+            if (!surfacePicker3D) return;
+
+            const showPicker = currentView === '3d' && !!selectedTooth;
+            surfacePicker3D.classList.toggle('hidden', !showPicker);
+
+            if (!showPicker) {
+                return;
+            }
+
+            if (selectedTooth) {
+                surfacePickerToothLabel.textContent = `Tooth #${selectedTooth} - ${getToothName(selectedTooth)}`;
+                surfacePickerHelperText.textContent = selectedTargetType === 'surface'
+                    ? `${getSurfaceLabel(selectedSurfaceKey)} selected.`
+                    : 'Camera focused on the selected tooth. Now choose one large surface button below.';
+            } else {
+                surfacePickerToothLabel.textContent = 'No tooth selected';
+                surfacePickerHelperText.textContent = 'Step 1: Click a tooth in the 3D model. The camera will zoom in automatically.';
+            }
+
+            surfacePickerButtons.forEach(btn => {
+                const surfaceKey = btn.dataset.surface;
+                const disabled = !selectedTooth;
+                const isActive = selectedTooth && selectedTargetType === 'surface' && selectedSurfaceKey === surfaceKey;
+
+                btn.disabled = disabled;
+                btn.classList.toggle('opacity-50', disabled);
+                btn.classList.toggle('cursor-not-allowed', disabled);
+                btn.classList.toggle('scale-[0.98]', disabled);
+
+                btn.classList.remove('bg-red-600', 'text-white', 'border-red-600', 'shadow-md', 'ring-2', 'ring-red-100');
+                btn.classList.add('bg-white', 'text-gray-700', 'border-gray-200');
+
+                if (isActive) {
+                    btn.classList.remove('bg-white', 'text-gray-700', 'border-gray-200');
+                    btn.classList.add('bg-red-600', 'text-white', 'border-red-600', 'shadow-md', 'ring-2', 'ring-red-100');
+                }
+            });
+        }
+
+        function selectSurfaceFrom3DPicker(surfaceKey) {
+            if (!selectedTooth) {
+                alert('Please click a tooth in the 3D model first.');
+                return;
+            }
+
+            selectedTargetType = 'surface';
+            selectedSurfaceKey = surfaceKey;
+
+            const state = ensureToothState(selectedTooth);
+            state.lastSelectedSurface = surfaceKey;
+            const currentSurfaceRecord = state.surfaces[surfaceKey];
+            selectedLegend = currentSurfaceRecord ? currentSurfaceRecord.code : null;
+
+            updateSelectedToothUI();
+            renderThreeVisuals();
+        }
+
+        function easeInOutCubic(value) {
+            return value < 0.5
+                ? 4 * value * value * value
+                : 1 - Math.pow(-2 * value + 2, 3) / 2;
+        }
+
+        function animateCameraTo(targetPosition, targetLookAt, duration = 650) {
+            if (!camera || !controls) return;
+
+            if (cameraAnimationFrame) {
+                cancelAnimationFrame(cameraAnimationFrame);
+            }
+
+            const startPosition = camera.position.clone();
+            const startTarget = controls.target.clone();
+            const startTime = performance.now();
+
+            function step(now) {
+                const progress = Math.min((now - startTime) / duration, 1);
+                const eased = easeInOutCubic(progress);
+
+                camera.position.lerpVectors(startPosition, targetPosition, eased);
+                controls.target.lerpVectors(startTarget, targetLookAt, eased);
+                camera.updateProjectionMatrix();
+                controls.update();
+
+                if (progress < 1) {
+                    cameraAnimationFrame = requestAnimationFrame(step);
+                } else {
+                    cameraAnimationFrame = null;
+                }
+            }
+
+            cameraAnimationFrame = requestAnimationFrame(step);
+        }
+
+        function focusCameraOnTooth(mesh) {
+            if (!mesh || !camera || !controls) return;
+
+            const toothPosition = new THREE.Vector3();
+            mesh.getWorldPosition(toothPosition);
+
+            const toothNumber = Number(mesh.userData.tooth);
+            const isUpperArch = adultUpper.includes(toothNumber);
+
+            // Upper teeth are best viewed from below so the bottom/end of the cylinder is visible.
+            // Lower teeth are best viewed from above so the top/end of the cylinder is visible.
+            const cameraOffset = isUpperArch
+                ? new THREE.Vector3(0, -2.2, 4.2)
+                : new THREE.Vector3(0, 2.4, 4.2);
+
+            const lookAtOffset = isUpperArch
+                ? new THREE.Vector3(0, -0.15, 0)
+                : new THREE.Vector3(0, 0.15, 0);
+
+            animateCameraTo(
+                toothPosition.clone().add(cameraOffset),
+                toothPosition.clone().add(lookAtOffset),
+                700
+            );
+        }
+
+        function resetCameraToFull3DView() {
+            if (!camera || !controls) return;
+
+            animateCameraTo(
+                initialCameraPosition ? initialCameraPosition.clone() : new THREE.Vector3(0, 1.2, 14),
+                initialControlsTarget ? initialControlsTarget.clone() : new THREE.Vector3(0, 0, 0),
+                700
+            );
+        }
+
+        function clear3DSurfacePickerSelection(shouldResetCamera = false) {
+            selectedTooth = null;
+            selectedTargetType = null;
+            selectedSurfaceKey = null;
+            selectedMesh = null;
+            selectedLegend = null;
+
+            if (threeSceneInitialized) {
+                renderThreeVisuals();
+
+                if (shouldResetCamera) {
+                    resetCameraToFull3DView();
+                }
+            }
+
+            updateSelectedToothUI();
+            updateLegendActiveState();
+            updateActionButtons();
+            updateHistoryButtons();
+            update3DSurfacePicker();
+        }
+
+        function ensureToothState(toothNumber) {
+            const numericToothNumber = Number(toothNumber);
+
+            if (!odontogramState[numericToothNumber]) {
+                odontogramState[numericToothNumber] = createDefaultToothState(numericToothNumber);
+            } else {
+                odontogramState[numericToothNumber] = normalizeOdontogramEntry(odontogramState[
+                    numericToothNumber]) ||
+                    createDefaultToothState(numericToothNumber);
+            }
+
+            return odontogramState[numericToothNumber];
+        }
+
+        function updateHiddenInput() {
+            odontogramDataInput.value = JSON.stringify(Object.values(odontogramState));
+        }
+
+        function updateLegendActiveState() {
+            document.querySelectorAll('.legend-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (selectedLegend && btn.dataset.code === selectedLegend) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function getSelectedRecord() {
+            if (!selectedTooth || !selectedTargetType) return null;
+
+            const state = ensureToothState(selectedTooth);
+
+            if (selectedTargetType === 'status') return state.status;
+            if (selectedTargetType === 'surface' && selectedSurfaceKey) return state.surfaces[
+                selectedSurfaceKey];
+            if (selectedTargetType === '3d') return state.threeD;
+
+            return null;
+        }
+
+        function renderSelectedToothLegendList() {
+            const selectedRecord = getSelectedRecord();
+
+            if (!selectedRecord) {
+                selectedToothLegendList.innerHTML =
+                    '<span class="text-[11px] text-gray-400 italic">No treatment assigned yet.</span>';
+                return;
+            }
+
+            selectedToothLegendList.innerHTML = `
+                    <span class="treatment-chip inline-flex items-center gap-2">
+                        <span class="legend-color-dot" style="background:${selectedRecord.colorHex};"></span>
+                        ${getLegendDisplayCode(selectedRecord.code)} - ${selectedRecord.label}
+                    </span>
+                `;
+        }
+
+        function updateActionButtons() {
+            const hasSelectedTarget = !!selectedTooth && !!selectedTargetType;
+            const hasSelectedLegend = !!selectedLegend;
+            const hasAssignedTreatment = !!getSelectedRecord();
+
+            applyTreatmentBtn.disabled = !(hasSelectedTarget && hasSelectedLegend);
+            clearCurrentToothBtn.disabled = !hasAssignedTreatment;
+            updateHistoryButtons();
+        }
+
+        function updateSelectedToothUI() {
+            if (!selectedTooth || !selectedTargetType) {
+                drawerSelectedLegendPreview.textContent = selectedLegend ?
+                    `${selectedLegend} - ${(getLegendByCode(selectedLegend)?.label || selectedLegend)}` :
+                    'No legend selected yet';
+
+                selectedToothDisplay.textContent = currentView === '2d' ?
+                    'Click a tooth surface on the 2D odontogram' :
+                    'Click a tooth on the 3D odontogram';
+
+                selectedToothName.textContent = 'No tooth selected';
+                toothHoverLabel.innerText = 'Select a tooth';
+                legendStatusNote.classList.add('hidden');
+                selectedLegend = null;
+                selectedViewBadge.textContent = currentView === '2d' ? '2D View' : '3D View';
+
+                updateLegendActiveState();
+                renderSelectedToothLegendList();
+                updateActionButtons();
+                update3DSurfacePicker();
+                return;
+            }
+
+            if (currentView === '3d' && !selectedTargetType) {
+                selectedToothDisplay.textContent = `Tooth #${selectedTooth} - Choose a surface below`;
+                selectedToothName.textContent = getToothName(selectedTooth);
+                toothHoverLabel.innerText = `Selected: #${selectedTooth}`;
+                selectedViewBadge.textContent = '3D View';
+                legendStatusNote.classList.remove('hidden');
+                legendStatusNote.textContent = 'Step 2: Choose one of the 5 surfaces from the 3D surface picker below, then select a legend and click Apply Treatment.';
+                selectedLegend = null;
+
+                updateLegendActiveState();
+                renderSelectedToothLegendList();
+                updateActionButtons();
+                update3DSurfacePicker();
+                return;
+            }
+
+            const surfaceText = selectedTargetType === 'surface' ?
+                getSurfaceLabel(selectedSurfaceKey) :
+                selectedTargetType === 'status' ?
+                    getSurfaceLabel('status') :
+                    getSurfaceLabel('whole');
+
+            selectedToothDisplay.textContent = `Tooth #${selectedTooth} - ${surfaceText}`;
+            selectedToothName.textContent = getToothName(selectedTooth);
+            toothHoverLabel.innerText = `Selected: #${selectedTooth}`;
+            selectedViewBadge.textContent = currentView === '2d' ? '2D View' : '3D View';
+            legendStatusNote.classList.remove('hidden');
+            legendStatusNote.textContent = 'Choose a treatment legend below, then click Apply Treatment.';
+
+            const record = getSelectedRecord();
+            selectedLegend = record ? record.code : null;
+
+            updateLegendActiveState();
+            renderSelectedToothLegendList();
+            updateActionButtons();
+            update3DSurfacePicker();
+        }
+
+        function openLegendDrawer() {
+            legendSearchInput.value = '';
+            clearLegendSearchBtn.classList.add('hidden');
+            renderLegendButtons('');
+            legendDrawer.classList.add('open');
+            legendDrawerBackdrop.classList.add('show');
+            document.body.classList.add('legend-drawer-open');
+        }
+
+        function closeLegendDrawer() {
+            legendDrawer.classList.remove('open');
+            legendDrawerBackdrop.classList.remove('show');
+            document.body.classList.remove('legend-drawer-open');
+        }
+
+        openLegendDrawerBtn.addEventListener('click', openLegendDrawer);
+        closeLegendDrawerBtn.addEventListener('click', closeLegendDrawer);
+        legendDrawerBackdrop.addEventListener('click', closeLegendDrawer);
+
+        legendSearchInput.addEventListener('input', function () {
+            const value = legendSearchInput.value.trim();
+            clearLegendSearchBtn.classList.toggle('hidden', value.length === 0);
+            renderLegendButtons(value);
+        });
+
+        clearLegendSearchBtn.addEventListener('click', function () {
+            legendSearchInput.value = '';
+            clearLegendSearchBtn.classList.add('hidden');
+            renderLegendButtons('');
+            legendSearchInput.focus();
+        });
+
+        function renderLegendButtons(searchTerm = '') {
+            legendContainer.innerHTML = '';
+
+            const normalizedSearch = searchTerm.trim().toLowerCase();
+            let totalResults = 0;
+
+            legendCategories.forEach(category => {
+                const categoryLegends = category.items
+                    .map(code => legends.find(item => item.code === code))
+                    .filter(Boolean)
+                    .filter(legend => {
+                        if (!normalizedSearch) return true;
+                        return (
+                            legend.code.toLowerCase().includes(normalizedSearch) ||
+                            legend.label.toLowerCase().includes(normalizedSearch)
+                        );
+                    });
+
+                if (!categoryLegends.length) return;
+
+                totalResults += categoryLegends.length;
+
+                const categoryBlock = document.createElement('div');
+                categoryBlock.className = 'legend-category-block';
+
+                categoryBlock.innerHTML = `
+                        <div class="legend-category-head">
+                            <div class="legend-category-title">
+                                <span class="legend-category-icon">
+                                    <i class="${category.icon}"></i>
+                                </span>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-900">${category.title}</p>
+                                    <p class="text-[11px] text-gray-500">Choose a legend from this group</p>
+                                </div>
+                            </div>
+                            <span class="legend-category-count">${categoryLegends.length}</span>
+                        </div>
+                    `;
+
+                const body = document.createElement('div');
+                body.className = 'legend-category-body';
+
+                categoryLegends.forEach(legend => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.dataset.code = legend.code;
+                    btn.className = 'legend-btn';
+
+                    btn.innerHTML = `
+                            <span class="legend-color-dot" style="background:${legendColors[legend.code]};"></span>
+                            <i class="${legendIcons[legend.code]} text-[#8B0000] w-4 text-center"></i>
+                            <span class="legend-meta">
+                                <span class="legend-code">${legend.displayCode || legend.code}</span>
+                                <span class="legend-label">${legend.label}</span>
+                            </span>
+                        `;
+
+                    btn.addEventListener('click', function () {
+                        if (!selectedTooth || !selectedTargetType) {
+                            alert('Please select a tooth target first.');
+                            return;
+                        }
+
+                        selectedLegend = legend.code;
+                        selectedLegendPreview.textContent =
+                            `${legend.displayCode || legend.code} - ${legend.label}`;
+                        drawerSelectedLegendPreview.textContent =
+                            `${legend.displayCode || legend.code} - ${legend.label}`;
+                        updateLegendActiveState();
+                        updateActionButtons();
+                    });
+
+                    body.appendChild(btn);
+                });
+
+                categoryBlock.appendChild(body);
+                legendContainer.appendChild(categoryBlock);
+            });
+
+            legendResultCount.textContent = `${totalResults} result${totalResults === 1 ? '' : 's'}`;
+
+            if (totalResults === 0) {
+                legendEmptyState.classList.remove('hidden');
+            } else {
+                legendEmptyState.classList.add('hidden');
+            }
+
+            updateLegendActiveState();
+        }
+
+        function createLegendPayload(code) {
+            const legendObj = getLegendByCode(code);
+            return {
+                code: code,
+                label: legendObj ? legendObj.label : code,
+                colorHex: legendColors[code] || '#ef4444'
+            };
+        }
+
+        function isAdultTooth(toothNumber) {
+            return adultUpper.includes(toothNumber) || adultLower.includes(toothNumber);
+        }
+
+        function getPreferredToothVisual(state) {
+            if (!state) return null;
+
+            if (state.status) return state.status;
+
+            const surfacePriority = ['center', 'top', 'right', 'bottom', 'left'];
+            for (const key of surfacePriority) {
+                if (state.surfaces[key]) return state.surfaces[key];
+            }
+
+            return null;
+        }
+
+        function getFirstTreatedSurfaceKey(state) {
+            if (!state || !state.surfaces) return null;
+
+            const surfacePriority = ['top', 'left', 'center', 'right', 'bottom'];
+
+            for (const key of surfacePriority) {
+                if (state.surfaces[key] && state.surfaces[key].code) {
+                    return key;
+                }
+            }
+
+            return null;
+        }
+
+        function getPreferredSurfaceKey(state) {
+            if (!state || !state.surfaces) return null;
+
+            const lastSurface = state.lastSelectedSurface;
+
+            if (
+                lastSurface &&
+                state.surfaces[lastSurface] &&
+                state.surfaces[lastSurface].code
+            ) {
+                return lastSurface;
+            }
+
+            return getFirstTreatedSurfaceKey(state);
+        }
+
+        function getStatusBoxDisplayRecord(state) {
+            if (!state || !state.surfaces) return null;
+
+            const preferredSurfaceKey = getPreferredSurfaceKey(state);
+
+            if (
+                preferredSurfaceKey &&
+                state.surfaces[preferredSurfaceKey] &&
+                state.surfaces[preferredSurfaceKey].code
+            ) {
+                return state.surfaces[preferredSurfaceKey];
+            }
+
+            return null;
+        }
+
+        function getStatusBoxDisplaySurfaceKey(state) {
+            if (!state || !state.surfaces) return null;
+
+            return getPreferredSurfaceKey(state);
+        }
+
+        function applyDividedStatusBoxVisual(statusBox, record) {
+            const colorPart = document.createElement('span');
+            const codePart = document.createElement('span');
+            const colorHex = record ? record.colorHex : '#ffffff';
+            const code = record ? record.code : '';
+
+            statusBox.classList.add('status-box-divided');
+            statusBox.innerHTML = '';
+
+            statusBox.style.padding = '0';
+            statusBox.style.display = 'flex';
+            statusBox.style.flexDirection = 'column';
+            statusBox.style.alignItems = 'stretch';
+            statusBox.style.justifyContent = 'stretch';
+            statusBox.style.overflow = 'hidden';
+            statusBox.style.boxSizing = 'border-box';
+            statusBox.style.background = '#ffffff';
+            statusBox.style.borderColor = record ? colorHex : '';
+
+            colorPart.className = 'status-box-color-part';
+            colorPart.style.display = 'flex';
+            colorPart.style.alignItems = 'center';
+            colorPart.style.justifyContent = 'center';
+            colorPart.style.flex = '1 1 0';
+            colorPart.style.minHeight = '0';
+            colorPart.style.width = '100%';
+            colorPart.style.background = record ? colorHex : '#ffffff';
+
+            codePart.className = 'status-box-code-part';
+            codePart.textContent = code;
+            codePart.style.display = 'flex';
+            codePart.style.alignItems = 'center';
+            codePart.style.justifyContent = 'center';
+            codePart.style.flex = '1 1 0';
+            codePart.style.minHeight = '0';
+            codePart.style.width = '100%';
+            codePart.style.background = '#ffffff';
+            codePart.style.borderTop = '1px solid #8B0000';
+            codePart.style.color = record ? colorHex : 'transparent';
+            codePart.style.fontSize = code.length > 1 ? '8.5px' : '10px';
+            codePart.style.fontWeight = '900';
+            codePart.style.lineHeight = '1';
+            codePart.style.letterSpacing = '-0.03em';
+            codePart.style.whiteSpace = 'nowrap';
+
+            statusBox.appendChild(colorPart);
+            statusBox.appendChild(codePart);
+        }
+
+
+        function restoreSavedSurfaceSelectionForTooth(toothNumber) {
+            const state = ensureToothState(toothNumber);
+            const savedSurfaceKey = getPreferredSurfaceKey(state);
+
+            if (!savedSurfaceKey) {
+                selectedTargetType = null;
+                selectedSurfaceKey = null;
+                selectedLegend = null;
+                return;
+            }
+
+            selectedTargetType = 'surface';
+            selectedSurfaceKey = savedSurfaceKey;
+            selectedLegend = state.surfaces[savedSurfaceKey].code;
+            state.lastSelectedSurface = savedSurfaceKey;
+        }
+
+        function sync3DFrom2D(toothNumber) {
+            const state = ensureToothState(toothNumber);
+
+            if (!isAdultTooth(toothNumber)) {
+                state.threeD = null;
+                return;
+            }
+
+            state.threeD = getPreferredToothVisual(state);
+        }
+
+        function fillAll2DSurfacesFromLegend(state, payload) {
+            state.status = payload;
+            state.surfaces.top = payload;
+            state.surfaces.left = payload;
+            state.surfaces.center = payload;
+            state.surfaces.right = payload;
+            state.surfaces.bottom = payload;
+        }
+
+        function clearAll2DSurfaces(state) {
+            state.status = null;
+            state.surfaces.top = null;
+            state.surfaces.left = null;
+            state.surfaces.center = null;
+            state.surfaces.right = null;
+            state.surfaces.bottom = null;
+        }
+
+        function snapshotState() {
+            return JSON.stringify(odontogramState);
+        }
+
+        function restoreStateFromSnapshot(snapshot) {
+            const parsed = JSON.parse(snapshot);
+
+            Object.keys(odontogramState).forEach(key => delete odontogramState[key]);
+            Object.keys(parsed).forEach(key => {
+                odontogramState[key] = parsed[key];
+            });
+
+            updateHiddenInput();
+            render2DOdontogram();
+
+            if (threeSceneInitialized) {
+                renderThreeVisuals();
+            }
+
+            updateSelectedToothUI();
+            updateLegendActiveState();
+            renderSelectedToothLegendList();
+            updateActionButtons();
+            updateHistoryButtons();
+        }
+
+        function pushHistory() {
+            historyStack.push(snapshotState());
+            if (historyStack.length > HISTORY_LIMIT) {
+                historyStack.shift();
+            }
+            redoStack = [];
+            updateHistoryButtons();
+        }
+
+        function updateHistoryButtons() {
+            if (undoBtn) undoBtn.disabled = historyStack.length === 0;
+            if (redoBtn) redoBtn.disabled = redoStack.length === 0;
+            if (clearSelectionBtn) clearSelectionBtn.disabled = !(selectedTooth && selectedTargetType);
+        }
+
+        function clearCurrentSelection() {
+            if (currentView === '3d') {
+                clear3DSurfacePickerSelection(true);
+                return;
+            }
+
+            selectedTooth = null;
+            selectedTargetType = null;
+            selectedSurfaceKey = null;
+            selectedMesh = null;
+            selectedLegend = null;
+
+            render2DOdontogram();
+
+            if (threeSceneInitialized) {
+                renderThreeVisuals();
+            }
+
+            updateSelectedToothUI();
+            updateLegendActiveState();
+            updateActionButtons();
+            updateHistoryButtons();
+        }
+
+        function undoLastAction() {
+            if (!historyStack.length) return;
+
+            redoStack.push(snapshotState());
+            const previous = historyStack.pop();
+            restoreStateFromSnapshot(previous);
+        }
+
+        function redoLastAction() {
+            if (!redoStack.length) return;
+
+            historyStack.push(snapshotState());
+            const next = redoStack.pop();
+            restoreStateFromSnapshot(next);
+        }
+
+        function applyLegendToSelectedTarget(code) {
+            if (!selectedTooth || !selectedTargetType) return;
+
+            if (selectedTargetType === 'status') {
+                alert('Please apply treatments by clicking an actual tooth surface, not the divided indicator box.');
+                return;
+            }
+
+            pushHistory();
+
+            const state = ensureToothState(selectedTooth);
+            const payload = createLegendPayload(code);
+            hasAppliedTreatmentThisSession = true;
+
+            if (selectedTargetType === 'status') {
+                state.status = payload;
+                sync3DFrom2D(selectedTooth);
+            } else if (selectedTargetType === 'surface' && selectedSurfaceKey) {
+                state.surfaces[selectedSurfaceKey] = payload;
+                sync3DFrom2D(selectedTooth);
+            } else if (selectedTargetType === '3d') {
+                state.threeD = payload;
+                fillAll2DSurfacesFromLegend(state, payload);
+
+                if (selectedMesh) {
+                    selectedMesh.material.color.setStyle(payload.colorHex);
+                    selectedMesh.userData.legend = code;
+                    selectedMesh.userData.originalColor = payload.colorHex;
+                    applySelectedMeshState(selectedMesh);
+                }
+            }
+
+            updateHiddenInput();
+            render2DOdontogram();
+
+            if (threeSceneInitialized) {
+                renderThreeVisuals();
+            }
+
+            renderSelectedToothLegendList();
+            updateLegendActiveState();
+            updateActionButtons();
+            selectedLegendPreview.textContent = `${getLegendDisplayCode(payload.code)} - ${payload.label}`;
+            drawerSelectedLegendPreview.textContent = `${getLegendDisplayCode(payload.code)} - ${payload.label}`;
+            closeLegendDrawer();
+
+            if (currentView === '3d') {
+                setTimeout(function () {
+                    clear3DSurfacePickerSelection(false);
+                }, 120);
+            }
+        }
+
+        function clearSelectedTargetTreatment() {
+            if (!pendingResetPayload) return;
+            pushHistory();
+
+            const {
+                tooth,
+                targetType,
+                surfaceKey
+            } = pendingResetPayload;
+            const state = ensureToothState(tooth);
+
+            if (targetType === 'status') {
+                pendingResetPayload = null;
+                closeResetModal();
+                return;
+            } else if (targetType === 'surface' && surfaceKey) {
+                state.surfaces[surfaceKey] = null;
+                state.lastSelectedSurface = getFirstTreatedSurfaceKey(state);
+                sync3DFrom2D(tooth);
+            } else if (targetType === '3d') {
+                state.threeD = null;
+                state.lastSelectedSurface = null;
+                clearAll2DSurfaces(state);
+
+                if (selectedMesh && Number(selectedMesh.userData.tooth) === Number(tooth)) {
+                    selectedMesh.material.color.setStyle('#FFFFF0');
+                    selectedMesh.userData.originalColor = '#FFFFF0';
+                    delete selectedMesh.userData.legend;
+                    applySelectedMeshState(selectedMesh);
+                }
+            }
+
+            selectedLegend = null;
+            pendingResetPayload = null;
+
+            selectedLegendPreview.textContent = 'No legend selected yet.';
+            drawerSelectedLegendPreview.textContent = 'No legend selected yet.';
+
+            updateHiddenInput();
+            render2DOdontogram();
+
+            if (threeSceneInitialized) {
+                renderThreeVisuals();
+            }
+
+            renderSelectedToothLegendList();
+            updateLegendActiveState();
+            updateActionButtons();
+            closeResetModal();
+        }
+
+        function openResetModal() {
+            if (!selectedTooth || !selectedTargetType || !getSelectedRecord()) return;
+
+            pendingResetPayload = {
+                tooth: selectedTooth,
+                targetType: selectedTargetType,
+                surfaceKey: selectedSurfaceKey
+            };
+
+            const partText = selectedTargetType === 'surface' ?
+                getSurfaceLabel(selectedSurfaceKey) :
+                selectedTargetType === 'status' ?
+                    'Status Box' :
+                    'Whole Tooth';
+
+            resetTreatmentMessage.textContent =
+                `Are you sure you want to reset the treatment for tooth #${selectedTooth} (${getToothName(selectedTooth)}) - ${partText}?`;
+
+            resetTreatmentModal.classList.remove('hidden');
+            resetTreatmentModal.classList.add('flex');
+        }
+
+        function closeResetModal() {
+            pendingResetPayload = null;
+            resetTreatmentModal.classList.add('hidden');
+            resetTreatmentModal.classList.remove('flex');
+        }
+
+        function createToothUnit(toothNumber, statusPlacement = 'top') {
+            const state = ensureToothState(toothNumber);
+
+            const wrap = document.createElement('div');
+            wrap.className = 'tooth-unit';
+
+            const statusBox = document.createElement('div');
+            statusBox.className = 'status-box';
+            statusBox.dataset.tooth = toothNumber;
+            statusBox.setAttribute('aria-label', `Surface legend indicator for tooth #${toothNumber}`);
+            statusBox.title = 'Display only: this box updates after applying a legend to a tooth surface.';
+            statusBox.style.cursor = 'default';
+
+            const statusDisplayRecord = getStatusBoxDisplayRecord(state);
+
+            applyDividedStatusBoxVisual(statusBox, statusDisplayRecord);
+
+            const toothNumberEl = document.createElement('div');
+            toothNumberEl.className = 'tooth-number';
+            toothNumberEl.textContent = toothNumber;
+
+            const toothFace = document.createElement('div');
+            toothFace.className = 'tooth-2d-wrapper';
+
+            toothFace.innerHTML = `
+                    <svg viewBox="0 0 100 100" class="tooth-svg" preserveAspectRatio="xMidYMid meet">
+                        <path class="surface-part surface-top" data-surface="top" d="M 0 0 L 100 0 L 50 50 Z" />
+                        <path class="surface-part surface-right" data-surface="right" d="M 100 0 L 100 100 L 50 50 Z" />
+                        <path class="surface-part surface-bottom" data-surface="bottom" d="M 100 100 L 0 100 L 50 50 Z" />
+                        <path class="surface-part surface-left" data-surface="left" d="M 0 100 L 0 0 L 50 50 Z" />
+                        <circle class="surface-part surface-center" data-surface="center" cx="50" cy="50" r="22" />
+                    </svg>
+                `;
+
+            const surfaces = toothFace.querySelectorAll('.surface-part');
+            surfaces.forEach(part => {
+                const surface = part.dataset.surface;
+                const surfaceRecord = state.surfaces[surface];
+
+                if (surfaceRecord) {
+                    part.style.fill = surfaceRecord.colorHex;
+                }
+
+                if (selectedTooth === toothNumber && selectedTargetType === 'surface' &&
+                    selectedSurfaceKey === surface) {
+                    part.classList.add('selected-target');
+                }
+
+                part.addEventListener('click', function () {
+                    currentView = '2d';
+                    selectedTooth = toothNumber;
+                    selectedTargetType = 'surface';
+                    selectedSurfaceKey = surface;
+                    updateSelectedToothUI();
+                    render2DOdontogram();
+                });
+
+                part.addEventListener('mouseenter', function () {
+                    toothHoverLabel.innerText = `Tooth #${toothNumber}`;
+                });
+
+                part.addEventListener('mouseleave', function () {
+                    toothHoverLabel.innerText = selectedTooth ? `Selected: #${selectedTooth}` :
+                        'Select a tooth';
+                });
+            });
+
+            if (statusPlacement === 'top') {
+                wrap.appendChild(statusBox);
+                wrap.appendChild(toothNumberEl);
+                wrap.appendChild(toothFace);
+            } else {
+                wrap.appendChild(toothFace);
+                wrap.appendChild(toothNumberEl);
+                wrap.appendChild(statusBox);
+            }
+
+            return wrap;
+        }
+
+        function createRow(leftTeeth, rightTeeth, statusPlacement = 'top', leftLabel = '', rightLabel = '') {
+            const row = document.createElement('div');
+            row.className = 'odontogram-row';
+
+            const left = document.createElement('div');
+            left.className = 'status-label-left';
+            left.innerHTML = leftLabel ? leftLabel : '&nbsp;';
+
+            if (statusPlacement === 'top') {
+                left.style.paddingTop = '10px';
+            } else {
+                left.style.alignSelf = 'flex-end';
+                left.style.paddingBottom = '10px';
+            }
+            row.appendChild(left);
+
+            leftTeeth.forEach(tooth => row.appendChild(createToothUnit(tooth, statusPlacement)));
+
+            const spacer = document.createElement('div');
+            spacer.className = 'w-3 md:w-5';
+            row.appendChild(spacer);
+
+            rightTeeth.forEach(tooth => row.appendChild(createToothUnit(tooth, statusPlacement)));
+
+            const right = document.createElement('div');
+            right.className = 'status-label-right';
+            right.innerHTML = rightLabel ? rightLabel : '&nbsp;';
+
+            if (statusPlacement === 'top') {
+                right.style.paddingTop = '10px';
+            } else {
+                right.style.alignSelf = 'flex-end';
+                right.style.paddingBottom = '10px';
+            }
+            row.appendChild(right);
+
+            return row;
+        }
+
+        function render2DOdontogram() {
+            board2d.innerHTML = '';
+
+            const row1 = createRow(primaryUpperRight, primaryUpperLeft, 'top', 'STATUS<br>RIGHT', 'LEFT');
+            row1.classList.add('arch-divider');
+            board2d.appendChild(row1);
+
+            const row2 = createRow(adultUpperRight, adultUpperLeft, 'top', '', '');
+            row2.style.marginBottom = '24px';
+            board2d.appendChild(row2);
+
+            const row3 = createRow(adultLowerRight, adultLowerLeft, 'bottom', '', '');
+            row3.classList.add('arch-divider');
+            board2d.appendChild(row3);
+
+            const row4 = createRow(primaryLowerRight, primaryLowerLeft, 'bottom', 'STATUS<br>RIGHT', 'LEFT');
+            board2d.appendChild(row4);
+        }
+
+        function switchView(view) {
+            const previousView = currentView;
+            currentView = view;
+
+            if (view === '2d') {
+                selectedMesh = null;
+                panel2d.classList.add('active');
+                panel3d.classList.remove('active');
+                view2dBtn.classList.add('active');
+                view3dBtn.classList.remove('active');
+                viewInstructionText.textContent =
+                    'Click a tooth surface to assign a treatment legend';
+            } else {
+                panel2d.classList.remove('active');
+                panel3d.classList.add('active');
+                view2dBtn.classList.remove('active');
+                view3dBtn.classList.add('active');
+                viewInstructionText.textContent = 'Click a tooth in the 3D model, then choose a surface below';
+
+                if (previousView !== '3d') {
+                    // Keep odontogramState unchanged so all saved markings
+                    // render in 3D, but do not carry the active 2D selection.
+                    selectedTooth = null;
+                    selectedTargetType = null;
+                    selectedSurfaceKey = null;
+                    selectedMesh = null;
+                    selectedLegend = null;
+                }
+
+                if (!threeSceneInitialized) {
+                    initThreeScene();
+                } else if (renderer && camera) {
+                    handleResize();
+                    renderThreeVisuals();
+                }
+            }
+
+            if (view === '3d' && threeSceneInitialized && selectedTooth) {
+                selectedMesh = teethMeshes.find(mesh => Number(mesh.userData.tooth) === Number(
+                    selectedTooth)) || null;
+                renderThreeVisuals();
+            }
+
+            updateSelectedToothUI();
+            update3DSurfacePicker();
+        }
+
+        view2dBtn.addEventListener('click', () => switchView('2d'));
+        view3dBtn.addEventListener('click', () => switchView('3d'));
+
+        function getOdontogramTheme() {
+            const root = document.documentElement;
+
+            return (
+                root.getAttribute('data-theme') === 'dark' ||
+                root.classList.contains('dark')
+            )
+                ? 'dark'
+                : 'light';
+        }
+
+        function syncOdontogram3DTheme(theme = getOdontogramTheme()) {
+            const isDark = theme === 'dark';
+
+            const backgroundColor = isDark
+                ? '#0D1117'
+                : '#D8E0EA';
+
+            if (scene) {
+                scene.background = new THREE.Color(backgroundColor);
+            }
+
+            if (renderer) {
+                renderer.setClearColor(backgroundColor, 1);
+            }
+
+            if (renderer && scene && camera) {
+                renderer.render(scene, camera);
+            }
+        }
+
+        window.addEventListener('global-theme-change', function (event) {
+            syncOdontogram3DTheme(
+                event.detail?.theme || getOdontogramTheme()
+            );
+        });
+
+        function initThreeScene() {
+            const width = container.clientWidth || 700;
+            const height = container.clientHeight || 480;
+
+            scene = new THREE.Scene();
+            syncOdontogram3DTheme();
+
+            camera = new THREE.PerspectiveCamera(
+                40,
+                width / height,
+                0.1,
+                1000
+
+            );
+
+            camera.position.set(0, 1.2, 14);
+
+            renderer = new THREE.WebGLRenderer({
+                antialias: true,
+                alpha: false
+            });
+
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(width, height);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
+            syncOdontogram3DTheme();
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.07;
+            controls.minDistance = 2.2;
+            controls.maxDistance = 30;
+            controls.maxPolarAngle = Math.PI / 1.8;
+            controls.target.set(0, 0, 0);
+            controls.update();
+
+            initialCameraPosition = camera.position.clone();
+            initialControlsTarget = controls.target.clone();
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+            scene.add(ambientLight);
+
+            const keyLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            keyLight.position.set(10, 15, 10);
+            keyLight.castShadow = true;
+            keyLight.shadow.mapSize.width = 1024;
+            keyLight.shadow.mapSize.height = 1024;
+            scene.add(keyLight);
+
+            const backLight = new THREE.DirectionalLight(0xffffff, 0.45);
+            backLight.position.set(-10, 5, -10);
+            scene.add(backLight);
+
+            const fillLight = new THREE.DirectionalLight(0xffffff, 0.35);
+            fillLight.position.set(0, 8, 12);
+            scene.add(fillLight);
+
+            const enamelMaterialProps = {
+                color: 0xFFFFF8,
+                metalness: 0.02,
+                roughness: 0.26,
+                emissive: 0x090909,
+                emissiveIntensity: 0.04,
+                envMapIntensity: 0.95
+            };
+
+            const gumMaterialProps = {
+                color: 0xF2A7A2,
+                roughness: 0.68,
+                metalness: 0.0,
+                emissive: 0x220808,
+                emissiveIntensity: 0.025
+            };
+
+            function createStandardMaterial(props) {
+                return new THREE.MeshStandardMaterial(props);
+            }
+
+            function getToothType(toothNum) {
+                const lastDigit = Number(String(toothNum).slice(-1));
+
+                if (lastDigit === 1 || lastDigit === 2) return 'incisor';
+                if (lastDigit === 3) return 'canine';
+                if (lastDigit === 4 || lastDigit === 5) return 'premolar';
+
+                return 'molar';
+            }
+
+            function getToothDimensions(type) {
+                const sizes = {
+                    incisor: {
+                        width: 0.34,
+                        height: 0.50,
+                        depth: 0.24,
+                        hitWidth: 0.50,
+                        hitHeight: 0.66,
+                        hitDepth: 0.38
+                    },
+                    canine: {
+                        width: 0.36,
+                        height: 0.54,
+                        depth: 0.26,
+                        hitWidth: 0.52,
+                        hitHeight: 0.70,
+                        hitDepth: 0.40
+                    },
+                    premolar: {
+                        width: 0.46,
+                        height: 0.48,
+                        depth: 0.34,
+                        hitWidth: 0.62,
+                        hitHeight: 0.64,
+                        hitDepth: 0.48
+                    },
+                    molar: {
+                        width: 0.62,
+                        height: 0.47,
+                        depth: 0.44,
+                        hitWidth: 0.78,
+                        hitHeight: 0.64,
+                        hitDepth: 0.60
+                    }
+                };
+
+                return sizes[type] || sizes.incisor;
+            }
+
+            function addVisualPart(group, mesh, visualParts, colorableParts = null) {
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                group.add(mesh);
+                visualParts.push(mesh);
+
+                if (colorableParts) {
+                    mesh.userData.colorable = true;
+                    colorableParts.push(mesh);
+                }
+
+                return mesh;
+            }
+
+            function createSoftCusp(x, y, z, scale, material) {
+                const cusp = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.105 * scale, 18, 12),
+                    material.clone()
+                );
+
+                cusp.scale.set(1.05, 0.50, 0.85);
+                cusp.position.set(x, y, z);
+
+                return cusp;
+            }
+
+            function createStylizedTooth(toothNum, isUpper = true) {
+                const type = getToothType(toothNum);
+                const size = getToothDimensions(type);
+                const toothGroup = new THREE.Group();
+
+                const visualParts = [];
+                const colorableParts = [];
+
+                const enamelMaterial = createStandardMaterial(enamelMaterialProps);
+                const crownDirection = isUpper ? -1 : 1;
+                const gumDirection = isUpper ? 1 : -1;
+
+                const crown = new THREE.Mesh(
+                    new THREE.SphereGeometry(1, 32, 22),
+                    enamelMaterial.clone()
+                );
+
+                crown.scale.set(size.width, size.height, size.depth);
+                crown.position.set(0, crownDirection * 0.22, 0);
+                addVisualPart(toothGroup, crown, visualParts, colorableParts);
+
+                const neck = new THREE.Mesh(
+                    new THREE.CylinderGeometry(size.width * 0.74, size.width * 0.86, 0.12, 26, 1),
+                    enamelMaterial.clone()
+                );
+
+                neck.position.set(0, gumDirection * 0.08, 0);
+                addVisualPart(toothGroup, neck, visualParts, colorableParts);
+
+                if (type === 'incisor') {
+                }
+
+                if (type === 'canine') {
+                    const point = new THREE.Mesh(
+                        new THREE.ConeGeometry(size.width * 0.35, 0.16, 28, 1),
+                        enamelMaterial.clone()
+                    );
+
+                    point.position.set(0, crownDirection * 0.70, 0);
+
+                    if (isUpper) {
+                        point.rotation.x = Math.PI;
+                    }
+
+                    addVisualPart(toothGroup, point, visualParts, colorableParts);
+                }
+
+                if (type === 'premolar') {
+                    const cuspY = crownDirection * 0.54;
+                    const cuspA = createSoftCusp(-size.width * 0.20, cuspY, -size.depth * 0.15, 0.90, enamelMaterial);
+                    const cuspB = createSoftCusp(size.width * 0.20, cuspY, size.depth * 0.15, 0.90, enamelMaterial);
+
+                    addVisualPart(toothGroup, cuspA, visualParts, colorableParts);
+                    addVisualPart(toothGroup, cuspB, visualParts, colorableParts);
+                }
+
+                if (type === 'molar') {
+                    const cuspY = crownDirection * 0.51;
+                    const cuspPositions = [
+                        [-size.width * 0.23, cuspY, -size.depth * 0.20],
+                        [size.width * 0.23, cuspY, -size.depth * 0.20],
+                        [-size.width * 0.23, cuspY, size.depth * 0.20],
+                        [size.width * 0.23, cuspY, size.depth * 0.20]
+                    ];
+
+                    cuspPositions.forEach(pos => {
+                        const cusp = createSoftCusp(pos[0], pos[1], pos[2], 1.0, enamelMaterial);
+                        addVisualPart(toothGroup, cusp, visualParts, colorableParts);
+                    });
+                }
+
+                const hitGeometry = new THREE.SphereGeometry(1, 16, 12);
+                const hitMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xffffff,
+                    transparent: true,
+                    opacity: 0.001,
+                    depthWrite: false
+                });
+
+                const hitMesh = new THREE.Mesh(hitGeometry, hitMaterial);
+                hitMesh.scale.set(size.hitWidth, size.hitHeight, size.hitDepth);
+                hitMesh.position.set(0, crownDirection * 0.25, 0);
+
+                hitMesh.userData = {
+                    tooth: toothNum,
+                    originalColor: '#FFFFF8',
+                    visualGroup: toothGroup,
+                    visualParts: visualParts,
+                    colorableParts: colorableParts
+                };
+
+                toothGroup.add(hitMesh);
+
+                return {
+                    group: toothGroup,
+                    hitMesh: hitMesh
+                };
+            }
+
+            function createArch(teethArray, yPosition, isUpper = true) {
+                const group = new THREE.Group();
+                const archStartAngle = Math.PI + 0.08;
+                const archEndAngle = -0.08;
+                const archWidthRadius = 3.18;
+                const archDepthRadius = 2.85;
+
+                teethArray.forEach((toothNum, i) => {
+                    const tooth = createStylizedTooth(toothNum, isUpper);
+
+                    const ratio = teethArray.length > 1 ? (i / (teethArray.length - 1)) : 0;
+                    const sideSign = ratio < 0.5 ? -1 : 1;
+                    let angle = archStartAngle - ratio * (archStartAngle - archEndAngle);
+
+                    const lastDigit = Number(String(toothNum).slice(-1));
+                    const molarAngleOffsetMap = {
+                        6: 0.016,
+                        7: 0.033,
+                        8: 0.052,
+                    };
+                    const molarYNudgeMap = {
+                        6: 0.05,
+                        7: 0.08,
+                        8: 0.11,
+                    };
+
+                    if (molarAngleOffsetMap[lastDigit]) {
+                        angle += sideSign * molarAngleOffsetMap[lastDigit];
+                    }
+
+                    const x = Math.cos(angle) * archWidthRadius;
+                    const z = Math.sin(angle) * archDepthRadius;
+                    const yNudge = molarYNudgeMap[lastDigit]
+                        ? (isUpper ? molarYNudgeMap[lastDigit] : -molarYNudgeMap[lastDigit])
+                        : 0;
+
+                    tooth.group.position.set(x, yPosition + yNudge, z);
+                    tooth.group.lookAt(0, yPosition + yNudge, -0.10);
+
+                    group.add(tooth.group);
+                    teethMeshes.push(tooth.hitMesh);
+                });
+
+                scene.add(group);
+            }
+
+            function createGumArch(yPosition, isUpper = true) {
+                const points = [];
+                const gumStartAngle = Math.PI + 0.08;
+                const gumEndAngle = -0.08;
+                const gumWidthRadius = 3.58;
+                const gumDepthRadius = 2.92;
+
+                for (let i = 0; i <= 72; i++) {
+                    const t = i / 72;
+                    const angle = gumStartAngle - t * (gumStartAngle - gumEndAngle);
+                    const x = Math.cos(angle) * gumWidthRadius;
+                    const z = Math.sin(angle) * gumDepthRadius;
+                    points.push(new THREE.Vector3(x, yPosition, z));
+                }
+
+                const curve = new THREE.CatmullRomCurve3(points);
+
+                const mainGeometry = new THREE.TubeGeometry(curve, 96, 0.39, 24, false);
+                const mainGum = new THREE.Mesh(mainGeometry, createStandardMaterial(gumMaterialProps));
+                mainGum.castShadow = true;
+                mainGum.receiveShadow = true;
+                scene.add(mainGum);
+
+                const lipPoints = points.map(point => new THREE.Vector3(point.x, point.y + (isUpper ? -0.22 : 0.22), point.z + 0.02));
+                const lipCurve = new THREE.CatmullRomCurve3(lipPoints);
+                const lipGeometry = new THREE.TubeGeometry(lipCurve, 96, 0.19, 18, false);
+                const lipGum = new THREE.Mesh(
+                    lipGeometry,
+                    createStandardMaterial({
+                        ...gumMaterialProps,
+                        color: 0xF9C4BF,
+                        roughness: 0.72
+                    })
+                );
+
+                lipGum.castShadow = true;
+                lipGum.receiveShadow = true;
+                scene.add(lipGum);
+
+                function addGumCover() {
+                    const coverSegments = 72;
+                    const vertices = [];
+                    const indices = [];
+
+                    const outerWidthRadius = 3.72;
+                    const outerDepthRadius = 2.98;
+                    const innerWidthRadius = 2.92;
+                    const innerDepthRadius = 2.18;
+
+                    const awayFromTeethY = yPosition + (isUpper ? 0.30 : -0.30);
+                    const nearTeethY = yPosition + (isUpper ? -0.26 : 0.26);
+
+                    function pushVertex(x, y, z) {
+                        vertices.push(x, y, z);
+                        return (vertices.length / 3) - 1;
+                    }
+
+                    for (let i = 0; i <= coverSegments; i++) {
+                        const t = i / coverSegments;
+                        const angle = gumStartAngle - t * (gumStartAngle - gumEndAngle);
+
+                        const outerX = Math.cos(angle) * outerWidthRadius;
+                        const outerZ = Math.sin(angle) * outerDepthRadius;
+                        const innerX = Math.cos(angle) * innerWidthRadius;
+                        const innerZ = Math.sin(angle) * innerDepthRadius;
+
+                        pushVertex(outerX, awayFromTeethY, outerZ);
+                        pushVertex(innerX, awayFromTeethY, innerZ);
+                        pushVertex(outerX, nearTeethY, outerZ);
+                        pushVertex(innerX, nearTeethY, innerZ);
+                    }
+
+                    for (let i = 0; i < coverSegments; i++) {
+                        const base = i * 4;
+                        const next = (i + 1) * 4;
+
+                        const outerAway = base;
+                        const innerAway = base + 1;
+                        const outerNear = base + 2;
+                        const innerNear = base + 3;
+
+                        const nextOuterAway = next;
+                        const nextInnerAway = next + 1;
+                        const nextOuterNear = next + 2;
+                        const nextInnerNear = next + 3;
+
+                        // outer curved wall
+                        indices.push(outerAway, nextOuterAway, outerNear);
+                        indices.push(nextOuterAway, nextOuterNear, outerNear);
+
+                        // inner curved wall
+                        indices.push(innerAway, innerNear, nextInnerAway);
+                        indices.push(nextInnerAway, innerNear, nextInnerNear);
+
+                        // away-from-teeth cover surface
+                        indices.push(outerAway, innerAway, nextOuterAway);
+                        indices.push(nextOuterAway, innerAway, nextInnerAway);
+
+                        // near-teeth cover surface
+                        indices.push(outerNear, nextOuterNear, innerNear);
+                        indices.push(nextOuterNear, nextInnerNear, innerNear);
+                    }
+
+                    // close left end
+                    indices.push(0, 2, 1);
+                    indices.push(1, 2, 3);
+
+                    // close right end
+                    const last = coverSegments * 4;
+                    indices.push(last, last + 1, last + 2);
+                    indices.push(last + 1, last + 3, last + 2);
+
+                    const coverGeometry = new THREE.BufferGeometry();
+                    coverGeometry.setAttribute(
+                        'position',
+                        new THREE.Float32BufferAttribute(vertices, 3)
+                    );
+                    coverGeometry.setIndex(indices);
+                    coverGeometry.computeVertexNormals();
+
+                    const coverMaterial = createStandardMaterial({
+                        ...gumMaterialProps,
+                        color: 0xF3A09B,
+                        roughness: 0.74,
+                        side: THREE.DoubleSide
+                    });
+
+                    const coverMesh = new THREE.Mesh(coverGeometry, coverMaterial);
+                    coverMesh.castShadow = true;
+                    coverMesh.receiveShadow = true;
+                    scene.add(coverMesh);
+                }
+
+                addGumCover();
+
+                function addGumEndCap(basePoint, lipPoint, sideSign) {
+                    const mainCap = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.34, 24, 18),
+                        createStandardMaterial(gumMaterialProps)
+                    );
+                    mainCap.scale.set(1.02, 1.24, 0.96);
+                    mainCap.position.set(
+                        basePoint.x + sideSign * 0.06,
+                        basePoint.y + (isUpper ? 0.01 : -0.01),
+                        basePoint.z
+                    );
+                    mainCap.castShadow = true;
+                    mainCap.receiveShadow = true;
+                    scene.add(mainCap);
+
+                    const lipCap = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.20, 20, 14),
+                        createStandardMaterial({
+                            ...gumMaterialProps,
+                            color: 0xF9C4BF,
+                            roughness: 0.72
+                        })
+                    );
+                    lipCap.scale.set(1.10, 1.16, 0.88);
+                    lipCap.position.set(
+                        lipPoint.x + sideSign * 0.08,
+                        lipPoint.y,
+                        lipPoint.z + 0.01
+                    );
+                    lipCap.castShadow = true;
+                    lipCap.receiveShadow = true;
+                    scene.add(lipCap);
+
+                    const bridge = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.13, 0.13, 0.28, 18, 1),
+                        createStandardMaterial({
+                            ...gumMaterialProps,
+                            color: 0xF6B4AE,
+                            roughness: 0.70
+                        })
+                    );
+                    bridge.scale.set(0.85, 1.0, 0.72);
+                    bridge.position.set(
+                        basePoint.x + sideSign * 0.07,
+                        (basePoint.y + lipPoint.y) / 2,
+                        basePoint.z + 0.01
+                    );
+                    bridge.rotation.z = Math.PI / 2;
+                    bridge.castShadow = true;
+                    bridge.receiveShadow = true;
+                    scene.add(bridge);
+                }
+
+                addGumEndCap(points[0], lipPoints[0], -1);
+                addGumEndCap(points[points.length - 1], lipPoints[lipPoints.length - 1], 1);
+            }
+
+            createGumArch(1.30, true);
+            createGumArch(-1.30, false);
+
+            createArch(adultUpper, 0.95, true);
+            createArch(adultLower, -0.95, false);
+
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+
+            renderer.domElement.addEventListener('pointermove', onThreePointerMove);
+            renderer.domElement.addEventListener('pointerleave', onThreePointerLeave);
+            renderer.domElement.addEventListener('pointerdown', onThreePointerDown);
+
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+            }
+
+            animate();
+
+            setTimeout(() => {
+                loadingOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    loadingOverlay.style.display = 'none';
+                }, 500);
+            }, 600);
+
+            threeSceneInitialized = true;
+            renderThreeVisuals();
+        }
+
+        function handleResize() {
+            if (!renderer || !camera) return;
+            const newWidth = container.clientWidth || 700;
+            const newHeight = container.clientHeight || 480;
+            camera.aspect = newWidth / newHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(newWidth, newHeight);
+        }
+
+        function setToothPartVisual(part, options = {}) {
+            if (!part || !part.material) return;
+
+            const material = part.material;
+            const opacity = options.opacity ?? 1;
+
+            material.transparent = opacity < 1;
+            material.opacity = opacity;
+            material.emissive.setHex(options.emissiveHex ?? 0x111111);
+            material.emissiveIntensity = options.emissiveIntensity ?? 0.08;
+
+            if (options.colorHex && part.userData.colorable) {
+                material.color.setStyle(options.colorHex);
+            }
+
+            material.needsUpdate = true;
+        }
+
+        function renderThreeVisuals() {
+            if (!teethMeshes.length) return;
+
+            teethMeshes.forEach(mesh => {
+                const toothId = Number(mesh.userData.tooth);
+                const state = ensureToothState(toothId);
+                const isSelectedTooth = selectedTooth && toothId === Number(selectedTooth);
+                const shouldDim = currentView === '3d' && selectedTooth && !isSelectedTooth;
+                const visualRecord = state.threeD || getPreferredToothVisual(state);
+
+                const visualGroup = mesh.userData.visualGroup;
+                const visualParts = mesh.userData.visualParts || [];
+                const colorableParts = mesh.userData.colorableParts || [];
+
+                if (visualGroup) {
+                    visualGroup.scale.set(1, 1, 1);
+                }
+
+                visualParts.forEach(part => {
+                    setToothPartVisual(part, {
+                        opacity: shouldDim ? 0.34 : 1,
+                        emissiveIntensity: shouldDim ? 0.02 : 0.08
+                    });
+                });
+
+                if (visualRecord) {
+                    colorableParts.forEach(part => {
+                        setToothPartVisual(part, {
+                            colorHex: visualRecord.colorHex,
+                            opacity: shouldDim ? 0.40 : 1,
+                            emissiveIntensity: shouldDim ? 0.03 : 0.10
+                        });
+                    });
+
+                    mesh.userData.originalColor = visualRecord.colorHex;
+                    mesh.userData.legend = visualRecord.code;
+                } else {
+                    colorableParts.forEach(part => {
+                        setToothPartVisual(part, {
+                            colorHex: '#FFFFF8',
+                            opacity: shouldDim ? 0.34 : 1,
+                            emissiveIntensity: shouldDim ? 0.02 : 0.08
+                        });
+                    });
+
+                    mesh.userData.originalColor = '#FFFFF8';
+                    delete mesh.userData.legend;
+                }
+            });
+
+            if (selectedMesh && currentView === '3d') {
+                applySelectedMeshState(selectedMesh);
+            }
+        }
+
+        function applySelectedMeshState(mesh) {
+            if (!mesh) return;
+
+            const visualGroup = mesh.userData.visualGroup;
+            const visualParts = mesh.userData.visualParts || [];
+            const colorableParts = mesh.userData.colorableParts || [];
+
+            if (visualGroup) {
+                visualGroup.scale.set(1.13, 1.13, 1.13);
+            }
+
+            visualParts.forEach(part => {
+                setToothPartVisual(part, {
+                    opacity: 1,
+                    emissiveHex: 0x8B0000,
+                    emissiveIntensity: 0.20
+                });
+            });
+
+            colorableParts.forEach(part => {
+                setToothPartVisual(part, {
+                    opacity: 1,
+                    emissiveHex: 0x8B0000,
+                    emissiveIntensity: 0.28
+                });
+            });
+        }
+
+        function updateMousePosition(event) {
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        }
+
+        function showTooltip(event, mesh) {
+            const toothNumber = mesh.userData.tooth;
+            const toothName = getToothName(toothNumber);
+            const state = ensureToothState(toothNumber);
+            const treatment = state.threeD || getPreferredToothVisual(state);
+
+            toothTooltipContent.innerHTML = `
+                    <div class="text-xs font-extrabold tracking-wide text-red-200 mb-1">Tooth #${toothNumber}</div>
+                    <div class="text-sm font-bold leading-tight">${toothName}</div>
+                    <div class="mt-1 text-[11px] text-gray-300">Click to choose this tooth, then select a surface.</div>
+                    <div class="mt-2 text-xs ${treatment ? 'text-emerald-200' : 'text-gray-300'}">
+                        ${treatment ? `Current visual: ${getLegendDisplayCode(treatment.code)} - ${treatment.label}` : 'No treatment assigned'}
+                    </div>
+                `;
+
+            const rect = container.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            toothTooltip.style.left = `${x}px`;
+            toothTooltip.style.top = `${y}px`;
+            toothTooltip.classList.add('show');
+        }
+
+        function hideTooltip() {
+            toothTooltip.classList.remove('show');
+        }
+
+        function onThreePointerMove(event) {
+            updateMousePosition(event);
+            raycaster.setFromCamera(mouse, camera);
+
+            const intersects = raycaster.intersectObjects(teethMeshes);
+
+            if (intersects.length > 0) {
+                hoveredMesh = intersects[0].object;
+                const hoveredToothNumber = hoveredMesh.userData.tooth;
+                toothHoverLabel.innerText = selectedTooth && selectedTargetType === '3d' ?
+                    `Selected: #${selectedTooth}` :
+                    `Tooth #${hoveredToothNumber}`;
+
+                showTooltip(event, hoveredMesh);
+            } else {
+                hoveredMesh = null;
+                toothHoverLabel.innerText = selectedTooth ? `Selected: #${selectedTooth}` : 'Select a tooth';
+                hideTooltip();
+            }
+        }
+
+        function onThreePointerLeave() {
+            hoveredMesh = null;
+            toothHoverLabel.innerText = selectedTooth ? `Selected: #${selectedTooth}` : 'Select a tooth';
+            hideTooltip();
+        }
+
+        function onThreePointerDown(event) {
+            updateMousePosition(event);
+            raycaster.setFromCamera(mouse, camera);
+
+            const intersects = raycaster.intersectObjects(teethMeshes);
+
+            if (intersects.length > 0) {
+                selectedMesh = intersects[0].object;
+                selectedTooth = selectedMesh.userData.tooth;
+                restoreSavedSurfaceSelectionForTooth(selectedTooth);
+
+                focusCameraOnTooth(selectedMesh);
+                renderThreeVisuals();
+                updateSelectedToothUI();
+
+                if (hoveredMesh) {
+                    showTooltip(event, hoveredMesh);
+                }
+
+                return;
+            }
+
+            clear3DSurfacePickerSelection(false);
+            hideTooltip();
+        }
+
+        const procedureStartTimestamp = Date.now();
+
+        function formatElapsedTime(totalSeconds) {
+            const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+            const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+            const seconds = String(totalSeconds % 60).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+
+        function updateProcedureTimer() {
+            const elapsedSeconds = Math.floor((Date.now() - procedureStartTimestamp) / 1000);
+            procedureTimer.textContent = formatElapsedTime(elapsedSeconds);
+        }
+
+        applyTreatmentBtn.addEventListener('click', function () {
+            if (!selectedTooth || !selectedTargetType) {
+                alert('Please select a tooth target first.');
+                selectedLegendPreview.textContent = selectedLegend ?
+                    `${selectedLegend} - ${(getLegendByCode(selectedLegend)?.label || selectedLegend)}` :
+                    'No legend selected yet.';
+                return;
+            }
+
+            if (!selectedLegend) {
+                alert('Please choose a treatment legend first.');
+                return;
+            }
+
+            applyLegendToSelectedTarget(selectedLegend);
+        });
+
+        clearCurrentToothBtn.addEventListener('click', function () {
+            if (!selectedTooth || !selectedTargetType || !getSelectedRecord()) return;
+            openResetModal();
+        });
+
+        confirmResetTreatmentBtn.addEventListener('click', clearSelectedTargetTreatment);
+        cancelResetTreatmentBtn.addEventListener('click', closeResetModal);
+
+        resetTreatmentModal.addEventListener('click', function (event) {
+            if (event.target === resetTreatmentModal || event.target.classList.contains(
+                'modal-backdrop')) {
+                closeResetModal();
+            }
+        });
+
+        window.addEventListener('resize', handleResize);
+
+        const finishProcedureBtn = document.getElementById('finishProcedureBtn');
+        const followUpBtn = document.getElementById('followUpBtn');
+        const saveProcedureUrl = @json($saveProcedureUrl ?? null);
+        const storeFollowUpUrl = @json(!$historicalMode && $appointment ? route('dentist.dentist.appointments.follow-up.store', $appointment -> id) : null);
+
+        function showProcedureToast(message, type = 'success') {
+            const existingToast = document.getElementById('procedureToast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+
+            const toast = document.createElement('div');
+            toast.id = 'procedureToast';
+
+            const isSuccess = type === 'success';
+
+            toast.className = `
+        fixed top-24 right-6 z-[100000]
+        min-w-[280px] max-w-[420px]
+        rounded-2xl px-5 py-4 shadow-2xl border
+        flex items-start gap-3
+        transition-all duration-300
+        translate-x-6 opacity-0
+        ${isSuccess
+                    ? 'bg-white border-green-100 text-gray-800'
+                    : 'bg-white border-red-100 text-gray-800'}
+    `;
+
+            toast.innerHTML = `
+        <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0
+            ${isSuccess ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
+            <i class="fa-solid ${isSuccess ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i>
+        </div>
+
+        <div class="min-w-0 flex-1">
+            <p class="text-sm font-extrabold ${isSuccess ? 'text-green-700' : 'text-red-700'}">
+                ${isSuccess ? 'Success' : 'Error'}
+            </p>
+            <p class="text-sm font-semibold text-gray-700 mt-0.5 leading-relaxed">
+                ${message}
+            </p>
+        </div>
+
+        <button type="button" class="text-gray-400 hover:text-gray-700 transition">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    `;
+
+            toast.querySelector('button')?.addEventListener('click', () => {
+                toast.classList.add('translate-x-6', 'opacity-0');
+                setTimeout(() => toast.remove(), 250);
+            });
+
+            document.body.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-x-6', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('translate-x-6', 'opacity-0');
+                setTimeout(() => toast.remove(), 250);
+            }, 3500);
+        }
+
+        function setFollowUpEmptySlotPlaceholder() {
+            const slotPlaceholder = document.getElementById('followUpSlotPlaceholder');
+
+            if (!slotPlaceholder) return;
+
+            slotPlaceholder.classList.add('follow-up-empty-slot-placeholder');
+            slotPlaceholder.innerHTML = `
+                    <div class="follow-up-empty-icon">
+                        <i class="fa-regular fa-calendar"></i>
+                    </div>
+                    <h4>Choose a date</h4>
+                    <p>Select an available day to see time slots.</p>
+                `;
+        }
+
+        function hideFollowUpSelectedTime() {
+            const selectedTimePill = document.getElementById('followUpSelectedTimePill');
+            const selectedTimeText = document.getElementById('followUpSelectedTimeText');
+
+            if (selectedTimeText) {
+                selectedTimeText.textContent = '';
+            }
+
+            if (selectedTimePill) {
+                selectedTimePill.classList.add('hidden');
+                selectedTimePill.classList.remove('show');
+                selectedTimePill.style.display = 'none';
+            }
+        }
+
+        function syncFollowUpSlotState() {
+            const slotsWrap = document.querySelector('.follow-up-slots-wrap');
+            const dateInput = document.getElementById('followup_appointment_date');
+            const timeInput = document.getElementById('followup_appointment_time');
+            const datePill = document.getElementById('followUpDatePill');
+            const slotPlaceholder = document.getElementById('followUpSlotPlaceholder');
+            const slotContainer = document.getElementById('followUpSlotContainer');
+            const slotGrid = document.getElementById('followUpSlotGrid');
+            const selectedTimePill = document.getElementById('followUpSelectedTimePill');
+            const selectedTimeText = document.getElementById('followUpSelectedTimeText');
+            const clearTimeBtn = document.getElementById('followUpClearTimeBtn');
+
+            const hasDate = Boolean(dateInput?.value);
+            const hasSlotMarkup = Boolean(slotGrid?.children?.length);
+            const hasAvailableSlots = Boolean(slotGrid?.querySelector('.slot-chip:not(.disabled)'));
+            const selectedValue = timeInput?.value || '';
+
+            slotsWrap?.classList.toggle('is-empty', !hasDate);
+            slotsWrap?.classList.toggle('has-date', hasDate);
+            slotsWrap?.classList.toggle('has-slots', hasDate && hasSlotMarkup);
+
+            if (!hasDate) {
+                if (datePill) {
+                    datePill.innerHTML = '';
+                    datePill.classList.add('hidden');
+                    datePill.classList.remove('show');
+                    datePill.style.display = 'none';
+                }
+
+                if (slotContainer) {
+                    slotContainer.classList.add('hidden');
+                    slotContainer.style.display = 'none';
+                }
+
+                if (slotGrid) {
+                    slotGrid.innerHTML = '';
+                    slotGrid.style.display = 'none';
+                }
+
+                if (slotPlaceholder) {
+                    setFollowUpEmptySlotPlaceholder();
+                    slotPlaceholder.classList.remove('hidden');
+                    slotPlaceholder.style.display = 'flex';
+                }
+
+                if (clearTimeBtn) {
+                    clearTimeBtn.classList.add('hidden');
+                }
+
+                hideFollowUpSelectedTime();
+                return;
+            }
+
+            if (datePill) {
+                if (datePill.textContent.trim().length > 0) {
+                    datePill.classList.remove('hidden');
+                    datePill.classList.add('show');
+                    datePill.style.display = 'flex';
+                } else {
+                    datePill.classList.add('hidden');
+                    datePill.classList.remove('show');
+                    datePill.style.display = 'none';
+                }
+            }
+
+            if (slotPlaceholder) {
+                slotPlaceholder.classList.add('hidden');
+                slotPlaceholder.style.display = 'none';
+            }
+
+            if (slotContainer) {
+                slotContainer.classList.remove('hidden');
+                slotContainer.style.display = 'block';
+            }
+
+            if (clearTimeBtn) {
+                clearTimeBtn.classList.toggle('hidden', !hasAvailableSlots);
+            }
+
+            if (selectedTimePill && selectedTimeText) {
+                if (selectedValue) {
+                    selectedTimeText.textContent = selectedValue;
+                    selectedTimePill.classList.remove('hidden');
+                    selectedTimePill.classList.add('show');
+                    selectedTimePill.style.display = 'flex';
+                } else {
+                    hideFollowUpSelectedTime();
+                }
+            }
+        }
+
+        function resetFollowUpForm() {
+            const form = document.getElementById('followUpForm');
+            const dateInput = document.getElementById('followup_appointment_date');
+            const timeInput = document.getElementById('followup_appointment_time');
+            const reasonInput = document.getElementById('followup_reason');
+            const datePill = document.getElementById('followUpDatePill');
+            const slotPlaceholder = document.getElementById('followUpSlotPlaceholder');
+            const slotContainer = document.getElementById('followUpSlotContainer');
+            const slotGrid = document.getElementById('followUpSlotGrid');
+            const clearTimeBtn = document.getElementById('followUpClearTimeBtn');
+
+            if (form) form.reset();
+            if (dateInput) dateInput.value = '';
+            if (timeInput) timeInput.value = '';
+            if (reasonInput) reasonInput.value = '';
+
+            if (typeof selectedDate !== 'undefined') selectedDate = null;
+            if (typeof selectedTime !== 'undefined') selectedTime = null;
+
+            document.getElementById('followUpDateError')?.classList.add('hidden');
+            document.getElementById('followUpTimeError')?.classList.add('hidden');
+
+            document.querySelector('.follow-up-cal-wrap')?.classList.remove('error');
+            document.querySelector('.follow-up-slots-wrap')?.classList.remove('error');
+
+            if (datePill) {
+                datePill.innerHTML = '';
+                datePill.classList.add('hidden');
+                datePill.classList.remove('show');
+                datePill.style.display = 'none';
+            }
+
+            if (slotPlaceholder) {
+                setFollowUpEmptySlotPlaceholder();
+                slotPlaceholder.classList.remove('hidden');
+                slotPlaceholder.style.display = 'flex';
+            }
+
+            if (slotContainer) {
+                slotContainer.classList.add('hidden');
+                slotContainer.style.display = 'none';
+            }
+
+            if (slotGrid) {
+                slotGrid.innerHTML = '';
+                slotGrid.style.display = 'none';
+            }
+
+            if (clearTimeBtn) {
+                clearTimeBtn.classList.add('hidden');
+            }
+
+            hideFollowUpSelectedTime();
+            syncFollowUpSlotState();
+        }
+
+        const followUpClearTimeBtn = document.getElementById('followUpClearTimeBtn');
+
+        function clearFollowUpTimeSelection() {
+            const slotGrid = document.getElementById('followUpSlotGrid');
+            const timeInput = document.getElementById('followup_appointment_time');
+
+            if (typeof selectedTime !== 'undefined') {
+                selectedTime = null;
+            }
+
+            if (timeInput) {
+                timeInput.value = '';
+                timeInput.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+
+            slotGrid?.querySelectorAll('.slot-chip').forEach(chip => {
+                chip.classList.remove(
+                    'selected',
+                    'bg-[#8B0000]',
+                    'text-white',
+                    'border-[#8B0000]',
+                    'shadow-[0_2px_12px_rgba(139,0,0,0.25)]'
+                );
+                chip.classList.add('border-[#e8e2dd]', 'bg-[#fafaf8]', 'text-[#1a1410]');
+                chip.setAttribute('aria-pressed', 'false');
+            });
+
+            syncFollowUpSlotState();
+        }
+
+        if (followUpClearTimeBtn) {
+            followUpClearTimeBtn.addEventListener('click', clearFollowUpTimeSelection);
+        }
+
+        if (typeof renderSlotLoading === 'function') {
+            const originalRenderSlotLoading = renderSlotLoading;
+            renderSlotLoading = function (iso) {
+                originalRenderSlotLoading(iso);
+                setTimeout(syncFollowUpSlotState, 0);
+            };
+        }
+
+        if (typeof renderSlots === 'function') {
+            const originalRenderSlots = renderSlots;
+            renderSlots = function (payload, iso) {
+                originalRenderSlots(payload, iso);
+                setTimeout(syncFollowUpSlotState, 0);
+            };
+        }
+
+        if (typeof clearSlotSelectionUI === 'function') {
+            const originalClearSlotSelectionUI = clearSlotSelectionUI;
+            clearSlotSelectionUI = function () {
+                originalClearSlotSelectionUI();
+                setFollowUpEmptySlotPlaceholder();
+                setTimeout(syncFollowUpSlotState, 0);
+            };
+        }
+
+        document.getElementById('followUpSlotGrid')?.addEventListener('click', function () {
+            setTimeout(syncFollowUpSlotState, 0);
+        });
+
+        document.getElementById('followup_appointment_date')?.addEventListener('change', function () {
+            setTimeout(syncFollowUpSlotState, 0);
+        });
+
+        document.getElementById('followup_appointment_time')?.addEventListener('change', syncFollowUpSlotState);
+
+        ['followUpDatePill', 'followUpSlotGrid'].forEach(function (id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+
+            new MutationObserver(function () {
+                setTimeout(syncFollowUpSlotState, 0);
+            }).observe(el, {
+                childList: true,
+                subtree: true
+            });
+        });
+
+        window.openFollowUpModal = function () {
+            resetFollowUpForm();
+
+            const modal = document.getElementById('followUpModal');
+            if (!modal) return;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            requestAnimationFrame(() => {
+                if (typeof renderCalendar === 'function') {
+                    renderCalendar();
+                } else {
+                    console.warn('renderCalendar is not loaded.');
+                }
+            });
+        };
+
+        window.closeFollowUpModal = function () {
+            const modal = document.getElementById('followUpModal');
+            if (!modal) return;
+
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        function getCleanOdontogramDataForSave() {
+            let rawData = [];
+
+            try {
+                rawData = JSON.parse(odontogramDataInput.value || '[]');
+            } catch (error) {
+                rawData = [];
+            }
+
+            if (!Array.isArray(rawData)) {
+                rawData = Object.values(rawData || {});
+            }
+
+            return rawData
+                .map(function (entry) {
+                    const toothNumber = Number(entry?.tooth || 0);
+
+                    if (!toothNumber) {
+                        return null;
+                    }
+
+                    const cleanEntry = {
+                        tooth: toothNumber,
+                        toothName: entry.toothName || getToothName(toothNumber),
+                        status: null,
+                        surfaces: {
+                            top: null,
+                            left: null,
+                            center: null,
+                            right: null,
+                            bottom: null,
+                        },
+                        threeD: null,
+                        lastSelectedSurface: null,
+                    };
+
+                    if (entry.status && entry.status.code) {
+                        cleanEntry.status = entry.status;
+                    }
+
+                    if (entry.threeD && entry.threeD.code) {
+                        cleanEntry.threeD = entry.threeD;
+                    }
+
+                    const surfaces = entry.surfaces || {};
+
+                    ['top', 'left', 'center', 'right', 'bottom'].forEach(function (surfaceKey) {
+                        if (surfaces[surfaceKey] && surfaces[surfaceKey].code) {
+                            cleanEntry.surfaces[surfaceKey] = surfaces[surfaceKey];
+                        }
+                    });
+
+                    const savedSurfaceKey =
+                        ['top', 'left', 'center', 'right', 'bottom'].includes(entry.lastSelectedSurface)
+                            ? entry.lastSelectedSurface
+                            : null;
+
+                    cleanEntry.lastSelectedSurface =
+                        savedSurfaceKey && cleanEntry.surfaces[savedSurfaceKey]
+                            ? savedSurfaceKey
+                            : getFirstTreatedSurfaceKey(cleanEntry);
+
+                    if (!cleanEntry.threeD) {
+                        cleanEntry.threeD = getPreferredToothVisual(cleanEntry);
+                    }
+
+                    const hasTreatment =
+                        (cleanEntry.status && cleanEntry.status.code) ||
+                        (cleanEntry.threeD && cleanEntry.threeD.code) ||
+                        Object.values(cleanEntry.surfaces).some(function (surface) {
+                            return surface && surface.code;
+                        });
+
+                    return hasTreatment ? cleanEntry : null;
+                })
+                .filter(Boolean);
+        }
+
+        async function saveProcedure(completionAction, clickedButton, loadingText) {
+            const originalButtonHtml = clickedButton.innerHTML;
+
+            updateHiddenInput();
+
+            if (!hasAppliedTreatmentThisSession) {
+                alert(
+                    'Please apply at least one treatment to the tooth chart before finishing the procedure.'
+                );
+                return;
+            }
+
+            const cleanOdontogramData = getCleanOdontogramDataForSave();
+
+            if (cleanOdontogramData.length === 0) {
+                alert(
+                    'Please apply at least one treatment to the tooth chart before finishing the procedure.'
+                );
+                return;
+            }
+
+            const payload = {
+                odontogram_data: cleanOdontogramData,
+                oral_examination: document.getElementById('oralExaminationNotes').value,
+                diagnosis: document.getElementById('diagnosisNotes').value,
+                prescriptions: document.getElementById('prescriptionsNotes').value,
+                completion_action: completionAction,
+                has_applied_treatment: hasAppliedTreatmentThisSession,
+                procedure_duration_seconds: historicalMode
+                    ? 0
+                    : Math.max(0, Math.floor((Date.now() - procedureStartTimestamp) / 1000)),
+            };
+
+            finishProcedureBtn.disabled = true;
+            if (followUpBtn) {
+                followUpBtn.disabled = true;
+            }
+
+            clickedButton.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> ${loadingText}`;
+
+            try {
+                const response = await fetch(saveProcedureUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': @json(csrf_token()),
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    console.error(result);
+                    showProcedureToast(
+                        result.message ||
+                        'Failed to save procedure. Please check your inputs and try again.',
+                        'error'
+                    );
+                    return;
+                }
+
+                if (completionAction === 'finished') {
+                    openFinishProcedureModal({
+                        title: historicalMode ? 'Existing Appointment Saved!' : 'Procedure Completed!',
+                        message: historicalMode
+                            ? 'The historical appointment, notes, duration, and odontogram were saved successfully.'
+                            : 'The odontogram and procedure notes were saved successfully. This appointment has been marked as completed.',
+                        icon: 'fa-clipboard-check',
+                        buttonText: historicalMode ? 'Back to Patient Profile' : 'Back to Appointments',
+                        redirectUrl: result.redirect_url || null,
+                    });
+                } else {
+                    showProcedureToast(result.message || 'Procedure completed successfully.', 'success');
+
+                    if (result.redirect_url) {
+                        setTimeout(() => {
+                            window.location.href = result.redirect_url;
+                        }, 900);
+                    }
+                }
+
+            } catch (error) {
+                console.error(error);
+                showProcedureToast('Something went wrong while saving the procedure.', 'error');
+            } finally {
+                finishProcedureBtn.disabled = false;
+                if (followUpBtn) {
+                    followUpBtn.disabled = false;
+                }
+                clickedButton.innerHTML = originalButtonHtml;
+            }
+        }
+
+        finishProcedureBtn.addEventListener('click', function () {
+            updateHiddenInput();
+
+            if (!hasAppliedTreatmentThisSession || getCleanOdontogramDataForSave().length === 0) {
+                openFinishProcedureModal({
+                    title: 'Treatment Required',
+                    message: 'Please apply at least one treatment to the tooth chart before finishing the procedure.',
+                    icon: 'fa-tooth',
+                    buttonText: 'Review Procedure',
+                });
+                return;
+            }
+
+            openFinishProcedureModal({
+                title: historicalMode ? 'Save Existing Appointment?' : 'Finish Procedure?',
+                message: historicalMode
+                    ? 'Are you sure you want to save this historical appointment? The old visit details, odontogram, and notes will be stored as a completed appointment.'
+                    : 'Are you sure you want to finish this procedure? The odontogram and procedure notes will be saved, and this appointment will be marked as completed.',
+                icon: 'fa-circle-question',
+                confirmation: true,
+            });
+        });
+
+        confirmFinishProcedureBtn.addEventListener('click', function () {
+            closeFinishProcedureModal();
+            saveProcedure('finished', finishProcedureBtn, 'Saving Procedure...');
+        });
+
+        dismissFinishProcedureBtn.addEventListener('click', closeFinishProcedureModal);
+        finishProcedureModalActionBtn.addEventListener('click', closeFinishProcedureModal);
+
+        finishProcedureModal.addEventListener('click', function (event) {
+            if (event.target === finishProcedureModal || event.target.classList.contains('procedure-confirm-backdrop')) {
+                closeFinishProcedureModal();
+            }
+        });
+
+        followUpBtn?.addEventListener('click', function () {
+            openFollowUpModal();
+        });
+
+        document.getElementById('followUpForm')?.addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const form = event.currentTarget;
+            const dateInput = document.getElementById('followup_appointment_date');
+            const timeInput = document.getElementById('followup_appointment_time');
+            const reasonInput = document.getElementById('followup_reason');
+            const confirmBtn = document.getElementById('confirmFollowUpBtn');
+
+            let valid = true;
+
+            if (!dateInput?.value) {
+                document.getElementById('followUpDateError')?.classList.remove('hidden');
+                document.querySelector('.follow-up-cal-wrap')?.classList.add('error');
+                valid = false;
+            }
+
+            if (!timeInput?.value) {
+                document.getElementById('followUpTimeError')?.classList.remove('hidden');
+                document.querySelector('.follow-up-slots-wrap')?.classList.add('error');
+                valid = false;
+            }
+
+            if (!reasonInput?.value.trim()) {
+                reasonInput.focus();
+                valid = false;
+            }
+
+            if (!valid) return;
+
+            const originalBtnHtml = confirmBtn.innerHTML;
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML =
+                '<i class="fa-solid fa-circle-notch fa-spin mr-1"></i> Saving...';
+
+            try {
+                const followUpResponse = await fetch(storeFollowUpUrl, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': @json(csrf_token()),
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: new FormData(form),
+                });
+
+                const followUpResult = await followUpResponse.json().catch(() => null);
+
+                if (!followUpResponse.ok) {
+                    alert(followUpResult?.message || 'Failed to schedule follow-up appointment.');
+                    confirmBtn.disabled = false;
+                    confirmBtn.innerHTML = originalBtnHtml;
+                    return;
+                }
+
+                await saveProcedure('follow_up', confirmBtn, 'Saving Procedure...');
+
+            } catch (error) {
+                console.error(error);
+                alert('Something went wrong while scheduling the follow-up appointment.');
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = originalBtnHtml;
+            }
+        });
+
+        if (clearSelectionBtn) {
+            clearSelectionBtn.addEventListener('click', clearCurrentSelection);
+        }
+
+        if (undoBtn) {
+            undoBtn.addEventListener('click', undoLastAction);
+        }
+
+        if (redoBtn) {
+            redoBtn.addEventListener('click', redoLastAction);
+        }
+
+        function handleHistoryKeyboardShortcuts(event) {
+            const isTyping =
+                event.target &&
+                (
+                    event.target.tagName === 'INPUT' ||
+                    event.target.tagName === 'TEXTAREA' ||
+                    event.target.isContentEditable
+                );
+
+            if (isTyping) return;
+
+            const key = event.key.toLowerCase();
+            const isCtrlOrCmd = event.ctrlKey || event.metaKey;
+
+            if (!isCtrlOrCmd) return;
+
+            if (key === 'z' && !event.shiftKey) {
+                event.preventDefault();
+                undoLastAction();
+                return;
+            }
+
+            if (key === 'y' || (key === 'z' && event.shiftKey)) {
+                event.preventDefault();
+                redoLastAction();
+            }
+        }
+
+        if (cancelProcedureBtn) {
+            cancelProcedureBtn.addEventListener('click', openCancelProcedureModal);
+        }
+
+        if (dismissCancelProcedureBtn) {
+            dismissCancelProcedureBtn.addEventListener('click', closeCancelProcedureModal);
+        }
+
+        if (confirmCancelProcedureBtn) {
+            confirmCancelProcedureBtn.addEventListener('click', function () {
+                window.location.href = cancelProcedureRedirectUrl;
+            });
+        }
+
+        if (cancelProcedureModal) {
+            cancelProcedureModal.addEventListener('click', function (event) {
+                if (event.target === cancelProcedureModal || event.target.classList.contains(
+                    'modal-backdrop')) {
+                    closeCancelProcedureModal();
+                }
+            });
+        }
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeResetModal();
+                closeCancelProcedureModal();
+                closeFinishProcedureModal();
+
+                if (currentView === '3d' && selectedTooth) {
+                    clear3DSurfacePickerSelection(false);
+                }
+            }
+        });
+
+        surfacePickerButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                selectSurfaceFrom3DPicker(button.dataset.surface);
+            });
+        });
+
+        if (reset3DViewBtn) {
+            reset3DViewBtn.addEventListener('click', function () {
+                clear3DSurfacePickerSelection(true);
+            });
+        }
+
+        if (close3DSurfacePickerBtn) {
+            close3DSurfacePickerBtn.addEventListener('click', function () {
+                clear3DSurfacePickerSelection(false);
+            });
+        }
+
+        updateProcedureTimer();
+        setInterval(updateProcedureTimer, 1000);
+
+        renderLegendButtons('');
+        updateHiddenInput();
+        render2DOdontogram();
+        updateSelectedToothUI();
+        updateHistoryButtons();
+
+        document.addEventListener('keydown', handleHistoryKeyboardShortcuts);
+    });
+</script>
+@endsection
