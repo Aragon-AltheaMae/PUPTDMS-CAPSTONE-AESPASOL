@@ -29,6 +29,7 @@
 @import './components/footer.css';
 @import './components/impersonation-banner.css';
 @import './pages/error-pages.css';
+@import './pages/auth/login.css';
 
 /* Shared page styles */
 @import './pages/dentist/dentist-shared.css';
