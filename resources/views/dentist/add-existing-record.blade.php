@@ -4,7 +4,7 @@
 
 @section('title', 'Add Existing Record')
 
-@vite('resources/css/pages/dentist/add-existing-record.css')
+@vite('resources/css/app.css')
 
 @section('content')
 <main id="mainContent" class="dentist-page-shell existing-record-page">

@@ -50,6 +50,7 @@
 @import './pages/dentist/dentist-book-appointment.css';
 @import './pages/dentist/odontogram.css';
 @import './pages/dentist/dentist-walk-in.css';
+@import './pages/dentist/add-existing-record.css';
 
 /* Patient pages */
 @import './pages/patient/dashboard.css';
