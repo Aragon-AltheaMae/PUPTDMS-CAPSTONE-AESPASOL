@@ -407,12 +407,8 @@
     "file": "assets/fa-v4compatibility-CErXDOsT.woff2",
     "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2"
   },
-  "public/images/PUP-TAGUIG-CAMPUS.jpg": {
-    "file": "assets/PUP-TAGUIG-CAMPUS-BDkSDBAE.jpg",
-    "src": "public/images/PUP-TAGUIG-CAMPUS.jpg"
-  },
   "resources/css/app.css": {
-    "file": "assets/app-BsLwfp0t.css",
+    "file": "assets/app-BV4ZaUpm.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -421,7 +417,7 @@
     ]
   },
   "resources/css/pages/auth/login.css": {
-    "file": "assets/login-AgYURyY2.css",
+    "file": "assets/login-lxmtUQ-g.css",
     "src": "resources/css/pages/auth/login.css",
     "isEntry": true,
     "name": "login",
