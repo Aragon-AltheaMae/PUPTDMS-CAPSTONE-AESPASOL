@@ -28,6 +28,7 @@
 @import './components/sidebar.css';
 @import './components/footer.css';
 @import './components/impersonation-banner.css';
+@import './pages/error-pages.css';
 
 /* Shared page styles */
 @import './pages/dentist/dentist-shared.css';
