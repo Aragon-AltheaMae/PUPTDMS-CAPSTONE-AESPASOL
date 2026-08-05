@@ -106,26 +106,38 @@ class EnsureSessionActivity
                 ], 401);
             }
 
-            if (
-                $request->session()->pull(
-                    'session_idle_modal_pending',
-                    false
-                )
-            ) {
-                $request->attributes->set(
-                    'session_idle_expired',
+            if ($alreadyLocked || $hasTimedOut) {
+
+                $request->session()->put(
+                    'session_idle_locked',
                     true
                 );
 
-                return $next($request);
+                if (
+                    $request->expectsJson() ||
+                    $request->ajax()
+                ) {
+                    return response()->json([
+                        'expired' => true,
+                        'message' =>
+                        'Your session has expired due to inactivity.',
+                    ], 401);
+                }
+
+                if ($request->isMethod('GET')) {
+
+                    $request->attributes->set(
+                        'session_idle_expired',
+                        true
+                    );
+
+                    return $next($request);
+                }
+
+                return response()->json([
+                    'expired' => true,
+                ], 401);
             }
-
-            $request->session()->put(
-                'session_idle_modal_pending',
-                true
-            );
-
-            return redirect()->back();
         }
 
         return $next($request);
