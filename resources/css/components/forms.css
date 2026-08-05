@@ -202,6 +202,20 @@
     }
 }
 
+.global-field-error.is-success {
+    display: flex;
+    color: #15803d;
+}
+
+.global-field-error.is-success i {
+    color: currentColor;
+}
+
+[data-theme="dark"] .global-field-error.is-success,
+.dark .global-field-error.is-success {
+    color: #86efac;
+}
+
 [data-theme="dark"] .global-field-error,
 .dark .global-field-error {
     color: #fca5a5;

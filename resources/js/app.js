@@ -4213,6 +4213,39 @@ registerGlobalValidationRule(
     }
 );
 
+registerGlobalValidationRule(
+    'strongPassword',
+    function (field) {
+        const value = String(field.value || '');
+
+        if (!value) {
+            return '';
+        }
+
+        if (value.length < 8) {
+            return 'Password must contain at least 8 characters.';
+        }
+
+        if (!/[a-z]/.test(value)) {
+            return 'Password must contain at least one lowercase letter.';
+        }
+
+        if (!/[A-Z]/.test(value)) {
+            return 'Password must contain at least one uppercase letter.';
+        }
+
+        if (!/\d/.test(value)) {
+            return 'Password must contain at least one number.';
+        }
+
+        if (!/[^A-Za-z0-9]/.test(value)) {
+            return 'Password must contain at least one special character.';
+        }
+
+        return '';
+    }
+);
+
 const globalFormValidationRules = new Map();
 
 function registerGlobalFormValidationRule(name, validator) {
@@ -4365,69 +4398,171 @@ function ensureGlobalFieldError(field) {
     return error;
 }
 
-function showFormInputValidationMessage(field, message) {
+function showFormInputValidationMessage(
+    field,
+    message = '',
+    successMessage = ''
+) {
     if (!field) return;
 
     field.setCustomValidity('');
 
-    const hasError = Boolean(message);
-    const controlHost = getGlobalFieldControlHost(field);
-    const customSelect = field.closest?.('.custom-select');
+    const hasError =
+        Boolean(message);
 
-    field.classList.toggle('is-invalid', hasError);
+    const hasValue =
+        String(field.value || '')
+            .trim()
+            .length > 0;
+
+    const hasSuccess =
+        !hasError &&
+        hasValue &&
+        Boolean(successMessage);
+
+    const controlHost =
+        getGlobalFieldControlHost(field);
+
+    const customSelect =
+        field.closest?.('.custom-select');
+
+    field.classList.toggle(
+        'is-invalid',
+        hasError
+    );
+
+    field.classList.toggle(
+        'is-valid',
+        !hasError && hasValue
+    );
 
     if (
         controlHost &&
         controlHost !== field &&
         !customSelect
     ) {
-        controlHost.classList.toggle('is-invalid', hasError);
-    }
+        controlHost.classList.toggle(
+            'is-invalid',
+            hasError
+        );
 
-    customSelect?.classList.toggle('is-invalid', hasError);
-
-    const error = ensureGlobalFieldError(field);
-
-    if (error) {
-        error.innerHTML = hasError
-            ? `
-                <i class="fa-solid fa-circle-exclamation"></i>
-                <span>${escapeHtml(message)}</span>
-              `
-            : '';
-
-        error.classList.toggle('show', hasError);
-        error.setAttribute(
-            'aria-hidden',
-            hasError ? 'false' : 'true'
+        controlHost.classList.toggle(
+            'is-valid',
+            !hasError && hasValue
         );
     }
 
-    if (field.id && error) {
-        error.id = `${field.id}-global-error`;
+    customSelect?.classList.toggle(
+        'is-invalid',
+        hasError
+    );
+
+    customSelect?.classList.toggle(
+        'is-valid',
+        !hasError && hasValue
+    );
+
+    const indicator =
+        ensureGlobalFieldError(field);
+
+    if (indicator) {
+        if (hasError) {
+            indicator.innerHTML = `
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span>${escapeHtml(message)}</span>
+            `;
+        } else if (hasSuccess) {
+            indicator.innerHTML = `
+                <i class="fa-solid fa-circle-check"></i>
+                <span>${escapeHtml(successMessage)}</span>
+            `;
+        } else {
+            indicator.innerHTML = '';
+        }
+
+        indicator.classList.toggle(
+            'show',
+            hasError || hasSuccess
+        );
+
+        indicator.classList.toggle(
+            'is-success',
+            hasSuccess
+        );
+
+        indicator.setAttribute(
+            'aria-hidden',
+            hasError || hasSuccess
+                ? 'false'
+                : 'true'
+        );
+    }
+
+    if (field.id && indicator) {
+        indicator.id =
+            `${field.id}-global-error`;
 
         if (hasError) {
-            field.setAttribute('aria-invalid', 'true');
             field.setAttribute(
-                'aria-describedby',
-                error.id
+                'aria-invalid',
+                'true'
             );
         } else {
-            field.removeAttribute('aria-invalid');
+            field.removeAttribute(
+                'aria-invalid'
+            );
+        }
 
-            if (
-                field.getAttribute('aria-describedby') === error.id
-            ) {
-                field.removeAttribute('aria-describedby');
-            }
+        if (hasError || hasSuccess) {
+            field.setAttribute(
+                'aria-describedby',
+                indicator.id
+            );
+        } else if (
+            field.getAttribute(
+                'aria-describedby'
+            ) === indicator.id
+        ) {
+            field.removeAttribute(
+                'aria-describedby'
+            );
         }
     }
 }
 
 function validateFormInputField(field) {
-    const message = getFormInputValidationMessage(field);
+    if (!field) return true;
 
-    showFormInputValidationMessage(field, message);
+    const message =
+        getFormInputValidationMessage(field);
+
+    let successMessage = '';
+
+    if (
+        !message &&
+        field.name === 'password_confirmation' &&
+        String(field.value || '').length > 0 &&
+        field.form
+    ) {
+        const passwordField =
+            field.form.querySelector(
+                '[name="password"]'
+            );
+
+        if (
+            passwordField &&
+            field.value === passwordField.value
+        ) {
+            successMessage =
+                'Passwords match.';
+        }
+    }
+
+    showFormInputValidationMessage(
+        field,
+        message,
+        successMessage
+    );
 
     return !message;
 }
