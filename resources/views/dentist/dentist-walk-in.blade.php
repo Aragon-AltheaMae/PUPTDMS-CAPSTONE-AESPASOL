@@ -2,6 +2,9 @@
 
 @section('layout-role', 'dentist')
 
+@section('hide-sidebar')
+@endsection
+
 @section('title', 'Walk-in Appointment')
 
 @section('content')
@@ -13,7 +16,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 @endphp
 
 <main id="mainContent" class="book-container min-h-screen bg-[#F4F4F4] dark:bg-[#020b14] py-6">
-    <div id="dentistBookAppointmentPage">
+    <div id="dentistWalkInPage" class="walkin-page">
         <div class="book-page-wrap">
 
             <div class="w-full pt-10 pb-2 animate-fade-up">
@@ -35,13 +38,24 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                         style="width:20%; background: linear-gradient(90deg, #8B0000, #c9a84c)"></div>
                 </div>
 
-                <div class="text-center mb-1">
-                    <p class="text-xs font-semibold uppercase tracking-widest mb-1 text-[#8B0000]">
-                        <i class="fa-regular fa-calendar-check mr-1"></i> PUP TAGUIG DENTAL CLINIC
-                    </p>
-                    <h1 class="text-3xl sm:text-4xl font-extrabold text-[#660000]">Walk-in Appointment</h1>
-                    <p class="text-sm text-[#9e9690] mt-1">Create a walk-in appointment and proceed directly to
-                        procedure.</p>
+                <div class="walkin-page-hero">
+                    <div class="walkin-page-hero-icon" aria-hidden="true">
+                        <i class="fa-solid fa-person-walking-arrow-right"></i>
+                    </div>
+
+                    <div class="walkin-page-hero-copy">
+                        <p class="walkin-page-kicker">Dentist Walk-in Workflow · Dentist Workspace</p>
+                        <h1 class="walkin-page-title">Walk-in Patient Intake</h1>
+                        <p class="walkin-page-description">
+                            Register or select the patient, document the required clinical history,
+                            and begin the dental procedure from one guided workflow.
+                        </p>
+                    </div>
+
+                    <div class="walkin-page-status">
+                        <i class="fa-solid fa-bolt"></i>
+                        Same-day intake
+                    </div>
                 </div>
 
             </div>
@@ -114,7 +128,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                     <div class="p-6 sm:p-8">
 
                         <form id="appointmentForm" action="{{ route('dentist.walk-in.start') }}" method="POST"
-                            enctype="multipart/form-data">
+                            enctype="multipart/form-data" data-global-selects>
 
                             <input type="hidden" name="patient_id" id="selectedPatientId">
                             <input type="hidden" name="patient_mode" id="patientMode" value="existing">
@@ -157,18 +171,31 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
 
                                             <div class="tab-panel active" id="existingPanel">
-                                                <div class="walkin-search-wrap">
-                                                    <i class="fa-solid fa-magnifying-glass walkin-search-icon"></i>
+                                                <div class="walkin-search-wrap search-wrap global-search"
+                                                    data-search-wrapper>
+                                                    <i class="fa-solid fa-magnifying-glass search-icon"
+                                                        aria-hidden="true"></i>
 
-                                                    <input type="text" id="patientSearch"
-                                                        class="form-input walkin-search-input w-full border border-[#e8e2dd] rounded-xl bg-white outline-none"
-                                                        placeholder="Search by name, ID, or email..."
-                                                        autocomplete="off">
+                                                    <input type="search" id="patientSearch"
+                                                        class="search-input walkin-search-input"
+                                                        placeholder="Search by name, ID, or email..." autocomplete="off"
+                                                        data-search-input>
+
+                                                    <button type="button" class="search-clear" data-search-clear
+                                                        aria-label="Clear patient search" title="Clear search">
+                                                        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                                                    </button>
                                                 </div>
 
-                                                <div class="patient-results" id="patientResults">
-                                                    <div class="empty-state">
-                                                        Search for a student, faculty, or administrative patient.
+                                                <div class="patient-results" id="patientResults" aria-live="polite">
+                                                    <div class="empty-state walkin-patient-state">
+                                                        <div class="patient-empty-icon walkin-patient-state-icon">
+                                                            <i class="fa-solid fa-user-doctor" aria-hidden="true"></i>
+                                                        </div>
+                                                        <p class="empty-state-title">Find a patient record</p>
+                                                        <p class="empty-state-sub">
+                                                            Search by name, student or employee ID, or email address.
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -324,11 +351,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-tooth text-xs"></i> Dental Symptoms <span
                                                 class="flex-1 h-px bg-[#f9e8e8]"></span>
                                         </p>
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                                            <span>Question</span><span class="text-center">YES</span><span
-                                                class="text-center">NO</span>
-                                        </div>
                                         @php
                                         $dentalQ1 = [
                                         [
@@ -358,14 +380,23 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         ];
                                         @endphp
                                         @foreach ($dentalQ1 as $q)
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ !$loop->last ? 'border-b border-[#f0ebe6]' : '' }} text-sm text-[#1a1410]">
-                                            <span class="leading-snug question-text">{{ $q['q'] }}</span>
-                                            <input type="radio" name="{{ $q['name'] }}" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="{{ $q['name'] }}" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">{{ $q['q'] }}</span>
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="{{ $q['q'] }}">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="{{ $q['name'] }}" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="{{ $q['name'] }}" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
                                         @endforeach
                                     </div>
@@ -376,11 +407,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-circle-dot text-xs"></i> Jaw &amp; Bite Symptoms
                                             <span class="flex-1 h-px bg-[#f9e8e8]"></span>
                                         </p>
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                                            <span>Question</span><span class="text-center">YES</span><span
-                                                class="text-center">NO</span>
-                                        </div>
                                         @php
                                         $dentalQ2 = [
                                         ['name' => 'clicking', 'q' => 'Clicking'],
@@ -412,14 +438,23 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         ];
                                         @endphp
                                         @foreach ($dentalQ2 as $q)
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ !$loop->last ? 'border-b border-[#f0ebe6]' : '' }} text-sm text-[#1a1410]">
-                                            <span class="leading-snug question-text">{{ $q['q'] }}</span>
-                                            <input type="radio" name="{{ $q['name'] }}" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="{{ $q['name'] }}" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">{{ $q['q'] }}</span>
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="{{ $q['q'] }}">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="{{ $q['name'] }}" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="{{ $q['name'] }}" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
                                         @endforeach
                                         <p class="text-xs text-[#8B0000] mt-2 italic pl-4">
@@ -437,32 +472,45 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-notes-medical text-xs"></i> Dental Procedures
                                             <span class="flex-1 h-px bg-[#f9e8e8]"></span>
                                         </p>
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                                            <span>Question</span><span class="text-center">YES</span><span
-                                                class="text-center">NO</span>
-                                        </div>
 
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
-                                            <span class="question-text">Have you had any periodontal (gum)
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Have you had any periodontal (gum)
                                                 treatment?</span>
-                                            <input type="radio" name="periodontal" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="periodontal" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Have you had any periodontal (gum) treatment?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="periodontal" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="periodontal" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
 
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
-                                            <span class="question-text">Have you had a difficult tooth
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Have you had a difficult tooth
                                                 extraction?</span>
-                                            <input type="radio" name="difficult_extraction" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="difficult_extraction" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Have you had a difficult tooth extraction?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="difficult_extraction" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="difficult_extraction" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
                                         <div class="ml-6 mt-2 mb-2 hidden" id="extraction_date_box">
                                             <label class="text-xs text-[#8B0000] italic block mb-1">Date of
@@ -475,27 +523,45 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
-                                            <span class="question-text">Have you had prolonged bleeding following
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Have you had prolonged bleeding following
                                                 tooth
                                                 extractions?</span>
-                                            <input type="radio" name="prolonged_bleeding" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="prolonged_bleeding" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Have you had prolonged bleeding following tooth extractions?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="prolonged_bleeding" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="prolonged_bleeding" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
 
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
-                                            <span class="question-text">Do you wear complete or partial
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Do you wear complete or partial
                                                 dentures?</span>
-                                            <input type="radio" name="dentures" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="dentures" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Do you wear complete or partial dentures?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="dentures" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="dentures" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
                                         <div class="ml-6 mt-2 mb-2 hidden" id="dentures_date_box">
                                             <label class="text-xs text-[#8B0000] italic block mb-1">Date of
@@ -508,13 +574,24 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
-                                            <span class="question-text">Have you had orthodontic treatment?</span>
-                                            <input type="radio" name="ortho_treatment" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="ortho_treatment" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Have you had orthodontic
+                                                treatment?</span>
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Have you had orthodontic treatment?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="ortho_treatment" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="ortho_treatment" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
                                         <div class="ml-6 mt-2 mb-2 hidden" id="ortho_date_box">
                                             <label class="text-xs text-[#8B0000] italic block mb-1">Date of
@@ -547,345 +624,410 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                     </div>
                                 </div>
                             </div>
-                        
 
-                    <div class="step-content hidden">
-                            <div class="booking-step-header">
-                                <p class="booking-step-eyebrow">Step 4 of 5</p>
-                                <h2 class="booking-step-title">Medical History</h2>
-                                <p class="booking-step-subtitle">
-                                    Provide important medical information so the clinic can prepare safe and
-                                    proper
-                                    dental care for you.
-                                </p>
-                            </div>
 
-                            <div class="booking-step-body">
-
-                                <div class="section-card">
-                                    <p class="section-card-title">
-                                        <i class="fa-solid fa-heart-pulse text-xs"></i> General Health
-                                        <span class="section-card-title-line"></span>
+                            <div class="step-content hidden">
+                                <div class="booking-step-header">
+                                    <p class="booking-step-eyebrow">Step 4 of 5</p>
+                                    <h2 class="booking-step-title">Medical History</h2>
+                                    <p class="booking-step-subtitle">
+                                        Provide important medical information so the clinic can prepare safe and
+                                        proper
+                                        dental care for you.
                                     </p>
-                                    <div
-                                        class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                                        <span>Question</span><span class="text-center">YES</span><span
-                                            class="text-center">NO</span>
-                                    </div>
-
-                                    <div
-                                        class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
-                                        <span class="question-text">Are you in good health?</span>
-                                        <input type="radio" name="good_health" value="YES"
-                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                            required>
-                                        <input type="radio" name="good_health" value="NO"
-                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
-                                    </div>
-                                    <div class="ml-6 mt-1 mb-2 hidden" id="good_health_box">
-                                        <label class="text-xs text-[#8B0000] italic">If NO, please provide
-                                            details:</label>
-                                        <input type="text" name="good_health_details" maxlength="150"
-                                            id="good_health_details"
-                                            class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
-                                            placeholder="Input here">
-                                        <div class="text-right text-xs"><span id="goodHealthCount">0/150</span>
-                                        </div>
-                                    </div>
-
-                                    <div
-                                        class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
-                                        <span class="question-text">When was your last medical
-                                            examination?</span>
-                                        <input type="radio" name="had_medical_exam" value="YES"
-                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                            required>
-                                        <input type="radio" name="had_medical_exam" value="NO"
-                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
-                                    </div>
-                                    <div class="ml-6 mt-1 mb-2 hidden" id="medical_exam_box">
-                                        <label class="text-xs text-[#8B0000] italic block mb-1">If YES, when was
-                                            your
-                                            last medical examination?</label>
-                                        <div class="date-input-wrap compact">
-                                            <input type="text" id="medicalExamDate" name="medical_exam_date"
-                                                class="js-flatpickr-date-max-today w-full form-input voice-small border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full"
-                                                placeholder="Select date" readonly>
-                                            <i class="fa-regular fa-calendar date-input-icon"></i>
-                                        </div>
-                                    </div>
-
-                                    <div
-                                        class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
-                                        <span class="question-text">Are you currently receiving treatment for
-                                            any
-                                            illness?</span>
-                                        <input type="radio" name="under_treatment" value="YES"
-                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                            required>
-                                        <input type="radio" name="under_treatment" value="NO"
-                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
-                                    </div>
-                                    <div class="ml-6 mt-1 mb-2 hidden" id="treatment_box">
-                                        <label class="text-xs text-[#8B0000] italic">If YES, please
-                                            specify:</label>
-                                        <input type="text" name="treatment_details" maxlength="150"
-                                            id="treatment_details"
-                                            class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
-                                            placeholder="Input here">
-                                        <div class="text-right text-xs"><span id="treatmentCount">0/150</span>
-                                        </div>
-                                    </div>
-
-                                    <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
-                                        <span class="question-text">Have you ever been hospitalized?</span>
-                                        <input type="radio" name="hospitalized" value="YES"
-                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                            required>
-                                        <input type="radio" name="hospitalized" value="NO"
-                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
-                                    </div>
-                                    <div class="ml-6 mt-1 mb-2 hidden" id="hospital_box">
-                                        <label class="text-xs text-[#8B0000] italic">If YES, please provide
-                                            details:</label>
-                                        <input type="text" name="hospital_details" maxlength="150" id="hospital_details"
-                                            class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
-                                            placeholder="Input here">
-                                        <div class="text-right text-xs"><span id="hospitalCount">0/150</span>
-                                        </div>
-                                    </div>
                                 </div>
 
-                                <div class="section-card">
-                                    <p class="section-card-title">
-                                        <i class="fa-solid fa-triangle-exclamation text-xs"></i> Allergies
-                                        <span class="section-card-title-line"></span>
-                                    </p>
-                                    <div
-                                        class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                                        <span>Are you allergic to any of the following?</span><span
-                                            class="text-center">YES</span><span class="text-center">NO</span>
-                                    </div>
-                                    <div
-                                        class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
-                                        <span class="question-text">Medicines</span>
-                                        <input type="radio" name="allergy_medicine" value="YES"
-                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                            required>
-                                        <input type="radio" name="allergy_medicine" value="NO"
-                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
-                                    </div>
-                                    <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
-                                        <span class="question-text">Food</span>
-                                        <input type="radio" name="allergy_food" value="YES"
-                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                            required>
-                                        <input type="radio" name="allergy_food" value="NO"
-                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
-                                    </div>
-                                    <div class="mt-3">
-                                        <label class="text-xs text-[#8B0000] italic block mb-1">Others (please
-                                            specify):</label>
-                                        <input type="text" name="allergy_others"
-                                            class="form-input voice-medium border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full"
-                                            placeholder="Input here">
-                                    </div>
-                                </div>
+                                <div class="booking-step-body">
 
-                                <div class="section-card">
-                                    <p class="section-card-title">
-                                        <i class="fa-solid fa-pills text-xs"></i> Medications
-                                        <span class="section-card-title-line"></span>
-                                    </p>
-                                    <div
-                                        class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                                        <span>Question</span><span class="text-center">YES</span><span
-                                            class="text-center">NO</span>
-                                    </div>
-                                    <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
-                                        <span class="question-text">Are you taking any prescription or
-                                            non-prescription
-                                            medication?</span>
-                                        <input type="radio" name="medication" value="YES"
-                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                            required>
-                                        <input type="radio" name="medication" value="NO"
-                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
-                                    </div>
-                                    <div class="ml-6 mt-1 mb-2 hidden" id="medication_box">
-                                        <label class="text-xs text-[#8B0000] italic">If YES, please
-                                            specify:</label>
-                                        <input type="text" name="medication_details" maxlength="150"
-                                            id="medication_details"
-                                            class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
-                                            placeholder="Input here">
-                                        <div class="text-right text-xs"><span id="medicationCount">0/150</span>
+                                    <div class="section-card">
+                                        <p class="section-card-title">
+                                            <i class="fa-solid fa-heart-pulse text-xs"></i> General Health
+                                            <span class="section-card-title-line"></span>
+                                        </p>
+
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Are you in good health?</span>
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Are you in good health?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="good_health" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="good_health" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="ml-6 mt-1 mb-2 hidden" id="good_health_box">
+                                            <label class="text-xs text-[#8B0000] italic">If NO, please provide
+                                                details:</label>
+                                            <input type="text" name="good_health_details" maxlength="150"
+                                                id="good_health_details"
+                                                class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
+                                                placeholder="Input here">
+                                            <div class="text-right text-xs"><span id="goodHealthCount">0/150</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">When was your last medical
+                                                examination?</span>
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="When was your last medical examination?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="had_medical_exam" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="had_medical_exam" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="ml-6 mt-1 mb-2 hidden" id="medical_exam_box">
+                                            <label class="text-xs text-[#8B0000] italic block mb-1">If YES, when was
+                                                your
+                                                last medical examination?</label>
+                                            <div class="date-input-wrap compact">
+                                                <input type="text" id="medicalExamDate" name="medical_exam_date"
+                                                    class="js-flatpickr-date-max-today w-full form-input voice-small border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full"
+                                                    placeholder="Select date" readonly>
+                                                <i class="fa-regular fa-calendar date-input-icon"></i>
+                                            </div>
+                                        </div>
+
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Are you currently receiving treatment for
+                                                any
+                                                illness?</span>
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Are you currently receiving treatment for any illness?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="under_treatment" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="under_treatment" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="ml-6 mt-1 mb-2 hidden" id="treatment_box">
+                                            <label class="text-xs text-[#8B0000] italic">If YES, please
+                                                specify:</label>
+                                            <input type="text" name="treatment_details" maxlength="150"
+                                                id="treatment_details"
+                                                class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
+                                                placeholder="Input here">
+                                            <div class="text-right text-xs"><span id="treatmentCount">0/150</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Have you ever been hospitalized?</span>
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Have you ever been hospitalized?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="hospitalized" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="hospitalized" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="ml-6 mt-1 mb-2 hidden" id="hospital_box">
+                                            <label class="text-xs text-[#8B0000] italic">If YES, please provide
+                                                details:</label>
+                                            <input type="text" name="hospital_details" maxlength="150"
+                                                id="hospital_details"
+                                                class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
+                                                placeholder="Input here">
+                                            <div class="text-right text-xs"><span id="hospitalCount">0/150</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                @if ($isFemalePatient)
-                                <div class="section-card" id="forWomenSection">
-                                    <p class="section-card-title">
-                                        <i class="fa-solid fa-venus text-xs"></i> For Women Only
-                                        <span class="section-card-title-line"></span>
-                                    </p>
-                                    <div
-                                        class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                                        <span>Question</span><span class="text-center">YES</span><span
-                                            class="text-center">NO</span>
+                                    <div class="section-card">
+                                        <p class="section-card-title">
+                                            <i class="fa-solid fa-triangle-exclamation text-xs"></i> Allergies
+                                            <span class="section-card-title-line"></span>
+                                        </p>
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Medicines</span>
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Medicines">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="allergy_medicine" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="allergy_medicine" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Food</span>
+
+                                            <div class="global-question-options" role="radiogroup" aria-label="Food">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="allergy_food" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="allergy_food" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <label class="text-xs text-[#8B0000] italic block mb-1">Others (please
+                                                specify):</label>
+                                            <input type="text" name="allergy_others"
+                                                class="form-input voice-medium border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full"
+                                                placeholder="Input here">
+                                        </div>
                                     </div>
 
-                                    @foreach ([
-                                    ['name' => 'pregnant', 'q' => 'Are you pregnant?'],
-                                    ['name' => 'nursing', 'q' => 'Are you nursing?'],
-                                    [
-                                    'name' => 'birth_control',
-                                    'q' => 'Are you taking birth
-                                    control pills?',
-                                    ],
-                                    ] as $i => $q)
-                                    <div
-                                        class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ $i < 2 ? 'border-b border-[#f0ebe6]' : '' }} text-sm">
-                                        <span class="question-text">{{ $q['q'] }}</span>
-                                        <input type="radio" name="{{ $q['name'] }}" value="YES"
-                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                            required>
-                                        <input type="radio" name="{{ $q['name'] }}" value="NO"
-                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
-                                    </div>
-                                    @endforeach
-                                </div>
-                                @else
-                                <input type="hidden" name="pregnant" value="NO">
-                                <input type="hidden" name="nursing" value="NO">
-                                <input type="hidden" name="birth_control" value="NO">
-                                @endif
+                                    <div class="section-card">
+                                        <p class="section-card-title">
+                                            <i class="fa-solid fa-pills text-xs"></i> Medications
+                                            <span class="section-card-title-line"></span>
+                                        </p>
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Are you taking any prescription or
+                                                non-prescription
+                                                medication?</span>
 
-                                <div class="section-card mt-5">
-                                    <p class="section-card-title">
-                                        <i class="fa-solid fa-stethoscope text-xs"></i> Medical Conditions
-                                        <span class="section-card-title-line"></span>
-                                    </p>
-                                    <p class="text-xs text-[#5c5550] mb-3">Please indicate below if you
-                                        presently
-                                        have
-                                        or have ever had any of the following:</p>
-                                    <div
-                                        class="medical-condition-grid grid grid-cols-1 sm:grid-cols-2 gap-y-2.5 gap-x-6">
-                                        @foreach ($diseases as $d)
-                                        <label class="flex items-center gap-2.5 cursor-pointer">
-                                            <input type="checkbox" name="diseases[]" value="{{ $d->code }}"
-                                                class="w-4 h-4 rounded border-2 border-[#e8e2dd] cursor-pointer accent-[#8B0000] flex-shrink-0">
-                                            <span class="text-[0.82rem] text-[#1a1410]">{{ $d->label }}</span>
-                                        </label>
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Are you taking any prescription or non-prescription medication?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="medication" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="medication" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="ml-6 mt-1 mb-2 hidden" id="medication_box">
+                                            <label class="text-xs text-[#8B0000] italic">If YES, please
+                                                specify:</label>
+                                            <input type="text" name="medication_details" maxlength="150"
+                                                id="medication_details"
+                                                class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
+                                                placeholder="Input here">
+                                            <div class="text-right text-xs"><span id="medicationCount">0/150</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @if ($isFemalePatient)
+                                    <div class="section-card" id="forWomenSection">
+                                        <p class="section-card-title">
+                                            <i class="fa-solid fa-venus text-xs"></i> For Women Only
+                                            <span class="section-card-title-line"></span>
+                                        </p>
+
+                                        @foreach ([
+                                        ['name' => 'pregnant', 'q' => 'Are you pregnant?'],
+                                        ['name' => 'nursing', 'q' => 'Are you nursing?'],
+                                        [
+                                        'name' => 'birth_control',
+                                        'q' => 'Are you taking birth
+                                        control pills?',
+                                        ],
+                                        ] as $i => $q)
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">{{ $q['q'] }}</span>
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="{{ $q['q'] }}">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="{{ $q['name'] }}" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="{{ $q['name'] }}" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
+                                        </div>
                                         @endforeach
                                     </div>
-                                </div>
+                                    @else
+                                    <input type="hidden" name="pregnant" value="NO">
+                                    <input type="hidden" name="nursing" value="NO">
+                                    <input type="hidden" name="birth_control" value="NO">
+                                    @endif
 
-                                <div class="section-card">
-                                    <p class="section-card-title">
-                                        <i class="fa-solid fa-smoking text-xs"></i> Tobacco Use
-                                        <span class="section-card-title-line"></span>
-                                    </p>
-                                    <div
-                                        class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                                        <span>Question</span><span class="text-center">YES</span><span
-                                            class="text-center">NO</span>
-                                    </div>
-                                    <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
-                                        <span class="question-text">Do you use tobacco products or any
-                                            derivatives?</span>
-                                        <input type="radio" name="tobacco_use" value="YES"
-                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                            required>
-                                        <input type="radio" name="tobacco_use" value="NO"
-                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
-                                    </div>
-                                    <div id="tobacco_details" class="ml-6 mt-2 space-y-2 hidden text-sm">
-                                        <div class="flex items-center gap-3 flex-wrap">
-                                            <span class="text-xs text-[#8B0000] italic w-28">How much per
-                                                day:</span>
-                                            <input type="text" name="tobacco_per_day" placeholder="Input here"
-                                                class="form-input voice-small border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full">
-                                        </div>
-                                        <div class="flex items-center gap-3 flex-wrap">
-                                            <span class="text-xs text-[#8B0000] italic w-28">Per week:</span>
-                                            <input type="text" name="tobacco_per_week" placeholder="Input here"
-                                                class="form-input voice-small border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="section-card">
-                                    <p class="section-card-title">
-                                        <i class="fa-solid fa-head-side-mask text-xs"></i> Do You Suffer From
-                                        <span class="section-card-title-line"></span>
-                                    </p>
-                                    <div
-                                        class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                                        <span>Condition</span><span class="text-center">YES</span><span
-                                            class="text-center">NO</span>
-                                    </div>
-                                    @foreach ([['name' => 'headaches', 'q' => 'Headaches'], ['name' => 'earaches', 'q'
-                                    => 'Earaches'], ['name' => 'neck_aches', 'q' => 'Neck aches']] as $i => $q)
-                                    <div
-                                        class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ $i < 2 ? 'border-b border-[#f0ebe6]' : '' }} text-sm">
-                                        <span class="question-text">{{ $q['q'] }}</span>
-                                        <input type="radio" name="{{ $q['name'] }}" value="YES"
-                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                            required>
-                                        <input type="radio" name="{{ $q['name'] }}" value="NO"
-                                            class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
-                                    </div>
-                                    @endforeach
-                                </div>
-
-                                <div class="section-card">
-                                    <p class="section-card-title">
-                                        <i class="fa-solid fa-phone-volume text-xs"></i> Emergency Contact
-                                        <span class="section-card-title-line"></span>
-                                    </p>
-
-                                    <div class="emergency-fields-stack">
-                                        <div>
-                                            <label class="block text-xs font-semibold text-[#333] mb-1.5">
-                                                Person to contact in case of emergency
+                                    <div class="section-card mt-5">
+                                        <p class="section-card-title">
+                                            <i class="fa-solid fa-stethoscope text-xs"></i> Medical Conditions
+                                            <span class="section-card-title-line"></span>
+                                        </p>
+                                        <p class="text-xs text-[#5c5550] mb-3">Please indicate below if you
+                                            presently
+                                            have
+                                            or have ever had any of the following:</p>
+                                        <div
+                                            class="medical-condition-grid grid grid-cols-1 sm:grid-cols-2 gap-y-2.5 gap-x-6">
+                                            @foreach ($diseases as $d)
+                                            <label class="flex items-center gap-2.5 cursor-pointer">
+                                                <input type="checkbox" name="diseases[]" value="{{ $d->code }}"
+                                                    class="w-4 h-4 rounded border-2 border-[#e8e2dd] cursor-pointer accent-[#8B0000] flex-shrink-0">
+                                                <span class="text-[0.82rem] text-[#1a1410]">{{ $d->label }}</span>
                                             </label>
-                                            <input type="text" id="emergency_person" name="emergency_person"
-                                                maxlength="50" pattern="[A-Za-zÑñ\s.'-]+"
-                                                title="Only letters, spaces, apostrophe, period, and hyphen are allowed."
-                                                class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
-                                                placeholder="Full name" required>
-
-                                            <p id="emergency_person_feedback" class="field-help-text text-[#9e9690]">
-                                                Only letters, spaces, apostrophe, period, and hyphen are allowed.
-                                            </p>
+                                            @endforeach
                                         </div>
+                                    </div>
 
-                                        <div>
-                                            <label class="block text-xs font-semibold text-[#333] mb-1.5">
-                                                Contact Number
-                                            </label>
-                                            <input type="tel" id="emergency_number" name="emergency_number"
-                                                inputmode="numeric" autocomplete="tel" maxlength="13"
-                                                class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full"
-                                                placeholder="09xx xxx xxxx" required>
-                                            <p id="emergency_number_feedback" class="field-help-text text-[#9e9690]">
-                                                Format: 09xx xxx xxxx
-                                            </p>
+                                    <div class="section-card">
+                                        <p class="section-card-title">
+                                            <i class="fa-solid fa-smoking text-xs"></i> Tobacco Use
+                                            <span class="section-card-title-line"></span>
+                                        </p>
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Do you use tobacco products or any
+                                                derivatives?</span>
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Do you use tobacco products or any derivatives?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="tobacco_use" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="tobacco_use" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
+                                        <div id="tobacco_details" class="ml-6 mt-2 space-y-2 hidden text-sm">
+                                            <div class="flex items-center gap-3 flex-wrap">
+                                                <span class="text-xs text-[#8B0000] italic w-28">How much per
+                                                    day:</span>
+                                                <input type="text" name="tobacco_per_day" placeholder="Input here"
+                                                    class="form-input voice-small border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full">
+                                            </div>
+                                            <div class="flex items-center gap-3 flex-wrap">
+                                                <span class="text-xs text-[#8B0000] italic w-28">Per week:</span>
+                                                <input type="text" name="tobacco_per_week" placeholder="Input here"
+                                                    class="form-input voice-small border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full">
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                        <div>
-                                            <label class="block text-xs font-semibold text-[#333] mb-1.5">
-                                                Relation to Patient <span class="required-star">*</span>
-                                            </label>
-                                            <div class="relative w-full">
+                                    <div class="section-card">
+                                        <p class="section-card-title">
+                                            <i class="fa-solid fa-head-side-mask text-xs"></i> Do You Suffer From
+                                            <span class="section-card-title-line"></span>
+                                        </p>
+                                        @foreach ([['name' => 'headaches', 'q' => 'Headaches'], ['name' => 'earaches',
+                                        'q'
+                                        => 'Earaches'], ['name' => 'neck_aches', 'q' => 'Neck aches']] as $i => $q)
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">{{ $q['q'] }}</span>
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="{{ $q['q'] }}">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="{{ $q['name'] }}" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="{{ $q['name'] }}" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </div>
+
+                                    <div class="section-card">
+                                        <p class="section-card-title">
+                                            <i class="fa-solid fa-phone-volume text-xs"></i> Emergency Contact
+                                            <span class="section-card-title-line"></span>
+                                        </p>
+
+                                        <div class="emergency-fields-stack">
+                                            <div>
+                                                <label class="block text-xs font-semibold text-[#333] mb-1.5">
+                                                    Person to contact in case of emergency
+                                                </label>
+                                                <input type="text" id="emergency_person" name="emergency_person"
+                                                    maxlength="50" pattern="[A-Za-zÑñ\s.'-]+"
+                                                    title="Only letters, spaces, apostrophe, period, and hyphen are allowed."
+                                                    class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
+                                                    placeholder="Full name" required>
+
+                                                <p id="emergency_person_feedback"
+                                                    class="field-help-text text-[#9e9690]">
+                                                    Only letters, spaces, apostrophe, period, and hyphen are allowed.
+                                                </p>
+                                            </div>
+
+                                            <div>
+                                                <label class="block text-xs font-semibold text-[#333] mb-1.5">
+                                                    Contact Number
+                                                </label>
+                                                <input type="tel" id="emergency_number" name="emergency_number"
+                                                    inputmode="numeric" autocomplete="tel" maxlength="13"
+                                                    class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full"
+                                                    placeholder="09xx xxx xxxx" required>
+                                                <p id="emergency_number_feedback"
+                                                    class="field-help-text text-[#9e9690]">
+                                                    Format: 09xx xxx xxxx
+                                                </p>
+                                            </div>
+
+                                            <div>
+                                                <label class="block text-xs font-semibold text-[#333] mb-1.5">
+                                                    Relation to Patient <span class="required-star">*</span>
+                                                </label>
                                                 <select id="emergency_relation" name="emergency_relation"
-                                                    class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none appearance-none pr-8"
-                                                    required>
-                                                    <option value="" disabled selected>Select relation
-                                                    </option>
+                                                    class="js-custom-select form-select-custom"
+                                                    data-placeholder="Select relation" required>
+                                                    <option value="" disabled selected>Select relation</option>
                                                     <option value="Mother">Mother</option>
                                                     <option value="Father">Father</option>
                                                     <option value="Sibling">Sibling</option>
@@ -897,81 +1039,81 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                                     <option value="Cousin">Cousin</option>
                                                     <option value="Child">Child</option>
                                                 </select>
-                                                <div
-                                                    class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center">
-                                                    <i class="fa-solid fa-chevron-down text-[10px] text-[#5c5550]"></i>
-                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="section-card signature-section-card">
-                                    <div class="signature-full-row">
-                                        <label class="block text-xs font-semibold text-[#333] mb-1.5">
-                                            Patient's Signature <span class="required-star">*</span>
-                                        </label>
+                                    <div class="section-card signature-section-card">
+                                        <div class="signature-full-row">
+                                            <label class="block text-xs font-semibold text-[#333] mb-1.5">
+                                                Patient's Signature <span class="required-star">*</span>
+                                            </label>
 
-                                        {{-- Hidden file input only. No upload UI for walk-in.
-                                        The drawn signature from the canvas will be converted to PNG and attached here.
-                                        --}}
-                                        <input type="file" name="patient_signature" id="patient_signature"
-                                            class="hidden" accept=".png,image/png">
+                                            {{-- Hidden file input only. No upload UI for walk-in.
+                                            The drawn signature from the canvas will be converted to PNG and attached
+                                            here.
+                                            --}}
+                                            <input type="file" name="patient_signature" id="patient_signature"
+                                                class="hidden" accept=".png,image/png">
 
-                                        <div class="signature-methods-grid signature-drawing-only">
-                                            <div class="signature-draw-card">
-                                                <p class="signature-draw-title">Draw the patient's signature here</p>
+                                            <div class="signature-methods-grid signature-drawing-only">
+                                                <div class="signature-draw-card">
+                                                    <p class="signature-draw-title">Draw the patient's signature here
+                                                    </p>
 
-                                                <div class="signature-pad-wrap">
-                                                    <canvas id="signatureCanvas" class="signature-pad-canvas"></canvas>
-                                                </div>
+                                                    <div class="signature-pad-wrap">
+                                                        <canvas id="signatureCanvas"
+                                                            class="signature-pad-canvas"></canvas>
+                                                    </div>
 
-                                                <div class="signature-pad-footer">
-                                                    <span class="signature-pad-help">
-                                                        Use the drawing tablet, mouse, touch, or stylus. Click <b>Use
-                                                            Drawn Signature</b> after signing.
-                                                    </span>
+                                                    <div class="signature-pad-footer">
+                                                        <span class="signature-pad-help">
+                                                            Use the drawing tablet, mouse, touch, or stylus. Click
+                                                            <b>Use
+                                                                Drawn Signature</b> after signing.
+                                                        </span>
 
-                                                    <div class="signature-pad-actions">
-                                                        <button type="button" id="signatureUndoBtn"
-                                                            class="signature-pad-btn">
-                                                            Undo
-                                                        </button>
+                                                        <div class="signature-pad-actions">
+                                                            <button type="button" id="signatureUndoBtn"
+                                                                class="signature-pad-btn">
+                                                                Undo
+                                                            </button>
 
-                                                        <button type="button" id="signatureClearBtn"
-                                                            class="signature-pad-btn">
-                                                            Clear Signature
-                                                        </button>
+                                                            <button type="button" id="signatureClearBtn"
+                                                                class="signature-pad-btn">
+                                                                Clear Signature
+                                                            </button>
 
-                                                        <button type="button" id="signatureUseDrawnBtn"
-                                                            class="signature-pad-btn primary">
-                                                            Use Drawn Signature
-                                                        </button>
+                                                            <button type="button" id="signatureUseDrawnBtn"
+                                                                class="signature-pad-btn primary">
+                                                                Use Drawn Signature
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <div id="signature_result_box" class="mt-3 hidden text-left w-full max-w-full">
-                                            <p id="signature_filename"
-                                                class="text-xs text-[#5c5550] font-semibold truncate"></p>
+                                            <div id="signature_result_box"
+                                                class="mt-3 hidden text-left w-full max-w-full">
+                                                <p id="signature_filename"
+                                                    class="text-xs text-[#5c5550] font-semibold truncate"></p>
 
-                                            <div id="signature_error"
-                                                class="mt-1 hidden rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 leading-5 font-semibold">
+                                                <div id="signature_error"
+                                                    class="mt-1 hidden rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 leading-5 font-semibold">
+                                                </div>
                                             </div>
-                                        </div>
 
-                                        @error('patient_signature')
-                                        <p class="text-xs text-red-600 mt-3 font-semibold">
-                                            <i class="fa-solid fa-circle-exclamation mr-1"></i>
-                                            {{ $message }}
-                                        </p>
-                                        @enderror
+                                            @error('patient_signature')
+                                            <p class="text-xs text-red-600 mt-3 font-semibold">
+                                                <i class="fa-solid fa-circle-exclamation mr-1"></i>
+                                                {{ $message }}
+                                            </p>
+                                            @enderror
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                        </div>
+                            </div>
                     </div>
 
                     <div class="step-content hidden" id="step5">
@@ -1053,15 +1195,16 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                     </div>
                 </div>
 
-                <div id="navBtns" class="flex justify-end mt-8 gap-3 nav-btns-row">
+                <div id="navBtns" class="walkin-form-navigation nav-btns-row">
                     <button type="button" id="prevBtn" style="display:none;"
-                        class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-2xl px-6 py-3 text-sm font-semibold text-[#5c5550] bg-white shadow-sm">
-                        <i class="fa-solid fa-chevron-left text-xs"></i> Previous
+                        class="btn-secondary-custom walkin-nav-btn walkin-nav-prev">
+                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                        <span>Previous</span>
                     </button>
 
-                    <button type="button" id="nextBtn"
-                        class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-2xl px-8 py-3 text-sm font-bold shadow-[0_10px_24px_rgba(139,0,0,0.18)]">
-                        Next <i class="fa-solid fa-chevron-right text-xs"></i>
+                    <button type="button" id="nextBtn" class="btn-primary-custom walkin-nav-btn walkin-nav-next">
+                        <span>Next</span>
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
                     </button>
                 </div>
                 </form>
@@ -1077,10 +1220,11 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     <dialog id="introBookingModal" class="m-auto w-[calc(100vw-1.5rem)] max-w-[620px]">
         <div class="intro-booking-modal-panel">
             <div class="intro-booking-modal-hero">
-                <p class="intro-booking-modal-eyebrow">PUP Taguig Dental Clinic</p>
-                <h2 class="intro-booking-modal-title">Let's get your dental appointment ready.</h2>
+                <p class="intro-booking-modal-eyebrow">Dentist Walk-in Workflow</p>
+                <h2 class="intro-booking-modal-title">Prepare the walk-in patient for treatment.</h2>
                 <p class="intro-booking-modal-subtitle">
-                    This form will help the clinic prepare safe and proper care for your visit.
+                    Complete the patient intake, service selection, clinical history, and signature before starting the
+                    procedure.
                 </p>
             </div>
 
@@ -1096,37 +1240,38 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                 <div class="intro-checklist">
                     <div class="intro-check-item">
                         <div class="intro-check-icon"><i class="fa-solid fa-check"></i></div>
-                        <p>Fill out all required fields marked with <b>*</b>.</p>
+                        <p>Select an existing patient or create a guest record for today's walk-in visit.</p>
                     </div>
                     <div class="intro-check-item">
                         <div class="intro-check-icon"><i class="fa-solid fa-phone-volume"></i></div>
-                        <p>Prepare your emergency contact information.</p>
+                        <p>Choose the requested dental service and complete the patient's dental and medical history.
+                        </p>
                     </div>
                     <div class="intro-check-item">
                         <div class="intro-check-icon"><i class="fa-solid fa-signature"></i></div>
-                        <p>Prepare your patient signature image or draw it directly in the form.</p>
+                        <p>Ask the patient to review the information and provide a drawn signature.</p>
                     </div>
                     <div class="intro-check-item">
                         <div class="intro-check-icon"><i class="fa-solid fa-list-check"></i></div>
-                        <p>Review your information before submitting.</p>
+                        <p>Verify the intake summary before starting the dental procedure.</p>
                     </div>
                 </div>
 
                 <div class="intro-modal-actions">
                     <button type="button" id="introStartBtn" class="intro-action-btn intro-action-primary">
                         <i class="fa-solid fa-play"></i>
-                        <span>Start Booking</span>
+                        <span>Begin Walk-in Intake</span>
                     </button>
 
                     <button type="button" id="introContinueDraftBtn"
                         class="hidden intro-action-btn intro-action-secondary">
                         <i class="fa-solid fa-clock-rotate-left"></i>
-                        <span>Continue Draft</span>
+                        <span>Continue Walk-in Draft</span>
                     </button>
 
                     <a href="{{ route('dentist.dentist.appointments') }}" class="intro-action-btn intro-action-muted">
                         <i class="fa-solid fa-house"></i>
-                        <span>Back Home</span>
+                        <span>Back to Appointments</span>
                     </a>
                 </div>
             </div>
@@ -1328,7 +1473,13 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
         markFormDirty();
 
-        showMiniTab("Existing patient selected.");
+        window.showToast?.({
+            type: "success",
+            title: "Patient Selected",
+            message:
+                `${patient.name || "Patient"} was selected successfully.`,
+            duration: 3500,
+        });
     }
 
     function selectGuestPatient(shouldProceed = true) {
@@ -1469,14 +1620,109 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     let patientSearchTimer = null;
     let patientSearchLoadedOnFocus = false;
 
-    function renderPatientMessage(message) {
+    let patientLoadingMessageTimer = null;
+
+    function clearPatientLoadingMessageTimer() {
+        window.clearTimeout(patientLoadingMessageTimer);
+        patientLoadingMessageTimer = null;
+    }
+
+    function renderPatientMessage(
+        message,
+        {
+            title = "",
+            icon = "fa-user-magnifying-glass",
+            loading = false,
+        } = {}
+    ) {
         if (!patientResults) return;
 
+        const stateTitle = title || (
+            loading
+                ? "Loading patient records"
+                : message
+        );
+
+        const stateMessage = title
+            ? message
+            : loading
+                ? message
+                : "";
+
         patientResults.innerHTML = `
-        <div class="empty-state">
-            ${message}
-        </div>
-    `;
+            <div class="empty-state walkin-patient-state ${loading ? "is-loading" : ""}">
+                <div class="patient-empty-icon walkin-patient-state-icon">
+                    <i class="fa-solid ${icon} ${loading ? "fa-spin" : ""}"
+                        aria-hidden="true"></i>
+                </div>
+
+                <p class="empty-state-title">
+                    ${safePatientText(stateTitle)}
+                </p>
+
+                ${stateMessage ? `
+                    <p class="empty-state-sub" data-patient-state-message>
+                        ${safePatientText(stateMessage)}
+                    </p>
+                ` : ""}
+            </div>
+        `;
+    }
+
+    function updatePatientLoadingMessage(requestId) {
+        clearPatientLoadingMessageTimer();
+
+        const delayedMessages = [
+            {
+                delay: 2500,
+                message: "Still loading. The clinic database may be responding slowly.",
+            },
+            {
+                delay: 6000,
+                message: "This is taking longer than usual. Please keep this page open.",
+            },
+            {
+                delay: 10000,
+                message: "Patient records are still being retrieved. You may retry the search shortly.",
+            },
+        ];
+
+        let index = 0;
+
+        const showNextMessage = () => {
+            if (
+                requestId !== patientSearchRequestId ||
+                index >= delayedMessages.length
+            ) {
+                return;
+            }
+
+            const messageElement = patientResults?.querySelector(
+                "[data-patient-state-message]"
+            );
+
+            if (messageElement) {
+                messageElement.textContent =
+                    delayedMessages[index].message;
+            }
+
+            index += 1;
+
+            if (index < delayedMessages.length) {
+                const nextDelay =
+                    delayedMessages[index].delay -
+                    delayedMessages[index - 1].delay;
+
+                patientLoadingMessageTimer =
+                    window.setTimeout(showNextMessage, nextDelay);
+            }
+        };
+
+        patientLoadingMessageTimer =
+            window.setTimeout(
+                showNextMessage,
+                delayedMessages[0].delay
+            );
     }
 
     function getPatientInitials(name) {
@@ -1506,7 +1752,13 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         if (!patientResults) return;
 
         if (!patients.length) {
-            renderPatientMessage("No patient found.");
+            renderPatientMessage(
+                "Try another name, ID, or email address.",
+                {
+                    title: "No patient record found",
+                    icon: "fa-user-slash",
+                }
+            );
             return;
         }
 
@@ -1577,7 +1829,17 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         if (!patientResults) return;
 
         const requestId = ++patientSearchRequestId;
-        renderPatientMessage("Loading patient records...");
+
+        renderPatientMessage(
+            "Please wait while the clinic database is checked.",
+            {
+                title: "Loading patient records",
+                icon: "fa-circle-notch",
+                loading: true,
+            }
+        );
+
+        updatePatientLoadingMessage(requestId);
 
         try {
             const params = new URLSearchParams();
@@ -1604,11 +1866,27 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             }
 
             const patients = await response.json();
-            if (requestId !== patientSearchRequestId) return;
+
+            if (requestId !== patientSearchRequestId) {
+                return;
+            }
+
+            clearPatientLoadingMessageTimer();
             renderPatients(Array.isArray(patients) ? patients : []);
         } catch (error) {
-            if (requestId !== patientSearchRequestId) return;
-            renderPatientMessage("Unable to load patient records. Please try again.");
+            if (requestId !== patientSearchRequestId) {
+                return;
+            }
+
+            clearPatientLoadingMessageTimer();
+
+            renderPatientMessage(
+                "Check your connection, then search again.",
+                {
+                    title: "Unable to load patient records",
+                    icon: "fa-triangle-exclamation",
+                }
+            );
         }
     }
 
@@ -1637,6 +1915,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
         patientSearchTimer = setTimeout(function () {
             if (!query) {
+                patientSearchLoadedOnFocus = true;
                 loadPatients("", true);
                 return;
             }
@@ -1644,6 +1923,13 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             loadPatients(query, false);
         }, 350);
     });
+
+    patientSearch
+        ?.closest("[data-search-wrapper]")
+        ?.querySelector("[data-search-clear]")
+        ?.addEventListener("click", () => {
+            patientSearchLoadedOnFocus = true;
+        });
 
     function hasSavedDraft() {
         const raw = localStorage.getItem(DRAFT_KEY);
@@ -1754,6 +2040,16 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                 }
             }
         }
+        const relationSelect =
+            document.getElementById("emergency_relation");
+
+        const relationWrapper =
+            relationSelect?.closest(".custom-select");
+
+        if (relationWrapper) {
+            window.syncCustomSelect?.(relationWrapper);
+        }
+
         const restoredMode = patientModeInput?.value || "existing";
         setPatientMode(restoredMode, false);
 
@@ -1762,24 +2058,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         }
 
         formIsDirty = true;
-    }
-
-    const miniTab = document.getElementById("miniTab");
-    const miniTabText = document.getElementById("miniTabText");
-
-    function showMiniTab(msg) {
-        if (!miniTab) return;
-        miniTabText.textContent = msg || "Please complete all required fields.";
-        miniTab.style.opacity = "1";
-        miniTab.style.pointerEvents = "auto";
-        miniTab.classList.add("show");
-
-        clearTimeout(window.__mtTimer);
-        window.__mtTimer = setTimeout(() => {
-            miniTab.style.opacity = "0";
-            miniTab.style.pointerEvents = "none";
-            miniTab.classList.remove("show");
-        }, 3200);
     }
 
     function showInputError(input) {
@@ -2947,8 +3225,15 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     });
 
     function openLeaveModal(onConfirm) {
+        if (window.__SESSION_EXPIRED__) {
+            return;
+        }
+
         pendingNavigation = onConfirm;
-        leaveModal.showModal();
+
+        if (!leaveModal.open) {
+            leaveModal.showModal();
+        }
     }
 
     function confirmReloadPage() {
@@ -3168,15 +3453,47 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         });
 
         setTimeout(() => {
-            if (!modal.open) {
-                lockPageScroll();
-                modal.showModal();
+            if (
+                window.__SESSION_EXPIRED__ ||
+                modal.open
+            ) {
+                return;
             }
+
+            lockPageScroll();
+            modal.showModal();
         }, 350);
     }
 
     showStep(0);
     initIntroBookingModal();
+
+    function refreshWalkInGlobalControls() {
+        const page =
+            document.getElementById("dentistWalkInPage") ||
+            document;
+
+        window.initSearchClearButtons?.(page);
+        window.initCustomSelects?.(page);
+
+        const relationSelect =
+            document.getElementById("emergency_relation");
+
+        const relationWrapper =
+            relationSelect?.closest(".custom-select");
+
+        if (relationWrapper) {
+            window.syncCustomSelect?.(relationWrapper);
+        }
+    }
+
+    refreshWalkInGlobalControls();
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        refreshWalkInGlobalControls,
+        { once: true }
+    );
 
     window.addEventListener("resize", () => {
         document.querySelectorAll(".sm-grid-1col").forEach(el => {
@@ -3194,8 +3511,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         "medicationCount", 150);
 
     document.addEventListener("DOMContentLoaded", () => {
-        document.querySelectorAll(".question-text").forEach(q => {
-            const row = q.closest("div");
+        document.querySelectorAll(".global-question-text").forEach(q => {
+            const row = q.closest(".global-question-row");
             const hasRequiredRadio = row?.querySelector("input[required]");
 
             if (hasRequiredRadio && !q.querySelector(".required-star")) {
@@ -3206,8 +3523,19 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             }
         });
 
-        document.querySelectorAll("input[required], select[required], textarea[required]").forEach(input => {
-            if (input.tagName === "INPUT" && input.type === "hidden") return;
+        document.querySelectorAll(
+            "input[required], select[required], textarea[required]"
+        ).forEach(input => {
+            if (
+                input.tagName === "INPUT" &&
+                (
+                    input.type === "hidden" ||
+                    input.type === "radio" ||
+                    input.type === "checkbox"
+                )
+            ) {
+                return;
+            }
 
             let label = null;
 

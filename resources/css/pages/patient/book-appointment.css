@@ -1,59 +1,3 @@
-@keyframes confirmBackdropFade {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes confirmModalPop {
-    0% {
-        opacity: 0;
-        transform: translate3d(-50%, -50%, 0) scale(0.92);
-    }
-
-    60% {
-        opacity: 1;
-        transform: translate3d(-50%, -50%, 0) scale(1.03);
-    }
-
-    100% {
-        opacity: 1;
-        transform: translate3d(-50%, -50%, 0) scale(1);
-    }
-}
-
-@keyframes confirmIconPop {
-    0% {
-        opacity: 0;
-        transform: scale(0.55) rotate(-10deg);
-    }
-
-    60% {
-        opacity: 1;
-        transform: scale(1.08) rotate(4deg);
-    }
-
-    100% {
-        opacity: 1;
-        transform: scale(1) rotate(0);
-    }
-}
-
-@keyframes confirmContentRise {
-    from {
-        opacity: 0;
-        transform: translateY(16px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
 #confirmModal::backdrop {
     animation: confirmBackdropFade 0.25s ease-out;
 }
@@ -448,9 +392,6 @@ textarea.form-input::placeholder {
     z-index: 5;
 }
 
-.question-text {
-    color: #333 !important;
-}
 
 .required-star {
     color: #8B0000;
@@ -459,15 +400,7 @@ textarea.form-input::placeholder {
     display: inline;
 }
 
-.q-radio:checked {
-    border-color: #8B0000;
-    background: #8B0000;
-    box-shadow: inset 0 0 0 3px white;
-}
 
-.q-radio:hover:not(:checked) {
-    border-color: #8B0000;
-}
 
 
 .btn-primary-custom,
@@ -1232,10 +1165,6 @@ textarea {
     color: #d1d5db !important;
 }
 
-[data-theme="dark"] #mainContent .q-radio {
-    background: #0b141c !important;
-    border-color: #374151 !important;
-}
 
 [data-theme="dark"] #mainContent .step-counter-pill {
     background: #0d1117 !important;
@@ -1243,11 +1172,6 @@ textarea {
     color: #cbd5e1 !important;
 }
 
-[data-theme="dark"] #mainContent .q-radio:checked {
-    background: #8B0000 !important;
-    border-color: #fca5a5 !important;
-    box-shadow: inset 0 0 0 3px #0b141c !important;
-}
 
 [data-theme="dark"] #mainContent .book-card {
     background: linear-gradient(145deg, #0d1117, #111827) !important;

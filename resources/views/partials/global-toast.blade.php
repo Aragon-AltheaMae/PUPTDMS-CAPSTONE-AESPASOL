@@ -49,6 +49,7 @@
 
 @if (\Illuminate\Support\Facades\Auth::check())
     <div id="sessionTimeoutModal" class="ui-modal session-timeout-modal" data-session-timeout-modal data-modal-static
+        data-session-expired="{{ request()->attributes->get('session_idle_expired', false) ? 'true' : 'false' }}"
         data-session-timeout-seconds="{{ $idleTimeoutSeconds }}"
         data-session-activity-url="{{ route('session.activity') }}"
         data-session-expire-url="{{ route('session.expire') }}" data-session-redirect-url="{{ url('/') }}"

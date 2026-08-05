@@ -284,11 +284,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-tooth text-xs"></i> Dental Symptoms <span
                                                 class="flex-1 h-px bg-[#f9e8e8]"></span>
                                         </p>
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                                            <span>Question</span><span class="text-center">YES</span><span
-                                                class="text-center">NO</span>
-                                        </div>
                                         @php
                                         $dentalQ1 = [
                                         [
@@ -318,14 +313,23 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         ];
                                         @endphp
                                         @foreach ($dentalQ1 as $q)
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ !$loop->last ? 'border-b border-[#f0ebe6]' : '' }} text-sm text-[#1a1410]">
-                                            <span class="leading-snug question-text">{{ $q['q'] }}</span>
-                                            <input type="radio" name="{{ $q['name'] }}" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="{{ $q['name'] }}" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">{{ $q['q'] }}</span>
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="{{ $q['q'] }}">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="{{ $q['name'] }}" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="{{ $q['name'] }}" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
                                         @endforeach
                                     </div>
@@ -336,11 +340,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-circle-dot text-xs"></i> Jaw &amp; Bite Symptoms
                                             <span class="flex-1 h-px bg-[#f9e8e8]"></span>
                                         </p>
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                                            <span>Question</span><span class="text-center">YES</span><span
-                                                class="text-center">NO</span>
-                                        </div>
                                         @php
                                         $dentalQ2 = [
                                         ['name' => 'clicking', 'q' => 'Clicking'],
@@ -372,14 +371,23 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         ];
                                         @endphp
                                         @foreach ($dentalQ2 as $q)
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ !$loop->last ? 'border-b border-[#f0ebe6]' : '' }} text-sm text-[#1a1410]">
-                                            <span class="leading-snug question-text">{{ $q['q'] }}</span>
-                                            <input type="radio" name="{{ $q['name'] }}" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="{{ $q['name'] }}" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">{{ $q['q'] }}</span>
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="{{ $q['q'] }}">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="{{ $q['name'] }}" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="{{ $q['name'] }}" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
                                         @endforeach
                                         <p class="text-xs text-[#8B0000] mt-2 italic pl-4">
@@ -397,32 +405,45 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-notes-medical text-xs"></i> Dental Procedures
                                             <span class="flex-1 h-px bg-[#f9e8e8]"></span>
                                         </p>
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                                            <span>Question</span><span class="text-center">YES</span><span
-                                                class="text-center">NO</span>
-                                        </div>
 
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
-                                            <span class="question-text">Have you had any periodontal (gum)
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Have you had any periodontal (gum)
                                                 treatment?</span>
-                                            <input type="radio" name="periodontal" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="periodontal" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Have you had any periodontal (gum) treatment?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="periodontal" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="periodontal" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
 
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
-                                            <span class="question-text">Have you had a difficult tooth
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Have you had a difficult tooth
                                                 extraction?</span>
-                                            <input type="radio" name="difficult_extraction" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="difficult_extraction" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Have you had a difficult tooth extraction?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="difficult_extraction" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="difficult_extraction" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
                                         <div class="ml-6 mt-2 mb-2 hidden" id="extraction_date_box">
                                             <label class="text-xs text-[#8B0000] italic block mb-1">Date of
@@ -435,27 +456,46 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
-                                            <span class="question-text">Have you had prolonged bleeding following
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Have you had prolonged bleeding
+                                                following
                                                 tooth
                                                 extractions?</span>
-                                            <input type="radio" name="prolonged_bleeding" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="prolonged_bleeding" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Have you had prolonged bleeding following tooth extractions?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="prolonged_bleeding" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="prolonged_bleeding" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
 
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
-                                            <span class="question-text">Do you wear complete or partial
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Do you wear complete or partial
                                                 dentures?</span>
-                                            <input type="radio" name="dentures" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="dentures" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Do you wear complete or partial dentures?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="dentures" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="dentures" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
                                         <div class="ml-6 mt-2 mb-2 hidden" id="dentures_date_box">
                                             <label class="text-xs text-[#8B0000] italic block mb-1">Date of
@@ -468,13 +508,24 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
-                                            <span class="question-text">Have you had orthodontic treatment?</span>
-                                            <input type="radio" name="ortho_treatment" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="ortho_treatment" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Have you had orthodontic
+                                                treatment?</span>
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Have you had orthodontic treatment?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="ortho_treatment" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="ortho_treatment" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
                                         <div class="ml-6 mt-2 mb-2 hidden" id="ortho_date_box">
                                             <label class="text-xs text-[#8B0000] italic block mb-1">Date of
@@ -528,20 +579,24 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-heart-pulse text-xs"></i> General Health
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                                            <span>Question</span><span class="text-center">YES</span><span
-                                                class="text-center">NO</span>
-                                        </div>
 
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
-                                            <span class="question-text">Are you in good health?</span>
-                                            <input type="radio" name="good_health" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="good_health" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Are you in good health?</span>
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Are you in good health?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="good_health" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="good_health" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
                                         <div class="ml-6 mt-1 mb-2 hidden" id="good_health_box">
                                             <label class="text-xs text-[#8B0000] italic">If NO, please provide
@@ -554,15 +609,24 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
-                                            <span class="question-text">When was your last medical
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">When was your last medical
                                                 examination?</span>
-                                            <input type="radio" name="had_medical_exam" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="had_medical_exam" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="When was your last medical examination?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="had_medical_exam" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="had_medical_exam" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
                                         <div class="ml-6 mt-1 mb-2 hidden" id="medical_exam_box">
                                             <label class="text-xs text-[#8B0000] italic block mb-1">If YES, when was
@@ -576,16 +640,26 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
-                                            <span class="question-text">Are you currently receiving treatment for
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Are you currently receiving treatment
+                                                for
                                                 any
                                                 illness?</span>
-                                            <input type="radio" name="under_treatment" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="under_treatment" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Are you currently receiving treatment for any illness?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="under_treatment" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="under_treatment" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
                                         <div class="ml-6 mt-1 mb-2 hidden" id="treatment_box">
                                             <label class="text-xs text-[#8B0000] italic">If YES, please
@@ -598,13 +672,23 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
-                                            <span class="question-text">Have you ever been hospitalized?</span>
-                                            <input type="radio" name="hospitalized" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="hospitalized" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Have you ever been hospitalized?</span>
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Have you ever been hospitalized?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="hospitalized" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="hospitalized" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
                                         <div class="ml-6 mt-1 mb-2 hidden" id="hospital_box">
                                             <label class="text-xs text-[#8B0000] italic">If YES, please provide
@@ -623,27 +707,40 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-triangle-exclamation text-xs"></i> Allergies
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                                            <span>Are you allergic to any of the following?</span><span
-                                                class="text-center">YES</span><span class="text-center">NO</span>
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Medicines</span>
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Medicines">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="allergy_medicine" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="allergy_medicine" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 border-b border-[#f0ebe6] text-sm">
-                                            <span class="question-text">Medicines</span>
-                                            <input type="radio" name="allergy_medicine" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="allergy_medicine" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
-                                        </div>
-                                        <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
-                                            <span class="question-text">Food</span>
-                                            <input type="radio" name="allergy_food" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="allergy_food" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Food</span>
+
+                                            <div class="global-question-options" role="radiogroup" aria-label="Food">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="allergy_food" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="allergy_food" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
                                         <div class="mt-3">
                                             <label class="text-xs text-[#8B0000] italic block mb-1">Others (please
@@ -659,20 +756,25 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-pills text-xs"></i> Medications
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                                            <span>Question</span><span class="text-center">YES</span><span
-                                                class="text-center">NO</span>
-                                        </div>
-                                        <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
-                                            <span class="question-text">Are you taking any prescription or
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Are you taking any prescription or
                                                 non-prescription
                                                 medication?</span>
-                                            <input type="radio" name="medication" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="medication" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Are you taking any prescription or non-prescription medication?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="medication" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="medication" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
                                         <div class="ml-6 mt-1 mb-2 hidden" id="medication_box">
                                             <label class="text-xs text-[#8B0000] italic">If YES, please
@@ -692,11 +794,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-venus text-xs"></i> For Women Only
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                                            <span>Question</span><span class="text-center">YES</span><span
-                                                class="text-center">NO</span>
-                                        </div>
 
                                         @foreach ([
                                         ['name' => 'pregnant', 'q' => 'Are you pregnant?'],
@@ -707,14 +804,23 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         control pills?',
                                         ],
                                         ] as $i => $q)
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ $i < 2 ? 'border-b border-[#f0ebe6]' : '' }} text-sm">
-                                            <span class="question-text">{{ $q['q'] }}</span>
-                                            <input type="radio" name="{{ $q['name'] }}" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="{{ $q['name'] }}" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">{{ $q['q'] }}</span>
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="{{ $q['q'] }}">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="{{ $q['name'] }}" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="{{ $q['name'] }}" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
                                         @endforeach
                                     </div>
@@ -750,19 +856,24 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-smoking text-xs"></i> Tobacco Use
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                                            <span>Question</span><span class="text-center">YES</span><span
-                                                class="text-center">NO</span>
-                                        </div>
-                                        <div class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 text-sm">
-                                            <span class="question-text">Do you use tobacco products or any
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">Do you use tobacco products or any
                                                 derivatives?</span>
-                                            <input type="radio" name="tobacco_use" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="tobacco_use" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="Do you use tobacco products or any derivatives?">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="tobacco_use" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="tobacco_use" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
                                         <div id="tobacco_details" class="ml-6 mt-2 space-y-2 hidden text-sm">
                                             <div class="flex items-center gap-3 flex-wrap">
@@ -784,21 +895,25 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-head-side-mask text-xs"></i> Do You Suffer From
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] gap-2 text-[0.72rem] font-bold text-[#9e9690] uppercase tracking-widest pb-1">
-                                            <span>Condition</span><span class="text-center">YES</span><span
-                                                class="text-center">NO</span>
-                                        </div>
                                         @foreach ([['name' => 'headaches', 'q' => 'Headaches'], ['name' => 'earaches',
                                         'q' => 'Earaches'], ['name' => 'neck_aches', 'q' => 'Neck aches']] as $i => $q)
-                                        <div
-                                            class="grid grid-cols-[1fr_52px_52px] items-center gap-2 py-2.5 {{ $i < 2 ? 'border-b border-[#f0ebe6]' : '' }} text-sm">
-                                            <span class="question-text">{{ $q['q'] }}</span>
-                                            <input type="radio" name="{{ $q['name'] }}" value="YES"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer"
-                                                required>
-                                            <input type="radio" name="{{ $q['name'] }}" value="NO"
-                                                class="q-radio appearance-none w-4 h-4 border-2 border-[#e8e2dd] rounded-full mx-auto cursor-pointer">
+                                        <div class="global-question-row">
+                                            <span class="global-question-text">{{ $q['q'] }}</span>
+
+                                            <div class="global-question-options" role="radiogroup"
+                                                aria-label="{{ $q['q'] }}">
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="{{ $q['name'] }}" value="YES"
+                                                        class="global-radio-input" required>
+                                                    <span>Yes</span>
+                                                </label>
+
+                                                <label class="global-radio-option">
+                                                    <input type="radio" name="{{ $q['name'] }}" value="NO"
+                                                        class="global-radio-input">
+                                                    <span>No</span>
+                                                </label>
+                                            </div>
                                         </div>
                                         @endforeach
                                     </div>
@@ -1698,122 +1813,122 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         const patientGender = @json($patient -> gender ?? 'N/A');
         const dentalHistoryBody = `
     ${subSection("Basic Info", `
-        ${row("Last Dental Visit", get("last_dental_visit"))}
-        ${row("Previous Dentist", get("previous_dentist"))}
-    `)}
+            ${row("Last Dental Visit", get("last_dental_visit"))}
+            ${row("Previous Dentist", get("previous_dentist"))}
+        `)}
 
     ${subSection("Dental Symptoms", `
-        ${row("Bleeding Gums", get("bleeding_gums"))}
-        ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
-        ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
-        ${row("Tooth Pain", get("tooth_pain"))}
-        ${row("Sores/Lumps", get("sores"))}
-        ${row("Jaw Injuries", get("injuries"))}
-    `)}
+            ${row("Bleeding Gums", get("bleeding_gums"))}
+            ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
+            ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
+            ${row("Tooth Pain", get("tooth_pain"))}
+            ${row("Sores/Lumps", get("sores"))}
+            ${row("Jaw Injuries", get("injuries"))}
+        `)}
 
     ${subSection("Jaw & Bite Symptoms", `
-        ${row("Clicking", get("clicking"))}
-        ${row("Joint Pain", get("joint_pain"))}
-        ${row("Difficulty Moving", get("difficulty_moving"))}
-        ${row("Difficulty Chewing", get("difficulty_chewing"))}
-        ${row("Frequent Headaches", get("jaw_headaches"))}
-        ${row("Grinding/Clenching", get("clench_grind"))}
-        ${row("Lips/Cheek Biting", get("biting"))}
-        ${row("Teeth Loosening", get("teeth_loosening"))}
-        ${row("Food Caught Between Teeth", get("food_teeth"))}
-        ${row("Medicine Reaction", get("med_reaction"))}
-    `)}
+            ${row("Clicking", get("clicking"))}
+            ${row("Joint Pain", get("joint_pain"))}
+            ${row("Difficulty Moving", get("difficulty_moving"))}
+            ${row("Difficulty Chewing", get("difficulty_chewing"))}
+            ${row("Frequent Headaches", get("jaw_headaches"))}
+            ${row("Grinding/Clenching", get("clench_grind"))}
+            ${row("Lips/Cheek Biting", get("biting"))}
+            ${row("Teeth Loosening", get("teeth_loosening"))}
+            ${row("Food Caught Between Teeth", get("food_teeth"))}
+            ${row("Medicine Reaction", get("med_reaction"))}
+        `)}
 
     ${subSection("Dental Procedures", `
-        ${row("Periodontal Treatment", get("periodontal"))}
-        ${row("Difficult Extraction", get("difficult_extraction"))}
-        ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
+            ${row("Periodontal Treatment", get("periodontal"))}
+            ${row("Difficult Extraction", get("difficult_extraction"))}
+            ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
 
-        ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
-        ${row("Dentures", get("dentures"))}
-        ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
+            ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
+            ${row("Dentures", get("dentures"))}
+            ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
 
-        ${row("Orthodontic Treatment", get("ortho_treatment"))}
-        ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
-    `)}
+            ${row("Orthodontic Treatment", get("ortho_treatment"))}
+            ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
+        `)}
 
     ${fullWidthSection("Additional Concerns", `
-        ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
+            ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
                 ? get("additional_concerns")
                 : '<span class="text-[#9e9690] italic">No additional concerns provided.</span>'}
-    `)}
+        `)}
     `;
 
         const medicalHistoryBody = `
     ${subSection("General Health", `
-        ${row("Good Health", get("good_health"))}
-        ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
+            ${row("Good Health", get("good_health"))}
+            ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
 
-        ${row("Had Medical Exam", get("had_medical_exam"))}
-        ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
+            ${row("Had Medical Exam", get("had_medical_exam"))}
+            ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
 
-        ${row("Under Treatment", get("under_treatment"))}
-        ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
+            ${row("Under Treatment", get("under_treatment"))}
+            ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
 
-        ${row("Hospitalized", get("hospitalized"))}
-        ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
-    `)}
+            ${row("Hospitalized", get("hospitalized"))}
+            ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
+        `)}
 
     ${subSection("Allergies", `
-        ${row("Allergy (Medicine)", get("allergy_medicine"))}
-        ${row("Allergy (Food)", get("allergy_food"))}
-        ${optionalRow("Allergy (Others)", get("allergy_others"))}
-    `)}
+            ${row("Allergy (Medicine)", get("allergy_medicine"))}
+            ${row("Allergy (Food)", get("allergy_food"))}
+            ${optionalRow("Allergy (Others)", get("allergy_others"))}
+        `)}
 
     ${subSection("Medications", `
-        ${row("Medication", get("medication"))}
-        ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
-    `)}
+            ${row("Medication", get("medication"))}
+            ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
+        `)}
 
     ${isFemalePatient ? subSection("For Women Only", `
-        ${row("Pregnant", get("pregnant"))}
-        ${row("Nursing", get("nursing"))}
-        ${row("Birth Control Pills", get("birth_control"))}
-    `) : ""}
+            ${row("Pregnant", get("pregnant"))}
+            ${row("Nursing", get("nursing"))}
+            ${row("Birth Control Pills", get("birth_control"))}
+        `) : ""}
 
     ${fullWidthSection("Medical Conditions", `
-        <b class="text-[#5c5550] dark:text-[#e5e5e5] font-semibold">Selected Conditions:</b> ${diseaseText}
-    `)}
+            <b class="text-[#5c5550] dark:text-[#e5e5e5] font-semibold">Selected Conditions:</b> ${diseaseText}
+        `)}
 
     ${subSection("Tobacco Use", `
-        ${row("Tobacco Use", get("tobacco_use"))}
-        ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
-        ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
-    `)}
+            ${row("Tobacco Use", get("tobacco_use"))}
+            ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
+            ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
+        `)}
 
     ${subSection("Do You Suffer From", `
-        ${row("Headaches", get("headaches"))}
-        ${row("Earaches", get("earaches"))}
-        ${row("Neck Aches", get("neck_aches"))}
-    `)}
+            ${row("Headaches", get("headaches"))}
+            ${row("Earaches", get("earaches"))}
+            ${row("Neck Aches", get("neck_aches"))}
+        `)}
     `;
 
         document.getElementById("summaryBox").innerHTML = `
     ${summaryCard("Patient Information", "fa-user", `
-        <div class="grid grid-cols-1 gap-y-1">
-            ${row("Name", patientName)}
-            ${row("Gender", patientGender)}
-        </div>
-    `)}
+            <div class="grid grid-cols-1 gap-y-1">
+                ${row("Name", patientName)}
+                ${row("Gender", patientGender)}
+            </div>
+        `)}
 
     <div class="grid grid-cols-2 gap-4 sm-grid-1col">
         ${summaryCard("Appointment Details", "fa-calendar-check", `
-        <div class="grid grid-cols-1 gap-y-1">
-            ${row("Date", get("appointment_date"))}
-            ${row("Time", get("appointment_time"))}
-        </div>
-    `)}
-
-        ${summaryCard("Service", "fa-tooth", `
             <div class="grid grid-cols-1 gap-y-1">
-                ${row("Type", get("service_type"))}
+                ${row("Date", get("appointment_date"))}
+                ${row("Time", get("appointment_time"))}
             </div>
         `)}
+
+        ${summaryCard("Service", "fa-tooth", `
+                <div class="grid grid-cols-1 gap-y-1">
+                    ${row("Type", get("service_type"))}
+                </div>
+            `)}
     </div>
 
     ${summaryCard("Dental History", "fa-teeth", dentalHistoryBody)}
@@ -1822,12 +1937,12 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
     <div class="grid grid-cols-2 gap-4 sm-grid-1col">
         ${summaryCard("Emergency Contact", "fa-phone", `
-            <div class="grid grid-cols-1 gap-y-1">
-                ${row("Name", get("emergency_person"))}
-                ${row("Number", get("emergency_number"))}
-                ${row("Relation", emergencyRelation)}
-            </div>
-        `)}
+                <div class="grid grid-cols-1 gap-y-1">
+                    ${row("Name", get("emergency_person"))}
+                    ${row("Number", get("emergency_number"))}
+                    ${row("Relation", emergencyRelation)}
+                </div>
+            `)}
 
         ${summaryCard("Signature", "fa-signature", sigHTML)}
     </div>
@@ -1970,7 +2085,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     document.querySelectorAll('input[name="had_medical_exam"]').forEach(r => r.addEventListener("change",
         syncMedicalExamBox));
     syncMedicalExamBox();
-    
+
     [{
         name: "good_health",
         boxId: "good_health_box",
@@ -3015,8 +3130,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         "medicationCount", 150);
 
     document.addEventListener("DOMContentLoaded", () => {
-        document.querySelectorAll(".question-text").forEach(q => {
-            const row = q.closest("div");
+        document.querySelectorAll(".global-question-text").forEach(q => {
+            const row = q.closest(".global-question-row");
             const hasRequiredRadio = row?.querySelector("input[required]");
 
             if (hasRequiredRadio && !q.querySelector(".required-star")) {
@@ -3027,8 +3142,19 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             }
         });
 
-        document.querySelectorAll("input[required], select[required], textarea[required]").forEach(input => {
-            if (input.tagName === "INPUT" && input.type === "hidden") return;
+        document.querySelectorAll(
+            "input[required], select[required], textarea[required]"
+        ).forEach(input => {
+            if (
+                input.tagName === "INPUT" &&
+                (
+                    input.type === "hidden" ||
+                    input.type === "radio" ||
+                    input.type === "checkbox"
+                )
+            ) {
+                return;
+            }
 
             let label = null;
 

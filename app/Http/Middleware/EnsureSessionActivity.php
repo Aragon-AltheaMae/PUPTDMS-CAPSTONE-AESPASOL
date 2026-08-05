@@ -90,7 +90,6 @@ class EnsureSessionActivity
             $timeoutSeconds;
 
         if ($alreadyLocked || $hasTimedOut) {
-
             $request->session()->put(
                 'session_idle_locked',
                 true
@@ -107,12 +106,26 @@ class EnsureSessionActivity
                 ], 401);
             }
 
-            return redirect()->route(
-                'login',
-                [
-                    'reason' => 'idle',
-                ]
+            if (
+                $request->session()->pull(
+                    'session_idle_modal_pending',
+                    false
+                )
+            ) {
+                $request->attributes->set(
+                    'session_idle_expired',
+                    true
+                );
+
+                return $next($request);
+            }
+
+            $request->session()->put(
+                'session_idle_modal_pending',
+                true
             );
+
+            return redirect()->back();
         }
 
         return $next($request);
