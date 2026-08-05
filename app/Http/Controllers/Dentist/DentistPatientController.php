@@ -23,7 +23,35 @@ class DentistPatientController extends Controller
         $today = Carbon::today()->toDateString();
 
         $appointments = Appointment::with('patient')
-            ->orderBy('appointment_date', 'asc')
+            ->whereHas('patient')
+            ->orderByRaw(
+                '
+        CASE
+            WHEN appointment_date = ? THEN 0
+            WHEN appointment_date > ? THEN 1
+            ELSE 2
+        END
+        ',
+                [$today, $today]
+            )
+            ->orderByRaw(
+                '
+        CASE
+            WHEN appointment_date >= ?
+            THEN appointment_date
+        END ASC
+        ',
+                [$today]
+            )
+            ->orderByRaw(
+                '
+        CASE
+            WHEN appointment_date < ?
+            THEN appointment_date
+        END DESC
+        ',
+                [$today]
+            )
             ->orderBy('appointment_time', 'asc')
             ->get();
 
@@ -53,18 +81,24 @@ class DentistPatientController extends Controller
             "Dentist viewed patient list"
         );
 
-        return view('dentist.dentist-patient', compact(
-            'appointments',
-            'upcomingAppointments',
-            'pastAppointments',
-            'todayCount',
-            'upcomingCount',
-            'rescheduledCount',
-            'cancelledCount',
-            'completedCount',
-            'allCount',
-            'notifications'
-        ));
+        return view('shared.patient-list', [
+            'layoutRole' => 'dentist',
+            'pageTitle' => 'Patient Directory',
+            'pageShellClass' => 'admin-page-shell dentist-page-shell',
+            'isDentistView' => true,
+            'patientProfileRouteName' => 'dentist.dentist.patient.profile',
+
+            'appointments' => $appointments,
+            'upcomingAppointments' => $upcomingAppointments,
+            'pastAppointments' => $pastAppointments,
+            'todayCount' => $todayCount,
+            'upcomingCount' => $upcomingCount,
+            'rescheduledCount' => $rescheduledCount,
+            'cancelledCount' => $cancelledCount,
+            'completedCount' => $completedCount,
+            'allCount' => $allCount,
+            'notifications' => $notifications,
+        ]);
     }
 
     public function profile(Patient $patient)
@@ -75,16 +109,29 @@ class DentistPatientController extends Controller
             return redirect('/login');
         }
 
+        $patient->loadMissing([
+            'user',
+            'odontogram',
+            'medicalHistory.answers.question',
+            'medicalHistory.diseaseAnswers.disease',
+            'dentalHistory',
+            'dentalHistoryDates',
+            'dentalHistoryConcerns',
+            'dentalHistoryAnswers.condition',
+        ]);
+
         $today = Carbon::today()->toDateString();
 
-        $futureVisits = Appointment::where('patient_id', $patient->id)
+        $futureVisits = Appointment::with(['procedure', 'followUpAppointments', 'dentist'])
+            ->where('patient_id', $patient->id)
             ->whereDate('appointment_date', '>=', $today)
             ->whereIn('status', ['upcoming', 'rescheduled'])
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        $pastVisits = Appointment::where('patient_id', $patient->id)
+        $pastVisits = Appointment::with(['procedure', 'followUpAppointments', 'dentist'])
+            ->where('patient_id', $patient->id)
             ->where(function ($query) use ($today) {
                 $query->whereDate('appointment_date', '<', $today)
                     ->orWhereIn('status', ['completed', 'cancelled']);

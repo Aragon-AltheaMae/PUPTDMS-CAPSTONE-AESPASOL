@@ -16,6 +16,8 @@ use App\Helpers\AuditLogger;
 
 class UserManagementController extends Controller
 {
+    private const PASSWORD_LENGTH = 12;
+
     public function __construct(
         private readonly ConcurrentSessionService $concurrentSessionService
     ) {}
@@ -28,8 +30,13 @@ class UserManagementController extends Controller
         $search = trim((string) $request->get('search', ''));
         $roleFilter = trim((string) $request->get('role', ''));
         $statusFilter = trim((string) $request->get('status', ''));
-        $perPage = (int) $request->get('per_page', 10);
-        $perPage = in_array($perPage, [10, 20, 50, 100]) ? $perPage : 10;
+        $perPageInput = (int) $request->input('per_page', 10);
+
+        $perPage = in_array(
+            $perPageInput,
+            [10, 20, 50, 100],
+            true
+        ) ? $perPageInput : 10;
 
         $query = User::with(['role', 'patient']);
 
@@ -79,19 +86,9 @@ class UserManagementController extends Controller
 
         if ($request->ajax()) {
             return response()->json([
-                'users' => $users->getCollection()->map(function ($user) {
-                    return [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'email' => $user->email,
-                        'status' => $user->status,
-                        'role_id' => $user->role_id,
-                        'role_name' => optional($user->role)->name ?? '—',
-                        'role_slug' => optional($user->role)->slug ?? '',
-                        'created_at_day' => optional($user->created_at)?->format('M d, Y'),
-                        'created_at_time' => optional($user->created_at)?->format('h:i A'),
-                    ];
-                })->values(),
+                'users' => $users->getCollection()
+                    ->map(fn($user) => $this->formatUserForResponse($user))
+                    ->values(),
                 'pagination' => [
                     'total' => $users->total(),
                     'from' => $users->firstItem() ?? 0,
@@ -132,24 +129,41 @@ class UserManagementController extends Controller
 
     public function store(Request $request)
     {
+        $request->merge([
+            'phone' => $this->normalizePhoneNumber($request->input('phone')),
+        ]);
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email|unique:patients,email',
-            'password' => 'required|min:8|confirmed',
             'role_id' => 'nullable|exists:roles,id',
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
             'status' => 'required|in:active,inactive',
-            'phone' => 'nullable|string|max:20',
+            'phone' => ['nullable', 'regex:/^09\d{9}$/'],
             'birthdate' => 'nullable|date',
             'gender' => 'nullable|in:Male,Female',
+        ], [
+            'phone.regex' => 'Phone number must start with 09 and contain exactly 11 digits.',
+        ]);
+
+        $roleId = $this->resolveUserRoleId(
+            $request->input('role_id')
+        );
+
+        $request->merge([
+            'role_id' => $roleId,
         ]);
 
         $user = DB::transaction(function () use ($request) {
-            $role = $request->role_id ? Role::find($request->role_id) : null;
+            $role = Role::findOrFail($request->role_id);
 
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' => Hash::make($request->password),
+                'phone' => $request->phone,
+                'birthdate' => $request->birthdate,
+                'gender' => $request->gender,
+                'password' => Hash::make((string) $request->password),
                 'role_id' => $request->role_id,
                 'status' => $request->status,
             ]);
@@ -180,6 +194,10 @@ class UserManagementController extends Controller
     }
     public function update(Request $request, User $user)
     {
+        $request->merge([
+            'phone' => $this->normalizePhoneNumber($request->input('phone')),
+        ]);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => [
@@ -192,27 +210,42 @@ class UserManagementController extends Controller
             ],
             'role_id' => 'nullable|exists:roles,id',
             'status' => 'required|in:active,inactive',
-            'phone' => 'nullable|string|max:20',
+            'phone' => ['nullable', 'regex:/^09\d{9}$/'],
             'birthdate' => 'nullable|date',
             'gender' => 'nullable|in:Male,Female',
+        ], [
+            'phone.regex' => 'Phone number must start with 09 and contain exactly 11 digits.',
         ]);
 
         $originalRole = $user->role;
-        $newRoleId = $validated['role_id'] ?? null;
-        $newRole = $newRoleId ? Role::find($newRoleId) : null;
+        $newRoleId = $this->resolveUserRoleId(
+            $validated['role_id'] ?? null
+        );
+
+        $newRole = Role::findOrFail($newRoleId);
         $roleChanged = (string) ($user->role_id ?? '') !== (string) ($newRoleId ?? '');
 
         if ($roleChanged) {
             $this->authorizeRoleChange($request, $user);
         }
 
-        DB::transaction(function () use ($request, $user, $newRole, $newRoleId) {
-            $user->update([
+        DB::transaction(function () use (
+            $request,
+            $user,
+            $newRole,
+            $newRoleId
+        ) {
+            $user->forceFill([
                 'name' => $request->name,
                 'email' => $request->email,
+                'phone' => $request->phone,
+                'birthdate' => $request->birthdate,
+                'gender' => $request->gender,
                 'role_id' => $newRoleId,
                 'status' => $request->status,
-            ]);
+            ])->save();
+
+            $user->refresh();
 
             if ($newRole && $newRole->slug === 'patient') {
                 $patient = Patient::firstOrNew(['user_id' => $user->id]);
@@ -435,5 +468,99 @@ class UserManagementController extends Controller
 
         return redirect()->route('admin.user_management')
             ->with('success', 'User deleted successfully.');
+    }
+
+    private function formatUserForResponse(User $user): array
+    {
+        $user->loadMissing(['role', 'patient']);
+
+        $patient = $user->patient;
+        $role = $user->role;
+        $displayRole = $role?->display_name ?? $role?->name ?? 'No Role';
+        $phone = $patient?->phone ?: $user->phone;
+        $birthdate = $patient?->birthdate ?: $user->birthdate;
+        $gender = $patient?->gender ?: $user->gender;
+
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'status' => $user->status,
+            'role_id' => $user->role_id,
+            'role_name' => $displayRole,
+            'role_slug' => $role?->slug ?? '',
+            'created_at_day' => optional($user->created_at)?->format('M d, Y'),
+            'created_at_time' => optional($user->created_at)?->format('h:i A'),
+            'details' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $displayRole,
+                'status' => ucfirst((string) $user->status),
+                'source' => 'Users',
+                'created_at' => optional($user->created_at)?->format('M d, Y h:i A') ?? 'N/A',
+                'updated_at' => optional($user->updated_at)?->format('M d, Y h:i A') ?? 'N/A',
+                'phone' => $phone ?: 'N/A',
+                'phone_raw' => $phone ?: '',
+                'birthdate' => $birthdate?->format('M d, Y') ?? 'N/A',
+                'birthdate_raw' => $birthdate?->format('Y-m-d') ?? '',
+                'gender' => $gender ?: 'N/A',
+                'gender_raw' => $gender ?: '',
+                'patient_profile' => $patient ? 'Linked' : 'Not linked',
+                'last_login_at' => optional($user->last_login_at)?->format('M d, Y h:i A') ?? 'Never',
+            ],
+        ];
+    }
+
+    private function resolveUserRoleId(mixed $roleId): int
+    {
+        if (!empty($roleId)) {
+            return (int) $roleId;
+        }
+
+        $patientRoleId = Role::query()
+            ->where('slug', 'patient')
+            ->orWhereRaw('LOWER(name) = ?', ['patient'])
+            ->value('id');
+
+        abort_unless(
+            $patientRoleId,
+            422,
+            'The default Patient role is not configured.'
+        );
+
+        return (int) $patientRoleId;
+    }
+
+    private function generateRandomPassword(): string
+    {
+        $lower = 'abcdefghijkmnopqrstuvwxyz';
+        $upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+        $numbers = '23456789';
+        $symbols = '@#$%*!?';
+
+        $password = [
+            $lower[random_int(0, strlen($lower) - 1)],
+            $upper[random_int(0, strlen($upper) - 1)],
+            $numbers[random_int(0, strlen($numbers) - 1)],
+            $symbols[random_int(0, strlen($symbols) - 1)],
+        ];
+
+        $all = $lower . $upper . $numbers . $symbols;
+
+        while (count($password) < self::PASSWORD_LENGTH) {
+            $password[] = $all[random_int(0, strlen($all) - 1)];
+        }
+
+        shuffle($password);
+
+        return implode('', $password);
+    }
+
+    private function normalizePhoneNumber(mixed $value): ?string
+    {
+        $digits = preg_replace('/\D+/', '', (string) $value);
+
+        return $digits !== '' ? $digits : null;
     }
 }

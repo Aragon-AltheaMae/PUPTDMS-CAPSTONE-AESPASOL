@@ -158,6 +158,62 @@
                                             <span class="toggle-slider"></span>
                                         </label>
                                     </div>
+
+                                    <div class="mt-5 mb-4 pt-4 border-t border-gray-50">
+                                        <p class="text-xs text-gray-400 mb-4 font-medium uppercase tracking-wide">AI Services</p>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <label class="form-label">AI Operating Mode</label>
+                                            <select name="ai_mode" class="form-ctrl form-sel">
+                                                @foreach (['normal' => 'Normal', 'degraded' => 'Degraded', 'offline' => 'Offline'] as $value => $label)
+                                                <option value="{{ $value }}" {{ old('ai_mode', $settings['ai_mode']->value ?? 'normal') === $value ? 'selected' : '' }}>
+                                                    {{ $label }}</option>
+                                                @endforeach
+                                            </select>
+                                            <div class="setting-note">Offline disables AI calls and uses fallback workflows only.</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="setting-row">
+                                        <div class="setting-row-info">
+                                            <div class="setting-row-label">AI Chatbot</div>
+                                            <div class="setting-row-desc">Allow the chatbot to call the AI service when available</div>
+                                        </div>
+                                        <label class="toggle-wrap">
+                                            <input type="hidden" name="ai_chatbot_enabled" value="0">
+                                            <input type="checkbox" name="ai_chatbot_enabled" value="1" {{
+                                                old('ai_chatbot_enabled', $settings['ai_chatbot_enabled']->value ?? '1') === '1' ? 'checked' : '' }}>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+
+                                    <div class="setting-row">
+                                        <div class="setting-row-info">
+                                            <div class="setting-row-label">AI Signature Verification</div>
+                                            <div class="setting-row-desc">If unavailable, signatures are accepted and flagged for manual review</div>
+                                        </div>
+                                        <label class="toggle-wrap">
+                                            <input type="hidden" name="ai_signature_enabled" value="0">
+                                            <input type="checkbox" name="ai_signature_enabled" value="1" {{
+                                                old('ai_signature_enabled', $settings['ai_signature_enabled']->value ?? '1') === '1' ? 'checked' : '' }}>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
+
+                                    <div class="setting-row">
+                                        <div class="setting-row-info">
+                                            <div class="setting-row-label">AI Report Narratives</div>
+                                            <div class="setting-row-desc">If unavailable, reports will still generate using the built-in fallback narrative</div>
+                                        </div>
+                                        <label class="toggle-wrap">
+                                            <input type="hidden" name="ai_reports_enabled" value="0">
+                                            <input type="checkbox" name="ai_reports_enabled" value="1" {{
+                                                old('ai_reports_enabled', $settings['ai_reports_enabled']->value ?? '1') === '1' ? 'checked' : '' }}>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -870,6 +926,10 @@
         language: 'English (US)',
         maintenance_mode: '0',
         debug_mode: '0',
+        ai_mode: 'normal',
+        ai_chatbot_enabled: '1',
+        ai_signature_enabled: '1',
+        ai_reports_enabled: '1',
 
         notif_new_appointment: '1',
         notif_cancellation: '1',

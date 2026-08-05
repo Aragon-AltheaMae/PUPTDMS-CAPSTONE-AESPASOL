@@ -73,7 +73,6 @@ class AcademicPeriodController extends Controller
             ->orderByDesc('start_date')
             ->first();
 
-        $periods = AcademicPeriod::all();
         AuditLogger::log(
             'view',
             'academic_periods',
@@ -200,27 +199,138 @@ class AcademicPeriodController extends Controller
             ->with('success', 'Academic period set as active successfully.');
     }
 
-    public function syncFromFlss(FacultyApiService $facultyApiService)
-    {
+    public function syncFromFlss(
+        Request $request,
+        FacultyApiService $facultyApiService
+    ) {
         try {
-            $academicPeriod = $facultyApiService->syncActiveAcademicYearSemester();
+            $currentActive = AcademicPeriod::query()
+                ->where('is_active', true)
+                ->first();
+
+            $previousState = $currentActive
+                ? [
+                    'academic_year' => $currentActive->academic_year,
+                    'semester' => $currentActive->semester,
+                    'start_date' => optional(
+                        $currentActive->start_date
+                    )->format('Y-m-d'),
+                    'end_date' => optional(
+                        $currentActive->end_date
+                    )->format('Y-m-d'),
+                ]
+                : null;
+
+            $academicPeriod = $facultyApiService
+                ->syncActiveAcademicYearSemester();
+
+            $academicPeriod->refresh();
+
+            $currentState = [
+                'academic_year' => $academicPeriod->academic_year,
+                'semester' => $academicPeriod->semester,
+                'start_date' => optional(
+                    $academicPeriod->start_date
+                )->format('Y-m-d'),
+                'end_date' => optional(
+                    $academicPeriod->end_date
+                )->format('Y-m-d'),
+            ];
+
+            $alreadySynced =
+                $previousState !== null &&
+                $previousState === $currentState;
+
+            $message = $alreadySynced
+                ? "Academic year {$academicPeriod->academic_year} "
+                . "{$academicPeriod->semester} is already synced with FLSS."
+                : 'Academic period synced from FLSS successfully.';
 
             AuditLogger::log(
                 'sync',
                 'academic_periods',
-                "Admin synced academic period from FLSS: {$academicPeriod->academic_year} - {$academicPeriod->semester}"
+                $alreadySynced
+                    ? "Admin checked FLSS sync; academic period was already synced: "
+                    . "{$academicPeriod->academic_year} - "
+                    . "{$academicPeriod->semester}"
+                    : "Admin synced academic period from FLSS: "
+                    . "{$academicPeriod->academic_year} - "
+                    . "{$academicPeriod->semester}"
             );
 
+            $payload = [
+                'id' => $academicPeriod->id,
+                'academic_year' => $academicPeriod->academic_year,
+                'semester' => $academicPeriod->semester,
+
+                'start_date' => optional(
+                    $academicPeriod->start_date
+                )->format('Y-m-d'),
+
+                'end_date' => optional(
+                    $academicPeriod->end_date
+                )->format('Y-m-d'),
+
+                'start_date_display' => optional(
+                    $academicPeriod->start_date
+                )->format('M d, Y'),
+
+                'end_date_display' => optional(
+                    $academicPeriod->end_date
+                )->format('M d, Y'),
+
+                'end_date_long' => optional(
+                    $academicPeriod->end_date
+                )->format('F d, Y'),
+
+                'description' => $academicPeriod->description,
+                'is_active' => (bool) $academicPeriod->is_active,
+                'status' => $academicPeriod->status,
+
+                'progress_percent' => (int) (
+                    $academicPeriod->progress_percent ?? 0
+                ),
+
+                'days_remaining' => (int) (
+                    $academicPeriod->days_remaining ?? 0
+                ),
+            ];
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'already_synced' => $alreadySynced,
+                    'message' => $message,
+                    'academic_period' => $payload,
+                ]);
+            }
+
             return redirect()
                 ->route('admin.academic_periods')
-                ->with('success', 'Academic period synced from FLSS successfully.');
+                ->with(
+                    $alreadySynced ? 'info' : 'success',
+                    $message
+                );
         } catch (\Throwable $e) {
+            report($e);
+
+            $message =
+                'Failed to sync academic period from FLSS: '
+                . $e->getMessage();
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                ], 422);
+            }
+
             return redirect()
                 ->route('admin.academic_periods')
-                ->with('error', 'Failed to sync academic period from FLSS: ' . $e->getMessage());
+                ->with('error', $message);
         }
     }
-
+    
     private function ensureAcademicPeriodIsUnique(
         Request $request,
         string $academicYear,

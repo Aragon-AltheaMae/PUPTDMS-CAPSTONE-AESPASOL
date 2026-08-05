@@ -7,12 +7,13 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Patient;
+use App\Services\AiServiceManager;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\RateLimiter;
 
 class ChatbotController extends Controller
 {
-    public function chat(Request $request)
+    public function chat(Request $request, AiServiceManager $aiServiceManager)
     {
         $request->validate([
             'message' => 'required|string|max:300',
@@ -36,12 +37,12 @@ class ChatbotController extends Controller
 
         RateLimiter::hit($rateKey, 60);
 
-        $apiKey = config('services.chatbot.api_key');
+        $apiKey = config('services.openai.api_key');
 
         if (!$apiKey) {
             return response()->json(
                 [
-                    'error' => 'Missing CHATBOT_API_KEY sa .env or config/services.php.',
+                    'error' => 'Missing OPENAI_API_KEY sa .env or config/services.php.',
                 ],
                 500,
             );
@@ -135,15 +136,28 @@ class ChatbotController extends Controller
             ]);
         }
 
+        if (!$this->isClinicSystemTopic($request->message, $context, $role)) {
+            return response()->json([
+                'reply' => "I can only assist with topics related to the PUP Taguig Dental Clinic Management System, such as appointments, records, schedules, document requests, login, reports, inventory, and patient management.",
+            ]);
+        }
+
+        if (!$aiServiceManager->shouldUse('chatbot')) {
+            $aiServiceManager->recordFallback('chatbot', 'Chatbot AI is disabled or offline.', [
+                'user_id' => Auth::id(),
+            ]);
+
+            return response()->json([
+                'reply' => 'AI assistant is temporarily unavailable. I can still help with basic navigation, login, appointments, records, and document request questions.',
+            ]);
+        }
+
         try {
-            $models = ['gemini-2.0-flash', 'gemini-2.5-flash'];
             $currentContext = $context ?: 'unknown';
             $userMessage = $request->message;
+            $model = trim((string) config('services.openai.chatbot_model', 'gpt-5.5'));
 
-            foreach ($models as $model) {
-                $url = "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}";
-
-                $prompt = <<<PROMPT
+            $prompt = <<<PROMPT
 You are the official AI assistant of the PUP Taguig Dental Clinic Management System.
 
 {$roleContext}
@@ -179,69 +193,100 @@ Patient:
 
 Answer only based on the user's role. Do not tell admins/dentists to use patient-only booking features unless explaining that it is a patient feature.
 Keep answers short but complete. Use 1 to 3 complete sentences. Do not cut off mid-sentence.
+If the user asks something unrelated to the PUP Taguig Dental Clinic Management System, politely refuse and redirect them to system-related topics only.
 
 User message: {$userMessage}
 PROMPT;
 
-                $response = Http::withoutVerifying()
-                    ->timeout(20)
-                    ->withHeaders([
-                        'Content-Type' => 'application/json',
-                    ])
-                    ->post($url, [
-                        'contents' => [
-                            [
-                                'role' => 'user',
-                                'parts' => [
-                                    [
-                                        'text' => $prompt,
-                                    ],
+            $response = Http::withToken($apiKey)
+                ->acceptJson()
+                ->asJson()
+                ->timeout(30)
+                ->retry(1, 500)
+                ->post('https://api.openai.com/v1/responses', [
+                    'model' => $model,
+                    'input' => [
+                        [
+                            'role' => 'user',
+                            'content' => [
+                                [
+                                    'type' => 'input_text',
+                                    'text' => $prompt,
                                 ],
                             ],
                         ],
-                        'generationConfig' => [
-                            'temperature' => 0.2,
-                            'maxOutputTokens' => 220,
-                        ],
-                    ]);
-
-                if ($response->successful()) {
-                    $reply = data_get($response->json(), 'candidates.0.content.parts.0.text');
-
-                    return response()->json([
-                        'reply' => $reply ?: 'Sorry, walang response mula sa AI.',
-                    ]);
-                }
-
-                if (in_array($response->status(), [404, 429, 500, 503])) {
-                    continue;
-                }
-
-                return response()->json(
-                    [
-                        'error' => 'May problema sa AI API.',
-                        'status' => $response->status(),
-                        'body' => $response->body(),
                     ],
-                    500,
-                );
+                    'max_output_tokens' => 220,
+                ]);
+
+            if ($response->successful()) {
+                $reply = $this->extractOutputText($response->json());
+
+                $aiServiceManager->recordSuccess('chatbot', 'OpenAI chatbot response generated.', [
+                    'user_id' => Auth::id(),
+                ]);
+
+                return response()->json([
+                    'reply' => $reply ?: 'Sorry, walang response mula sa AI.',
+                ]);
             }
 
-            return response()->json(
-                [
-                    'error' => 'Temporary unavailable ang AI assistant.',
-                ],
-                503,
-            );
+            Log::warning('OpenAI chatbot request failed', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+                'user_id' => Auth::id(),
+            ]);
+
+            $aiServiceManager->recordFailure('chatbot', 'OpenAI chatbot request failed.', [
+                'status' => $response->status(),
+                'user_id' => Auth::id(),
+            ]);
+
+            $aiServiceManager->recordFallback('chatbot', 'OpenAI chatbot fallback response served.', [
+                'user_id' => Auth::id(),
+            ]);
+
+            return response()->json([
+                'reply' => 'AI assistant is temporarily unavailable. I can still help with basic navigation, login, appointments, records, and document request questions.',
+            ]);
         } catch (\Throwable $e) {
-            return response()->json(
-                [
-                    'error' => 'Server error: ' . $e->getMessage(),
-                ],
-                500,
-            );
+            Log::error('OpenAI chatbot exception', [
+                'message' => $e->getMessage(),
+                'user_id' => Auth::id(),
+            ]);
+
+            $aiServiceManager->recordFailure('chatbot', 'OpenAI chatbot exception.', [
+                'message' => $e->getMessage(),
+                'user_id' => Auth::id(),
+            ]);
+
+            $aiServiceManager->recordFallback('chatbot', 'OpenAI chatbot fallback response served after exception.', [
+                'user_id' => Auth::id(),
+            ]);
+
+            return response()->json([
+                'reply' => 'AI assistant is temporarily unavailable. I can still help with basic navigation, login, appointments, records, and document request questions.',
+            ]);
         }
     }
+
+    private function extractOutputText(array $payload): ?string
+    {
+        if (!empty($payload['output_text']) && is_string($payload['output_text'])) {
+            return trim($payload['output_text']);
+        }
+
+        foreach (($payload['output'] ?? []) as $output) {
+            foreach (($output['content'] ?? []) as $content) {
+                if (isset($content['text']) && is_string($content['text']) && trim($content['text']) !== '') {
+                    return trim($content['text']);
+                }
+            }
+        }
+
+        return null;
+    }
+
     private function getLocalSystemReply(string $message, ?string $context = null, ?Patient $patient = null, bool $isLoginPage = false, string $role = 'guest'): ?string
     {
         $text = strtolower($message);
@@ -443,5 +488,75 @@ PROMPT;
         }
 
         return null;
+    }
+
+    private function isClinicSystemTopic(string $message, ?string $context = null, string $role = 'guest'): bool
+    {
+        $text = strtolower(trim($message));
+
+        if ($text === '') {
+            return false;
+        }
+
+        if (str_word_count($text) <= 3 && preg_match('/^(hi|hello|hey|help)$/i', $text)) {
+            return true;
+        }
+
+        $allowedKeywords = [
+            'appointment',
+            'appointments',
+            'book',
+            'booking',
+            'schedule',
+            'clinic',
+            'dental',
+            'dentist',
+            'patient',
+            'patients',
+            'record',
+            'records',
+            'odontogram',
+            'document',
+            'documents',
+            'clearance',
+            'report',
+            'reports',
+            'inventory',
+            'login',
+            'sign in',
+            'sso',
+            'dashboard',
+            'walk-in',
+            'walk in',
+            'follow-up',
+            'follow up',
+            'reschedule',
+            'cancel',
+            'notification',
+            'system',
+            'medical history',
+            'dental history',
+            'profile',
+            'session',
+            'admin',
+            'homepage',
+            'time slot',
+            'available date',
+        ];
+
+        foreach ($allowedKeywords as $keyword) {
+            if (str_contains($text, $keyword)) {
+                return true;
+            }
+        }
+
+        if ($context && str_contains($context, '/login')) {
+            return str_contains($text, 'login')
+                || str_contains($text, 'sign in')
+                || str_contains($text, 'sso')
+                || str_contains($text, 'account');
+        }
+
+        return false;
     }
 }

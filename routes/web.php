@@ -4,7 +4,10 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+<<<<<<< HEAD
 use App\Models\User;
+=======
+>>>>>>> fixdev
 use App\Models\Role;
 use Illuminate\Support\Facades\DB;
 use App\Models\Patient;
@@ -194,6 +197,28 @@ Route::post('/login', [BackupLoginController::class, 'store'])->name('login.stor
 // Logout (all roles)
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
+<<<<<<< HEAD
+=======
+Route::post(
+    '/session/expire',
+    [
+        SessionManagementController::class,
+        'expire',
+    ]
+)->name('session.expire');
+
+Route::post(
+    '/session/activity',
+    [
+        SessionManagementController::class,
+        'activity',
+    ]
+)
+    ->middleware('auth')
+    ->name('session.activity');
+
+
+>>>>>>> fixdev
 Route::middleware('auth')->prefix('notifications')->name('notifications.')->group(function () {
     Route::post('/{notificationId}/read', [NotificationController::class, 'markAsRead'])
         ->name('mark-read');
@@ -335,6 +360,12 @@ Route::prefix('admin')
         Route::get('/system-logs/export', [SystemLogController::class, 'export'])
             ->name('admin.system_logs.export');
 
+<<<<<<< HEAD
+=======
+        Route::post('/system-logs/archive', [SystemLogController::class, 'archive'])
+            ->name('admin.system_logs.archive');
+
+>>>>>>> fixdev
 
         /*
         |--------------------------------------------------------------------------
@@ -359,6 +390,7 @@ Route::prefix('admin')
         Route::get('/appointments', [AdminAppointmentController::class, 'index'])
             ->name('admin.admin.appointments');
 
+<<<<<<< HEAD
         Route::get('/appointments/{id}', [AdminAppointmentController::class, 'show'])
             ->name('admin.admin.appointments.show');
 
@@ -375,6 +407,8 @@ Route::prefix('admin')
             ->name('admin.admin.appointments.cancel');
 
 
+=======
+>>>>>>> fixdev
         /*
         |--------------------------------------------------------------------------
         | PATIENT LIST (FOR IMPERSONATION)
@@ -818,6 +852,17 @@ Route::prefix('patient')->middleware(['role:patient'])->group(function () {
     Route::post('/book-appointment/validate-signature', [AppointmentController::class, 'validateSignature'])
         ->name('book.appointment.validate-signature');
 
+<<<<<<< HEAD
+=======
+    Route::get('/signature-review', [AppointmentController::class, 'showSignatureReview'])
+        ->middleware('permission:book_appointments')
+        ->name('patient.signature-review.show');
+
+    Route::post('/signature-review', [AppointmentController::class, 'updateSignatureReview'])
+        ->middleware('permission:book_appointments')
+        ->name('patient.signature-review.update');
+
+>>>>>>> fixdev
     Route::get('/appointments', [AppointmentController::class, 'index'])
         ->middleware('permission:view_own_appointments')
         ->name('book.appointment.index');
@@ -827,6 +872,14 @@ Route::prefix('patient')->middleware(['role:patient'])->group(function () {
     })->name('patient.appointment.cancelled.view');
 });
 
+<<<<<<< HEAD
+=======
+Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
+    Route::post('/patients/{patient}/signature/invalid', [AppointmentController::class, 'markSignatureInvalid'])
+        ->name('admin.patient.signature.invalid');
+});
+
+>>>>>>> fixdev
 /*
 |--------------------------------------------------------------------------
 | DENTIST ROUTES
@@ -834,6 +887,12 @@ Route::prefix('patient')->middleware(['role:patient'])->group(function () {
 */
 
 Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
+<<<<<<< HEAD
+=======
+    Route::post('/patients/{patient}/signature/invalid', [AppointmentController::class, 'markSignatureInvalid'])
+        ->middleware('permission:manage_patient_profiles')
+        ->name('dentist.patient.signature.invalid');
+>>>>>>> fixdev
 
     Route::get('/dashboard', function () {
         $now   = \Carbon\Carbon::now();
@@ -890,7 +949,14 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
                         'patientProfileUrl' => $appointment->patient_id
                             ? route('dentist.dentist.patient.profile', $appointment->patient_id)
                             : '#',
+<<<<<<< HEAD
                         'rescheduleUrl' => route('dentist.dentist.appointments.reschedule', $appointment->id),
+=======
+                        'rescheduleUrl' => route(
+                            'dentist.dentist.appointments.reschedule.update',
+                            $appointment->id
+                        ),
+>>>>>>> fixdev
                         'cancelUrl' => route('dentist.dentist.appointments.cancel', $appointment->id),
                     ];
                 })->values()->toArray();
@@ -988,10 +1054,13 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         ->middleware('permission:manage_patient_profiles')
         ->name('dentist.dentist.appointments.patientProfile');
 
+<<<<<<< HEAD
     Route::get('/appointments/{id}/reschedule', [DentistAppointmentController::class, 'reschedule'])
         ->middleware('permission:manage_appointments')
         ->name('dentist.dentist.appointments.reschedule');
 
+=======
+>>>>>>> fixdev
     Route::put('/appointments/{id}/reschedule', [DentistAppointmentController::class, 'updateReschedule'])
         ->middleware('permission:manage_appointments')
         ->name('dentist.dentist.appointments.reschedule.update');
@@ -1142,6 +1211,13 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
     Route::post('/walk-in/start', [WalkInController::class, 'startWalkIn'])
         ->name('dentist.walk-in.start');
 
+<<<<<<< HEAD
+=======
+    Route::get('/add-existing-record', [\App\Http\Controllers\Dentist\ExistingRecordController::class, 'index'])
+        ->middleware('permission:manage_appointments')
+        ->name('dentist.existing-record.index');
+
+>>>>>>> fixdev
     // Document Requests
     //     if (session('role') !== 'dentist') {
     //         return redirect('/login');
@@ -1175,6 +1251,25 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         ->middleware('permission:manage_appointments')
         ->name('dentist.odontogram.start');
 
+<<<<<<< HEAD
+=======
+    Route::get('/odontogram/patient/{patient}/historical', [OdontogramController::class, 'createHistorical'])
+        ->middleware('permission:manage_appointments')
+        ->name('dentist.odontogram.historical.create');
+
+    Route::post('/odontogram/patient/{patient}/historical', [OdontogramController::class, 'storeHistoricalIntake'])
+        ->middleware('permission:manage_appointments')
+        ->name('dentist.odontogram.historical.intake.store');
+
+    Route::get('/odontogram/historical/slots', [OdontogramController::class, 'historicalSlotsForDate'])
+        ->middleware('permission:manage_appointments')
+        ->name('dentist.odontogram.historical.slots');
+
+    Route::get('/odontogram/patient/{patient}/historical/odontogram', [OdontogramController::class, 'showHistoricalOdontogram'])
+        ->middleware('permission:manage_appointments')
+        ->name('dentist.odontogram.historical.odontogram');
+
+>>>>>>> fixdev
     Route::get('/odontogram/appointment/{appointment}', [OdontogramController::class, 'show'])
         ->middleware('permission:manage_appointments')
         ->name('dentist.odontogram');
@@ -1183,6 +1278,13 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         ->middleware('permission:manage_appointments')
         ->name('dentist.odontogram.save');
 
+<<<<<<< HEAD
+=======
+    Route::post('/odontogram/patient/{patient}/historical/save', [OdontogramController::class, 'storeHistorical'])
+        ->middleware('permission:manage_appointments')
+        ->name('dentist.odontogram.historical.store');
+
+>>>>>>> fixdev
     // Inventory
     Route::get('/inventory', [InventoryController::class, 'index'])
         ->middleware('permission:manage_inventory')
@@ -1231,3 +1333,32 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
 });*/
 
 Route::post('/chat/send', [ChatbotController::class, 'chat']);
+<<<<<<< HEAD
+=======
+
+if (app()->environment('local')) {
+    Route::get('/dev/error-pages/{code}', function (string $code) {
+        $allowedCodes = [
+            '401',
+            '402',
+            '403',
+            '404',
+            '419',
+            '429',
+            '500',
+            '503',
+        ];
+
+        abort_unless(
+            in_array($code, $allowedCodes, true),
+            404
+        );
+
+        return response()->view(
+            "errors.{$code}",
+            [],
+            (int) $code
+        );
+    })->where('code', '[0-9]+');
+}
+>>>>>>> fixdev

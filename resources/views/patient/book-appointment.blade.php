@@ -110,7 +110,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                 <div class="p-6 sm:p-8">
 
                     <form id="appointmentForm" action="{{ route('book.appointment.store') }}" method="POST"
-                        enctype="multipart/form-data">
+                        enctype="multipart/form-data" data-global-selects>
                         @csrf
 
                         <div class="step-content hidden">
@@ -844,29 +844,21 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                                 <label class="block text-xs font-semibold text-[#333] mb-1.5">
                                                     Relation to Patient <span class="required-star">*</span>
                                                 </label>
-                                                <div class="relative w-full">
-                                                    <select id="emergency_relation" name="emergency_relation"
-                                                        class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none appearance-none pr-8"
-                                                        required>
-                                                        <option value="" disabled selected>Select relation
-                                                        </option>
-                                                        <option value="Mother">Mother</option>
-                                                        <option value="Father">Father</option>
-                                                        <option value="Sibling">Sibling</option>
-                                                        <option value="Guardian">Guardian</option>
-                                                        <option value="Spouse">Spouse</option>
-                                                        <option value="Grandparent">Grandparent</option>
-                                                        <option value="Aunt">Aunt</option>
-                                                        <option value="Uncle">Uncle</option>
-                                                        <option value="Cousin">Cousin</option>
-                                                        <option value="Child">Child</option>
-                                                    </select>
-                                                    <div
-                                                        class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center">
-                                                        <i
-                                                            class="fa-solid fa-chevron-down text-[10px] text-[#5c5550]"></i>
-                                                    </div>
-                                                </div>
+                                                <select name="emergency_relation" id="emergency_relation"
+                                                    class="js-custom-select" data-placeholder="Select relation"
+                                                    aria-label="Relation to patient" required>
+                                                    <option value="" disabled selected>Select relation</option>
+                                                    <option value="Mother">Mother</option>
+                                                    <option value="Father">Father</option>
+                                                    <option value="Sibling">Sibling</option>
+                                                    <option value="Guardian">Guardian</option>
+                                                    <option value="Spouse">Spouse</option>
+                                                    <option value="Grandparent">Grandparent</option>
+                                                    <option value="Aunt">Aunt</option>
+                                                    <option value="Uncle">Uncle</option>
+                                                    <option value="Cousin">Cousin</option>
+                                                    <option value="Child">Child</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -1278,13 +1270,18 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                 else el.value = value;
             });
         });
-        if (document.getElementById("emergency_relation")?.value === "Others") {
-            const other = document.getElementById("relation_other");
-            if (other) {
-                other.classList.remove("hidden");
-                other.setAttribute("required", "true");
+
+        form.querySelectorAll('select').forEach(select => {
+            const wrapper = select.closest('.custom-select');
+
+            if (
+                wrapper &&
+                typeof window.syncCustomSelect === 'function'
+            ) {
+                window.syncCustomSelect(wrapper);
             }
-        }
+        });
+
         const restoredDate = document.getElementById("appointment_date")?.value;
         const restoredTime = document.getElementById("appointment_time")?.value;
         if (restoredDate) {
@@ -1419,6 +1416,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         if (!target) return;
 
         const block =
+            target.closest('.custom-select') ||
             target.closest('.grid') ||
             target.closest('.ml-6') ||
             target.closest('.section-card') ||
@@ -1431,8 +1429,20 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             block: "center"
         });
 
-        if (typeof target.focus === "function" && !target.hasAttribute("readonly")) {
-            setTimeout(() => target.focus(), 250);
+        const focusTarget =
+            target.closest('.custom-select')
+                ?.querySelector('.custom-select-button') ||
+            target;
+
+        if (
+            typeof focusTarget.focus === 'function' &&
+            !target.hasAttribute('readonly')
+        ) {
+            setTimeout(() => {
+                focusTarget.focus({
+                    preventScroll: true
+                });
+            }, 250);
         }
     }
 
@@ -1959,19 +1969,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     document.querySelectorAll('input[name="had_medical_exam"]').forEach(r => r.addEventListener("change",
         syncMedicalExamBox));
     syncMedicalExamBox();
-    document.getElementById("emergency_relation")
-        ?.addEventListener("change", function () {
-            const other = document.getElementById("relation_other");
-            if (!other) return;
-            if (this.value === "Others") {
-                other.classList.remove("hidden");
-                other.setAttribute("required", "true");
-            } else {
-                other.classList.add("hidden");
-                other.removeAttribute("required");
-                other.value = "";
-            }
-        });
+    
     [{
         name: "good_health",
         boxId: "good_health_box",

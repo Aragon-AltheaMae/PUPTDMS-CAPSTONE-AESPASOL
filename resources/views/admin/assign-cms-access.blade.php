@@ -5,22 +5,18 @@
 @section('title', 'CMS Access')
 
 @section('content')
-<main id="mainContent" class="admin-page-shell page-enter">
+<main id="mainContent" class="admin-page-shell cms-page page-enter">
     <div class="w-full">
-        <div class="page-banner cms-banner"
-            style="display:flex!important;align-items:center!important;
+        <div class="page-banner cms-banner" style="display:flex!important;align-items:center!important;
                     justify-content:flex-start!important;text-align:left!important;">
-            <div class="page-banner-inner cms-banner-inner"
-                style="width:100%!important;max-width:none!important;
+            <div class="page-banner-inner cms-banner-inner" style="width:100%!important;max-width:none!important;
                         margin:0!important;display:flex!important;
                         align-items:center!important;justify-content:flex-start!important;
                         text-align:left!important;">
-                <div class="cms-banner-title-wrap"
-                    style="width:100%!important;margin:0!important;
+                <div class="cms-banner-title-wrap" style="width:100%!important;margin:0!important;
                             display:flex!important;align-items:center!important;
                             justify-content:flex-start!important;text-align:left!important;">
-                    <h1 class="page-title cms-banner-title"
-                        style="display:block!important;width:auto!important;
+                    <h1 class="page-title cms-banner-title" style="display:block!important;width:auto!important;
                                 margin:0!important;margin-left:0!important;
                                 margin-right:auto!important;text-align:left!important;
                                 justify-self:start!important;align-self:center!important;">
@@ -31,264 +27,268 @@
         </div>
 
         <div class="admin-page-body">
-            
-        <div class="cms-layout">
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-header-left">
-                        <div class="card-header-icon">
-                            <i class="fa-solid fa-user-plus"></i>
-                        </div>
-                        <div>
-                            <h2 class="card-title">CMS Access Form</h2>
-                        </div>
-                    </div>
-                    <span class="entry-badge">Access Setup</span>
-                </div>
 
-                <form id="assignCmsAccessForm" method="POST" action="{{ route('admin.assign-cms-access.store') }}"
-                    novalidate>
-                    @csrf
-
-                    <div class="card-body">
-                        <div class="section-block">
-                            <div class="section-head-left">
-                                <div class="section-icon">
-                                    <i class="fa-solid fa-magnifying-glass"></i>
-                                </div>
-                                <div>
-                                    <h3 class="section-title">User Selection</h3>
-                                </div>
-                            </div>
-
-                            <div class="cms-grid">
-                                <div class="field-group full search-combo">
-                                    <label for="user_search" class="field-label">
-                                        Select User<span class="required-mark">*</span>
-                                    </label>
-
-                                    <div class="user-search-row voice-search-row">
-                                        <div class="search-input-wrap" data-search-wrapper>
-                                            <i class="fa-solid fa-magnifying-glass cms-search-leading-icon"></i>
-
-                                            <input type="text" id="user_search" class="access-input cms-search-input"
-                                                placeholder="Search faculty by name or email" autocomplete="off"
-                                                data-search-input>
-
-                                            <button type="button" id="userSearchClearBtn" class="cms-search-clear-btn"
-                                                data-search-clear aria-label="Clear search">
-                                                <i class="fa-solid fa-xmark"></i>
-                                            </button>
-
-                                            <button type="button" id="toggleUserDropdown" class="dropdown-toggle-btn"
-                                                aria-label="Show user list">
-                                                <i class="fa-solid fa-chevron-down"></i>
-                                            </button>
-                                        </div>
-
-                                        <div class="voice-input-toggle">
-                                            <button type="button" id="cmsSearchMicBtn" class="voice-search-mic external"
-                                                data-voice-trigger data-voice-target="#user_search"
-                                                data-voice-status="#cmsSearchVoiceStatus"
-                                                aria-label="Toggle voice input" aria-pressed="false">
-                                                <i class="fa-solid fa-microphone"></i>
-                                            </button>
-
-                                            <span id="cmsSearchVoiceStatus" class="voice-status hidden"
-                                                aria-live="polite"></span>
-                                        </div>
-                                    </div>
-
-                                    <div id="searchResults" class="search-results"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <input type="hidden" name="external_admin_id" id="external_admin_id">
-
-                        <div class="section-block">
-                            <div class="section-head-left">
-                                <div class="section-icon">
-                                    <i class="fa-solid fa-id-card"></i>
-                                </div>
-                                <div>
-                                    <h3 class="section-title">Synced User Information</h3>
-                                </div>
-                            </div>
-
-                            <div class="synced-user-layout">
-                                <div class="synced-row synced-row-top">
-                                    <div class="field-group">
-                                        <label for="fname" class="field-label">First Name</label>
-                                        <input type="text" name="fname" id="fname" class="access-input" readonly>
-                                    </div>
-
-                                    <div class="field-group">
-                                        <label for="lname" class="field-label">Last Name</label>
-                                        <input type="text" name="lname" id="lname" class="access-input" readonly>
-                                    </div>
-
-                                    <div class="field-group">
-                                        <label for="age" class="field-label">Age</label>
-                                        <input type="number" name="age" id="age" class="access-input" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="synced-row synced-row-mid">
-                                    <div class="field-group">
-                                        <label for="email" class="field-label">Email</label>
-                                        <input type="email" name="email" id="email" class="access-input" readonly>
-                                    </div>
-
-                                    <div class="field-group">
-                                        <label for="office" class="field-label">Office</label>
-                                        <input type="text" name="office" id="office" class="access-input" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="synced-row synced-row-full">
-                                    <div class="field-group">
-                                        <label for="address" class="field-label">Address</label>
-                                        <input type="text" name="address" id="address" class="access-input" readonly>
-                                    </div>
-                                </div>
-
-                                <div class="synced-row synced-row-bottom">
-                                    <div class="field-group">
-                                        <label for="contact_number" class="field-label">Contact Number</label>
-                                        <input type="text" name="contact_number" id="contact_number"
-                                            class="access-input" readonly>
-                                    </div>
-
-                                    <div class="field-group">
-                                        <label for="gender" class="field-label">Gender</label>
-                                        <input type="text" name="gender" id="gender" class="access-input" readonly>
-                                    </div>
-
-                                    <div class="field-group">
-                                        <label for="senior_pwd" class="field-label">Senior / PWD</label>
-                                        <input type="text" name="senior_pwd" id="senior_pwd" class="access-input"
-                                            readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="section-block">
-                            <div class="section-head-left">
-                                <div class="section-icon">
-                                    <i class="fa-solid fa-shield-halved"></i>
-                                </div>
-                                <div>
-                                    <h3 class="section-title">Access Configuration</h3>
-                                </div>
-                            </div>
-
-                            <div class="cms-role-status">
-                                <div class="field-group">
-                                    <label for="cms_role" class="field-label">
-                                        CMS Role<span class="required-mark">*</span>
-                                    </label>
-                                    <select name="cms_role" id="cms_role" class="access-select" required>
-                                        <option value="" disabled selected hidden>Select CMS Role</option>
-                                        <option value="admin">Admin</option>
-                                        <option value="patient">Patient</option>
-                                        <option value="dentist">Dentist</option>
-                                    </select>
-                                </div>
-
-                                <div class="field-group">
-                                    <label for="cms_status" class="field-label">
-                                        CMS Access Status<span class="required-mark">*</span>
-                                    </label>
-                                    <select name="cms_status" id="cms_status" class="access-select" required>
-                                        <option value="" disabled selected hidden>Select Status</option>
-                                        <option value="active">Active</option>
-                                        <option value="inactive">Inactive</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="access-card-footer">
-                        <button type="button" class="btn-reset" id="resetAssignCmsBtn">
-                            <i class="fa-solid fa-arrow-left"></i>
-                            Reset
-                        </button>
-
-                        <button type="submit" class="btn-save">
-                            <i class="fa-solid fa-user-plus"></i>
-                            Save Access
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="sidebar-stack">
-                <div class="info-card">
-                    <div class="preview-inner">
-                        <div class="preview-avatar">
-                            <i class="fa-solid fa-user-shield"></i>
-                        </div>
-
-                        <div class="preview-name" id="preview_name">No user selected</div>
-                        <div class="preview-email" id="preview_email">Select a user to preview synced information.
-                        </div>
-
-                        <div class="preview-meta">
-                            <div class="preview-meta-item">
-                                <div class="preview-meta-label">Office</div>
-                                <div class="preview-meta-value" id="preview_office">—</div>
-                            </div>
-
-                            <div class="preview-meta-item">
-                                <div class="preview-meta-label">Contact Number</div>
-                                <div class="preview-meta-value" id="preview_contact">—</div>
-                            </div>
-
-                            <div class="preview-meta-item">
-                                <div class="preview-meta-label">Address</div>
-                                <div class="preview-meta-value" id="preview_address">—</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="info-card quick-notes-card">
-                    <div class="section-head quick-notes-head admin-mb-xs">
-                        <div class="section-head-left">
-                            <div class="section-icon">
-                                <i class="fa-solid fa-circle-info"></i>
+            <div class="cms-layout">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <div class="card-header-icon">
+                                <i class="fa-solid fa-user-plus"></i>
                             </div>
                             <div>
-                                <h3 class="section-title quick-notes-title">Quick Notes</h3>
-                                <div class="section-note">Small guidance for cleaner admin workflow.</div>
+                                <h2 class="card-title">CMS Access Form</h2>
+                            </div>
+                        </div>
+                        <span class="entry-badge">Access Setup</span>
+                    </div>
+
+                    <form id="assignCmsAccessForm" method="POST" action="{{ route('admin.assign-cms-access.store') }}"
+                        novalidate>
+                        @csrf
+
+                        <div class="card-body">
+                            <div class="section-block">
+                                <div class="section-head">
+                                    <div class="section-head-left">
+                                        <div class="section-icon">
+                                            <i class="fa-solid fa-magnifying-glass"></i>
+                                        </div>
+
+                                        <div>
+                                            <h3 class="section-title">User Selection</h3>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="cms-grid">
+                                    <div class="field-group full search-combo">
+                                        <label for="user_search" class="field-label">
+                                            Select User<span class="required-mark">*</span>
+                                        </label>
+
+                                        <div class="user-search-row voice-search-row">
+                                            <div class="search-input-wrap" data-search-wrapper>
+                                                <i class="fa-solid fa-magnifying-glass cms-search-leading-icon"></i>
+
+                                                <input type="text" id="user_search"
+                                                    class="access-input cms-search-input"
+                                                    placeholder="Search faculty by name or email" autocomplete="off"
+                                                    data-search-input>
+
+                                                <button type="button" id="userSearchClearBtn"
+                                                    class="cms-search-clear-btn" data-search-clear
+                                                    aria-label="Clear search">
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                </button>
+                                            </div>
+
+                                            <div class="voice-input-toggle">
+                                                <button type="button" id="cmsSearchMicBtn"
+                                                    class="voice-search-mic external" data-voice-trigger
+                                                    data-voice-target="#user_search"
+                                                    data-voice-status="#cmsSearchVoiceStatus"
+                                                    aria-label="Toggle voice input" aria-pressed="false">
+                                                    <i class="fa-solid fa-microphone"></i>
+                                                </button>
+
+                                                <span id="cmsSearchVoiceStatus" class="voice-status hidden"
+                                                    aria-live="polite"></span>
+                                            </div>
+                                        </div>
+
+                                        <div id="searchResults" class="search-results"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="external_admin_id" id="external_admin_id">
+
+                            <div class="section-block">
+                                <div class="section-head-left">
+                                    <div class="section-icon">
+                                        <i class="fa-solid fa-id-card"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="section-title">Synced User Information</h3>
+                                    </div>
+                                </div>
+
+                                <div class="synced-user-layout">
+                                    <div class="synced-row synced-row-top">
+                                        <div class="field-group">
+                                            <label for="fname" class="field-label">First Name</label>
+                                            <input type="text" name="fname" id="fname" class="access-input" readonly>
+                                        </div>
+
+                                        <div class="field-group">
+                                            <label for="lname" class="field-label">Last Name</label>
+                                            <input type="text" name="lname" id="lname" class="access-input" readonly>
+                                        </div>
+
+                                        <div class="field-group">
+                                            <label for="age" class="field-label">Age</label>
+                                            <input type="number" name="age" id="age" class="access-input" readonly>
+                                        </div>
+                                    </div>
+
+                                    <div class="synced-row synced-row-mid">
+                                        <div class="field-group">
+                                            <label for="email" class="field-label">Email</label>
+                                            <input type="email" name="email" id="email" class="access-input" readonly>
+                                        </div>
+
+                                        <div class="field-group">
+                                            <label for="office" class="field-label">Office</label>
+                                            <input type="text" name="office" id="office" class="access-input" readonly>
+                                        </div>
+                                    </div>
+
+                                    <div class="synced-row synced-row-full">
+                                        <div class="field-group">
+                                            <label for="address" class="field-label">Address</label>
+                                            <input type="text" name="address" id="address" class="access-input"
+                                                readonly>
+                                        </div>
+                                    </div>
+
+                                    <div class="synced-row synced-row-bottom">
+                                        <div class="field-group">
+                                            <label for="contact_number" class="field-label">Contact Number</label>
+                                            <input type="text" name="contact_number" id="contact_number"
+                                                class="access-input" readonly>
+                                        </div>
+
+                                        <div class="field-group">
+                                            <label for="gender" class="field-label">Gender</label>
+                                            <input type="text" name="gender" id="gender" class="access-input" readonly>
+                                        </div>
+
+                                        <div class="field-group">
+                                            <label for="senior_pwd" class="field-label">Senior / PWD</label>
+                                            <input type="text" name="senior_pwd" id="senior_pwd" class="access-input"
+                                                readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="section-block">
+                                <div class="section-head-left">
+                                    <div class="section-icon">
+                                        <i class="fa-solid fa-shield-halved"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="section-title">Access Configuration</h3>
+                                    </div>
+                                </div>
+
+                                <div class="cms-role-status">
+                                    <div class="field-group">
+                                        <label for="cms_role" class="field-label">
+                                            CMS Role<span class="required-mark">*</span>
+                                        </label>
+                                        <select name="cms_role" id="cms_role" class="access-select js-custom-select"
+                                            required>
+                                            <option value="" disabled selected hidden>Select CMS Role</option>
+                                            <option value="admin">Admin</option>
+                                            <option value="patient">Patient</option>
+                                            <option value="dentist">Dentist</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="field-group">
+                                        <label for="cms_status" class="field-label">
+                                            CMS Access Status<span class="required-mark">*</span>
+                                        </label>
+                                        <select name="cms_status" id="cms_status" class="access-select js-custom-select"
+                                            required>
+                                            <option value="" disabled selected hidden>Select Status</option>
+                                            <option value="active">Active</option>
+                                            <option value="inactive">Inactive</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="access-card-footer">
+                            <button type="button" class="btn-reset" id="resetAssignCmsBtn">
+                                <i class="fa-solid fa-rotate-left"></i>
+                                Reset
+                            </button>
+
+                            <button type="submit" class="ui-btn ui-btn-primary">
+                                <i class="fa-solid fa-user-plus"></i>
+                                Save Access
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="sidebar-stack">
+                    <div class="info-card">
+                        <div class="preview-inner">
+                            <div class="preview-avatar">
+                                <i class="fa-solid fa-user-shield"></i>
+                            </div>
+
+                            <div class="preview-name" id="preview_name">No user selected</div>
+                            <div class="preview-email" id="preview_email">Select a user to preview synced information.
+                            </div>
+
+                            <div class="preview-meta">
+                                <div class="preview-meta-item">
+                                    <div class="preview-meta-label">Office</div>
+                                    <div class="preview-meta-value" id="preview_office">—</div>
+                                </div>
+
+                                <div class="preview-meta-item">
+                                    <div class="preview-meta-label">Contact Number</div>
+                                    <div class="preview-meta-value" id="preview_contact">—</div>
+                                </div>
+
+                                <div class="preview-meta-item">
+                                    <div class="preview-meta-label">Address</div>
+                                    <div class="preview-meta-value" id="preview_address">—</div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="tip-list">
-                        <div class="tip-item">
-                            <i class="fa-solid fa-check"></i>
-                            <span>Select from the dropdown first to avoid manually typing inconsistent user
-                                details.</span>
+                    <div class="info-card quick-notes-card">
+                        <div class="section-head quick-notes-head admin-mb-xs">
+                            <div class="section-head-left">
+                                <div class="section-icon">
+                                    <i class="fa-solid fa-circle-info"></i>
+                                </div>
+                                <div>
+                                    <h3 class="section-title quick-notes-title">Quick Notes</h3>
+                                    <div class="section-note">Small guidance for cleaner admin workflow.</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="tip-item">
-                            <i class="fa-solid fa-user-gear"></i>
-                            <span>Assign the appropriate CMS role before saving so the account is mapped
-                                correctly.</span>
-                        </div>
-                        <div class="tip-item">
-                            <i class="fa-solid fa-shield"></i>
-                            <span>Use <strong>Inactive</strong> status when the user record should remain stored but
-                                access must be disabled.</span>
+
+                        <div class="tip-list">
+                            <div class="tip-item">
+                                <i class="fa-solid fa-check"></i>
+                                <span>Select from the dropdown first to avoid manually typing inconsistent user
+                                    details.</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fa-solid fa-user-gear"></i>
+                                <span>Assign the appropriate CMS role before saving so the account is mapped
+                                    correctly.</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fa-solid fa-shield"></i>
+                                <span>Use <strong>Inactive</strong> status when the user record should remain stored but
+                                    access must be disabled.</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 </main>
 @endsection
 
@@ -297,7 +297,6 @@
     document.addEventListener('DOMContentLoaded', function () {
 
         const searchInput = document.getElementById('user_search');
-        const toggleButton = document.getElementById('toggleUserDropdown');
         const clearSearchButton = document.getElementById('userSearchClearBtn');
         const resultsBox = document.getElementById('searchResults');
 
@@ -324,6 +323,7 @@
         let fullListLoaded = false;
         let isDropdownMode = false;
         let usersFetchPromise = null;
+        let searchRequestSerial = 0;
 
         @if ($errors -> any())
             window.showToast?.({
@@ -361,193 +361,6 @@
             toggleUserSearchClear(searchInput);
         };
 
-        function closeCmsCustomDropdowns(except = null) {
-            document.querySelectorAll('.cms-custom-select.is-open').forEach(wrapper => {
-                if (wrapper === except) return;
-
-                wrapper.classList.remove('is-open');
-                wrapper.querySelector('.cms-custom-select-btn')?.setAttribute('aria-expanded', 'false');
-            });
-        }
-
-        function syncCmsCustomSelects(root = document) {
-            const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
-            const wrappers = [];
-
-            if (scope.matches && scope.matches('.cms-custom-select')) {
-                wrappers.push(scope);
-            }
-
-            scope.querySelectorAll?.('.cms-custom-select').forEach(wrapper => {
-                if (!wrappers.includes(wrapper)) wrappers.push(wrapper);
-            });
-
-            wrappers.forEach(wrapper => {
-                const select = wrapper.querySelector('select');
-                const valueText = wrapper.querySelector('[data-cms-custom-select-value]');
-                const button = wrapper.querySelector('.cms-custom-select-btn');
-
-                if (!select || !valueText || !button) return;
-
-                const selectedOption = select.options[select.selectedIndex];
-                const selectedValue = select.value || '';
-
-                valueText.textContent = selectedOption?.textContent?.trim() || 'Select option';
-
-                wrapper.classList.toggle('is-disabled', select.disabled);
-                button.disabled = select.disabled;
-
-                wrapper.classList.remove(
-                    'role-admin',
-                    'role-dentist',
-                    'role-patient',
-                    'status-active',
-                    'status-inactive',
-                    'has-value'
-                );
-
-                if (selectedValue) {
-                    wrapper.classList.add('has-value');
-
-                    if (select.id === 'cms_role') {
-                        wrapper.classList.add(`role-${selectedValue}`);
-                    }
-
-                    if (select.id === 'cms_status') {
-                        wrapper.classList.add(`status-${selectedValue}`);
-                    }
-                }
-
-                wrapper.querySelectorAll('.cms-custom-select-option').forEach(option => {
-                    const isActive = Number(option.dataset.index) === select.selectedIndex;
-
-                    option.classList.toggle('is-active', isActive);
-                    option.setAttribute('aria-selected', isActive ? 'true' : 'false');
-                });
-            });
-        }
-
-        function initCmsCustomDropdowns(root = document) {
-            const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
-
-            scope.querySelectorAll('#assignCmsAccessForm select.access-select').forEach(select => {
-                if (select.dataset.customDropdownReady === 'true') return;
-
-                select.dataset.customDropdownReady = 'true';
-                select.classList.add('cms-native-select');
-
-                const wrapper = document.createElement('div');
-                wrapper.className = 'cms-custom-select';
-
-                const button = document.createElement('button');
-                button.type = 'button';
-                button.className = 'cms-custom-select-btn';
-                button.setAttribute('aria-haspopup', 'listbox');
-                button.setAttribute('aria-expanded', 'false');
-
-                const valueSpan = document.createElement('span');
-                valueSpan.setAttribute('data-cms-custom-select-value', '');
-
-                const chevron = document.createElement('i');
-                chevron.className = 'fa-solid fa-chevron-down';
-                chevron.setAttribute('aria-hidden', 'true');
-
-                button.appendChild(valueSpan);
-                button.appendChild(chevron);
-
-                const menu = document.createElement('div');
-                menu.className = 'cms-custom-select-menu';
-                menu.setAttribute('role', 'listbox');
-
-                Array.from(select.options).forEach(option => {
-                    if (option.hidden) return;
-
-                    const item = document.createElement('button');
-                    item.type = 'button';
-                    item.className = 'cms-custom-select-option';
-                    item.dataset.value = option.value;
-                    item.dataset.index = String(option.index);
-                    item.setAttribute('role', 'option');
-
-                    if (select.id === 'cms_role' && option.value) {
-                        item.classList.add(`role-${option.value}`);
-                    }
-
-                    if (select.id === 'cms_status' && option.value) {
-                        item.classList.add(`status-${option.value}`);
-                    }
-
-                    const labelSpan = document.createElement('span');
-                    labelSpan.textContent = option.textContent.trim();
-
-                    const checkIcon = document.createElement('i');
-                    checkIcon.className = 'fa-solid fa-check cms-custom-select-check';
-                    checkIcon.setAttribute('aria-hidden', 'true');
-
-                    item.appendChild(labelSpan);
-                    item.appendChild(checkIcon);
-
-                    item.addEventListener('click', event => {
-                        event.preventDefault();
-                        event.stopPropagation();
-
-                        if (select.disabled) return;
-
-                        select.selectedIndex = option.index;
-
-                        select.dispatchEvent(new Event('input', {
-                            bubbles: true
-                        }));
-                        select.dispatchEvent(new Event('change', {
-                            bubbles: true
-                        }));
-
-                        wrapper.classList.remove('is-open');
-                        button.setAttribute('aria-expanded', 'false');
-
-                        syncCmsCustomSelects(wrapper);
-                    });
-
-                    menu.appendChild(item);
-                });
-
-                select.parentNode.insertBefore(wrapper, select);
-                wrapper.appendChild(select);
-                wrapper.appendChild(button);
-                wrapper.appendChild(menu);
-
-                button.addEventListener('click', event => {
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    if (select.disabled) return;
-
-                    const willOpen = !wrapper.classList.contains('is-open');
-
-                    closeCmsCustomDropdowns(wrapper);
-
-                    wrapper.classList.toggle('is-open', willOpen);
-                    button.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-                });
-
-                select.addEventListener('change', () => syncCmsCustomSelects(wrapper));
-
-                syncCmsCustomSelects(wrapper);
-            });
-        }
-
-        document.addEventListener('click', event => {
-            if (event.target.closest('.cms-custom-select')) return;
-            closeCmsCustomDropdowns();
-        });
-
-        document.addEventListener('keydown', event => {
-            if (event.key !== 'Escape') return;
-            closeCmsCustomDropdowns();
-        });
-
-        initCmsCustomDropdowns(document);
-
         function hideResults() {
             resultsBox.classList.remove('is-open');
             resultsBox.innerHTML = '';
@@ -582,32 +395,28 @@
         }
 
         function resetAssignCmsForm() {
+            assignForm?.reset();
+
             searchInput.value = '';
-            externalAdminId.value = '';
-            fname.value = lname.value = email.value = office.value =
-                address.value = age.value = gender.value =
-                contactNumber.value = seniorPwd.value = '';
-            document.getElementById('cms_role').value = '';
-            document.getElementById('cms_status').value = '';
-            syncCmsCustomSelects(document);
-            setCmsFieldError(searchInput, '');
-            setCmsFieldError(document.getElementById('cms_role'), '');
-            setCmsFieldError(document.getElementById('cms_status'), '');
 
+            clearFormFields();
             hideResults();
+
+            cmsRole.value = '';
+            cmsStatus.value = '';
+
+            setCmsFieldError(searchInput, '');
+            setCmsFieldError(cmsRole, '');
+            setCmsFieldError(cmsStatus, '');
+
             toggleUserSearchClear(searchInput);
-            resetPreview();
 
-            if (window.initSearchClearButtons) {
-                window.initSearchClearButtons();
-            }
-
-            if (clearSearchButton) {
-                clearSearchButton.addEventListener('click', function () {
-                    clearFormFields();
-                    hideResults();
-                    toggleUserSearchClear(searchInput);
-                });
+            if (typeof window.syncCustomSelect === 'function') {
+                document
+                    .querySelectorAll('.custom-select')
+                    .forEach(wrapper => {
+                        window.syncCustomSelect(wrapper);
+                    });
             }
         }
 
@@ -669,23 +478,87 @@
             showResults();
         }
 
-        async function fetchAllUsers() {
-            if (fullListLoaded) return fullUserList;
-            if (usersFetchPromise) return usersFetchPromise;
+        function normalizeSearchText(value) {
+            return String(value ?? '')
+                .toLowerCase()
+                .replace(/[^a-z0-9@\s._-]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
 
-            usersFetchPromise = fetch('/admin/external-admins/search', {
+        function buildSearchTokens(value) {
+            return normalizeSearchText(value).split(' ').filter(Boolean);
+        }
+
+        function scoreSearchValue(haystack, query, tokens) {
+            const normalizedHaystack = normalizeSearchText(haystack);
+            if (!normalizedHaystack) return -1;
+            if (normalizedHaystack === query) return 1000;
+            if (normalizedHaystack.startsWith(query)) return 800;
+            if (tokens.length && tokens.every(token => normalizedHaystack.includes(token))) {
+                return 500 - normalizedHaystack.indexOf(tokens[0]);
+            }
+            if (normalizedHaystack.includes(query)) return 250 - normalizedHaystack.indexOf(query);
+            return -1;
+        }
+
+        function scoreUser(user, query) {
+            const tokens = buildSearchTokens(query);
+            if (!tokens.length) return 0;
+
+            const values = [
+                user.full_name,
+                `${user.fname ?? ''} ${user.lname ?? ''}`,
+                user.email,
+                user.office,
+                user.admin_id,
+            ];
+
+            let best = -1;
+            values.forEach((value, index) => {
+                const score = scoreSearchValue(value, normalizeSearchText(query), tokens);
+                if (score >= 0) {
+                    best = Math.max(best, score - index * 10);
+                }
+            });
+
+            return best;
+        }
+
+        async function fetchUsers(query = '') {
+            const params = new URLSearchParams();
+            const trimmed = query.trim();
+            if (trimmed) {
+                params.set('search', trimmed);
+            }
+
+            const response = await fetch(`/admin/external-admins/search?${params.toString()}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
                 }
-            })
-                .then(async res => {
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                    const data = await res.json();
-                    if (!data || !data.success || !Array.isArray(data.data)) throw new Error(
-                        'Invalid response format');
-                    fullUserList = data.data;
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (!data || !data.success || !Array.isArray(data.data)) {
+                throw new Error('Invalid response format');
+            }
+
+            return data.data;
+        }
+
+        async function fetchAllUsers() {
+            if (fullListLoaded) return fullUserList;
+            if (usersFetchPromise) return usersFetchPromise;
+
+            usersFetchPromise = fetchUsers('')
+                .then(users => {
+                    fullUserList = users;
                     fullListLoaded = true;
                     return fullUserList;
                 })
@@ -700,55 +573,104 @@
             return usersFetchPromise;
         }
 
-        function filterUsersLocally(query) {
-            const term = query.trim().toLowerCase();
-            if (!term) return [];
-            return fullUserList.filter(u => [u.full_name, u.fname, u.lname, u.email, u.office]
-                .some(v => String(v ?? '').toLowerCase().includes(term))
-            );
+        function rankUsers(users, query) {
+            const normalizedQuery = normalizeSearchText(query);
+            if (!normalizedQuery) return users;
+
+            return [...users]
+                .map(user => ({
+                    user,
+                    score: scoreUser(user, normalizedQuery),
+                }))
+                .filter(entry => entry.score >= 0)
+                .sort((a, b) => b.score - a.score)
+                .map(entry => entry.user);
         }
 
         searchInput.addEventListener('input', async function () {
             const query = this.value.trim();
+
             toggleUserSearchClear(this);
             clearFormFields();
             isDropdownMode = false;
 
             if (!query) {
-                hideResults();
+                const users = await fetchAllUsers();
+                users.length
+                    ? renderResults(users)
+                    : renderNoResults('No users available.');
+
                 return;
             }
-            if (!fullListLoaded) await fetchAllUsers();
 
-            const filtered = filterUsersLocally(query);
-            filtered.length ? renderResults(filtered) : renderNoResults('No results found.');
+            const requestId = ++searchRequestSerial;
+
+            try {
+                const users = await fetchUsers(query);
+                if (requestId !== searchRequestSerial) return;
+
+                const filtered = rankUsers(users, query);
+
+                filtered.length
+                    ? renderResults(filtered)
+                    : renderNoResults('No matching users found.');
+            } catch (error) {
+                console.error('User search error:', error);
+                if (requestId !== searchRequestSerial) return;
+
+                renderNoResults('Unable to search users right now.');
+            }
         });
 
-        toggleButton.addEventListener('click', async function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            if (dropdownOpen && isDropdownMode) {
-                hideResults();
-                return;
-            }
+        async function openUserDropdown() {
             isDropdownMode = true;
 
-            if (!fullListLoaded) await fetchAllUsers();
-            fullUserList.length ? renderResults(fullUserList) : renderNoResults(
-                'No users available.');
+            if (!fullListLoaded) {
+                await fetchAllUsers();
+            }
+
+            const query = searchInput.value.trim();
+
+            if (query) {
+                const filtered = rankUsers(fullUserList, query);
+
+                filtered.length
+                    ? renderResults(filtered)
+                    : renderNoResults('No matching users found.');
+
+                return;
+            }
+
+            fullUserList.length
+                ? renderResults(fullUserList)
+                : renderNoResults('No users available.');
+        }
+
+        searchInput.addEventListener('focus', openUserDropdown);
+
+        searchInput.addEventListener('click', function () {
+            if (!dropdownOpen) {
+                openUserDropdown();
+            }
         });
 
         searchInput.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') hideResults();
         });
 
-        document.addEventListener('click', function (e) {
-            const inside = searchInput.contains(e.target) ||
-                toggleButton.contains(e.target) ||
-                resultsBox.contains(e.target);
-            if (!inside) hideResults();
+        document.addEventListener('click', function (event) {
+            const searchWrapper =
+                searchInput.closest('[data-search-wrapper]');
+
+            const clickedInside =
+                searchWrapper?.contains(event.target) ||
+                resultsBox.contains(event.target);
+
+            if (!clickedInside) {
+                hideResults();
+            }
         });
+
         const assignForm = document.getElementById('assignCmsAccessForm');
         const cmsRole = document.getElementById('cms_role');
         const cmsStatus = document.getElementById('cms_status');
@@ -757,7 +679,7 @@
             if (!field) return null;
 
             if (field.classList.contains('access-select')) {
-                return field.closest('.cms-custom-select') || field.closest('.field-group');
+                return field.closest('.custom-select') || field.closest('.field-group');
             }
 
             return field.closest('.field-group') || field.parentElement;
@@ -768,7 +690,7 @@
 
             const host = getFieldErrorHost(field);
             const fieldGroup = field.closest('.field-group');
-            const customSelect = field.closest('.cms-custom-select');
+            const customSelect = field.closest('.custom-select');
 
             field.classList.toggle('is-invalid', Boolean(message));
             host?.classList.toggle('is-invalid', Boolean(message));
@@ -852,15 +774,26 @@
 
         cmsRole?.addEventListener('change', () => {
             setCmsFieldError(cmsRole, cmsRole.value ? '' : 'Please select a CMS role.');
-            syncCmsCustomSelects(document);
         });
 
         cmsStatus?.addEventListener('change', () => {
             setCmsFieldError(cmsStatus, cmsStatus.value ? '' : 'Please select an access status.');
-            syncCmsCustomSelects(document);
         });
 
-        if (resetBtn) resetBtn.addEventListener('click', resetAssignCmsForm);
+        resetBtn?.addEventListener('click', function () {
+            resetAssignCmsForm();
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+
+            window.setTimeout(() => {
+                searchInput.focus({
+                    preventScroll: true
+                });
+            }, 450);
+        });
 
         toggleUserSearchClear(searchInput);
         resetPreview();

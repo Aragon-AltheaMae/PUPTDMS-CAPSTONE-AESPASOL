@@ -19,11 +19,17 @@ return [
 'date' => $r->appointment_date ? \Carbon\Carbon::parse($r->appointment_date)->format('F d, Y') : '',
 'time' => $r->appointment_time ?? '',
 'status' => strtolower($r->status ?? ''),
-'duration' => $r->duration ?? '',
-'remarks' => $r->remarks ?? '',
-'oral' => $r->oral_examination ?? '',
-'diagnosis' => $r->diagnosis ?? '',
-'prescription' => $r->prescription ?? '',
+'duration' => $r->procedure?->procedure_duration_seconds
+? \Carbon\CarbonInterval::seconds((int) $r->procedure->procedure_duration_seconds)
+->cascade()
+->forHumans(['short' => true, 'minimumUnit' => 'second'])
+: $r->duration ?? ($r->procedure_duration ?? ($r->treatment_duration ?? '60 mins')),
+'remarks' => $r->procedure?->completion_action
+? \Illuminate\Support\Str::of($r->procedure->completion_action)->replace('_', ' ')->title()
+: $r->remarks ?? '',
+'oral' => $r->procedure?->oral_examination ?? '',
+'diagnosis' => $r->procedure?->diagnosis ?? '',
+'prescription' => $r->procedure?->prescriptions ?? '',
 ];
 })
 ->values();
@@ -46,40 +52,42 @@ $appt->service_type .
 $completedCalendarAppointments = [];
 
 foreach (
-    collect($records ?? [])->filter(function ($record) {
-        return strtolower($record->status ?? '') === 'completed';
-    }) as $record
+collect($records ?? [])->filter(function ($record) {
+return strtolower($record->status ?? '') === 'completed';
+})
+as $record
 ) {
-    if (empty($record->appointment_date)) {
-        continue;
-    }
+if (empty($record->appointment_date)) {
+continue;
+}
 
-    $dateKey = \Carbon\Carbon::parse(
-        $record->appointment_date
-    )->format('Y-m-d');
+$dateKey = \Carbon\Carbon::parse($record->appointment_date)->format('Y-m-d');
 
-    $completedCalendarAppointments[$dateKey] ??= [];
+$completedCalendarAppointments[$dateKey] ??= [];
 
-    $completedCalendarAppointments[$dateKey][] = [
-        'service' => $record->service_type ?? 'Dental Appointment',
+$completedCalendarAppointments[$dateKey][] = [
+'service' => $record->service_type ?? 'Dental Appointment',
 
-        'time' => !empty($record->appointment_time)
-            ? \Carbon\Carbon::parse(
-                $record->appointment_time
-            )->format('g:i A')
-            : 'Time not recorded',
+'time' => !empty($record->appointment_time)
+? \Carbon\Carbon::parse($record->appointment_time)->format('g:i A')
+: 'Time not recorded',
 
-        'status' => 'completed',
+'status' => 'completed',
 
-        'dentist' => $record->dentist_name
-            ?? optional($record->dentist)->name
-            ?? 'Assigned Dentist',
+'dentist' => $record->dentist_name ?? (optional($record->dentist)->name ?? 'Assigned Dentist'),
 
-        'duration' => $record->duration ?? null,
-        'remarks' => $record->remarks ?? null,
-        'diagnosis' => $record->diagnosis ?? null,
-        'prescription' => $record->prescription ?? null,
-    ];
+'duration' => $record->procedure?->procedure_duration_seconds
+? \Carbon\CarbonInterval::seconds((int) $record->procedure->procedure_duration_seconds)
+->cascade()
+->forHumans(['short' => true, 'minimumUnit' => 'second'])
+: $record->duration ?? ($record->procedure_duration ?? ($record->treatment_duration ?? '60 mins')),
+'remarks' => $record->procedure?->completion_action
+? \Illuminate\Support\Str::of($record->procedure->completion_action)->replace('_', ' ')->title()
+: $record->remarks ?? null,
+'oral' => $record->procedure?->oral_examination ?? null,
+'diagnosis' => $record->procedure?->diagnosis ?? null,
+'prescription' => $record->procedure?->prescriptions ?? null,
+];
 }
 
 $dashboardDisplayName = ucwords(
@@ -173,7 +181,9 @@ isset($upcomingAppointment) && $upcomingAppointment
                             <span
                                 class="greeting-insight-chip inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/15 px-3 py-1.5 text-xs font-semibold text-white">
                                 <i class="fa-solid fa-tooth"></i>
-                                {{ $recordCount > 0 ? 'Last Visit: ' . ($latestRecordDate ?? 'Available') : 'No dental
+                                {{ $recordCount > 0
+                                ? 'Last Visit: ' . ($latestRecordDate ?? 'Available')
+                                : 'No dental
                                 record yet' }}
                             </span>
 
@@ -380,45 +390,94 @@ isset($upcomingAppointment) && $upcomingAppointment
                 </div>
             </dialog>
 
+
         </div>
 </main>
 
+<div id="privateInformationModal" class="ui-modal modal-theme-warning" role="dialog" aria-modal="true"
+    aria-labelledby="privateInformationModalTitle" aria-describedby="privateInformationModalDescription">
+    <div class="ui-modal-card modal-sm" tabindex="-1">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+
+                <div class="modal-copy">
+                    <h2 id="privateInformationModalTitle" class="modal-title">
+                        Show Private Information?
+                    </h2>
+
+                    <p id="privateInformationModalDescription" class="modal-subtitle">
+                        Your personal contact and identification details will become visible.
+                    </p>
+                </div>
+            </div>
+
+            <button type="button" class="modal-x" onclick="closePrivateInformationModal()"
+                aria-label="Close private information modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="modal-bd">
+            <div class="global-confirm-alert">
+                <i class="fa-solid fa-eye"></i>
+
+                <div>
+                    <p>Private information will be displayed.</p>
+
+                    <span>
+                        Make sure no one else can see your screen before continuing.
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-ft">
+            <button type="button" class="ui-btn ui-btn-secondary" onclick="closePrivateInformationModal()">
+                Cancel
+            </button>
+
+            <button type="button" class="ui-btn ui-btn-primary" onclick="confirmShowPrivateInformation()">
+                <i class="fa-regular fa-eye"></i>
+                Show Information
+            </button>
+        </div>
+    </div>
+</div>
+
 @include('components.appointment-calendar-script', [
-    'mode' => 'patient-dashboard',
-    'renderStyle' => 'patient',
-    'calendarContainerId' => 'calendarSkeletonContainer',
+'mode' => 'patient-dashboard',
+'renderStyle' => 'patient',
+'calendarContainerId' => 'calendarSkeletonContainer',
 
-    'dateInputId' => null,
-    'timeInputId' => null,
+'dateInputId' => null,
+'timeInputId' => null,
 
-    'slotEndpoint' => route('book.appointment.slots'),
-    'bookingUrl' => route('patient.book.appointment'),
+'slotEndpoint' => route('book.appointment.slots'),
+'bookingUrl' => route('patient.book.appointment'),
 
-    'scheduleRules' => isset($schedules)
-        ? $schedules
-        : (
-            isset($scheduleRules)
-                ? $scheduleRules
-                : \App\Models\ClinicSchedule::active()
-                    ->get()
-                    ->values()
-                    ->toArray()
-        ),
+'scheduleRules' => isset($schedules)
+? $schedules
+: (isset($scheduleRules)
+? $scheduleRules
+: \App\Models\ClinicSchedule::active()->get()->values()->toArray()),
 
-    'blockedDates' => $unavailableDates ?? [],
-    'appointmentCountsPerDay' => $appointmentCountsPerDay ?? [],
-    'philippineHolidays' => $philippineHolidays ?? [],
-    'personalAppointments' => $calendarAppointments ?? [],
-    'completedAppointments' => $completedCalendarAppointments ?? [],
+'blockedDates' => $unavailableDates ?? [],
+'appointmentCountsPerDay' => $appointmentCountsPerDay ?? [],
+'philippineHolidays' => $philippineHolidays ?? [],
+'personalAppointments' => $calendarAppointments ?? [],
+'completedAppointments' => $completedCalendarAppointments ?? [],
 
-    'useDynamicScheduleRules' => true,
-    'disallowToday' => true,
-    'allowToggleOffDate' => false,
+'useDynamicScheduleRules' => true,
+'disallowToday' => true,
+'allowToggleOffDate' => false,
 
-    'maxFutureMonths' => 6,
-    'historyMonths' => 12,
+'maxFutureMonths' => 6,
+'historyMonths' => 12,
 
-    'appointmentHistoryUrl' => route('patient.record'),
+'appointmentHistoryUrl' => route('patient.record'),
 ])
 @endsection
 
@@ -544,22 +603,36 @@ isset($upcomingAppointment) && $upcomingAppointment
     document.addEventListener('DOMContentLoaded', function () {
         const quickAction = new URLSearchParams(window.location.search).get('quick_action');
 
+        const privateInformationModal =
+            document.getElementById(
+                'privateInformationModal'
+            );
+
+        privateInformationModal?.addEventListener(
+            'click',
+            function (event) {
+                if (event.target === privateInformationModal) {
+                    closePrivateInformationModal();
+                }
+            }
+        );
+
         renderGreeting();
         initRecordModal();
 
         if (quickAction === 'record') {
             setTimeout(() => {
-                window.openDocModal
-                    ? window.openDocModal('dentalHealthRecordModal')
-                    : document.getElementById('dentalHealthRecordModal')?.showModal();
+                window.openDocModal ?
+                    window.openDocModal('dentalHealthRecordModal') :
+                    document.getElementById('dentalHealthRecordModal')?.showModal();
             }, 150);
         }
 
         if (quickAction === 'clearance') {
             setTimeout(() => {
-                window.openDocModal
-                    ? window.openDocModal('dentalClearanceModal')
-                    : document.getElementById('dentalClearanceModal')?.showModal();
+                window.openDocModal ?
+                    window.openDocModal('dentalClearanceModal') :
+                    document.getElementById('dentalClearanceModal')?.showModal();
             }, 150);
         }
 
@@ -569,29 +642,28 @@ isset($upcomingAppointment) && $upcomingAppointment
             window.history.replaceState({}, '', cleanUrl.toString());
         }
 
-        window.runEnterpriseLoading([
-            {
-                label: 'Loading calendar and appointment details',
-                tasks: [
-                    renderUpcomingAppointment
-                ]
-            },
-            {
-                label: 'Loading profile information',
-                tasks: [
-                    renderProfile
-                ]
-            },
-            {
-                label: 'Loading records and document services',
-                tasks: [
-                    () => {
-                        renderRequestDocs();
-                        setTimeout(initRequestDocInteractions, 80);
-                    },
-                    renderRecords
-                ]
-            }
+        window.runEnterpriseLoading([{
+            label: 'Loading calendar and appointment details',
+            tasks: [
+                renderUpcomingAppointment
+            ]
+        },
+        {
+            label: 'Loading profile information',
+            tasks: [
+                renderProfile
+            ]
+        },
+        {
+            label: 'Loading records and document services',
+            tasks: [
+                () => {
+                    renderRequestDocs();
+                    setTimeout(initRequestDocInteractions, 80);
+                },
+                renderRecords
+            ]
+        }
         ], {
             initialDelay: 450,
             phaseGap: 260,
@@ -663,23 +735,147 @@ isset($upcomingAppointment) && $upcomingAppointment
         el.setAttribute('data-masked', isMasked ? 'true' : 'false');
     }
 
-    function toggleAllSensitive(button) {
-        var isMasked = button.getAttribute('data-masked') !== 'false';
-        var nextMasked = !isMasked;
+    let pendingPrivateInformationButton = null;
 
-        setMaskedContent('maskedIdentityValue', window.profileMaskedState.identityMasked, window.profileMaskedState
-            .identityRaw, nextMasked);
-        setMaskedContent('maskedContactValue', window.profileMaskedState.contactMasked, window.profileMaskedState
-            .contactRaw, nextMasked);
-        setMaskedContent('maskedEmailValue', window.profileMaskedState.emailMasked, window.profileMaskedState.emailRaw,
-            nextMasked);
-        setMaskedContent('maskedEmergencyNumber', window.profileMaskedState.emergencyMasked, window.profileMaskedState
-            .emergencyRaw, nextMasked);
+    function setPrivateInformationVisibility(button, shouldMask) {
+        if (!button || !window.profileMaskedState) {
+            return;
+        }
 
-        button.setAttribute('data-masked', nextMasked ? 'true' : 'false');
-        button.innerHTML = nextMasked ?
-            '<i class="fa-regular fa-eye"></i>' :
-            '<i class="fa-regular fa-eye-slash"></i>';
+        setMaskedContent(
+            'maskedIdentityValue',
+            window.profileMaskedState.identityMasked,
+            window.profileMaskedState.identityRaw,
+            shouldMask
+        );
+
+        setMaskedContent(
+            'maskedContactValue',
+            window.profileMaskedState.contactMasked,
+            window.profileMaskedState.contactRaw,
+            shouldMask
+        );
+
+        setMaskedContent(
+            'maskedEmailValue',
+            window.profileMaskedState.emailMasked,
+            window.profileMaskedState.emailRaw,
+            shouldMask
+        );
+
+        setMaskedContent(
+            'maskedEmergencyNumber',
+            window.profileMaskedState.emergencyMasked,
+            window.profileMaskedState.emergencyRaw,
+            shouldMask
+        );
+
+        const tooltip = shouldMask
+            ? 'Show private information'
+            : 'Hide private information';
+
+        button.setAttribute(
+            'data-masked',
+            shouldMask ? 'true' : 'false'
+        );
+
+        button.setAttribute(
+            'aria-pressed',
+            shouldMask ? 'false' : 'true'
+        );
+
+        button.setAttribute('aria-label', tooltip);
+        button.setAttribute('data-tooltip', tooltip);
+
+        button.innerHTML = shouldMask
+            ? '<i class="fa-regular fa-eye"></i>'
+            : '<i class="fa-regular fa-eye-slash"></i>';
+    }
+
+    function handlePrivateInformationToggle(button) {
+        if (!button) {
+            return;
+        }
+
+        const isCurrentlyMasked =
+            button.getAttribute('data-masked') !== 'false';
+
+        if (!isCurrentlyMasked) {
+            setPrivateInformationVisibility(button, true);
+            return;
+        }
+
+        openPrivateInformationModal(button);
+    }
+
+    function openPrivateInformationModal(button) {
+        const modal = document.getElementById(
+            'privateInformationModal'
+        );
+
+        if (!modal) {
+            return;
+        }
+
+        pendingPrivateInformationButton = button;
+
+        modal.classList.remove('closing');
+        modal.classList.add('open');
+
+        document.documentElement.classList.add('modal-lock');
+        document.body.classList.add('modal-lock');
+
+        requestAnimationFrame(() => {
+            modal
+                .querySelector('.ui-modal-card')
+                ?.focus();
+        });
+    }
+
+    function hideActiveGlobalTooltip() {
+        window.hideGlobalActionTooltip?.();
+
+        document
+            .getElementById('globalActionTooltip')
+            ?.classList.remove('show');
+    }
+
+    function closePrivateInformationModal() {
+        const modal = document.getElementById(
+            'privateInformationModal'
+        );
+
+        if (!modal || !modal.classList.contains('open')) {
+            pendingPrivateInformationButton = null;
+            return;
+        }
+
+        hideActiveGlobalTooltip();
+
+        modal.classList.add('closing');
+
+        window.setTimeout(() => {
+            modal.classList.remove('open', 'closing');
+
+            document.documentElement.classList.remove('modal-lock');
+            document.body.classList.remove('modal-lock');
+
+            pendingPrivateInformationButton = null;
+        }, 170);
+    }
+
+    function confirmShowPrivateInformation() {
+        const button =
+            pendingPrivateInformationButton ||
+            document.getElementById(
+                'dashboardProfilePrivacyToggle'
+            );
+
+        if (button) {
+            setPrivateInformationVisibility(button, false);
+        }
+
+        closePrivateInformationModal();
     }
 
     function renderUpcomingAppointment() {
@@ -712,13 +908,16 @@ isset($upcomingAppointment) && $upcomingAppointment
                 '<div class="upcoming-tooth-glass w-12 h-12 rounded-[0.95rem] text-white flex items-center justify-center">' +
                 '<i class="fa-solid fa-tooth text-[15px] relative z-[1] drop-shadow-[0_1px_2px_rgba(0,0,0,0.22)]"></i>' +
                 '</div>' +
-                '<span class="upcoming-live-dot absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full ' + statusDotCls + ' border-2 border-white dark:border-[#161B22]"></span>' +
+                '<span class="upcoming-live-dot absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full ' +
+                statusDotCls + ' border-2 border-white dark:border-[#161B22]"></span>' +
                 '</div>' +
 
                 '<div class="min-w-0 flex-1">' +
                 '<div class="flex flex-wrap items-center gap-2">' +
-                '<h3 class="text-lg sm:text-[1.15rem] font-extrabold text-gray-900 dark:text-[#F3F4F6] leading-tight truncate">' + window.escapeHtml(d.service) + '</h3>' +
-                '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border ' + statusPillCls + ' ' + statusDarkPill + '">' +
+                '<h3 class="text-lg sm:text-[1.15rem] font-extrabold text-gray-900 dark:text-[#F3F4F6] leading-tight truncate">' +
+                window.escapeHtml(d.service) + '</h3>' +
+                '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border ' +
+                statusPillCls + ' ' + statusDarkPill + '">' +
                 '<span class="w-1.5 h-1.5 rounded-full ' + statusDotCls + '"></span>' +
                 window.escapeHtml(d.status) +
                 '</span>' +
@@ -859,8 +1058,16 @@ isset($upcomingAppointment) && $upcomingAppointment
         };
 
         var globalToggle =
-            '<button type="button" id="profileSensitiveToggle" data-masked="true" onclick="toggleAllSensitive(this)" class="profile-toggle-btn inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-500 hover:text-[#8B0000] transition flex-shrink-0" aria-label="Toggle sensitive info">' +
-            '<i class="fa-regular fa-eye text-sm"></i>' +
+            '<button type="button" ' +
+            'id="dashboardProfilePrivacyToggle" ' +
+            'onclick="handlePrivateInformationToggle(this)" ' +
+            'class="ui-icon-btn neutral patient-privacy-toggle" ' +
+            'data-masked="true" ' +
+            'data-tooltip="Show private information" ' +
+            'data-tooltip-tone="neutral" ' +
+            'aria-label="Show private information" ' +
+            'aria-pressed="false">' +
+            '<i class="fa-regular fa-eye"></i>' +
             '</button>';
 
         var identityRow = identityLabel ?
@@ -1115,7 +1322,8 @@ isset($upcomingAppointment) && $upcomingAppointment
                 '<span class="inline-flex items-center rounded-full bg-white border border-gray-200 text-gray-600 px-3 py-1 text-xs font-semibold">Treatments</span>' +
                 '<span class="inline-flex items-center rounded-full bg-white border border-gray-200 text-gray-600 px-3 py-1 text-xs font-semibold">Diagnosis summary</span>' +
                 '</div>' +
-                '<a href="' + ROUTE_BOOK + '" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-[0.85rem] bg-[#8B0000] hover:bg-[#660000] text-white text-sm font-bold transition-all duration-300 hover:-translate-y-0.5">' +
+                '<a href="' + ROUTE_BOOK +
+                '" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-[0.85rem] bg-[#8B0000] hover:bg-[#660000] text-white text-sm font-bold transition-all duration-300 hover:-translate-y-0.5">' +
                 '<i class="fa-solid fa-calendar-plus"></i> Book First Appointment' +
                 '</a>' +
                 '</div>' +
@@ -1139,14 +1347,18 @@ isset($upcomingAppointment) && $upcomingAppointment
                 '<div class="dashboard-card-polished rounded-[1rem] border border-gray-200 bg-white p-4 hover:border-red-200 hover:shadow-sm transition-all duration-300 hover:-translate-y-0.5">' +
                 '<div class="flex items-start justify-between gap-3">' +
                 '<div class="flex items-start gap-3 min-w-0">' +
-                '<div class="w-10 h-10 rounded-[0.85rem] ' + (idx === 0 ? 'bg-red-50 text-[#8B0000]' : 'bg-gray-50 text-gray-600') + ' flex items-center justify-center flex-shrink-0">' +
+                '<div class="w-10 h-10 rounded-[0.85rem] ' + (idx === 0 ? 'bg-red-50 text-[#8B0000]' :
+                    'bg-gray-50 text-gray-600') + ' flex items-center justify-center flex-shrink-0">' +
                 '<i class="fa-solid fa-tooth text-sm"></i>' +
                 '</div>' +
                 '<div class="min-w-0">' +
                 '<div class="flex flex-wrap items-center gap-2">' +
-                '<p class="text-sm font-extrabold text-gray-900 truncate">' + window.escapeHtml(r.service) + '</p>' +
+                '<p class="text-sm font-extrabold text-gray-900 truncate">' + window.escapeHtml(r.service) +
+                '</p>' +
                 '<span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold border ' +
-                ((r.status || '').toLowerCase() === 'completed' ? 'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100') + '">' +
+                ((r.status || '').toLowerCase() === 'completed' ?
+                    'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100') +
+                '">' +
                 window.escapeHtml((r.status || '').toLowerCase() === 'completed' ? 'Completed' : 'Cancelled') +
                 '</span>' +
                 '</div>' +
@@ -1160,7 +1372,8 @@ isset($upcomingAppointment) && $upcomingAppointment
                 '</div>' +
                 '</div>' +
                 '</div>' +
-                '<button type="button" class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-gray-50 hover:bg-[#8B0000] hover:text-white text-gray-700 text-[11px] font-bold border border-gray-200 hover:border-transparent transition-all duration-300 flex-shrink-0" onclick="openRecordModalFromData(\'' + encoded + '\')">' +
+                '<button type="button" class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-gray-50 hover:bg-[#8B0000] hover:text-white text-gray-700 text-[11px] font-bold border border-gray-200 hover:border-transparent transition-all duration-300 flex-shrink-0" onclick="openRecordModalFromData(\'' +
+                encoded + '\')">' +
                 '<i class="fa-solid fa-eye text-[10px]"></i>' +
                 '<span>View Details</span>' +
                 '</button>' +
@@ -1170,7 +1383,8 @@ isset($upcomingAppointment) && $upcomingAppointment
 
         html +=
             '<div class="pt-2">' +
-            '<a href="' + ROUTE_RECORD + '" class="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-[0.85rem] bg-[#8B0000] hover:bg-[#660000] text-white text-sm font-bold transition-all duration-300 hover:-translate-y-0.5">' +
+            '<a href="' + ROUTE_RECORD +
+            '" class="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-[0.85rem] bg-[#8B0000] hover:bg-[#660000] text-white text-sm font-bold transition-all duration-300 hover:-translate-y-0.5">' +
             '<i class="fa-solid fa-folder-open"></i>' +
             '<span>View All Records</span>' +
             '<i class="fa-solid fa-arrow-right text-[11px]"></i>' +
@@ -1207,7 +1421,8 @@ isset($upcomingAppointment) && $upcomingAppointment
 
             '<div class="rounded-[0.85rem] bg-white border border-gray-200 px-3 py-3 col-span-2 xl:col-span-1">' +
             '<p class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Status</p>' +
-            '<p class="overview-status-text mt-1 text-sm font-extrabold text-[#8B0000]">' + window.escapeHtml(dispOverviewStatus) + '</p>' +
+            '<p class="overview-status-text mt-1 text-sm font-extrabold text-[#8B0000]">' + window.escapeHtml(
+                dispOverviewStatus) + '</p>' +
             '</div>' +
             '</div>' +
             '</div>' +
@@ -1297,5 +1512,16 @@ isset($upcomingAppointment) && $upcomingAppointment
             calendar.classList.remove('calendar-focus-pulse');
         }, 1200);
     }
+
+    document.addEventListener('keydown', function (event) {
+        if (
+            event.key === 'Escape' &&
+            document
+                .getElementById('privateInformationModal')
+                ?.classList.contains('open')
+        ) {
+            closePrivateInformationModal();
+        }
+    });
 </script>
 @endsection

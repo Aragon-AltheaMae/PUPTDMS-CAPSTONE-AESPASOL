@@ -35,13 +35,39 @@
 
     <script>
         (function() {
-            const theme = localStorage.getItem('theme') || 'light';
-            const role = @json($layoutRole);
+            const savedTheme =
+                localStorage.getItem('theme');
 
-            document.documentElement.setAttribute('data-theme', theme);
-            document.documentElement.classList.toggle('dark', theme === 'dark');
+            const theme =
+                savedTheme === 'dark' ?
+                'dark' :
+                'light';
+
+            const isDark =
+                theme === 'dark';
+
+            const role =
+                @json($layoutRole);
+
+            document.documentElement.setAttribute(
+                'data-theme',
+                theme
+            );
+
+            document.documentElement.classList.toggle(
+                'dark',
+                isDark
+            );
+
+            document.documentElement.style.colorScheme =
+                isDark ?
+                'dark' :
+                'light';
+
             document.documentElement.style.backgroundColor =
-                theme === 'dark' ? '#000D1A' : '#F4F4F4';
+                isDark ?
+                '#101111' :
+                '#F4F4F4';
 
             const sidebarKeys = {
                 admin: 'adminSidebarCollapsed',
@@ -61,6 +87,40 @@
         })();
     </script>
 
+    <style>
+        html.accessibility-preload .header,
+        html.accessibility-preload #sidebar,
+        html.accessibility-preload #mainContent,
+        html.accessibility-preload #siteFooter {
+            visibility: hidden !important;
+        }
+    </style>
+
+    <script>
+        (function() {
+            const root = document.documentElement;
+
+            root.classList.add('accessibility-preload');
+
+            const releaseAccessibilityPreload = () => {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        root.classList.remove(
+                            'accessibility-preload'
+                        );
+                    });
+                });
+            };
+
+            window.releaseAccessibilityPreload =
+                releaseAccessibilityPreload;
+            setTimeout(
+                releaseAccessibilityPreload,
+                1500
+            );
+        })();
+    </script>
+
     <title>
         @hasSection('title')
             @yield('title') | PUP Taguig Dental Clinic
@@ -70,19 +130,8 @@
     </title>
 
     <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <link rel="stylesheet" href="{{ asset('css/header.css') }}">
-
-    <script src="{{ asset('js/header.js') }}?v={{ filemtime(public_path('js/header.js')) }}" defer></script>
 
     @yield('styles')
     @stack('styles')
@@ -126,6 +175,7 @@
         @include('partials.impersonation-banner')
         @include('components.reschedule-modal')
         @include('components.cancel-modal')
+        @include('components.patient-record-modal')
     @endif
 
     @if ($isAdmin)
@@ -143,6 +193,64 @@
     @endif
 
     @include('partials.global-toast')
+
+    <div id="logoutConfirmModal" class="ui-modal logout-confirm-modal modal-theme-warning" role="dialog"
+        aria-modal="true" aria-labelledby="logoutConfirmTitle" aria-describedby="logoutConfirmDescription"
+        aria-hidden="true">
+        <div class="ui-modal-card modal-sm logout-confirm-card">
+            <div class="modal-hd">
+                <div class="modal-heading">
+                    <div class="modal-icon logout-confirm-icon">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </div>
+
+                    <div class="modal-copy">
+                        <h2 id="logoutConfirmTitle" class="modal-title">
+                            Confirm Logout
+                        </h2>
+
+                        <p class="modal-subtitle">
+                            You are about to end your current session.
+                        </p>
+                    </div>
+                </div>
+
+                <button type="button" class="modal-x" data-logout-modal-close aria-label="Close logout confirmation">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="modal-bd">
+                <div class="logout-confirm-message">
+                    <div class="logout-confirm-message-icon">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+
+                    <div>
+                        <p id="logoutConfirmDescription">
+                            Are you sure you want to log out?
+                        </p>
+
+                        <span>
+                            You will need to sign in again to access your account.
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-ft logout-confirm-actions">
+                <button type="button" class="btn-close-modal" data-logout-modal-close>
+                    Stay Signed In
+                </button>
+
+                <button type="button" id="confirmLogoutBtn" class="modal-btn-confirm danger">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Log Out</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     @include('partials.terms-modal')
     @include('partials.inactivity-logout')
 
@@ -187,11 +295,6 @@
         ])
     @endif
 
-    @if ($isDentist)
-        @include('components.reschedule-modal-script')
-        @include('components.cancel-modal-script')
-    @endif
-
     @if ($isPatient && !$hideMobileNav && !$hidePatientModals)
         <script>
             function openQuickAction(type) {
@@ -210,8 +313,50 @@
         </script>
     @endif
 
+    <div id="globalActionTooltip" class="global-action-tooltip" role="tooltip" aria-hidden="true">
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/sienna-accessibility@latest/dist/sienna-accessibility.umd.js"
         data-position="bottom-right" data-offset="{{ $accessibilityOffset }}" defer></script>
+
+    <script>
+        document.addEventListener(
+            'DOMContentLoaded',
+            function() {
+                const release = () => {
+                    window.releaseAccessibilityPreload?.();
+                };
+
+                if (document.querySelector('.asw-widget')) {
+                    release();
+                    return;
+                }
+
+                const observer = new MutationObserver(() => {
+                    if (
+                        !document.querySelector(
+                            '.asw-widget'
+                        )
+                    ) {
+                        return;
+                    }
+
+                    observer.disconnect();
+                    release();
+                });
+
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+
+                setTimeout(() => {
+                    observer.disconnect();
+                    release();
+                }, 1500);
+            }
+        );
+    </script>
 
     @include('partials.chatbot')
 

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\View\View;
+use Illuminate\Http\JsonResponse;
 
 class SessionManagementController extends Controller
 {
@@ -38,6 +39,44 @@ class SessionManagementController extends Controller
             'otherSessionsCount' => $sessions->where('is_current', false)->count(),
             'sessionLimit' => $this->concurrentSessionService->getSessionLimitForUser($user),
             'notifications' => collect(),
+        ]);
+    }
+
+    public function activity(
+        Request $request
+    ): JsonResponse {
+        if (
+            (bool) $request->session()->get(
+                'session_idle_locked',
+                false
+            )
+        ) {
+            return response()->json([
+                'expired' => true,
+            ], 401);
+        }
+
+        $request->session()->put(
+            'last_activity_at',
+            now()->getTimestamp()
+        );
+
+        return response()->json([
+            'active' => true,
+        ]);
+    }
+
+    public function expire(
+        Request $request
+    ): JsonResponse {
+        $this->logoutCurrentSession(
+            $request,
+            $request->user(),
+            false
+        );
+
+        return response()->json([
+            'expired' => true,
         ]);
     }
 
@@ -147,6 +186,7 @@ class SessionManagementController extends Controller
             'impersonator_admin_id',
             'impersonator_admin_email',
             'last_activity_at',
+            'session_idle_locked',
         ]);
 
         $request->session()->invalidate();

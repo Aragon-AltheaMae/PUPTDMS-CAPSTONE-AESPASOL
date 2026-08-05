@@ -329,10 +329,69 @@ class RolePermissionController extends Controller
                 ->with('error', 'Cannot delete the Super Admin role.');
         }
 
-        $role->permissions()->detach();
-        $role->delete();
+        $fallbackRole = $this->resolveFallbackRole($role);
+        $affectedUsers = 0;
+
+        DB::transaction(function () use ($role, $fallbackRole, &$affectedUsers) {
+            $affectedUsers = User::where('role_id', $role->id)->count();
+
+            if ($affectedUsers > 0) {
+                User::where('role_id', $role->id)->update([
+                    'role_id' => $fallbackRole->id,
+                ]);
+            }
+
+            $role->permissions()->detach();
+            $role->delete();
+        });
+
+        AuditLogger::log(
+            'delete',
+            'roles_permissions',
+            "Deleted role ID {$role->id} ({$role->name}) and reassigned {$affectedUsers} user(s) to {$fallbackRole->display_name}"
+        );
+
+        $message = $affectedUsers > 0
+            ? "Role '{$role->name}' has been deleted. {$affectedUsers} user(s) were reassigned to {$fallbackRole->display_name}."
+            : "Role '{$role->name}' has been deleted.";
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'fallback_role' => [
+                    'id' => $fallbackRole->id,
+                    'name' => $fallbackRole->display_name,
+                    'slug' => $fallbackRole->slug,
+                ],
+                'affected_users' => $affectedUsers,
+            ]);
+        }
 
         return redirect()->route('admin.role_permissions')
-            ->with('success', "Role '{$role->name}' has been deleted.");
+            ->with('success', $message);
+    }
+
+    private function resolveFallbackRole(Role $deletedRole): Role
+    {
+        $name = strtolower((string) $deletedRole->name);
+        $slug = strtolower((string) $deletedRole->slug);
+
+        if (str_contains($slug, 'dentist') || str_contains($name, 'dentist')) {
+            return Role::where('slug', 'dentist')->firstOrFail();
+        }
+
+        if (
+            str_contains($slug, 'admin') ||
+            str_contains($name, 'admin') ||
+            str_contains($slug, 'staff') ||
+            str_contains($name, 'staff') ||
+            str_contains($slug, 'clinic') ||
+            str_contains($name, 'clinic')
+        ) {
+            return Role::where('slug', 'admin')->firstOrFail();
+        }
+
+        return Role::where('slug', 'patient')->firstOrFail();
     }
 }

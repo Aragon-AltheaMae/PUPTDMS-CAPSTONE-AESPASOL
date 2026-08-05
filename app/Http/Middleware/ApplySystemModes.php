@@ -23,7 +23,7 @@ class ApplySystemModes
                 ], 503);
             }
 
-            return response()->view('errors.maintenance', [], 503);
+            return response()->view('errors.503', [], 503);
         }
 
         return $next($request);

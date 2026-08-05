@@ -260,11 +260,17 @@ html body #mainContent #patientAccountSection {
 
 html body #mainContent #patientAccountSection .section-card,
 html body #mainContent #patientAccountSection .walkin-account-card {
-    background: linear-gradient(180deg, #fffefe 0%, #fff8f7 100%) !important;
-    border: 1px solid #e8e2dd !important;
-    border-radius: 22px !important;
-    padding: 1rem !important;
-    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.025) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
 }
 
 html body #mainContent #patientAccountSection .section-card-title {
@@ -1144,9 +1150,15 @@ select.form-input {
 
 [data-theme="dark"] html body #mainContent #patientAccountSection,
 [data-theme="dark"] html body #mainContent #patientAccountSection .section-card,
-[data-theme="dark"] html body #mainContent #patientAccountSection .walkin-account-card {
-    background: linear-gradient(145deg, #0d1117, #111827) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
+[data-theme="dark"] html body #mainContent #patientAccountSection .walkin-account-card,
+html[data-theme="dark"] body #mainContent #patientAccountSection .section-card,
+html[data-theme="dark"] body #mainContent #patientAccountSection .walkin-account-card {
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 [data-theme="dark"] html body #mainContent #patientAccountSection .account-tabs {
@@ -1228,11 +1240,16 @@ html[data-theme="dark"] body #mainContent #patientAccountSection {
     box-shadow: 0 18px 42px rgba(0, 0, 0, 0.42) !important;
 }
 
+[data-theme="dark"] html body #mainContent #patientAccountSection .section-card,
+[data-theme="dark"] html body #mainContent #patientAccountSection .walkin-account-card,
 html[data-theme="dark"] body #mainContent #patientAccountSection .section-card,
 html[data-theme="dark"] body #mainContent #patientAccountSection .walkin-account-card {
-    background: linear-gradient(145deg, #111827, #0f172a) !important;
-    border-color: rgba(255, 255, 255, 0.12) !important;
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.32) !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 html[data-theme="dark"] body #mainContent #patientAccountSection .booking-step-title {
