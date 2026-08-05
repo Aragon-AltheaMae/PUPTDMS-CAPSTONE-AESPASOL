@@ -2736,6 +2736,9 @@ function initSessionTimeoutModal() {
     let idleTimer = null;
     let sessionExpired = false;
     let redirectStarted = false;
+    const expiredByServer =
+        modal.dataset.sessionExpired === 'true';
+
     let activityRequestRunning = false;
 
     let lastActivityAt = Date.now();
@@ -2762,6 +2765,32 @@ function initSessionTimeoutModal() {
 
         document.body.classList.add(
             'session-expired'
+        );
+
+        document
+            .querySelectorAll('dialog[open]')
+            .forEach(dialog => {
+                try {
+                    dialog.close();
+                } catch (_) {
+                    dialog.removeAttribute('open');
+                }
+            });
+
+        document.documentElement.classList.remove(
+            'intro-modal-open'
+        );
+
+        document.body.classList.remove(
+            'intro-modal-open'
+        );
+
+        document.body.style.removeProperty(
+            'position'
+        );
+
+        document.body.style.removeProperty(
+            'width'
         );
 
         openModal(modal.id);
@@ -2924,6 +2953,26 @@ function initSessionTimeoutModal() {
         true
     );
 
+    document.addEventListener(
+        'click',
+        event => {
+            if (!sessionExpired) return;
+
+            const signInAgainButton =
+                event.target.closest(
+                    '[data-session-timeout-primary]'
+                );
+
+            if (signInAgainButton) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        },
+        true
+    );
+
     primaryButton?.addEventListener(
         'click',
         async () => {
@@ -2958,8 +3007,11 @@ function initSessionTimeoutModal() {
         }
     );
 
-    syncActivityWithServer();
-    scheduleIdleTimeout();
+    if (expiredByServer) {
+        showSessionTimeoutModal();
+    } else {
+        scheduleIdleTimeout();
+    }
 }
 
 function acceptTerms() {
