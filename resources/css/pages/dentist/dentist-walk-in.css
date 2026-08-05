@@ -879,15 +879,6 @@ textarea.form-input::placeholder {
     color: #7F8C98;
 }
 
-#mainContent.book-container {
-    width: 100vw !important;
-    max-width: none !important;
-    margin-left: calc(50% - 50vw) !important;
-    margin-right: calc(50% - 50vw) !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-}
-
 #mainContent .book-page-wrap {
     width: min(100% - 2rem, 1180px) !important;
     max-width: 1180px !important;
@@ -1669,18 +1660,6 @@ body.intro-modal-open {
     #introBookingModal::backdrop {
         background: rgba(17, 24, 39, 0.78);
     }
-}
-
-.signature-methods-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 1rem;
-    align-items: stretch;
-}
-
-.signature-methods-grid .file-upload-zone {
-    min-height: 280px;
-    height: 100%;
 }
 
 .signature-draw-card {
