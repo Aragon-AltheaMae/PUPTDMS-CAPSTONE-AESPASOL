@@ -28,6 +28,8 @@
 @import './components/sidebar.css';
 @import './components/footer.css';
 @import './components/impersonation-banner.css';
+@import './pages/error-pages.css';
+@import './pages/auth/login.css';
 
 /* Shared page styles */
 @import './pages/dentist/dentist-shared.css';
@@ -40,6 +42,7 @@
 @import './pages/shared/clinic-schedule.css';
 @import "./pages/shared/inventory.css";
 @import './pages/shared/reports.css';
+@import './pages/shared/active-sessions.css';
 
 /* Dentist pages */
 @import './pages/dentist/dentist-dashboard.css';
@@ -48,6 +51,8 @@
 @import './pages/dentist/dentist-book-appointment.css';
 @import './pages/dentist/odontogram.css';
 @import './pages/dentist/dentist-walk-in.css';
+@import './pages/dentist/add-existing-record.css';
+
 /* Patient pages */
 @import './pages/patient/dashboard.css';
 @import './pages/patient/book-appointment.css';
@@ -69,6 +74,7 @@
 @import './pages/admin/system-settings.css';
 @import './pages/admin/user-management.css';
 @import './pages/admin/ai-generated-report.css';
+@import './pages/admin/session-management.css';
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 @plugin "daisyui";

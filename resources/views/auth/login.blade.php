@@ -1,7 +1,6 @@
 @extends('layouts.auth')
 
 @section('styles')
-@vite('resources/css/pages/auth/login.css')
 @endsection
 
 @section('content')

@@ -129,9 +129,8 @@ html[data-theme="dark"] .auth-container {
     justify-content: center;
     text-align: center;
     overflow: hidden;
-    background: url('C:\PUPTDMS-CAPSTONE-AESPASOL\public\images\PUP-TAGUIG-CAMPUS.jpg') center center / cover no-repeat;
+    background: url('/images/PUP-TAGUIG-CAMPUS.jpg') center center / cover no-repeat;
 }
-
 .hero::before {
     content: '';
     position: absolute;

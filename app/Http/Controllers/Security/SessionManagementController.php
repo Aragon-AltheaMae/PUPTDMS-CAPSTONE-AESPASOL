@@ -31,7 +31,7 @@ class SessionManagementController extends Controller
         $history = $this->concurrentSessionService->recentSessionHistoryForUser($user);
         $role = $this->normalizeRole((string) (session('impersonated_role') ?: optional($user->role)->slug ?: session('role')));
 
-        return view('security.sessions', [
+        return view('shared.sessions', [
             'role' => $role,
             'sessions' => $sessions,
             'history' => $history,
