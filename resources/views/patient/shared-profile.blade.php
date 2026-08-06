@@ -1084,24 +1084,32 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
 
             <div class="card-body appointment-drawer-section-body">
                 <div class="space-y-4 text-sm">
-                    <div>
-                        <p class="text-[11px] font-bold text-gray-400 uppercase mb-1">Treatment</p>
-                        <p id="detailTreatment" class="text-gray-800">No treatment record yet.</p>
+                    <div class="global-info-item">
+                        <p class="global-info-label">Treatment</p>
+                        <p id="detailTreatment" class="global-info-value">
+                            No treatment record yet.
+                        </p>
                     </div>
 
-                    <div>
-                        <p class="text-[11px] font-bold text-gray-400 uppercase mb-1">Oral Examination</p>
-                        <p id="detailOralExam" class="text-gray-800">No oral examination record yet.</p>
+                    <div class="global-info-item">
+                        <p class="global-info-label">Oral Examination</p>
+                        <p id="detailOralExam" class="global-info-value">
+                            No oral examination record yet.
+                        </p>
                     </div>
 
-                    <div>
-                        <p class="text-[11px] font-bold text-gray-400 uppercase mb-1">Diagnosis</p>
-                        <p id="detailDiagnosis" class="text-gray-800">No diagnosis record yet.</p>
+                   <div class="global-info-item">
+                       <p class="global-info-label">Diagnosis</p>
+                        <p id="detailDiagnosis" class="global-info-value">
+                            No diagnosis record yet.
+                        </p>
                     </div>
 
-                    <div>
-                        <p class="text-[11px] font-bold text-gray-400 uppercase mb-1">Prescription</p>
-                        <p id="detailPrescription" class="text-gray-800">No prescription recorded.</p>
+                    <div class="global-info-item">
+                        <p class="global-info-label">Prescription</p>
+                        <p id="detailPrescription" class="global-info-value">
+                            No prescription recorded.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -1121,7 +1129,9 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
             </div>
 
             <div class="card-body appointment-drawer-section-body">
-                <p id="detailFollowUp" class="text-sm text-gray-800">No follow-up appointment scheduled.</p>
+                <p class="global-info-value">
+                    No odontogram record yet.
+                </p>
             </div>
         </section>
 

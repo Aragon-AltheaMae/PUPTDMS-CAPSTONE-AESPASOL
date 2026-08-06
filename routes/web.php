@@ -1275,29 +1275,3 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
 });*/
 
 Route::post('/chat/send', [ChatbotController::class, 'chat']);
-
-if (app()->environment('local')) {
-    Route::get('/dev/error-pages/{code}', function (string $code) {
-        $allowedCodes = [
-            '401',
-            '402',
-            '403',
-            '404',
-            '419',
-            '429',
-            '500',
-            '503',
-        ];
-
-        abort_unless(
-            in_array($code, $allowedCodes, true),
-            404
-        );
-
-        return response()->view(
-            "errors.{$code}",
-            [],
-            (int) $code
-        );
-    })->where('code', '[0-9]+');
-}

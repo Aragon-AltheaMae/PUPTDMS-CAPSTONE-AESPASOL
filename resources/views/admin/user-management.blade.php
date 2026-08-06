@@ -1197,52 +1197,53 @@ $inactiveCount = $inactiveCount ?? 0;
             data-discard-message="Closing this modal will remove the password you entered. Do you want to discard it?"
             novalidate>
             @csrf
-            <div class="modal-bd modal-scroll-body space-y-4">
-                <div data-global-field>
-                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">New
-                        Password <span class="text-red-500">*</span></label>
-                    <div class="relative">
-                        <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                        <input type="password" name="password" id="resetPassword" placeholder="Min. 8 characters"
-                            class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-10 py-2.5 text-sm"
-                            required>
-                        <button type="button" onclick="togglePassVis('resetPassword','resetEye')"
-                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                            <i class="fa-regular fa-eye text-xs" id="resetEye"></i>
-                        </button>
-                    </div>
+            <div class="modal-bd modal-scroll-body">
+                <div class="modal-form-grid">
 
-                    <div class="password-strength" id="resetPasswordStrength" data-strength="empty">
-                        <div class="password-strength-track">
-                            <span class="password-strength-fill"></span>
+                    <div class="global-form-group" data-global-field>
+                        <label class="global-form-label" for="resetPassword">
+                            New Password
+                            <span class="required-mark">*</span>
+                        </label>
+
+                        <div class="global-control-wrap">
+                            <i class="fa-solid fa-lock global-control-icon"></i>
+
+                            <input type="password" name="password" id="resetPassword"
+                                class="form-input-custom global-control-with-icon global-control-with-action"
+                                placeholder="Enter new password" autocomplete="new-password" minlength="8"
+                                data-field-label="New Password" data-required-message="Please enter a new password."
+                                data-validation-rule="strongPassword" required>
+
+                            <button type="button" class="global-input-action"
+                                onclick="togglePassVis('resetPassword', 'resetEye')"
+                                aria-label="Show or hide new password">
+                                <i class="fa-regular fa-eye" id="resetEye"></i>
+                            </button>
                         </div>
+                    </div>
 
-                        <div class="password-strength-meta">
-                            <span id="resetPasswordStrengthLabel">Enter a password</span>
-                            <span id="resetPasswordStrengthHint">Use 8+ chars, number, uppercase, and symbol.</span>
+                    <div class="global-form-group" data-global-field>
+                        <label class="global-form-label" for="resetPasswordConf">
+                            Confirm Password
+                            <span class="required-mark">*</span>
+                        </label>
+
+                        <div class="global-control-wrap">
+                            <i class="fa-solid fa-lock global-control-icon"></i>
+
+                            <input type="password" name="password_confirmation" id="resetPasswordConf"
+                                class="form-input-custom global-control-with-icon global-control-with-action"
+                                placeholder="Repeat new password" autocomplete="new-password"
+                                data-field-label="Confirm Password"
+                                data-required-message="Please confirm the new password." required>
+
+                            <button type="button" class="global-input-action"
+                                onclick="togglePassVis('resetPasswordConf', 'resetEye2')"
+                                aria-label="Show or hide confirmed password">
+                                <i class="fa-regular fa-eye" id="resetEye2"></i>
+                            </button>
                         </div>
-                    </div>
-                </div>
-
-                <div data-global-field>
-                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">Confirm
-                        Password <span class="text-red-500">*</span></label>
-
-                    <div class="relative">
-                        <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                        <input type="password" name="password_confirmation" id="resetPasswordConf"
-                            placeholder="Repeat password"
-                            class="field-input w-full border border-gray-200 rounded-lg pl-9 pr-10 py-2.5 text-sm"
-                            required>
-                        <button type="button" onclick="togglePassVis('resetPasswordConf','resetEye2')"
-                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                            <i class="fa-regular fa-eye text-xs" id="resetEye2"></i>
-                        </button>
-                    </div>
-
-                    <div class="password-match" id="resetPasswordMatch" data-match="empty">
-                        <span class="password-match-dot"></span>
-                        <span id="resetPasswordMatchText">Confirm your password.</span>
                     </div>
                 </div>
             </div>
@@ -1260,7 +1261,7 @@ $inactiveCount = $inactiveCount ?? 0;
     </div>
 </div>
 
-<div id="viewModal" class="ui-modal modal-theme-view" aria-hidden="true">
+<div id="viewModal" class="ui-modal" aria-hidden="true">
 
     <div class="ui-modal-card modal-md">
         <div class="modal-hd">
@@ -1784,16 +1785,48 @@ $inactiveCount = $inactiveCount ?? 0;
     }
 
     function openResetModal(source, id, name) {
-        if (source === 'patients') {
-            document.getElementById('resetForm').action = `/admin/user-management/patient/${id}/reset-password`;
-        } else {
-            document.getElementById('resetForm').action = `/admin/user-management/${id}/reset-password`;
+        const resetForm =
+            document.getElementById('resetForm');
+
+        const resetPassword =
+            document.getElementById('resetPassword');
+
+        const resetPasswordConf =
+            document.getElementById('resetPasswordConf');
+
+        const resetSubtitle =
+            document.getElementById('resetModalSubtitle');
+
+        if (
+            !resetForm ||
+            !resetPassword ||
+            !resetPasswordConf
+        ) {
+            return;
         }
 
-        document.getElementById('resetModalSubtitle').textContent = 'Resetting password for: ' + name;
-        document.getElementById('resetPassword').value = '';
-        document.getElementById('resetPasswordConf').value = '';
-        updateResetPasswordFeedback();
+        resetForm.action =
+            source === 'patients'
+                ? `/admin/user-management/patient/${id}/reset-password`
+                : `/admin/user-management/${id}/reset-password`;
+
+        if (resetSubtitle) {
+            resetSubtitle.textContent =
+                `Resetting password for: ${name}`;
+        }
+
+        resetForm.reset();
+
+        window.showFormInputValidationMessage?.(
+            resetPassword,
+            ''
+        );
+
+        window.showFormInputValidationMessage?.(
+            resetPasswordConf,
+            ''
+        );
+
         openModal('resetModal');
     }
 
@@ -1982,111 +2015,6 @@ $inactiveCount = $inactiveCount ?? 0;
         openModal('viewModal');
     }
 
-    function getPasswordStrength(password) {
-        const value = String(password || '');
-
-        if (!value.length) {
-            return {
-                state: 'empty',
-                width: '0%',
-                label: 'Enter a password',
-                hint: 'Use 8+ chars, number, uppercase, and symbol.',
-            };
-        }
-
-        let score = 0;
-
-        if (value.length >= 8) score++;
-        if (/[a-z]/.test(value) && /[A-Z]/.test(value)) score++;
-        if (/\d/.test(value)) score++;
-        if (/[^A-Za-z0-9]/.test(value)) score++;
-
-        if (score <= 1) {
-            return {
-                state: 'weak',
-                width: '35%',
-                label: 'Weak password',
-                hint: 'Add more characters and numbers.',
-            };
-        }
-
-        if (score <= 3) {
-            return {
-                state: 'medium',
-                width: '68%',
-                label: 'Medium password',
-                hint: 'Add uppercase or symbol to improve.',
-            };
-        }
-
-        return {
-            state: 'strong',
-            width: '100%',
-            label: 'Strong password',
-            hint: 'Good password strength.',
-        };
-    }
-
-    function updateResetPasswordStrength() {
-        const input = document.getElementById('resetPassword');
-        const meter = document.getElementById('resetPasswordStrength');
-        const label = document.getElementById('resetPasswordStrengthLabel');
-        const hint = document.getElementById('resetPasswordStrengthHint');
-
-        if (!input || !meter || !label || !hint) return;
-
-        const result = getPasswordStrength(input.value);
-
-        meter.dataset.strength = result.state;
-        meter.style.setProperty('--strength-width', result.width);
-        label.textContent = result.label;
-        hint.textContent = result.hint;
-    }
-
-    function updateResetPasswordMatch() {
-        const password = document.getElementById('resetPassword');
-        const confirm = document.getElementById('resetPasswordConf');
-        const match = document.getElementById('resetPasswordMatch');
-        const text = document.getElementById('resetPasswordMatchText');
-
-        if (!password || !confirm || !match || !text) return;
-
-        const passwordValue = password.value.trim();
-        const confirmValue = confirm.value.trim();
-
-        confirm.classList.remove('is-password-match', 'is-password-mismatch');
-
-        if (!confirmValue.length) {
-            match.dataset.match = 'empty';
-            text.textContent = 'Confirm your password.';
-            return;
-        }
-
-        if (passwordValue === confirmValue) {
-            match.dataset.match = 'matched';
-            text.textContent = 'Passwords match.';
-            confirm.classList.add('is-password-match');
-            return;
-        }
-
-        match.dataset.match = 'mismatch';
-        text.textContent = 'Passwords do not match.';
-        confirm.classList.add('is-password-mismatch');
-    }
-
-    function updateResetPasswordFeedback() {
-        updateResetPasswordStrength();
-        updateResetPasswordMatch();
-    }
-
-    document.addEventListener('input', function (event) {
-        if (!event.target) return;
-
-        if (event.target.id === 'resetPassword' || event.target.id === 'resetPasswordConf') {
-            updateResetPasswordFeedback();
-        }
-    });
-
     function togglePassVis(inputId, iconId) {
         const inp = document.getElementById(inputId);
         const ico = document.getElementById(iconId);
@@ -2110,7 +2038,6 @@ $inactiveCount = $inactiveCount ?? 0;
     window.openViewModalFromButton = openViewModalFromButton;
     window.togglePassVis = togglePassVis;
     window.refreshGeneratedPassword = refreshGeneratedPassword;
-    window.copyGeneratedPassword = copyGeneratedPassword;
     window.copyFieldValue = copyFieldValue;
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -2150,7 +2077,11 @@ $inactiveCount = $inactiveCount ?? 0;
             },
             signal: umController.signal
         })
-            .then(function (res) {
+            .then(async function (res) {
+                if (!res.ok) {
+                    throw new Error(`User request failed: ${res.status}`);
+                }
+
                 return res.json();
             })
             .then(function (data) {
@@ -2900,6 +2831,8 @@ $inactiveCount = $inactiveCount ?? 0;
             }, 350);
         });
     }
+
+    var statusFilter = document.getElementById('statusFilter');
 
     if (statusFilter) {
         statusFilter.addEventListener('change', function () {
