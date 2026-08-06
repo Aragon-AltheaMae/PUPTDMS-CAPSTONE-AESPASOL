@@ -114,7 +114,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                         @csrf
 
                         <div class="step-content hidden">
-                            <div class="booking-step-shell">
                                 <div class="booking-step-header">
                                     <p class="booking-step-eyebrow">Step 1 of 5</p>
                                     <h2 class="booking-step-title">Select Date &amp; Time</h2>
@@ -186,7 +185,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
                         <div class="step-content hidden">
                             <div class="booking-step-shell">
@@ -560,7 +558,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                             </div>
                         </div>
 
-                        <div class="step-content hidden">
+                        <div class="step-content hidden" id="step4">
                             <div class="booking-step-shell">
                                 <div class="booking-step-header">
                                     <p class="booking-step-eyebrow">Step 4 of 5</p>
@@ -1053,12 +1051,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         @enderror
                                     </div>
                                 </div>
-
                             </div>
                         </div>
 
                         <div class="step-content hidden" id="step5">
-                            <div>
                                 <div id="summarySection">
                                     <div class="booking-step-header">
                                         <p class="booking-step-eyebrow">Step 5 of 5</p>
@@ -1094,7 +1090,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             and privacy policy.
                                         </p>
                                     </div>
-
+                                    
+                            
                                     <div class="section-card mb-2">
                                         <div class="flex items-start gap-2 mb-4">
                                             <i class="fa-solid fa-shield-halved text-[#8B0000] mt-0.5"></i>
@@ -1105,6 +1102,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                                 complete.
                                             </p>
                                         </div>
+
                                         <label
                                             class="confirm-checkbox-wrap flex items-start gap-3 p-4 rounded-xl border border-[#e8e2dd] bg-[#fafaf8] cursor-pointer">
                                             <input id="finalConfirm" type="checkbox"
@@ -1141,7 +1139,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
                         <div id="navBtns" class="flex justify-end mt-8 gap-3 nav-btns-row">
                             <button type="button" id="prevBtn"

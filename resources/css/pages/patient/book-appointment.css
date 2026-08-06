@@ -54,6 +54,41 @@
     opacity: 1;
 }
 
+body.role-patient
+#mainContent.book-container
+#step4,
+body.role-patient
+#mainContent.book-container
+#step5 {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    transform: none !important;
+    overflow: visible !important;
+}
+
+body.role-patient
+#mainContent.book-container
+#step4 > .booking-step-shell,
+body.role-patient
+#mainContent.book-container
+#step5 > #summarySection,
+body.role-patient
+#mainContent.book-container
+#step5 > #confirmationSection {
+    margin-top: 0 !important;
+    transform: none !important;
+}
+
+body.role-patient
+#mainContent.book-container
+#step4 .booking-step-header,
+body.role-patient
+#mainContent.book-container
+#step5 .booking-step-header {
+    margin-top: 0 !important;
+    transform: none !important;
+}
+
 .step-circle {
     transition: all 0.4s ease;
 }
