@@ -248,19 +248,57 @@ dialog#record_modal::backdrop {
     border-radius: 50%;
 }
 
+body.role-patient
+#mainContent.patient-records-page
+.records-hero
 .hero-title {
+    margin: 0 !important;
+    padding: 0 !important;
+
     font-size: clamp(1.35rem, 3vw, 2rem);
     font-weight: 800;
-    color: white;
-    line-height: 1.15;
+    line-height: 1.05;
+
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+
+    background: none !important;
+    background-image: none !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+
     position: relative;
     z-index: 1;
 }
 
+[data-theme="dark"]
+body.role-patient
+#mainContent.patient-records-page
+.records-hero
+.hero-title,
+.dark
+body.role-patient
+#mainContent.patient-records-page
+.records-hero
+.hero-title {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    background: none !important;
+    background-image: none !important;
+}
+
+body.role-patient
+#mainContent.patient-records-page
+.records-hero
 .hero-sub {
+    margin: 0.30rem 0 0 !important;
+    padding: 0 !important;
+
     font-size: 0.85rem;
-    color: rgba(255, 255, 255, .8);
-    margin-top: 6px;
+    line-height: 1.25;
+
+    color: rgba(255, 255, 255, 0.8) !important;
+
     position: relative;
     z-index: 1;
 }
