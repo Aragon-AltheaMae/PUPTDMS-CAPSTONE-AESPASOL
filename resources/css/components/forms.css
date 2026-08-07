@@ -936,6 +936,17 @@ textarea.form-input-custom.global-form-textarea {
     color: #fca5a5 !important;
 }
 
+.field-optional {
+    margin-left: .25rem;
+    color: #9ca3af;
+    font-size: .72rem;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .field-optional {
+    color: #94a3b8;
+}
+
 .global-switch {
     position: relative;
     display: inline-flex;

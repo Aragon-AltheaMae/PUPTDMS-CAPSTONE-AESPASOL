@@ -1,4 +1,5 @@
 import './bootstrap';
+import './odontogram-preview';
 import './header';
 
 import '@fontsource/inter/300.css';
@@ -4010,11 +4011,28 @@ function isContactInput(field) {
 }
 
 function getGlobalFieldLabel(field) {
-    if (!field) return 'This field';
+    if (!field) {
+        return 'This field';
+    }
 
     const explicitLabel = field.id
-        ? document.querySelector(`label[for="${CSS.escape(field.id)}"]`)
+        ? document.querySelector(
+            `label[for="${CSS.escape(field.id)}"]`
+        )
         : null;
+
+    const questionRow =
+        field.closest('.global-question-row');
+
+    const questionText =
+        questionRow
+            ?.querySelector('.global-question-text')
+            ?.textContent;
+
+    const radioGroupLabel =
+        field
+            .closest('[role="radiogroup"]')
+            ?.getAttribute('aria-label');
 
     const friendlyNames = {
         name: 'Full Name',
@@ -4023,25 +4041,42 @@ function getGlobalFieldLabel(field) {
         password_confirmation: 'Confirm Password',
         role_id: 'Role',
         status: 'Status',
+
+        last_dental_visit: 'Last Dental Visit',
+        previous_dentist: 'Previous Dentist',
+        service_type: 'Dental Service',
+        emergency_person: 'Emergency Contact Person',
+        emergency_number: 'Emergency Contact Number',
+        emergency_relation: 'Relation to Patient',
     };
+
+    const humanizedName = String(
+        field.name || ''
+    )
+        .replace(/\[\]$/, '')
+        .replace(/[_-]+/g, ' ')
+        .replace(/\b\w/g, character =>
+            character.toUpperCase()
+        );
 
     const fallbackName =
         friendlyNames[field.name] ||
-        field.name ||
+        humanizedName ||
         'This field';
 
     const labelText =
+        field.dataset.fieldLabel ||
+        questionText ||
+        radioGroupLabel ||
         explicitLabel?.textContent ||
         field.closest('[data-global-field]')
-            ?.querySelector('label')
+            ?.querySelector(
+                ':scope > label, :scope > .global-form-label'
+            )
             ?.textContent ||
-        field.closest(
-            '.um-field-full, .um-field-grid > div, .um-user-side-card .space-y-4 > div'
-        )?.querySelector('label')?.textContent ||
         field.closest(
             '.field-group, .form-group, .st-form-group'
         )?.querySelector('label')?.textContent ||
-        field.dataset.fieldLabel ||
         fallbackName;
 
     return String(labelText)
@@ -4066,19 +4101,47 @@ function getFormInputValidationMessage(field) {
     const label = getGlobalFieldLabel(field);
 
     if (type === 'radio') {
-        if (!field.required) return '';
+        if (!field.required) {
+            return '';
+        }
 
         const form = field.form || document;
+
         const radioGroup = form.querySelectorAll(
             `input[type="radio"][name="${CSS.escape(field.name)}"]`
         );
 
-        const hasChecked = Array.from(radioGroup)
+        const hasChecked = Array
+            .from(radioGroup)
             .some(radio => radio.checked);
 
-        return hasChecked
-            ? ''
-            : `Please select a ${label.toLowerCase()}.`;
+        if (hasChecked) {
+            return '';
+        }
+
+        const requiredMessage =
+            field.dataset.requiredMessage ||
+            Array.from(radioGroup).find(
+                radio =>
+                    radio.dataset.requiredMessage
+            )?.dataset.requiredMessage;
+
+        if (requiredMessage) {
+            return requiredMessage;
+        }
+
+        const isYesNoQuestion =
+            Boolean(
+                field.closest(
+                    '.global-question-row'
+                )
+            );
+
+        if (isYesNoQuestion) {
+            return 'Please select Yes or No.';
+        }
+
+        return `Please select ${label.toLowerCase()}.`;
     }
 
     if (type === 'checkbox') {

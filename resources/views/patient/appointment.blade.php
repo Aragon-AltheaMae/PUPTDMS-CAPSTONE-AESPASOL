@@ -726,7 +726,7 @@ $appt->service_type .
             <div id="apptOdontogramSection" class="hidden">
                 <div class="appt-section-title">Odontogram</div>
 
-                @include('components.view-odontogram')
+                @include('components.odontogram-preview')
             </div>
 
             <div class="appt-section-title">Clinical Details</div>

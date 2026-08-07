@@ -3,6 +3,17 @@
     max-width: none;
 }
 
+.patient-profile-title {
+    min-width: 0;
+    margin: 0;
+
+    color: var(--text-1);
+    font-size: 1.5rem;
+    font-weight: 850;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+
 [data-theme="dark"] #mainContent.patient-profile-page,
 .dark #mainContent.patient-profile-page {
     background:
@@ -156,526 +167,6 @@
     border-color: rgba(252, 165, 165, 0.35) !important;
 }
 
-.profile-odontogram-wrap {
-    border: 1px solid rgba(139, 0, 0, 0.13);
-    border-radius: 1.1rem;
-    background: rgba(255, 255, 255, 0.82);
-    padding: 1rem 1.1rem;
-}
-
-.profile-odontogram-head {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    align-items: flex-start;
-}
-
-.profile-odontogram-label {
-    color: #8b0000;
-    font-size: 0.75rem;
-    font-weight: 900;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-}
-
-.profile-odontogram-sub {
-    color: #8a6f6f;
-    font-size: 0.8rem;
-    font-weight: 700;
-    margin-top: 0.2rem;
-}
-
-.profile-odontogram-legend {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 0.45rem 0.7rem;
-    font-size: 0.65rem;
-    font-weight: 800;
-    color: #6b7280;
-}
-
-.profile-odontogram-legend-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-}
-
-.profile-odontogram-legend-dot {
-    width: 0.75rem;
-    height: 0.75rem;
-    border-radius: 0.2rem;
-    border: 1px solid rgba(0, 0, 0, 0.14);
-    flex-shrink: 0;
-}
-
-.profile-odontogram-board-wrap {
-    position: relative;
-    border-radius: 1rem;
-    overflow: hidden;
-    background: linear-gradient(180deg, #d8e0ea 0%, #eef2f7 100%);
-    border: 1px solid rgba(139, 0, 0, 0.08);
-}
-
-.profile-odontogram-canvas {
-    width: 100%;
-    height: 440px;
-    min-height: 440px;
-    position: relative;
-}
-
-.profile-odontogram-loading {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.92);
-    transition: opacity 0.4s ease;
-}
-
-.profile-odontogram-guide {
-    position: absolute;
-    top: 0.9rem;
-    left: 0.9rem;
-    z-index: 3;
-    display: inline-flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    max-width: calc(100% - 1.8rem);
-}
-
-.profile-odontogram-guide-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    padding: 0.45rem 0.65rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(139, 0, 0, 0.08);
-    font-size: 0.7rem;
-    font-weight: 800;
-    color: #6b7280;
-    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
-}
-
-.profile-odontogram-guide-key {
-    width: 1.35rem;
-    height: 1.35rem;
-    border-radius: 999px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: #8b0000;
-    color: #fff;
-    font-size: 0.62rem;
-    font-weight: 900;
-    flex-shrink: 0;
-}
-
-.profile-odontogram-tooltip {
-    position: absolute;
-    z-index: 5;
-    pointer-events: none;
-    min-width: 180px;
-    max-width: 240px;
-    padding: 0.7rem 0.8rem;
-    border-radius: 0.9rem;
-    background: rgba(17, 24, 39, 0.94);
-    color: #fff;
-    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.2);
-    opacity: 0;
-    transform: translate(-50%, calc(-100% - 14px));
-    transition: opacity 0.16s ease;
-}
-
-.profile-odontogram-tooltip.show {
-    opacity: 1;
-}
-
-.profile-odontogram-row {
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 0.6rem;
-    margin-bottom: 0.9rem;
-}
-
-.profile-odontogram-arch-line {
-    text-align: center;
-    font-size: 0.62rem;
-    font-weight: 900;
-    color: #9b7777;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    border-top: 1px dashed rgba(139, 0, 0, 0.18);
-    border-bottom: 1px dashed rgba(139, 0, 0, 0.18);
-    padding: 0.35rem 0;
-    margin: 0.45rem 0 0.8rem;
-}
-
-.profile-tooth-unit {
-    width: 2.8rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.22rem;
-}
-
-.profile-tooth-status {
-    width: 1.6rem;
-    height: 0.48rem;
-    border-radius: 999px;
-    border: 1px solid #d3c4c4;
-    background: #fff;
-    overflow: hidden;
-}
-
-.profile-tooth-status-bar {
-    width: 100%;
-    height: 100%;
-    display: block;
-}
-
-.profile-tooth-number {
-    font-size: 0.75rem;
-    font-weight: 900;
-    color: #7a5c5c;
-    line-height: 1;
-}
-
-.profile-tooth-btn {
-    width: 2.45rem;
-    background: transparent;
-    border: 0;
-    padding: 0;
-    cursor: pointer;
-}
-
-.profile-tooth-svg {
-    width: 2.45rem;
-    height: 2.45rem;
-    display: block;
-}
-
-.profile-tooth-surface {
-    fill: #fff;
-    stroke: #cfc7c0;
-    stroke-width: 2.2;
-    transition: transform 0.18s ease, filter 0.18s ease;
-}
-
-.profile-tooth-btn:hover .profile-tooth-surface {
-    filter: drop-shadow(0 4px 8px rgba(139, 0, 0, 0.12));
-}
-
-.profile-odontogram-empty {
-    fill: #fff;
-}
-
-.profile-tooth-root {
-    width: 1px;
-    height: 1rem;
-    background: #cfc7c0;
-}
-
-.profile-odontogram-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 100000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    isolation: isolate;
-}
-
-.profile-odontogram-modal.hidden {
-    display: none !important;
-}
-
-.profile-odontogram-backdrop {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    background: rgba(15, 23, 42, 0.68);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-}
-
-.profile-odontogram-card {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    width: min(100%, 680px);
-    max-height: calc(100dvh - 2rem);
-    border-radius: 1.25rem;
-    background: #fff8ef;
-    border: 1px solid rgba(139, 0, 0, 0.16);
-    box-shadow:
-        0 30px 80px rgba(15, 23, 42, 0.34),
-        0 8px 24px rgba(139, 0, 0, 0.14);
-    overflow: hidden;
-    animation: profileOdontogramModalIn 0.2s ease-out;
-}
-
-@keyframes profileOdontogramModalIn {
-    from {
-        opacity: 0;
-        transform: translateY(12px) scale(0.97);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
-.profile-odontogram-card-hero {
-    position: relative;
-    flex-shrink: 0;
-    padding: 1.25rem 3.75rem 1.25rem 1.25rem;
-    color: #fff;
-    background:
-        radial-gradient(circle at top right, rgba(255, 255, 255, 0.16), transparent 32%),
-        linear-gradient(135deg, #7a0000, #8b0000, #661010);
-}
-
-.profile-odontogram-card-hero h3 {
-    margin: 0;
-    font-size: 1.35rem;
-    font-weight: 900;
-    line-height: 1.25;
-}
-
-.profile-odontogram-card-hero p {
-    margin: 0.25rem 0 0;
-    font-size: 0.82rem;
-    opacity: 0.86;
-    font-weight: 700;
-}
-
-.profile-odontogram-close {
-    position: absolute;
-    top: 0.85rem;
-    right: 0.85rem;
-    z-index: 2;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    padding: 0;
-    border-radius: 999px;
-    color: #fff;
-    cursor: pointer;
-    background: rgba(255, 255, 255, 0.14);
-    border: 1px solid rgba(255, 255, 255, 0.22);
-    transition:
-        background 0.18s ease,
-        transform 0.18s ease;
-}
-
-.profile-odontogram-close:hover {
-    background: rgba(255, 255, 255, 0.24);
-    transform: rotate(4deg);
-}
-
-.profile-odontogram-close:focus-visible {
-    outline: 3px solid rgba(255, 255, 255, 0.65);
-    outline-offset: 2px;
-}
-
-.profile-odontogram-card-body {
-    min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    padding: 1rem;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(139, 0, 0, 0.35) transparent;
-}
-
-.profile-odontogram-card-body::-webkit-scrollbar {
-    width: 8px;
-}
-
-.profile-odontogram-card-body::-webkit-scrollbar-thumb {
-    background: rgba(139, 0, 0, 0.30);
-    border-radius: 999px;
-}
-
-.profile-odontogram-tooth-main {
-    display: grid;
-    grid-template-columns: 150px minmax(0, 1fr);
-    padding: 0.95rem;
-    gap: 1rem;
-    align-items: center;
-    border: 1px solid rgba(139, 0, 0, 0.13);
-    border-radius: 1rem;
-    background: #fff;
-}
-
-.profile-odontogram-tooth-visual {
-    min-height: 110px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.profile-odontogram-big-tooth {
-    width: 4.2rem;
-    height: 2.35rem;
-    border-radius: 0.55rem;
-    border: 3px solid #9b1c1c;
-    background: #fecaca;
-    color: #7f1d1d;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    position: relative;
-    box-shadow: 0 5px 0 rgba(127, 29, 29, 0.35);
-}
-
-.profile-odontogram-big-tooth::before,
-.profile-odontogram-big-tooth::after {
-    content: '';
-    position: absolute;
-    bottom: -2.95rem;
-    width: 3px;
-    height: 2.6rem;
-    background: #c9b9aa;
-    border-radius: 999px;
-}
-
-.profile-odontogram-big-tooth::before {
-    left: 1.5rem;
-    transform: rotate(4deg);
-}
-
-.profile-odontogram-big-tooth::after {
-    right: 1.5rem;
-    transform: rotate(-4deg);
-}
-
-.profile-odontogram-info-label {
-    color: #9b7777;
-    font-size: 0.62rem;
-    font-weight: 900;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-}
-
-.profile-odontogram-condition-pill {
-    display: inline-flex;
-    max-width: 100%;
-    margin-top: 0.4rem;
-    border-radius: 0.55rem;
-    padding: 0.48rem 0.7rem;
-    font-size: 0.78rem;
-    font-weight: 800;
-    line-height: 1.35;
-    overflow-wrap: anywhere;
-    border: 1px solid rgba(139, 0, 0, 0.28);
-    background: #fee2e2;
-    color: #7f1d1d;
-}
-
-.profile-odontogram-tooth-name {
-    margin: 0.8rem 0;
-    color: #7b6b6b;
-    font-size: 0.82rem;
-    font-weight: 700;
-}
-
-.profile-odontogram-info-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.6rem;
-}
-
-.profile-odontogram-info-box {
-    min-width: 0;
-    padding: 0.7rem 0.8rem !important;
-    border-radius: 0.75rem;
-    border: 1px solid rgba(139, 0, 0, 0.13);
-    background: #fff;
-}
-
-.profile-odontogram-info-box p {
-    color: #9b7777;
-    font-size: 0.58rem;
-    font-weight: 900;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-}
-
-.profile-odontogram-info-box strong {
-    display: block;
-    margin-top: 0.25rem;
-    font-size: 0.82rem;
-    line-height: 1.35;
-    color: #2b1515;
-    overflow-wrap: anywhere;
-}
-
-.profile-odontogram-history {
-    margin-top: 0.85rem;
-}
-
-.profile-odontogram-surface-list {
-    margin-top: 0.65rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.45rem;
-}
-
-.profile-odontogram-surface-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    max-width: 100%;
-    border-radius: 999px;
-    padding: 0.38rem 0.6rem;
-    font-size: 0.72rem;
-    font-weight: 800;
-    border: 1px solid rgba(139, 0, 0, 0.18);
-    background: #fff;
-    color: #4b3b3b;
-}
-
-.profile-odontogram-surface-swatch {
-    width: 0.7rem;
-    height: 0.7rem;
-    border-radius: 0.18rem;
-    border: 1px solid rgba(0, 0, 0, 0.14);
-    flex-shrink: 0;
-}
-
-.profile-odontogram-history-item {
-    margin-top: 0.65rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.45rem 0.65rem;
-    align-items: center;
-    font-size: 0.8rem;
-    color: #4b3b3b;
-}
-
-.profile-odontogram-history-dot {
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 999px;
-    background: #fecaca;
-    border: 1px solid #fca5a5;
-    flex-shrink: 0;
-}
-
 @media (max-width: 640px) {
 
     #mainContent.patient-profile-page>.w-full.fade-in>div:first-child {
@@ -706,13 +197,12 @@
         flex: 0 0 32px !important;
     }
 
-    #mainContent.patient-profile-page>.w-full.fade-in>div:first-child>div:first-child>div:last-child>h1 {
-        flex: 0 1 auto !important;
-        min-width: 0 !important;
-        margin: 0 !important;
-        text-align: left !important;
-        font-size: 1.05rem !important;
-        line-height: 1.15 !important;
+    .patient-profile-title {
+        flex: 0 1 auto;
+        min-width: 0;
+        font-size: 1.05rem;
+        line-height: 1.15;
+        text-align: left;
     }
 
     #mainContent.patient-profile-page>.w-full.fade-in>div:first-child>div:nth-child(2) {
@@ -749,280 +239,6 @@
         font-size: 0.68rem !important;
         flex-shrink: 0 !important;
     }
-
-    .profile-odontogram-head {
-        flex-direction: column;
-    }
-
-    .profile-odontogram-legend {
-        justify-content: flex-start;
-    }
-
-    .profile-odontogram-canvas {
-        height: 360px;
-        min-height: 360px;
-    }
-
-    .profile-odontogram-modal {
-        align-items: flex-end;
-        padding: 0;
-    }
-
-    .profile-odontogram-card {
-        width: 100%;
-        max-height: 94dvh;
-        border-radius: 1.25rem 1.25rem 0 0;
-        border-bottom: 0;
-    }
-
-    .profile-odontogram-card-hero {
-        padding: 1rem 3.5rem 1rem 1rem;
-    }
-
-    .profile-odontogram-card-body {
-        padding: 0.85rem;
-    }
-
-    .profile-odontogram-tooth-main,
-    .profile-odontogram-info-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .profile-odontogram-tooth-main {
-        text-align: center;
-    }
-
-    .profile-odontogram-condition-pill {
-        justify-content: center;
-    }
-}
-
-.drawer-overlay {
-    position: fixed;
-    inset: var(--header-h, 64px) 0 0;
-    z-index: 110;
-
-    background: var(--drawer-overlay-bg);
-
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-
-    transition:
-        opacity .22s ease,
-        visibility .22s ease;
-}
-
-.drawer-overlay.open {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-}
-
-.appointment-details-drawer {
-    position: fixed;
-    top: var(--header-h, 64px);
-    right: 0;
-    bottom: 0;
-    z-index: 120;
-
-    width: min(100%, 500px);
-    display: flex;
-    flex-direction: column;
-
-    background: var(--drawer-bg);
-    border-left: 1px solid var(--border);
-
-    transform: translateX(100%);
-    visibility: hidden;
-    pointer-events: none;
-
-    transition:
-        transform .3s cubic-bezier(.22, 1, .36, 1),
-        visibility 0s linear .3s;
-}
-
-.appointment-details-drawer.open {
-    transform: translateX(0);
-    visibility: visible;
-    pointer-events: auto;
-
-    transition:
-        transform .3s cubic-bezier(.22, 1, .36, 1),
-        visibility 0s linear 0s;
-}
-
-.appointment-drawer-heading {
-    min-width: 0;
-    display: flex;
-    align-items: flex-start;
-    gap: .8rem;
-}
-
-.appointment-drawer-eyebrow {
-    color: var(--crimson);
-    font-size: 10px;
-    font-weight: 900;
-    line-height: 1;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-}
-
-.appointment-drawer-title {
-    margin: 0;
-    color: var(--text-1);
-    font-size: 17px;
-    font-weight: 900;
-    line-height: 1.25;
-    overflow-wrap: anywhere;
-}
-
-.appointment-drawer-schedule {
-    margin-top: .55rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: .4rem .9rem;
-    color: var(--text-2);
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 1.4;
-}
-
-.appointment-drawer-schedule>span {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.appointment-drawer-status-bar {
-    flex: 0 0 auto;
-    min-height: 55px;
-    padding: .7rem 1.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: .75rem;
-    background: var(--surface);
-    border-bottom-color: var(--border);
-}
-
-.appointment-drawer-status-label {
-    color: var(--text-2);
-    font-size: 11px;
-    font-weight: 900;
-    line-height: 1;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-}
-
-.appointment-drawer-body {
-    flex: 1 1 auto;
-    min-height: 0;
-    padding: 1rem;
-    display: grid;
-    align-content: start;
-    gap: .85rem;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    background: var(--surface);
-}
-
-.appointment-drawer-section-header .card-header-icon {
-    width: 34px;
-    height: 34px;
-    border-radius: 11px;
-    font-size: 12px;
-}
-
-.appointment-drawer-body {
-    flex: 1 1 auto;
-    min-height: 0;
-    padding: 1rem;
-
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    grid-auto-rows: max-content;
-    align-content: start;
-    gap: .85rem;
-
-    overflow-x: hidden;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    background: var(--surface);
-}
-
-.appointment-drawer-section.card {
-    display: block;
-    width: 100%;
-    min-width: 0;
-    background: var(--card);
-    border-color: var(--border);
-    height: auto;
-    min-height: max-content;
-    max-height: none;
-    overflow: visible;
-    flex: none;
-    animation: none;
-    box-shadow: none;
-}
-
-.appointment-drawer-section-header.card-header {
-    position: relative;
-    display: flex;
-    width: 100%;
-    min-width: 0;
-    height: auto;
-    min-height: 56px;
-    background: var(--card);
-    border-bottom-color: var(--border);
-    padding: .75rem .9rem;
-    overflow: visible;
-}
-
-.appointment-drawer-section-header .card-header-left {
-    min-width: 0;
-}
-
-.appointment-drawer-section-header .card-title {
-    color: var(--text-1);
-    font-size: 14px;
-    font-weight: 800;
-    line-height: 1.3;
-    min-width: 0;
-    white-space: normal;
-    overflow-wrap: anywhere;
-}
-
-.appointment-drawer-section-body.card-body {
-    display: block;
-    width: 100%;
-    min-width: 0;
-    height: auto;
-    min-height: 0;
-    max-height: none;
-    padding: .9rem;
-    overflow: visible;
-    color: var(--text-2);
-    font-size: 13px;
-    font-weight: 400;
-    line-height: 1.55;
-}
-
-.appointment-drawer-section-body p,
-.appointment-drawer-section-body div {
-    max-width: 100%;
-    overflow-wrap: anywhere;
-}
-
-.appointment-drawer-section-body p+p {
-    margin-top: .45rem;
-}
-
-.appointment-drawer-section-body strong {
-    color: var(--text-1);
 }
 
 [data-theme="dark"] body:has(#mainContent.patient-profile-page) #startModalContent,
@@ -1048,163 +264,6 @@
     background: rgba(248, 250, 252, 0.08) !important;
     color: #cbd5e1 !important;
     border-color: rgba(203, 213, 225, 0.22) !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .appointment-drawer-header,
-.dark body:has(#mainContent.patient-profile-page) .appointment-drawer-header {
-    background: #161b22 !important;
-    border-color: #30363d !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) #detailsDrawer .bg-gray-50,
-.dark body:has(#mainContent.patient-profile-page) #detailsDrawer .bg-gray-50 {
-    background: rgba(13, 17, 23, 0.84) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) #drawerBody,
-.dark body:has(#mainContent.patient-profile-page) #drawerBody {
-    background: #0d1117 !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) #detailsDrawer .text-gray-800,
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) #detailsDrawer .text-gray-700,
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) #detailsDrawer .text-gray-600,
-.dark body:has(#mainContent.patient-profile-page) #detailsDrawer .text-gray-800,
-.dark body:has(#mainContent.patient-profile-page) #detailsDrawer .text-gray-700,
-.dark body:has(#mainContent.patient-profile-page) #detailsDrawer .text-gray-600 {
-    color: #e5e7eb !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) #detailsDrawer .text-gray-500,
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) #detailsDrawer .text-gray-400,
-.dark body:has(#mainContent.patient-profile-page) #detailsDrawer .text-gray-500,
-.dark body:has(#mainContent.patient-profile-page) #detailsDrawer .text-gray-400 {
-    color: #94a3b8 !important;
-}
-
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-card,
-.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-card {
-    background:
-        radial-gradient(circle at top left, rgba(139, 0, 0, 0.12), transparent 34%),
-        linear-gradient(145deg, #0d1117, #161b22) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-card-body,
-.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-card-body {
-    color: #e5e7eb;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-tooth-main,
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-info-box,
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-surface-pill,
-.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-tooth-main,
-.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-info-box,
-.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-surface-pill {
-    background: rgba(248, 250, 252, 0.06) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-info-box strong,
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-history-item,
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-surface-pill,
-.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-info-box strong,
-.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-history-item,
-.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-surface-pill {
-    color: #e5e7eb !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-tooth-name,
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-info-label,
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-info-box p,
-.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-tooth-name,
-.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-info-label,
-.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-info-box p {
-    color: #cbd5e1 !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-wrap,
-.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-wrap {
-    border-color: rgba(252, 165, 165, 0.18) !important;
-    background:
-        radial-gradient(circle at top left, rgba(139, 0, 0, 0.12), transparent 34%),
-        linear-gradient(145deg, rgba(13, 17, 23, 0.82), rgba(22, 27, 34, 0.74)) !important;
-    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-label,
-.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-label {
-    color: #fca5a5 !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-sub,
-.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-legend,
-.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-legend-item {
-    color: #cbd5e1 !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-legend-dot,
-.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-legend-dot {
-    border-color: rgba(255, 255, 255, 0.18) !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-board-wrap,
-.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-board-wrap {
-    background:
-        radial-gradient(circle at top left, rgba(139, 0, 0, 0.12), transparent 34%),
-        linear-gradient(180deg, rgba(13, 17, 23, 0.82), rgba(22, 27, 34, 0.74)) !important;
-    border-color: rgba(252, 165, 165, 0.12) !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-loading,
-.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-loading {
-    background: rgba(13, 17, 23, 0.92) !important;
-    color: #e5e7eb !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-empty,
-.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-empty {
-    fill: rgba(248, 250, 252, 0.06) !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-tooth-surface,
-.dark body:has(#mainContent.patient-profile-page) .profile-tooth-surface {
-    fill: rgba(248, 250, 252, 0.06) !important;
-    stroke: rgba(255, 255, 255, 0.18) !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-tooth-status,
-.dark body:has(#mainContent.patient-profile-page) .profile-tooth-status {
-    background: rgba(248, 250, 252, 0.06) !important;
-    border-color: rgba(255, 255, 255, 0.14) !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-tooth-number,
-.dark body:has(#mainContent.patient-profile-page) .profile-tooth-root {
-    color: #cbd5e1 !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-tooth-root {
-    background: rgba(255, 255, 255, 0.16) !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.patient-profile-page) .profile-odontogram-arch-line,
-.dark body:has(#mainContent.patient-profile-page) .profile-odontogram-arch-line {
-    color: #94a3b8 !important;
-    border-color: rgba(252, 165, 165, 0.18) !important;
-}
-
-.drawer-close-btn.ui-icon-btn {
-    background: rgba(255, 255, 255, .12);
-    border-color: rgba(255, 255, 255, .2);
-    color: #ffffff;
-}
-
-.drawer-close-btn.ui-icon-btn:hover {
-    background: rgba(255, 255, 255, .22);
-    color: #ffffff;
 }
 
 .patient-profile-layout {
@@ -1301,8 +360,7 @@
     margin-top: .8rem;
 }
 
-.patient-type-badge,
-.patient-active-badge {
+.patient-type-badge {
     min-height: 27px;
     padding: 4px 11px;
     border: 1px solid transparent;
@@ -1320,12 +378,6 @@
     background: var(--status-cancelled-bg, #fef2f2);
     border-color: var(--status-cancelled-border, #fecaca);
     color: var(--status-cancelled-text, #991b1b);
-}
-
-.patient-active-badge {
-    background: var(--status-completed-bg, #ecfdf5);
-    border-color: var(--status-completed-border, #a7f3d0);
-    color: var(--status-completed-text, #047857);
 }
 
 .patient-summary-details {
@@ -1629,6 +681,48 @@
     outline-offset: 2px;
 }
 
+[data-theme="dark"] .patient-profile-page .treatment-tabs,
+.dark .patient-profile-page .treatment-tabs {
+    background: rgba(248, 250, 252, 0.045);
+    border-color: rgba(255, 255, 255, 0.10);
+}
+
+[data-theme="dark"] .patient-profile-page .treatment-tab,
+.dark .patient-profile-page .treatment-tab {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .patient-profile-page .treatment-tab:hover,
+.dark .patient-profile-page .treatment-tab:hover {
+    background: rgba(139, 0, 0, 0.14);
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .patient-profile-page .treatment-tab.is-active,
+.dark .patient-profile-page .treatment-tab.is-active {
+    background:
+        linear-gradient(135deg,
+            rgba(139, 0, 0, 0.30),
+            rgba(185, 28, 28, 0.18));
+    border-color: rgba(252, 165, 165, 0.24);
+    color: #fca5a5;
+    box-shadow:
+        0 6px 16px rgba(0, 0, 0, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .patient-profile-page .treatment-tab-count,
+.dark .patient-profile-page .treatment-tab-count {
+    background: rgba(148, 163, 184, 0.10);
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .patient-profile-page .treatment-tab.is-active .treatment-tab-count,
+.dark .patient-profile-page .treatment-tab.is-active .treatment-tab-count {
+    background: rgba(252, 165, 165, 0.12);
+    color: #fca5a5;
+}
+
 .treatment-tab-count {
     min-width: 22px;
     height: 22px;
@@ -1826,23 +920,5 @@
     .treatment-visit-action,
     .treatment-visit-action .ui-btn {
         width: 100%;
-    }
-
-    .appointment-details-drawer {
-        top: auto;
-        width: 100%;
-        max-height: 90dvh;
-        border-left: 0;
-        border-top: 1px solid var(--border);
-        border-radius: 24px 24px 0 0;
-        transform: translateY(100%);
-    }
-
-    .appointment-details-drawer.open {
-        transform: translateY(0);
-    }
-
-    .drawer-overlay {
-        inset: 0;
     }
 }

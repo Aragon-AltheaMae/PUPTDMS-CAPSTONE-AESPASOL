@@ -9,12 +9,6 @@
 
 @section('content')
 
-@php
-$notifications = collect($notifications ?? []);
-$notifCount = $notifications->count();
-$isFemalePatient = strtolower($patient->gender ?? '') === 'female';
-@endphp
-
 <main id="mainContent" class="book-container min-h-screen bg-[#F4F4F4] dark:bg-[#020b14] py-6">
     <div id="dentistWalkInPage" class="walkin-page">
         <div class="book-page-wrap">
@@ -128,7 +122,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                     <div class="p-6 sm:p-8">
 
                         <form id="appointmentForm" action="{{ route('dentist.walk-in.start') }}" method="POST"
-                            enctype="multipart/form-data" data-global-selects>
+                            enctype="multipart/form-data" data-global-selects data-global-validation>
 
                             <input type="hidden" name="patient_id" id="selectedPatientId">
                             <input type="hidden" name="patient_mode" id="patientMode" value="existing">
@@ -151,7 +145,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                     </div>
 
                                     <div class="booking-step-body">
-                                        <div class="section-card walkin-account-card">
+                                        <div class="section-card walkin-account-card" data-global-field>
                                             <p class="section-card-title">
                                                 <i class="fa-solid fa-user-magnifying-glass text-xs"></i>
                                                 Select or create patient
@@ -171,68 +165,142 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
 
                                             <div class="tab-panel active" id="existingPanel">
-                                                <div class="walkin-search-wrap search-wrap global-search"
-                                                    data-search-wrapper>
-                                                    <i class="fa-solid fa-magnifying-glass search-icon"
-                                                        aria-hidden="true"></i>
 
-                                                    <input type="search" id="patientSearch"
-                                                        class="search-input walkin-search-input"
-                                                        placeholder="Search by name, ID, or email..." autocomplete="off"
-                                                        data-search-input>
+                                                <div class="patient-picker-toolbar">
 
-                                                    <button type="button" class="search-clear" data-search-clear
-                                                        aria-label="Clear patient search" title="Clear search">
-                                                        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
-                                                    </button>
+                                                    <div class="search-wrap global-search patient-picker-search"
+                                                        data-search-wrapper>
+
+                                                        <i class="fa-solid fa-magnifying-glass search-icon"
+                                                            aria-hidden="true">
+                                                        </i>
+
+                                                        <input type="text" id="patientSearch" class="search-input"
+                                                            placeholder="Search by name, ID, or email..."
+                                                            autocomplete="off" inputmode="search" data-search-input>
+
+                                                        <button type="button" class="search-clear" data-search-clear
+                                                            aria-label="Clear patient search" title="Clear search">
+
+                                                            <i class="fa-solid fa-xmark" aria-hidden="true">
+                                                            </i>
+                                                        </button>
+                                                    </div>
+
+                                                    <div class="global-page-size-control">
+                                                        <label for="patientPageSize">
+                                                            Show
+                                                        </label>
+
+                                                        <div class="global-page-size-select" data-global-page-size
+                                                            data-page-size-input="#patientPageSize"
+                                                            data-page-size-callback="handleWalkInPatientPerPageChange">
+
+                                                            <select id="patientPageSize" class="global-page-size-native"
+                                                                tabindex="-1" aria-hidden="true">
+
+                                                                <option value="10" selected>10</option>
+                                                                <option value="20">20</option>
+                                                                <option value="50">50</option>
+                                                                <option value="100">100</option>
+                                                            </select>
+
+                                                            <button type="button" class="global-page-size-trigger"
+                                                                data-page-size-trigger aria-haspopup="listbox"
+                                                                aria-expanded="false">
+
+                                                                <span data-page-size-value>10</span>
+
+                                                                <i class="fa-solid fa-chevron-down"></i>
+                                                            </button>
+
+                                                            <div class="global-page-size-menu" role="listbox">
+
+                                                                @foreach ([10, 20, 50, 100] as $size)
+                                                                <button type="button"
+                                                                    class="global-page-size-option {{ $size === 10 ? 'is-selected' : '' }}"
+                                                                    data-page-size-option data-value="{{ $size }}"
+                                                                    role="option"
+                                                                    aria-selected="{{ $size === 10 ? 'true' : 'false' }}">
+
+                                                                    <span>{{ $size }}</span>
+                                                                    <i class="fa-solid fa-check"></i>
+                                                                </button>
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
+
+                                                        <span>entries</span>
+                                                    </div>
+
                                                 </div>
 
-                                                <div class="patient-results" id="patientResults" aria-live="polite">
-                                                    <div class="empty-state walkin-patient-state">
-                                                        <div class="patient-empty-icon walkin-patient-state-icon">
-                                                            <i class="fa-solid fa-user-doctor" aria-hidden="true"></i>
+                                                <div class="patient-picker-status">
+                                                    <span id="patientEntriesInfo" class="global-pagebar-info">
+                                                        Showing 0 patient records
+                                                    </span>
+                                                </div>
+
+                                                <div id="patientResults" class="patient-results table-grid-view"
+                                                    aria-live="polite">
+                                                </div>
+
+                                                <div id="patientPaginationBar"
+                                                    class="global-pagebar global-pagebar-bottom" hidden>
+
+                                                    <div id="patientPaginationInfo" class="global-pagebar-info">
+                                                    </div>
+
+                                                    <div class="global-pagination-wrap">
+                                                        <div id="patientPagination" class="global-pagination"
+                                                            aria-label="Patient record pagination">
                                                         </div>
-                                                        <p class="empty-state-title">Find a patient record</p>
-                                                        <p class="empty-state-sub">
-                                                            Search by name, student or employee ID, or email address.
-                                                        </p>
                                                     </div>
                                                 </div>
                                             </div>
-
                                             <div class="tab-panel" id="guestPanel">
                                                 <div class="guest-fields-grid">
-                                                    <div>
+
+                                                    <div data-global-field>
                                                         <label class="walkin-field-label" for="guestName">
-                                                            Guest full name <span class="required-star">*</span>
+                                                            Guest full name
+                                                            <span class="required-star">*</span>
                                                         </label>
 
                                                         <input type="text" id="guestName" name="guest_name"
                                                             class="form-input w-full border border-[#e8e2dd] rounded-xl bg-white outline-none"
                                                             placeholder="Enter guest full name" autocomplete="off"
+                                                            data-required-message="Please enter the guest full name."
                                                             disabled>
                                                     </div>
 
                                                     <div class="walkin-two-col">
-                                                        <div>
+
+                                                        <div data-global-field>
                                                             <label class="walkin-field-label" for="guestEmail">
                                                                 Email
+                                                                <span class="field-optional">(Optional)</span>
                                                             </label>
 
                                                             <input type="email" id="guestEmail" name="guest_email"
+                                                                data-required-message="Please enter a valid email address."
                                                                 class="form-input w-full border border-[#e8e2dd] rounded-xl bg-white outline-none"
-                                                                placeholder="Optional" autocomplete="off" disabled>
+                                                                placeholder="Enter email address" autocomplete="email"
+                                                                disabled>
                                                         </div>
 
-                                                        <div>
+                                                        <div data-global-field>
                                                             <label class="walkin-field-label" for="guestPhone">
                                                                 Phone
+                                                                <span class="field-optional">(Optional)</span>
                                                             </label>
 
                                                             <input type="text" id="guestPhone" name="guest_phone"
                                                                 class="form-input w-full border border-[#e8e2dd] rounded-xl bg-white outline-none"
-                                                                placeholder="Optional" autocomplete="off" disabled>
+                                                                placeholder="09xx xxx xxxx" autocomplete="tel"
+                                                                inputmode="numeric" disabled>
                                                         </div>
+
                                                     </div>
                                                 </div>
 
@@ -241,14 +309,23 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                                     Create guest account
                                                 </button>
                                             </div>
-
                                             <div class="selected-patient-box" id="selectedPatientBox" hidden>
+
                                                 <span>
                                                     <i class="fa-solid fa-circle-check text-[11px] mr-1"></i>
                                                     Selected patient
                                                 </span>
+
                                                 <strong id="selectedPatientName"></strong>
+
                                                 <small id="selectedPatientMeta"></small>
+
+                                                <button type="button" id="clearSelectedPatientBtn"
+                                                    class="btn-secondary-global">
+
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                    <span>Clear Selection</span>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -265,11 +342,11 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                     </div>
 
                                     <div class="booking-step-body">
-                                        <div class="service-step-grid">
+                                        <div class="service-step-grid global-choice-group" data-global-field>
                                             @foreach ($serviceTypes as $service)
                                             <label class="service-option group">
                                                 <input type="radio" name="service_type" value="{{ $service['name'] }}"
-                                                    class="service-option-input">
+                                                    class="service-option-input" required>
 
                                                 <div class="service-option-card">
                                                     <div class="service-option-main">
@@ -323,25 +400,38 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <span class="section-card-title-line"></span>
                                         </p>
                                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                            <div>
-                                                <label class="block text-xs font-semibold text-[#333] mb-1.5">Last
-                                                    Dental
-                                                    Visit</label>
+
+                                            <div data-global-field>
+                                                <label for="lastDentalVisit"
+                                                    class="block text-xs font-semibold text-[#333] mb-1.5">
+                                                    Last Dental Visit
+                                                </label>
+
                                                 <div class="date-input-wrap compact">
                                                     <input type="text" id="lastDentalVisit" name="last_dental_visit"
                                                         class="js-flatpickr-date-max-today form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
-                                                        placeholder="Select date" readonly required>
+                                                        placeholder="Select date"
+                                                        data-required-message="Please select the patient's last dental visit."
+                                                        readonly required>
+
                                                     <i class="fa-regular fa-calendar date-input-icon"></i>
                                                 </div>
                                             </div>
-                                            <div>
-                                                <label class="block text-xs font-semibold text-[#333] mb-1.5">Previous
-                                                    Dentist</label>
+
+                                            <div data-global-field>
+                                                <label for="previous_dentist"
+                                                    class="block text-xs font-semibold text-[#333] mb-1.5">
+                                                    Previous Dentist
+                                                </label>
+
                                                 <input type="text" id="previous_dentist" name="previous_dentist"
                                                     maxlength="50"
                                                     class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
-                                                    placeholder="Dr. Name" required>
+                                                    placeholder="Dr. Name"
+                                                    data-required-message="Please enter the patient's previous dentist."
+                                                    required>
                                             </div>
+
                                         </div>
                                     </div>
 
@@ -380,10 +470,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         ];
                                         @endphp
                                         @foreach ($dentalQ1 as $q)
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">{{ $q['q'] }}</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="{{ $q['q'] }}">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="{{ $q['name'] }}" value="YES"
@@ -438,10 +528,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         ];
                                         @endphp
                                         @foreach ($dentalQ2 as $q)
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">{{ $q['q'] }}</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="{{ $q['q'] }}">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="{{ $q['name'] }}" value="YES"
@@ -473,11 +563,11 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <span class="flex-1 h-px bg-[#f9e8e8]"></span>
                                         </p>
 
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">Have you had any periodontal (gum)
                                                 treatment?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Have you had any periodontal (gum) treatment?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="periodontal" value="YES"
@@ -493,11 +583,11 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">Have you had a difficult tooth
                                                 extraction?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Have you had a difficult tooth extraction?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="difficult_extraction" value="YES"
@@ -523,12 +613,13 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row">
-                                            <span class="global-question-text">Have you had prolonged bleeding following
+                                        <div class="global-question-row" data-global-field>
+                                            <span class="global-question-text">Have you had prolonged bleeding
+                                                following
                                                 tooth
                                                 extractions?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Have you had prolonged bleeding following tooth extractions?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="prolonged_bleeding" value="YES"
@@ -544,11 +635,11 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">Do you wear complete or partial
                                                 dentures?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Do you wear complete or partial dentures?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="dentures" value="YES"
@@ -574,11 +665,11 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">Have you had orthodontic
                                                 treatment?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Have you had orthodontic treatment?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="ortho_treatment" value="YES"
@@ -645,10 +736,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <span class="section-card-title-line"></span>
                                         </p>
 
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">Are you in good health?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Are you in good health?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="good_health" value="YES"
@@ -674,11 +765,11 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">When was your last medical
                                                 examination?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="When was your last medical examination?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="had_medical_exam" value="YES"
@@ -705,12 +796,13 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row">
-                                            <span class="global-question-text">Are you currently receiving treatment for
+                                        <div class="global-question-row" data-global-field>
+                                            <span class="global-question-text">Are you currently receiving treatment
+                                                for
                                                 any
                                                 illness?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Are you currently receiving treatment for any illness?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="under_treatment" value="YES"
@@ -736,10 +828,11 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row">
-                                            <span class="global-question-text">Have you ever been hospitalized?</span>
+                                        <div class="global-question-row" data-global-field>
+                                            <span class="global-question-text">Have you ever been
+                                                hospitalized?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Have you ever been hospitalized?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="hospitalized" value="YES"
@@ -771,10 +864,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-triangle-exclamation text-xs"></i> Allergies
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">Medicines</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Medicines">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="allergy_medicine" value="YES"
@@ -789,10 +882,11 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                                 </label>
                                             </div>
                                         </div>
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">Food</span>
 
-                                            <div class="global-question-options" role="radiogroup" aria-label="Food">
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
+                                                aria-label="Food">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="allergy_food" value="YES"
                                                         class="global-radio-input" required>
@@ -820,12 +914,12 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-pills text-xs"></i> Medications
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">Are you taking any prescription or
                                                 non-prescription
                                                 medication?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Are you taking any prescription or non-prescription medication?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="medication" value="YES"
@@ -852,47 +946,63 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         </div>
                                     </div>
 
-                                    @if ($isFemalePatient)
-                                    <div class="section-card" id="forWomenSection">
+                                    <div class="section-card hidden" id="forWomenSection">
+
                                         <p class="section-card-title">
-                                            <i class="fa-solid fa-venus text-xs"></i> For Women Only
+                                            <i class="fa-solid fa-venus text-xs"></i>
+                                            For Women Only
                                             <span class="section-card-title-line"></span>
                                         </p>
 
                                         @foreach ([
-                                        ['name' => 'pregnant', 'q' => 'Are you pregnant?'],
-                                        ['name' => 'nursing', 'q' => 'Are you nursing?'],
+                                        [
+                                        'name' => 'pregnant',
+                                        'q' => 'Are you pregnant?',
+                                        ],
+                                        [
+                                        'name' => 'nursing',
+                                        'q' => 'Are you nursing?',
+                                        ],
                                         [
                                         'name' => 'birth_control',
-                                        'q' => 'Are you taking birth
-                                        control pills?',
+                                        'q' => 'Are you taking birth control pills?',
                                         ],
-                                        ] as $i => $q)
-                                        <div class="global-question-row">
-                                            <span class="global-question-text">{{ $q['q'] }}</span>
+                                        ] as $q)
 
-                                            <div class="global-question-options" role="radiogroup"
+                                        <div class="global-question-row" data-global-field>
+
+                                            <span class="global-question-text">
+                                                {{ $q['q'] }}
+                                            </span>
+
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="{{ $q['q'] }}">
+
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="{{ $q['name'] }}" value="YES"
-                                                        class="global-radio-input" required>
+                                                        class="global-radio-input" disabled>
+
                                                     <span>Yes</span>
                                                 </label>
 
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="{{ $q['name'] }}" value="NO"
-                                                        class="global-radio-input">
+                                                        class="global-radio-input" disabled>
+
                                                     <span>No</span>
                                                 </label>
                                             </div>
                                         </div>
                                         @endforeach
                                     </div>
-                                    @else
-                                    <input type="hidden" name="pregnant" value="NO">
-                                    <input type="hidden" name="nursing" value="NO">
-                                    <input type="hidden" name="birth_control" value="NO">
-                                    @endif
+
+                                    <div id="nonFemaleDefaults">
+                                        <input type="hidden" name="pregnant" value="NO">
+
+                                        <input type="hidden" name="nursing" value="NO">
+
+                                        <input type="hidden" name="birth_control" value="NO">
+                                    </div>
 
                                     <div class="section-card mt-5">
                                         <p class="section-card-title">
@@ -920,11 +1030,11 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-smoking text-xs"></i> Tobacco Use
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">Do you use tobacco products or any
                                                 derivatives?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Do you use tobacco products or any derivatives?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="tobacco_use" value="YES"
@@ -959,13 +1069,14 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-head-side-mask text-xs"></i> Do You Suffer From
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        @foreach ([['name' => 'headaches', 'q' => 'Headaches'], ['name' => 'earaches',
+                                        @foreach ([['name' => 'headaches', 'q' => 'Headaches'], ['name' =>
+                                        'earaches',
                                         'q'
                                         => 'Earaches'], ['name' => 'neck_aches', 'q' => 'Neck aches']] as $i => $q)
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">{{ $q['q'] }}</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="{{ $q['q'] }}">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="{{ $q['name'] }}" value="YES"
@@ -990,43 +1101,39 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         </p>
 
                                         <div class="emergency-fields-stack">
-                                            <div>
+                                            <div data-global-field>
                                                 <label class="block text-xs font-semibold text-[#333] mb-1.5">
                                                     Person to contact in case of emergency
                                                 </label>
+
                                                 <input type="text" id="emergency_person" name="emergency_person"
                                                     maxlength="50" pattern="[A-Za-zÑñ\s.'-]+"
-                                                    title="Only letters, spaces, apostrophe, period, and hyphen are allowed."
+                                                    data-required-message="Please enter the emergency contact person's name."
+                                                    data-pattern-message="Only letters, spaces, apostrophe, period, and hyphen are allowed."
                                                     class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
                                                     placeholder="Full name" required>
-
-                                                <p id="emergency_person_feedback"
-                                                    class="field-help-text text-[#9e9690]">
-                                                    Only letters, spaces, apostrophe, period, and hyphen are allowed.
-                                                </p>
                                             </div>
 
-                                            <div>
+                                            <div data-global-field>
                                                 <label class="block text-xs font-semibold text-[#333] mb-1.5">
                                                     Contact Number
                                                 </label>
+
                                                 <input type="tel" id="emergency_number" name="emergency_number"
                                                     inputmode="numeric" autocomplete="tel" maxlength="13"
+                                                    data-required-message="Please enter an emergency contact number."
                                                     class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full"
                                                     placeholder="09xx xxx xxxx" required>
-                                                <p id="emergency_number_feedback"
-                                                    class="field-help-text text-[#9e9690]">
-                                                    Format: 09xx xxx xxxx
-                                                </p>
                                             </div>
 
-                                            <div>
+                                            <div data-global-field>
                                                 <label class="block text-xs font-semibold text-[#333] mb-1.5">
                                                     Relation to Patient <span class="required-star">*</span>
                                                 </label>
                                                 <select id="emergency_relation" name="emergency_relation"
-                                                    class="js-custom-select form-select-custom"
-                                                    data-placeholder="Select relation" required>
+                                                    class="js-custom-select" data-placeholder="Select relation"
+                                                    data-required-message="Please select the patient's relation."
+                                                    required>
                                                     <option value="" disabled selected>Select relation</option>
                                                     <option value="Mother">Mother</option>
                                                     <option value="Father">Father</option>
@@ -1050,7 +1157,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </label>
 
                                             {{-- Hidden file input only. No upload UI for walk-in.
-                                            The drawn signature from the canvas will be converted to PNG and attached
+                                            The drawn signature from the canvas will be converted to PNG and
+                                            attached
                                             here.
                                             --}}
                                             <input type="file" name="patient_signature" id="patient_signature"
@@ -1058,7 +1166,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
                                             <div class="signature-methods-grid signature-drawing-only">
                                                 <div class="signature-draw-card">
-                                                    <p class="signature-draw-title">Draw the patient's signature here
+                                                    <p class="signature-draw-title">Draw the patient's signature
+                                                        here
                                                     </p>
 
                                                     <div class="signature-pad-wrap">
@@ -1114,215 +1223,219 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                 </div>
 
                             </div>
+
+                            <div class="step-content hidden" id="step5">
+                                <div id="summarySection">
+                                    <div class="booking-step-header">
+                                        <p class="booking-step-eyebrow">Step 5 of 5</p>
+                                        <h2 class="booking-step-title">Review Your Information</h2>
+                                        <p class="booking-step-subtitle">
+                                            Please review all the information you provided before proceeding to
+                                            final
+                                            confirmation.
+                                        </p>
+                                    </div>
+
+                                    <div id="summaryBox" class="space-y-4"></div>
+
+                                    <div class="flex justify-center gap-3 mt-8 nav-btns-row">
+                                        <button type="button" id="summaryBackBtn"
+                                            class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-6 py-2.5 text-sm font-semibold text-[#5c5550] bg-transparent">
+                                            <i class="fa-solid fa-chevron-left text-xs"></i> Back
+                                        </button>
+                                        <button type="button" id="goToConfirmationBtn"
+                                            class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-6 py-2.5 text-sm font-bold">
+                                            Proceed to Confirm <i class="fa-solid fa-chevron-right text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div id="confirmationSection" class="hidden">
+                                    <div class="booking-step-header">
+                                        <p class="booking-step-eyebrow">Step 5 of 5</p>
+                                        <h2 class="booking-step-title">Final Confirmation</h2>
+                                        <p class="booking-step-subtitle">
+                                            Confirm that the information is accurate and that you accept the clinic
+                                            terms
+                                            and privacy policy.
+                                        </p>
+                                    </div>
+
+                                    <div class="section-card mb-2">
+                                        <div class="flex items-start gap-2 mb-4">
+                                            <i class="fa-solid fa-shield-halved text-[#8B0000] mt-0.5"></i>
+                                            <p class="text-sm text-[#5c5550]">
+                                                By submitting, you confirm that all the information provided is
+                                                accurate
+                                                and
+                                                complete.
+                                            </p>
+                                        </div>
+                                        <label
+                                            class="confirm-checkbox-wrap flex items-start gap-3 p-4 rounded-xl border border-[#e8e2dd] bg-[#fafaf8] cursor-pointer">
+                                            <input id="finalConfirm" type="checkbox"
+                                                class="w-5 h-5 rounded border-2 border-[#e8e2dd] bg-white cursor-pointer flex-shrink-0 mt-0.5 accent-[#8B0000]"
+                                                required>
+                                            <span class="text-sm text-[#1a1410] leading-relaxed">
+                                                I have reviewed my dental and medical information and I accept the
+                                                <a href="/privacy-policy"
+                                                    class="text-[#8B0000] hover:underline font-semibold">Privacy
+                                                    Policy</a>
+                                                and
+                                                <a href="/terms-of-service"
+                                                    class="text-[#8B0000] hover:underline font-semibold">Terms of
+                                                    Service</a>.
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div class="flex justify-center gap-3 mt-8 nav-btns-row">
+                                        <button type="button" id="confirmBackBtn"
+                                            class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-6 py-2.5 text-sm font-semibold text-[#5c5550] bg-transparent">
+                                            <i class="fa-solid fa-chevron-left text-xs"></i> Back
+                                        </button>
+                                        <button type="submit" id="finalSubmitBtn"
+                                            class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-6 py-2.5 text-sm font-bold">
+                                            <i class="fa-solid fa-play"></i>
+                                            Start Procedure
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="navBtns" class="walkin-form-navigation nav-btns-row">
+                                <button type="button" id="prevBtn" style="display:none;"
+                                    class="btn-secondary-custom walkin-nav-btn walkin-nav-prev">
+                                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                                    <span>Previous</span>
+                                </button>
+
+                                <button type="button" id="nextBtn"
+                                    class="btn-primary-custom walkin-nav-btn walkin-nav-next">
+                                    <span>Next</span>
+                                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                                </button>
+                            </div>
+                        </form>
                     </div>
+                </div>
 
-                    <div class="step-content hidden" id="step5">
-                        <div id="summarySection">
-                            <div class="booking-step-header">
-                                <p class="booking-step-eyebrow">Step 5 of 5</p>
-                                <h2 class="booking-step-title">Review Your Information</h2>
-                                <p class="booking-step-subtitle">
-                                    Please review all the information you provided before proceeding to
-                                    final
-                                    confirmation.
-                                </p>
-                            </div>
+                <div id="miniTab" class="mini-tab">
+                    <i class="fa-solid fa-circle-exclamation text-red-400" aria-hidden="true"></i>
+                    <span id="miniTabText">Please complete all required fields.</span>
+                </div>
 
-                            <div id="summaryBox" class="space-y-4"></div>
-
-                            <div class="flex justify-center gap-3 mt-8 nav-btns-row">
-                                <button type="button" id="summaryBackBtn"
-                                    class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-6 py-2.5 text-sm font-semibold text-[#5c5550] bg-transparent">
-                                    <i class="fa-solid fa-chevron-left text-xs"></i> Back
-                                </button>
-                                <button type="button" id="goToConfirmationBtn"
-                                    class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-6 py-2.5 text-sm font-bold">
-                                    Proceed to Confirm <i class="fa-solid fa-chevron-right text-xs"></i>
-                                </button>
-                            </div>
+                <dialog id="introBookingModal" class="m-auto w-[calc(100vw-1.5rem)] max-w-[620px]">
+                    <div class="intro-booking-modal-panel">
+                        <div class="intro-booking-modal-hero">
+                            <p class="intro-booking-modal-eyebrow">Dentist Walk-in Workflow</p>
+                            <h2 class="intro-booking-modal-title">Prepare the walk-in patient for treatment.</h2>
+                            <p class="intro-booking-modal-subtitle">
+                                Complete the patient intake, service selection, clinical history, and signature before
+                                starting
+                                the
+                                procedure.
+                            </p>
                         </div>
 
-                        <div id="confirmationSection" class="hidden">
-                            <div class="booking-step-header">
-                                <p class="booking-step-eyebrow">Step 5 of 5</p>
-                                <h2 class="booking-step-title">Final Confirmation</h2>
-                                <p class="booking-step-subtitle">
-                                    Confirm that the information is accurate and that you accept the clinic
-                                    terms
-                                    and privacy policy.
-                                </p>
+                        <div class="intro-booking-modal-body">
+                            <div class="intro-step-strip">
+                                <div class="intro-step-pill">1<span>Patient</span></div>
+                                <div class="intro-step-pill">2<span>Service</span></div>
+                                <div class="intro-step-pill">3<span>Dental</span></div>
+                                <div class="intro-step-pill">4<span>Medical</span></div>
+                                <div class="intro-step-pill">5<span>Start</span></div>
                             </div>
 
-                            <div class="section-card mb-2">
-                                <div class="flex items-start gap-2 mb-4">
-                                    <i class="fa-solid fa-shield-halved text-[#8B0000] mt-0.5"></i>
-                                    <p class="text-sm text-[#5c5550]">
-                                        By submitting, you confirm that all the information provided is
-                                        accurate
-                                        and
-                                        complete.
+                            <div class="intro-checklist">
+                                <div class="intro-check-item">
+                                    <div class="intro-check-icon"><i class="fa-solid fa-check"></i></div>
+                                    <p>Select an existing patient or create a guest record for today's walk-in visit.
                                     </p>
                                 </div>
-                                <label
-                                    class="confirm-checkbox-wrap flex items-start gap-3 p-4 rounded-xl border border-[#e8e2dd] bg-[#fafaf8] cursor-pointer">
-                                    <input id="finalConfirm" type="checkbox"
-                                        class="w-5 h-5 rounded border-2 border-[#e8e2dd] bg-white cursor-pointer flex-shrink-0 mt-0.5 accent-[#8B0000]"
-                                        required>
-                                    <span class="text-sm text-[#1a1410] leading-relaxed">
-                                        I have reviewed my dental and medical information and I accept the
-                                        <a href="/privacy-policy"
-                                            class="text-[#8B0000] hover:underline font-semibold">Privacy
-                                            Policy</a>
-                                        and
-                                        <a href="/terms-of-service"
-                                            class="text-[#8B0000] hover:underline font-semibold">Terms of
-                                            Service</a>.
-                                    </span>
-                                </label>
+                                <div class="intro-check-item">
+                                    <div class="intro-check-icon"><i class="fa-solid fa-phone-volume"></i></div>
+                                    <p>Choose the requested dental service and complete the patient's dental and medical
+                                        history.
+                                    </p>
+                                </div>
+                                <div class="intro-check-item">
+                                    <div class="intro-check-icon"><i class="fa-solid fa-signature"></i></div>
+                                    <p>Ask the patient to review the information and provide a drawn signature.</p>
+                                </div>
+                                <div class="intro-check-item">
+                                    <div class="intro-check-icon"><i class="fa-solid fa-list-check"></i></div>
+                                    <p>Verify the intake summary before starting the dental procedure.</p>
+                                </div>
                             </div>
 
-                            <div class="flex justify-center gap-3 mt-8 nav-btns-row">
-                                <button type="button" id="confirmBackBtn"
-                                    class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-6 py-2.5 text-sm font-semibold text-[#5c5550] bg-transparent">
-                                    <i class="fa-solid fa-chevron-left text-xs"></i> Back
+                            <div class="intro-modal-actions">
+                                <button type="button" id="introStartBtn" class="intro-action-btn intro-action-primary">
+                                    <i class="fa-solid fa-play"></i>
+                                    <span>Begin Walk-in Intake</span>
                                 </button>
-                                <button type="button" id="finalSubmitBtn"
-                                    class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-6 py-2.5 text-sm font-bold">
-                                    <i class="fa-solid fa-play"></i> Start Procedure
+
+                                <button type="button" id="introContinueDraftBtn"
+                                    class="hidden intro-action-btn intro-action-secondary">
+                                    <i class="fa-solid fa-clock-rotate-left"></i>
+                                    <span>Continue Walk-in Draft</span>
                                 </button>
+
+                                <a href="{{ route('dentist.dentist.appointments') }}"
+                                    class="intro-action-btn intro-action-muted">
+                                    <i class="fa-solid fa-house"></i>
+                                    <span>Back to Appointments</span>
+                                </a>
                             </div>
                         </div>
                     </div>
-                </div>
+                </dialog>
 
-                <div id="navBtns" class="walkin-form-navigation nav-btns-row">
-                    <button type="button" id="prevBtn" style="display:none;"
-                        class="btn-secondary-custom walkin-nav-btn walkin-nav-prev">
-                        <i class="fa-solid fa-chevron-left text-xs"></i>
-                        <span>Previous</span>
-                    </button>
+                <dialog id="confirmModal"
+                    class="border-0 p-0 rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.25)] max-w-[480px] w-[calc(100vw-2rem)]">
+                    <div class="bg-[#8B0000] px-8 py-10 text-center">
+                        <div
+                            class="confirm-modal-icon w-16 h-16 rounded-full bg-white/15 flex items-center justify-center mx-auto mb-6">
+                            <i class="fa-solid fa-calendar-check text-white text-2xl"></i>
+                        </div>
 
-                    <button type="button" id="nextBtn" class="btn-primary-custom walkin-nav-btn walkin-nav-next">
-                        <span>Next</span>
-                        <i class="fa-solid fa-chevron-right text-xs"></i>
-                    </button>
-                </div>
-                </form>
+                        <h2 class="confirm-modal-title text-2xl font-extrabold text-white mb-4">
+                            Appointment Confirmed!
+                        </h2>
+
+                        <p id="confirmMessage" class="confirm-modal-message text-white/85 text-sm leading-7 mb-6"></p>
+
+                        <button type="button" id="okBtn" class="confirm-modal-button">
+                            <i class="fa-solid fa-play"></i>
+                            Start Procedure
+                        </button>
+                    </div>
+                </dialog>
+
+                <dialog id="leaveModal"
+                    class="m-auto border-0 p-0 rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.25)] max-w-[440px] w-[calc(100vw-2rem)]">
+                    <div class="bg-[#8B0000] px-6 py-5">
+                        <h3 class="text-lg font-bold text-white mb-0.5">Leave this page?</h3>
+                        <p class="text-sm text-white/80">Your appointment form has unsaved changes. You can save your
+                            draft,
+                            discard it, or continue editing.</p>
+                    </div>
+                    <div class="bg-white px-6 py-5 flex justify-end gap-3 flex-wrap">
+                        <button type="button" id="cancelLeaveBtn"
+                            class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-4 py-2 text-sm font-semibold text-[#5c5550] bg-transparent">
+                            Cancel
+                        </button>
+                        <button type="button" id="discardDraftBtn"
+                            class="btn-secondary-custom inline-flex items-center gap-2 border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 rounded-xl px-4 py-2 text-sm font-semibold transition-colors">
+                            Discard
+                        </button>
+                        <button type="button" id="saveDraftBtn"
+                            class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-5 py-2 text-sm font-bold">
+                            Save Draft
+                        </button>
+                    </div>
+                </dialog>
             </div>
         </div>
-    </div>
-
-    <div id="miniTab" class="mini-tab">
-        <i class="fa-solid fa-circle-exclamation text-red-400" aria-hidden="true"></i>
-        <span id="miniTabText">Please complete all required fields.</span>
-    </div>
-
-    <dialog id="introBookingModal" class="m-auto w-[calc(100vw-1.5rem)] max-w-[620px]">
-        <div class="intro-booking-modal-panel">
-            <div class="intro-booking-modal-hero">
-                <p class="intro-booking-modal-eyebrow">Dentist Walk-in Workflow</p>
-                <h2 class="intro-booking-modal-title">Prepare the walk-in patient for treatment.</h2>
-                <p class="intro-booking-modal-subtitle">
-                    Complete the patient intake, service selection, clinical history, and signature before starting the
-                    procedure.
-                </p>
-            </div>
-
-            <div class="intro-booking-modal-body">
-                <div class="intro-step-strip">
-                    <div class="intro-step-pill">1<span>Patient</span></div>
-                    <div class="intro-step-pill">2<span>Service</span></div>
-                    <div class="intro-step-pill">3<span>Dental</span></div>
-                    <div class="intro-step-pill">4<span>Medical</span></div>
-                    <div class="intro-step-pill">5<span>Start</span></div>
-                </div>
-
-                <div class="intro-checklist">
-                    <div class="intro-check-item">
-                        <div class="intro-check-icon"><i class="fa-solid fa-check"></i></div>
-                        <p>Select an existing patient or create a guest record for today's walk-in visit.</p>
-                    </div>
-                    <div class="intro-check-item">
-                        <div class="intro-check-icon"><i class="fa-solid fa-phone-volume"></i></div>
-                        <p>Choose the requested dental service and complete the patient's dental and medical history.
-                        </p>
-                    </div>
-                    <div class="intro-check-item">
-                        <div class="intro-check-icon"><i class="fa-solid fa-signature"></i></div>
-                        <p>Ask the patient to review the information and provide a drawn signature.</p>
-                    </div>
-                    <div class="intro-check-item">
-                        <div class="intro-check-icon"><i class="fa-solid fa-list-check"></i></div>
-                        <p>Verify the intake summary before starting the dental procedure.</p>
-                    </div>
-                </div>
-
-                <div class="intro-modal-actions">
-                    <button type="button" id="introStartBtn" class="intro-action-btn intro-action-primary">
-                        <i class="fa-solid fa-play"></i>
-                        <span>Begin Walk-in Intake</span>
-                    </button>
-
-                    <button type="button" id="introContinueDraftBtn"
-                        class="hidden intro-action-btn intro-action-secondary">
-                        <i class="fa-solid fa-clock-rotate-left"></i>
-                        <span>Continue Walk-in Draft</span>
-                    </button>
-
-                    <a href="{{ route('dentist.dentist.appointments') }}" class="intro-action-btn intro-action-muted">
-                        <i class="fa-solid fa-house"></i>
-                        <span>Back to Appointments</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </dialog>
-
-    <dialog id="confirmModal"
-        class="border-0 p-0 rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.25)] max-w-[480px] w-[calc(100vw-2rem)]">
-        <div class="bg-[#8B0000] px-8 py-10 text-center">
-            <div
-                class="confirm-modal-icon w-16 h-16 rounded-full bg-white/15 flex items-center justify-center mx-auto mb-6">
-                <i class="fa-solid fa-calendar-check text-white text-2xl"></i>
-            </div>
-
-            <h2 class="confirm-modal-title text-2xl font-extrabold text-white mb-4">
-                Appointment Confirmed!
-            </h2>
-
-            <p id="confirmMessage" class="confirm-modal-message text-white/85 text-sm leading-7 mb-6"></p>
-
-            <button type="button" id="okBtn"
-                class="confirm-modal-button bg-white text-[#8B0000] border-0 px-8 py-2.5 rounded-xl font-bold text-sm cursor-pointer transition hover:scale-[1.03] hover:shadow-lg active:scale-[0.98]">
-                Back to Appointments
-            </button>
-        </div>
-    </dialog>
-
-    <dialog id="leaveModal"
-        class="m-auto border-0 p-0 rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.25)] max-w-[440px] w-[calc(100vw-2rem)]">
-        <div class="bg-[#8B0000] px-6 py-5">
-            <h3 class="text-lg font-bold text-white mb-0.5">Leave this page?</h3>
-            <p class="text-sm text-white/80">Your appointment form has unsaved changes. You can save your draft,
-                discard it, or continue editing.</p>
-        </div>
-        <div class="bg-white px-6 py-5 flex justify-end gap-3 flex-wrap">
-            <button type="button" id="cancelLeaveBtn"
-                class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-4 py-2 text-sm font-semibold text-[#5c5550] bg-transparent">
-                Cancel
-            </button>
-            <button type="button" id="discardDraftBtn"
-                class="btn-secondary-custom inline-flex items-center gap-2 border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 rounded-xl px-4 py-2 text-sm font-semibold transition-colors">
-                Discard
-            </button>
-            <button type="button" id="saveDraftBtn"
-                class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-5 py-2 text-sm font-bold">
-                Save Draft
-            </button>
-        </div>
-    </dialog>
-    </div>
-    </div>
 </main>
 
 @endsection
@@ -1332,11 +1445,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
 <script>
     const diseaseLabelByCode = @json($diseases -> pluck('label', 'code'));
-    const isFemalePatient = @json($isFemalePatient);
     const DRAFT_KEY = "dentistWalkInDraft:v1";
-
-    const appointmentCountsPerDay = @json($appointmentCountsPerDay ?? []);
-    const MAX_SLOTS_PER_DAY = 5;
 
     let selectedWalkInPatient = null;
 
@@ -1352,6 +1461,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     const selectedPatientBox = document.getElementById("selectedPatientBox");
     const selectedPatientName = document.getElementById("selectedPatientName");
     const selectedPatientMeta = document.getElementById("selectedPatientMeta");
+    const clearSelectedPatientBtn = document.getElementById("clearSelectedPatientBtn");
 
     const createGuestBtn = document.getElementById("createGuestBtn");
     const guestName = document.getElementById("guestName");
@@ -1367,7 +1477,9 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             if (!enabled) {
                 input.required = false;
                 input.value = "";
-                input.classList.remove("input-invalid", "input-valid", "border-red-500");
+                window.clearFormInputValidation?.(
+                    input
+                );
             }
         });
 
@@ -1378,14 +1490,117 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
     [guestName, guestEmail, guestPhone].forEach(input => {
         input?.addEventListener("input", () => {
-            if (patientModeInput?.value === "guest" && selectedPatientId?.value) {
-                clearSelectedPatientUI();
+            if (
+                patientModeInput?.value === "guest" &&
+                selectedPatientId?.value
+            ) {
+                clearSelectedPatientUI({
+                    clearSearch: false,
+                    reloadPatients: false,
+                });
             }
         });
     });
 
-    function clearSelectedPatientUI() {
+    const forWomenSection =
+        document.getElementById(
+            "forWomenSection"
+        );
+
+    const nonFemaleDefaults =
+        document.getElementById(
+            "nonFemaleDefaults"
+        );
+
+    const womenFieldNames = [
+        "pregnant",
+        "nursing",
+        "birth_control",
+    ];
+
+    function normalizePatientGender(
+        gender
+    ) {
+        return String(gender || "")
+            .trim()
+            .toLowerCase();
+    }
+
+    function isFemaleGender(
+        gender
+    ) {
+        const normalizedGender =
+            normalizePatientGender(
+                gender
+            );
+
+        return [
+            "female",
+            "f",
+            "woman",
+        ].includes(
+            normalizedGender
+        );
+    }
+
+    function updateWomenSection(
+        gender
+    ) {
+        const showWomenSection =
+            isFemaleGender(
+                gender
+            );
+
+        forWomenSection
+            ?.classList.toggle(
+                "hidden",
+                !showWomenSection
+            );
+
+        if (nonFemaleDefaults) {
+            nonFemaleDefaults.hidden =
+                showWomenSection;
+
+            nonFemaleDefaults
+                .querySelectorAll("input")
+                .forEach(input => {
+                    input.disabled =
+                        showWomenSection;
+                });
+        }
+
+        womenFieldNames.forEach(name => {
+            const radios =
+                document.querySelectorAll(
+                    `input[type="radio"][name="${name}"]`
+                );
+
+            radios.forEach((radio, index) => {
+                radio.disabled =
+                    !showWomenSection;
+
+                radio.required =
+                    showWomenSection &&
+                    index === 0;
+
+                if (!showWomenSection) {
+                    radio.checked = false;
+
+                    window
+                        .clearFormInputValidation?.(
+                            radio
+                        );
+                }
+            });
+        });
+    }
+
+    function clearSelectedPatientUI({
+        clearSearch = true,
+        reloadPatients = true, } = {}) {
+
         selectedWalkInPatient = null;
+        updateWomenSection(null);
 
         if (selectedPatientId) {
             selectedPatientId.value = "";
@@ -1399,18 +1614,66 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             selectedPatientMeta.textContent = "";
         }
 
-        selectedPatientBox?.setAttribute("hidden", "hidden");
+        selectedPatientBox?.setAttribute(
+            "hidden",
+            "hidden"
+        );
 
-        document.querySelectorAll(".patient-result").forEach(result => {
-            result.classList.remove("selected");
+        document
+            .querySelectorAll(
+                ".patient-record-card"
+            )
+            .forEach(card => {
+                card.classList.remove(
+                    "is-selected"
+                );
 
-            const pill = result.querySelector(".patient-select-pill");
-            if (pill) {
-                pill.classList.remove("chosen");
-                pill.innerHTML = `<i class="fa-solid fa-plus"></i> Select`;
-            }
-        });
+                const checkbox =
+                    card.querySelector(
+                        ".patient-card-checkbox"
+                    );
+
+                if (checkbox) {
+                    checkbox.checked = false;
+                }
+            });
+
+        if (clearSearch && patientSearch) {
+            patientSearch.value = "";
+
+            window.syncInputClearButton?.(
+                patientSearch
+            );
+        }
+
+        window.clearGlobalGroupError?.(
+            document.querySelector(
+                ".walkin-account-card"
+            ),
+            "walkin-patient"
+        );
+
+        if (reloadPatients) {
+            patientCurrentPage = 1;
+
+            loadPatients("", true);
+        }
+
+        markFormDirty();
     }
+
+    clearSelectedPatientBtn
+        ?.addEventListener(
+            "click",
+            () => {
+                clearSelectedPatientUI({
+                    clearSearch: true,
+                    reloadPatients: true,
+                });
+
+                patientSearch?.focus();
+            }
+        );
 
     function setPatientMode(mode, shouldClearSelected = false) {
         const normalizedMode = mode === "guest" ? "guest" : "existing";
@@ -1430,7 +1693,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         setGuestFieldsEnabled(isGuest);
 
         if (isGuest && shouldClearSelected) {
-            clearSelectedPatientUI();
+            clearSelectedPatientUI({
+                clearSearch: false,
+                reloadPatients: false,
+            });
         }
 
         if (!isGuest) {
@@ -1445,6 +1711,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             ...patient,
             mode: "existing",
         };
+
+        updateWomenSection(
+            patient.gender
+        );
 
         setPatientMode("existing", false);
 
@@ -1473,12 +1743,18 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
         markFormDirty();
 
-        window.showToast?.({
-            type: "success",
-            title: "Patient Selected",
-            message:
-                `${patient.name || "Patient"} was selected successfully.`,
-            duration: 3500,
+        window.clearGlobalGroupError?.(
+            document.querySelector(
+                ".walkin-account-card"
+            ),
+            "walkin-patient"
+        );
+
+        requestAnimationFrame(() => {
+            selectedPatientBox?.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+            });
         });
     }
 
@@ -1488,13 +1764,17 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         const phone = guestPhone?.value?.trim() || "";
 
         if (!name) {
-            showMiniTab("Please enter the guest full name.");
-            guestName?.classList.add("input-invalid", "border-red-500");
-            guestName?.focus();
+            window.validateFormInputField?.(
+                guestName
+            );
+
+            window.focusGlobalInvalidField?.(
+                guestName
+            );
             return false;
         }
 
-        guestName?.classList.remove("input-invalid", "border-red-500");
+        window.clearFormInputValidation?.(guestName);
 
         selectedWalkInPatient = {
             id: null,
@@ -1504,6 +1784,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             phone,
             type: "Guest Patient",
         };
+
+        updateWomenSection(null);
 
         if (selectedPatientId) {
             selectedPatientId.value = "";
@@ -1571,6 +1853,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                 type: data.patient.type || "Guest",
             };
 
+            updateWomenSection(
+                data.patient.gender
+            );
+
             if (selectedPatientId) {
                 selectedPatientId.value = data.patient.id;
             }
@@ -1618,7 +1904,37 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     });
 
     let patientSearchTimer = null;
-    let patientSearchLoadedOnFocus = false;
+
+    let patientCurrentPage = 1;
+    let patientPageSize = 10;
+
+    let patientPaginationMeta = {
+        currentPage: 1,
+        lastPage: 1,
+        total: 0,
+        from: null,
+        to: null,
+    };
+
+    const patientEntriesInfo =
+        document.getElementById(
+            'patientEntriesInfo'
+        );
+
+    const patientPaginationBar =
+        document.getElementById(
+            'patientPaginationBar'
+        );
+
+    const patientPaginationInfo =
+        document.getElementById(
+            'patientPaginationInfo'
+        );
+
+    const patientPagination =
+        document.getElementById(
+            'patientPagination'
+        );
 
     let patientLoadingMessageTimer = null;
 
@@ -1650,8 +1966,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                 : "";
 
         patientResults.innerHTML = `
-            <div class="empty-state walkin-patient-state ${loading ? "is-loading" : ""}">
-                <div class="patient-empty-icon walkin-patient-state-icon">
+            <div class="empty-state ${loading ? "is-loading" : ""}">
+                <div class="patient-empty-icon">
                     <i class="fa-solid ${icon} ${loading ? "fa-spin" : ""}"
                         aria-hidden="true"></i>
                 </div>
@@ -1748,80 +2064,613 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             .replaceAll("'", "&#039;");
     }
 
-    function renderPatients(patients) {
-        if (!patientResults) return;
+    function safePatientUrl(value) {
+        const rawValue =
+            String(value ?? '').trim();
 
-        if (!patients.length) {
-            renderPatientMessage(
-                "Try another name, ID, or email address.",
-                {
-                    title: "No patient record found",
-                    icon: "fa-user-slash",
+        if (!rawValue) {
+            return '';
+        }
+
+        try {
+            const url = new URL(
+                rawValue,
+                window.location.origin
+            );
+
+            if (
+                !['http:', 'https:']
+                    .includes(url.protocol)
+            ) {
+                return '';
+            }
+
+            return url.href;
+        } catch {
+            return '';
+        }
+    }
+
+    function createPatientPageButton({
+        label,
+        page,
+        current = false,
+        disabled = false,
+        ariaLabel = '',
+    }) {
+        const element =
+            document.createElement(
+                disabled || current
+                    ? 'button'
+                    : 'button'
+            );
+
+        element.type = 'button';
+
+        element.className = disabled
+            ? 'global-page-disabled'
+            : current
+                ? 'global-page-current'
+                : 'global-page-btn';
+
+        element.innerHTML = label;
+
+        if (ariaLabel) {
+            element.setAttribute(
+                'aria-label',
+                ariaLabel
+            );
+        }
+
+        if (current) {
+            element.setAttribute(
+                'aria-current',
+                'page'
+            );
+        }
+
+        element.disabled =
+            disabled || current;
+
+        if (!disabled && !current) {
+            element.addEventListener(
+                'click',
+                () => {
+                    patientCurrentPage = page;
+
+                    loadPatients(
+                        patientSearch?.value.trim() || '',
+                        !(patientSearch?.value.trim())
+                    );
+
+                    patientResults?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                    });
                 }
             );
+        }
+
+        return element;
+    }
+
+    function renderPatientPagination() {
+        if (
+            !patientPagination ||
+            !patientPaginationBar
+        ) {
             return;
         }
 
-        patientResults.innerHTML = "";
+        patientPagination.replaceChildren();
 
-        patients.forEach(patient => {
-            const item = document.createElement("button");
-            item.type = "button";
-            item.className = "patient-result";
-            item.dataset.patientId = patient.id;
+        const {
+            currentPage,
+            lastPage,
+            total,
+            from,
+            to,
+        } = patientPaginationMeta;
 
-            const patientName = patient.name || "Unnamed Patient";
-            const patientType = patient.type || "Patient";
-            const patientEmail = patient.email || "";
-            const studentNumber = patient.student_number || "";
-            const program = patient.program || "";
+        if (!total) {
+            patientPaginationBar.hidden = true;
+            return;
+        }
 
-            const metaParts = [
-                patientType,
-                studentNumber,
-                program,
-                patientEmail,
-            ].filter(Boolean);
+        patientPaginationBar.hidden = false;
 
-            item.innerHTML = `
-            <span class="patient-avatar">${safePatientText(getPatientInitials(patientName))}</span>
+        if (patientEntriesInfo) {
+            patientEntriesInfo.innerHTML =
+                `Showing <strong>${from}</strong>–` +
+                `<strong>${to}</strong> of ` +
+                `<strong>${total}</strong> patients`;
+        }
 
-            <span class="patient-result-main">
-                <strong class="patient-result-name">${safePatientText(patientName)}</strong>
-                <small class="patient-result-meta">${safePatientText(metaParts.join(" - "))}</small>
+        if (patientPaginationInfo) {
+            patientPaginationInfo.textContent =
+                `Page ${currentPage} of ${lastPage}`;
+        }
+
+        patientPagination.appendChild(
+            createPatientPageButton({
+                label:
+                    '<i class="fa-solid fa-chevron-left global-page-icon"></i>',
+                page:
+                    Math.max(
+                        1,
+                        currentPage - 1
+                    ),
+                disabled:
+                    currentPage === 1,
+                ariaLabel: 'Previous page',
+            })
+        );
+
+        const pageWindow = 5;
+        const halfWindow =
+            Math.floor(pageWindow / 2);
+
+        let startPage = Math.max(
+            1,
+            currentPage - halfWindow
+        );
+
+        let endPage = Math.min(
+            lastPage,
+            startPage + pageWindow - 1
+        );
+
+        if (
+            endPage - startPage + 1 <
+            pageWindow
+        ) {
+            startPage = Math.max(
+                1,
+                endPage - pageWindow + 1
+            );
+        }
+
+        if (startPage > 1) {
+            patientPagination.appendChild(
+                createPatientPageButton({
+                    label: '1',
+                    page: 1,
+                    current:
+                        currentPage === 1,
+                })
+            );
+
+            if (startPage > 2) {
+                const ellipsis =
+                    document.createElement(
+                        'span'
+                    );
+
+                ellipsis.className =
+                    'global-page-ellipsis';
+
+                ellipsis.textContent = '…';
+
+                patientPagination.appendChild(
+                    ellipsis
+                );
+            }
+        }
+
+        for (
+            let page = startPage;
+            page <= endPage;
+            page += 1
+        ) {
+            patientPagination.appendChild(
+                createPatientPageButton({
+                    label: String(page),
+                    page,
+                    current:
+                        page === currentPage,
+                })
+            );
+        }
+
+        if (endPage < lastPage) {
+            if (endPage < lastPage - 1) {
+                const ellipsis =
+                    document.createElement(
+                        'span'
+                    );
+
+                ellipsis.className =
+                    'global-page-ellipsis';
+
+                ellipsis.textContent = '…';
+
+                patientPagination.appendChild(
+                    ellipsis
+                );
+            }
+
+            patientPagination.appendChild(
+                createPatientPageButton({
+                    label: String(lastPage),
+                    page: lastPage,
+                    current:
+                        currentPage === lastPage,
+                })
+            );
+        }
+
+        patientPagination.appendChild(
+            createPatientPageButton({
+                label:
+                    '<i class="fa-solid fa-chevron-right global-page-icon"></i>',
+                page:
+                    Math.min(
+                        lastPage,
+                        currentPage + 1
+                    ),
+                disabled:
+                    currentPage === lastPage,
+                ariaLabel: 'Next page',
+            })
+        );
+    }
+
+    function createPatientCard(patient) {
+        const card =
+            document.createElement(
+                'div'
+            );
+
+        card.setAttribute(
+            'role',
+            'button'
+        );
+
+        card.setAttribute(
+            'tabindex',
+            '0'
+        );
+
+        card.className = [
+            'table-record-card',
+            'patient-record-card',
+        ].join(' ');
+
+        card.dataset.patientId =
+            patient.id;
+
+        const patientName =
+            patient.name ||
+            'Unnamed Patient';
+
+        const patientType =
+            patient.type ||
+            'Patient';
+
+        const patientEmail =
+            patient.email || '';
+
+        const studentNumber =
+            patient.student_number || '';
+
+        const program =
+            patient.program || '';
+
+        const avatarUrl =
+            safePatientUrl(
+                patient.avatar_url
+            );
+
+        card.innerHTML = `
+        <span class="patient-avatar patient-avatar-md">
+    ${avatarUrl
+                ? `
+            <img
+                src="${safePatientText(
+                    avatarUrl
+                )}"
+                alt="${safePatientText(
+                    patientName
+                )}"
+                loading="lazy"
+            >
+        `
+                : `
+            <span>
+                ${safePatientText(
+                    getPatientInitials(
+                        patientName
+                    )
+                )}
+            </span>
+        `
+            }
+</span>
+
+        <span class="patient-card-content">
+            <span class="patient-card-header">
+                <strong class="patient-card-name">
+                    ${safePatientText(
+                patientName
+            )}
+                </strong>
+
+                <span class="table-status table-status-info">
+                    ${safePatientText(
+                patientType
+            )}
+                </span>
             </span>
 
-            <span class="patient-select-pill">
-                <i class="fa-solid fa-plus"></i>
-                Select
+            <span class="patient-card-meta">
+                ${studentNumber
+                ? `
+                            <span>
+                                <i class="fa-solid fa-id-card"></i>
+                                ${safePatientText(
+                    studentNumber
+                )}
+                            </span>
+                        `
+                : ''
+            }
+
+                ${program
+                ? `
+                            <span>
+                                <i class="fa-solid fa-graduation-cap"></i>
+                                ${safePatientText(
+                    program
+                )}
+                            </span>
+                        `
+                : ''
+            }
+
+                ${patientEmail
+                ? `
+                            <span>
+                                <i class="fa-solid fa-envelope"></i>
+                                ${safePatientText(
+                    patientEmail
+                )}
+                            </span>
+                        `
+                : ''
+            }
             </span>
-        `;
 
-            item.addEventListener("click", function () {
-                selectWalkInPatient(patient);
+            <label
+    class="patient-card-checkbox-wrap"
+    aria-label="Select ${safePatientText(patientName)}"
+>
+    <input
+        type="checkbox"
+        class="patient-card-checkbox"
+        aria-label="Select ${safePatientText(patientName)}"
+    >
+</label>
+    `;
 
-                document.querySelectorAll(".patient-result").forEach(result => {
-                    result.classList.remove("selected");
+        const patientCheckbox =
+            card.querySelector(
+                '.patient-card-checkbox'
+            );
 
-                    const pill = result.querySelector(".patient-select-pill");
-                    if (pill) {
-                        pill.classList.remove("chosen");
-                        pill.innerHTML = `<i class="fa-solid fa-plus"></i> Select`;
+        if (
+            String(selectedPatientId?.value) ===
+            String(patient.id)
+        ) {
+            card.classList.add(
+                'is-selected'
+            );
+
+            if (patientCheckbox) {
+                patientCheckbox.checked = true;
+            }
+        }
+
+        function selectPatientCard() {
+            document
+                .querySelectorAll(
+                    '.patient-record-card'
+                )
+                .forEach(item => {
+                    item.classList.remove(
+                        'is-selected'
+                    );
+
+                    const checkbox =
+                        item.querySelector(
+                            '.patient-card-checkbox'
+                        );
+
+                    if (checkbox) {
+                        checkbox.checked = false;
                     }
                 });
 
-                item.classList.add("selected");
+            selectWalkInPatient(patient);
 
-                const pill = item.querySelector(".patient-select-pill");
-                if (pill) {
-                    pill.classList.add("chosen");
-                    pill.innerHTML = `<i class="fa-solid fa-check"></i> Selected`;
+            card.classList.add(
+                'is-selected'
+            );
+
+            if (patientCheckbox) {
+                patientCheckbox.checked = true;
+            }
+        }
+
+        card.addEventListener(
+            'click',
+            event => {
+                if (
+                    event.target.closest(
+                        '.patient-card-checkbox-wrap'
+                    )
+                ) {
+                    return;
                 }
-            });
 
-            patientResults.appendChild(item);
-        });
+                selectPatientCard();
+            }
+        );
+
+        card.addEventListener(
+            'keydown',
+            event => {
+                if (
+                    event.key !== 'Enter' &&
+                    event.key !== ' '
+                ) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                selectPatientCard();
+            }
+        );
+
+        patientCheckbox?.addEventListener(
+            'change',
+            function (event) {
+                event.stopPropagation();
+
+                if (this.checked) {
+                    selectPatientCard();
+                    return;
+                }
+
+                card.classList.remove(
+                    'is-selected'
+                );
+
+                if (
+                    String(
+                        selectedPatientId?.value
+                    ) ===
+                    String(patient.id)
+                ) {
+                    clearSelectedPatientUI({
+                        clearSearch: false,
+                        reloadPatients: false,
+                    });
+                }
+            }
+        );
+
+        patientCheckbox?.addEventListener(
+            'click',
+            event => {
+                event.stopPropagation();
+            }
+        );
+
+        return card;
     }
+
+    function renderPatients(responseData) {
+        const patients =
+            Array.isArray(responseData?.data)
+                ? responseData.data
+                : [];
+
+        patientPaginationMeta = {
+            currentPage:
+                Number(
+                    responseData?.current_page
+                ) || 1,
+
+            lastPage:
+                Number(
+                    responseData?.last_page
+                ) || 1,
+
+            total:
+                Number(
+                    responseData?.total
+                ) || 0,
+
+            from:
+                responseData?.from ?? null,
+
+            to:
+                responseData?.to ?? null,
+        };
+
+        patientCurrentPage =
+            patientPaginationMeta.currentPage;
+
+        if (!patients.length) {
+            renderPatientMessage(
+                'Try another name, ID, or email address.',
+                {
+                    title:
+                        'No patient record found',
+                    icon:
+                        'fa-user-slash',
+                }
+            );
+
+            if (patientEntriesInfo) {
+                patientEntriesInfo.textContent =
+                    'Showing 0 patient records';
+            }
+
+            if (patientPaginationBar) {
+                patientPaginationBar.hidden =
+                    true;
+            }
+
+            return;
+        }
+
+        const grid =
+            document.createElement('div');
+
+        grid.className =
+            'table-record-grid patient-record-grid';
+
+        patients.forEach(patient => {
+            grid.appendChild(
+                createPatientCard(patient)
+            );
+        });
+
+        patientResults.replaceChildren(grid);
+
+        renderPatientPagination();
+    }
+
+    window.handleWalkInPatientPerPageChange =
+        function handleWalkInPatientPerPageChange(
+            value
+        ) {
+            const allowedPageSizes = [
+                10,
+                20,
+                50,
+                100,
+            ];
+
+            const requestedPageSize =
+                Number(value);
+
+            patientPageSize =
+                allowedPageSizes.includes(
+                    requestedPageSize
+                )
+                    ? requestedPageSize
+                    : 10;
+
+            patientCurrentPage = 1;
+
+            loadPatients(
+                patientSearch?.value.trim() || '',
+                !patientSearch?.value.trim()
+            );
+        };
 
     let patientSearchRequestId = 0;
 
@@ -1852,7 +2701,15 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                 params.set("show_all", "1");
             }
 
-            params.set("limit", "30");
+            params.set(
+                'page',
+                String(patientCurrentPage)
+            );
+
+            params.set(
+                'per_page',
+                String(patientPageSize)
+            );
 
             const response = await fetch(`{{ route('dentist.walk-in.search-patient') }}?${params.toString()}`, {
                 headers: {
@@ -1861,75 +2718,90 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                 },
             });
 
+            const responseData =
+                await response.json().catch(() => ({}));
+
             if (!response.ok) {
-                throw new Error(`Patient search failed. Status: ${response.status}`);
+                throw new Error(
+                    responseData?.debug ||
+                    responseData?.message ||
+                    `Patient search failed. Status: ${response.status}`
+                );
             }
 
-            const patients = await response.json();
-
-            if (requestId !== patientSearchRequestId) {
+            if (
+                requestId !==
+                patientSearchRequestId
+            ) {
                 return;
             }
 
             clearPatientLoadingMessageTimer();
-            renderPatients(Array.isArray(patients) ? patients : []);
+
+            renderPatients(responseData);
+
         } catch (error) {
-            if (requestId !== patientSearchRequestId) {
+            if (
+                requestId !==
+                patientSearchRequestId
+            ) {
                 return;
             }
 
             clearPatientLoadingMessageTimer();
+
+            console.error(
+                'Walk-in patient loading error:',
+                error
+            );
 
             renderPatientMessage(
+                error.message ||
                 "Check your connection, then search again.",
                 {
-                    title: "Unable to load patient records",
-                    icon: "fa-triangle-exclamation",
+                    title:
+                        "Unable to load patient records",
+                    icon:
+                        "fa-triangle-exclamation",
                 }
             );
         }
     }
 
-    patientSearch?.addEventListener("focus", function () {
-        const query = this.value.trim();
-
-        if (!query && !patientSearchLoadedOnFocus) {
-            patientSearchLoadedOnFocus = true;
-            loadPatients("", true);
+    function loadInitialPatientRecords() {
+        if (
+            !patientResults ||
+            patientResults.dataset
+                .initialPatientsLoaded === "true"
+        ) {
+            return;
         }
-    });
 
-    patientSearch?.addEventListener("click", function () {
-        const query = this.value.trim();
+        patientResults.dataset
+            .initialPatientsLoaded = "true";
 
-        if (!query && !patientSearchLoadedOnFocus) {
-            patientSearchLoadedOnFocus = true;
-            loadPatients("", true);
+        loadPatients("", true);
+    }
+
+    patientSearch?.addEventListener(
+        'input',
+        function () {
+            clearTimeout(patientSearchTimer);
+
+            const query =
+                this.value.trim();
+
+            patientCurrentPage = 1;
+
+            patientSearchTimer =
+                setTimeout(() => {
+                    loadPatients(
+                        query,
+                        !query
+                    );
+                }, 350);
         }
-    });
-
-    patientSearch?.addEventListener("input", function () {
-        clearTimeout(patientSearchTimer);
-
-        const query = this.value.trim();
-
-        patientSearchTimer = setTimeout(function () {
-            if (!query) {
-                patientSearchLoadedOnFocus = true;
-                loadPatients("", true);
-                return;
-            }
-
-            loadPatients(query, false);
-        }, 350);
-    });
-
-    patientSearch
-        ?.closest("[data-search-wrapper]")
-        ?.querySelector("[data-search-clear]")
-        ?.addEventListener("click", () => {
-            patientSearchLoadedOnFocus = true;
-        });
+    );
 
     function hasSavedDraft() {
         const raw = localStorage.getItem(DRAFT_KEY);
@@ -2011,35 +2883,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                 else el.value = value;
             });
         });
-        if (document.getElementById("emergency_relation")?.value === "Others") {
-            const other = document.getElementById("relation_other");
-            if (other) {
-                other.classList.remove("hidden");
-                other.setAttribute("required", "true");
-            }
-        }
-        const restoredDate = document.getElementById("appointment_date")?.value;
-        const restoredTime = document.getElementById("appointment_time")?.value;
-        if (restoredDate) {
-            const appointmentCount = appointmentCountsPerDay[restoredDate] || 0;
-            if (appointmentCount >= MAX_SLOTS_PER_DAY) {
-                showSlotFullWarning(restoredDate);
-            } else {
-                await selectDate(restoredDate);
-                if (restoredTime) {
-                    const restoredTimeChip = Array.from(document.querySelectorAll(".slot-chip")).find(c =>
-                        c.dataset.time === restoredTime && !c.classList.contains("disabled")
-                    );
 
-                    if (restoredTimeChip) {
-                        restoredTimeChip.click();
-                    } else {
-                        const timeInput = document.getElementById("appointment_time");
-                        if (timeInput) timeInput.value = "";
-                    }
-                }
-            }
-        }
         const relationSelect =
             document.getElementById("emergency_relation");
 
@@ -2057,14 +2901,13 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             selectGuestPatient(false);
         }
 
-        formIsDirty = true;
-    }
+        if (restoredMode !== "guest") {
+            updateWomenSection(
+                selectedWalkInPatient?.gender
+            );
+        }
 
-    function showInputError(input) {
-        if (!input) return;
-        input.classList.add("border-red-500");
-        input.style.animation = "shake 0.3s ease";
-        setTimeout(() => input.style.animation = "", 400);
+        formIsDirty = true;
     }
 
     let step = 0,
@@ -2168,9 +3011,64 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         }
     }
 
+    function validateCurrentWalkInStep(stepElement) {
+        if (!stepElement) {
+            return {
+                valid: true,
+                firstInvalid: null,
+            };
+        }
+
+        const fields = Array.from(
+            stepElement.querySelectorAll(
+                [
+                    "input:not([type='hidden'])",
+                    "select",
+                    "textarea",
+                ].join(",")
+            )
+        ).filter(field => {
+            return (
+                !field.disabled &&
+                field.type !== "button" &&
+                field.type !== "submit"
+            );
+        });
+
+        const checkedGroups = new Set();
+        let firstInvalid = null;
+
+        fields.forEach(field => {
+            if (field.type === "radio") {
+                if (checkedGroups.has(field.name)) {
+                    return;
+                }
+
+                checkedGroups.add(field.name);
+            }
+
+            const valid =
+                window.validateFormInputField?.(field) ??
+                field.checkValidity();
+
+            if (!valid && !firstInvalid) {
+                firstInvalid = field;
+            }
+        });
+
+        if (firstInvalid) {
+            window.focusGlobalInvalidField?.(
+                firstInvalid
+            );
+        }
+
+        return {
+            valid: !firstInvalid,
+            firstInvalid,
+        };
+    }
+
     function isStepComplete(s) {
-
-
         const stepEl = steps[s];
         if (!stepEl) return true;
 
@@ -2180,76 +3078,91 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
             if (mode === "guest") {
                 if (!guestName?.value?.trim()) {
-                    showMiniTab("Please enter the guest full name.");
-                    scrollToInvalidTarget(guestName || document.getElementById("patientAccountSection"));
+                    window.validateFormInputField?.(
+                        guestName
+                    );
+
+                    window.focusGlobalInvalidField?.(
+                        guestName
+                    );
+
                     return false;
                 }
 
                 if (!selectedPatientInput?.value) {
-                    showMiniTab("Please click Create guest account before proceeding.");
-                    scrollToInvalidTarget(createGuestBtn || document.getElementById("patientAccountSection"));
+                    showMiniTab(
+                        "Please click Create guest account before proceeding."
+                    );
+
+                    scrollToInvalidTarget(
+                        createGuestBtn ||
+                        document.getElementById(
+                            "patientAccountSection"
+                        )
+                    );
+
                     return false;
                 }
             } else if (!selectedPatientInput?.value) {
-                showMiniTab("Please select an existing patient first, or use Guest Onboarding.");
-                scrollToInvalidTarget(document.getElementById("patientAccountSection"));
+                const patientGroup =
+                    document.querySelector(
+                        ".walkin-account-card"
+                    );
+
+                window.showGlobalGroupError?.(
+                    patientGroup,
+                    "walkin-patient",
+                    "Please select an existing patient or use Guest Onboarding."
+                );
+
+                patientGroup?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                });
+
                 return false;
             }
         }
 
         if (s === 1) {
-            const selectedService = stepEl.querySelector('input[name="service_type"]:checked');
+            const serviceGroup =
+                stepEl.querySelector(
+                    ".service-step-grid"
+                );
+
+            const selectedService =
+                serviceGroup?.querySelector(
+                    'input[name="service_type"]:checked'
+                );
 
             if (!selectedService) {
-                showMiniTab("Please select a service type.");
-                scrollToInvalidTarget(stepEl.querySelector(".service-step-grid"));
+                window.showGlobalGroupError?.(
+                    serviceGroup,
+                    "service_type",
+                    "Please select a dental service."
+                );
+
+                serviceGroup?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                });
+
                 return false;
             }
+
+            window.clearGlobalGroupError?.(
+                serviceGroup,
+                "service_type"
+            );
         }
 
-        const fields = stepEl.querySelectorAll(
-            "input[required]:not([type='radio']):not([type='checkbox']):not([type='hidden']):not([type='file']), select[required], textarea[required]"
-        );
+        const validation =
+            validateCurrentWalkInStep(stepEl);
 
-        for (const input of fields) {
-            if (!input.value || !input.value.trim()) {
-                scrollToInvalidTarget(input);
-                return false;
-            }
-        }
-
-        const radios = stepEl.querySelectorAll("input[type='radio']");
-        if (radios.length) {
-            const groups = [...new Set([...radios].map(r => r.name))];
-
-            for (const name of groups) {
-                const checked = stepEl.querySelector(`input[name="${name}"]:checked`);
-                if (!checked) {
-                    const firstRadio = stepEl.querySelector(`input[name="${name}"]`);
-                    scrollToInvalidTarget(firstRadio);
-                    return false;
-                }
-            }
-        }
-        const person = stepEl.querySelector("#emergency_person");
-
-        if (person && !validateEmergencyPerson(true)) {
-            showMiniTab("This name is invalid. Please use letters only.");
-            scrollToInvalidTarget(person);
+        if (!validation.valid) {
             return false;
         }
 
-        const phone = stepEl.querySelector("#emergency_number");
-        if (phone) {
-            const digits = phone.value.replace(/\D/g, "");
-            if (!/^09\d{9}$/.test(digits)) {
-                showMiniTab("Please enter a valid contact number.");
-                phone.classList.add("input-invalid");
-                setPhoneFeedback("Enter a valid mobile number in the format 09xx xxx xxxx.", "error");
-                scrollToInvalidTarget(phone);
-                return false;
-            }
-        }
         if (s === 3) {
             const signatureInput = document.getElementById("patient_signature");
             const signatureBlock = document.querySelector(".signature-section-card") || signatureInput;
@@ -2272,12 +3185,18 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
     nextBtn?.addEventListener("click", () => {
         if (!isStepComplete(step)) {
-            showMiniTab("Please complete all required fields before proceeding.");
             return;
         }
-        if (!completedSteps.includes(step)) completedSteps.push(step);
-        showStep(Math.min(step + 1, steps.length - 1));
+
+        if (!completedSteps.includes(step)) {
+            completedSteps.push(step);
+        }
+
+        showStep(
+            Math.min(step + 1, steps.length - 1)
+        );
     });
+
     prevBtn?.addEventListener("click", () => showStep(Math.max(step - 1, 0)));
     document.getElementById("summaryBackBtn")?.addEventListener("click", () => showStep(3));
     document.getElementById("goToConfirmationBtn")?.addEventListener("click", () => {
@@ -2343,8 +3262,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     function markFormDirty() {
         formIsDirty = true;
     }
-
-    setupCharLimit("additional_concerns", "concernCount", 150);
 
     function buildSummary() {
         const form = document.getElementById("appointmentForm");
@@ -2494,11 +3411,29 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                                                                                                                                                                         ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
                                                                                                                                                                                     `)}
 
-    ${isFemalePatient ? subSection("For Women Only", `
-                                                                                                                                                                                        ${row("Pregnant", get("pregnant"))}
-                                                                                                                                                                                        ${row("Nursing", get("nursing"))}
-                                                                                                                                                                                        ${row("Birth Control Pills", get("birth_control"))}
-                                                                                                                                                                                    `) : ""}
+    ${isFemaleGender(
+            selectedWalkInPatient?.gender
+        )
+                ? subSection(
+                    "For Women Only",
+                    `
+            ${row(
+                        "Pregnant",
+                        get("pregnant")
+                    )}
+
+            ${row(
+                        "Nursing",
+                        get("nursing")
+                    )}
+
+            ${row(
+                        "Birth Control Pills",
+                        get("birth_control")
+                    )}
+        `
+                )
+                : ""}
 
     ${fullWidthSection("Medical Conditions", `
                                                                                                                                                                                         <b class="text-[#5c5550] dark:text-[#e5e5e5] font-semibold">Selected Conditions:</b> ${diseaseText}
@@ -2561,106 +3496,241 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         });
     }
 
-    const confirmModal = document.getElementById("confirmModal");
-    const confirmMessage = document.getElementById("confirmMessage");
-    const okBtn = document.getElementById("okBtn");
+    const confirmModal =
+        document.getElementById(
+            "confirmModal"
+        );
 
-    function showSlotFullWarning(date) {
-        const slotFullModal = document.getElementById("slotFullModal");
-        if (!slotFullModal) return;
+    const confirmMessage =
+        document.getElementById(
+            "confirmMessage"
+        );
 
-        const dateDisplay = new Date(date + "T00:00:00").toLocaleDateString("en-US", {
-            weekday: "short",
-            year: "numeric",
-            month: "short",
-            day: "numeric"
-        });
+    const okBtn =
+        document.getElementById(
+            "okBtn"
+        );
 
-        const msg = document.getElementById("slotFullMessage");
-        if (msg) {
-            msg.innerHTML =
-                `<strong>The appointment slots for ${dateDisplay} are fully booked.</strong><br>Please select a different date to continue with your booking.`;
-        }
+    const finalSubmitBtn =
+        document.getElementById(
+            "finalSubmitBtn"
+        );
 
-        slotFullModal.showModal();
-    }
+    const finalConfirm =
+        document.getElementById(
+            "finalConfirm"
+        );
 
-    const finalSubmitBtn = document.getElementById('finalSubmitBtn');
-    const finalConfirm = document.getElementById('finalConfirm');
+    const appointmentForm =
+        document.getElementById(
+            "appointmentForm"
+        );
+
+    const appointmentsRedirectUrl =
+        @json(
+            route(
+                'dentist.dentist.appointments'
+            )
+        );
+
+    let appointmentSubmitRunning = false;
 
     function replayConfirmModalAnimation() {
-        if (!confirmModal) return;
+        if (!confirmModal) {
+            return;
+        }
 
-        confirmModal.classList.remove("confirm-modal-animate");
+        confirmModal.classList.remove(
+            "confirm-modal-animate"
+        );
+
         void confirmModal.offsetWidth;
-        confirmModal.classList.add("confirm-modal-animate");
 
-        confirmModal.querySelectorAll(
-            ".confirm-modal-icon, .confirm-modal-title, .confirm-modal-message, .confirm-modal-button"
-        ).forEach(el => {
-            el.style.animation = "none";
-            void el.offsetWidth;
-            el.style.animation = "";
-        });
+        confirmModal.classList.add(
+            "confirm-modal-animate"
+        );
+
+        confirmModal
+            .querySelectorAll(
+                [
+                    ".confirm-modal-icon",
+                    ".confirm-modal-title",
+                    ".confirm-modal-message",
+                    ".confirm-modal-button",
+                ].join(",")
+            )
+            .forEach(element => {
+                element.style.animation =
+                    "none";
+
+                void element.offsetWidth;
+
+                element.style.animation = "";
+            });
     }
-    if (finalSubmitBtn) {
-        finalSubmitBtn.addEventListener("click", () => {
-            if (!finalConfirm || !finalConfirm.checked) {
-                showMiniTab("Please confirm before starting the procedure.");
+
+    function setFinalSubmitLoading(
+        loading
+    ) {
+        if (!finalSubmitBtn) {
+            return;
+        }
+
+        finalSubmitBtn.disabled = loading;
+
+        finalSubmitBtn.innerHTML = loading
+            ? `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>Starting Procedure...</span>
+        `
+            : `
+            <i class="fa-solid fa-play"></i>
+            <span>Start Procedure</span>
+        `;
+    }
+
+    async function submitWalkInAppointment() {
+        if (
+            !appointmentForm ||
+            appointmentSubmitRunning
+        ) {
+            return;
+        }
+
+        if (
+            !finalConfirm ||
+            !finalConfirm.checked
+        ) {
+            showMiniTab(
+                "Please confirm before starting the procedure."
+            );
+
+            finalConfirm?.focus();
+            return;
+        }
+
+        appointmentSubmitRunning = true;
+        formSubmitting = true;
+
+        setFinalSubmitLoading(true);
+
+        try {
+            const response = await fetch(
+                appointmentForm.action,
+                {
+                    method:
+                        appointmentForm.method ||
+                        "POST",
+
+                    headers: {
+                        Accept:
+                            "application/json",
+
+                        "X-Requested-With":
+                            "XMLHttpRequest",
+                    },
+
+                    body:
+                        new FormData(
+                            appointmentForm
+                        ),
+                }
+            );
+
+            const responseData =
+                await response
+                    .json()
+                    .catch(() => ({}));
+
+            if (!response.ok) {
+                if (
+                    response.status === 422 &&
+                    responseData?.errors
+                ) {
+                    const firstMessage =
+                        Object.values(
+                            responseData.errors
+                        )
+                            .flat()
+                            .find(Boolean);
+
+                    throw new Error(
+                        firstMessage ||
+                        "Please check the submitted information."
+                    );
+                }
+
+                throw new Error(
+                    responseData?.message ||
+                    "Unable to start the procedure."
+                );
+            }
+
+            clearDraft();
+            formIsDirty = false;
+
+            const patientName =
+                selectedWalkInPatient?.name ||
+                selectedPatientName
+                    ?.textContent
+                    ?.trim() ||
+                "the selected patient";
+
+            if (confirmMessage) {
+                confirmMessage.textContent =
+                    responseData?.message ||
+                    `The walk-in appointment for ${patientName} has been recorded successfully.`;
+            }
+
+            if (
+                confirmModal &&
+                !confirmModal.open
+            ) {
+                confirmModal.showModal();
+                replayConfirmModalAnimation();
+            }
+
+            okBtn?.focus();
+
+            okBtn.dataset.startUrl =
+                responseData?.start_url || "";
+
+        } catch (error) {
+            appointmentSubmitRunning = false;
+            formSubmitting = false;
+
+            setFinalSubmitLoading(false);
+
+            showMiniTab(
+                error.message ||
+                "Unable to start the procedure. Please try again."
+            );
+        }
+    }
+
+    appointmentForm?.addEventListener(
+        "submit",
+        function (event) {
+            event.preventDefault();
+
+            submitWalkInAppointment();
+        }
+    );
+
+    okBtn?.addEventListener(
+        "click",
+        () => {
+            const startUrl =
+                okBtn.dataset.startUrl;
+
+            if (!startUrl) {
                 return;
             }
 
-            clearDraft();
-            formSubmitting = true;
-            document.getElementById("appointmentForm").submit();
-        });
-    }
-
-    if (okBtn) {
-        okBtn.addEventListener("click", () => {
-            clearDraft();
-            formSubmitting = true;
-            document.getElementById("appointmentForm").submit();
-        });
-    }
-
-    var html = document.documentElement;
-    var themeToggleContainer = document.getElementById("themeToggle");
-
-    [{
-        name: "difficult_extraction",
-        boxId: "extraction_date_box",
-        showOn: "YES"
-    }, {
-        name: "dentures",
-        boxId: "dentures_date_box",
-        showOn: "YES"
-    }, {
-        name: "ortho_treatment",
-        boxId: "ortho_date_box",
-        showOn: "YES"
-    }].forEach(({
-        name,
-        boxId,
-        showOn
-    }) => {
-        const radios = document.getElementsByName(name);
-        const box = document.getElementById(boxId);
-        if (!box || !radios.length) return;
-        const inp = box.querySelector("input");
-        radios.forEach(r => r.addEventListener("change", () => {
-            if (r.checked && r.value === showOn) {
-                box.classList.remove("hidden");
-                if (inp) inp.required = true;
-            } else if (r.checked) {
-                box.classList.add("hidden");
-                if (inp) {
-                    inp.required = false;
-                    inp.value = "";
-                }
-            }
-        }));
-    });
+            window.location.href =
+                startUrl;
+        }
+    );
 
     function syncMedicalExamBox() {
         const sel = document.querySelector('input[name="had_medical_exam"]:checked');
@@ -2679,19 +3749,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     document.querySelectorAll('input[name="had_medical_exam"]').forEach(r => r.addEventListener("change",
         syncMedicalExamBox));
     syncMedicalExamBox();
-    document.getElementById("emergency_relation")
-        ?.addEventListener("change", function () {
-            const other = document.getElementById("relation_other");
-            if (!other) return;
-            if (this.value === "Others") {
-                other.classList.remove("hidden");
-                other.setAttribute("required", "true");
-            } else {
-                other.classList.add("hidden");
-                other.removeAttribute("required");
-                other.value = "";
-            }
-        });
+
     [{
         name: "good_health",
         boxId: "good_health_box",
@@ -3051,66 +4109,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     setTimeout(resizeSignatureCanvas, 300);
 
     const emergencyNumber = document.getElementById("emergency_number");
-    const emergencyNumberFeedback = document.getElementById("emergency_number_feedback");
-    let emergencyNumberFeedbackTimer = null;
-    const emergencyPerson = document.getElementById("emergency_person");
-    const emergencyPersonFeedback = document.getElementById("emergency_person_feedback");
-
-    function setEmergencyPersonFeedback(message, type = "") {
-        if (!emergencyPersonFeedback) return;
-
-        emergencyPersonFeedback.textContent = message;
-        emergencyPersonFeedback.classList.remove("error", "success", "text-[#9e9690]");
-
-        if (type === "error") emergencyPersonFeedback.classList.add("error");
-        else if (type === "success") emergencyPersonFeedback.classList.add("success");
-        else emergencyPersonFeedback.classList.add("text-[#9e9690]");
-    }
-
-    function validateEmergencyPerson(showNeutral = false) {
-        if (!emergencyPerson) return false;
-
-        const value = emergencyPerson.value.trim();
-        const validNamePattern = /^[A-Za-zÑñ\s.'-]+$/;
-
-        emergencyPerson.classList.remove("input-invalid", "input-valid");
-
-        if (!value.length) {
-            if (showNeutral) {
-                setEmergencyPersonFeedback("Only letters, spaces, apostrophe, period, and hyphen are allowed.");
-            } else {
-                setEmergencyPersonFeedback("");
-            }
-            return false;
-        }
-
-        if (!validNamePattern.test(value)) {
-            emergencyPerson.classList.add("input-invalid");
-            setEmergencyPersonFeedback("This name is invalid. Please use letters only.", "error");
-            return false;
-        }
-
-        emergencyPerson.classList.add("input-valid");
-        setEmergencyPersonFeedback("Valid emergency contact name.", "success");
-        return true;
-    }
-
-    emergencyPerson?.addEventListener("input", (e) => {
-        const sanitizedValue = e.target.value.replace(/[^A-Za-zÑñ\s.'-]/g, "");
-        const hadInvalidChars = sanitizedValue !== e.target.value;
-
-        if (hadInvalidChars) {
-            e.target.value = sanitizedValue;
-            showMiniTab("Emergency contact name must contain letters only.");
-        }
-
-        validateEmergencyPerson(true);
-        markFormDirty();
-    });
-
-    emergencyPerson?.addEventListener("blur", () => {
-        validateEmergencyPerson(true);
-    });
 
     function formatPhoneDisplay(rawDigits) {
         const digits = rawDigits.slice(0, 11);
@@ -3123,64 +4121,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         return out;
     }
 
-    function setPhoneFeedback(message, type = "") {
-        if (!emergencyNumberFeedback) return;
-        if (emergencyNumberFeedbackTimer) {
-            clearTimeout(emergencyNumberFeedbackTimer);
-            emergencyNumberFeedbackTimer = null;
-        }
-
-        emergencyNumberFeedback.textContent = message;
-        emergencyNumberFeedback.classList.remove("error", "success", "text-[#9e9690]");
-        if (type === "error") emergencyNumberFeedback.classList.add("error");
-        else if (type === "success") {
-            emergencyNumberFeedback.classList.add("success");
-            emergencyNumberFeedbackTimer = setTimeout(() => {
-                if (!emergencyNumberFeedback.classList.contains("success")) return;
-                emergencyNumberFeedback.textContent = "";
-                emergencyNumberFeedback.classList.remove("success");
-                emergencyNumberFeedback.classList.add("text-[#9e9690]");
-                emergencyNumberFeedbackTimer = null;
-            }, 3000);
-        } else emergencyNumberFeedback.classList.add("text-[#9e9690]");
-    }
-
-    function validateEmergencyNumber(showNeutral = false) {
-        if (!emergencyNumber) return false;
-
-        const digits = emergencyNumber.value.replace(/\D/g, "");
-
-        emergencyNumber.classList.remove("input-invalid", "input-valid", "border-red-500", "border-green-600");
-
-        if (!digits.length) {
-            if (showNeutral) setPhoneFeedback("Format: 09xx xxx xxxx");
-            else setPhoneFeedback("");
-            return false;
-        }
-
-        if (!digits.startsWith("09")) {
-            emergencyNumber.classList.add("input-invalid");
-            setPhoneFeedback("Contact number must start with 09.", "error");
-            return false;
-        }
-
-        if (digits.length < 11) {
-            emergencyNumber.classList.add("input-invalid");
-            setPhoneFeedback("Contact number must be 11 digits.", "error");
-            return false;
-        }
-
-        if (digits.length === 11) {
-            emergencyNumber.classList.add("input-valid");
-            setPhoneFeedback("Valid contact number.", "success");
-            return true;
-        }
-
-        emergencyNumber.classList.add("input-invalid");
-        setPhoneFeedback("Contact number must be 11 digits only.", "error");
-        return false;
-    }
-
     emergencyNumber?.addEventListener("input", (e) => {
         const hadNonDigit = /[^\d\s]/.test(e.target.value);
 
@@ -3191,20 +4131,15 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
         emergencyNumber.value = formatPhoneDisplay(digits);
 
+        window.validateFormInputField?.(
+            emergencyNumber
+        );
+
         if (hadNonDigit) {
             showMiniTab("Contact number must contain digits only.");
         }
 
-        validateEmergencyNumber(true);
         markFormDirty();
-    });
-
-    emergencyNumber?.addEventListener("focus", () => {
-        validateEmergencyNumber(true);
-    });
-
-    emergencyNumber?.addEventListener("blur", () => {
-        validateEmergencyNumber(true);
     });
 
     let formIsDirty = false;
@@ -3236,23 +4171,12 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         }
     }
 
-    function confirmReloadPage() {
-        openLeaveModal(() => {
-            window.location.reload();
-        });
-    }
-
     function closeLeaveModal() {
         if (leaveModal.open) leaveModal.close();
         pendingNavigation = null;
     }
 
     document.getElementById('cancelLeaveBtn')?.addEventListener('click', closeLeaveModal);
-
-    document.getElementById('slotFullOkBtn')?.addEventListener('click', () => {
-        const modal = document.getElementById('slotFullModal');
-        if (modal) modal.close();
-    });
 
     document.getElementById('saveDraftBtn')?.addEventListener('click', () => {
         saveDraftData();
@@ -3293,120 +4217,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             }
         });
     });
-
-    const clearSlotSelectionBtn = document.getElementById("clearSlotSelection");
-
-    function clearTimeSelectionOnly() {
-        const timeInput = document.getElementById("appointment_time");
-        const selectedSlotDisplay = document.getElementById("selectedSlotDisplay");
-        const selectedSlotText = document.getElementById("selectedSlotText");
-
-        if (timeInput) timeInput.value = "";
-        if (selectedSlotText) selectedSlotText.textContent = "";
-
-        selectedSlotDisplay?.classList.add("hidden");
-        clearSlotSelectionBtn?.classList.add("hidden");
-
-        document.querySelectorAll("#slotGrid .slot-chip").forEach(chip => {
-            chip.classList.remove("selected", "bg-[#8B0000]", "text-white");
-            chip.setAttribute("aria-pressed", "false");
-        });
-
-        markFormDirty();
-    }
-
-    function clearDateAndTimeSelection() {
-        const dateInput = document.getElementById("appointment_date");
-        const dateBanner = document.getElementById("dateBanner");
-        const slotContainer = document.getElementById("slotContainer");
-        const slotPlaceholder = document.getElementById("slotPlaceholder");
-        const slotGrid = document.getElementById("slotGrid");
-        const timePanel = document.querySelector(".time-panel");
-
-        if (dateInput) dateInput.value = "";
-
-        clearTimeSelectionOnly();
-
-        if (slotGrid) slotGrid.innerHTML = "";
-
-        dateBanner?.classList.add("hidden");
-
-        slotContainer?.classList.add("hidden");
-        slotContainer?.classList.remove("slot-fade-in", "slot-fade-out");
-
-        slotPlaceholder?.classList.remove("hidden", "slot-fade-in", "slot-fade-out");
-        slotPlaceholder?.style.removeProperty("display");
-        slotPlaceholder?.style.removeProperty("transform");
-        slotPlaceholder?.style.removeProperty("opacity");
-
-        timePanel?.classList.add("is-empty");
-    }
-
-    clearSlotSelectionBtn?.addEventListener("click", clearTimeSelectionOnly);
-
-    document.getElementById("appointment_date")?.addEventListener("change", function () {
-        const slotPlaceholder = document.getElementById("slotPlaceholder");
-        const slotContainer = document.getElementById("slotContainer");
-        const timePanel = document.querySelector(".time-panel");
-
-        if (!this.value) {
-            clearDateAndTimeSelection();
-            slotPlaceholder?.classList.remove("hidden");
-            slotContainer?.classList.add("hidden");
-            timePanel?.classList.add("is-empty");
-        } else {
-            slotPlaceholder?.classList.add("hidden");
-            slotContainer?.classList.remove("hidden");
-            timePanel?.classList.remove("is-empty");
-            animateSlotsIn();
-        }
-    });
-
-    const selectedSlotObserver = new MutationObserver(() => {
-        const selectedSlotDisplay = document.getElementById("selectedSlotDisplay");
-        const timeInput = document.getElementById("appointment_time");
-
-        if (timeInput?.value && !selectedSlotDisplay?.classList.contains("hidden")) {
-            clearSlotSelectionBtn?.classList.remove("hidden");
-            document.querySelector(".time-panel")?.classList.remove("is-empty");
-        } else {
-            clearSlotSelectionBtn?.classList.add("hidden");
-        }
-    });
-
-    const selectedSlotDisplayNode = document.getElementById("selectedSlotDisplay");
-
-    if (selectedSlotDisplayNode) {
-        selectedSlotObserver.observe(selectedSlotDisplayNode, {
-            attributes: true,
-            attributeFilter: ["class"]
-        });
-    }
-
-    const slotContainer = document.getElementById("slotContainer");
-    const slotPlaceholder = document.getElementById("slotPlaceholder");
-    const timePanel = document.querySelector(".time-panel");
-
-    let slotAnimationLock = false;
-
-    function animateSlotsIn() {
-        if (!slotContainer || slotAnimationLock) return;
-
-        slotAnimationLock = true;
-
-        timePanel?.classList.remove("is-empty");
-
-        slotPlaceholder?.classList.add("hidden");
-        slotPlaceholder?.style.setProperty("display", "none", "important");
-
-        slotContainer.classList.remove("hidden", "slot-fade-out");
-        slotContainer.classList.add("slot-fade-in");
-
-        setTimeout(() => {
-            slotContainer.classList.remove("slot-fade-in");
-            slotAnimationLock = false;
-        }, 320);
-    }
 
     function initIntroBookingModal() {
         const modal = document.getElementById("introBookingModal");
@@ -3470,28 +4280,41 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
     function refreshWalkInGlobalControls() {
         const page =
-            document.getElementById("dentistWalkInPage") ||
-            document;
+            document.getElementById(
+                'dentistWalkInPage'
+            ) || document;
 
         window.initSearchClearButtons?.(page);
         window.initCustomSelects?.(page);
+        window.initGlobalPageSizeSelects?.(page);
+        window.bindFormInputValidation?.(page);
 
         const relationSelect =
-            document.getElementById("emergency_relation");
+            document.getElementById(
+                'emergency_relation'
+            );
 
         const relationWrapper =
-            relationSelect?.closest(".custom-select");
+            relationSelect?.closest(
+                '.custom-select'
+            );
 
         if (relationWrapper) {
-            window.syncCustomSelect?.(relationWrapper);
+            window.syncCustomSelect?.(
+                relationWrapper
+            );
         }
     }
 
     refreshWalkInGlobalControls();
+    loadInitialPatientRecords();
 
     document.addEventListener(
         "DOMContentLoaded",
-        refreshWalkInGlobalControls,
+        () => {
+            refreshWalkInGlobalControls();
+            loadInitialPatientRecords();
+        },
         { once: true }
     );
 

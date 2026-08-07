@@ -110,7 +110,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                 <div class="p-6 sm:p-8">
 
                     <form id="appointmentForm" action="{{ route('book.appointment.store') }}" method="POST"
-                        enctype="multipart/form-data" data-global-selects>
+                        enctype="multipart/form-data" data-global-selects data-global-validation>
                         @csrf
 
                         <div class="step-content hidden">
@@ -254,25 +254,38 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <span class="section-card-title-line"></span>
                                         </p>
                                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                            <div>
-                                                <label class="block text-xs font-semibold text-[#333] mb-1.5">Last
-                                                    Dental
-                                                    Visit</label>
+
+                                            <div data-global-field>
+                                                <label for="lastDentalVisit"
+                                                    class="block text-xs font-semibold text-[#333] mb-1.5">
+                                                    Last Dental Visit
+                                                </label>
+
                                                 <div class="date-input-wrap compact">
                                                     <input type="text" id="lastDentalVisit" name="last_dental_visit"
                                                         class="js-flatpickr-date-max-today form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
-                                                        placeholder="Select date" readonly required>
+                                                        placeholder="Select date"
+                                                        data-required-message="Please select your last dental visit."
+                                                        readonly required>
+
                                                     <i class="fa-regular fa-calendar date-input-icon"></i>
                                                 </div>
                                             </div>
-                                            <div>
-                                                <label class="block text-xs font-semibold text-[#333] mb-1.5">Previous
-                                                    Dentist</label>
+
+                                            <div data-global-field>
+                                                <label for="previous_dentist"
+                                                    class="block text-xs font-semibold text-[#333] mb-1.5">
+                                                    Previous Dentist
+                                                </label>
+
                                                 <input type="text" id="previous_dentist" name="previous_dentist"
                                                     maxlength="50"
                                                     class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
-                                                    placeholder="Dr. Name" required>
+                                                    placeholder="Dr. Name"
+                                                    data-required-message="Please enter your previous dentist."
+                                                    required>
                                             </div>
+
                                         </div>
                                     </div>
 
@@ -311,10 +324,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         ];
                                         @endphp
                                         @foreach ($dentalQ1 as $q)
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">{{ $q['q'] }}</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="{{ $q['q'] }}">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="{{ $q['name'] }}" value="YES"
@@ -369,10 +382,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         ];
                                         @endphp
                                         @foreach ($dentalQ2 as $q)
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">{{ $q['q'] }}</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="{{ $q['q'] }}">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="{{ $q['name'] }}" value="YES"
@@ -404,11 +417,12 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <span class="flex-1 h-px bg-[#f9e8e8]"></span>
                                         </p>
 
-                                        <div class="global-question-row">
+                                        <div class="global-question-row"
+    data-global-field>
                                             <span class="global-question-text">Have you had any periodontal (gum)
                                                 treatment?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Have you had any periodontal (gum) treatment?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="periodontal" value="YES"
@@ -424,11 +438,12 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row">
+                                        <div class="global-question-row"
+    data-global-field>
                                             <span class="global-question-text">Have you had a difficult tooth
                                                 extraction?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Have you had a difficult tooth extraction?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="difficult_extraction" value="YES"
@@ -454,13 +469,13 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">Have you had prolonged bleeding
                                                 following
                                                 tooth
                                                 extractions?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Have you had prolonged bleeding following tooth extractions?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="prolonged_bleeding" value="YES"
@@ -476,11 +491,11 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">Do you wear complete or partial
                                                 dentures?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Do you wear complete or partial dentures?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="dentures" value="YES"
@@ -506,11 +521,11 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">Have you had orthodontic
                                                 treatment?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Have you had orthodontic treatment?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="ortho_treatment" value="YES"
@@ -578,10 +593,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <span class="section-card-title-line"></span>
                                         </p>
 
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">Are you in good health?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Are you in good health?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="good_health" value="YES"
@@ -607,11 +622,11 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">When was your last medical
                                                 examination?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="When was your last medical examination?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="had_medical_exam" value="YES"
@@ -638,13 +653,13 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">Are you currently receiving treatment
                                                 for
                                                 any
                                                 illness?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Are you currently receiving treatment for any illness?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="under_treatment" value="YES"
@@ -670,10 +685,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">Have you ever been hospitalized?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Have you ever been hospitalized?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="hospitalized" value="YES"
@@ -705,10 +720,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-triangle-exclamation text-xs"></i> Allergies
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">Medicines</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Medicines">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="allergy_medicine" value="YES"
@@ -723,10 +738,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                                 </label>
                                             </div>
                                         </div>
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">Food</span>
 
-                                            <div class="global-question-options" role="radiogroup" aria-label="Food">
+                                            <div class="global-question-options global-choice-group" role="radiogroup" aria-label="Food">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="allergy_food" value="YES"
                                                         class="global-radio-input" required>
@@ -754,12 +769,12 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-pills text-xs"></i> Medications
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">Are you taking any prescription or
                                                 non-prescription
                                                 medication?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Are you taking any prescription or non-prescription medication?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="medication" value="YES"
@@ -802,10 +817,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         control pills?',
                                         ],
                                         ] as $i => $q)
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">{{ $q['q'] }}</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="{{ $q['q'] }}">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="{{ $q['name'] }}" value="YES"
@@ -854,11 +869,11 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-smoking text-xs"></i> Tobacco Use
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">Do you use tobacco products or any
                                                 derivatives?</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="Do you use tobacco products or any derivatives?">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="tobacco_use" value="YES"
@@ -895,10 +910,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         </p>
                                         @foreach ([['name' => 'headaches', 'q' => 'Headaches'], ['name' => 'earaches',
                                         'q' => 'Earaches'], ['name' => 'neck_aches', 'q' => 'Neck aches']] as $i => $q)
-                                        <div class="global-question-row">
+                                        <div class="global-question-row" data-global-field>
                                             <span class="global-question-text">{{ $q['q'] }}</span>
 
-                                            <div class="global-question-options" role="radiogroup"
+                                            <div class="global-question-options global-choice-group" role="radiogroup"
                                                 aria-label="{{ $q['q'] }}">
                                                 <label class="global-radio-option">
                                                     <input type="radio" name="{{ $q['name'] }}" value="YES"

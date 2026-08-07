@@ -740,8 +740,6 @@ $pageSubtitle = $historicalMode
 @endsection
 
 @section('scripts')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 @unless ($historicalMode)
 @include('components.appointment-calendar-script', [
 'mode' => 'booking',
@@ -868,17 +866,7 @@ $pageSubtitle = $historicalMode
         let redoStack = [];
         const HISTORY_LIMIT = 50;
 
-        let scene = null;
-        let camera = null;
-        let renderer = null;
-        let controls = null;
-        let raycaster = null;
-        let mouse = null;
-        let teethMeshes = [];
-        let threeSceneInitialized = false;
-        let cameraAnimationFrame = null;
-        let initialCameraPosition = null;
-        let initialControlsTarget = null;
+        let odontogramThreeState = null;
 
         const legends = [{
             code: 'D',
@@ -1033,6 +1021,181 @@ $pageSubtitle = $historicalMode
             Object.values(rawSavedOdontogramData || {});
 
         const odontogramState = {};
+
+        function initThreeScene() {
+            if (
+                odontogramThreeState
+            ) {
+                return;
+            }
+
+            odontogramThreeState =
+                window.Odontogram3D.create({
+                    container,
+
+                    data:
+                        Object.values(
+                            odontogramState
+                        ),
+
+                    mode:
+                        'editor',
+
+                    onToothHover:
+                        (
+                            toothNumber,
+                            mesh,
+                            event
+                        ) => {
+                            hoveredMesh =
+                                mesh;
+
+                            if (!toothNumber) {
+                                toothHoverLabel
+                                    .innerText =
+                                    selectedTooth
+                                        ? `Selected: #${selectedTooth}`
+                                        : 'Select a tooth';
+
+                                hideTooltip();
+
+                                return;
+                            }
+
+                            toothHoverLabel
+                                .innerText =
+                                `Tooth #${toothNumber}`;
+
+                            showTooltip(
+                                event,
+                                mesh
+                            );
+                        },
+
+                    onToothClick:
+                        (
+                            toothNumber,
+                            mesh
+                        ) => {
+                            if (
+                                !toothNumber ||
+                                !mesh
+                            ) {
+                                clear3DSurfacePickerSelection(
+                                    false
+                                );
+
+                                hideTooltip();
+
+                                return;
+                            }
+
+                            selectedTooth =
+                                toothNumber;
+
+                            selectedMesh =
+                                mesh;
+
+                            restoreSavedSurfaceSelectionForTooth(
+                                toothNumber
+                            );
+
+                            window
+                                .Odontogram3D
+                                .focusTooth(
+                                    odontogramThreeState,
+                                    mesh
+                                );
+
+                            renderThreeVisuals();
+
+                            updateSelectedToothUI();
+                        },
+
+                    onReady:
+                        () => {
+                            loadingOverlay.style
+                                .opacity =
+                                '0';
+
+                            setTimeout(() => {
+                                loadingOverlay.style
+                                    .display =
+                                    'none';
+                            }, 500);
+                        }
+                });
+        }
+
+        function renderThreeVisuals() {
+            if (
+                !odontogramThreeState
+            ) {
+                return;
+            }
+
+            window.Odontogram3D.update(
+                odontogramThreeState,
+
+                Object.values(
+                    odontogramState
+                ),
+
+                {
+                    selectedTooth:
+                        selectedTooth,
+
+                    dimUnselected:
+                        currentView === '3d' &&
+                        Boolean(
+                            selectedTooth
+                        )
+                }
+            );
+        }
+
+        function focusCameraOnTooth(
+                mesh
+            ) {
+                if (
+                    !odontogramThreeState ||
+                    !mesh
+                ) {
+                    return;
+                }
+
+                window.Odontogram3D
+                    .focusTooth(
+                        odontogramThreeState,
+                        mesh
+                    );
+            }
+
+            function resetCameraToFull3DView() {
+                if (
+                    !odontogramThreeState
+                ) {
+                    return;
+                }
+
+                window.Odontogram3D
+                    .resetCamera(
+                        odontogramThreeState
+                    );
+            }
+
+            function handleResize() {
+                if (
+                    !odontogramThreeState
+                ) {
+                    return;
+                }
+
+                window.Odontogram3D
+                    .resize(
+                        odontogramThreeState
+                    );
+            }
 
         function createDefaultToothState(toothNumber) {
             return {
@@ -1330,78 +1493,6 @@ $pageSubtitle = $historicalMode
             renderThreeVisuals();
         }
 
-        function easeInOutCubic(value) {
-            return value < 0.5
-                ? 4 * value * value * value
-                : 1 - Math.pow(-2 * value + 2, 3) / 2;
-        }
-
-        function animateCameraTo(targetPosition, targetLookAt, duration = 650) {
-            if (!camera || !controls) return;
-
-            if (cameraAnimationFrame) {
-                cancelAnimationFrame(cameraAnimationFrame);
-            }
-
-            const startPosition = camera.position.clone();
-            const startTarget = controls.target.clone();
-            const startTime = performance.now();
-
-            function step(now) {
-                const progress = Math.min((now - startTime) / duration, 1);
-                const eased = easeInOutCubic(progress);
-
-                camera.position.lerpVectors(startPosition, targetPosition, eased);
-                controls.target.lerpVectors(startTarget, targetLookAt, eased);
-                camera.updateProjectionMatrix();
-                controls.update();
-
-                if (progress < 1) {
-                    cameraAnimationFrame = requestAnimationFrame(step);
-                } else {
-                    cameraAnimationFrame = null;
-                }
-            }
-
-            cameraAnimationFrame = requestAnimationFrame(step);
-        }
-
-        function focusCameraOnTooth(mesh) {
-            if (!mesh || !camera || !controls) return;
-
-            const toothPosition = new THREE.Vector3();
-            mesh.getWorldPosition(toothPosition);
-
-            const toothNumber = Number(mesh.userData.tooth);
-            const isUpperArch = adultUpper.includes(toothNumber);
-
-            // Upper teeth are best viewed from below so the bottom/end of the cylinder is visible.
-            // Lower teeth are best viewed from above so the top/end of the cylinder is visible.
-            const cameraOffset = isUpperArch
-                ? new THREE.Vector3(0, -2.2, 4.2)
-                : new THREE.Vector3(0, 2.4, 4.2);
-
-            const lookAtOffset = isUpperArch
-                ? new THREE.Vector3(0, -0.15, 0)
-                : new THREE.Vector3(0, 0.15, 0);
-
-            animateCameraTo(
-                toothPosition.clone().add(cameraOffset),
-                toothPosition.clone().add(lookAtOffset),
-                700
-            );
-        }
-
-        function resetCameraToFull3DView() {
-            if (!camera || !controls) return;
-
-            animateCameraTo(
-                initialCameraPosition ? initialCameraPosition.clone() : new THREE.Vector3(0, 1.2, 14),
-                initialControlsTarget ? initialControlsTarget.clone() : new THREE.Vector3(0, 0, 0),
-                700
-            );
-        }
-
         function clear3DSurfacePickerSelection(shouldResetCamera = false) {
             selectedTooth = null;
             selectedTargetType = null;
@@ -1409,7 +1500,7 @@ $pageSubtitle = $historicalMode
             selectedMesh = null;
             selectedLegend = null;
 
-            if (threeSceneInitialized) {
+            if (odontogramThreeState) {
                 renderThreeVisuals();
 
                 if (shouldResetCamera) {
@@ -1864,8 +1955,8 @@ $pageSubtitle = $historicalMode
             updateHiddenInput();
             render2DOdontogram();
 
-            if (threeSceneInitialized) {
-                renderThreeVisuals();
+            if (odontogramThreeState) {
+    renderThreeVisuals();
             }
 
             updateSelectedToothUI();
@@ -1904,7 +1995,7 @@ $pageSubtitle = $historicalMode
 
             render2DOdontogram();
 
-            if (threeSceneInitialized) {
+            if (odontogramThreeState) {
                 renderThreeVisuals();
             }
 
@@ -1953,19 +2044,12 @@ $pageSubtitle = $historicalMode
             } else if (selectedTargetType === '3d') {
                 state.threeD = payload;
                 fillAll2DSurfacesFromLegend(state, payload);
-
-                if (selectedMesh) {
-                    selectedMesh.material.color.setStyle(payload.colorHex);
-                    selectedMesh.userData.legend = code;
-                    selectedMesh.userData.originalColor = payload.colorHex;
-                    applySelectedMeshState(selectedMesh);
-                }
             }
 
             updateHiddenInput();
             render2DOdontogram();
 
-            if (threeSceneInitialized) {
+            if (odontogramThreeState) {
                 renderThreeVisuals();
             }
 
@@ -2006,13 +2090,6 @@ $pageSubtitle = $historicalMode
                 state.threeD = null;
                 state.lastSelectedSurface = null;
                 clearAll2DSurfaces(state);
-
-                if (selectedMesh && Number(selectedMesh.userData.tooth) === Number(tooth)) {
-                    selectedMesh.material.color.setStyle('#FFFFF0');
-                    selectedMesh.userData.originalColor = '#FFFFF0';
-                    delete selectedMesh.userData.legend;
-                    applySelectedMeshState(selectedMesh);
-                }
             }
 
             selectedLegend = null;
@@ -2024,7 +2101,7 @@ $pageSubtitle = $historicalMode
             updateHiddenInput();
             render2DOdontogram();
 
-            if (threeSceneInitialized) {
+            if (odontogramThreeState) {
                 renderThreeVisuals();
             }
 
@@ -2229,19 +2306,28 @@ $pageSubtitle = $historicalMode
                     selectedLegend = null;
                 }
 
-                if (!threeSceneInitialized) {
+                if (!odontogramThreeState) {
                     initThreeScene();
-                } else if (renderer && camera) {
+                } else {
                     handleResize();
                     renderThreeVisuals();
                 }
             }
 
-            if (view === '3d' && threeSceneInitialized && selectedTooth) {
-                selectedMesh = teethMeshes.find(mesh => Number(mesh.userData.tooth) === Number(
-                    selectedTooth)) || null;
-                renderThreeVisuals();
-            }
+            if (
+                    view === '3d' &&
+                    odontogramThreeState &&
+                    selectedTooth
+                ) {
+                    selectedMesh =
+                        window.Odontogram3D
+                            .getToothMesh(
+                                odontogramThreeState,
+                                selectedTooth
+                            );
+
+                    renderThreeVisuals();
+                }
 
             updateSelectedToothUI();
             update3DSurfacePicker();
@@ -2259,671 +2345,6 @@ $pageSubtitle = $historicalMode
             )
                 ? 'dark'
                 : 'light';
-        }
-
-        function syncOdontogram3DTheme(theme = getOdontogramTheme()) {
-            const isDark = theme === 'dark';
-
-            const backgroundColor = isDark
-                ? '#0D1117'
-                : '#D8E0EA';
-
-            if (scene) {
-                scene.background = new THREE.Color(backgroundColor);
-            }
-
-            if (renderer) {
-                renderer.setClearColor(backgroundColor, 1);
-            }
-
-            if (renderer && scene && camera) {
-                renderer.render(scene, camera);
-            }
-        }
-
-        window.addEventListener('global-theme-change', function (event) {
-            syncOdontogram3DTheme(
-                event.detail?.theme || getOdontogramTheme()
-            );
-        });
-
-        function initThreeScene() {
-            const width = container.clientWidth || 700;
-            const height = container.clientHeight || 480;
-
-            scene = new THREE.Scene();
-            syncOdontogram3DTheme();
-
-            camera = new THREE.PerspectiveCamera(
-                40,
-                width / height,
-                0.1,
-                1000
-
-            );
-
-            camera.position.set(0, 1.2, 14);
-
-            renderer = new THREE.WebGLRenderer({
-                antialias: true,
-                alpha: false
-            });
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.setSize(width, height);
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            container.appendChild(renderer.domElement);
-            syncOdontogram3DTheme();
-
-            controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            controls.dampingFactor = 0.07;
-            controls.minDistance = 2.2;
-            controls.maxDistance = 30;
-            controls.maxPolarAngle = Math.PI / 1.8;
-            controls.target.set(0, 0, 0);
-            controls.update();
-
-            initialCameraPosition = camera.position.clone();
-            initialControlsTarget = controls.target.clone();
-
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
-            scene.add(ambientLight);
-
-            const keyLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            keyLight.position.set(10, 15, 10);
-            keyLight.castShadow = true;
-            keyLight.shadow.mapSize.width = 1024;
-            keyLight.shadow.mapSize.height = 1024;
-            scene.add(keyLight);
-
-            const backLight = new THREE.DirectionalLight(0xffffff, 0.45);
-            backLight.position.set(-10, 5, -10);
-            scene.add(backLight);
-
-            const fillLight = new THREE.DirectionalLight(0xffffff, 0.35);
-            fillLight.position.set(0, 8, 12);
-            scene.add(fillLight);
-
-            const enamelMaterialProps = {
-                color: 0xFFFFF8,
-                metalness: 0.02,
-                roughness: 0.26,
-                emissive: 0x090909,
-                emissiveIntensity: 0.04,
-                envMapIntensity: 0.95
-            };
-
-            const gumMaterialProps = {
-                color: 0xF2A7A2,
-                roughness: 0.68,
-                metalness: 0.0,
-                emissive: 0x220808,
-                emissiveIntensity: 0.025
-            };
-
-            function createStandardMaterial(props) {
-                return new THREE.MeshStandardMaterial(props);
-            }
-
-            function getToothType(toothNum) {
-                const lastDigit = Number(String(toothNum).slice(-1));
-
-                if (lastDigit === 1 || lastDigit === 2) return 'incisor';
-                if (lastDigit === 3) return 'canine';
-                if (lastDigit === 4 || lastDigit === 5) return 'premolar';
-
-                return 'molar';
-            }
-
-            function getToothDimensions(type) {
-                const sizes = {
-                    incisor: {
-                        width: 0.34,
-                        height: 0.50,
-                        depth: 0.24,
-                        hitWidth: 0.50,
-                        hitHeight: 0.66,
-                        hitDepth: 0.38
-                    },
-                    canine: {
-                        width: 0.36,
-                        height: 0.54,
-                        depth: 0.26,
-                        hitWidth: 0.52,
-                        hitHeight: 0.70,
-                        hitDepth: 0.40
-                    },
-                    premolar: {
-                        width: 0.46,
-                        height: 0.48,
-                        depth: 0.34,
-                        hitWidth: 0.62,
-                        hitHeight: 0.64,
-                        hitDepth: 0.48
-                    },
-                    molar: {
-                        width: 0.62,
-                        height: 0.47,
-                        depth: 0.44,
-                        hitWidth: 0.78,
-                        hitHeight: 0.64,
-                        hitDepth: 0.60
-                    }
-                };
-
-                return sizes[type] || sizes.incisor;
-            }
-
-            function addVisualPart(group, mesh, visualParts, colorableParts = null) {
-                mesh.castShadow = true;
-                mesh.receiveShadow = true;
-                group.add(mesh);
-                visualParts.push(mesh);
-
-                if (colorableParts) {
-                    mesh.userData.colorable = true;
-                    colorableParts.push(mesh);
-                }
-
-                return mesh;
-            }
-
-            function createSoftCusp(x, y, z, scale, material) {
-                const cusp = new THREE.Mesh(
-                    new THREE.SphereGeometry(0.105 * scale, 18, 12),
-                    material.clone()
-                );
-
-                cusp.scale.set(1.05, 0.50, 0.85);
-                cusp.position.set(x, y, z);
-
-                return cusp;
-            }
-
-            function createStylizedTooth(toothNum, isUpper = true) {
-                const type = getToothType(toothNum);
-                const size = getToothDimensions(type);
-                const toothGroup = new THREE.Group();
-
-                const visualParts = [];
-                const colorableParts = [];
-
-                const enamelMaterial = createStandardMaterial(enamelMaterialProps);
-                const crownDirection = isUpper ? -1 : 1;
-                const gumDirection = isUpper ? 1 : -1;
-
-                const crown = new THREE.Mesh(
-                    new THREE.SphereGeometry(1, 32, 22),
-                    enamelMaterial.clone()
-                );
-
-                crown.scale.set(size.width, size.height, size.depth);
-                crown.position.set(0, crownDirection * 0.22, 0);
-                addVisualPart(toothGroup, crown, visualParts, colorableParts);
-
-                const neck = new THREE.Mesh(
-                    new THREE.CylinderGeometry(size.width * 0.74, size.width * 0.86, 0.12, 26, 1),
-                    enamelMaterial.clone()
-                );
-
-                neck.position.set(0, gumDirection * 0.08, 0);
-                addVisualPart(toothGroup, neck, visualParts, colorableParts);
-
-                if (type === 'incisor') {
-                }
-
-                if (type === 'canine') {
-                    const point = new THREE.Mesh(
-                        new THREE.ConeGeometry(size.width * 0.35, 0.16, 28, 1),
-                        enamelMaterial.clone()
-                    );
-
-                    point.position.set(0, crownDirection * 0.70, 0);
-
-                    if (isUpper) {
-                        point.rotation.x = Math.PI;
-                    }
-
-                    addVisualPart(toothGroup, point, visualParts, colorableParts);
-                }
-
-                if (type === 'premolar') {
-                    const cuspY = crownDirection * 0.54;
-                    const cuspA = createSoftCusp(-size.width * 0.20, cuspY, -size.depth * 0.15, 0.90, enamelMaterial);
-                    const cuspB = createSoftCusp(size.width * 0.20, cuspY, size.depth * 0.15, 0.90, enamelMaterial);
-
-                    addVisualPart(toothGroup, cuspA, visualParts, colorableParts);
-                    addVisualPart(toothGroup, cuspB, visualParts, colorableParts);
-                }
-
-                if (type === 'molar') {
-                    const cuspY = crownDirection * 0.51;
-                    const cuspPositions = [
-                        [-size.width * 0.23, cuspY, -size.depth * 0.20],
-                        [size.width * 0.23, cuspY, -size.depth * 0.20],
-                        [-size.width * 0.23, cuspY, size.depth * 0.20],
-                        [size.width * 0.23, cuspY, size.depth * 0.20]
-                    ];
-
-                    cuspPositions.forEach(pos => {
-                        const cusp = createSoftCusp(pos[0], pos[1], pos[2], 1.0, enamelMaterial);
-                        addVisualPart(toothGroup, cusp, visualParts, colorableParts);
-                    });
-                }
-
-                const hitGeometry = new THREE.SphereGeometry(1, 16, 12);
-                const hitMaterial = new THREE.MeshBasicMaterial({
-                    color: 0xffffff,
-                    transparent: true,
-                    opacity: 0.001,
-                    depthWrite: false
-                });
-
-                const hitMesh = new THREE.Mesh(hitGeometry, hitMaterial);
-                hitMesh.scale.set(size.hitWidth, size.hitHeight, size.hitDepth);
-                hitMesh.position.set(0, crownDirection * 0.25, 0);
-
-                hitMesh.userData = {
-                    tooth: toothNum,
-                    originalColor: '#FFFFF8',
-                    visualGroup: toothGroup,
-                    visualParts: visualParts,
-                    colorableParts: colorableParts
-                };
-
-                toothGroup.add(hitMesh);
-
-                return {
-                    group: toothGroup,
-                    hitMesh: hitMesh
-                };
-            }
-
-            function createArch(teethArray, yPosition, isUpper = true) {
-                const group = new THREE.Group();
-                const archStartAngle = Math.PI + 0.08;
-                const archEndAngle = -0.08;
-                const archWidthRadius = 3.18;
-                const archDepthRadius = 2.85;
-
-                teethArray.forEach((toothNum, i) => {
-                    const tooth = createStylizedTooth(toothNum, isUpper);
-
-                    const ratio = teethArray.length > 1 ? (i / (teethArray.length - 1)) : 0;
-                    const sideSign = ratio < 0.5 ? -1 : 1;
-                    let angle = archStartAngle - ratio * (archStartAngle - archEndAngle);
-
-                    const lastDigit = Number(String(toothNum).slice(-1));
-                    const molarAngleOffsetMap = {
-                        6: 0.016,
-                        7: 0.033,
-                        8: 0.052,
-                    };
-                    const molarYNudgeMap = {
-                        6: 0.05,
-                        7: 0.08,
-                        8: 0.11,
-                    };
-
-                    if (molarAngleOffsetMap[lastDigit]) {
-                        angle += sideSign * molarAngleOffsetMap[lastDigit];
-                    }
-
-                    const x = Math.cos(angle) * archWidthRadius;
-                    const z = Math.sin(angle) * archDepthRadius;
-                    const yNudge = molarYNudgeMap[lastDigit]
-                        ? (isUpper ? molarYNudgeMap[lastDigit] : -molarYNudgeMap[lastDigit])
-                        : 0;
-
-                    tooth.group.position.set(x, yPosition + yNudge, z);
-                    tooth.group.lookAt(0, yPosition + yNudge, -0.10);
-
-                    group.add(tooth.group);
-                    teethMeshes.push(tooth.hitMesh);
-                });
-
-                scene.add(group);
-            }
-
-            function createGumArch(yPosition, isUpper = true) {
-                const points = [];
-                const gumStartAngle = Math.PI + 0.08;
-                const gumEndAngle = -0.08;
-                const gumWidthRadius = 3.58;
-                const gumDepthRadius = 2.92;
-
-                for (let i = 0; i <= 72; i++) {
-                    const t = i / 72;
-                    const angle = gumStartAngle - t * (gumStartAngle - gumEndAngle);
-                    const x = Math.cos(angle) * gumWidthRadius;
-                    const z = Math.sin(angle) * gumDepthRadius;
-                    points.push(new THREE.Vector3(x, yPosition, z));
-                }
-
-                const curve = new THREE.CatmullRomCurve3(points);
-
-                const mainGeometry = new THREE.TubeGeometry(curve, 96, 0.39, 24, false);
-                const mainGum = new THREE.Mesh(mainGeometry, createStandardMaterial(gumMaterialProps));
-                mainGum.castShadow = true;
-                mainGum.receiveShadow = true;
-                scene.add(mainGum);
-
-                const lipPoints = points.map(point => new THREE.Vector3(point.x, point.y + (isUpper ? -0.22 : 0.22), point.z + 0.02));
-                const lipCurve = new THREE.CatmullRomCurve3(lipPoints);
-                const lipGeometry = new THREE.TubeGeometry(lipCurve, 96, 0.19, 18, false);
-                const lipGum = new THREE.Mesh(
-                    lipGeometry,
-                    createStandardMaterial({
-                        ...gumMaterialProps,
-                        color: 0xF9C4BF,
-                        roughness: 0.72
-                    })
-                );
-
-                lipGum.castShadow = true;
-                lipGum.receiveShadow = true;
-                scene.add(lipGum);
-
-                function addGumCover() {
-                    const coverSegments = 72;
-                    const vertices = [];
-                    const indices = [];
-
-                    const outerWidthRadius = 3.72;
-                    const outerDepthRadius = 2.98;
-                    const innerWidthRadius = 2.92;
-                    const innerDepthRadius = 2.18;
-
-                    const awayFromTeethY = yPosition + (isUpper ? 0.30 : -0.30);
-                    const nearTeethY = yPosition + (isUpper ? -0.26 : 0.26);
-
-                    function pushVertex(x, y, z) {
-                        vertices.push(x, y, z);
-                        return (vertices.length / 3) - 1;
-                    }
-
-                    for (let i = 0; i <= coverSegments; i++) {
-                        const t = i / coverSegments;
-                        const angle = gumStartAngle - t * (gumStartAngle - gumEndAngle);
-
-                        const outerX = Math.cos(angle) * outerWidthRadius;
-                        const outerZ = Math.sin(angle) * outerDepthRadius;
-                        const innerX = Math.cos(angle) * innerWidthRadius;
-                        const innerZ = Math.sin(angle) * innerDepthRadius;
-
-                        pushVertex(outerX, awayFromTeethY, outerZ);
-                        pushVertex(innerX, awayFromTeethY, innerZ);
-                        pushVertex(outerX, nearTeethY, outerZ);
-                        pushVertex(innerX, nearTeethY, innerZ);
-                    }
-
-                    for (let i = 0; i < coverSegments; i++) {
-                        const base = i * 4;
-                        const next = (i + 1) * 4;
-
-                        const outerAway = base;
-                        const innerAway = base + 1;
-                        const outerNear = base + 2;
-                        const innerNear = base + 3;
-
-                        const nextOuterAway = next;
-                        const nextInnerAway = next + 1;
-                        const nextOuterNear = next + 2;
-                        const nextInnerNear = next + 3;
-
-                        // outer curved wall
-                        indices.push(outerAway, nextOuterAway, outerNear);
-                        indices.push(nextOuterAway, nextOuterNear, outerNear);
-
-                        // inner curved wall
-                        indices.push(innerAway, innerNear, nextInnerAway);
-                        indices.push(nextInnerAway, innerNear, nextInnerNear);
-
-                        // away-from-teeth cover surface
-                        indices.push(outerAway, innerAway, nextOuterAway);
-                        indices.push(nextOuterAway, innerAway, nextInnerAway);
-
-                        // near-teeth cover surface
-                        indices.push(outerNear, nextOuterNear, innerNear);
-                        indices.push(nextOuterNear, nextInnerNear, innerNear);
-                    }
-
-                    // close left end
-                    indices.push(0, 2, 1);
-                    indices.push(1, 2, 3);
-
-                    // close right end
-                    const last = coverSegments * 4;
-                    indices.push(last, last + 1, last + 2);
-                    indices.push(last + 1, last + 3, last + 2);
-
-                    const coverGeometry = new THREE.BufferGeometry();
-                    coverGeometry.setAttribute(
-                        'position',
-                        new THREE.Float32BufferAttribute(vertices, 3)
-                    );
-                    coverGeometry.setIndex(indices);
-                    coverGeometry.computeVertexNormals();
-
-                    const coverMaterial = createStandardMaterial({
-                        ...gumMaterialProps,
-                        color: 0xF3A09B,
-                        roughness: 0.74,
-                        side: THREE.DoubleSide
-                    });
-
-                    const coverMesh = new THREE.Mesh(coverGeometry, coverMaterial);
-                    coverMesh.castShadow = true;
-                    coverMesh.receiveShadow = true;
-                    scene.add(coverMesh);
-                }
-
-                addGumCover();
-
-                function addGumEndCap(basePoint, lipPoint, sideSign) {
-                    const mainCap = new THREE.Mesh(
-                        new THREE.SphereGeometry(0.34, 24, 18),
-                        createStandardMaterial(gumMaterialProps)
-                    );
-                    mainCap.scale.set(1.02, 1.24, 0.96);
-                    mainCap.position.set(
-                        basePoint.x + sideSign * 0.06,
-                        basePoint.y + (isUpper ? 0.01 : -0.01),
-                        basePoint.z
-                    );
-                    mainCap.castShadow = true;
-                    mainCap.receiveShadow = true;
-                    scene.add(mainCap);
-
-                    const lipCap = new THREE.Mesh(
-                        new THREE.SphereGeometry(0.20, 20, 14),
-                        createStandardMaterial({
-                            ...gumMaterialProps,
-                            color: 0xF9C4BF,
-                            roughness: 0.72
-                        })
-                    );
-                    lipCap.scale.set(1.10, 1.16, 0.88);
-                    lipCap.position.set(
-                        lipPoint.x + sideSign * 0.08,
-                        lipPoint.y,
-                        lipPoint.z + 0.01
-                    );
-                    lipCap.castShadow = true;
-                    lipCap.receiveShadow = true;
-                    scene.add(lipCap);
-
-                    const bridge = new THREE.Mesh(
-                        new THREE.CylinderGeometry(0.13, 0.13, 0.28, 18, 1),
-                        createStandardMaterial({
-                            ...gumMaterialProps,
-                            color: 0xF6B4AE,
-                            roughness: 0.70
-                        })
-                    );
-                    bridge.scale.set(0.85, 1.0, 0.72);
-                    bridge.position.set(
-                        basePoint.x + sideSign * 0.07,
-                        (basePoint.y + lipPoint.y) / 2,
-                        basePoint.z + 0.01
-                    );
-                    bridge.rotation.z = Math.PI / 2;
-                    bridge.castShadow = true;
-                    bridge.receiveShadow = true;
-                    scene.add(bridge);
-                }
-
-                addGumEndCap(points[0], lipPoints[0], -1);
-                addGumEndCap(points[points.length - 1], lipPoints[lipPoints.length - 1], 1);
-            }
-
-            createGumArch(1.30, true);
-            createGumArch(-1.30, false);
-
-            createArch(adultUpper, 0.95, true);
-            createArch(adultLower, -0.95, false);
-
-            raycaster = new THREE.Raycaster();
-            mouse = new THREE.Vector2();
-
-            renderer.domElement.addEventListener('pointermove', onThreePointerMove);
-            renderer.domElement.addEventListener('pointerleave', onThreePointerLeave);
-            renderer.domElement.addEventListener('pointerdown', onThreePointerDown);
-
-            function animate() {
-                requestAnimationFrame(animate);
-                controls.update();
-                renderer.render(scene, camera);
-            }
-
-            animate();
-
-            setTimeout(() => {
-                loadingOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    loadingOverlay.style.display = 'none';
-                }, 500);
-            }, 600);
-
-            threeSceneInitialized = true;
-            renderThreeVisuals();
-        }
-
-        function handleResize() {
-            if (!renderer || !camera) return;
-            const newWidth = container.clientWidth || 700;
-            const newHeight = container.clientHeight || 480;
-            camera.aspect = newWidth / newHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(newWidth, newHeight);
-        }
-
-        function setToothPartVisual(part, options = {}) {
-            if (!part || !part.material) return;
-
-            const material = part.material;
-            const opacity = options.opacity ?? 1;
-
-            material.transparent = opacity < 1;
-            material.opacity = opacity;
-            material.emissive.setHex(options.emissiveHex ?? 0x111111);
-            material.emissiveIntensity = options.emissiveIntensity ?? 0.08;
-
-            if (options.colorHex && part.userData.colorable) {
-                material.color.setStyle(options.colorHex);
-            }
-
-            material.needsUpdate = true;
-        }
-
-        function renderThreeVisuals() {
-            if (!teethMeshes.length) return;
-
-            teethMeshes.forEach(mesh => {
-                const toothId = Number(mesh.userData.tooth);
-                const state = ensureToothState(toothId);
-                const isSelectedTooth = selectedTooth && toothId === Number(selectedTooth);
-                const shouldDim = currentView === '3d' && selectedTooth && !isSelectedTooth;
-                const visualRecord = state.threeD || getPreferredToothVisual(state);
-
-                const visualGroup = mesh.userData.visualGroup;
-                const visualParts = mesh.userData.visualParts || [];
-                const colorableParts = mesh.userData.colorableParts || [];
-
-                if (visualGroup) {
-                    visualGroup.scale.set(1, 1, 1);
-                }
-
-                visualParts.forEach(part => {
-                    setToothPartVisual(part, {
-                        opacity: shouldDim ? 0.34 : 1,
-                        emissiveIntensity: shouldDim ? 0.02 : 0.08
-                    });
-                });
-
-                if (visualRecord) {
-                    colorableParts.forEach(part => {
-                        setToothPartVisual(part, {
-                            colorHex: visualRecord.colorHex,
-                            opacity: shouldDim ? 0.40 : 1,
-                            emissiveIntensity: shouldDim ? 0.03 : 0.10
-                        });
-                    });
-
-                    mesh.userData.originalColor = visualRecord.colorHex;
-                    mesh.userData.legend = visualRecord.code;
-                } else {
-                    colorableParts.forEach(part => {
-                        setToothPartVisual(part, {
-                            colorHex: '#FFFFF8',
-                            opacity: shouldDim ? 0.34 : 1,
-                            emissiveIntensity: shouldDim ? 0.02 : 0.08
-                        });
-                    });
-
-                    mesh.userData.originalColor = '#FFFFF8';
-                    delete mesh.userData.legend;
-                }
-            });
-
-            if (selectedMesh && currentView === '3d') {
-                applySelectedMeshState(selectedMesh);
-            }
-        }
-
-        function applySelectedMeshState(mesh) {
-            if (!mesh) return;
-
-            const visualGroup = mesh.userData.visualGroup;
-            const visualParts = mesh.userData.visualParts || [];
-            const colorableParts = mesh.userData.colorableParts || [];
-
-            if (visualGroup) {
-                visualGroup.scale.set(1.13, 1.13, 1.13);
-            }
-
-            visualParts.forEach(part => {
-                setToothPartVisual(part, {
-                    opacity: 1,
-                    emissiveHex: 0x8B0000,
-                    emissiveIntensity: 0.20
-                });
-            });
-
-            colorableParts.forEach(part => {
-                setToothPartVisual(part, {
-                    opacity: 1,
-                    emissiveHex: 0x8B0000,
-                    emissiveIntensity: 0.28
-                });
-            });
-        }
-
-        function updateMousePosition(event) {
-            const rect = renderer.domElement.getBoundingClientRect();
-            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
         }
 
         function showTooltip(event, mesh) {
@@ -2952,59 +2373,6 @@ $pageSubtitle = $historicalMode
 
         function hideTooltip() {
             toothTooltip.classList.remove('show');
-        }
-
-        function onThreePointerMove(event) {
-            updateMousePosition(event);
-            raycaster.setFromCamera(mouse, camera);
-
-            const intersects = raycaster.intersectObjects(teethMeshes);
-
-            if (intersects.length > 0) {
-                hoveredMesh = intersects[0].object;
-                const hoveredToothNumber = hoveredMesh.userData.tooth;
-                toothHoverLabel.innerText = selectedTooth && selectedTargetType === '3d' ?
-                    `Selected: #${selectedTooth}` :
-                    `Tooth #${hoveredToothNumber}`;
-
-                showTooltip(event, hoveredMesh);
-            } else {
-                hoveredMesh = null;
-                toothHoverLabel.innerText = selectedTooth ? `Selected: #${selectedTooth}` : 'Select a tooth';
-                hideTooltip();
-            }
-        }
-
-        function onThreePointerLeave() {
-            hoveredMesh = null;
-            toothHoverLabel.innerText = selectedTooth ? `Selected: #${selectedTooth}` : 'Select a tooth';
-            hideTooltip();
-        }
-
-        function onThreePointerDown(event) {
-            updateMousePosition(event);
-            raycaster.setFromCamera(mouse, camera);
-
-            const intersects = raycaster.intersectObjects(teethMeshes);
-
-            if (intersects.length > 0) {
-                selectedMesh = intersects[0].object;
-                selectedTooth = selectedMesh.userData.tooth;
-                restoreSavedSurfaceSelectionForTooth(selectedTooth);
-
-                focusCameraOnTooth(selectedMesh);
-                renderThreeVisuals();
-                updateSelectedToothUI();
-
-                if (hoveredMesh) {
-                    showTooltip(event, hoveredMesh);
-                }
-
-                return;
-            }
-
-            clear3DSurfacePickerSelection(false);
-            hideTooltip();
         }
 
         const procedureStartTimestamp = Date.now();

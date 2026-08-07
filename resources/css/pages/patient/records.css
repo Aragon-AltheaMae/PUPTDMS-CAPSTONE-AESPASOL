@@ -1,227 +1,139 @@
-dialog#record_modal {
-    position: fixed;
-    inset: 0;
-    margin: auto;
-    padding: 0;
-    border: none;
-    background: transparent;
-    width: min(92vw, 560px);
-    max-width: 560px;
-    max-height: 90vh;
-    overflow: visible;
-    z-index: 9999;
-}
-
-dialog#record_modal[open] {
-    display: block;
-}
-
-dialog#record_modal::backdrop {
-    background: rgba(0, 0, 0, 0.58);
-    backdrop-filter: blur(3px);
-}
-
-.patient-record-modal-inner {
-    width: 100%;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-    border-radius: 1.25rem;
-    border: 1px solid rgba(139, 0, 0, 0.18);
-    background: #fff8ef;
-    color: #101111;
-    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.3);
-}
-
-.prm-head {
-    position: relative;
-    padding: 1.5rem;
-    color: #fff;
-    background:
-        radial-gradient(circle at top right, rgba(255, 255, 255, .16), transparent 28%),
-        linear-gradient(135deg, #8B0000, #6b0000);
-    flex-shrink: 0;
-}
-
-.prm-eyebrow {
-    font-size: .65rem;
-    font-weight: 900;
-    letter-spacing: .16em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, .78);
-    margin-bottom: .35rem;
-}
-
-.prm-title {
-    font-size: clamp(1.15rem, 2.5vw, 1.45rem);
-    font-weight: 900;
-    line-height: 1.2;
-}
-
-.prm-close-btn {
-    position: absolute;
-    top: 1.25rem;
-    right: 1.25rem;
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, .16);
-    border: 1px solid rgba(255, 255, 255, .25);
-    color: #fff;
+.record-modal-meta {
     display: flex;
     align-items: center;
-    justify-content: center;
-}
-
-.prm-meta-strip {
-    display: flex;
     flex-wrap: wrap;
-    gap: .65rem;
-    margin-top: 1rem;
+    gap: 10px;
+    margin-top: 8px;
 }
 
-.prm-meta-chip {
+.record-modal-meta>span {
     display: inline-flex;
     align-items: center;
-    gap: .45rem;
-    padding: .35rem .75rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, .14);
-    border: 1px solid rgba(255, 255, 255, .22);
-    font-size: .78rem;
+    gap: 6px;
+
+    color: var(--text-3);
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.record-modal-meta i {
+    color: var(--crimson);
+    font-size: 11px;
+}
+
+.record-modal-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.record-summary-card {
+    min-width: 0;
+    padding: 15px 16px;
+
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+}
+
+.record-summary-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    margin-bottom: 10px;
+
+    color: var(--crimson);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.record-summary-value {
+    display: block;
+
+    color: var(--text-2);
+    font-size: 13px;
     font-weight: 800;
 }
 
-.prm-body {
-    padding: 1.25rem;
-    flex: 1 1 auto;
-    overflow-y: auto;
-    min-height: 0;
+.record-modal-section+.record-modal-section {
+    margin-top: 18px;
 }
 
-.prm-chip-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: .75rem;
-    margin-bottom: 1.2rem;
-}
-
-.prm-chip-box,
-.prm-sec-card {
-    background: #fff;
-    border: 1px solid rgba(139, 0, 0, 0.13);
-    border-radius: .95rem;
-}
-
-.prm-chip-box {
-    padding: .9rem 1rem;
-}
-
-.prm-chip-lbl,
-.prm-sec-lbl {
-    font-size: .64rem;
-    font-weight: 900;
-    letter-spacing: .13em;
-    text-transform: uppercase;
-    color: #8B0000;
-}
-
-.prm-sec {
-    margin-bottom: 1rem;
-}
-
-.prm-sec-head {
+.record-modal-section-title {
     display: flex;
     align-items: center;
-    gap: .7rem;
-    margin-bottom: .5rem;
+    gap: 8px;
+
+    margin-bottom: 8px;
+
+    color: var(--crimson);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: .1em;
+    text-transform: uppercase;
 }
 
-.prm-sec-rule {
+.record-modal-section-title::after {
+    content: "";
     flex: 1;
     height: 1px;
-    background: rgba(139, 0, 0, 0.18);
+    background: var(--crimson-mid);
 }
 
-.prm-sec-card {
-    padding: 1rem;
-    color: #4b5563;
-    font-size: .86rem;
-    line-height: 1.6;
+.record-modal-content {
+    min-height: 58px;
+    padding: 14px 15px;
+
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+
+    color: var(--text-2);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.55;
+
     white-space: pre-wrap;
-    min-height: 3.5rem;
+    overflow-wrap: anywhere;
 }
 
-.prm-footer {
-    padding: 1rem 1.25rem;
-    border-top: 1px solid rgba(139, 0, 0, 0.12);
-    display: flex;
-    justify-content: flex-end;
-    flex-shrink: 0;
+[data-theme="dark"] .record-summary-card,
+.dark .record-summary-card,
+[data-theme="dark"] .record-modal-content,
+.dark .record-modal-content {
+    background: rgba(13, 17, 23, .72);
+    border-color: rgba(255, 255, 255, .10);
 }
 
-.prm-close-main {
-    padding: .7rem 1.4rem;
-    border-radius: 999px;
-    background: #fff;
-    color: #8B0000;
-    border: 1px solid #f0cccc;
-    font-size: .8rem;
-    font-weight: 900;
+[data-theme="dark"] .record-modal-meta>span,
+.dark .record-modal-meta>span,
+[data-theme="dark"] .record-summary-value,
+.dark .record-summary-value,
+[data-theme="dark"] .record-modal-content,
+.dark .record-modal-content {
+    color: #CBD5E1;
 }
 
-[data-theme="dark"] .prm-head {
-    background:
-        radial-gradient(circle at top right, rgba(139, 0, 0, .32), transparent 30%),
-        linear-gradient(135deg, #101111, #0D1117) !important;
+[data-theme="dark"] .record-modal-meta i,
+.dark .record-modal-meta i,
+[data-theme="dark"] .record-summary-label,
+.dark .record-summary-label,
+[data-theme="dark"] .record-modal-section-title,
+.dark .record-modal-section-title {
+    color: #FCA5A5;
 }
 
-[data-theme="dark"] .prm-chip-box,
-[data-theme="dark"] .prm-sec-card {
-    background: #101111 !important;
-    border-color: rgba(255, 255, 255, .12) !important;
-    color: #C9D1D9 !important;
-}
-
-[data-theme="dark"] .prm-chip-lbl,
-[data-theme="dark"] .prm-sec-lbl {
-    color: #ffe8e8 !important;
-}
-
-[data-theme="dark"] .prm-sec-rule {
-    background: rgba(255, 255, 255, .12) !important;
-}
-
-[data-theme="dark"] .prm-footer {
-    border-top-color: rgba(255, 255, 255, .12) !important;
-}
-
-[data-theme="dark"] .prm-close-main {
-    background: #161B22 !important;
-    color: #F3F4F6 !important;
-    border-color: rgba(255, 255, 255, .12) !important;
-}
-
-[data-theme="dark"] .patient-record-modal-inner {
-    background: #0D1117 !important;
-    color: #F3F4F6 !important;
-    border-color: rgba(255, 255, 255, .12) !important;
+[data-theme="dark"] .record-modal-section-title::after,
+.dark .record-modal-section-title::after {
+    background: rgba(252, 165, 165, .18);
 }
 
 @media (max-width: 640px) {
-    dialog#record_modal {
-        inset: auto 0 0 0;
-        width: 100%;
-        max-width: 100%;
-        margin: 0;
-    }
-
-    .patient-record-modal-inner {
-        border-radius: 1.5rem 1.5rem 0 0;
-        max-height: 88vh;
-    }
-
-    .prm-chip-row {
+    .record-modal-summary {
         grid-template-columns: 1fr;
     }
 }
@@ -248,10 +160,7 @@ dialog#record_modal::backdrop {
     border-radius: 50%;
 }
 
-body.role-patient
-#mainContent.patient-records-page
-.records-hero
-.hero-title {
+body.role-patient #mainContent.patient-records-page .records-hero .hero-title {
     margin: 0 !important;
     padding: 0 !important;
 
@@ -271,26 +180,15 @@ body.role-patient
     z-index: 1;
 }
 
-[data-theme="dark"]
-body.role-patient
-#mainContent.patient-records-page
-.records-hero
-.hero-title,
-.dark
-body.role-patient
-#mainContent.patient-records-page
-.records-hero
-.hero-title {
+[data-theme="dark"] body.role-patient #mainContent.patient-records-page .records-hero .hero-title,
+.dark body.role-patient #mainContent.patient-records-page .records-hero .hero-title {
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
     background: none !important;
     background-image: none !important;
 }
 
-body.role-patient
-#mainContent.patient-records-page
-.records-hero
-.hero-sub {
+body.role-patient #mainContent.patient-records-page .records-hero .hero-sub {
     margin: 0.30rem 0 0 !important;
     padding: 0 !important;
 
@@ -553,16 +451,6 @@ body.role-patient
 
 @media (max-width: 375px) {
 
-    .prm-head,
-    .prm-body,
-    .prm-footer {
-        padding: 1rem;
-    }
-
-    .prm-title {
-        font-size: 1.15rem;
-    }
-
     .hero-title {
         font-size: 1.35rem;
     }
@@ -614,15 +502,6 @@ body.role-patient
         width: 100%;
         justify-content: center;
     }
-
-    .prm-meta-strip {
-        flex-direction: column;
-    }
-
-    .prm-meta-chip {
-        width: 100%;
-        justify-content: center;
-    }
 }
 
 @media (max-width: 768px) {
@@ -650,10 +529,6 @@ body.role-patient
 
     .rec-card {
         gap: 0.75rem;
-    }
-
-    .prm-chip-row {
-        grid-template-columns: 1fr;
     }
 }
 
@@ -688,11 +563,6 @@ body.role-patient
     textarea,
     select {
         font: inherit;
-    }
-
-    dialog#record_modal {
-        width: min(92vw, 680px);
-        max-width: 680px;
     }
 
     .records-body {
@@ -732,30 +602,13 @@ body.role-patient
     }
 }
 
-
-.rec-card,
-.prm-body,
-.patient-record-modal-inner {
+.rec-card {
     min-width: 0;
 }
 
 .rec-meta {
     min-width: 0;
 }
-
-
-dialog#record_modal {
-    -webkit-overflow-scrolling: touch;
-}
-
-.patient-record-modal-inner {
-    overflow: hidden;
-}
-
-.prm-body {
-    -webkit-overflow-scrolling: touch;
-}
-
 
 @media (hover: none) {
 
@@ -768,39 +621,18 @@ dialog#record_modal {
     .rec-btn {
         min-height: 44px;
     }
-
-    .prm-close-btn {
-        min-width: 44px;
-        min-height: 44px;
-    }
 }
 
 .hero-title,
-.prm-title,
 .rec-service,
-.prm-sec-card,
 .rec-meta,
 .rec-meta-chip {
     overflow-wrap: anywhere;
     word-break: break-word;
 }
 
-.rec-card > *,
-.prm-chip-box {
+.rec-card>* {
     min-width: 0;
-}
-
-.prm-body {
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
-}
-
-.prm-body::-webkit-scrollbar {
-    width: 8px;
-}
-
-.prm-body::-webkit-scrollbar-thumb {
-    border-radius: 999px;
 }
 
 .hero-stat {
@@ -810,4 +642,47 @@ dialog#record_modal {
 .records-body,
 .records-hero {
     width: min(100%, 1400px);
+}
+
+.record-modal-wide {
+    width: min(1180px, calc(100vw - 48px));
+    max-width: 1180px;
+}
+
+.record-modal-wide .modal-bd {
+    display: grid;
+    gap: 1rem;
+}
+
+.record-modal-summary-three {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    gap: .85rem;
+}
+
+.record-modal-grid-two {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: .85rem;
+}
+
+.record-modal-grid-two .record-modal-section {
+    margin: 0;
+}
+
+.record-modal-odontogram-section {
+    min-width: 0;
+}
+
+.record-modal-odontogram {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+}
+
+.record-modal-odontogram>.odontogram-preview {
+    border: 0;
+    border-radius: 0;
 }

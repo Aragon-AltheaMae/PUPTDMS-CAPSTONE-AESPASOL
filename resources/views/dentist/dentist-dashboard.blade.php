@@ -362,7 +362,7 @@ class="upcoming-item hover:bg-red-50/40 rounded-xl transition" >
 
 <span class="upcoming-time-dot ${statusClass(appt.status)}"></span>
 
-<div class="patient-avatar patient-avatar-sm upcoming-avatar ${avatarClass(appt.status)}">
+<div class="patient-avatar patient-avatar-sm ${avatarClass(appt.status)}">
 ${
 photo
 ? `<img src="${escHtml(photo)}" alt="${escHtml(name)}">`
@@ -1597,7 +1597,7 @@ ${ renderUnifiedCalendarLegend('dentist') }
 <div class="scheduled-patient-head">
 <a href="${profileUrl}${profileUrl.includes('?') ? '&' : '?'}from=dashboard"
 onclick="closeDayAppointmentsModal()"
-class="patient-avatar patient-avatar-sm scheduled-patient-avatar">
+class="patient-avatar patient-avatar-sm">
 ${avatarHtml}
 </a>
 
