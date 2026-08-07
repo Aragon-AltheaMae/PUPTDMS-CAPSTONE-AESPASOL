@@ -424,7 +424,8 @@ $notifCount = $notifications->count();
                         : 'all'))));
 
                         $patient = $appt->patient;
-
+                        $isWalkInAppointment =
+                        (bool) ($appt->is_walk_in ?? false);
                         $patientId = $patient?->id ?? $appt->patient_id;
                         $patientName = $patient?->name ?? 'Unknown Patient';
                         $patientStudentNo = filled($patient?->student_no)
@@ -459,9 +460,13 @@ $notifCount = $notifications->count();
 
                         $patientImage = $patient?->profile_image
                         ? asset('storage/' . $patient->profile_image)
-                        : 'https://ui-avatars.com/api/?name=' .
-                        urlencode($patientName) .
-                        '&background=660000&color=FFFFFF&rounded=true&size=128';
+                        : null;
+
+                        $patientInitials = collect(preg_split('/\s+/', trim($patientName)))
+                        ->filter()
+                        ->take(2)
+                        ->map(fn($part) => strtoupper(substr($part, 0, 1)))
+                        ->implode('');
                         $dateLabel = Carbon::parse($appt->appointment_date)->format('d M Y');
                         $timeLabel = Carbon::parse($appt->appointment_time)->format('g:i A');
                         $serviceLabel =
@@ -548,13 +553,30 @@ $notifCount = $notifications->count();
 
                                 <div class="patient-list-card-body">
                                     <div class="patient-list-main">
-                                        <img src="{{ $patientImage }}" class="patient-list-avatar"
-                                            alt="{{ $patientName }}" />
+                                        <span class="patient-avatar patient-avatar-md">
+                                            @if ($patientImage)
+                                            <img src="{{ $patientImage }}" alt="{{ $patientName }}">
+                                            @else
+                                            <span>{{ $patientInitials ?: '?' }}</span>
+                                            @endif
+                                        </span>
 
                                         <div class="patient-list-person">
-                                            <h3 class="patient-list-name">
-                                                {{ $patientName }}
-                                            </h3>
+                                            <div class="patient-list-name-row">
+
+                                                <h3 class="patient-list-name">
+                                                    {{ $patientName }}
+                                                </h3>
+
+                                                @if ($isWalkInAppointment)
+                                                <span class="ui-action-btn ui-action-neutral ui-action-indicator"
+                                                    data-tooltip="Walk-in appointment" data-tooltip-tone="neutral"
+                                                    aria-label="Walk-in appointment" tabindex="0">
+                                                    <i class="fa-solid fa-person-walking"></i>
+                                                </span>
+                                                @endif
+
+                                            </div>
 
                                             <div class="patient-list-meta">
                                                 <span class="global-info-pill">
@@ -634,13 +656,30 @@ $notifCount = $notifications->count();
                                 <div class="patient-grid-card-body">
                                     <div class="patient-grid-card-header">
                                         <div class="patient-grid-card-identity">
-                                            <img src="{{ $patientImage }}" class="patient-grid-card-avatar"
-                                                alt="{{ $patientName }}" />
+                                            <span class="patient-avatar patient-avatar-lg">
+                                                @if ($patientImage)
+                                                <img src="{{ $patientImage }}" alt="{{ $patientName }}">
+                                                @else
+                                                <span>{{ $patientInitials ?: '?' }}</span>
+                                                @endif
+                                            </span>
 
                                             <div class="patient-grid-card-person">
-                                                <h3 class="patient-grid-card-name">
-                                                    {{ $patientName }}
-                                                </h3>
+                                                <div class="patient-grid-name-row">
+
+                                                    <h3 class="patient-grid-card-name">
+                                                        {{ $patientName }}
+                                                    </h3>
+
+                                                    @if ($isWalkInAppointment)
+                                                    <span class="ui-action-btn ui-action-neutral ui-action-indicator"
+                                                        data-tooltip="Walk-in appointment" data-tooltip-tone="neutral"
+                                                        aria-label="Walk-in appointment" tabindex="0">
+                                                        <i class="fa-solid fa-person-walking"></i>
+                                                    </span>
+                                                    @endif
+
+                                                </div>
 
                                                 <div class="patient-grid-card-meta">
                                                     <span class="global-info-pill">

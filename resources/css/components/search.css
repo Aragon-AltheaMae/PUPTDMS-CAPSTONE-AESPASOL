@@ -84,6 +84,9 @@
 .search-wrap .search-input,
 .global-search .search-input,
 [data-search-wrapper] [data-search-input] {
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
     height: 42px !important;
     min-height: 42px !important;
     padding: 0 42px 0 40px !important;
@@ -95,8 +98,13 @@
     font-weight: 700 !important;
     line-height: 42px !important;
     outline: none !important;
-    box-shadow: 0 8px 18px rgba(139, 0, 0, 0.055) !important;
-    transition: border-color .18s ease, box-shadow .18s ease, background .18s ease, transform .18s ease !important;
+    box-shadow:
+        0 8px 18px rgba(139, 0, 0, 0.055) !important;
+    transition:
+        border-color .18s ease,
+        box-shadow .18s ease,
+        background .18s ease,
+        transform .18s ease !important;
 }
 
 .search-wrap .search-input::placeholder,
@@ -388,4 +396,17 @@
 .dark .search-email,
 .dark .search-empty {
     color: #CBD5E1 !important;
+}
+
+[data-search-input]::-webkit-search-cancel-button,
+[data-search-input]::-webkit-search-decoration,
+[data-search-input]::-webkit-search-results-button,
+[data-search-input]::-webkit-search-results-decoration {
+    display: none;
+    -webkit-appearance: none;
+}
+
+[data-search-input] {
+    appearance: none;
+    -webkit-appearance: none;
 }

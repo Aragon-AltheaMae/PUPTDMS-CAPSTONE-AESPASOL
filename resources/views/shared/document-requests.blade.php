@@ -1586,33 +1586,57 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
     }
 
     function buildPatientAvatar(r) {
-        const displayName = getPatientDisplayName(r.patient_name);
-        const initials = getRequestInitials(displayName);
-        const photoUrl = getPatientPhotoUrl(r);
+    const displayName =
+        getPatientDisplayName(
+            r.patient_name
+        );
 
-        if (!photoUrl) {
-            return `
-            <div class="global-record-avatar"
-                aria-hidden="true">
-                ${esc(initials)}
+    const initials =
+        getRequestInitials(
+            displayName
+        );
+
+    const photoUrl =
+        getPatientPhotoUrl(r);
+
+    if (!photoUrl) {
+        return `
+            <div
+                class="
+                    patient-avatar
+                    patient-avatar-md
+                "
+                aria-hidden="true"
+            >
+                <span>
+                    ${esc(initials)}
+                </span>
             </div>
         `;
-        }
+    }
 
-        return `
-        <div class="global-record-avatar">
+    return `
+        <div
+            class="
+                patient-avatar
+                patient-avatar-md
+            "
+        >
             <img
                 src="${esc(photoUrl)}"
                 alt="${esc(displayName)}"
                 loading="lazy"
                 onerror="
-                    const avatar = this.parentElement;
-                    avatar.textContent = '${esc(initials)}';
+                    const avatar =
+                        this.parentElement;
+
+                    avatar.innerHTML =
+                        '<span>${esc(initials)}</span>';
                 "
             >
         </div>
     `;
-    }
+}
 
     function getStatusLabel(status) {
         const normalized = String(status || 'pending').replace(/_/g, '-').toLowerCase();

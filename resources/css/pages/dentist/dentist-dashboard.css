@@ -807,42 +807,8 @@
     background: #8B0000;
 }
 
-.upcoming-avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 999px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    background: #fff5f5;
-    color: #8B0000;
-    font-size: 0.75rem;
-    font-weight: 900;
-    border: 2px solid #8B0000;
-    flex-shrink: 0;
-}
-
-.upcoming-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.avatar-confirmed {
-    border-color: #22c55e;
-}
-
-.avatar-pending {
-    border-color: #eab308;
-}
-
 .avatar-cancelled {
     border-color: #ef4444;
-}
-
-.avatar-default {
-    border-color: #8B0000;
 }
 
 .upcoming-time-dot {
@@ -1288,9 +1254,7 @@
     box-shadow: 0 10px 24px rgba(139, 0, 0, 0.35) !important;
 }
 
-[data-theme="dark"] #mainContent .upcoming-avatar,
 [data-theme="dark"] #mainContent .upcoming-time-dot,
-.dark #mainContent .upcoming-avatar,
 .dark #mainContent .upcoming-time-dot {
     background: rgba(139, 0, 0, 0.28) !important;
     color: #FCA5A5 !important;
@@ -1736,15 +1700,6 @@
 [data-theme="dark"] .scheduled-patient-schedule,
 .dark .scheduled-patient-schedule {
     color: #FCA5A5 !important;
-}
-
-[data-theme="dark"] .scheduled-patient-avatar,
-[data-theme="dark"] .upcoming-avatar,
-.dark .scheduled-patient-avatar,
-.dark .upcoming-avatar {
-    background: rgba(139, 0, 0, 0.28) !important;
-    color: #FCA5A5 !important;
-    border-color: rgba(252, 165, 165, 0.42) !important;
 }
 
 [data-theme="dark"] #dayAppointmentsModalBox>div:last-child button,
@@ -2598,42 +2553,6 @@
     align-items: start !important;
     gap: 0.42rem !important;
     min-width: 0 !important;
-}
-
-.patient-avatar,
-.scheduled-patient-avatar,
-.upcoming-avatar {
-    width: 34px !important;
-    height: 34px !important;
-    min-width: 34px !important;
-    border-radius: 999px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    overflow: hidden !important;
-    background: #fff5f5 !important;
-    color: #8B0000 !important;
-    font-size: 0.68rem !important;
-    font-weight: 900 !important;
-    border: 2px solid rgba(139, 0, 0, 0.18) !important;
-    flex-shrink: 0 !important;
-}
-
-.patient-avatar img,
-.scheduled-patient-avatar img,
-.upcoming-avatar img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    display: block !important;
-}
-
-.patient-avatar-sm,
-.scheduled-patient-avatar {
-    width: 28px !important;
-    height: 28px !important;
-    min-width: 28px !important;
-    font-size: 0.6rem !important;
 }
 
 .scheduled-patient-info {

@@ -82,10 +82,12 @@ $upcomingTotal = $upcomingAppointments->count();
 $pastTotal = $pastAppointments->count();
 $allAppointments = $upcomingAppointments->merge($pastAppointments);
 $appointmentRefreshItems = $allAppointments
-->map(fn($appointment) => [
+->map(
+fn($appointment) => [
 'id' => $appointment->id,
 'updated_at' => optional($appointment->updated_at)->toISOString(),
-])
+],
+)
 ->values();
 $normalizeAppointmentStatus = function ($status) {
 $normalized = strtolower(trim((string) ($status ?? '')));
@@ -386,8 +388,16 @@ $notifCount = $notifications->count();
                     <div class="space-y-2.5">
                         @foreach ($items as $i => $appt)
                         @php
-                        $patientName = optional($appt->patient)->name ?? 'Unknown Patient';
-                        $profilePatientId = optional($appt->patient)->id ?? ($appt->patient_id ?? null);
+                        $patientName =
+                        optional($appt->patient)->name
+                        ?? 'Unknown Patient';
+
+                        $profilePatientId =
+                        optional($appt->patient)->id
+                        ?? ($appt->patient_id ?? null);
+
+                        $isWalkInAppointment =
+                        (bool) ($appt->is_walk_in ?? false);
 
                         $profileUrl = $profilePatientId
                         ? route($patientProfileRouteName, ['patient' => $profilePatientId])
@@ -409,12 +419,34 @@ $notifCount = $notifications->count();
                         $courseCode = trim((string) ($patient?->course_code ?? ''));
                         $courseName = trim((string) ($patient?->course_name ?? ''));
 
+                        $isFacultyPatient = filled($patient?->faculty_code);
+
+                        if ($isFacultyPatient) {
+                        $program = 'Faculty';
+                        $programFull = 'Faculty';
+                        } else {
                         $program =
                         $courseCode !== ''
                         ? $courseCode
-                        : ($courseName !== ''
+                        : (
+                        $courseName !== ''
                         ? $courseName
-                        : 'No program');
+                        : 'No program'
+                        );
+
+                        $programFull = collect([
+                        $courseCode,
+                        $courseName !== $courseCode
+                        ? $courseName
+                        : null,
+                        ])
+                        ->filter()
+                        ->implode(' — ');
+
+                        if ($programFull === '') {
+                        $programFull = 'No program';
+                        }
+                        }
 
                         $programFull = collect([
                         $courseCode,
@@ -436,7 +468,10 @@ $notifCount = $notifications->count();
                         ? ($appt->other_services ?? '' ?:
                         'Others')
                         : $appt->service_type ?? '—';
-                        $isToday = ($appt->appointment_date ?? null) === $today;
+
+                        $isToday =
+                        ($appt->appointment_date ?? null) === $today;
+
                         $serviceLower = strtolower($serviceLabel);
                         $badgeClass = 'service-badge-default';
                         if (str_contains($serviceLower, 'surgery')) {
@@ -507,9 +542,27 @@ $notifCount = $notifications->count();
                                 </div>
 
                                 <div class="appt-patient-cell flex items-center justify-start gap-3">
-                                    <img src="{{ optional($appt->patient)->profile_image ? asset('storage/' . $appt->patient->profile_image) : 'https://ui-avatars.com/api/?name=' . urlencode($patientName) . '&background=8B0000&color=ffffff&bold=true' }}"
-                                        alt="{{ $patientName }}"
-                                        class="w-8 h-8 rounded-full object-cover border border-gray-200 flex-shrink-0">
+                                    @php
+                                    $patientImage = optional($appt->patient)->profile_image
+                                    ? asset('storage/' . optional($appt->patient)->profile_image)
+                                    : null;
+
+                                    $patientInitials = collect(preg_split('/\s+/', trim($patientName)))
+                                    ->filter()
+                                    ->take(2)
+                                    ->map(fn($part) => strtoupper(substr($part, 0, 1)))
+                                    ->implode('');
+                                    @endphp
+
+                                    <span class="patient-avatar patient-avatar-md">
+                                        @if ($patientImage)
+                                        <img src="{{ $patientImage }}" alt="{{ $patientName }}">
+                                        @else
+                                        <span>
+                                            {{ $patientInitials ?: '?' }}
+                                        </span>
+                                        @endif
+                                    </span>
                                     <div class="text-left min-w-0">
                                         <p class="appt-patient-name text-[13px] font-bold text-gray-800 leading-tight">
                                             {{ $patientName }}</p>
@@ -626,8 +679,16 @@ $notifCount = $notifications->count();
                 <div class="mobile-appointments-list">
                     @foreach ($items as $i => $appt)
                     @php
-                    $patientName = optional($appt->patient)->name ?? 'Unknown Patient';
-                    $profilePatientId = optional($appt->patient)->id ?? ($appt->patient_id ?? null);
+                    $patientName =
+                    optional($appt->patient)->name
+                    ?? 'Unknown Patient';
+
+                    $profilePatientId =
+                    optional($appt->patient)->id
+                    ?? ($appt->patient_id ?? null);
+
+                    $isWalkInAppointment =
+                    (bool) ($appt->is_walk_in ?? false);
 
                     $profileUrl = $profilePatientId
                     ? route($patientProfileRouteName, ['patient' => $profilePatientId])
@@ -648,12 +709,34 @@ $notifCount = $notifications->count();
                     $courseCode = trim((string) ($patient?->course_code ?? ''));
                     $courseName = trim((string) ($patient?->course_name ?? ''));
 
+                    $isFacultyPatient = filled($patient?->faculty_code);
+
+                    if ($isFacultyPatient) {
+                    $program = 'Faculty';
+                    $programFull = 'Faculty';
+                    } else {
                     $program =
                     $courseCode !== ''
                     ? $courseCode
-                    : ($courseName !== ''
+                    : (
+                    $courseName !== ''
                     ? $courseName
-                    : 'No program');
+                    : 'No program'
+                    );
+
+                    $programFull = collect([
+                    $courseCode,
+                    $courseName !== $courseCode
+                    ? $courseName
+                    : null,
+                    ])
+                    ->filter()
+                    ->implode(' — ');
+
+                    if ($programFull === '') {
+                    $programFull = 'No program';
+                    }
+                    }
 
                     $programFull = collect([
                     $courseCode,
@@ -724,9 +807,20 @@ $notifCount = $notifications->count();
                         <div class="flex items-start justify-between gap-2 mb-4 pl-1">
                             <div class="min-w-0">
                                 <div class="flex items-center gap-2 flex-wrap mb-1">
+
                                     <p
                                         class="mobile-patient-name text-[15px] font-extrabold text-gray-800 leading-snug">
-                                        {{ $patientName }}</p>
+                                        {{ $patientName }}
+                                    </p>
+
+                                    @if ($isWalkInAppointment)
+                                    <span class="ui-action-btn ui-action-neutral ui-action-indicator"
+                                        data-tooltip="Walk-in appointment" data-tooltip-tone="neutral"
+                                        aria-label="Walk-in appointment" tabindex="0">
+                                        <i class="fa-solid fa-person-walking"></i>
+                                    </span>
+                                    @endif
+
                                     @if ($isToday)
                                     <span
                                         class="text-[9px] font-bold uppercase tracking-wide bg-blue-600 text-white px-2 py-0.5 rounded-md">Today</span>
@@ -818,9 +912,7 @@ $notifCount = $notifications->count();
                             @if ($canStartProcedure)
                             <button type="button"
                                 class="ui-action-btn ui-action-success {{ $isToday ? '' : 'is-start-locked' }}"
-                                data-tooltip="{{ $isToday
-        ? 'Start procedure'
-        : 'Start procedure is available on the appointment date only' }}"
+                                data-tooltip="{{ $isToday ? 'Start procedure' : 'Start procedure is available on the appointment date only' }}"
                                 data-tooltip-tone="{{ $isToday ? 'start' : 'locked' }}"
                                 data-start-locked="{{ $isToday ? '0' : '1' }}"
                                 aria-disabled="{{ $isToday ? 'false' : 'true' }}"
@@ -951,8 +1043,16 @@ $notifCount = $notifications->count();
                     <div class="space-y-2.5">
                         @foreach ($items as $i => $appt)
                         @php
-                        $patientName = optional($appt->patient)->name ?? 'Unknown Patient';
-                        $profilePatientId = optional($appt->patient)->id ?? ($appt->patient_id ?? null);
+                        $patientName =
+                        optional($appt->patient)->name
+                        ?? 'Unknown Patient';
+
+                        $profilePatientId =
+                        optional($appt->patient)->id
+                        ?? ($appt->patient_id ?? null);
+
+                        $isWalkInAppointment =
+                        (bool) ($appt->is_walk_in ?? false);
 
                         $profileUrl = $profilePatientId
                         ? route($patientProfileRouteName, ['patient' => $profilePatientId])
@@ -974,12 +1074,34 @@ $notifCount = $notifications->count();
                         $courseCode = trim((string) ($patient?->course_code ?? ''));
                         $courseName = trim((string) ($patient?->course_name ?? ''));
 
+                        $isFacultyPatient = filled($patient?->faculty_code);
+
+                        if ($isFacultyPatient) {
+                        $program = 'Faculty';
+                        $programFull = 'Faculty';
+                        } else {
                         $program =
                         $courseCode !== ''
                         ? $courseCode
-                        : ($courseName !== ''
+                        : (
+                        $courseName !== ''
                         ? $courseName
-                        : 'No program');
+                        : 'No program'
+                        );
+
+                        $programFull = collect([
+                        $courseCode,
+                        $courseName !== $courseCode
+                        ? $courseName
+                        : null,
+                        ])
+                        ->filter()
+                        ->implode(' — ');
+
+                        if ($programFull === '') {
+                        $programFull = 'No program';
+                        }
+                        }
 
                         $programFull = collect([
                         $courseCode,
@@ -1064,19 +1186,65 @@ $notifCount = $notifications->count();
                                 </div>
 
                                 <div class="appt-patient-cell flex items-center justify-start gap-3">
-                                    <img src="{{ optional($appt->patient)->profile_image ? asset('storage/' . $appt->patient->profile_image) : 'https://ui-avatars.com/api/?name=' . urlencode($patientName) . '&background=9ca3af&color=ffffff&bold=true' }}"
-                                        alt="{{ $patientName }}"
-                                        class="w-8 h-8 rounded-full object-cover border border-gray-200 flex-shrink-0 opacity-80">
+                                    @php
+                                    $patientImage = optional($appt->patient)->profile_image
+                                    ? asset(
+                                    'storage/' .
+                                    optional($appt->patient)->profile_image
+                                    )
+                                    : null;
+
+                                    $patientInitials = collect(
+                                    preg_split(
+                                    '/\s+/',
+                                    trim($patientName)
+                                    )
+                                    )
+                                    ->filter()
+                                    ->take(2)
+                                    ->map(
+                                    fn ($part) =>
+                                    strtoupper(
+                                    substr($part, 0, 1)
+                                    )
+                                    )
+                                    ->implode('');
+                                    @endphp
+
+                                    <span class="patient-avatar patient-avatar-md">
+                                        @if ($patientImage)
+                                        <img src="{{ $patientImage }}" alt="{{ $patientName }}">
+                                        @else
+                                        <span>
+                                            {{ $patientInitials ?: '?' }}
+                                        </span>
+                                        @endif
+                                    </span>
                                     <div class="text-left min-w-0">
-                                        <p class="appt-patient-name text-[13px] font-bold text-gray-800 leading-tight"
-                                            title="{{ $patientName }}">
-                                            {{ $patientName }}</p>
+
+                                        <div class="appt-patient-name-row">
+
+                                            <p class="appt-patient-name">
+                                                {{ $patientName }}
+                                            </p>
+
+                                            @if ($isWalkInAppointment)
+                                            <span class="ui-action-btn ui-action-neutral ui-action-indicator"
+                                                data-tooltip="Walk-in appointment" data-tooltip-tone="neutral"
+                                                aria-label="Walk-in appointment" tabindex="0">
+                                                <i class="fa-solid fa-person-walking"></i>
+                                            </span>
+                                            @endif
+
+                                        </div>
+
                                         <div class="global-info-group">
                                             <span class="global-info-pill">
                                                 <i class="fa-regular fa-id-card"></i>
                                                 {{ $studentNumber }}
                                             </span>
                                         </div>
+
                                     </div>
                                 </div>
 
@@ -1136,11 +1304,22 @@ $notifCount = $notifications->count();
                 <div class="mobile-appointments-list">
                     @foreach ($items as $i => $appt)
                     @php
-                    $patientName = optional($appt->patient)->name ?? 'Unknown Patient';
-                    $profilePatientId = optional($appt->patient)->id ?? ($appt->patient_id ?? null);
+                    $patientName =
+                    optional($appt->patient)->name
+                    ?? 'Unknown Patient';
+
+                    $profilePatientId =
+                    optional($appt->patient)->id
+                    ?? ($appt->patient_id ?? null);
+
+                    $isWalkInAppointment =
+                    (bool) ($appt->is_walk_in ?? false);
 
                     $profileUrl = $profilePatientId
-                    ? route($patientProfileRouteName, ['patient' => $profilePatientId])
+                    ? route(
+                    $patientProfileRouteName,
+                    ['patient' => $profilePatientId]
+                    )
                     : null;
 
                     if ($isDentistView && $profilePatientId) {
@@ -1158,12 +1337,34 @@ $notifCount = $notifications->count();
                     $courseCode = trim((string) ($patient?->course_code ?? ''));
                     $courseName = trim((string) ($patient?->course_name ?? ''));
 
+                    $isFacultyPatient = filled($patient?->faculty_code);
+
+                    if ($isFacultyPatient) {
+                    $program = 'Faculty';
+                    $programFull = 'Faculty';
+                    } else {
                     $program =
                     $courseCode !== ''
                     ? $courseCode
-                    : ($courseName !== ''
+                    : (
+                    $courseName !== ''
                     ? $courseName
-                    : 'No program');
+                    : 'No program'
+                    );
+
+                    $programFull = collect([
+                    $courseCode,
+                    $courseName !== $courseCode
+                    ? $courseName
+                    : null,
+                    ])
+                    ->filter()
+                    ->implode(' — ');
+
+                    if ($programFull === '') {
+                    $programFull = 'No program';
+                    }
+                    }
 
                     $programFull = collect([
                     $courseCode,
@@ -1231,11 +1432,25 @@ $notifCount = $notifications->count();
                         style="animation-delay:{{ $i * 0.04 }}s">
                         <div class="pl-1">
                             <div class="flex items-start justify-between gap-2 mb-3">
+
                                 <div class="min-w-0">
-                                    <p class="mobile-patient-name text-[15px] font-extrabold text-gray-800 leading-snug"
-                                        title="{{ $patientName }}">
-                                        {{ $patientName }}
-                                    </p>
+
+                                    <div class="flex items-center gap-2 flex-wrap mb-1">
+
+                                        <p
+                                            class="mobile-patient-name text-[15px] font-extrabold text-gray-800 leading-snug">
+                                            {{ $patientName }}
+                                        </p>
+
+                                        @if ($isWalkInAppointment)
+                                        <span class="ui-action-btn ui-action-neutral ui-action-indicator"
+                                            data-tooltip="Walk-in appointment" data-tooltip-tone="neutral"
+                                            aria-label="Walk-in appointment" tabindex="0">
+                                            <i class="fa-solid fa-person-walking"></i>
+                                        </span>
+                                        @endif
+
+                                    </div>
 
                                     <div class="global-info-group">
                                         <span class="global-info-pill">
@@ -1253,11 +1468,18 @@ $notifCount = $notifications->count();
                                         <i class="fa-regular fa-calendar"></i>
                                         {{ $weekday }}, {{ $dateLabel }}
                                     </p>
+
                                 </div>
+
                                 <span class="status-pill {{ $pastStatusClass }} past-status-pill flex-shrink-0"
                                     data-appt-id="{{ $appt->id }}" data-status-base="{{ $pastStatusBase }}"
-                                    data-cancel-reason="{{ $cancelReasonLabel }}"><span class="status-dot"></span><span
-                                        class="past-status-text">{{ $pastStatusLabel }}</span></span>
+                                    data-cancel-reason="{{ $cancelReasonLabel }}">
+                                    <span class="status-dot"></span>
+                                    <span class="past-status-text">
+                                        {{ $pastStatusLabel }}
+                                    </span>
+                                </span>
+
                             </div>
 
                             <div class="appointment-grid-details">
@@ -1599,9 +1821,8 @@ $notifCount = $notifications->count();
                     return payload;
                 }
 
-                return Array.isArray(payload?.appointments)
-                    ? payload.appointments
-                    : [];
+                return Array.isArray(payload?.appointments) ?
+                    payload.appointments : [];
             },
 
             getItemId(appointment) {
@@ -2207,8 +2428,7 @@ $notifCount = $notifications->count();
             !upcomingVisible &&
             !pastVisible;
 
-        const showUpcomingStatusEmpty =
-            !hasSearch &&
+        const showUpcomingStatusEmpty = !hasSearch &&
             (
                 showCombinedPanelEmpty ||
                 (
@@ -2218,8 +2438,7 @@ $notifCount = $notifications->count();
                 )
             );
 
-        const showPastStatusEmpty =
-            !hasSearch &&
+        const showPastStatusEmpty = !hasSearch &&
             appointmentPeriodFilter === 'past' &&
             (hasPanelFilters || hasDropdownStatusFilter) &&
             !pastVisible;
@@ -2273,9 +2492,9 @@ $notifCount = $notifications->count();
             );
 
             button.style.display =
-                hasPanelFilters
-                    ? "inline-flex"
-                    : "none";
+                hasPanelFilters ?
+                    "inline-flex" :
+                    "none";
         });
     }
 
@@ -2286,10 +2505,8 @@ $notifCount = $notifications->count();
             sort: activeSort?.dataset.sort || "newest",
             period: "all",
             status: "all",
-            fromDate:
-                document.getElementById("fromDate")?.value || "",
-            toDate:
-                document.getElementById("toDate")?.value || ""
+            fromDate: document.getElementById("fromDate")?.value || "",
+            toDate: document.getElementById("toDate")?.value || ""
         };
     }
 

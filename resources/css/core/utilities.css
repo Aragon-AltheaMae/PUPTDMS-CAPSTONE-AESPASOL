@@ -2313,20 +2313,36 @@
 }
 
 .global-info-icon {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    flex: 0 0 36px;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-    background: var(--status-bg,
+
+    border-radius: 11px;
+
+    background:
+        var(--status-bg,
             var(--status-default-bg));
-    color: var(--status-text,
+
+    color:
+        var(--status-text,
             var(--status-default-text));
-    border: 1px solid var(--status-border,
+
+    border:
+        1px solid var(--status-border,
             var(--status-default-border));
+
+    flex-shrink: 0;
 }
 
 .global-info-icon i {
     color: currentColor;
+    font-size: 13px;
+    line-height: 1;
 }
 
 .global-info-copy {
@@ -2615,39 +2631,6 @@
     flex: 1 1 auto;
 }
 
-.global-record-avatar {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    flex: 0 0 40px;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    overflow: hidden;
-    border-radius: 999px;
-
-    background:
-        linear-gradient(135deg,
-            var(--crimson, #8B0000),
-            var(--crimson-dark, #5F0000));
-
-    color: #FFFFFF;
-    font-size: 12px;
-    font-weight: 900;
-    line-height: 1;
-
-    box-shadow: 0 6px 14px rgba(139, 0, 0, .18);
-}
-
-.global-record-avatar img {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: cover;
-}
-
 .global-record-identity {
     min-width: 0;
     flex: 1 1 auto;
@@ -2763,4 +2746,23 @@
 [data-theme="dark"] .global-record-name,
 .dark .global-record-name {
     color: #F8FAFC;
+}
+
+.ui-action-indicator {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    border-radius: 9px;
+    cursor: default;
+    pointer-events: auto;
+}
+
+.ui-action-indicator i {
+    font-size: 10px;
+}
+
+.ui-action-indicator:hover,
+.ui-action-indicator:focus-visible {
+    transform: none;
+    box-shadow: none;
 }

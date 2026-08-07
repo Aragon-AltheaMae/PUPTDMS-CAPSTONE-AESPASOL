@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class WalkInController extends Controller
 {
@@ -78,46 +79,138 @@ class WalkInController extends Controller
         Request $request,
         FacultyApiService $facultyApiService,
         StudentApiService $studentApiService
-    )
-    {
+    ) {
         $search = trim((string) $request->query('q', ''));
         $showAll = $request->boolean('show_all');
-        $limit = max(1, min((int) $request->query('limit', 30), 80));
+
+        $page = max(
+            1,
+            (int) $request->query('page', 1)
+        );
+
+        $perPageInput = (int) $request->query(
+            'per_page',
+            10
+        );
+
+        $perPage = in_array(
+            $perPageInput,
+            [10, 20, 50, 100],
+            true
+        )
+            ? $perPageInput
+            : 10;
+        $sourceLimit = 150;
 
         if ($search === '' && ! $showAll) {
-            return response()->json([]);
+            return response()->json([
+                'data' => [],
+                'current_page' => 1,
+                'last_page' => 1,
+                'per_page' => $perPage,
+                'total' => 0,
+                'from' => null,
+                'to' => null,
+            ]);
         }
 
         try {
             $hasMeaningfulSearch = mb_strlen($search) >= 2;
 
             $patients = collect()
-                ->merge($this->searchLocalPatients($search, $limit))
-                ->merge($hasMeaningfulSearch || $showAll
-                    ? $this->searchOgosPatients($search, $limit, $studentApiService)
-                    : [])
-                ->merge($hasMeaningfulSearch || $showAll
-                    ? $this->searchFacultyPatients($search, $limit, $facultyApiService)
-                    : [])
-                ->merge($hasMeaningfulSearch || $showAll
-                    ? $this->searchExternalAdminPatients($search, $limit)
-                    : [])
-                ->unique(fn (array $patient) => $this->resolvePatientIdentityKey($patient))
+                ->merge(
+                    $this->searchLocalPatients(
+                        $search,
+                        $sourceLimit
+                    )
+                )
+                ->merge(
+                    $hasMeaningfulSearch
+                        ? $this->searchOgosPatients(
+                            $search,
+                            $sourceLimit,
+                            $studentApiService
+                        )
+                        : []
+                )
+                ->merge(
+                    $hasMeaningfulSearch
+                        ? $this->searchFacultyPatients(
+                            $search,
+                            $sourceLimit,
+                            $facultyApiService
+                        )
+                        : []
+                )
+                ->merge(
+                    $hasMeaningfulSearch
+                        ? $this->searchExternalAdminPatients(
+                            $search,
+                            $sourceLimit
+                        )
+                        : []
+                )
+                ->filter()
+                ->unique(
+                    fn(array $patient) =>
+                    $this->resolvePatientIdentityKey(
+                        $patient
+                    )
+                )
                 ->map(function (array $patient) use ($search) {
-                    $patient['_score'] = $this->scorePatientSearchMatch($patient, $search);
+                    $patient['_score'] =
+                        $this->scorePatientSearchMatch(
+                            $patient,
+                            $search
+                        );
+
                     return $patient;
                 })
-                ->filter(fn (array $patient) => $search === '' || (($patient['_score'] ?? -1) >= 0))
+                ->filter(
+                    fn(array $patient) =>
+                    $search === '' ||
+                        (($patient['_score'] ?? -1) >= 0)
+                )
                 ->sortByDesc('_score')
-                ->take($limit)
-                ->filter()
                 ->map(function (array $patient) {
                     unset($patient['_score']);
+
                     return $patient;
                 })
                 ->values();
 
-            return response()->json($patients);
+            $total = $patients->count();
+
+            $lastPage = max(
+                1,
+                (int) ceil($total / $perPage)
+            );
+
+            $page = min($page, $lastPage);
+
+            $offset = ($page - 1) * $perPage;
+
+            $pageRecords = $patients
+                ->slice($offset, $perPage)
+                ->values();
+
+            $from = $total > 0
+                ? $offset + 1
+                : null;
+
+            $to = $total > 0
+                ? min($offset + $perPage, $total)
+                : null;
+
+            return response()->json([
+                'data' => $pageRecords,
+                'current_page' => $page,
+                'last_page' => $lastPage,
+                'per_page' => $perPage,
+                'total' => $total,
+                'from' => $from,
+                'to' => $to,
+            ]);
         } catch (\Throwable $e) {
             Log::error('Walk-in student API search failed', [
                 'message' => $e->getMessage(),
@@ -141,7 +234,7 @@ class WalkInController extends Controller
             );
 
             return collect($students)
-                ->map(fn ($student) => $studentApiService->normalizeStudent((array) $student))
+                ->map(fn($student) => $studentApiService->normalizeStudent((array) $student))
                 ->filter()
                 ->map(function (array $student) {
                     $user = $this->syncWalkInUser($student);
@@ -150,11 +243,17 @@ class WalkInController extends Controller
                     return [
                         'id' => $patient->id,
                         'name' => $student['name'],
+                        'gender' => $student['gender'] ?? null,
                         'email' => $student['email'],
                         'type' => 'Student',
                         'student_number' => $student['student_number'] ?? null,
                         'program' => $student['program'] ?? null,
                         'record_url' => route('dentist.odontogram.historical.create', ['patient' => $patient->id]),
+                        'avatar_url' =>
+                        $this->resolvePatientAvatarUrl(
+                            $patient,
+                            $student['name']
+                        ),
                     ];
                 })
                 ->all();
@@ -210,7 +309,7 @@ class WalkInController extends Controller
             return 800;
         }
 
-        if ($tokens !== [] && collect($tokens)->every(fn (string $token) => str_contains($normalizedHaystack, $token))) {
+        if ($tokens !== [] && collect($tokens)->every(fn(string $token) => str_contains($normalizedHaystack, $token))) {
             return 500 - strpos($normalizedHaystack, $tokens[0]);
         }
 
@@ -253,11 +352,47 @@ class WalkInController extends Controller
         return 'id:' . strtolower(trim((string) ($patient['id'] ?? ($patient['name'] ?? Str::uuid()->toString()))));
     }
 
-    private function searchLocalPatients(string $search, int $limit): array
-    {
+    private function searchLocalPatients(
+        string $search,
+        int $limit
+    ): array {
+        $userColumns = [
+            'id',
+            'name',
+            'first_name',
+            'middle_name',
+            'last_name',
+            'suffix_name',
+            'email',
+        ];
+
+        if (Schema::hasColumn('users', 'profile_image')) {
+            $userColumns[] = 'profile_image';
+        }
+
+        $patientColumns = [
+            'id',
+            'user_id',
+            'name',
+            'email',
+            'phone',
+            'gender',
+            'student_no',
+            'course_name',
+            'faculty_code',
+        ];
+
+        if (Schema::hasColumn('patients', 'profile_image')) {
+            $patientColumns[] = 'profile_image';
+        }
+
         $query = Patient::query()
-            ->with('user:id,name,first_name,middle_name,last_name,suffix_name,email')
-            ->select('id', 'user_id', 'name', 'email', 'phone', 'gender', 'student_no', 'course_name', 'faculty_code')
+            ->with([
+                'user' => function ($query) use ($userColumns) {
+                    $query->select($userColumns);
+                },
+            ])
+            ->select($patientColumns)
             ->orderBy('name');
 
         if ($search !== '') {
@@ -281,7 +416,7 @@ class WalkInController extends Controller
                     $user?->middle_name,
                     $user?->last_name,
                     $user?->suffix_name,
-                ])->filter(fn ($value) => filled($value))->implode(' '));
+                ])->filter(fn($value) => filled($value))->implode(' '));
 
                 if ($resolvedName === '') {
                     $resolvedName = trim((string) ($user?->name ?? ''));
@@ -293,13 +428,52 @@ class WalkInController extends Controller
 
                 return [
                     'id' => $patient->id,
-                    'name' => $resolvedName !== '' ? $resolvedName : 'Patient',
-                    'email' => $patient->email ?? $user?->email,
-                    'type' => $patient->faculty_code ? 'Faculty' : ($patient->student_no ? 'Student' : 'Patient'),
-                    'student_number' => $patient->student_no,
-                    'program' => $patient->course_name ?? $patient->faculty_code,
-                    'faculty_code' => $patient->faculty_code,
-                    'record_url' => route('dentist.odontogram.historical.create', ['patient' => $patient->id]),
+
+                    'name' =>
+                    $resolvedName !== ''
+                        ? $resolvedName
+                        : 'Patient',
+
+                    'gender' =>
+                    $patient->gender,
+
+                    'email' =>
+                    $patient->email
+                        ?? $user?->email,
+
+                    'type' =>
+                    $patient->faculty_code
+                        ? 'Faculty'
+                        : (
+                            $patient->student_no
+                            ? 'Student'
+                            : 'Patient'
+                        ),
+
+                    'student_number' =>
+                    $patient->student_no,
+
+                    'program' =>
+                    $patient->course_name
+                        ?? $patient->faculty_code,
+
+                    'faculty_code' =>
+                    $patient->faculty_code,
+
+                    'avatar_url' =>
+                    $this->resolvePatientAvatarUrl(
+                        $patient,
+                        $resolvedName
+                    ),
+
+                    'record_url' =>
+                    route(
+                        'dentist.odontogram.historical.create',
+                        [
+                            'patient' =>
+                            $patient->id,
+                        ]
+                    ),
                 ];
             })
             ->all();
@@ -363,12 +537,23 @@ class WalkInController extends Controller
                 return [
                     'id' => $patient->id,
                     'name' => $patient->name,
+                    'gender' =>
+                    $patient->gender
+                        ?? data_get(
+                            $faculty,
+                            'profile.gender'
+                        ),
                     'email' => $patient->email,
                     'type' => 'Faculty',
                     'student_number' => null,
                     'program' => $faculty['faculty_code'] ?? $faculty['department'] ?? data_get($faculty, 'profile.department'),
                     'faculty_code' => $faculty['faculty_code'] ?? null,
                     'record_url' => route('dentist.odontogram.historical.create', ['patient' => $patient->id]),
+                    'avatar_url' =>
+                    $this->resolvePatientAvatarUrl(
+                        $patient,
+                        $patient->name
+                    ),
                 ];
             });
 
@@ -427,11 +612,19 @@ class WalkInController extends Controller
                 return [
                     'id' => $patient->id,
                     'name' => $patient->name,
+                    'gender' =>
+                    $patient->gender
+                        ?? ($admin['gender'] ?? null),
                     'email' => $patient->email,
                     'type' => 'Administrative',
                     'student_number' => null,
                     'program' => $office !== '' ? $office : null,
                     'record_url' => route('dentist.odontogram.historical.create', ['patient' => $patient->id]),
+                    'avatar_url' =>
+                    $this->resolvePatientAvatarUrl(
+                        $patient,
+                        $patient->name
+                    ),
                 ];
             });
 
@@ -468,7 +661,14 @@ class WalkInController extends Controller
                 'patient' => [
                     'id' => $patient->id,
                     'name' => $patient->name ?? optional($patient->user)->name,
+                    'gender' => $patient->gender,
                     'email' => $patient->email ?? optional($patient->user)->email,
+                    'avatar_url' =>
+                    $this->resolvePatientAvatarUrl(
+                        $patient,
+                        $patient->name
+                            ?? optional($patient->user)->name
+                    ),
                     'type' => 'Guest',
                 ],
             ]);
@@ -527,11 +727,44 @@ class WalkInController extends Controller
             $appointmentData['concern'] = $validated['concern'] ?? null;
         }
 
-        $appointment = Appointment::create($appointmentData);
+        $appointment = Appointment::create(
+            $appointmentData
+        );
 
-        return redirect()->route('dentist.odontogram', [
-            'appointment' => $appointment->id,
-        ]);
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+
+                'message' =>
+                'The walk-in appointment was recorded successfully.',
+
+                'appointment_id' =>
+                $appointment->id,
+
+                'start_url' =>
+                route(
+                    'dentist.odontogram',
+                    [
+                        'appointment' =>
+                        $appointment->id,
+                    ]
+                ) .
+                    '?from=walk-in&start_procedure=1',
+            ]);
+        }
+
+        return redirect()
+            ->route(
+                'dentist.odontogram',
+                [
+                    'appointment' =>
+                    $appointment->id,
+                ]
+            )
+            ->with(
+                'success',
+                'The walk-in appointment was recorded successfully.'
+            );
     }
 
     private function syncWalkInUser(array $data): User
@@ -660,5 +893,77 @@ class WalkInController extends Controller
         $patient->save();
 
         return $patient;
+    }
+
+    private function resolvePatientAvatarUrl(
+        Patient $patient,
+        ?string $displayName = null
+    ): ?string {
+        $patientAvatar = '';
+
+        if (
+            Schema::hasColumn(
+                $patient->getTable(),
+                'profile_image'
+            )
+        ) {
+            $patientAvatar = trim(
+                (string) (
+                    $patient->getAttribute(
+                        'profile_image'
+                    ) ?? ''
+                )
+            );
+        }
+
+        $userAvatar = '';
+
+        if (
+            $patient->user &&
+            Schema::hasColumn(
+                $patient->user->getTable(),
+                'profile_image'
+            )
+        ) {
+            $userAvatar = trim(
+                (string) (
+                    $patient->user->getAttribute(
+                        'profile_image'
+                    ) ?? ''
+                )
+            );
+        }
+
+        foreach (
+            [
+                $patientAvatar,
+                $userAvatar,
+            ] as $avatar
+        ) {
+            if ($avatar === '') {
+                continue;
+            }
+
+            $path = ltrim(
+                str_replace(
+                    'storage/',
+                    '',
+                    $avatar
+                ),
+                '/'
+            );
+
+            if (
+                Storage::disk('public')->exists(
+                    $path
+                )
+            ) {
+                return Storage::disk('public')->url(
+                    $path
+                );
+            }
+        }
+
+        return null;
     }
 }
