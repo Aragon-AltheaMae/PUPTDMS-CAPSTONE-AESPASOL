@@ -1364,7 +1364,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         } catch {
             return;
         }
-
         const form = document.getElementById("appointmentForm");
         if (!form) return;
         Object.keys(obj).forEach((name) => {

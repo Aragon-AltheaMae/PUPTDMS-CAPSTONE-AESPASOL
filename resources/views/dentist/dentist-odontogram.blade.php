@@ -2308,7 +2308,6 @@ $pageSubtitle = $historicalMode
                 antialias: true,
                 alpha: false
             });
-
             renderer.setPixelRatio(window.devicePixelRatio);
             renderer.setSize(width, height);
             renderer.shadowMap.enabled = true;
