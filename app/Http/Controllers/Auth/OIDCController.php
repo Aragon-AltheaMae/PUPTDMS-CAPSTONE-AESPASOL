@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class OIDCController extends Controller
@@ -286,8 +288,7 @@ class OIDCController extends Controller
 
         if ($assignedAccess) {
             if (($assignedAccess->cms_status ?? 'inactive') !== 'active') {
-                return redirect()->route('login')
-                    ->with('error', 'Your CMS access is inactive. Contact administrator.');
+                return $this->renderInactiveAccessPage();
             }
 
             if (!empty($assignedAccess->cms_role)) {
@@ -295,17 +296,16 @@ class OIDCController extends Controller
             }
         } elseif ($facultyAccess && $facultyAccess->user) {
             if (($facultyAccess->user->status ?? 'inactive') !== 'active') {
-                return redirect()->route('login')
-                    ->with('error', 'Your CMS access is inactive. Contact administrator.');
+                return $this->renderInactiveAccessPage();
             }
 
             if (!empty($facultyAccess->user->role?->slug)) {
                 $roleSlug = $facultyAccess->user->role->slug;
-                $roleId = Role::where('slug', $roleSlug)->value('id');
+                $roleId = $this->resolveLocalRoleId($roleSlug);
             }
         }
 
-        $roleId = Role::where('slug', $roleSlug)->value('id');
+        $roleId = $this->resolveLocalRoleId($roleSlug);
 
         Log::info('ROLE MAPPING DEBUG', [
             'incoming_roles'      => $incomingRoles,
@@ -330,6 +330,10 @@ class OIDCController extends Controller
                 $query->orWhere('sso_user_id', $ssoUserId);
             })
             ->first();
+
+        if ($user && ($user->status ?? 'inactive') !== 'active') {
+            return $this->renderInactiveAccessPage();
+        }
 
         if (!$user) {
             $user = User::create([
@@ -378,7 +382,6 @@ class OIDCController extends Controller
         $user->access_token  = $accessToken;
         $user->refresh_token = $refreshToken;
         $user->last_login_at = now();
-        $user->status        = 'active';
         $user->save();
         // I-reload para makuha yung actual role na naka-set sa DB
         $user->refresh();
@@ -699,5 +702,49 @@ class OIDCController extends Controller
         } catch (\Throwable $e) {
             return $value;
         }
+    }
+
+    protected function resolveLocalRoleId(?string $roleSlug): ?int
+    {
+        $normalizedSlug = strtolower(trim((string) $roleSlug));
+
+        if ($normalizedSlug === '') {
+            return null;
+        }
+
+        $roleId = Role::where('slug', $normalizedSlug)->value('id');
+
+        if ($roleId) {
+            return (int) $roleId;
+        }
+
+        $coreRoleNames = [
+            'admin' => 'Admin',
+            'dentist' => 'Dentist',
+            'patient' => 'Patient',
+        ];
+
+        if (!isset($coreRoleNames[$normalizedSlug])) {
+            return null;
+        }
+
+        $role = Role::updateOrCreate(
+            ['slug' => $normalizedSlug],
+            ['name' => $coreRoleNames[$normalizedSlug]]
+        );
+
+        Log::warning('OIDC auto-restored missing core role', [
+            'role_slug' => $normalizedSlug,
+            'role_id' => $role->id,
+        ]);
+
+        return (int) $role->id;
+    }
+
+    protected function renderInactiveAccessPage(): HttpResponse
+    {
+        return response()->view('errors.403', [
+            'exception' => new AccessDeniedHttpException('Your account is inactive. Please contact the administrator.'),
+        ], 403);
     }
 }

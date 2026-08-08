@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class BackupLoginController extends Controller
 {
@@ -25,7 +27,7 @@ class BackupLoginController extends Controller
         return view('auth.backup-login');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse|Response
     {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
@@ -61,9 +63,7 @@ class BackupLoginController extends Controller
             $this->hitRateLimiter($request);
             $this->logFailedAttempt($user->email, 'Backup login blocked because the local admin account is inactive.', $user);
 
-            return back()
-                ->withInput($request->only('email'))
-                ->with('error', 'Your local account is inactive. Please contact the administrator.');
+            return $this->renderInactiveAccessPage();
         }
 
         $roleSlug = optional($user->role)->slug;
@@ -258,5 +258,12 @@ class BackupLoginController extends Controller
         }
 
         return $supportsColumns;
+    }
+
+    private function renderInactiveAccessPage(): Response
+    {
+        return response()->view('errors.403', [
+            'exception' => new AccessDeniedHttpException('Your account is inactive. Please contact the administrator.'),
+        ], 403);
     }
 }
