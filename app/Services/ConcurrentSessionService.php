@@ -45,6 +45,16 @@ class ConcurrentSessionService
         $currentSessionId ??= session()->getId();
         $limit = $this->getSessionLimitForUser($user);
 
+        if ($limit <= 1) {
+            $terminatedSessions = $this->revokeOtherSessions(
+                $user,
+                $currentSessionId,
+                'new_login_single_session_policy'
+            );
+
+            return $this->result($terminatedSessions, $limit, true);
+        }
+
         return DB::transaction(function () use ($user, $currentSessionId, $limit, $sessionTable) {
             $lockedUser = User::query()
                 ->with('role')
