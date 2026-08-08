@@ -9,7 +9,7 @@ return [
         'super_admin' => (int) env('CONCURRENT_SESSIONS_SUPER_ADMIN_LIMIT', 1),
         'admin' => (int) env('CONCURRENT_SESSIONS_ADMIN_LIMIT', 1),
         'dentist' => (int) env('CONCURRENT_SESSIONS_DENTIST_LIMIT', 1),
-        'patient' => (int) env('CONCURRENT_SESSIONS_PATIENT_LIMIT', 3),
+        'patient' => (int) env('CONCURRENT_SESSIONS_PATIENT_LIMIT', 1),
     ],
 
     'strategy' => env('CONCURRENT_SESSIONS_STRATEGY', 'replace_oldest'),

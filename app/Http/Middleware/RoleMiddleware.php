@@ -18,6 +18,38 @@ class RoleMiddleware
 
         $user = Auth::user();
 
+        if (($user?->status ?? 'inactive') !== 'active') {
+            Auth::guard('patient')->logout();
+            Auth::guard('web')->logout();
+            Auth::logout();
+
+            $request->session()->forget([
+                'role',
+                'patient_id',
+                'patient_name',
+                'email',
+                'admin_logged_in',
+                'admin_id',
+                'admin_name',
+                'admin_email',
+                'dentist_id',
+                'dentist_name',
+                'dentist_email',
+                'impersonated_role',
+                'impersonated_patient_id',
+                'impersonator_role',
+                'impersonator_admin_id',
+                'impersonator_admin_email',
+                'last_activity_at',
+                'session_idle_locked',
+            ]);
+
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            abort(403, 'You no longer have access.');
+        }
+
         // If admin is impersonating, use impersonated role first
         $userRole = session('impersonated_role') ?: optional($user->role)->slug;
 

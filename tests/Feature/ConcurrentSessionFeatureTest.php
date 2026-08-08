@@ -27,7 +27,7 @@ class ConcurrentSessionFeatureTest extends TestCase
             'concurrent-sessions.role_limits' => [
                 'admin' => 1,
                 'dentist' => 1,
-                'patient' => 3,
+                'patient' => 1,
             ],
         ]);
     }
@@ -47,21 +47,19 @@ class ConcurrentSessionFeatureTest extends TestCase
         $this->assertDatabaseMissing('sessions', ['id' => 'old-admin-session-2']);
     }
 
-    public function test_patient_login_policy_keeps_three_sessions_and_removes_only_the_oldest_excess_session(): void
+    public function test_patient_login_policy_revokes_existing_older_sessions_like_admin_and_dentist(): void
     {
         $patient = $this->makeUser('patient@example.com', 'patient');
 
-        $this->insertSession('patient-session-1', $patient->id, now()->subMinutes(30)->timestamp);
-        $this->insertSession('patient-session-2', $patient->id, now()->subMinutes(20)->timestamp);
-        $this->insertSession('patient-session-3', $patient->id, now()->subMinutes(10)->timestamp);
+        $this->insertSession('patient-session-1', $patient->id, now()->subMinutes(20)->timestamp);
+        $this->insertSession('patient-session-2', $patient->id, now()->subMinutes(5)->timestamp);
 
         $result = app(ConcurrentSessionService::class)
             ->enforceLimitForCurrentSession($patient, 'new-patient-session');
 
-        $this->assertSame(1, $result['terminated_sessions']);
+        $this->assertSame(2, $result['terminated_sessions']);
         $this->assertDatabaseMissing('sessions', ['id' => 'patient-session-1']);
-        $this->assertDatabaseHas('sessions', ['id' => 'patient-session-2']);
-        $this->assertDatabaseHas('sessions', ['id' => 'patient-session-3']);
+        $this->assertDatabaseMissing('sessions', ['id' => 'patient-session-2']);
     }
 
     public function test_deactivating_a_user_revokes_their_existing_sessions(): void
