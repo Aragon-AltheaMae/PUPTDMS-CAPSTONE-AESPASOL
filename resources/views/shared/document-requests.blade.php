@@ -140,29 +140,41 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
 @endphp
 
 <main id="mainContent" class="{{ $isDentist ? 'dentist-page-shell' : 'admin-page-shell' }}
-           admin-page-shell
            page-enter
            docreq-page
            mode-list" data-document-request-role="{{ $role }}">
     <div class="w-full">
 
-        <div class="page-banner docreq-header-wrap">
-            <div class="page-banner-inner">
-                <div>
-                    <h1 class="page-title">Document Requests</h1>
-                </div>
+        <div class="docreq-header-wrap mb-5">
+            @if ($isDentist)
+            <div class="dentist-hero">
+                <div class="dentist-hero-content">
+                    <div class="dentist-hero-icon">
+                        <i class="fa-solid fa-file-medical"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="dentist-hero-eyebrow">
+                            <i class="fa-solid fa-tooth"></i>
+                            Document Management
+                        </div>
 
-                <div class="page-banner-actions">
-                    <a href="{{ route('admin.document-requests.export') }}" class="ui-btn ui-btn-secondary">
-                        <i class="fa-solid fa-file-export text-xs"></i>
-                        Export CSV
-                    </a>
-                    <a href="{{ route('admin.document-requests.print-queue') }}" class="ui-btn ui-btn-primary">
-                        <i class="fa-solid fa-print text-xs"></i>
-                        Print Queue
-                    </a>
+                        <h2 class="dentist-hero-title">
+                            Document Requests
+                        </h2>
+                    </div>
                 </div>
             </div>
+            @else
+            <div class="page-banner">
+                <div class="page-banner-inner">
+                    <div>
+                        <h1 class="page-title">
+                            Document Requests
+                        </h1>
+                    </div>
+                </div>
+            </div>
+            @endif
         </div>
 
         <div class="table-card rounded-2xl border border-gray-200 shadow-sm bg-white">
@@ -181,24 +193,11 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                         class="docreq-toolbar-actions flex items-center gap-2 order-1 md:order-2 w-full md:w-auto justify-end">
 
                         <div class="docreq-search-wrap flex-1 md:flex-none flex items-center gap-2">
-                            <div class="search-wrap global-search flex-1 md:w-64" data-search-wrapper>
-                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            <x-search-bar id="searchInput" placeholder="Search document…"
+                                callback="handleDocumentRequestSearch" :debounce="350" class="flex-1 md:w-64" />
 
-                                <input id="searchInput" type="text" placeholder="Search document…" data-search-input
-                                    class="search-input" oninput="onSearch(this)" />
-
-                                <button type="button" class="search-clear" data-search-clear aria-label="Clear search">
-                                    <i class="fa-solid fa-xmark text-xs"></i>
-                                </button>
-                            </div>
-
-                            <div class="voice-input-toggle">
-                                <span class="voice-status hidden" data-voice-status></span>
-                                <button type="button" class="voice-search-mic external" data-global-voice-trigger
-                                    data-voice-target="#searchInput" aria-label="Use voice search" title="Voice search">
-                                    <i class="fa-solid fa-microphone"></i>
-                                </button>
-                            </div>
+                            <x-voice-input target="#searchInput" status-id="patientSearchVoiceStatus"
+                                label="Use voice search" title="Voice search" />
                         </div>
 
                         <div id="docreqStatusSelect"
@@ -305,48 +304,10 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                 </div>
             </div>
 
-            <div class="global-pagebar global-pagebar-top docreq-pagebar docreq-pagebar-top">
-                <div class="global-pagebar-left">
-                    <span class="global-pagebar-info docreq-page-info" id="pageInfoTop"></span>
-
-                    <div class="global-page-size-control docreq-page-size-control">
-                        <label for="docreqPerPageSelect">Show</label>
-
-                        <div class="global-page-size-select" data-global-page-size
-                            data-page-size-input="#docreqPerPageSelect" data-page-size-callback="selectDocreqPerPage">
-
-                            <input type="hidden" id="docreqPerPageSelect" class="global-page-size-native"
-                                value="{{ (int) $perPage }}">
-
-                            <button type="button" class="global-page-size-trigger" data-page-size-trigger
-                                aria-haspopup="listbox" aria-expanded="false">
-
-                                <span data-page-size-value>{{ (int) $perPage }}</span>
-                                <i class="fa-solid fa-chevron-down"></i>
-                            </button>
-
-                            <div class="global-page-size-menu" role="listbox">
-                                @foreach ([10, 20, 50, 100] as $size)
-                                <button type="button"
-                                    class="global-page-size-option {{ (int) $perPage === $size ? 'is-selected' : '' }}"
-                                    data-page-size-option data-value="{{ $size }}" role="option"
-                                    aria-selected="{{ (int) $perPage === $size ? 'true' : 'false' }}">
-
-                                    <span>{{ $size }}</span>
-                                    <i class="fa-solid fa-check"></i>
-                                </button>
-                                @endforeach
-                            </div>
-                        </div>
-
-                        <span>per page</span>
-                    </div>
-                </div>
-
-                <div class="global-pagination-wrap docreq-pagination-wrap">
-                    <div id="pagControlsTop" class="global-pagination docreq-page-controls"></div>
-                </div>
-            </div>
+            <x-pagination-bar id="docreqPaginationTopBar" info-id="pageInfoTop" pagination-id="pagControlsTop"
+                position="top" :show-entries="true" page-size-id="docreqPerPageSelect"
+                page-size-callback="selectDocreqPerPage" :page-size-value="$perPage" page-size-label="per page"
+                label="entries" class="docreq-pagebar docreq-pagebar-top" />
 
             <div id="docreqTableHead"
                 class="hidden md:grid gap-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 py-3.5 px-6 bg-[#FAFAFA] border-b border-gray-200"
@@ -363,13 +324,10 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
             <div id="requestListContainer" class="docreq-list-container"></div>
             <div id="requestGridContainer" class="docreq-grid requests-grid"></div>
 
-            <div class="global-pagebar global-pagebar-bottom">
-                <span class="global-pagebar-info" id="pageInfo"></span>
+            <div id="docreqEmptyState" class="empty-state-host"></div>
 
-                <div class="global-pagination-wrap">
-                    <div id="pagControls" class="global-pagination"></div>
-                </div>
-            </div>
+            <x-pagination-bar id="docreqPaginationBottomBar" info-id="pageInfo" pagination-id="pagControls"
+                position="bottom" :page-size-value="$perPage" label="entries" />
 
         </div>
     </div>
@@ -722,17 +680,8 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                     </div>
 
                     <div class="global-textarea-tools">
-                        <div class="voice-input-toggle">
-                            <button type="button" class="voice-search-mic external" data-global-voice-trigger
-                                data-voice-target="#rejectNotes" data-voice-status="#rejectNotesVoiceStatus"
-                                aria-label="Use voice input for rejection reason" title="Voice input">
-
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
-
-                            <span id="rejectNotesVoiceStatus" class="voice-status hidden" data-voice-status
-                                aria-live="polite"></span>
-                        </div>
+                        <x-voice-input target="#searchInput" status-id="patientSearchVoiceStatus"
+                            label="Use voice search" title="Voice search" />
                     </div>
 
                     <div class="global-field-error" data-error-for="rejectNotes" aria-hidden="true">
@@ -780,7 +729,10 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
 
     let searchQuery = '';
 
-    const DOCREQ_INDEX_URL = @json(route('admin.document-requests.index'));
+    const DOCREQ_ROUTES = @json($routes ?? []);
+    const DOCREQ_METHODS = @json($methods ?? []);
+    const DOCREQ_REFRESH_ITEMS = @json($refreshItems ?? []);
+    const DOCREQ_INDEX_URL = DOCREQ_ROUTES.index || window.location.pathname;
     const DOCREQ_INITIAL_PAGINATION = @json($docRequestPagination);
 
     let docreqPagination = DOCREQ_INITIAL_PAGINATION || {
@@ -909,7 +861,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
         docreqRefreshWatcher = window.initGlobalRefreshWatcher({
             key: 'docreq',
             url: DOCREQ_DATA_URL,
-            initialItems: allRequests,
+            initialItems: DOCREQ_REFRESH_ITEMS,
             anchorSelector: '#mainContent.docreq-page .table-card',
             itemLabel: 'document request',
             getItems: (payload) => {
@@ -1481,34 +1433,34 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
         }
 
         if (!page.length) {
-            const emptyHtml = buildEmptyStateHtml();
-
-            if (tableHead) tableHead.style.display = 'none';
-
-            if (currentViewMode === 'grid' && !isMobile) {
-                if (listContainer) {
-                    listContainer.style.display = 'none';
-                    listContainer.innerHTML = '';
-                }
-
-                if (gridContainer) {
-                    gridContainer.style.display = 'block';
-                    gridContainer.innerHTML = emptyHtml;
-                }
-            } else {
-                if (gridContainer) {
-                    gridContainer.style.display = 'none';
-                    gridContainer.innerHTML = '';
-                }
-
-                if (listContainer) {
-                    listContainer.style.display = 'flex';
-                    listContainer.innerHTML = emptyHtml;
-                }
+            if (tableHead) {
+                tableHead.style.display =
+                    'none';
             }
+
+            if (listContainer) {
+                listContainer.style.display =
+                    'none';
+
+                listContainer.innerHTML =
+                    '';
+            }
+
+            if (gridContainer) {
+                gridContainer.style.display =
+                    'none';
+
+                gridContainer.innerHTML =
+                    '';
+            }
+
+            renderDocreqEmptyState();
 
             return;
         }
+        window.EmptyState?.hide(
+            '#docreqEmptyState'
+        );
 
         if (isMobile) {
             if (tableHead) tableHead.style.display = 'none';
@@ -1564,79 +1516,42 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
         return raw;
     }
 
-    function getRequestInitials(name) {
-        const displayName = getPatientDisplayName(name);
+    function buildPatientAvatar(
+        request
+    ) {
+        const displayName =
+            getPatientDisplayName(
+                request.patient_name
+            );
 
-        return String(displayName || '?')
-            .trim()
-            .split(/\s+/)
-            .slice(0, 2)
-            .map(part => part.charAt(0))
-            .join('')
-            .toUpperCase() || '?';
-    }
+        return (
+            window.PatientUI
+                ?.buildAvatarHtml({
+                    name:
+                        displayName,
 
-    function getPatientPhotoUrl(r) {
-        return r.patient_photo_url ||
-            r.profile_photo_url ||
-            r.profile_picture_url ||
-            r.avatar_url ||
-            r.photo_url ||
-            '';
-    }
+                    url:
+                        request
+                            .patient_photo_url ||
+                        request
+                            .profile_photo_url ||
+                        request
+                            .profile_picture_url ||
+                        request
+                            .avatar_url ||
+                        request
+                            .photo_url ||
+                        '',
 
-    function buildPatientAvatar(r) {
-    const displayName =
-        getPatientDisplayName(
-            r.patient_name
+                    size:
+                        'md',
+
+                    escapeHtml:
+                        esc,
+                }) ||
+            ''
         );
-
-    const initials =
-        getRequestInitials(
-            displayName
-        );
-
-    const photoUrl =
-        getPatientPhotoUrl(r);
-
-    if (!photoUrl) {
-        return `
-            <div
-                class="
-                    patient-avatar
-                    patient-avatar-md
-                "
-                aria-hidden="true"
-            >
-                <span>
-                    ${esc(initials)}
-                </span>
-            </div>
-        `;
     }
-
-    return `
-        <div
-            class="
-                patient-avatar
-                patient-avatar-md
-            "
-        >
-            <img
-                src="${esc(photoUrl)}"
-                alt="${esc(displayName)}"
-                loading="lazy"
-                onerror="
-                    const avatar =
-                        this.parentElement;
-
-                    avatar.innerHTML =
-                        '<span>${esc(initials)}</span>';
-                "
-            >
-        </div>
-    `;
-}
 
     function getStatusLabel(status) {
         const normalized = String(status || 'pending').replace(/_/g, '-').toLowerCase();
@@ -1915,78 +1830,122 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
     `;
     }
 
-    function buildEmptyStateHtml() {
-        const isSearchMiss = searchQuery !== '';
-        const isDataEmpty = allRequests.length === 0;
+    function renderDocreqEmptyState() {
+        const isSearchMiss =
+            searchQuery !== '';
+
+        const isDataEmpty =
+            allRequests.length === 0;
+
+        if (isSearchMiss) {
+            window.EmptyState?.renderSearch({
+                host:
+                    '#docreqEmptyState',
+
+                input:
+                    '#searchInput',
+
+                query:
+                    searchQuery,
+
+                message:
+                    'Try another patient name or clear the search to see all requests.',
+            });
+
+            return;
+        }
 
         const statusEmptyCopy = {
             pending: {
-                stateClass: 'empty-pending',
-                iconHtml: '<i class="fa-solid fa-clock-rotate-left"></i>',
-                title: 'No pending requests',
-                subtitle: 'Pending document requests will appear here once submitted.'
+                icon:
+                    'fa-clock-rotate-left',
+
+                title:
+                    'No pending requests',
+
+                message:
+                    'Pending document requests will appear here once submitted.',
             },
+
             approved: {
-                stateClass: 'empty-approved',
-                iconHtml: '<i class="fa-solid fa-file-circle-check"></i>',
-                title: 'No approved requests',
-                subtitle: 'Approved document requests will appear here after review.'
+                icon:
+                    'fa-file-circle-check',
+
+                title:
+                    'No approved requests',
+
+                message:
+                    'Approved document requests will appear here after review.',
             },
+
             rejected: {
-                stateClass: 'empty-rejected',
-                iconHtml: '<i class="fa-solid fa-file-circle-xmark"></i>',
-                title: 'No rejected requests',
-                subtitle: 'Rejected document requests will appear here when applicable.'
-            }
+                icon:
+                    'fa-file-circle-xmark',
+
+                title:
+                    'No rejected requests',
+
+                message:
+                    'Rejected document requests will appear here when applicable.',
+            },
         };
 
-        let stateClass = 'empty-neutral';
-        let iconHtml = '<i class="fa-regular fa-folder-open"></i>';
-        let title = 'No document requests yet';
-        let subtitle = 'Incoming patient document requests will appear here once submitted.';
-        let buttonHtml = '';
+        if (activeFilter !== 'all') {
+            const copy =
+                statusEmptyCopy[
+                activeFilter
+                ] || {
+                    icon:
+                        'fa-filter-circle-xmark',
 
-        if (isSearchMiss) {
-            stateClass = 'empty-search';
-            iconHtml = '<i class="fa-solid fa-magnifying-glass"></i>';
-            title = `No results for "${esc(searchQuery)}"`;
-            subtitle = 'Try another patient name or clear the search to see all requests.';
-            buttonHtml = `
-            <button type="button"
-                data-clear-search
-                data-search-target="#searchInput"
-                class="empty-state-btn">
-                <i class="fa-solid fa-xmark"></i>
-                Clear search
-            </button>
-        `;
-        } else if (activeFilter !== 'all') {
-            const copy = statusEmptyCopy[activeFilter] || {
-                stateClass: 'empty-filter',
-                iconHtml: '<i class="fa-solid fa-filter-circle-xmark"></i>',
-                title: 'No matching requests found',
-                subtitle: 'No document requests are available for this status.'
-            };
+                    title:
+                        'No matching requests found',
 
-            stateClass = copy.stateClass;
-            iconHtml = copy.iconHtml;
-            title = copy.title;
-            subtitle = copy.subtitle;
-        } else if (!isDataEmpty) {
-            stateClass = 'empty-filter';
-            iconHtml = '<i class="fa-solid fa-filter-circle-xmark"></i>';
-            title = 'No matching requests found';
-            subtitle = 'No document requests match the selected filters.';
+                    message:
+                        'No document requests are available for this status.',
+                };
+
+            window.EmptyState?.render({
+                host:
+                    '#docreqEmptyState',
+
+                ...copy,
+            });
+
+            return;
         }
 
-        return `
-        <div class="empty-state ${stateClass}">
-            <div class="empty-state-icon">${iconHtml}</div>
-            <p class="empty-state-title">${title}</p>
-            <p class="empty-state-sub">${subtitle}</p>
-            ${buttonHtml}
-        </div>
-    `;
+        if (!isDataEmpty) {
+            window.EmptyState?.render({
+                host:
+                    '#docreqEmptyState',
+
+                icon:
+                    'fa-filter-circle-xmark',
+
+                title:
+                    'No matching requests found',
+
+                message:
+                    'No document requests match the selected filters.',
+            });
+
+            return;
+        }
+
+        window.EmptyState?.render({
+            host:
+                '#docreqEmptyState',
+
+            icon:
+                'fa-folder-open',
+
+            title:
+                'No document requests yet',
+
+            message:
+                'Incoming patient document requests will appear here once submitted.',
+        });
     }
 
     function buildMobileCard(r) {
@@ -2138,25 +2097,31 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
             '&quot;');
     }
 
-    function updateDocreqPerPageUI(value) {
-        const allowed = ['10', '20', '50', '100'];
-        const selectedValue = allowed.includes(String(value)) ? String(value) : '10';
-
-        const hiddenInput = document.getElementById('docreqPerPageSelect');
-
-        if (hiddenInput) hiddenInput.value = selectedValue;
-
-        window.syncGlobalPageSizeSelect?.(hiddenInput, selectedValue);
-    }
-
     function selectDocreqPerPage(value) {
-        const selectedValue = Number(value) || 10;
+        const selectedValue =
+            Number(value) || 10;
 
-        docreqPerPage = selectedValue;
+        docreqPerPage =
+            selectedValue;
+
         currentPage = 1;
 
-        updateDocreqPerPageUI(selectedValue);
-        closeDocreqDropdowns();
+        const input =
+            document.getElementById(
+                'docreqPerPageSelect'
+            );
+
+        if (input) {
+            input.value =
+                String(selectedValue);
+
+            window
+                .syncGlobalPageSizeSelect?.(
+                    input,
+                    selectedValue
+                );
+        }
+
         fetchDocRequests();
     }
 
@@ -2164,159 +2129,91 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
 
     window.initGlobalPageSizeSelects?.();
 
-    function renderDocreqPagebars(pagination) {
-        if (!pagination) return;
-
-        const from = Number(pagination.from || 0);
-        const to = Number(pagination.to || 0);
-        const total = Number(pagination.total || 0);
-
-        const infoHtml = total > 0 ?
-            `Showing <strong>${from}–${to}</strong> of <strong>${total}</strong> entries` :
-            'Showing <strong>0</strong> entries';
-
-        const topInfo = document.getElementById('pageInfoTop');
-        const bottomInfo = document.getElementById('pageInfo');
-
-        if (topInfo) topInfo.innerHTML = infoHtml;
-        if (bottomInfo) bottomInfo.innerHTML = infoHtml;
-
-        const paginationHtml = buildDocreqPagination(pagination);
-
-        const topPagination = document.getElementById('pagControlsTop');
-        const bottomPagination = document.getElementById('pagControls');
-
-        if (topPagination) topPagination.innerHTML = paginationHtml;
-        if (bottomPagination) bottomPagination.innerHTML = paginationHtml;
-    }
-
-    function buildDocreqPagination(p) {
-        if (!p || Number(p.last_page || 1) <= 1) {
-            return '';
+    function renderDocreqPagebars(
+        pagination
+    ) {
+        if (!pagination) {
+            return;
         }
 
-        const current = Number(p.current_page || 1);
-        const last = Number(p.last_page || 1);
-        const windowSize = 5;
-        const half = Math.floor(windowSize / 2);
+        window.renderGlobalPagination?.({
+            currentPage:
+                Number(
+                    pagination.current_page
+                ) || 1,
 
-        let start = Math.max(1, current - half);
-        let end = Math.min(last, start + windowSize - 1);
+            lastPage:
+                Number(
+                    pagination.last_page
+                ) || 1,
 
-        if (end - start + 1 < windowSize) {
-            start = Math.max(1, end - windowSize + 1);
+            total:
+                Number(
+                    pagination.total
+                ) || 0,
+
+            from:
+                pagination.from ?? null,
+
+            to:
+                pagination.to ?? null,
+
+            containers: [
+                document.getElementById(
+                    'pagControlsTop'
+                ),
+                document.getElementById(
+                    'pagControls'
+                ),
+            ],
+
+            bars: [
+                document.getElementById(
+                    'docreqPaginationTopBar'
+                ),
+                document.getElementById(
+                    'docreqPaginationBottomBar'
+                ),
+            ],
+
+            infoElements: [
+                document.getElementById(
+                    'pageInfoTop'
+                ),
+                document.getElementById(
+                    'pageInfo'
+                ),
+            ],
+
+            itemLabel: 'entries',
+
+            onPageChange(page) {
+                currentPage = page;
+
+                fetchDocRequests();
+            },
+        });
+
+        const input =
+            document.getElementById(
+                'docreqPerPageSelect'
+            );
+
+        if (
+            input &&
+            pagination.per_page
+        ) {
+            input.value =
+                String(
+                    pagination.per_page
+                );
+
+            window
+                .syncGlobalPageSizeSelect?.(
+                    input,
+                    pagination.per_page
+                );
         }
-
-        let html = `
-        <nav
-            class="global-pagination"
-            aria-label="Document requests pagination">
-    `;
-
-        html += current <= 1 ?
-            `
-            <button
-                type="button"
-                class="global-page-disabled"
-                aria-label="Previous page"
-                disabled>
-                <i class="fa-solid fa-chevron-left global-page-icon"></i>
-            </button>
-        ` :
-            `
-            <button
-                type="button"
-                class="global-page-btn"
-                onclick="docreqGoPage(${current - 1})"
-                aria-label="Previous page">
-                <i class="fa-solid fa-chevron-left global-page-icon"></i>
-            </button>
-        `;
-
-        if (start > 1) {
-            html += `
-            <button
-                type="button"
-                class="global-page-btn"
-                onclick="docreqGoPage(1)">
-                1
-            </button>
-        `;
-
-            if (start > 2) {
-                html += `
-                <span
-                    class="global-page-ellipsis"
-                    aria-hidden="true">
-                    &hellip;
-                </span>
-            `;
-            }
-        }
-
-        for (let page = start; page <= end; page++) {
-            html += page === current ?
-                `
-                <span
-                    class="global-page-current"
-                    aria-current="page">
-                    ${page}
-                </span>
-            ` :
-                `
-                <button
-                    type="button"
-                    class="global-page-btn"
-                    onclick="docreqGoPage(${page})">
-                    ${page}
-                </button>
-            `;
-        }
-
-        if (end < last) {
-            if (end < last - 1) {
-                html += `
-                <span
-                    class="global-page-ellipsis"
-                    aria-hidden="true">
-                    &hellip;
-                </span>
-            `;
-            }
-
-            html += `
-            <button
-                type="button"
-                class="global-page-btn"
-                onclick="docreqGoPage(${last})">
-                ${last}
-            </button>
-        `;
-        }
-
-        html += current >= last ?
-            `
-            <button
-                type="button"
-                class="global-page-disabled"
-                aria-label="Next page"
-                disabled>
-                <i class="fa-solid fa-chevron-right global-page-icon"></i>
-            </button>
-        ` :
-            `
-            <button
-                type="button"
-                class="global-page-btn"
-                onclick="docreqGoPage(${current + 1})"
-                aria-label="Next page">
-                <i class="fa-solid fa-chevron-right global-page-icon"></i>
-            </button>
-        `;
-
-        html += '</nav>';
-
-        return html;
     }
 
     function docreqGoPage(page) {
@@ -2601,15 +2498,16 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
 
     let docreqSearchTimer = null;
 
-    function onSearch(input) {
-        searchQuery = input.value.trim();
-        currentPage = 1;
+    window.handleDocumentRequestSearch =
+        function (value) {
+            searchQuery =
+                String(value || '')
+                    .trim();
 
-        clearTimeout(docreqSearchTimer);
-        docreqSearchTimer = setTimeout(() => {
-            fetchDocRequests();
-        }, 350);
-    }
+            currentPage = 1;
+
+            fetchDocRequests(true);
+        };
 
     function outside(id) {
         const el = document.getElementById(id);
@@ -2991,8 +2889,12 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
             btn.disabled = true;
 
             try {
-                const res = await fetch(`/admin/document-requests/${id}/approve`, {
-                    method: 'PATCH',
+                const approveUrl = String(
+                    DOCREQ_ROUTES.approve || ''
+                ).replace('__ID__', id);
+
+                const res = await fetch(approveUrl, {
+                    method: DOCREQ_METHODS.approve || 'POST',
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
@@ -3079,19 +2981,24 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                 );
 
                 try {
+                    const rejectUrl = String(
+                        DOCREQ_ROUTES.reject || ''
+                    ).replace('__ID__', id);
+
                     const response = await fetch(
-                        `/admin/document-requests/${id}/reject`, {
-                        method: 'PATCH',
-                        headers: {
-                            Accept: 'application/json',
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': CSRF,
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        body: JSON.stringify({
-                            reason: notes
-                        })
-                    }
+                        rejectUrl,
+                        {
+                            method: DOCREQ_METHODS.reject || 'POST',
+                            headers: {
+                                Accept: 'application/json',
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': CSRF,
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify({
+                                reason: notes
+                            })
+                        }
                     );
 
                     const data =
@@ -3137,8 +3044,6 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                 }
             }
         );
-
-        updateDocreqPerPageUI(docreqPerPage || 10);
 
         showSkeleton();
 

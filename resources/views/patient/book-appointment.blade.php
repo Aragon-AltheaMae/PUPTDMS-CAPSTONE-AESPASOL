@@ -26,9 +26,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         <div class="w-full pt-10 pb-2 animate-fade-up">
 
             <div class="flex items-center justify-between mt-8 mb-4">
-                <a href="{{ route('homepage') }}"
-                    class="back-home-btn flex items-center gap-2 bg-[#8B0000] hover:bg-[#660000] text-white px-4 py-2 rounded-xl text-xs font-bold border border-[#660000] transition shadow-sm">
-                    <i class="fa-solid fa-arrow-left text-xs"></i>
+                <a href="{{ route('homepage') }}" class="ui-btn ui-btn-primary ui-btn-sm">
+                    <i class="fa-solid fa-arrow-left"></i>
                     Back to Home
                 </a>
                 <span
@@ -114,77 +113,76 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                         @csrf
 
                         <div class="step-content hidden">
-                                <div class="booking-step-header">
-                                    <p class="booking-step-eyebrow">Step 1 of 5</p>
-                                    <h2 class="booking-step-title">Select Date &amp; Time</h2>
-                                    <p class="booking-step-subtitle">
-                                        Choose your preferred appointment date and available clinic time slot.
-                                    </p>
-                                </div>
+                            <div class="booking-step-header">
+                                <p class="booking-step-eyebrow">Step 1 of 5</p>
+                                <h2 class="booking-step-title">Select Date &amp; Time</h2>
+                                <p class="booking-step-subtitle">
+                                    Choose your preferred appointment date and available clinic time slot.
+                                </p>
+                            </div>
 
-                                <div class="booking-step-body">
-                                    <input type="hidden" id="appointment_date" name="appointment_date" required>
-                                    <input type="hidden" id="appointment_time" name="appointment_time" required>
+                            <div class="booking-step-body">
+                                <input type="hidden" id="appointment_date" name="appointment_date" required>
+                                <input type="hidden" id="appointment_time" name="appointment_time" required>
 
-                                    <div class="cal-time-layout grid gap-5 lg:gap-6 mx-auto w-full">
+                                <div class="cal-time-layout grid gap-5 lg:gap-6 mx-auto w-full">
 
-                                        <div class="calendar-shell-no-card">
-                                            <div id="calendarSkeletonContainer"></div>
-                                        </div>
-
-                                        <div class="time-panel flex flex-col is-empty">
-                                            <div class="mb-5">
-                                                <p
-                                                    class="text-[0.78rem] font-extrabold text-[#8B0000] uppercase tracking-[0.24em]">
-                                                    Pick a Time Slot
-                                                </p>
-                                                <p class="text-sm text-[#8c817a] mt-1 leading-6">
-                                                    Choose your preferred schedule for the selected date.
-                                                </p>
-                                            </div>
-
-                                            <div id="dateBanner"
-                                                class="hidden rounded-xl px-3 py-2 text-sm font-semibold text-white mb-3 shadow-md date-banner-gradient">
-                                            </div>
-
-                                            <div id="slotContainer" class="hidden">
-                                                <div id="slotGrid" class="slot-grid-ui grid grid-cols-2 gap-4">
-                                                </div>
-
-                                                <button type="button" id="clearSlotSelectionBtn"
-                                                    class="hidden mt-4 mb-2 w-full rounded-xl border border-[#e8caca] bg-white px-4 py-2 text-xs font-bold text-[#8B0000] hover:bg-[#fff5f5] transition"
-                                                    aria-hidden="true">
-                                                    <i class="fa-solid fa-xmark mr-1"></i>
-                                                    Clear selection
-                                                </button>
-
-                                                <div id="selectedSlotDisplay"
-                                                    class="hidden rounded-2xl px-4 py-3 text-sm font-semibold text-[#8B0000] bg-[linear-gradient(135deg,#fff5f5,#fffafa)] border border-[#e8caca] shadow-sm">
-                                                    <i class="fa-solid fa-circle-check mr-1.5"></i>
-                                                    Selected:
-                                                    <span id="selectedSlotText" class="font-bold"></span>
-                                                </div>
-                                            </div>
-
-                                            <div id="slotPlaceholder"
-                                                class="slot-placeholder-empty flex flex-col items-center justify-center gap-3 py-8 text-center text-[#9e9690]">
-                                                <div
-                                                    class="empty-icon w-12 h-12 rounded-full bg-[#f9e8e8] flex items-center justify-center text-[#8B0000] text-lg">
-                                                    <i class="fa-regular fa-calendar"></i>
-                                                </div>
-                                                <div>
-                                                    <p class="empty-title text-sm font-semibold text-[#5c5550]">Choose
-                                                        a
-                                                        date</p>
-                                                    <p class="empty-subtitle text-xs mt-1">Select an available day to
-                                                        see time slots.</p>
-                                                </div>
-                                            </div>
-                                        </div>
-
+                                    <div class="calendar-shell-no-card" data-global-field>
+                                        <div id="calendarSkeletonContainer"></div>
                                     </div>
+
+                                    <div class="time-panel flex flex-col is-empty" data-global-field>
+                                        <div class="mb-5">
+                                            <p
+                                                class="text-[0.78rem] font-extrabold text-[#8B0000] uppercase tracking-[0.24em]">
+                                                Pick a Time Slot
+                                            </p>
+                                            <p class="text-sm text-[#8c817a] mt-1 leading-6">
+                                                Choose your preferred schedule for the selected date.
+                                            </p>
+                                        </div>
+
+                                        <div id="dateBanner"
+                                            class="hidden rounded-xl px-3 py-2 text-sm font-semibold text-white mb-3 shadow-md date-banner-gradient">
+                                        </div>
+
+                                        <div id="slotContainer" class="hidden">
+                                            <div id="slotGrid" class="slot-grid-ui grid grid-cols-2 gap-4">
+                                            </div>
+
+                                            <button type="button" id="clearSlotSelectionBtn"
+                                                class="ui-btn ui-btn-secondary ui-btn-sm hidden mt-4 mb-2 w-full">
+                                                <i class="fa-solid fa-xmark"></i>
+                                                Clear selection
+                                            </button>
+
+                                            <div id="selectedSlotDisplay"
+                                                class="hidden rounded-2xl px-4 py-3 text-sm font-semibold text-[#8B0000] bg-[linear-gradient(135deg,#fff5f5,#fffafa)] border border-[#e8caca] shadow-sm">
+                                                <i class="fa-solid fa-circle-check mr-1.5"></i>
+                                                Selected:
+                                                <span id="selectedSlotText" class="font-bold"></span>
+                                            </div>
+                                        </div>
+
+                                        <div id="slotPlaceholder"
+                                            class="slot-placeholder-empty flex flex-col items-center justify-center gap-3 py-8 text-center text-[#9e9690]">
+                                            <div
+                                                class="empty-icon w-12 h-12 rounded-full bg-[#f9e8e8] flex items-center justify-center text-[#8B0000] text-lg">
+                                                <i class="fa-regular fa-calendar"></i>
+                                            </div>
+                                            <div>
+                                                <p class="empty-title text-sm font-semibold text-[#5c5550]">Choose
+                                                    a
+                                                    date</p>
+                                                <p class="empty-subtitle text-xs mt-1">Select an available day to
+                                                    see time slots.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
+                        </div>
 
                         <div class="step-content hidden">
                             <div class="booking-step-shell">
@@ -197,11 +195,12 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                 </div>
 
                                 <div class="booking-step-body">
-                                    <div class="service-step-grid">
+                                    <div class="service-step-grid global-choice-group" data-global-field>
                                         @foreach ($serviceTypes as $service)
                                         <label class="service-option group">
                                             <input type="radio" name="service_type" value="{{ $service['name'] }}"
-                                                class="service-option-input">
+                                                class="service-option-input"
+                                                data-required-message="Please select a dental service." required>
 
                                             <div class="service-option-card">
                                                 <div class="service-option-main">
@@ -261,14 +260,15 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                                     Last Dental Visit
                                                 </label>
 
-                                                <div class="date-input-wrap compact">
+                                                <div class="global-control-wrap">
+                                                    <i class="fa-regular fa-calendar global-control-icon"
+                                                        aria-hidden="true">
+                                                    </i>
                                                     <input type="text" id="lastDentalVisit" name="last_dental_visit"
-                                                        class="js-flatpickr-date-max-today form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
+                                                        class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
                                                         placeholder="Select date"
                                                         data-required-message="Please select your last dental visit."
                                                         readonly required>
-
-                                                    <i class="fa-regular fa-calendar date-input-icon"></i>
                                                 </div>
                                             </div>
 
@@ -324,24 +324,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         ];
                                         @endphp
                                         @foreach ($dentalQ1 as $q)
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">{{ $q['q'] }}</span>
 
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="{{ $q['q'] }}">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="{{ $q['name'] }}" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
+                                        <x-booking-question :name="$q['name']" :label="$q['q']"
+                                            :checked-value="old($q['name'])" required />
 
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="{{ $q['name'] }}" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
                                         @endforeach
                                     </div>
 
@@ -353,19 +339,34 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         </p>
                                         @php
                                         $dentalQ2 = [
-                                        ['name' => 'clicking', 'q' => 'Clicking'],
-                                        ['name' => 'joint_pain', 'q' => 'Pain (joint, side of the face)'],
+                                        [
+                                        'name' => 'clicking',
+                                        'q' => 'Clicking',
+                                        ],
+                                        [
+                                        'name' => 'joint_pain',
+                                        'q' => 'Pain (joint, side of the face)',
+                                        ],
                                         [
                                         'name' => 'difficulty_moving',
                                         'q' => 'Difficulty in opening/closing',
                                         ],
-                                        ['name' => 'difficulty_chewing', 'q' => 'Difficulty in chewing'],
-                                        ['name' => 'jaw_headaches', 'q' => 'Frequent headaches'],
+                                        [
+                                        'name' => 'difficulty_chewing',
+                                        'q' => 'Difficulty in chewing',
+                                        ],
+                                        [
+                                        'name' => 'jaw_headaches',
+                                        'q' => 'Frequent headaches',
+                                        ],
                                         [
                                         'name' => 'clench_grind',
                                         'q' => 'Do you clench or grind your teeth?',
                                         ],
-                                        ['name' => 'biting', 'q' => 'Frequent lips/cheek biting'],
+                                        [
+                                        'name' => 'biting',
+                                        'q' => 'Frequent lips/cheek biting',
+                                        ],
                                         [
                                         'name' => 'teeth_loosening',
                                         'q' => 'Have you noticed loosening of your teeth?',
@@ -376,37 +377,21 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         ],
                                         [
                                         'name' => 'med_reaction',
-                                        'q' =>
-                                        'Have you ever had a reaction to any medicine or dental anesthetic?',
+                                        'q' => 'Have you ever had a reaction to any medicine or dental anesthetic?',
                                         ],
                                         ];
                                         @endphp
+
                                         @foreach ($dentalQ2 as $q)
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">{{ $q['q'] }}</span>
 
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="{{ $q['q'] }}">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="{{ $q['name'] }}" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
+                                        <x-booking-question :name="$q['name']" :label="$q['q']"
+                                            :checked-value="old($q['name'])" required />
 
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="{{ $q['name'] }}" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
                                         @endforeach
+
                                         <p class="text-xs text-[#8B0000] mt-2 italic pl-4">
-                                            <i class="fa-solid fa-circle-info mr-1"></i> If <b>YES</b>, please
-                                            provide
-                                            details
-                                            during your
-                                            consultation.
+                                            <i class="fa-solid fa-circle-info mr-1"></i>
+                                            If <b>YES</b>, please provide details during your consultation.
                                         </p>
                                     </div>
 
@@ -417,137 +402,56 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <span class="flex-1 h-px bg-[#f9e8e8]"></span>
                                         </p>
 
-                                        <div class="global-question-row"
-    data-global-field>
-                                            <span class="global-question-text">Have you had any periodontal (gum)
-                                                treatment?</span>
+                                        <x-booking-question name="periodontal"
+                                            label="Have you had any periodontal (gum) treatment?"
+                                            :checked-value="old('periodontal')" required />
 
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Have you had any periodontal (gum) treatment?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="periodontal" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
+                                        <x-booking-question name="difficult_extraction"
+                                            label="Have you had a difficult tooth extraction?"
+                                            :checked-value="old('difficult_extraction')" required />
 
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="periodontal" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
-
-                                        <div class="global-question-row"
-    data-global-field>
-                                            <span class="global-question-text">Have you had a difficult tooth
-                                                extraction?</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Have you had a difficult tooth extraction?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="difficult_extraction" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="difficult_extraction" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
                                         <div class="ml-6 mt-2 mb-2 hidden" id="extraction_date_box">
                                             <label class="text-xs text-[#8B0000] italic block mb-1">Date of
                                                 extraction:</label>
-                                            <div class="date-input-wrap compact">
+                                            <div class="global-control-wrap">
+                                                <i class="fa-regular fa-calendar global-control-icon"></i>
                                                 <input type="text" id="extractionDate" name="extraction_date"
-                                                    class="js-flatpickr-date-max-today w-full form-input voice-small border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full"
+                                                    class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
                                                     placeholder="Select date" readonly>
-                                                <i class="fa-regular fa-calendar date-input-icon"></i>
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Have you had prolonged bleeding
-                                                following
-                                                tooth
-                                                extractions?</span>
+                                        <x-booking-question name="prolonged_bleeding"
+                                            label="Have you had prolonged bleeding following tooth extractions?"
+                                            :checked-value="old('prolonged_bleeding')" required />
 
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Have you had prolonged bleeding following tooth extractions?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="prolonged_bleeding" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="prolonged_bleeding" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
-
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Do you wear complete or partial
-                                                dentures?</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Do you wear complete or partial dentures?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="dentures" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="dentures" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question name="dentures"
+                                            label="Do you wear complete or partial dentures?"
+                                            :checked-value="old('dentures')" required />
                                         <div class="ml-6 mt-2 mb-2 hidden" id="dentures_date_box">
                                             <label class="text-xs text-[#8B0000] italic block mb-1">Date of
                                                 placement:</label>
-                                            <div class="date-input-wrap compact">
+                                            <div class="global-control-wrap">
+                                                <i class="fa-regular fa-calendar global-control-icon"></i>
                                                 <input type="text" id="denturesDate" name="dentures_date"
-                                                    class="js-flatpickr-date-max-today w-full form-input voice-small border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full"
+                                                    class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
                                                     placeholder="Select date" readonly>
-                                                <i class="fa-regular fa-calendar date-input-icon"></i>
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Have you had orthodontic
-                                                treatment?</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Have you had orthodontic treatment?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="ortho_treatment" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="ortho_treatment" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question name="ortho_treatment"
+                                            label="Have you had orthodontic treatment?"
+                                            :checked-value="old('ortho_treatment')" required />
                                         <div class="ml-6 mt-2 mb-2 hidden" id="ortho_date_box">
                                             <label class="text-xs text-[#8B0000] italic block mb-1">Date of
                                                 completion:</label>
-                                            <div class="date-input-wrap compact">
+                                            <div class="global-control-wrap">
+                                                <i class="fa-regular fa-calendar global-control-icon"
+                                                    aria-hidden="true">
+                                                </i>
                                                 <input type="text" id="orthoDate" name="ortho_date"
-                                                    class="js-flatpickr-date-max-today w-full form-input voice-small border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full"
+                                                    class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
                                                     placeholder="Select date" readonly>
-                                                <i class="fa-regular fa-calendar date-input-icon"></i>
                                             </div>
                                         </div>
                                     </div>
@@ -593,24 +497,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <span class="section-card-title-line"></span>
                                         </p>
 
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Are you in good health?</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Are you in good health?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="good_health" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="good_health" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question name="good_health" label="Are you in good health?"
+                                            :checked-value="old('good_health')" required />
                                         <div class="ml-6 mt-1 mb-2 hidden" id="good_health_box">
                                             <label class="text-xs text-[#8B0000] italic">If NO, please provide
                                                 details:</label>
@@ -622,58 +510,26 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">When was your last medical
-                                                examination?</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="When was your last medical examination?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="had_medical_exam" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="had_medical_exam" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question name="had_medical_exam"
+                                            label="When was your last medical examination?"
+                                            :checked-value="old('had_medical_exam')" required />
                                         <div class="ml-6 mt-1 mb-2 hidden" id="medical_exam_box">
                                             <label class="text-xs text-[#8B0000] italic block mb-1">If YES, when was
                                                 your
                                                 last medical examination?</label>
-                                            <div class="date-input-wrap compact">
+                                            <div class="global-control-wrap">
+                                                <i class="fa-regular fa-calendar global-control-icon"
+                                                    aria-hidden="true">
+                                                </i>
                                                 <input type="text" id="medicalExamDate" name="medical_exam_date"
-                                                    class="js-flatpickr-date-max-today w-full form-input voice-small border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full"
+                                                    class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
                                                     placeholder="Select date" readonly>
-                                                <i class="fa-regular fa-calendar date-input-icon"></i>
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Are you currently receiving treatment
-                                                for
-                                                any
-                                                illness?</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Are you currently receiving treatment for any illness?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="under_treatment" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="under_treatment" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question name="under_treatment"
+                                            label="Are you currently receiving treatment for any illness?"
+                                            :checked-value="old('under_treatment')" required />
                                         <div class="ml-6 mt-1 mb-2 hidden" id="treatment_box">
                                             <label class="text-xs text-[#8B0000] italic">If YES, please
                                                 specify:</label>
@@ -685,24 +541,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Have you ever been hospitalized?</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Have you ever been hospitalized?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="hospitalized" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="hospitalized" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question name="hospitalized" label="Have you ever been hospitalized?"
+                                            :checked-value="old('hospitalized')" required />
                                         <div class="ml-6 mt-1 mb-2 hidden" id="hospital_box">
                                             <label class="text-xs text-[#8B0000] italic">If YES, please provide
                                                 details:</label>
@@ -720,41 +560,11 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-triangle-exclamation text-xs"></i> Allergies
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Medicines</span>
+                                        <x-booking-question name="allergy_medicine" label="Medicines"
+                                            :checked-value="old('allergy_medicine')" required />
 
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Medicines">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="allergy_medicine" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="allergy_medicine" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Food</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup" aria-label="Food">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="allergy_food" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="allergy_food" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question name="allergy_food" label="Food"
+                                            :checked-value="old('allergy_food')" required />
                                         <div class="mt-3">
                                             <label class="text-xs text-[#8B0000] italic block mb-1">Others (please
                                                 specify):</label>
@@ -769,26 +579,9 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-pills text-xs"></i> Medications
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Are you taking any prescription or
-                                                non-prescription
-                                                medication?</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Are you taking any prescription or non-prescription medication?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="medication" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="medication" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question name="medication"
+                                            label="Are you taking any prescription or non-prescription medication?"
+                                            :checked-value="old('medication')" required />
                                         <div class="ml-6 mt-1 mb-2 hidden" id="medication_box">
                                             <label class="text-xs text-[#8B0000] italic">If YES, please
                                                 specify:</label>
@@ -813,28 +606,13 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         ['name' => 'nursing', 'q' => 'Are you nursing?'],
                                         [
                                         'name' => 'birth_control',
-                                        'q' => 'Are you taking birth
-                                        control pills?',
+                                        'q' => 'Are you taking birth control pills?',
                                         ],
-                                        ] as $i => $q)
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">{{ $q['q'] }}</span>
+                                        ] as $q)
 
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="{{ $q['q'] }}">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="{{ $q['name'] }}" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
+                                        <x-booking-question :name="$q['name']" :label="$q['q']"
+                                            :checked-value="old($q['name'])" required />
 
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="{{ $q['name'] }}" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
                                         @endforeach
                                     </div>
                                     @else
@@ -869,25 +647,9 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-smoking text-xs"></i> Tobacco Use
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Do you use tobacco products or any
-                                                derivatives?</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Do you use tobacco products or any derivatives?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="tobacco_use" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="tobacco_use" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question name="tobacco_use"
+                                            label="Do you use tobacco products or any derivatives?"
+                                            :checked-value="old('tobacco_use')" required />
                                         <div id="tobacco_details" class="ml-6 mt-2 space-y-2 hidden text-sm">
                                             <div class="flex items-center gap-3 flex-wrap">
                                                 <span class="text-xs text-[#8B0000] italic w-28">How much per
@@ -908,26 +670,15 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <i class="fa-solid fa-head-side-mask text-xs"></i> Do You Suffer From
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        @foreach ([['name' => 'headaches', 'q' => 'Headaches'], ['name' => 'earaches',
-                                        'q' => 'Earaches'], ['name' => 'neck_aches', 'q' => 'Neck aches']] as $i => $q)
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">{{ $q['q'] }}</span>
+                                        @foreach ([
+                                        ['name' => 'headaches', 'q' => 'Headaches'],
+                                        ['name' => 'earaches', 'q' => 'Earaches'],
+                                        ['name' => 'neck_aches', 'q' => 'Neck aches'],
+                                        ] as $q)
 
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="{{ $q['q'] }}">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="{{ $q['name'] }}" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
+                                        <x-booking-question :name="$q['name']" :label="$q['q']"
+                                            :checked-value="old($q['name'])" required />
 
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="{{ $q['name'] }}" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
                                         @endforeach
                                     </div>
 
@@ -938,34 +689,30 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         </p>
 
                                         <div class="emergency-fields-stack">
-                                            <div>
-                                                <label class="block text-xs font-semibold text-[#333] mb-1.5">
+                                            <div data-global-field>
+                                                <label for="emergency_person" class="global-form-label">
                                                     Person to contact in case of emergency
                                                 </label>
-                                                <input type="text" id="emergency_person" name="emergency_person"
-                                                    maxlength="50" pattern="[A-Za-zÑñ\s.'-]+"
-                                                    title="Only letters, spaces, apostrophe, period, and hyphen are allowed."
-                                                    class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
-                                                    placeholder="Full name" required>
 
-                                                <p id="emergency_person_feedback"
-                                                    class="field-help-text text-[#9e9690]">
-                                                    Only letters, spaces, apostrophe, period, and hyphen are allowed.
-                                                </p>
+                                                <input type="text" id="emergency_person" name="emergency_person"
+                                                    maxlength="50" pattern="[A-Za-zÑñ\s.'-]+" class="form-input-custom"
+                                                    placeholder="Full name"
+                                                    data-required-message="Please enter the emergency contact person's name."
+                                                    data-pattern-message="Only letters, spaces, apostrophe, period, and hyphen are allowed."
+                                                    required>
                                             </div>
 
-                                            <div>
-                                                <label class="block text-xs font-semibold text-[#333] mb-1.5">
+                                            <div data-global-field>
+                                                <label for="emergency_number" class="global-form-label">
                                                     Contact Number
                                                 </label>
+
                                                 <input type="tel" id="emergency_number" name="emergency_number"
                                                     inputmode="numeric" autocomplete="tel" maxlength="13"
-                                                    class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full"
-                                                    placeholder="09xx xxx xxxx" required>
-                                                <p id="emergency_number_feedback"
-                                                    class="field-help-text text-[#9e9690]">
-                                                    Format: 09xx xxx xxxx
-                                                </p>
+                                                    class="form-input-custom" placeholder="09xx xxx xxxx"
+                                                    data-validation-rule="philippineMobile"
+                                                    data-required-message="Please enter an emergency contact number."
+                                                    required>
                                             </div>
 
                                             <div>
@@ -991,7 +738,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         </div>
                                     </div>
 
-                                    <div class="signature-section-card">
+                                    <div class="signature-section-card" data-global-field>
                                         <label class="block text-xs font-semibold text-[#333] mb-1.5">
                                             Patient's Signature <span class="required-star">*</span>
                                         </label>
@@ -1008,11 +755,13 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                                     JPG, PNG, up to 25 MB
                                                 </p>
 
-                                                <label
-                                                    class="btn-primary-custom inline-flex items-center gap-1.5 bg-[#8B0000] text-white rounded-xl px-4 py-1.5 text-xs font-bold cursor-pointer">
-                                                    <i class="fa-solid fa-upload"></i> Browse
+                                                <label class="ui-btn ui-btn-primary ui-btn-sm cursor-pointer">
+                                                    <i class="fa-solid fa-upload"></i>
+                                                    Browse
+
                                                     <input type="file" name="patient_signature" id="patient_signature"
                                                         class="hidden" accept=".jpg,.jpeg,.png" required>
+
                                                     <input type="hidden" name="signature_source" id="signature_source"
                                                         value="">
                                                 </label>
@@ -1031,17 +780,20 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
                                                     <div class="signature-pad-actions">
                                                         <button type="button" id="signatureUndoBtn"
-                                                            class="signature-pad-btn">
+                                                            class="ui-btn ui-btn-secondary ui-btn-sm">
+                                                            <i class="fa-solid fa-rotate-left"></i>
                                                             Undo
                                                         </button>
 
                                                         <button type="button" id="signatureClearBtn"
-                                                            class="signature-pad-btn">
+                                                            class="ui-btn ui-btn-secondary ui-btn-sm">
+                                                            <i class="fa-solid fa-eraser"></i>
                                                             Clear Signature
                                                         </button>
 
                                                         <button type="button" id="signatureUseDrawnBtn"
-                                                            class="signature-pad-btn primary">
+                                                            class="ui-btn ui-btn-primary ui-btn-sm">
+                                                            <i class="fa-solid fa-check"></i>
                                                             Use Drawn Signature
                                                         </button>
                                                     </div>
@@ -1051,7 +803,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
                                         <div id="signature_result_box" class="mt-3 hidden text-left w-full max-w-full">
                                             <p id="signature_filename"
-                                                class="text-xs text-[#5c5550] font-semibold truncate"></p>
+                                                class="text-xs text-[#5c5550] font-semibold truncate">
+                                            </p>
 
                                             <div id="signature_error"
                                                 class="mt-1 hidden rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 leading-5 font-semibold">
@@ -1070,210 +823,333 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                         </div>
 
                         <div class="step-content hidden" id="step5">
-                                <div id="summarySection">
-                                    <div class="booking-step-header">
-                                        <p class="booking-step-eyebrow">Step 5 of 5</p>
-                                        <h2 class="booking-step-title">Review Your Information</h2>
-                                        <p class="booking-step-subtitle">
-                                            Please review all the information you provided before proceeding to
-                                            final
-                                            confirmation.
-                                        </p>
-                                    </div>
-
-                                    <div id="summaryBox" class="space-y-4"></div>
-
-                                    <div class="flex justify-center gap-3 mt-8 nav-btns-row">
-                                        <button type="button" id="summaryBackBtn"
-                                            class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-6 py-2.5 text-sm font-semibold text-[#5c5550] bg-transparent">
-                                            <i class="fa-solid fa-chevron-left text-xs"></i> Back
-                                        </button>
-                                        <button type="button" id="goToConfirmationBtn"
-                                            class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-6 py-2.5 text-sm font-bold">
-                                            Proceed to Confirm <i class="fa-solid fa-chevron-right text-xs"></i>
-                                        </button>
-                                    </div>
+                            <div id="summarySection">
+                                <div class="booking-step-header">
+                                    <p class="booking-step-eyebrow">Step 5 of 5</p>
+                                    <h2 class="booking-step-title">Review Your Information</h2>
+                                    <p class="booking-step-subtitle">
+                                        Please review all the information you provided before proceeding to
+                                        final
+                                        confirmation.
+                                    </p>
                                 </div>
 
-                                <div id="confirmationSection" class="hidden">
-                                    <div class="booking-step-header">
-                                        <p class="booking-step-eyebrow">Step 5 of 5</p>
-                                        <h2 class="booking-step-title">Final Confirmation</h2>
-                                        <p class="booking-step-subtitle">
-                                            Confirm that the information is accurate and that you accept the clinic
-                                            terms
-                                            and privacy policy.
-                                        </p>
-                                    </div>
-                                    
-                            
-                                    <div class="section-card mb-2">
-                                        <div class="flex items-start gap-2 mb-4">
-                                            <i class="fa-solid fa-shield-halved text-[#8B0000] mt-0.5"></i>
-                                            <p class="text-sm text-[#5c5550]">
-                                                By submitting, you confirm that all the information provided is
-                                                accurate
-                                                and
-                                                complete.
-                                            </p>
-                                        </div>
+                                <div id="summaryBox" class="space-y-4"></div>
 
-                                        <label
-                                            class="confirm-checkbox-wrap flex items-start gap-3 p-4 rounded-xl border border-[#e8e2dd] bg-[#fafaf8] cursor-pointer">
-                                            <input id="finalConfirm" type="checkbox"
-                                                class="w-5 h-5 rounded border-2 border-[#e8e2dd] bg-white cursor-pointer flex-shrink-0 mt-0.5 accent-[#8B0000]"
-                                                required>
-                                            <span class="text-sm text-[#1a1410] leading-relaxed">
-                                                I have reviewed my dental and medical information and agree to the
-                                                <a href="https://www.pup.edu.ph/privacy/" target="_blank"
-                                                    rel="noopener noreferrer" data-legal-link
-                                                    class="booking-legal-link">
-                                                    Privacy Policy
-                                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                                </a>
-                                                and
-                                                <a href="https://www.pup.edu.ph/terms/" target="_blank"
-                                                    rel="noopener noreferrer" data-legal-link
-                                                    class="booking-legal-link">
-                                                    Terms and Conditions
-                                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                                </a>.
-                                            </span>
-                                        </label>
-                                    </div>
-
-                                    <div class="flex justify-center gap-3 mt-8 nav-btns-row">
-                                        <button type="button" id="confirmBackBtn"
-                                            class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-6 py-2.5 text-sm font-semibold text-[#5c5550] bg-transparent">
-                                            <i class="fa-solid fa-chevron-left text-xs"></i> Back
-                                        </button>
-                                        <button type="button" id="finalSubmitBtn"
-                                            class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-6 py-2.5 text-sm font-bold">
-                                            <i class="fa-solid fa-check"></i> Submit Appointment
-                                        </button>
-                                    </div>
+                                <div class="flex justify-center gap-3 mt-8 nav-btns-row">
+                                    <button type="button" id="summaryBackBtn" class="ui-btn ui-btn-secondary">
+                                        <i class="fa-solid fa-chevron-left"></i>
+                                        Back
+                                    </button>
+                                    <button type="button" id="goToConfirmationBtn" class="ui-btn ui-btn-primary">
+                                        Proceed to Confirm
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </button>
                                 </div>
                             </div>
 
+                            <div id="confirmationSection" class="hidden">
+                                <div class="booking-step-header">
+                                    <p class="booking-step-eyebrow">Step 5 of 5</p>
+                                    <h2 class="booking-step-title">Final Confirmation</h2>
+                                    <p class="booking-step-subtitle">
+                                        Confirm that the information is accurate and that you accept the clinic
+                                        terms
+                                        and privacy policy.
+                                    </p>
+                                </div>
+
+
+                                <div class="section-card mb-2">
+                                    <div class="flex items-start gap-2 mb-4">
+                                        <i class="fa-solid fa-shield-halved text-[#8B0000] mt-0.5"></i>
+                                        <p class="text-sm text-[#5c5550]">
+                                            By submitting, you confirm that all the information provided is
+                                            accurate
+                                            and
+                                            complete.
+                                        </p>
+                                    </div>
+
+                                    <label
+                                        class="confirm-checkbox-wrap flex items-start gap-3 p-4 rounded-xl border border-[#e8e2dd] bg-[#fafaf8] cursor-pointer">
+                                        <input id="finalConfirm" type="checkbox"
+                                            class="w-5 h-5 rounded border-2 border-[#e8e2dd] bg-white cursor-pointer flex-shrink-0 mt-0.5 accent-[#8B0000]"
+                                            required>
+                                        <span class="text-sm text-[#1a1410] leading-relaxed">
+                                            I have reviewed my dental and medical information and agree to the
+                                            <a href="https://www.pup.edu.ph/privacy/" target="_blank"
+                                                rel="noopener noreferrer" data-legal-link class="booking-legal-link">
+                                                Privacy Policy
+                                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                            </a>
+                                            and
+                                            <a href="https://www.pup.edu.ph/terms/" target="_blank"
+                                                rel="noopener noreferrer" data-legal-link class="booking-legal-link">
+                                                Terms and Conditions
+                                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                            </a>.
+                                        </span>
+                                    </label>
+                                </div>
+
+                                <div class="flex justify-center gap-3 mt-8 nav-btns-row">
+                                    <button type="button" id="confirmBackBtn" class="ui-btn ui-btn-secondary">
+                                        <i class="fa-solid fa-chevron-left"></i>
+                                        Back
+                                    </button>
+                                    <button type="button" id="finalSubmitBtn" class="ui-btn ui-btn-primary">
+                                        <i class="fa-solid fa-calendar-check"></i>
+                                        Confirm Appointment
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                         <div id="navBtns" class="flex justify-end mt-8 gap-3 nav-btns-row">
-                            <button type="button" id="prevBtn"
-                                class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-2xl px-6 py-3 text-sm font-semibold text-[#5c5550] bg-white shadow-sm">
-                                <i class="fa-solid fa-chevron-left text-xs"></i> Previous
+                            <button type="button" id="prevBtn" class="ui-btn ui-btn-secondary">
+                                <i class="fa-solid fa-chevron-left"></i>
+                                Previous
                             </button>
 
-                            <button type="button" id="nextBtn"
-                                class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-2xl px-8 py-3 text-sm font-bold shadow-[0_10px_24px_rgba(139,0,0,0.18)]">
-                                Next <i class="fa-solid fa-chevron-right text-xs"></i>
+                            <button type="button" id="nextBtn" class="ui-btn ui-btn-primary">
+                                Next
+                                <i class="fa-solid fa-chevron-right"></i>
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
+</main>
 
-        <dialog id="introBookingModal" class="m-auto w-[calc(100vw-1.5rem)] max-w-[620px]">
-            <div class="intro-booking-modal-panel">
-                <div class="intro-booking-modal-hero">
-                    <p class="intro-booking-modal-eyebrow">PUP Taguig Dental Clinic</p>
-                    <h2 class="intro-booking-modal-title">Let’s get your dental appointment ready.</h2>
-                    <p class="intro-booking-modal-subtitle">
-                        This form will help the clinic prepare safe and proper care for your visit.
+<div id="introBookingModal" class="ui-modal" aria-hidden="true">
+
+    <div class="ui-modal-card modal-md">
+
+        <div class="modal-hd">
+            <div class="modal-heading">
+
+                <div class="modal-icon">
+                    <i class="fa-regular fa-calendar-check"></i>
+                </div>
+
+                <div class="modal-copy">
+                    <h2 class="modal-title">
+                        Let's get your dental appointment ready
+                    </h2>
+
+                    <p class="modal-subtitle">
+                        Complete the required booking information
+                        before submitting your appointment request.
                     </p>
                 </div>
 
-                <div class="intro-booking-modal-body">
-                    <div class="intro-step-strip">
-                        <div class="intro-step-pill">1<span>Date</span></div>
-                        <div class="intro-step-pill">2<span>Service</span></div>
-                        <div class="intro-step-pill">3<span>Dental</span></div>
-                        <div class="intro-step-pill">4<span>Medical</span></div>
-                        <div class="intro-step-pill">5<span>Confirm</span></div>
+            </div>
+        </div>
+
+        <div class="modal-bd">
+
+            <div class="booking-intro-steps">
+
+                <div class="booking-intro-step">
+                    <strong>1</strong>
+                    <span>Date</span>
+                </div>
+
+                <div class="booking-intro-step">
+                    <strong>2</strong>
+                    <span>Service</span>
+                </div>
+
+                <div class="booking-intro-step">
+                    <strong>3</strong>
+                    <span>Dental</span>
+                </div>
+
+                <div class="booking-intro-step">
+                    <strong>4</strong>
+                    <span>Medical</span>
+                </div>
+
+                <div class="booking-intro-step">
+                    <strong>5</strong>
+                    <span>Confirm</span>
+                </div>
+
+            </div>
+
+            <div class="booking-intro-checklist">
+
+                <div class="booking-intro-item">
+                    <div class="global-icon-box global-icon-box-sm">
+                        <i class="fa-solid fa-check"></i>
                     </div>
 
-                    <div class="intro-checklist">
-                        <div class="intro-check-item">
-                            <div class="intro-check-icon"><i class="fa-solid fa-check"></i></div>
-                            <p>Fill out all required fields marked with <b>*</b>.</p>
-                        </div>
-                        <div class="intro-check-item">
-                            <div class="intro-check-icon"><i class="fa-solid fa-phone-volume"></i></div>
-                            <p>Prepare your emergency contact information.</p>
-                        </div>
-                        <div class="intro-check-item">
-                            <div class="intro-check-icon"><i class="fa-solid fa-signature"></i></div>
-                            <p>Prepare your patient signature image or draw it directly in the form.</p>
-                        </div>
-                        <div class="intro-check-item">
-                            <div class="intro-check-icon"><i class="fa-solid fa-list-check"></i></div>
-                            <p>Review your information before submitting.</p>
-                        </div>
+                    <p>
+                        Fill out all required fields marked with
+                        <strong>*</strong>.
+                    </p>
+                </div>
+
+                <div class="booking-intro-item">
+                    <div class="global-icon-box global-icon-box-sm">
+                        <i class="fa-solid fa-phone-volume"></i>
                     </div>
 
-                    <div class="intro-modal-actions">
-                        <button type="button" id="introStartBtn" class="intro-action-btn intro-action-primary">
-                            <i class="fa-solid fa-play"></i>
-                            <span>Start Booking</span>
-                        </button>
+                    <p>
+                        Prepare your emergency contact information.
+                    </p>
+                </div>
 
-                        <button type="button" id="introContinueDraftBtn"
-                            class="hidden intro-action-btn intro-action-secondary">
-                            <i class="fa-solid fa-clock-rotate-left"></i>
-                            <span>Continue Draft</span>
-                        </button>
+                <div class="booking-intro-item">
+                    <div class="global-icon-box global-icon-box-sm">
+                        <i class="fa-solid fa-signature"></i>
+                    </div>
 
-                        <a href="{{ route('homepage') }}" class="intro-action-btn intro-action-muted">
-                            <i class="fa-solid fa-house"></i>
-                            <span>Back Home</span>
-                        </a>
+                    <p>
+                        Upload or draw your patient signature
+                        before confirmation.
+                    </p>
+                </div>
+
+                <div class="booking-intro-item">
+                    <div class="global-icon-box global-icon-box-sm">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+
+                    <p>
+                        Review your appointment information
+                        before submitting.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="modal-ft">
+
+            <a href="{{ route('homepage') }}" class="ui-btn ui-btn-secondary">
+
+                <i class="fa-solid fa-house"></i>
+                Back to Home
+            </a>
+
+            <button type="button" id="introContinueDraftBtn" class="hidden ui-btn ui-btn-secondary">
+
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                Continue Draft
+            </button>
+
+            <button type="button" id="introStartBtn" class="ui-btn ui-btn-primary">
+
+                <i class="fa-solid fa-play"></i>
+                Begin Booking
+            </button>
+
+        </div>
+
+    </div>
+</div>
+
+<div id="confirmModal" class="ui-modal" aria-hidden="true">
+    <div class="ui-modal-card modal-md">
+        <div class="modal-hd appointment-modal-header">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="appointment-modal-header-icon">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <div class="appointment-modal-header-copy">
+                    <span class="appointment-modal-eyebrow">
+                        Appointment Booking
+                    </span>
+                    <h2 class="appointment-modal-title">
+                        Appointment Confirmed
+                    </h2>
+                    <p class="appointment-modal-subtitle">
+                        Your appointment details are ready to be submitted.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-bd">
+            <div class="global-confirm-alert">
+                <i class="fa-solid fa-circle-check"></i>
+                <div>
+                    <strong>
+                        Appointment successfully scheduled
+                    </strong>
+                    <p id="confirmMessage">
+                        Your dental appointment has been scheduled successfully.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-ft">
+            <button type="button" id="okBtn" class="ui-btn ui-btn-primary">
+
+                <i class="fa-solid fa-house"></i>
+                Back to Home
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="leaveModal" class="ui-modal modal-theme-warning" aria-hidden="true">
+    <div class="ui-modal-card modal-sm">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div class="modal-copy">
+                    <h2 class="modal-title">
+                        Leave this page?
+                    </h2>
+                    <p class="modal-subtitle">
+                        Your appointment form has unsaved changes.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-bd">
+            <div class="modal-form-section">
+                <div class="modal-section-heading">
+                    <div class="modal-section-icon">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                    </div>
+                    <div>
+                        <h4>
+                            Unsaved appointment draft
+                        </h4>
+                        <p>
+                            You can save your draft, discard it,
+                            or continue editing.
+                        </p>
                     </div>
                 </div>
             </div>
-        </dialog>
+        </div>
 
-        <dialog id="confirmModal"
-            class="border-0 p-0 rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.25)] max-w-[480px] w-[calc(100vw-2rem)]">
-            <div class="bg-[#8B0000] px-8 py-10 text-center">
-                <div
-                    class="confirm-modal-icon w-16 h-16 rounded-full bg-white/15 flex items-center justify-center mx-auto mb-6">
-                    <i class="fa-solid fa-calendar-check text-white text-2xl"></i>
-                </div>
-
-                <h2 class="confirm-modal-title text-2xl font-extrabold text-white mb-4">
-                    Appointment Confirmed!
-                </h2>
-
-                <p id="confirmMessage" class="confirm-modal-message text-white/85 text-sm leading-7 mb-6"></p>
-
-                <button type="button" id="okBtn"
-                    class="confirm-modal-button bg-white text-[#8B0000] border-0 px-8 py-2.5 rounded-xl font-bold text-sm cursor-pointer transition hover:scale-[1.03] hover:shadow-lg active:scale-[0.98]">
-                    Back to Home
-                </button>
-            </div>
-        </dialog>
-
-        <dialog id="leaveModal"
-            class="m-auto border-0 p-0 rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.25)] max-w-[440px] w-[calc(100vw-2rem)]">
-            <div class="bg-[#8B0000] px-6 py-5">
-                <h3 class="text-lg font-bold text-white mb-0.5">Leave this page?</h3>
-                <p class="text-sm text-white/80">Your appointment form has unsaved changes. You can save your draft,
-                    discard it, or continue editing.</p>
-            </div>
-            <div class="bg-white px-6 py-5 flex justify-end gap-3 flex-wrap">
-                <button type="button" id="cancelLeaveBtn"
-                    class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-4 py-2 text-sm font-semibold text-[#5c5550] bg-transparent">
-                    Cancel
-                </button>
-                <button type="button" id="discardDraftBtn"
-                    class="btn-secondary-custom inline-flex items-center gap-2 border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 rounded-xl px-4 py-2 text-sm font-semibold transition-colors">
-                    Discard
-                </button>
-                <button type="button" id="saveDraftBtn"
-                    class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-5 py-2 text-sm font-bold">
-                    Save Draft
-                </button>
-            </div>
-        </dialog>
-</main>
+        <div class="modal-ft">
+            <button type="button" id="cancelLeaveBtn" class="ui-btn ui-btn-secondary">
+                Cancel
+            </button>
+            <button type="button" id="discardDraftBtn" class="ui-btn ui-btn-danger">
+                <i class="fa-solid fa-trash"></i>
+                Discard
+            </button>
+            <button type="button" id="saveDraftBtn" class="ui-btn ui-btn-primary">
+                <i class="fa-solid fa-floppy-disk"></i>
+                Save Draft
+            </button>
+        </div>
+    </div>
+</div>
 
 <div id="miniTab" class="mini-tab">
     <i class="fa-solid fa-circle-exclamation text-red-400" aria-hidden="true"></i>
@@ -1452,13 +1328,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         }, 3200);
     }
 
-    function showInputError(input) {
-        if (!input) return;
-        input.classList.add("border-red-500");
-        input.style.animation = "shake 0.3s ease";
-        setTimeout(() => input.style.animation = "", 400);
-    }
-
     let step = 0,
         completedSteps = [];
     const steps = document.querySelectorAll(".step-content");
@@ -1584,52 +1453,147 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             const timeInput = document.getElementById("appointment_time");
             const slotArea = document.getElementById("slotContainer") || document.getElementById("slotPlaceholder");
 
+            const calendarGroup =
+                document.querySelector(
+                    ".calendar-shell-no-card"
+                );
+
             if (!dateInput?.value) {
-                showMiniTab("Please select a date first.");
-                scrollToInvalidTarget(document.getElementById("calendarSkeletonContainer"));
+                window.showGlobalGroupError?.(
+                    calendarGroup,
+                    "appointment_date",
+                    "Please select an appointment date."
+                );
+
+                calendarGroup?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                });
+
                 return false;
             }
 
+            window.clearGlobalGroupError?.(
+                calendarGroup,
+                "appointment_date"
+            );
+
+            const timeGroup =
+                document.querySelector(
+                    ".time-panel"
+                );
+
             if (!timeInput?.value) {
-                showMiniTab("Please select a time slot.");
-                scrollToInvalidTarget(slotArea);
+                window.showGlobalGroupError?.(
+                    timeGroup,
+                    "appointment_time",
+                    "Please select an available time slot."
+                );
+
+                timeGroup?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                });
+
                 return false;
             }
+
+            window.clearGlobalGroupError?.(
+                timeGroup,
+                "appointment_time"
+            );
         }
 
         if (s === 1) {
-            const selectedService = stepEl.querySelector('input[name="service_type"]:checked');
+            const serviceGroup =
+                stepEl.querySelector(
+                    ".service-step-grid"
+                );
+
+            const selectedService =
+                serviceGroup?.querySelector(
+                    'input[name="service_type"]:checked'
+                );
+
             if (!selectedService) {
-                showMiniTab("Please select a service type.");
-                scrollToInvalidTarget(stepEl.querySelector(".service-step-grid"));
+                window.showGlobalGroupError?.(
+                    serviceGroup,
+                    "service_type",
+                    "Please select a dental service."
+                );
+
+                serviceGroup?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                });
+
                 return false;
             }
+
+            window.clearGlobalGroupError?.(
+                serviceGroup,
+                "service_type"
+            );
         }
 
-        const fields = stepEl.querySelectorAll(
-            "input[required]:not([type='radio']):not([type='checkbox']):not([type='hidden']):not([type='file']), select[required], textarea[required]"
-        );
+        const fields = Array.from(
+            stepEl.querySelectorAll(
+                [
+                    "input:not([type='hidden'])",
+                    "select",
+                    "textarea",
+                ].join(",")
+            )
+        ).filter(field => {
+            return (
+                !field.disabled &&
+                field.type !== "button" &&
+                field.type !== "submit"
+            );
+        });
 
-        for (const input of fields) {
-            if (!input.value || !input.value.trim()) {
-                scrollToInvalidTarget(input);
-                return false;
-            }
-        }
+        const processedRadioGroups =
+            new Set();
 
-        const radios = stepEl.querySelectorAll("input[type='radio']");
-        if (radios.length) {
-            const groups = [...new Set([...radios].map(r => r.name))];
+        let firstInvalid = null;
 
-            for (const name of groups) {
-                const checked = stepEl.querySelector(`input[name="${name}"]:checked`);
-                if (!checked) {
-                    const firstRadio = stepEl.querySelector(`input[name="${name}"]`);
-                    scrollToInvalidTarget(firstRadio);
-                    return false;
+        fields.forEach(field => {
+            if (field.type === "radio") {
+                if (
+                    processedRadioGroups.has(
+                        field.name
+                    )
+                ) {
+                    return;
                 }
+
+                processedRadioGroups.add(
+                    field.name
+                );
             }
+
+            const valid =
+                window.validateFormInputField?.(
+                    field
+                ) ??
+                field.checkValidity();
+
+            if (
+                !valid &&
+                !firstInvalid
+            ) {
+                firstInvalid = field;
+            }
+        });
+
+        if (firstInvalid) {
+            window.focusGlobalInvalidField?.(
+                firstInvalid
+            );
+
+            return false;
         }
+
         const person = stepEl.querySelector("#emergency_person");
         if (person && !validateEmergencyPerson(true)) {
             showMiniTab("This name is invalid. Please use letters only.");
@@ -1640,12 +1604,26 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         if (phone) {
             const digits = phone.value.replace(/\D/g, "");
             if (!/^09\d{9}$/.test(digits)) {
-                showMiniTab("Please enter a valid contact number.");
-                phone.classList.add("input-invalid");
-                setPhoneFeedback("Enter a valid mobile number in the format 09xx xxx xxxx.", "error");
-                scrollToInvalidTarget(phone);
+                phone.setCustomValidity(
+                    'Please enter a valid mobile number in the format 09xx xxx xxxx.'
+                );
+
+                window.validateFormInputField?.(
+                    phone
+                );
+
+                window.focusGlobalInvalidField?.(
+                    phone
+                );
+
                 return false;
             }
+
+            phone.setCustomValidity('');
+
+            window.validateFormInputField?.(
+                phone
+            );
         }
         if (s === 3) {
             const signatureInput = document.getElementById("patient_signature");
@@ -1658,7 +1636,30 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             }
 
             if (!signatureInput?.files?.length) {
-                showMiniTab("Please upload your patient signature.");
+                const signatureSection =
+                    document.querySelector(
+                        ".signature-section-card"
+                    );
+
+                if (!signatureInput?.files?.length) {
+                    window.showGlobalGroupError?.(
+                        signatureSection,
+                        "patient_signature",
+                        "Please upload or draw your patient signature."
+                    );
+
+                    signatureSection?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
+                    });
+
+                    return false;
+                }
+
+                window.clearGlobalGroupError?.(
+                    signatureSection,
+                    "patient_signature"
+                );
                 scrollToInvalidTarget(signatureBlock);
                 return false;
             }
@@ -1991,22 +1992,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     const finalSubmitBtn = document.getElementById('finalSubmitBtn');
     const finalConfirm = document.getElementById('finalConfirm');
 
-    function replayConfirmModalAnimation() {
-        if (!confirmModal) return;
-
-        confirmModal.classList.remove("confirm-modal-animate");
-        void confirmModal.offsetWidth;
-        confirmModal.classList.add("confirm-modal-animate");
-
-        confirmModal.querySelectorAll(
-            ".confirm-modal-icon, .confirm-modal-title, .confirm-modal-message, .confirm-modal-button"
-        ).forEach(el => {
-            el.style.animation = "none";
-            void el.offsetWidth;
-            el.style.animation = "";
-        });
-    }
-
     if (finalSubmitBtn) {
         finalSubmitBtn.addEventListener("click", () => {
             if (!finalConfirm || !finalConfirm.checked) {
@@ -2026,10 +2011,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         `;
             }
 
-            confirmModal?.showModal();
-            requestAnimationFrame(() => {
-                replayConfirmModalAnimation();
-            });
+            openModal("confirmModal");
         });
     }
 
@@ -2764,91 +2746,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         return out;
     }
 
-    function setPhoneFeedback(message, type = "") {
-        if (!emergencyNumberFeedback) return;
-
-        if (emergencyNumberFeedbackTimer) {
-            clearTimeout(emergencyNumberFeedbackTimer);
-            emergencyNumberFeedbackTimer = null;
-        }
-
-        emergencyNumberFeedback.textContent = message;
-        emergencyNumberFeedback.classList.remove("error", "success", "text-[#9e9690]");
-        if (type === "error") emergencyNumberFeedback.classList.add("error");
-        else if (type === "success") emergencyNumberFeedback.classList.add("success");
-        else emergencyNumberFeedback.classList.add("text-[#9e9690]");
-
-        if (type === "success") {
-            emergencyNumberFeedbackTimer = setTimeout(() => {
-                emergencyNumberFeedback.textContent = "";
-                emergencyNumberFeedback.classList.remove("success");
-                emergencyNumberFeedbackTimer = null;
-            }, 2000);
-        }
-    }
-
-    function validateEmergencyNumber(showNeutral = false) {
-        if (!emergencyNumber) return false;
-
-        const digits = emergencyNumber.value.replace(/\D/g, "");
-
-        emergencyNumber.classList.remove("input-invalid", "input-valid", "border-red-500", "border-green-600");
-
-        if (!digits.length) {
-            if (showNeutral) setPhoneFeedback("Format: 09xx xxx xxxx");
-            else setPhoneFeedback("");
-            return false;
-        }
-
-        if (!digits.startsWith("09")) {
-            emergencyNumber.classList.add("input-invalid");
-            setPhoneFeedback("Contact number must start with 09.", "error");
-            return false;
-        }
-
-        if (digits.length < 11) {
-            emergencyNumber.classList.add("input-invalid");
-            setPhoneFeedback("Contact number must be 11 digits.", "error");
-            return false;
-        }
-
-        if (digits.length === 11) {
-            emergencyNumber.classList.add("input-valid");
-            setPhoneFeedback("Valid contact number.", "success");
-            return true;
-        }
-
-        emergencyNumber.classList.add("input-invalid");
-        setPhoneFeedback("Contact number must be 11 digits only.", "error");
-        return false;
-    }
-
-    emergencyNumber?.addEventListener("input", (e) => {
-        const hadNonDigit = /[^\d\s]/.test(e.target.value);
-
-        let digits = e.target.value.replace(/\D/g, "");
-
-        if (digits.startsWith("9")) digits = "0" + digits;
-        if (digits.length > 11) digits = digits.slice(0, 11);
-
-        emergencyNumber.value = formatPhoneDisplay(digits);
-
-        if (hadNonDigit) {
-            showMiniTab("Contact number must contain digits only.");
-        }
-
-        validateEmergencyNumber(true);
-        markFormDirty();
-    });
-
-    emergencyNumber?.addEventListener("focus", () => {
-        validateEmergencyNumber(true);
-    });
-
-    emergencyNumber?.addEventListener("blur", () => {
-        validateEmergencyNumber(true);
-    });
-
     let formIsDirty = false;
     let formSubmitting = false;
     let pendingNavigation = null;
@@ -2866,20 +2763,50 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         });
     });
 
-    function openLeaveModal(onConfirm) {
-        pendingNavigation = onConfirm;
-        leaveModal.showModal();
-    }
-
     function confirmReloadPage() {
         openLeaveModal(() => {
             window.location.reload();
         });
     }
 
+    function openLeaveModal(onConfirm) {
+        if (
+            window.__SESSION_EXPIRED__ ||
+            !leaveModal
+        ) {
+            return;
+        }
+
+        pendingNavigation = onConfirm;
+
+        window.openModal?.(
+            "leaveModal"
+        );
+    }
+
     function closeLeaveModal() {
-        if (leaveModal.open) leaveModal.close();
+        window.closeModal?.(
+            "leaveModal"
+        );
+
         pendingNavigation = null;
+    }
+
+    function runPendingNavigation() {
+        if (
+            typeof pendingNavigation !==
+            "function"
+        ) {
+            pendingNavigation = null;
+            return;
+        }
+
+        const action =
+            pendingNavigation;
+
+        pendingNavigation = null;
+
+        action();
     }
 
     document.getElementById('cancelLeaveBtn')?.addEventListener('click', closeLeaveModal);
@@ -2889,29 +2816,46 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         if (modal) modal.close();
     });
 
-    document.getElementById('saveDraftBtn')?.addEventListener('click', () => {
-        saveDraftData();
-        formIsDirty = false;
-        leaveModal.close();
+    document
+        .getElementById(
+            "saveDraftBtn"
+        )
+        ?.addEventListener(
+            "click",
+            () => {
+                saveDraftData();
 
-        if (typeof pendingNavigation === "function") {
-            const action = pendingNavigation;
-            pendingNavigation = null;
-            action();
-        }
-    });
+                formIsDirty = false;
 
-    document.getElementById('discardDraftBtn')?.addEventListener('click', () => {
+                window.closeModal?.(
+                    "leaveModal"
+                );
+
+                if (
+                    typeof pendingNavigation ===
+                    "function"
+                ) {
+                    const action =
+                        pendingNavigation;
+
+                    pendingNavigation = null;
+
+                    action();
+                }
+            }
+        );
+
+    document.getElementById("discardDraftBtn")?.addEventListener("click", () => {
         clearDraft();
         formIsDirty = false;
-        leaveModal.close();
 
-        if (typeof pendingNavigation === "function") {
-            const action = pendingNavigation;
-            pendingNavigation = null;
-            action();
-        }
-    });
+        window.closeModal?.(
+            "leaveModal"
+        );
+
+        runPendingNavigation();
+    }
+    );
 
     document.querySelectorAll('a[href]').forEach(link => {
         link.addEventListener("click", e => {
@@ -3071,54 +3015,66 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     }
 
     function initIntroBookingModal() {
-        const modal = document.getElementById("introBookingModal");
-        const startBtn = document.getElementById("introStartBtn");
-        const continueDraftBtn = document.getElementById("introContinueDraftBtn");
+        const modal =
+            document.getElementById(
+                "introBookingModal"
+            );
+
+        const startBtn =
+            document.getElementById(
+                "introStartBtn"
+            );
+
+        const continueDraftBtn =
+            document.getElementById(
+                "introContinueDraftBtn"
+            );
 
         if (!modal) return;
 
-        const hasDraft = hasSavedDraft();
+        const hasDraft =
+            hasSavedDraft();
 
-        if (hasDraft) {
-            continueDraftBtn?.classList.remove("hidden");
-        } else {
-            continueDraftBtn?.classList.add("hidden");
-        }
+        continueDraftBtn?.classList.toggle(
+            "hidden",
+            !hasDraft
+        );
 
-        function lockPageScroll() {
-            const scrollY = window.scrollY || window.pageYOffset || 0;
-            document.body.dataset.lockedScrollY = String(scrollY);
-            document.body.style.top = `-${scrollY}px`;
-            document.documentElement.classList.add("intro-modal-open");
-            document.body.classList.add("intro-modal-open");
-        }
+        startBtn?.addEventListener(
+            "click",
+            () => {
+                window.closeModal?.(
+                    "introBookingModal"
+                );
+            }
+        );
 
-        function unlockPageScroll() {
-            const scrollY = parseInt(document.body.dataset.lockedScrollY || "0", 10);
-            document.documentElement.classList.remove("intro-modal-open");
-            document.body.classList.remove("intro-modal-open");
-            document.body.style.top = "";
-            delete document.body.dataset.lockedScrollY;
-            window.scrollTo(0, Number.isNaN(scrollY) ? 0 : scrollY);
-        }
+        continueDraftBtn?.addEventListener(
+            "click",
+            async () => {
+                window.closeModal?.(
+                    "introBookingModal"
+                );
 
-        modal.addEventListener("close", unlockPageScroll);
+                await restoreDraft();
 
-        startBtn?.addEventListener("click", () => {
-            modal.close();
-        });
-
-        continueDraftBtn?.addEventListener("click", async () => {
-            modal.close();
-            await restoreDraft();
-            showMiniTab("Saved draft loaded.");
-        });
+                showMiniTab(
+                    "Saved draft loaded."
+                );
+            }
+        );
 
         setTimeout(() => {
-            if (!modal.open) {
-                lockPageScroll();
-                modal.showModal();
+            if (
+                window.__SESSION_EXPIRED__ ||
+                modal.classList.contains("open")
+            ) {
+                return;
             }
+
+            window.openModal?.(
+                "introBookingModal"
+            );
         }, 350);
     }
 

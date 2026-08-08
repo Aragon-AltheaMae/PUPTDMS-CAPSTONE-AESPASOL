@@ -16,7 +16,7 @@
 
     <button type="button" class="btn-view-mode active" data-view-mode="list" title="List view" aria-label="List view"
         aria-pressed="true">
-        <i class="fa-solid fa-table-list"></i>
+        <i class="fa-solid fa-rectangle-list"></i>
         <span class="view-mode-label">
             {{ $listLabel }}
         </span>

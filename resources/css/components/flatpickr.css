@@ -251,56 +251,8 @@ span.flatpickr-weekday {
     pointer-events: auto !important;
 }
 
-.flatpickr-day.flatpickr-has-tooltip {
-    position: relative !important;
-    overflow: visible !important;
-    pointer-events: auto !important;
-}
-
 .flatpickr-day.flatpickr-disabled {
     pointer-events: auto !important;
-}
-
-.flatpickr-day.flatpickr-has-tooltip {
-    position: relative !important;
-    overflow: visible !important;
-}
-
-.flatpickr-tooltip-box {
-    position: absolute !important;
-    left: 50% !important;
-    bottom: calc(100% + 10px) !important;
-    transform: translateX(-50%) translateY(6px) !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-    z-index: 999999 !important;
-    padding: 8px 10px !important;
-    border-radius: 10px !important;
-    background: linear-gradient(135deg, #8B0000, #660000) !important;
-    color: #ffffff !important;
-    font-size: 11px !important;
-    font-weight: 800 !important;
-    line-height: 1.2 !important;
-    white-space: nowrap !important;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, .35) !important;
-    transition: opacity .18s ease, visibility .18s ease, transform .18s ease !important;
-}
-
-.flatpickr-day.flatpickr-has-tooltip:hover .flatpickr-tooltip-box {
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: translateX(-50%) translateY(0) !important;
-}
-
-.flatpickr-tooltip-arrow {
-    position: absolute !important;
-    top: calc(100% - 4px) !important;
-    left: 50% !important;
-    width: 10px !important;
-    height: 10px !important;
-    transform: translateX(-50%) rotate(45deg) !important;
-    background: #8B0000 !important;
 }
 
 [data-theme="dark"] .flatpickr-calendar {
@@ -380,30 +332,6 @@ span.flatpickr-weekday {
     border: 1px solid transparent !important;
     color: #374151 !important;
     font-weight: 700 !important;
-}
-
-.flatpickr-floating-tooltip {
-    position: fixed;
-    z-index: 9999999;
-    transform: translate(-50%, -100%) translateY(6px);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    padding: 8px 10px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #8B0000, #660000);
-    color: #ffffff;
-    font-size: 11px;
-    font-weight: 800;
-    white-space: nowrap;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, .35);
-    transition: .18s ease;
-}
-
-.flatpickr-floating-tooltip.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translate(-50%, -100%) translateY(0);
 }
 
 .flatpickr-day.flatpickr-disabled,

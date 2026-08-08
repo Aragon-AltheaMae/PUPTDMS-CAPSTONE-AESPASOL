@@ -1,18 +1,16 @@
 <div id="rescheduleModal" class="ui-modal modal-theme-warning" aria-hidden="true" role="dialog" aria-modal="true"
     aria-labelledby="rescheduleModalTitle" onclick="handleRescheduleBackdropClick(event)">
+    <div class="ui-modal-card modal-xl modal-split-card">
 
-    <div class="ui-modal-card modal-xl reschedule-modal-panel">
+        <div class="modal-hd">
 
-        <div class="modal-hd modal-themed-header reschedule-modal-header">
             <div class="modal-heading">
-                <div class="modal-icon modal-themed-icon">
+
+                <div class="modal-icon">
                     <i class="fa-regular fa-calendar-check"></i>
                 </div>
 
                 <div class="modal-copy">
-                    <span class="appointment-modal-eyebrow">
-                        Appointment Update
-                    </span>
 
                     <h2 id="rescheduleModalTitle" class="modal-title">
                         Reschedule Appointment
@@ -21,16 +19,17 @@
                     <p class="modal-subtitle">
                         Choose a new date and time, then save the changes.
                     </p>
+
                 </div>
+
             </div>
 
-            <button type="button" onclick="closeRescheduleModal()" class="modal-x" data-discard-close="rescheduleModal"
-                aria-label="Close reschedule modal">
+            <button type="button" onclick="closeRescheduleModal()" class="modal-x" aria-label="Close reschedule modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <form id="rescheduleForm" method="POST" class="reschedule-modal-form" data-discard-form
+        <form id="rescheduleForm" method="POST" class="modal-card-form" data-discard-form
             data-discard-title="Discard reschedule changes?"
             data-discard-subtitle="The selected schedule has not been saved."
             data-discard-message="Your selected date, time, and reason will be removed. Do you want to discard these changes?">
@@ -41,8 +40,8 @@
             <input type="hidden" id="new_appointment_date" name="new_appointment_date" required>
             <input type="hidden" id="new_appointment_time" name="new_appointment_time" required>
 
-            <div class="modal-bd reschedule-modal-body">
-                <div class="modal-profile-card reschedule-patient-summary">
+            <div class="modal-bd modal-scroll-body">
+                <div class="modal-profile-card">
                     <div class="modal-profile-main">
                         <div class="modal-profile-avatar">
                             <i class="fa-solid fa-user"></i>
@@ -94,82 +93,143 @@
                     </div>
                 </div>
 
-                <div class="section-label">
-                    <i class="fa-regular fa-calendar fa-xs"></i> New Date &amp; Time
+                <div class="modal-section-heading">
+                    <span class="modal-section-icon">
+                        <i class="fa-regular fa-calendar"></i>
+                    </span>
+
+                    <div>
+                        <h4>New Date &amp; Time</h4>
+                    </div>
                 </div>
 
-                <div id="dateError" class="error-msg" style="display:none;">
-                    <i class="fa-solid fa-circle-exclamation"></i> Please select a date.
-                </div>
+                <div class="modal-form-grid-2 mb-2 sm:mb-3">
 
-                <div class="two-col mb-2 sm:mb-3">
-                    <div class="cal-wrap">
+                    <div class="cal-wrap modal-calendar-panel calendar-shell-no-card" data-global-field>
                         <div id="calGridWrapReschedule"></div>
                     </div>
 
-                    <div class="slots-wrap">
-                        <div class="section-label" style="margin-bottom:.6rem;">
-                            <i class="fa-regular fa-clock fa-xs"></i> Time Slot
+                    <div class="slots-wrap modal-option-panel time-panel" data-global-field>
+
+                        <div class="modal-section-heading">
+                            <span class="modal-section-icon">
+                                <i class="fa-regular fa-clock"></i>
+                            </span>
+
+                            <div>
+                                <h4>Time Slot</h4>
+                            </div>
                         </div>
 
-                        <div id="dateBanner" class="hidden"></div>
-                        <div class="slots-date-pill" id="datePill"></div>
+                        <div id="dateBanner"
+                            class="
+        hidden
+        rounded-xl
+        px-3
+        py-2
+        text-sm
+        font-semibold
+        text-white
+        mb-3
+        shadow-md
+        date-banner-gradient
+    ">
+                        </div>
 
-                        <div id="slotPlaceholder" class="slots-placeholder">
-                            <i class="fa-regular fa-calendar-xmark"></i>
-                            <span>Select a date to see available slots</span>
+                        <div id="slotPlaceholder"
+                            class="slot-placeholder-empty flex flex-col items-center justify-center gap-3 py-8 text-center text-[#9e9690]">
+
+                            <div
+                                class="empty-icon w-12 h-12 rounded-full bg-[#f9e8e8] flex items-center justify-center text-[#8B0000] text-lg">
+                                <i class="fa-regular fa-calendar"></i>
+                            </div>
+
+                            <div>
+                                <p class="empty-title text-sm font-semibold text-[#5c5550]">
+                                    Choose a date
+                                </p>
+
+                                <p class="empty-subtitle text-xs mt-1">
+                                    Select an available day to see time slots.
+                                </p>
+                            </div>
                         </div>
 
                         <div id="slotContainer" class="hidden">
-                            <div id="slotGrid" class="slots-grid" style="display:none;"></div>
-                        </div>
 
-                        <button type="button" id="clearSlotSelectionBtn" class="slot-clear-selection hidden"
-                            onclick="clearRescheduleSlotSelection()">
-                            <i class="fa-solid fa-xmark"></i>
-                            Clear selection
-                        </button>
-
-                        <div id="selectedTimePill" class="selected-time-card hidden">
-
-                            <div class="selected-time-card-content">
-
-                                <div class="selected-time-icon">
-                                    <i class="fa-solid fa-circle-check"></i>
-                                </div>
-
-                                <div class="selected-time-copy">
-                                    <p class="selected-time-label">
-                                        Selected Time
-                                    </p>
-
-                                    <p id="selectedTimeText" class="selected-time-value">
-                                    </p>
-                                </div>
-
+                            <div id="slotGrid" class="slot-grid-ui grid grid-cols-2 gap-4">
                             </div>
+
+                            <button type="button" id="clearSlotSelectionBtn"
+                                class="
+            ui-btn
+            ui-btn-secondary
+            ui-btn-sm
+            hidden
+            mt-4
+            mb-2
+            w-full
+        "
+                                onclick="clearRescheduleSlotSelection()">
+                                <i class="fa-solid fa-xmark"></i>
+                                Clear selection
+                            </button>
+
+                            <div id="selectedSlotDisplay"
+                                class="
+            hidden
+            rounded-2xl
+            px-4
+            py-3
+            text-sm
+            font-semibold
+            text-[#8B0000]
+            bg-[linear-gradient(135deg,#fff5f5,#fffafa)]
+            border
+            border-[#e8caca]
+            shadow-sm
+        ">
+                                <i
+                                    class="
+                fa-solid
+                fa-circle-check
+                mr-1.5
+            "></i>
+
+                                Selected:
+
+                                <span id="selectedSlotText" class="font-bold"></span>
+                            </div>
+
                         </div>
                     </div>
                 </div>
 
-                <div id="timeError" class="error-msg" style="display:none;">
-                    <i class="fa-solid fa-circle-exclamation"></i> Please select a time slot.
+                <div class="modal-section-heading mt-5 sm:mt-6">
+
+                    <span class="modal-section-icon">
+                        <i class="fa-regular fa-message"></i>
+                    </span>
+
+                    <div>
+                        <h4>
+                            Reason for Rescheduling
+                        </h4>
+
+                        <p>
+                            Optional — add a short explanation for this schedule change.
+                        </p>
+                    </div>
+
                 </div>
 
-                <div class="section-label mt-5 sm:mt-6">
-                    <i class="fa-regular fa-message fa-xs"></i>
-                    Reason for Rescheduling
-                    <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span>
-                </div>
-
-                <div class="reason-wrap w-full">
+                <div class="w-full">
                     <textarea id="reschedule_reason" name="reschedule_reason" rows="3"
-                        placeholder="e.g. Patient requested a later date…"
-                        class="reason-textarea w-full min-h-[112px] resize-none"></textarea>
+                        placeholder="e.g. Patient requested a later date…" class="form-input w-full min-h-[112px] resize-none"></textarea>
                 </div>
             </div>
 
-            <div class="modal-ft reschedule-modal-footer">
+            <div class="modal-ft modal-sticky-footer">
 
                 <button type="button" id="cancelBtn" class="ui-btn ui-btn-secondary">
 
@@ -202,8 +262,15 @@
 
     function clearRescheduleSlotSelection() {
         const timeInput = document.getElementById('new_appointment_time');
-        const selectedTimePill = document.getElementById('selectedTimePill');
-        const selectedTimeText = document.getElementById('selectedTimeText');
+        const selectedSlotDisplay =
+            document.getElementById(
+                'selectedSlotDisplay'
+            );
+
+        const selectedSlotText =
+            document.getElementById(
+                'selectedSlotText'
+            );
         const clearBtn = document.getElementById('clearSlotSelectionBtn');
         const slotGrid = document.getElementById('slotGrid');
 
@@ -216,63 +283,105 @@
             }));
         }
 
-        if (selectedTimeText) selectedTimeText.textContent = '';
-
-        if (selectedTimePill) {
-            selectedTimePill.classList.remove('show');
-            selectedTimePill.classList.add('hidden');
-            selectedTimePill.style.display = 'none';
+        if (selectedSlotText) {
+            selectedSlotText.textContent = '';
         }
+
+        selectedSlotDisplay?.classList.add(
+            'hidden'
+        );
 
         if (clearBtn) {
             clearBtn.classList.add('hidden');
             clearBtn.setAttribute('aria-hidden', 'true');
         }
 
-        slotGrid?.querySelectorAll('.slot-chip').forEach(chip => {
-            slotGrid?.querySelectorAll('.slot-chip').forEach(chip => {
-                chip.classList.remove('selected');
-                chip.setAttribute('aria-pressed', 'false');
-            });
-            chip.setAttribute('aria-pressed', 'false');
-        });
+        slotGrid
+            ?.querySelectorAll('.slot-chip')
+            .forEach(chip => {
+                chip.classList.remove(
+                    'selected',
+                    'bg-[#8B0000]',
+                    'text-white',
+                    'border-[#8B0000]'
+                );
 
+                chip.classList.add(
+                    'border-[#e8e2dd]',
+                    'bg-[#fafaf8]',
+                    'text-[#1a1410]'
+                );
+
+                chip.setAttribute(
+                    'aria-pressed',
+                    'false'
+                );
+            });
         if (typeof markFormDirty === 'function') markFormDirty();
     }
 
     function resetRescheduleSlotUi() {
-        const slotPlaceholder = document.getElementById('slotPlaceholder');
-        const slotGrid = document.getElementById('slotGrid');
-        const selectedTimePill = document.getElementById('selectedTimePill');
-        const selectedTimeText = document.getElementById('selectedTimeText');
-        const clearBtn = document.getElementById('clearSlotSelectionBtn');
+        const slotPlaceholder =
+            document.getElementById(
+                'slotPlaceholder'
+            );
 
-        if (slotPlaceholder) {
-            slotPlaceholder.classList.remove('hidden');
-            slotPlaceholder.style.display = 'flex';
-            slotPlaceholder.innerHTML = `
-                <i class="fa-regular fa-calendar-xmark"></i>
-                <span>Select a date to see available slots</span>
-            `;
-        }
+        const slotContainer =
+            document.getElementById(
+                'slotContainer'
+            );
+
+        const slotGrid =
+            document.getElementById(
+                'slotGrid'
+            );
+
+        const selectedSlotDisplay =
+            document.getElementById(
+                'selectedSlotDisplay'
+            );
+
+        const selectedSlotText =
+            document.getElementById(
+                'selectedSlotText'
+            );
+
+        const clearBtn =
+            document.getElementById(
+                'clearSlotSelectionBtn'
+            );
+
+        slotPlaceholder?.classList.remove(
+            'hidden'
+        );
+
+        slotContainer?.classList.add(
+            'hidden'
+        );
 
         if (slotGrid) {
-            slotGrid.style.display = 'none';
             slotGrid.innerHTML = '';
+            slotGrid.style.removeProperty(
+                'display'
+            );
         }
 
-        if (selectedTimePill) {
-            selectedTimePill.classList.remove('show');
-            selectedTimePill.classList.add('hidden');
-            selectedTimePill.style.display = 'none';
+        selectedSlotDisplay?.classList.add(
+            'hidden'
+        );
+
+        if (selectedSlotText) {
+            selectedSlotText.textContent = '';
         }
 
-        if (selectedTimeText) selectedTimeText.textContent = '';
+        clearBtn?.classList.add(
+            'hidden'
+        );
 
-        if (clearBtn) {
-            clearBtn.classList.add('hidden');
-            clearBtn.setAttribute('aria-hidden', 'true');
-        }
+        clearBtn?.setAttribute(
+            'aria-hidden',
+            'true'
+        );
     }
 
     function openRescheduleModal(payload = {}) {
@@ -313,17 +422,39 @@
         if (typeof selectedDate !== 'undefined') selectedDate = null;
         if (typeof selectedTime !== 'undefined') selectedTime = null;
 
-        const dateError = document.getElementById('dateError');
-        const timeError = document.getElementById('timeError');
+        window.clearGlobalGroupError?.(
+            document.querySelector(
+                '#rescheduleModal .cal-wrap'
+            ),
+            'reschedule-date'
+        );
 
-        if (dateError) dateError.style.display = 'none';
-        if (timeError) timeError.style.display = 'none';
+        window.clearGlobalGroupError?.(
+            document.querySelector(
+                '#rescheduleModal .slots-wrap'
+            ),
+            'reschedule-time'
+        );
 
-        document.querySelector('#rescheduleModal .cal-wrap')?.classList.remove('error');
-        document.querySelector('#rescheduleModal .slots-wrap')?.classList.remove('error');
+        const calendarGroup =
+            document.querySelector(
+                '#rescheduleModal .cal-wrap'
+            );
 
-        document.getElementById('datePill')?.replaceChildren();
-        document.getElementById('datePill')?.classList.remove('show');
+        const timeSlotGroup =
+            document.querySelector(
+                '#rescheduleModal .slots-wrap'
+            );
+
+        window.clearGlobalGroupError?.(
+            calendarGroup,
+            'reschedule-date'
+        );
+
+        window.clearGlobalGroupError?.(
+            timeSlotGroup,
+            'reschedule-time'
+        );
 
         resetRescheduleSlotUi();
 
@@ -419,18 +550,44 @@
 
         let valid = true;
 
+        const calendarGroup =
+            document.querySelector(
+                '#rescheduleModal .cal-wrap'
+            );
+
+        const timeSlotGroup =
+            document.querySelector(
+                '#rescheduleModal .slots-wrap'
+            );
+
         if (!selectedDate) {
-            const dateError = document.getElementById("dateError");
-            if (dateError) dateError.style.display = "flex";
-            document.querySelector("#rescheduleModal .cal-wrap")?.classList.add("error");
+            window.showGlobalGroupError?.(
+                calendarGroup,
+                'reschedule-date',
+                'Please select a date.'
+            );
+
             valid = false;
+        } else {
+            window.clearGlobalGroupError?.(
+                calendarGroup,
+                'reschedule-date'
+            );
         }
 
         if (!selectedTime) {
-            const timeError = document.getElementById("timeError");
-            if (timeError) timeError.style.display = "flex";
-            document.querySelector("#rescheduleModal .slots-wrap")?.classList.add("error");
+            window.showGlobalGroupError?.(
+                timeSlotGroup,
+                'reschedule-time',
+                'Please select a time slot.'
+            );
+
             valid = false;
+        } else {
+            window.clearGlobalGroupError?.(
+                timeSlotGroup,
+                'reschedule-time'
+            );
         }
 
         if (!valid) {

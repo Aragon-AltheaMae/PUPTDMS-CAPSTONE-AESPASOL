@@ -2766,3 +2766,97 @@
     transform: none;
     box-shadow: none;
 }
+
+.badge-role {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .35rem;
+    padding: .32rem .72rem;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 900;
+    line-height: 1;
+    border: 1px solid transparent;
+}
+
+.badge-role.role-patient,
+.badge-role.role-student {
+    background: #DBEAFE;
+    border-color: #BFDBFE;
+    color: #1D4ED8;
+}
+
+.badge-role.role-dentist {
+    background: #D1FAE5;
+    border-color: #A7F3D0;
+    color: #065F46;
+}
+
+.badge-role.role-admin {
+    background: #FEE2E2;
+    border-color: #FECACA;
+    color: #8B0000;
+}
+
+.badge-role.role-faculty {
+    background: #FEF3C7;
+    border-color: #FDE68A;
+    color: #92400E;
+}
+
+.badge-role.role-guest {
+    background: #F3E8FF;
+    border-color: #E9D5FF;
+    color: #7C3AED;
+}
+
+.badge-role.role-none {
+    background: #F3F4F6;
+    border-color: #E5E7EB;
+    color: #4B5563;
+}
+
+[data-theme="dark"] .badge-role.role-patient,
+[data-theme="dark"] .badge-role.role-student,
+.dark .badge-role.role-patient,
+.dark .badge-role.role-student {
+    background: rgba(219, 234, 254, .14);
+    border-color: rgba(147, 197, 253, .28);
+    color: #60A5FA;
+}
+
+[data-theme="dark"] .badge-role.role-dentist,
+.dark .badge-role.role-dentist {
+    background: rgba(209, 250, 229, .14);
+    border-color: rgba(110, 231, 183, .28);
+    color: #34D399;
+}
+
+[data-theme="dark"] .badge-role.role-admin,
+.dark .badge-role.role-admin {
+    background: rgba(254, 226, 226, .14);
+    border-color: rgba(252, 165, 165, .28);
+    color: #F87171;
+}
+
+[data-theme="dark"] .badge-role.role-faculty,
+.dark .badge-role.role-faculty {
+    background: rgba(245, 158, 11, .14);
+    border-color: rgba(251, 191, 36, .28);
+    color: #FBBF24;
+}
+
+[data-theme="dark"] .badge-role.role-guest,
+.dark .badge-role.role-guest {
+    background: rgba(124, 58, 237, .16);
+    border-color: rgba(196, 181, 253, .28);
+    color: #C4B5FD;
+}
+
+[data-theme="dark"] .badge-role.role-none,
+.dark .badge-role.role-none {
+    background: rgba(255, 255, 255, .055);
+    border-color: rgba(255, 255, 255, .085);
+    color: #9CA3AF;
+}

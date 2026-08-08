@@ -114,12 +114,6 @@
     font-size: .7rem;
 }
 
-.dentist-dashboard-page {
-    width: 100%;
-    min-width: 0;
-    overflow-x: clip;
-}
-
 .dentist-dashboard-page>.w-full,
 .row2-grid,
 .row3-grid,
@@ -225,35 +219,108 @@
 
 .day-hover-card {
     position: absolute;
-    left: 50%;
     z-index: 120;
+
     padding: .75rem;
+
     border: 1px solid var(--border, #ede8e4);
     border-radius: 1rem;
+
     background: var(--card, #fff);
-    box-shadow: 0 18px 40px rgba(15, 23, 42, .18);
+
+    box-shadow:
+        0 18px 40px rgba(15, 23, 42, .18);
+
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: opacity .16s ease, transform .16s ease, visibility .16s ease;
+
+    will-change:
+        opacity,
+        transform;
+
+    transition:
+        opacity .18s ease,
+        transform .22s cubic-bezier(.22, 1, .36, 1),
+        visibility 0s linear .22s;
 }
 
-.day-hover-card.hover-bottom {
+.day-hover-card.hover-align-center {
+    left: 50%;
+    right: auto;
+}
+
+.day-hover-card.hover-align-center.hover-bottom {
     top: calc(100% + 8px);
-    transform: translateX(-50%) translateY(6px);
+
+    transform:
+        translateX(-50%) translateY(8px);
 }
 
-.day-hover-card.hover-top {
+.day-hover-card.hover-align-center.hover-top {
     bottom: calc(100% + 8px);
-    transform: translateX(-50%) translateY(-6px);
+
+    transform:
+        translateX(-50%) translateY(-8px);
 }
 
-.group:hover>.day-hover-card,
+.day-hover-card.hover-align-right {
+    left: 0;
+    right: auto;
+}
+
+.day-hover-card.hover-align-right.hover-bottom {
+    top: calc(100% + 8px);
+    transform: translateY(8px);
+}
+
+.day-hover-card.hover-align-right.hover-top {
+    bottom: calc(100% + 8px);
+    transform: translateY(-8px);
+}
+
+.day-hover-card.hover-align-left {
+    left: auto;
+    right: 0;
+}
+
+.day-hover-card.hover-align-left.hover-bottom {
+    top: calc(100% + 8px);
+    transform: translateY(8px);
+}
+
+.day-hover-card.hover-align-left.hover-top {
+    bottom: calc(100% + 8px);
+    transform: translateY(-8px);
+}
+
+.cal-cell-wrap:hover>.day-hover-card,
 .day-hover-card:hover {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    transform: translateX(-50%) translateY(0);
+
+    transition:
+        opacity .18s ease,
+        transform .22s cubic-bezier(.22, 1, .36, 1),
+        visibility 0s linear 0s;
+}
+
+.cal-cell-wrap:hover>.day-hover-card.hover-align-center,
+.day-hover-card.hover-align-center:hover {
+    transform:
+        translateX(-50%) translateY(0);
+}
+
+.cal-cell-wrap:hover>.day-hover-card.hover-align-left,
+.cal-cell-wrap:hover>.day-hover-card.hover-align-right,
+.day-hover-card.hover-align-left:hover,
+.day-hover-card.hover-align-right:hover {
+    transform: translateY(0);
+}
+
+#dentistCalendarContainer {
+    z-index: 10;
 }
 
 @media (max-width: 1023px) {
@@ -572,20 +639,28 @@
         min-height: 340px !important;
     }
 
+    .upcoming-date-navigation {
+        grid-template-columns:
+            32px minmax(0, 1fr) 32px;
+        gap: .35rem;
+    }
+
+    .upcoming-date-nav-btn {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+    }
+
     .upcoming-date-strip {
-        justify-content: flex-start !important;
-        padding-left: 0.15rem !important;
-        padding-right: 0.15rem !important;
-        scrollbar-width: thin;
+        grid-template-columns:
+            repeat(7, minmax(0, 1fr));
+
+        gap: .3rem;
     }
 
     .upcoming-date-btn {
-        min-width: 52px !important;
-    }
-
-    .upcoming-empty-state {
-        transform: none !important;
-        min-height: 150px !important;
+        min-width: 0 !important;
+        padding: .5rem .2rem;
     }
 
     #gadAnalyticsContainer,
@@ -673,9 +748,6 @@
     background: linear-gradient(to bottom, transparent, rgba(13, 17, 23, .9));
 }
 
-
-
-
 .upcoming-card {
     background: #fff;
     border: 1px solid #f3e3e3;
@@ -688,13 +760,73 @@
     flex-direction: column;
 }
 
+.upcoming-date-navigation {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) 34px;
+    align-items: center;
+    gap: .5rem;
+    width: 100%;
+    margin-bottom: .75rem;
+}
+
 .upcoming-date-strip {
-    display: flex;
-    gap: 0.55rem;
-    overflow-x: auto;
-    overflow-y: visible;
-    padding: 0.75rem 0.25rem 1rem;
+    display: grid;
+    grid-template-columns:
+        repeat(7, minmax(0, 1fr));
+    align-items: center;
+    gap: .45rem;
+
+    width: 100%;
+    min-width: 0;
+
+    padding: .75rem .15rem 1rem;
+
+    overflow: visible;
+}
+
+.upcoming-date-nav-btn {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
+
+    border: 1px solid #f1d9d9;
+    border-radius: 999px;
+
+    background: #ffffff;
+    color: #8B0000;
+
+    font-size: .7rem;
+
+    cursor: pointer;
+
+    transition:
+        background-color .18s ease,
+        border-color .18s ease,
+        color .18s ease,
+        transform .18s ease,
+        box-shadow .18s ease;
+}
+
+.upcoming-date-nav-btn:hover {
+    background: #8B0000;
+    border-color: #8B0000;
+    color: #ffffff;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 7px 16px rgba(139, 0, 0, .18);
+}
+
+.upcoming-range-label {
+    margin-top: .15rem;
+    color: #9ca3af;
+    font-size: .62rem;
+    font-weight: 650;
 }
 
 .upcoming-date-btn.active {
@@ -716,18 +848,14 @@
     flex-direction: column;
 }
 
-.upcoming-empty-state {
+.upcoming-list-area>.upcoming-empty-state {
     flex: 1;
-    min-height: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    transform: translateY(-28px);
+    min-height: 100%;
+    width: 100%;
 }
 
 .upcoming-date-btn {
-    min-width: 54px;
+    min-width: 0;
     border-radius: 1rem;
     border: 1px solid #f1d9d9;
     background: #fff8f8;
@@ -1133,6 +1261,31 @@
         width: 30% !important;
         text-align: center !important;
     }
+}
+
+[data-theme="dark"] #mainContent .upcoming-date-nav-btn,
+.dark #mainContent .upcoming-date-nav-btn {
+    background: rgba(255, 255, 255, .04);
+    border-color: rgba(255, 255, 255, .12);
+    color: #FCA5A5;
+}
+
+[data-theme="dark"] #mainContent .upcoming-date-nav-btn:hover,
+.dark #mainContent .upcoming-date-nav-btn:hover {
+    background:
+        linear-gradient(135deg,
+            #B91C1C,
+            #7F1D1D);
+
+    border-color:
+        rgba(252, 165, 165, .35);
+
+    color: #ffffff;
+}
+
+[data-theme="dark"] #mainContent .upcoming-range-label,
+.dark #mainContent .upcoming-range-label {
+    color: #8B949E;
 }
 
 [data-theme="dark"] #mainContent .kpi-card,
@@ -1924,6 +2077,134 @@
 }
 
 @media (max-width: 480px) {
+    .upcoming-date-navigation {
+        grid-template-columns:
+            28px minmax(0, 1fr) 28px;
+
+        gap: .25rem;
+    }
+
+    .upcoming-date-nav-btn {
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+
+        font-size: .62rem;
+    }
+
+    .upcoming-date-strip {
+        gap: .2rem;
+        padding-inline: 0;
+    }
+
+    .upcoming-date-btn {
+        min-width: 0 !important;
+        padding: .42rem .1rem;
+        border-radius: .75rem;
+    }
+
+    .upcoming-date-btn .text-sm {
+        font-size: .68rem !important;
+    }
+
+    .upcoming-date-btn .text-\[10px\] {
+        font-size: .5rem !important;
+    }
+
+    .appointment-status-badge {
+        max-width: none !important;
+        padding: 0.24rem 0.4rem !important;
+        font-size: 0.48rem !important;
+    }
+
+    #dayAppointmentsModal {
+        padding: 0.75rem !important;
+        align-items: center !important;
+    }
+
+    #dayAppointmentsModalBox {
+        width: min(100%, 304px) !important;
+        max-width: 304px !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        border-radius: 17px !important;
+    }
+
+    #dayAppointmentsModalBox>div:first-child {
+        padding: 0.88rem 1rem !important;
+    }
+
+    #dayAppointmentsModalBox>div:first-child h3 {
+        font-size: 0.98rem !important;
+        line-height: 1.1 !important;
+    }
+
+    #dayAppointmentsModalDate {
+        font-size: 0.76rem !important;
+        line-height: 1.15 !important;
+    }
+
+    #dayAppointmentsModalBox>div:nth-child(2) {
+        padding: 0.72rem 0.78rem !important;
+        max-height: 54vh !important;
+        max-height: 54dvh !important;
+    }
+
+    #dayAppointmentsModalBox>div:last-child {
+        padding: 0 0.78rem 0.78rem !important;
+    }
+
+    #dayAppointmentsModalBox>div:last-child button {
+        min-height: 32px !important;
+        height: 32px !important;
+        border-radius: 0.7rem !important;
+        font-size: 0.72rem !important;
+    }
+
+    .scheduled-patient-card {
+        padding: 0.58rem !important;
+        border-radius: 13px !important;
+    }
+
+    .scheduled-patient-head {
+        grid-template-columns: 28px minmax(0, 1fr) auto !important;
+        gap: 0.36rem !important;
+    }
+
+    .appointment-status-badge {
+        padding: 0.25rem 0.42rem !important;
+        font-size: 0.5rem !important;
+    }
+
+    .scheduled-patient-name {
+        font-size: 0.68rem !important;
+        line-height: 1.05 !important;
+        letter-spacing: -0.055em !important;
+    }
+
+    .scheduled-patient-meta {
+        font-size: 0.55rem !important;
+        line-height: 1.1 !important;
+    }
+
+    .scheduled-patient-actions {
+        gap: 0.28rem !important;
+        margin-top: 0.54rem !important;
+    }
+
+    .scheduled-action-btn {
+        height: 28px !important;
+        min-height: 28px !important;
+        padding: 0 0.18rem !important;
+        font-size: 0.46rem !important;
+        border-radius: 0.5rem !important;
+        gap: 0.15rem !important;
+    }
+
+    .scheduled-action-btn i {
+        font-size: 0.45rem !important;
+    }
+
     .dentist-dashboard-page {
         padding-left: 10px !important;
         padding-right: 10px !important;
@@ -2640,99 +2921,6 @@
     flex-shrink: 0;
 }
 
-
-
-
-@media (max-width: 480px) {
-    #dayAppointmentsModal {
-        padding: 0.75rem !important;
-        align-items: center !important;
-    }
-
-    #dayAppointmentsModalBox {
-        width: min(100%, 304px) !important;
-        max-width: 304px !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        border-radius: 17px !important;
-    }
-
-    #dayAppointmentsModalBox>div:first-child {
-        padding: 0.88rem 1rem !important;
-    }
-
-    #dayAppointmentsModalBox>div:first-child h3 {
-        font-size: 0.98rem !important;
-        line-height: 1.1 !important;
-    }
-
-    #dayAppointmentsModalDate {
-        font-size: 0.76rem !important;
-        line-height: 1.15 !important;
-    }
-
-    #dayAppointmentsModalBox>div:nth-child(2) {
-        padding: 0.72rem 0.78rem !important;
-        max-height: 54vh !important;
-        max-height: 54dvh !important;
-    }
-
-    #dayAppointmentsModalBox>div:last-child {
-        padding: 0 0.78rem 0.78rem !important;
-    }
-
-    #dayAppointmentsModalBox>div:last-child button {
-        min-height: 32px !important;
-        height: 32px !important;
-        border-radius: 0.7rem !important;
-        font-size: 0.72rem !important;
-    }
-
-    .scheduled-patient-card {
-        padding: 0.58rem !important;
-        border-radius: 13px !important;
-    }
-
-    .scheduled-patient-head {
-        grid-template-columns: 28px minmax(0, 1fr) auto !important;
-        gap: 0.36rem !important;
-    }
-
-    .appointment-status-badge {
-        padding: 0.25rem 0.42rem !important;
-        font-size: 0.5rem !important;
-    }
-
-    .scheduled-patient-name {
-        font-size: 0.68rem !important;
-        line-height: 1.05 !important;
-        letter-spacing: -0.055em !important;
-    }
-
-    .scheduled-patient-meta {
-        font-size: 0.55rem !important;
-        line-height: 1.1 !important;
-    }
-
-    .scheduled-patient-actions {
-        gap: 0.28rem !important;
-        margin-top: 0.54rem !important;
-    }
-
-    .scheduled-action-btn {
-        height: 28px !important;
-        min-height: 28px !important;
-        padding: 0 0.18rem !important;
-        font-size: 0.46rem !important;
-        border-radius: 0.5rem !important;
-        gap: 0.15rem !important;
-    }
-
-    .scheduled-action-btn i {
-        font-size: 0.45rem !important;
-    }
-}
-
 .appointment-status-badge {
     display: inline-flex !important;
     align-items: center !important;
@@ -2775,14 +2963,6 @@
     background: var(--status-cancelled-bg) !important;
     color: var(--status-cancelled-text) !important;
     border-color: var(--status-cancelled-border) !important;
-}
-
-@media (max-width: 480px) {
-    .appointment-status-badge {
-        max-width: none !important;
-        padding: 0.24rem 0.4rem !important;
-        font-size: 0.48rem !important;
-    }
 }
 
 [data-theme="dark"] .sched-patient-name,

@@ -246,27 +246,11 @@ $notifCount = $notifications->count();
 
                 <div class="appointment-filter-wrap">
                     <div class="appointment-search-row voice-search-row">
-                        <div class="search-wrap global-search" data-search-wrapper>
-                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <x-search-bar id="apptSearchInput" placeholder="Search patient"
+                            callback="handleAppointmentSearch" :debounce="250" class="flex-1" />
 
-                            <input id="apptSearchInput" type="text" placeholder="Search patient" class="search-input"
-                                data-search-input autocomplete="off">
-
-                            <button type="button" class="search-clear" data-search-clear aria-label="Clear search">
-                                <i class="fa-solid fa-xmark text-xs"></i>
-                            </button>
-                        </div>
-
-                        <div class="voice-input-toggle">
-                            <button type="button" class="voice-search-mic external" data-voice-trigger
-                                data-voice-target="#apptSearchInput" data-voice-status="#apptVoiceStatus"
-                                aria-label="Voice search appointments">
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
-
-                            <span id="apptVoiceStatus" class="voice-status hidden" data-voice-status
-                                aria-live="polite"></span>
-                        </div>
+                        <x-voice-input target="#apptSearchInput" status-id="apptVoiceStatus"
+                            label="Voice search appointments" title="Voice search" />
                     </div>
 
                     <input type="hidden" id="apptStatusFilter" value="all">
@@ -325,20 +309,8 @@ $notifCount = $notifications->count();
                         </button>
                     </div>
 
-                    <div class="view-toggle-container" data-global-view-toggle data-view-root="#mainContent"
-                        data-storage-key="ViewToggleMode" aria-label="View options">
-                        <span class="view-slider" aria-hidden="true"></span>
-
-                        <button type="button" class="btn-view-mode active" title="List view" aria-label="List view"
-                            aria-pressed="true" data-view-mode="list">
-                            <i class="fa-solid fa-list"></i>
-                        </button>
-
-                        <button type="button" class="btn-view-mode" title="Grid view" aria-label="Grid view"
-                            aria-pressed="false" data-view-mode="grid">
-                            <i class="fa-solid fa-grip"></i>
-                        </button>
-                    </div>
+                    <x-view-toggle id="appointmentsViewToggle" root="#mainContent" storage-key="appointmentsViewMode"
+                        list-label="List" grid-label="Grid" />
 
                     <button id="appointmentClearFilterBtn" type="button" onclick="resetAppointmentFilters()"
                         class="global-filter-reset-btn hidden" title="Reset filters">
@@ -543,26 +515,22 @@ $notifCount = $notifications->count();
 
                                 <div class="appt-patient-cell flex items-center justify-start gap-3">
                                     @php
-                                    $patientImage = optional($appt->patient)->profile_image
-                                    ? asset('storage/' . optional($appt->patient)->profile_image)
-                                    : null;
-
-                                    $patientInitials = collect(preg_split('/\s+/', trim($patientName)))
-                                    ->filter()
-                                    ->take(2)
-                                    ->map(fn($part) => strtoupper(substr($part, 0, 1)))
-                                    ->implode('');
+                                    $patientImage =
+                                    optional(
+                                    $appt->patient
+                                    )->profile_image
+                                    ? asset(
+                                    'storage/' .
+                                    optional(
+                                    $appt->patient
+                                    )->profile_image
+                                    )
+                                    : '';
                                     @endphp
 
-                                    <span class="patient-avatar patient-avatar-md">
-                                        @if ($patientImage)
-                                        <img src="{{ $patientImage }}" alt="{{ $patientName }}">
-                                        @else
-                                        <span>
-                                            {{ $patientInitials ?: '?' }}
-                                        </span>
-                                        @endif
-                                    </span>
+                                    <span class="patient-avatar patient-avatar-md" data-patient-avatar
+                                        data-patient-name="{{ $patientName }}"
+                                        data-patient-url="{{ $patientImage }}"></span>
                                     <div class="text-left min-w-0">
                                         <p class="appt-patient-name text-[13px] font-bold text-gray-800 leading-tight">
                                             {{ $patientName }}</p>
@@ -1187,39 +1155,22 @@ $notifCount = $notifications->count();
 
                                 <div class="appt-patient-cell flex items-center justify-start gap-3">
                                     @php
-                                    $patientImage = optional($appt->patient)->profile_image
+                                    $patientImage =
+                                    optional(
+                                    $appt->patient
+                                    )->profile_image
                                     ? asset(
                                     'storage/' .
-                                    optional($appt->patient)->profile_image
+                                    optional(
+                                    $appt->patient
+                                    )->profile_image
                                     )
-                                    : null;
-
-                                    $patientInitials = collect(
-                                    preg_split(
-                                    '/\s+/',
-                                    trim($patientName)
-                                    )
-                                    )
-                                    ->filter()
-                                    ->take(2)
-                                    ->map(
-                                    fn ($part) =>
-                                    strtoupper(
-                                    substr($part, 0, 1)
-                                    )
-                                    )
-                                    ->implode('');
+                                    : '';
                                     @endphp
 
-                                    <span class="patient-avatar patient-avatar-md">
-                                        @if ($patientImage)
-                                        <img src="{{ $patientImage }}" alt="{{ $patientName }}">
-                                        @else
-                                        <span>
-                                            {{ $patientInitials ?: '?' }}
-                                        </span>
-                                        @endif
-                                    </span>
+                                    <span class="patient-avatar patient-avatar-md" data-patient-avatar
+                                        data-patient-name="{{ $patientName }}"
+                                        data-patient-url="{{ $patientImage }}"></span>
                                     <div class="text-left min-w-0">
 
                                         <div class="appt-patient-name-row">

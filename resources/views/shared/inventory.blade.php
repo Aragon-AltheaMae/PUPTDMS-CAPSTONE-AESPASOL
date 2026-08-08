@@ -138,27 +138,11 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
 
                             <div
                                 class="inventory-search-row voice-search-row flex items-center gap-3 w-full lg:w-[340px] lg:flex-none">
-                                <div class="search-wrap global-search flex-1" data-search-wrapper>
-                                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                                <x-search-bar id="searchInput" placeholder="Search Stock No."
+                                    callback="handleInventorySearch" :debounce="250" class="flex-1" />
 
-                                    <input type="text" id="searchInput" placeholder="Search Stock No." data-search-input
-                                        class="search-input" oninput="inventoryCurrentPage = 1; renderTable();" />
-
-                                    <button type="button" class="search-clear" data-search-clear
-                                        aria-label="Clear search">
-                                        <i class="fa-solid fa-xmark text-xs"></i>
-                                    </button>
-                                </div>
-
-                                <div class="voice-input-toggle">
-                                    <button type="button" id="invMicToggleBtn" class="voice-search-mic external"
-                                        data-voice-trigger data-voice-target="#searchInput"
-                                        data-voice-status="#invVoiceStatus" aria-label="Voice search inventory">
-                                        <i class="fa-solid fa-microphone"></i>
-                                    </button>
-                                    <span id="invVoiceStatus" class="voice-status hidden" data-voice-status
-                                        aria-live="polite"></span>
-                                </div>
+                                <x-voice-input target="#searchInput" status-id="invVoiceStatus"
+                                    label="Voice search inventory" title="Voice search" />
                             </div>
 
                             <div class="inventory-mobile-actions flex items-center gap-2 flex-nowrap lg:flex-none">
@@ -189,64 +173,10 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                     </div>
                 </div>
 
-                <div class="global-pagebar global-pagebar-top">
-                    <div class="global-pagebar-left">
-                        <span id="inventoryPageInfoTop" class="global-pagebar-info" aria-live="polite">
-                        </span>
-
-                        <div class="global-page-size-control">
-                            <label for="inventoryPerPageSelect">
-                                Show
-                            </label>
-
-                            <div class="global-page-size-select" data-global-page-size
-                                data-page-size-input="#inventoryPerPageSelect"
-                                data-page-size-callback="handleInventoryPerPageChange">
-
-                                <select id="inventoryPerPageSelect" class="global-page-size-native" tabindex="-1"
-                                    aria-hidden="true">
-
-                                    @foreach ([10, 20, 50, 100] as $size)
-                                    <option value="{{ $size }}" {{ $size===10 ? 'selected' : '' }}>
-                                        {{ $size }}
-                                    </option>
-                                    @endforeach
-                                </select>
-
-                                <button type="button" class="global-page-size-trigger" data-page-size-trigger
-                                    aria-haspopup="listbox" aria-expanded="false">
-
-                                    <span data-page-size-value>
-                                        10
-                                    </span>
-
-                                    <i class="fa-solid fa-chevron-down"></i>
-                                </button>
-
-                                <div class="global-page-size-menu" role="listbox">
-
-                                    @foreach ([10, 20, 50, 100] as $size)
-                                    <button type="button"
-                                        class="global-page-size-option {{ $size === 10 ? 'is-selected' : '' }}"
-                                        data-page-size-option data-value="{{ $size }}" role="option"
-                                        aria-selected="{{ $size === 10 ? 'true' : 'false' }}">
-
-                                        <span>{{ $size }}</span>
-                                        <i class="fa-solid fa-check"></i>
-                                    </button>
-                                    @endforeach
-                                </div>
-                            </div>
-
-                            <span>per page</span>
-                        </div>
-                    </div>
-
-                    <div class="global-pagination-wrap">
-                        <div id="inventoryPaginationTop" class="global-pagination" aria-label="Inventory pagination">
-                        </div>
-                    </div>
-                </div>
+                <x-pagination-bar id="inventoryPaginationTopBar" info-id="inventoryPageInfoTop"
+                    pagination-id="inventoryPaginationTop" position="top" :show-entries="true"
+                    page-size-id="inventoryPerPageSelect" page-size-callback="handleInventoryPerPageChange"
+                    :page-size-value="10" page-size-label="per page" label="entries" />
 
                 <div id="tableWrapper" class="inventory-table-wrap">
                     <table class="data-table inventory-data-table">
@@ -269,16 +199,8 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                 <div id="inventoryGrid" class="inventory-grid"></div>
                 <div id="emptyState" class="empty-state-host"></div>
 
-                <div class="global-pagebar global-pagebar-bottom">
-                    <span id="inventoryPageInfoBottom" class="global-pagebar-info" aria-live="polite">
-                    </span>
-
-                    <div class="global-pagination-wrap">
-                        <div id="inventoryPaginationBottom" class="global-pagination" aria-label="Inventory pagination">
-                        </div>
-                    </div>
-                </div>
-
+                <x-pagination-bar id="inventoryPaginationBottomBar" info-id="inventoryPageInfoBottom"
+                    pagination-id="inventoryPaginationBottom" position="bottom" label="entries" />
             </div>
         </div>
     </div>
@@ -477,18 +399,8 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                                 oninput="formatStockNo(this)" required>
                         </div>
 
-                        <div class="voice-input-toggle">
-                            <button type="button" class="voice-search-mic external" data-voice-trigger
-                                data-voice-target="#addStock" data-voice-status="#addStockVoiceStatus"
-                                aria-label="Voice input for stock number">
-
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
-
-                            <span id="addStockVoiceStatus" class="voice-status hidden" data-voice-status
-                                aria-live="polite">
-                            </span>
-                        </div>
+                        <x-voice-input target="#addStock" status-id="addStockVoiceStatus"
+                            label="Voice input for stock number" title="Voice input" />
                     </div>
                 </div>
 
@@ -536,18 +448,8 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                                 data-char-counter="#charCounter-addName" required>
                         </div>
 
-                        <div class="voice-input-toggle">
-                            <button type="button" class="voice-search-mic external" data-voice-trigger
-                                data-voice-target="#addName" data-voice-status="#addNameVoiceStatus"
-                                aria-label="Voice input for item name">
-
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
-
-                            <span id="addNameVoiceStatus" class="voice-status hidden" data-voice-status
-                                aria-live="polite">
-                            </span>
-                        </div>
+                        <x-voice-input target="#addName" status-id="addNameVoiceStatus"
+                            label="Voice input for item name" title="Voice input" />
                     </div>
                 </div>
 
@@ -569,8 +471,8 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                                 <i class="fa-solid fa-minus"></i>
                             </button>
 
-                            <input id="addQty" name="qty" type="number" class="global-number-stepper-input" value="0"
-                                min="0" max="99999" step="1" inputmode="numeric" data-number-stepper-input
+                            <input id="addQty" name="qty" type="number" class="global-number-stepper-input" value="1"
+                                min="1" max="99999" step="1" inputmode="numeric" data-number-stepper-input
                                 data-field-label="Quantity" data-required-message="Please enter a quantity."
                                 data-validation-rule="wholeNumber" oninput="computeAddBalance()" required>
 
@@ -581,18 +483,8 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                             </button>
                         </div>
 
-                        <div class="voice-input-toggle">
-                            <button type="button" class="voice-search-mic external" data-voice-trigger
-                                data-voice-target="#addQty" data-voice-status="#addQtyVoiceStatus"
-                                aria-label="Voice input for quantity">
-
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
-
-                            <span id="addQtyVoiceStatus" class="voice-status hidden" data-voice-status
-                                aria-live="polite">
-                            </span>
-                        </div>
+                        <x-voice-input target="#addQty" status-id="addQtyVoiceStatus" label="Voice input for quantity"
+                            title="Voice input" />
                     </div>
                 </div>
 
@@ -626,18 +518,8 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                             </button>
                         </div>
 
-                        <div class="voice-input-toggle">
-                            <button type="button" class="voice-search-mic external" data-voice-trigger
-                                data-voice-target="#addUsed" data-voice-status="#addUsedVoiceStatus"
-                                aria-label="Voice input for consumed quantity">
-
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
-
-                            <span id="addUsedVoiceStatus" class="voice-status hidden" data-voice-status
-                                aria-live="polite">
-                            </span>
-                        </div>
+                        <x-voice-input target="#addUsed" status-id="addUsedVoiceStatus"
+                            label="Voice input for consumed quantity" title="Voice input" />
                     </div>
                 </div>
 
@@ -730,7 +612,6 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                 <div class="inventory-field" data-global-field>
 
                     <label for="editStock" class="inventory-field-label">
-
                         Stock Number
                         <span class="required-mark">*</span>
                     </label>
@@ -746,18 +627,8 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                                 oninput="formatStockNo(this)" required>
                         </div>
 
-                        <div class="voice-input-toggle">
-                            <button type="button" class="voice-search-mic external" data-voice-trigger
-                                data-voice-target="#editStock" data-voice-status="#editStockVoiceStatus"
-                                aria-label="Voice input for stock number">
-
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
-
-                            <span id="editStockVoiceStatus" class="voice-status hidden" data-voice-status
-                                aria-live="polite">
-                            </span>
-                        </div>
+                        <x-voice-input target="#editStock" status-id="editStockVoiceStatus"
+                            label="Voice input for stock number" title="Voice input" />
                     </div>
                 </div>
 
@@ -804,18 +675,8 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                                 data-char-counter="#charCounter-editName" required>
                         </div>
 
-                        <div class="voice-input-toggle">
-                            <button type="button" class="voice-search-mic external" data-voice-trigger
-                                data-voice-target="#editName" data-voice-status="#editNameVoiceStatus"
-                                aria-label="Voice input for item name">
-
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
-
-                            <span id="editNameVoiceStatus" class="voice-status hidden" data-voice-status
-                                aria-live="polite">
-                            </span>
-                        </div>
+                        <x-voice-input target="#editName" status-id="editNameVoiceStatus"
+                            label="Voice input for item name" title="Voice input" />
                     </div>
                 </div>
 
@@ -850,18 +711,8 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                             </button>
                         </div>
 
-                        <div class="voice-input-toggle">
-                            <button type="button" class="voice-search-mic external" data-voice-trigger
-                                data-voice-target="#editQty" data-voice-status="#editQtyVoiceStatus"
-                                aria-label="Voice input for quantity">
-
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
-
-                            <span id="editQtyVoiceStatus" class="voice-status hidden" data-voice-status
-                                aria-live="polite">
-                            </span>
-                        </div>
+                        <x-voice-input target="#editQty" status-id="editQtyVoiceStatus" label="Voice input for quantity"
+                            title="Voice input" />
                     </div>
                 </div>
 
@@ -895,18 +746,8 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                             </button>
                         </div>
 
-                        <div class="voice-input-toggle">
-                            <button type="button" class="voice-search-mic external" data-voice-trigger
-                                data-voice-target="#editUsed" data-voice-status="#editUsedVoiceStatus"
-                                aria-label="Voice input for consumed quantity">
-
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
-
-                            <span id="editUsedVoiceStatus" class="voice-status hidden" data-voice-status
-                                aria-live="polite">
-                            </span>
-                        </div>
+                        <x-voice-input target="#editUsed" status-id="editUsedVoiceStatus"
+                            label="Voice input for consumed quantity" title="Voice input" />
                     </div>
                 </div>
 
@@ -981,6 +822,12 @@ $inventoryDestroyUrlTemplate = route($inventoryRouteNames['destroy'], ['inventor
 
     var inventoryCurrentPage = 1;
     var inventoryEntriesPerPage = 10;
+
+    window.handleInventorySearch =
+        function () {
+            inventoryCurrentPage = 1;
+            renderTable();
+        };
 
     function handleInventoryPerPageChange(value) {
         const nextPerPage =
@@ -1064,8 +911,6 @@ $inventoryDestroyUrlTemplate = route($inventoryRouteNames['destroy'], ['inventor
                 document.getElementById('editModal')
             );
 
-            window.initGlobalVoiceInputs?.(document);
-
             const inventoryPerPageSelect =
                 document.getElementById(
                     'inventoryPerPageSelect'
@@ -1132,11 +977,10 @@ $inventoryDestroyUrlTemplate = route($inventoryRouteNames['destroy'], ['inventor
                 .trim()
                 .toLowerCase();
 
-        activeTab =
-            ['all', 'medicine', 'supplies']
-                .includes(normalizedTab)
-                ? normalizedTab
-                : 'all';
+        activeTab = ['all', 'medicine', 'supplies']
+            .includes(normalizedTab) ?
+            normalizedTab :
+            'all';
 
         document
             .querySelectorAll(
@@ -1268,16 +1112,12 @@ $inventoryDestroyUrlTemplate = route($inventoryRouteNames['destroy'], ['inventor
                 window.syncCustomSelect?.(wrapper);
             });
 
-        window.openModal?.('addModal');
+        window.openModal?.(
+            'addModal'
+        );
 
-        window.initGlobalVoiceInputs?.(modal);
-
-        document.dispatchEvent(
-            new CustomEvent('voice:refresh', {
-                detail: {
-                    root: modal
-                }
-            })
+        window.initGlobalVoiceInputs?.(
+            modal
         );
     }
 
@@ -1786,254 +1626,6 @@ aria-label="Delete inventory item"
     `;
     }
 
-    function renderInventoryPagination(
-        totalItems,
-        currentPage,
-        totalPages
-    ) {
-        const containers = [
-            document.getElementById(
-                'inventoryPaginationTop'
-            ),
-            document.getElementById(
-                'inventoryPaginationBottom'
-            )
-        ].filter(Boolean);
-
-        containers.forEach(container => {
-            container.replaceChildren();
-        });
-
-        if (totalItems <= 0) {
-            containers.forEach(container => {
-                container.hidden = true;
-            });
-
-            return;
-        }
-
-        containers.forEach(container => {
-            container.hidden = false;
-        });
-
-        const pageWindow = 5;
-        const halfWindow =
-            Math.floor(pageWindow / 2);
-
-        let startPage =
-            Math.max(
-                1,
-                currentPage - halfWindow
-            );
-
-        let endPage =
-            Math.min(
-                totalPages,
-                startPage + pageWindow - 1
-            );
-
-        if (
-            endPage - startPage + 1 <
-            pageWindow
-        ) {
-            startPage =
-                Math.max(
-                    1,
-                    endPage - pageWindow + 1
-                );
-        }
-
-        function goToPage(page) {
-            const nextPage =
-                Math.max(
-                    1,
-                    Math.min(totalPages, page)
-                );
-
-            if (
-                nextPage ===
-                inventoryCurrentPage
-            ) {
-                return;
-            }
-
-            inventoryCurrentPage =
-                nextPage;
-
-            renderTable();
-
-            document
-                .querySelector(
-                    '.inventory-table-card'
-                )
-                ?.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-        }
-
-        function createButton({
-            page,
-            label = '',
-            icon = '',
-            current = false,
-            disabled = false,
-            ariaLabel = ''
-        }) {
-            let element;
-
-            if (current) {
-                element =
-                    document.createElement('span');
-
-                element.className =
-                    'global-page-current';
-
-                element.setAttribute(
-                    'aria-current',
-                    'page'
-                );
-            } else if (disabled) {
-                element =
-                    document.createElement('button');
-
-                element.type = 'button';
-                element.className =
-                    'global-page-disabled';
-
-                element.disabled = true;
-            } else {
-                element =
-                    document.createElement('button');
-
-                element.type = 'button';
-                element.className =
-                    'global-page-btn';
-
-                element.addEventListener(
-                    'click',
-                    function () {
-                        goToPage(page);
-                    }
-                );
-            }
-
-            if (icon) {
-                const iconElement =
-                    document.createElement('i');
-
-                iconElement.className =
-                    `fa-solid ${icon} global-page-icon`;
-
-                element.appendChild(
-                    iconElement
-                );
-            } else {
-                element.textContent =
-                    String(label);
-            }
-
-            if (ariaLabel) {
-                element.setAttribute(
-                    'aria-label',
-                    ariaLabel
-                );
-            }
-
-            return element;
-        }
-
-        function createEllipsis() {
-            const ellipsis =
-                document.createElement('span');
-
-            ellipsis.className =
-                'global-page-ellipsis';
-
-            ellipsis.innerHTML =
-                '&hellip;';
-
-            ellipsis.setAttribute(
-                'aria-hidden',
-                'true'
-            );
-
-            return ellipsis;
-        }
-
-        function buildPagination(container) {
-            container.appendChild(
-                createButton({
-                    page: currentPage - 1,
-                    icon: 'fa-chevron-left',
-                    disabled: currentPage === 1,
-                    ariaLabel: 'Previous page'
-                })
-            );
-
-            if (startPage > 1) {
-                container.appendChild(
-                    createButton({
-                        page: 1,
-                        label: 1,
-                        ariaLabel: 'Page 1'
-                    })
-                );
-
-                if (startPage > 2) {
-                    container.appendChild(
-                        createEllipsis()
-                    );
-                }
-            }
-
-            for (
-                let page = startPage; page <= endPage; page++
-            ) {
-                container.appendChild(
-                    createButton({
-                        page,
-                        label: page,
-                        current: page === currentPage,
-                        ariaLabel: `Page ${page}`
-                    })
-                );
-            }
-
-            if (endPage < totalPages) {
-                if (
-                    endPage <
-                    totalPages - 1
-                ) {
-                    container.appendChild(
-                        createEllipsis()
-                    );
-                }
-
-                container.appendChild(
-                    createButton({
-                        page: totalPages,
-                        label: totalPages,
-                        ariaLabel: `Page ${totalPages}`
-                    })
-                );
-            }
-
-            container.appendChild(
-                createButton({
-                    page: currentPage + 1,
-                    icon: 'fa-chevron-right',
-                    disabled: currentPage === totalPages,
-                    ariaLabel: 'Next page'
-                })
-            );
-        }
-
-        containers.forEach(
-            buildPagination
-        );
-    }
-
     function renderTable() {
         const tbody =
             document.getElementById(
@@ -2082,20 +1674,13 @@ aria-label="Delete inventory item"
             );
         }
 
-        if (emptyState) {
-            emptyState.classList.remove(
-                'show',
-                'is-visible'
-            );
-
-            emptyState.replaceChildren();
-            emptyState.hidden = true;
-        }
+        window.EmptyState?.hide(
+            '#emptyState'
+        );
 
         let data =
-            Array.isArray(inventory)
-                ? inventory.slice()
-                : [];
+            Array.isArray(inventory) ?
+                inventory.slice() : [];
 
         if (activeTab !== 'all') {
             data = data.filter(function (item) {
@@ -2172,14 +1757,14 @@ aria-label="Delete inventory item"
             data.length;
 
         const totalInventoryCount =
-            Array.isArray(inventory)
-                ? inventory.length
-                : 0;
+            Array.isArray(inventory) ?
+                inventory.length :
+                0;
 
         const totalInventoryLabel =
-            totalInventoryCount === 1
-                ? 'item'
-                : 'items';
+            totalInventoryCount === 1 ?
+                'item' :
+                'items';
 
         document
             .querySelectorAll(
@@ -2222,13 +1807,13 @@ aria-label="Delete inventory item"
             );
 
         const entryLabel =
-            filteredInventoryCount === 1
-                ? 'entry'
-                : 'entries';
+            filteredInventoryCount === 1 ?
+                'entry' :
+                'entries';
 
         const pageInformation =
-            filteredInventoryCount > 0
-                ? `
+            filteredInventoryCount > 0 ?
+                `
             Showing
             <strong>
                 ${pageStart + 1}–${pageEnd}
@@ -2238,8 +1823,8 @@ aria-label="Delete inventory item"
                 ${filteredInventoryCount}
             </strong>
             ${entryLabel}
-        `
-                : `
+        ` :
+                `
             Showing
             <strong>0</strong>
             entries
@@ -2259,11 +1844,65 @@ aria-label="Delete inventory item"
                     pageInformation;
             });
 
-        renderInventoryPagination(
-            filteredInventoryCount,
-            inventoryCurrentPage,
-            totalPages
-        );
+        window.renderGlobalPagination?.({
+            currentPage: inventoryCurrentPage,
+
+            lastPage: totalPages,
+
+            total: filteredInventoryCount,
+
+            from: filteredInventoryCount > 0 ?
+                pageStart + 1 : null,
+
+            to: filteredInventoryCount > 0 ?
+                pageEnd : null,
+
+            containers: [
+                document.getElementById(
+                    'inventoryPaginationTop'
+                ),
+                document.getElementById(
+                    'inventoryPaginationBottom'
+                ),
+            ],
+
+            bars: [
+                document.getElementById(
+                    'inventoryPaginationTopBar'
+                ),
+                document.getElementById(
+                    'inventoryPaginationBottomBar'
+                ),
+            ],
+
+            infoElements: [
+                document.getElementById(
+                    'inventoryPageInfoTop'
+                ),
+                document.getElementById(
+                    'inventoryPageInfoBottom'
+                ),
+            ],
+
+            itemLabel: filteredInventoryCount === 1 ?
+                'entry' : 'entries',
+
+            onPageChange(page) {
+                inventoryCurrentPage =
+                    page;
+
+                renderTable();
+
+                document
+                    .querySelector(
+                        '.inventory-table-card'
+                    )
+                    ?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                    });
+            },
+        });
 
         if (!data.length) {
             if (tableWrapper) {
@@ -2284,90 +1923,107 @@ aria-label="Delete inventory item"
                 );
             }
 
-            if (emptyState) {
-                emptyState.hidden = false;
-            }
+            var isSearching =
+                q.length > 0;
 
-            [
-                document.getElementById(
-                    'inventoryPaginationTop'
-                ),
-                document.getElementById(
-                    'inventoryPaginationBottom'
-                )
-            ]
-                .filter(Boolean)
-                .forEach(function (pagination) {
-                    pagination.hidden = true;
-                    pagination.replaceChildren();
-                });
-
-            var isSearching = q.length > 0;
-            var hasFilters = Object.values(activeFilters).some(Boolean);
-            var icon, title, sub, extraHtml = '';
+            var hasFilters =
+                Object
+                    .values(
+                        activeFilters
+                    )
+                    .some(Boolean);
 
             if (isSearching) {
-                icon = 'fa-magnifying-glass';
-                title = 'No results for "' + q + '"';
-                sub = 'Try a different stock number or supply name.';
-                extraHtml =
-                    '<button type="button" data-clear-search data-search-target="#searchInput" class="empty-state-btn"><i class="fa-solid fa-xmark"></i> Clear search</button>';
-            } else if (hasFilters) {
-                icon = 'fa-sliders';
-                title = 'No matches for your filters';
-                sub = 'Try removing or adjusting your filter criteria.';
-                extraHtml =
-                    '<button type="button" onclick="clearFilterPanel()" class="empty-state-btn"><i class="fa-solid fa-xmark"></i> Reset</button>';
-            } else {
-                var msgs = {
-                    all: {
-                        icon: 'fa-box-open',
-                        title: 'No items in the inventory',
-                        sub: 'Add your first item using the "Add Item" button above.'
-                    },
-                    medicine: {
-                        icon: 'fa-pills',
-                        title: 'No medicines in the inventory',
-                        sub: 'Add a medicine item above.'
-                    },
-                    supplies: {
-                        icon: 'fa-syringe',
-                        title: 'No dental supplies in the inventory',
-                        sub: 'Add a supply item above.'
-                    }
-                };
+                window.EmptyState?.renderSearch({
+                    host: '#emptyState',
 
-                var msg = msgs[activeTab] || msgs.all;
-                icon = msg.icon;
-                title = msg.title;
-                sub = msg.sub;
+                    input: '#searchInput',
+
+                    query: q,
+
+                    message: 'Try a different stock number or supply name.',
+                });
+
+                return;
             }
 
-            emptyState.innerHTML = buildEmptyStateHtml({
-                icon: icon,
-                title: title,
-                sub: sub,
-                actionHtml: extraHtml
+            if (hasFilters) {
+                window.EmptyState?.render({
+                    host: '#emptyState',
+
+                    icon: 'fa-sliders',
+
+                    title: 'No matches for your filters',
+
+                    message: 'Try removing or adjusting your filter criteria.',
+
+                    actionHtml: `
+            <button
+                type="button"
+                class="empty-state-btn"
+                data-inventory-clear-filters
+            >
+                <i class="fa-solid fa-xmark"></i>
+                Reset
+            </button>
+        `,
+                });
+
+                document
+                    .querySelector(
+                        '#emptyState [data-inventory-clear-filters]'
+                    )
+                    ?.addEventListener(
+                        'click',
+                        clearFilterPanel
+                    );
+
+                return;
+            }
+
+            var messages = {
+                all: {
+                    icon: 'fa-box-open',
+
+                    title: 'No items in the inventory',
+
+                    message: 'Add your first item using the "Add Item" button above.',
+                },
+
+                medicine: {
+                    icon: 'fa-pills',
+
+                    title: 'No medicines in the inventory',
+
+                    message: 'Add a medicine item above.',
+                },
+
+                supplies: {
+                    icon: 'fa-syringe',
+
+                    title: 'No dental supplies in the inventory',
+
+                    message: 'Add a supply item above.',
+                },
+            };
+
+            window.EmptyState?.render({
+                host: '#emptyState',
+
+                ...(
+                    messages[
+                    activeTab
+                    ] ||
+                    messages.all
+                ),
             });
 
-            if (emptyState) {
-                emptyState.classList.add(
-                    'show'
-                );
-            }
             return;
         }
 
-        if (emptyState) {
-            emptyState.hidden = true;
-
-            emptyState.classList.remove(
-                'show',
-                'is-visible'
-            );
-
-            emptyState.replaceChildren();
-        }
+        window.EmptyState?.hide(
+            '#emptyState'
+        );
 
         if (currentViewMode === 'grid') {
             if (tableWrapper) {
@@ -2530,92 +2186,123 @@ aria-label="Delete inventory item"
         });
     }
 
-    function buildEmptyStateHtml({
-        icon,
-        title,
-        sub,
-        actionHtml = ''
-    }) {
-        var escapeText = window.escapeHtml || function (value) {
-            return String(value || '')
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        };
-
-        return `
-        <div class="empty-state">
-            <div class="empty-state-icon inventory-empty-icon">
-                <i class="fa-solid ${icon}"></i>
-            </div>
-
-            <p class="empty-state-title">${escapeText(title)}</p>
-            <p class="empty-state-sub">${escapeText(sub)}</p>
-
-            ${actionHtml}
-        </div>
-    `;
-    }
-
     function resetAddForm() {
         const addCategory =
-            document.getElementById('addCategory');
+            document.getElementById(
+                'addCategory'
+            );
 
         if (addCategory) {
             addCategory.value = '';
+
             addCategory.dispatchEvent(
-                new Event('change', {
-                    bubbles: true
-                })
+                new Event(
+                    'change',
+                    {
+                        bubbles: true
+                    }
+                )
             );
 
             window.syncCustomSelect?.(
-                addCategory.closest('.custom-select')
+                addCategory.closest(
+                    '.custom-select'
+                )
             );
         }
+
         [
             'addDate',
             'addStock',
             'addName',
-            'addUnit',
-            'addQty',
-            'addUsed',
-            'addBalance'
+            'addUnit'
         ].forEach(function (id) {
-            const field = document.getElementById(id);
-
-            if (field) {
-                field.value = '';
-                field.dispatchEvent(
-                    new Event('change', {
-                        bubbles: true
-                    })
+            const field =
+                document.getElementById(
+                    id
                 );
+
+            if (!field) {
+                return;
             }
+
+            field.value = '';
+
+            field.dispatchEvent(
+                new Event(
+                    'change',
+                    {
+                        bubbles: true
+                    }
+                )
+            );
         });
+
+        const addQty =
+            document.getElementById(
+                'addQty'
+            );
+
+        const addUsed =
+            document.getElementById(
+                'addUsed'
+            );
+
+        if (addQty) {
+            addQty.value = '1';
+        }
+
+        if (addUsed) {
+            addUsed.value = '0';
+        }
+
+        computeAddBalance();
+
         const form =
-            document.getElementById('addInventoryForm');
+            document.getElementById(
+                'addInventoryForm'
+            );
 
-        form?.querySelectorAll(
-            'input, select, textarea'
-        ).forEach(function (field) {
-            field.classList.remove('is-invalid', 'is-valid');
-            field.removeAttribute('aria-invalid');
-            field.removeAttribute('aria-describedby');
-            field.setCustomValidity('');
-        });
+        form
+            ?.querySelectorAll(
+                'input, select, textarea'
+            )
+            .forEach(function (field) {
+                field.classList.remove(
+                    'is-invalid',
+                    'is-valid'
+                );
 
-        form?.querySelectorAll('.global-field-error')
+                field.removeAttribute(
+                    'aria-invalid'
+                );
+
+                field.removeAttribute(
+                    'aria-describedby'
+                );
+
+                field.setCustomValidity('');
+            });
+
+        form
+            ?.querySelectorAll(
+                '.global-field-error'
+            )
             .forEach(function (error) {
                 error.remove();
             });
 
-        document.querySelectorAll('#addModal [data-voice-status]').forEach(function (status) {
-            status.classList.add('hidden');
-            status.textContent = '';
-        });
+        document
+            .querySelectorAll(
+                '#addModal [data-voice-status]'
+            )
+            .forEach(function (status) {
+                status.classList.add(
+                    'hidden'
+                );
+
+                status.textContent = '';
+            });
     }
 
     async function addItem() {
@@ -2841,18 +2528,6 @@ aria-label="Delete inventory item"
 
         computeEditBalance();
         window.openModal?.('editModal');
-
-        window.initGlobalVoiceInputs?.(
-            document.getElementById('editModal')
-        );
-
-        document.dispatchEvent(
-            new CustomEvent('voice:refresh', {
-                detail: {
-                    root: document.getElementById('editModal')
-                }
-            })
-        );
     }
 
     async function saveEdit() {

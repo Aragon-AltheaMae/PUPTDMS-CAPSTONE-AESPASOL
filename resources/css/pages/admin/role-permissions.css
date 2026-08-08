@@ -801,13 +801,6 @@
     overflow: hidden !important;
 }
 
-.progress-fill {
-    height: 100% !important;
-    border-radius: inherit !important;
-    background: linear-gradient(90deg, var(--crimson, #8B0000), #c0392b) !important;
-    transition: width .25s ease !important;
-}
-
 .group-card {
     background: #ffffff !important;
     border: 1px solid #f0eaea !important;

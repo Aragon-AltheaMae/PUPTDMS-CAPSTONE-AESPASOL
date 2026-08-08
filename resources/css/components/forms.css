@@ -1279,15 +1279,22 @@ textarea.form-input-custom.global-form-textarea {
 }
 
 .global-question-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    justify-content: space-between;
-    gap: 1.25rem;
+    column-gap: 1.25rem;
+    row-gap: .4rem;
     padding: .9rem 0;
 }
 
 .global-question-row:not(:last-child) {
     border-bottom: 1px solid var(--border-subtle, #ece7e2);
+}
+
+.global-question-row[data-global-field]>.global-field-error {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-top: 0;
 }
 
 .global-question-text {
@@ -1399,14 +1406,18 @@ textarea.form-input-custom.global-form-textarea {
 
 @media (max-width: 768px) {
     .global-question-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: .55rem;
+        grid-template-columns: 1fr;
+        align-items: stretch;
+        row-gap: .55rem;
     }
 
     .global-question-options {
         width: 100%;
         gap: .75rem;
+    }
+
+    .global-question-row[data-global-field]>.global-field-error {
+        grid-column: 1;
     }
 
     .global-radio-option {

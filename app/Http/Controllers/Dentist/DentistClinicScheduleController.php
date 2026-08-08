@@ -58,7 +58,7 @@ class DentistClinicScheduleController extends Controller
         $philippineHolidays = PhilippineHolidays::range(0, 1);
         $notifications = [];
 
-        return view('admin.clinic-schedule', [
+        return view('shared.clinic-schedule', [
             'schedules' => $schedules,
             'blockedDates' => $blockedDates,
             'appointmentCountsPerDay' => $appointmentCountsPerDay,

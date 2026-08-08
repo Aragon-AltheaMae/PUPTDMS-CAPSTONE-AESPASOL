@@ -10,12 +10,26 @@
 use Carbon\Carbon;
 $patientName = $patient->name ?? 'Unknown Patient';
 $today = Carbon::now()->format('F d, Y');
-$historicalMode = (bool) ($historicalMode ?? false);
-$pageEyebrow = $historicalMode ? 'Historical Appointment Import' : 'Dental Procedure Workspace';
-$pageTitle = $historicalMode ? 'Add Existing Appointment' : 'Patient Odontogram';
-$pageSubtitle = $historicalMode
-    ? 'Record previous manual appointments with notes, duration, and odontogram'
-    : '2D / 3D Treatment &amp; Condition Mapping';
+$existingAppointmentMode =
+(bool) (
+$existingAppointmentMode ??
+false
+);
+
+$pageEyebrow =
+$existingAppointmentMode
+? 'Add Existing Appointment'
+: 'Dental Procedure Workspace';
+
+$pageTitle =
+$existingAppointmentMode
+? 'Existing Appointment Odontogram'
+: 'Patient Odontogram';
+
+$pageSubtitle =
+$existingAppointmentMode
+? 'Complete the odontogram and clinical notes for the existing appointment.'
+: '2D / 3D Treatment &amp; Condition Mapping';
 @endphp
 
 <main id="mainContent" class="odontogram-page pt-[100px] px-3 md:px-6 pb-6">
@@ -24,10 +38,10 @@ $pageSubtitle = $historicalMode
             <div class="odontogram-hero-main">
                 <div class="odontogram-hero-left">
                     <button type="button" id="cancelProcedureBtn" class="hero-danger-btn"
-                        data-tooltip="{{ $historicalMode ? 'Cancel Entry' : 'Cancel Procedure' }}"
-                        aria-label="{{ $historicalMode ? 'Cancel Entry' : 'Cancel Procedure' }}">
+                        data-tooltip="{{ $existingAppointmentMode ? 'Cancel Entry' : 'Cancel Procedure' }}"
+                        aria-label="{{ $existingAppointmentMode ? 'Cancel Entry' : 'Cancel Procedure' }}">
                         <i class="fa-solid fa-xmark"></i>
-                        <span>{{ $historicalMode ? 'Cancel Entry' : 'Cancel Procedure' }}</span>
+                        <span>{{ $existingAppointmentMode ? 'Cancel Entry' : 'Cancel Procedure' }}</span>
                     </button>
 
                     <div class="hero-title-card">
@@ -50,11 +64,13 @@ $pageSubtitle = $historicalMode
 
                     <div class="hero-procedure-meta">
                         <div class="hero-stat">
-                            <span class="hero-stat-label">{{ $historicalMode ? 'Session Timer' : 'Procedure Time' }}</span>
+                            <span class="hero-stat-label">{{ $existingAppointmentMode ? 'Session Timer' : 'Procedure
+                                Time'
+                                }}</span>
                             <span id="procedureTimer" class="hero-stat-value">00:00:00</span>
                         </div>
                         <div class="hero-stat">
-                            <span class="hero-stat-label">{{ $historicalMode ? 'Entry Date' : 'Date' }}</span>
+                            <span class="hero-stat-label">{{ $existingAppointmentMode ? 'Entry Date' : 'Date' }}</span>
                             <span class="hero-stat-date">{{ $today }}</span>
                         </div>
                     </div>
@@ -154,7 +170,8 @@ $pageSubtitle = $historicalMode
                                     <span><strong>Right mouse:</strong> Move the model</span>
                                 </div>
                                 <div class="three-mouse-guide-item">
-                                    <span class="mouse-button-key mouse-wheel-key"><i class="fa-solid fa-arrows-up-down"></i></span>
+                                    <span class="mouse-button-key mouse-wheel-key"><i
+                                            class="fa-solid fa-arrows-up-down"></i></span>
                                     <span><strong>Scroll:</strong> Zoom in/out</span>
                                 </div>
                             </div>
@@ -316,38 +333,57 @@ $pageSubtitle = $historicalMode
                         </section>
 
                         <section class="right-section-card">
-                            @if ($historicalMode)
+                            @if ($existingAppointmentMode)
                             <div class="right-section-head">
                                 <div>
-                                    <p class="right-section-eyebrow">Historical Appointment</p>
-                                    <h3 class="right-section-title">Old Appointment Details</h3>
+                                    <p class="right-section-eyebrow">Existing Appointment</p>
+                                    <h3 class="right-section-title">Appointment Details</h3>
                                 </div>
                             </div>
 
                             <div class="right-section-body space-y-4">
-                                <div class="historical-intro-card">
-                                    Review the imported patient history details below. When you save this odontogram, the old appointment will be stored as a completed visit in the system.
+                                <div class="existing-appointment-intro-card">
+                                    Review the existing appointment details below.
+                                    When you save this odontogram,
+                                    the appointment will be stored as a completed visit
+                                    in the system.
                                 </div>
 
-                                <div class="historical-grid">
+                                <div class="existing-appointment-grid">
                                     <div>
-                                        <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Service Type</p>
-                                        <div class="historical-summary-card">{{ data_get($historicalDraft ?? [], 'service_type', '—') }}</div>
+                                        <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                                            Service Type</p>
+                                        <div class="existing-appointment-summary-card">{{
+                                            data_get($existingAppointmentDraft ??
+                                            [],
+                                            'service_type', '—') }}</div>
                                     </div>
 
                                     <div>
-                                        <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Appointment Date</p>
-                                        <div class="historical-summary-card">{{ data_get($historicalDraft ?? [], 'appointment_date', '—') }}</div>
+                                        <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                                            Appointment Date</p>
+                                        <div class="existing-appointment-summary-card">{{
+                                            data_get($existingAppointmentDraft ??
+                                            [],
+                                            'appointment_date', '—') }}</div>
                                     </div>
 
                                     <div>
-                                        <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Appointment Time</p>
-                                        <div class="historical-summary-card">{{ data_get($historicalDraft ?? [], 'appointment_time', '—') }}</div>
+                                        <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                                            Appointment Time</p>
+                                        <div class="existing-appointment-summary-card">{{
+                                            data_get($existingAppointmentDraft ??
+                                            [],
+                                            'appointment_time', '—') }}</div>
                                     </div>
 
                                     <div>
-                                        <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">Procedure Duration</p>
-                                        <div class="historical-summary-card">{{ data_get($historicalDraft ?? [], 'procedure_duration_hms', '—') }}</div>
+                                        <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                                            Procedure Duration</p>
+                                        <div class="existing-appointment-summary-card">{{
+                                            data_get($existingAppointmentDraft ??
+                                            [],
+                                            'procedure_duration_hms', '—') }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -400,7 +436,7 @@ $pageSubtitle = $historicalMode
                 </div>
 
                 <div class="odontogram-right-bottom space-y-3">
-                    @unless ($historicalMode)
+                    @unless ($existingAppointmentMode)
                     <button type="button" id="followUpBtn"
                         class="w-full flex justify-center items-center gap-2 bg-amber-100 hover:bg-amber-200 text-amber-800 text-sm font-semibold py-2.75 rounded-xl transition shadow-sm border border-amber-200">
                         <i class="fa-solid fa-calendar-plus"></i>
@@ -411,7 +447,7 @@ $pageSubtitle = $historicalMode
                     <button type="button" id="finishProcedureBtn"
                         class="w-full flex justify-center items-center gap-2 bg-[#8B0000] hover:bg-[#660000] text-white text-sm font-semibold py-2.75 rounded-xl transition shadow-md">
                         <i class="fa-solid fa-check"></i>
-                        {{ $historicalMode ? 'Save Existing Appointment' : 'Finish Procedure' }}
+                        {{ $existingAppointmentMode ? 'Save Existing Appointment' : 'Finish Procedure' }}
                     </button>
                 </div>
             </div>
@@ -551,14 +587,13 @@ $pageSubtitle = $historicalMode
 </div>
 
 <div id="finishProcedureModal"
-    class="procedure-confirm-modal fixed inset-0 z-[90] hidden items-center justify-center p-4"
-    role="dialog" aria-modal="true" aria-labelledby="finishProcedureModalTitle">
+    class="procedure-confirm-modal fixed inset-0 z-[90] hidden items-center justify-center p-4" role="dialog"
+    aria-modal="true" aria-labelledby="finishProcedureModalTitle">
     <div class="procedure-confirm-backdrop absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
 
     <div
         class="procedure-confirm-card relative w-[calc(100vw-2rem)] max-w-[480px] overflow-hidden rounded-2xl bg-[#8B0000] px-8 py-10 text-center shadow-[0_25px_60px_rgba(0,0,0,0.25)]">
-        <div
-            class="w-16 h-16 rounded-full bg-white/15 flex items-center justify-center mx-auto mb-6">
+        <div class="w-16 h-16 rounded-full bg-white/15 flex items-center justify-center mx-auto mb-6">
             <i id="finishProcedureModalIcon" class="fa-solid fa-clipboard-check text-white text-2xl"></i>
         </div>
 
@@ -587,7 +622,7 @@ $pageSubtitle = $historicalMode
     </div>
 </div>
 
-@unless ($historicalMode)
+@unless ($existingAppointmentMode)
 <div id="followUpModal"
     class="fixed inset-0 bg-black/50 hidden items-end sm:items-center justify-center backdrop-blur-sm z-[9999] p-0 sm:p-4">
 
@@ -740,7 +775,7 @@ $pageSubtitle = $historicalMode
 @endsection
 
 @section('scripts')
-@unless ($historicalMode)
+@unless ($existingAppointmentMode)
 @include('components.appointment-calendar-script', [
 'mode' => 'booking',
 'calendarContainerId' => 'followUpCalendarWrap',
@@ -796,7 +831,7 @@ $pageSubtitle = $historicalMode
         const confirmFinishProcedureBtn = document.getElementById('confirmFinishProcedureBtn');
         const dismissFinishProcedureBtn = document.getElementById('dismissFinishProcedureBtn');
         const finishProcedureModalActionBtn = document.getElementById('finishProcedureModalActionBtn');
-        const historicalMode = @json($historicalMode);
+        const existingAppointmentMode = @json($existingAppointmentMode);
         const cancelProcedureRedirectUrl = @json(route('dentist.dentist.patient.profile', $patient -> id ?? 1));
         let finishProcedureModalRedirectUrl = null;
         let finishProcedureModalCloseTimer = null;
@@ -1155,47 +1190,47 @@ $pageSubtitle = $historicalMode
         }
 
         function focusCameraOnTooth(
-                mesh
+            mesh
+        ) {
+            if (
+                !odontogramThreeState ||
+                !mesh
             ) {
-                if (
-                    !odontogramThreeState ||
-                    !mesh
-                ) {
-                    return;
-                }
-
-                window.Odontogram3D
-                    .focusTooth(
-                        odontogramThreeState,
-                        mesh
-                    );
+                return;
             }
 
-            function resetCameraToFull3DView() {
-                if (
-                    !odontogramThreeState
-                ) {
-                    return;
-                }
+            window.Odontogram3D
+                .focusTooth(
+                    odontogramThreeState,
+                    mesh
+                );
+        }
 
-                window.Odontogram3D
-                    .resetCamera(
-                        odontogramThreeState
-                    );
+        function resetCameraToFull3DView() {
+            if (
+                !odontogramThreeState
+            ) {
+                return;
             }
 
-            function handleResize() {
-                if (
-                    !odontogramThreeState
-                ) {
-                    return;
-                }
+            window.Odontogram3D
+                .resetCamera(
+                    odontogramThreeState
+                );
+        }
 
-                window.Odontogram3D
-                    .resize(
-                        odontogramThreeState
-                    );
+        function handleResize() {
+            if (
+                !odontogramThreeState
+            ) {
+                return;
             }
+
+            window.Odontogram3D
+                .resize(
+                    odontogramThreeState
+                );
+        }
 
         function createDefaultToothState(toothNumber) {
             return {
@@ -1956,7 +1991,7 @@ $pageSubtitle = $historicalMode
             render2DOdontogram();
 
             if (odontogramThreeState) {
-    renderThreeVisuals();
+                renderThreeVisuals();
             }
 
             updateSelectedToothUI();
@@ -2315,19 +2350,19 @@ $pageSubtitle = $historicalMode
             }
 
             if (
-                    view === '3d' &&
-                    odontogramThreeState &&
-                    selectedTooth
-                ) {
-                    selectedMesh =
-                        window.Odontogram3D
-                            .getToothMesh(
-                                odontogramThreeState,
-                                selectedTooth
-                            );
+                view === '3d' &&
+                odontogramThreeState &&
+                selectedTooth
+            ) {
+                selectedMesh =
+                    window.Odontogram3D
+                        .getToothMesh(
+                            odontogramThreeState,
+                            selectedTooth
+                        );
 
-                    renderThreeVisuals();
-                }
+                renderThreeVisuals();
+            }
 
             updateSelectedToothUI();
             update3DSurfacePicker();
@@ -2426,7 +2461,7 @@ $pageSubtitle = $historicalMode
         const finishProcedureBtn = document.getElementById('finishProcedureBtn');
         const followUpBtn = document.getElementById('followUpBtn');
         const saveProcedureUrl = @json($saveProcedureUrl ?? null);
-        const storeFollowUpUrl = @json(!$historicalMode && $appointment ? route('dentist.dentist.appointments.follow-up.store', $appointment -> id) : null);
+        const storeFollowUpUrl = @json(!$existingAppointmentMode && $appointment ? route('dentist.dentist.appointments.follow-up.store', $appointment -> id) : null);
 
         function showProcedureToast(message, type = 'success') {
             const existingToast = document.getElementById('procedureToast');
@@ -2878,7 +2913,7 @@ $pageSubtitle = $historicalMode
                 prescriptions: document.getElementById('prescriptionsNotes').value,
                 completion_action: completionAction,
                 has_applied_treatment: hasAppliedTreatmentThisSession,
-                procedure_duration_seconds: historicalMode
+                procedure_duration_seconds: existingAppointmentMode
                     ? 0
                     : Math.max(0, Math.floor((Date.now() - procedureStartTimestamp) / 1000)),
             };
@@ -2915,12 +2950,12 @@ $pageSubtitle = $historicalMode
 
                 if (completionAction === 'finished') {
                     openFinishProcedureModal({
-                        title: historicalMode ? 'Existing Appointment Saved!' : 'Procedure Completed!',
-                        message: historicalMode
-                            ? 'The historical appointment, notes, duration, and odontogram were saved successfully.'
+                        title: existingAppointmentMode ? 'Existing Appointment Saved!' : 'Procedure Completed!',
+                        message: existingAppointmentMode
+                            ? 'The existing appointment, notes, duration, and odontogram were saved successfully.'
                             : 'The odontogram and procedure notes were saved successfully. This appointment has been marked as completed.',
                         icon: 'fa-clipboard-check',
-                        buttonText: historicalMode ? 'Back to Patient Profile' : 'Back to Appointments',
+                        buttonText: existingAppointmentMode ? 'Back to Patient Profile' : 'Back to Appointments',
                         redirectUrl: result.redirect_url || null,
                     });
                 } else {
@@ -2959,9 +2994,9 @@ $pageSubtitle = $historicalMode
             }
 
             openFinishProcedureModal({
-                title: historicalMode ? 'Save Existing Appointment?' : 'Finish Procedure?',
-                message: historicalMode
-                    ? 'Are you sure you want to save this historical appointment? The old visit details, odontogram, and notes will be stored as a completed appointment.'
+                title: existingAppointmentMode ? 'Save Existing Appointment?' : 'Finish Procedure?',
+                message: existingAppointmentMode
+                    ? 'Are you sure you want to save this existing appointment? The old visit details, odontogram, and notes will be stored as a completed appointment.'
                     : 'Are you sure you want to finish this procedure? The odontogram and procedure notes will be saved, and this appointment will be marked as completed.',
                 icon: 'fa-circle-question',
                 confirmation: true,

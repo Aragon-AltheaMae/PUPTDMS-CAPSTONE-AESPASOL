@@ -31,6 +31,7 @@
 @import './pages/error-pages.css';
 @import './pages/auth/login.css';
 @import './components/odontogram-preview.css';
+@import './components/booking-workflow.css';
 
 /* Shared page styles */
 @import './pages/dentist/dentist-shared.css';
@@ -52,6 +53,7 @@
 @import './pages/dentist/odontogram.css';
 @import './pages/dentist/dentist-walk-in.css';
 @import './pages/dentist/add-existing-record.css';
+@import './pages/dentist/add-existing-appointment.css';
 
 /* Patient pages */
 @import './pages/patient/dashboard.css';

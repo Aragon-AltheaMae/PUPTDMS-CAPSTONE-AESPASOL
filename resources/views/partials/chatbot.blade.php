@@ -1,19 +1,22 @@
 <div class="assistive-fab-group" id="assistiveFabGroup">
+
     <button type="button" class="assistive-main-fab" id="assistiveMainFab" onclick="toggleAssistiveMenu()"
         aria-label="Open assistance tools" aria-expanded="false">
         <i class="fa-solid fa-wand-magic-sparkles"></i>
     </button>
 
     <div class="assistive-mini-menu" id="assistiveMiniMenu" aria-hidden="true">
+
         <button type="button" class="assistive-mini-fab chatbot-fab" onclick="closeAssistiveMenu(); toggleChat();"
-            aria-label="Open dental chatbot" data-tooltip="Chatbot">
+            aria-label="Open dental chatbot" data-tooltip="Chatbot" data-tooltip-tone="view">
             <i class="fas fa-comments"></i>
         </button>
 
         <button type="button" class="assistive-mini-fab accessibility-fab" onclick="toggleAccessibilityFromMain()"
-            aria-label="Open accessibility tools" data-tooltip="Accessibility">
+            aria-label="Open accessibility tools" data-tooltip="Accessibility" data-tooltip-tone="view">
             <i class="fa-solid fa-universal-access"></i>
         </button>
+
     </div>
 </div>
 
@@ -102,7 +105,8 @@
 <script>
     window.authUserName = "{{ optional(auth()->user())->name ?? '' }}";
     window.authUserId = "{{ auth()->id() ?? 'guest' }}";
-    window.authUserRole = "{{ session('impersonated_role') ?? optional(optional(auth()->user())->role)->slug ?? 'guest' }}";
+    window.authUserRole =
+        "{{ session('impersonated_role') ?? (optional(optional(auth()->user())->role)->slug ?? 'guest') }}";
     window.chatbotSessionId = "{{ session()->getId() }}";
     window.chatbotBotName = 'PUP SmileGuide AI';
 </script>
@@ -116,13 +120,15 @@
     const isLoginPage = chatbotContext.page === 'login' || window.location.pathname === '/login';
     const botName = window.chatbotBotName || 'PUP SmileGuide AI';
 
-    const currentUserId = window.authUserId || document.querySelector('meta[name="auth-user-id"]')?.getAttribute('content') || 'guest';
+    const currentUserId = window.authUserId || document.querySelector('meta[name="auth-user-id"]')?.getAttribute(
+        'content') || 'guest';
     const currentUserRole = window.authUserRole || 'guest';
     const currentChatSessionId = window.chatbotSessionId || 'session';
 
     const chatStorageKey = `puptdms_chatbot_messages_${currentUserRole}_${currentUserId}_${currentChatSessionId}`;
     const chatOpenStorageKey = `puptdms_chatbot_open_${currentUserRole}_${currentUserId}_${currentChatSessionId}`;
-    const assistiveOpenStorageKey = `puptdms_assistive_menu_open_${currentUserRole}_${currentUserId}_${currentChatSessionId}`;
+    const assistiveOpenStorageKey =
+        `puptdms_assistive_menu_open_${currentUserRole}_${currentUserId}_${currentChatSessionId}`;
 
     let introShown = false;
     let lastMessageType = null;
@@ -193,7 +199,7 @@
         );
     }
 
-    input.addEventListener('input', function () {
+    input.addEventListener('input', function() {
         if (input.value.length > CHAT_MAX_CHARS) {
             input.value = input.value.slice(0, CHAT_MAX_CHARS);
         }
@@ -281,7 +287,8 @@
     const activeRoleConfig = roleConfig[currentUserRole] || roleConfig.guest;
 
     function syncChatEmptyState() {
-        document.getElementById('chat-empty-desc')?.replaceChildren(document.createTextNode(activeRoleConfig.emptyDesc));
+        document.getElementById('chat-empty-desc')?.replaceChildren(document.createTextNode(activeRoleConfig
+            .emptyDesc));
     }
 
     syncChatEmptyState();
@@ -519,7 +526,7 @@
     function lockPageScrollInsideChatbot() {
         if (!chatWindow || !msgDiv) return;
 
-        msgDiv.addEventListener('wheel', function (event) {
+        msgDiv.addEventListener('wheel', function(event) {
             const atTop = msgDiv.scrollTop <= 0;
             const atBottom = Math.ceil(msgDiv.scrollTop + msgDiv.clientHeight) >= msgDiv.scrollHeight;
 
@@ -531,15 +538,19 @@
             }
 
             event.stopPropagation();
-        }, { passive: false });
+        }, {
+            passive: false
+        });
 
         let startY = 0;
 
-        msgDiv.addEventListener('touchstart', function (event) {
+        msgDiv.addEventListener('touchstart', function(event) {
             startY = event.touches[0].clientY;
-        }, { passive: true });
+        }, {
+            passive: true
+        });
 
-        msgDiv.addEventListener('touchmove', function (event) {
+        msgDiv.addEventListener('touchmove', function(event) {
             const currentY = event.touches[0].clientY;
             const deltaY = startY - currentY;
 
@@ -554,7 +565,9 @@
             }
 
             event.stopPropagation();
-        }, { passive: false });
+        }, {
+            passive: false
+        });
     }
 
     lockPageScrollInsideChatbot();
@@ -704,7 +717,8 @@
 
         try {
             const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-            const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : (document.querySelector('input[name="_token"]') ? document.querySelector('input[name="_token"]').value : '');
+            const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : (document.querySelector(
+                'input[name="_token"]') ? document.querySelector('input[name="_token"]').value : '');
 
             const response = await fetch('/chat/send', {
                 method: 'POST',
@@ -735,7 +749,8 @@
             if (!response.ok) {
                 if (response.status === 429) {
                     showChatWarning(
-                        data?.error || 'You have sent too many messages. Please wait a minute before trying again.',
+                        data?.error ||
+                        'You have sent too many messages. Please wait a minute before trying again.',
                         'Too many messages'
                     );
 
@@ -748,7 +763,8 @@
             let reply = data.reply || 'No response from AI.';
 
             if (window.authUserName && reply.toLowerCase().startsWith('hello')) {
-                reply = reply.replace(/^hello(?:\s+there)?[!,.\s]*/i, `Hello ${window.authUserName}! `).replace(/\s+/g, ' ').trim();
+                reply = reply.replace(/^hello(?:\s+there)?[!,.\s]*/i, `Hello ${window.authUserName}! `).replace(
+                    /\s+/g, ' ').trim();
             }
 
             addMessage('ai', reply);
@@ -789,30 +805,78 @@
 
         const actionMap = {
             admin: [
-                [['dashboard', 'admin dashboard'], 'Go to Dashboard', '/admin/dashboard'],
-                [['patient directory', 'patients page', 'manage patients', 'search patients'], 'Go to Patients', '/admin/patient-directory'],
-                [['appointment', 'appointments', 'reschedule', 'cancel appointment'], 'Go to Appointments', '/admin/appointments'],
-                [['document request', 'document requests', 'approve request', 'reject request'], 'Go to Document Requests', '/admin/document-requests'],
-                [['report', 'reports', 'analytics'], 'Go to Reports', '/admin/reports'],
-                [['inventory', 'stock', 'supplies', 'medicine'], 'Go to Inventory', '/admin/inventory'],
-                [['setting', 'settings', 'system settings'], 'Go to System Settings', '/admin/system-settings']
+                [
+                    ['dashboard', 'admin dashboard'], 'Go to Dashboard', '/admin/dashboard'
+                ],
+                [
+                    ['patient directory', 'patients page', 'manage patients', 'search patients'],
+                    'Go to Patients', '/admin/patient-directory'
+                ],
+                [
+                    ['appointment', 'appointments', 'reschedule', 'cancel appointment'], 'Go to Appointments',
+                    '/admin/appointments'
+                ],
+                [
+                    ['document request', 'document requests', 'approve request', 'reject request'],
+                    'Go to Document Requests', '/admin/document-requests'
+                ],
+                [
+                    ['report', 'reports', 'analytics'], 'Go to Reports', '/admin/reports'
+                ],
+                [
+                    ['inventory', 'stock', 'supplies', 'medicine'], 'Go to Inventory', '/admin/inventory'
+                ],
+                [
+                    ['setting', 'settings', 'system settings'], 'Go to System Settings',
+                    '/admin/system-settings'
+                ]
             ],
             dentist: [
-                [['patient profile', 'patient profiles', 'manage patients'], 'Go to Patients', '/dentist/patients'],
-                [['appointment', 'appointments', 'follow-up', 'consultation'], 'Go to Appointments', '/dentist/appointments'],
-                [['odontogram'], 'Go to Patients', '/dentist/patients'],
-                [['walk-in', 'walk in'], 'Go to Walk-in', '/dentist/walk-in'],
-                [['document request', 'document requests'], 'Go to Document Requests', '/dentist/document-requests'],
-                [['report', 'reports'], 'Go to Reports', '/dentist/report'],
-                [['inventory', 'stock', 'supplies', 'medicine'], 'Go to Inventory', '/dentist/inventory'],
-                [['schedule', 'clinic schedule'], 'Go to Clinic Schedule', '/dentist/clinic-schedule']
+                [
+                    ['patient profile', 'patient profiles', 'manage patients'], 'Go to Patients',
+                    '/dentist/patients'
+                ],
+                [
+                    ['appointment', 'appointments', 'follow-up', 'consultation'], 'Go to Appointments',
+                    '/dentist/appointments'
+                ],
+                [
+                    ['odontogram'], 'Go to Patients', '/dentist/patients'
+                ],
+                [
+                    ['walk-in', 'walk in'], 'Go to Walk-in', '/dentist/walk-in'
+                ],
+                [
+                    ['document request', 'document requests'], 'Go to Document Requests',
+                    '/dentist/document-requests'
+                ],
+                [
+                    ['report', 'reports'], 'Go to Reports', '/dentist/report'
+                ],
+                [
+                    ['inventory', 'stock', 'supplies', 'medicine'], 'Go to Inventory', '/dentist/inventory'
+                ],
+                [
+                    ['schedule', 'clinic schedule'], 'Go to Clinic Schedule', '/dentist/clinic-schedule'
+                ]
             ],
             patient: [
-                [['appointment', 'appointments'], 'Go to Appointments', '/patient/appointments'],
-                [['book', 'booking', 'available date'], 'Book Appointment', '/book-appointment'],
-                [['record', 'records', 'dental record', 'odontogram'], 'Go to Dental Records', '/record'],
-                [['document', 'clearance', 'document request'], 'Go to Document Requests', '/document-requests'],
-                [['schedule', 'available'], 'Check Available Dates', '/book-appointment']
+                [
+                    ['appointment', 'appointments'], 'Go to Appointments', '/patient/appointments'
+                ],
+                [
+                    ['book', 'booking', 'available date'], 'Book Appointment', '/book-appointment'
+                ],
+                [
+                    ['record', 'records', 'dental record', 'odontogram'], 'Go to Dental Records', '/record'
+                ],
+                [
+                    ['document', 'clearance', 'document request'], 'Go to Document Requests',
+                    '/document-requests'
+                ],
+                [
+                    ['schedule', 'available'], 'Check Available Dates', '/book-appointment'
+                ]
             ]
         };
 
@@ -831,7 +895,7 @@
     let chatCurrentY = 0;
     let isDraggingChat = false;
 
-    chatWindow.addEventListener('touchstart', function (e) {
+    chatWindow.addEventListener('touchstart', function(e) {
         if (!window.matchMedia('(max-width: 640px)').matches) return;
 
         chatStartY = e.touches[0].clientY;
@@ -842,7 +906,7 @@
         passive: true
     });
 
-    chatWindow.addEventListener('touchmove', function (e) {
+    chatWindow.addEventListener('touchmove', function(e) {
         if (!isDraggingChat) return;
 
         chatCurrentY = e.touches[0].clientY;
@@ -853,7 +917,7 @@
         passive: true
     });
 
-    chatWindow.addEventListener('touchend', function () {
+    chatWindow.addEventListener('touchend', function() {
         if (!isDraggingChat) return;
 
         const diff = Math.max(0, chatCurrentY - chatStartY);
@@ -868,7 +932,7 @@
         isDraggingChat = false;
     });
 
-    input.addEventListener('keydown', function (e) {
+    input.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
             e.preventDefault();
             sendMessage();
@@ -1005,7 +1069,7 @@
         scrollChat();
     }
 
-    document.addEventListener('click', function (e) {
+    document.addEventListener('click', function(e) {
         const target = e.target.closest('.chatbot-chip, .chatbot-send, .chat-action-btn');
         if (!target) return;
 
@@ -1033,7 +1097,7 @@
         }
     }
 
-    document.addEventListener('click', function (e) {
+    document.addEventListener('click', function(e) {
         const isAccessibilityBtn =
             e.target.closest('.asw-menu-btn') ||
             e.target.closest('[aria-label="Accessibility"]');
@@ -1063,10 +1127,11 @@
             document.body.classList.toggle('chatbot-open-mobile', isMobile);
         }
 
-        document.querySelectorAll('form[action*="logout"], a[href*="logout"], button[data-logout]').forEach(item => {
-            item.addEventListener('click', clearAssistiveStorageOnLogout);
-            item.addEventListener('submit', clearAssistiveStorageOnLogout);
-        });
+        document.querySelectorAll('form[action*="logout"], a[href*="logout"], button[data-logout]').forEach(
+            item => {
+                item.addEventListener('click', clearAssistiveStorageOnLogout);
+                item.addEventListener('submit', clearAssistiveStorageOnLogout);
+            });
     });
 
     function clearAssistiveStorageOnLogout() {
