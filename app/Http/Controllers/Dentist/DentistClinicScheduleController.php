@@ -58,18 +58,17 @@ class DentistClinicScheduleController extends Controller
         $philippineHolidays = PhilippineHolidays::range(0, 1);
         $notifications = [];
 
-        return view('shared.clinic-schedule', [
-            'layoutRole' => 'dentist',
-            'pageTitle' => 'Clinic Schedule',
-            'pageShellClass' => 'dentist-page-shell',
-            'isDentistView' => true,
-
+        return view('admin.clinic-schedule', [
             'schedules' => $schedules,
             'blockedDates' => $blockedDates,
             'appointmentCountsPerDay' => $appointmentCountsPerDay,
             'weeklyAppointments' => $weeklyAppointments,
             'philippineHolidays' => $philippineHolidays,
             'notifications' => $notifications,
+
+            'layoutRole' => 'dentist',
+            'pageShellClass' => 'dentist-page-shell',
+            'isDentistView' => true,
 
             'clinicScheduleRouteNames' => [
                 'store' => 'dentist.dentist.clinic_schedule.store',
@@ -247,11 +246,7 @@ class DentistClinicScheduleController extends Controller
             'close_time' => 'required_unless:status,closed|nullable|date_format:H:i|after:open_time',
             'break_time' => 'nullable|string',
             'max_slots' => 'required_unless:status,closed|nullable|integer|min:1|max:50',
-<<<<<<< HEAD
             'notes' => 'nullable|string|max:500',
-=======
-            'notes' => 'nullable|string|max:150',
->>>>>>> fixdev
         ]);
     }
 
