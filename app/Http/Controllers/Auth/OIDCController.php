@@ -301,11 +301,11 @@ class OIDCController extends Controller
 
             if (!empty($facultyAccess->user->role?->slug)) {
                 $roleSlug = $facultyAccess->user->role->slug;
-                $roleId = Role::where('slug', $roleSlug)->value('id');
+                $roleId = $this->resolveLocalRoleId($roleSlug);
             }
         }
 
-        $roleId = Role::where('slug', $roleSlug)->value('id');
+        $roleId = $this->resolveLocalRoleId($roleSlug);
 
         Log::info('ROLE MAPPING DEBUG', [
             'incoming_roles'      => $incomingRoles,
@@ -702,6 +702,43 @@ class OIDCController extends Controller
         } catch (\Throwable $e) {
             return $value;
         }
+    }
+
+    protected function resolveLocalRoleId(?string $roleSlug): ?int
+    {
+        $normalizedSlug = strtolower(trim((string) $roleSlug));
+
+        if ($normalizedSlug === '') {
+            return null;
+        }
+
+        $roleId = Role::where('slug', $normalizedSlug)->value('id');
+
+        if ($roleId) {
+            return (int) $roleId;
+        }
+
+        $coreRoleNames = [
+            'admin' => 'Admin',
+            'dentist' => 'Dentist',
+            'patient' => 'Patient',
+        ];
+
+        if (!isset($coreRoleNames[$normalizedSlug])) {
+            return null;
+        }
+
+        $role = Role::updateOrCreate(
+            ['slug' => $normalizedSlug],
+            ['name' => $coreRoleNames[$normalizedSlug]]
+        );
+
+        Log::warning('OIDC auto-restored missing core role', [
+            'role_slug' => $normalizedSlug,
+            'role_id' => $role->id,
+        ]);
+
+        return (int) $role->id;
     }
 
     protected function renderInactiveAccessPage(): HttpResponse
