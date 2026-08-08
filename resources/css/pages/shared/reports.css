@@ -1437,6 +1437,71 @@ hr.section-divider {
     gap: 18px;
 }
 
+.report-date-range-section {
+    display: flex;
+    flex-direction: column;
+    gap: .8rem;
+}
+
+.report-date-range-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.report-date-range-title {
+    color: var(--text-1, #111827);
+    font-size: .72rem;
+    font-weight: 900;
+    letter-spacing: .065em;
+    text-transform: uppercase;
+}
+
+.report-date-range-subtitle {
+    margin: .2rem 0 0;
+    color: var(--text-3, #9ca3af);
+    font-size: .7rem;
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+.report-date-range-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: .9rem;
+}
+
+.report-date-range-helper {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+
+    margin: -.15rem 0 0;
+
+    color: var(--text-3, #9ca3af);
+    font-size: .68rem;
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+.report-date-range-helper i {
+    color: var(--text-3, #9ca3af);
+    font-size: .65rem;
+}
+
+@media (max-width: 640px) {
+    .report-date-range-heading {
+        flex-direction: column;
+        gap: .5rem;
+    }
+
+    .report-date-range-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .fp-date-input-wrap {
     position: relative;
     width: 100%;

@@ -1397,18 +1397,8 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                                     </div>
                                 </div>
 
-                                <div class="voice-input-toggle">
-                                    <button type="button" id="reportNameMicBtn" class="voice-search-mic external"
-                                        data-voice-trigger data-voice-target="#reportName"
-                                        data-voice-status="#reportNameVoiceStatus"
-                                        aria-label="Voice input for report name">
-                                        <i class="fa-solid fa-microphone"></i>
-                                    </button>
-
-                                    <span id="reportNameVoiceStatus" class="voice-status hidden" data-voice-status
-                                        aria-live="polite">
-                                    </span>
-                                </div>
+                                <x-voice-input target="#reportName" status-id="reportNameVoiceStatus"
+                                    label="Voice input for report name" title="Voice input" />
                             </div>
                         </div>
 
@@ -1444,46 +1434,66 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                     </div>
 
                     <div class="modal-field" data-global-field>
-                        <label class="global-form-label" for="dateFrom">
-                            From
-                            <span class="required-mark">*</span>
-                        </label>
+                        <div class="modal-field modal-field-full report-date-range-section">
+                            <div class="report-date-range-heading">
+                                <div>
+                                    <div class="report-date-range-title">
+                                        Date Range
+                                    </div>
 
-                        <div class="fp-date-input-wrap">
-                            <input id="dateFrom" name="date_from" type="text"
-                                class="form-input-custom js-flatpickr-date-max-today" placeholder="Select start date"
-                                data-field-label="From Date" data-required-message="Please select a start date."
-                                data-validation-rule="notFutureDate" readonly required>
-
-                            <i class="fa-regular fa-calendar fp-date-icon"></i>
-                        </div>
-
-                        <div id="dateFromErr" class="global-field-error" data-error-for="dateFrom" aria-live="polite"
-                            aria-hidden="true">
-                        </div>
-                    </div>
-
-                    <div class="modal-field" data-global-field>
-                        <label class="global-form-label" for="dateTo">
-                            To
-                            <span class="modal-helper-text">(optional)</span>
-                        </label>
-
-                        <div class="fp-date-input-wrap">
-                            <input id="dateTo" name="date_to" type="text"
-                                class="form-input-custom js-flatpickr-date-max-today" placeholder="Select end date"
-                                data-field-label="To Date" data-required-message="Please select an end date."
-                                data-validation-rule="notFutureDate" readonly>
-
-                            <i class="fa-regular fa-calendar fp-date-icon"></i>
-
-                            <div id="dateToErr" class="global-field-error" data-error-for="dateTo" aria-live="polite"
-                                aria-hidden="true">
+                                    <p class="report-date-range-subtitle">
+                                        Select a single date or define a custom range.
+                                    </p>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="modal-field modal-field-full">
-                            <p class="modal-helper-text">
+                            <div class="report-date-range-grid">
+
+                                <div class="modal-field" data-global-field>
+                                    <label class="global-form-label" for="dateFrom">
+                                        From
+                                        <span class="required-mark">*</span>
+                                    </label>
+
+                                    <div class="fp-date-input-wrap">
+                                        <input id="dateFrom" name="date_from" type="text"
+                                            class="form-input-custom js-flatpickr-date-max-today"
+                                            placeholder="Select start date" data-field-label="From Date"
+                                            data-required-message="Please select a start date."
+                                            data-validation-rule="notFutureDate" readonly required>
+
+                                        <i class="fa-regular fa-calendar fp-date-icon" aria-hidden="true"></i>
+                                    </div>
+
+                                    <div id="dateFromErr" class="global-field-error" data-error-for="dateFrom"
+                                        aria-live="polite" aria-hidden="true"></div>
+                                </div>
+
+                                <div class="modal-field" data-global-field>
+                                    <label class="global-form-label" for="dateTo">
+                                        To
+                                        <span class="modal-helper-text">
+                                            (optional)
+                                        </span>
+                                    </label>
+
+                                    <div class="fp-date-input-wrap">
+                                        <input id="dateTo" name="date_to" type="text"
+                                            class="form-input-custom js-flatpickr-date-max-today"
+                                            placeholder="Select end date" data-field-label="To Date"
+                                            data-required-message="Please select an end date."
+                                            data-validation-rule="notFutureDate" readonly>
+
+                                        <i class="fa-regular fa-calendar fp-date-icon" aria-hidden="true"></i>
+                                    </div>
+
+                                    <div id="dateToErr" class="global-field-error" data-error-for="dateTo"
+                                        aria-live="polite" aria-hidden="true"></div>
+                                </div>
+
+                            </div>
+
+                            <p class="report-date-range-helper">
                                 <i class="fa-solid fa-circle-info"></i>
                                 Leave “To” empty to report on a single date.
                             </p>
@@ -1498,16 +1508,14 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             <div class="modal-inline-control">
                                 <div class="modal-inline-main">
                                     <div class="global-number-stepper" data-global-number-stepper>
-
                                         <button type="button" class="global-number-stepper-btn" data-number-step="-1"
                                             aria-label="Decrease quantity">
                                             <i class="fa-solid fa-minus"></i>
                                         </button>
 
-                                        <input id="reportQty" name="quantity" type="number" min="1" max="100" step="1"
-                                            class="global-number-stepper-input" placeholder="1–100"
-                                            data-number-stepper-input data-field-label="Quantity"
-                                            data-required-message="Please enter a quantity."
+                                        <input id="reportQty" name="quantity" type="number" value="1" min="1" max="100"
+                                            step="1" class="global-number-stepper-input" data-number-stepper-input
+                                            data-field-label="Quantity" data-required-message="Please enter a quantity."
                                             data-validation-rule="wholeNumber" required>
 
                                         <button type="button" class="global-number-stepper-btn" data-number-step="1"
@@ -1523,8 +1531,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             </div>
 
                             <div id="reportQtyErr" class="global-field-error" data-error-for="reportQty"
-                                aria-live="polite" aria-hidden="true">
-                            </div>
+                                aria-live="polite" aria-hidden="true"></div>
                         </div>
                     </div>
                 </div>
@@ -2678,6 +2685,24 @@ $customReportTemplates = collect($customReportTemplates ?? []);
         if (!form) return;
 
         form.reset();
+
+        const quantity =
+            document.getElementById(
+                'reportQty'
+            );
+
+        if (quantity) {
+            quantity.value = '1';
+
+            quantity.dispatchEvent(
+                new Event(
+                    'input',
+                    {
+                        bubbles: true
+                    }
+                )
+            );
+        }
 
         ['dateFrom', 'dateTo'].forEach(id => {
             const input = document.getElementById(id);

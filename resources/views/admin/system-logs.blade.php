@@ -123,15 +123,8 @@ $status = $status ?? 'active';
 
                 <div class="card-header-right sl-toolbar-actions">
                     <div class="voice-search-row sl-search-row">
-                        <div class="search-wrap global-search sl-search-wrap" data-search-wrapper>
-                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                            <input id="slSearch" name="search" class="search-input" type="text"
-                                placeholder="Search logs…" value="{{ $search ?? '' }}" data-search-input
-                                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                            <button type="button" class="search-clear" data-search-clear aria-label="Clear search">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-                        </div>
+                        <x-search-bar id="slSearch" name="search" placeholder="Search logs…" :value="$search ?? ''"
+                            callback="handleSystemLogsSearch" :debounce="400" class="sl-search-wrap" />
 
                         <div class="voice-input-toggle">
                             <span class="voice-status hidden" data-voice-status></span>
@@ -210,55 +203,10 @@ $status = $status ?? 'active';
                     @endforeach
                 </div>
 
-                <div class="global-pagebar global-pagebar-top">
-                    <div class="global-pagebar-left">
-                        <span class="global-pagebar-info">
-                            @if (method_exists($logs, 'total'))
-                            Showing <strong>{{ $logs->firstItem() }}–{{ $logs->lastItem() }}</strong>
-                            of <strong>{{ $logs->total() }}</strong> entries
-                            @else
-                            Showing <strong>{{ $logs->count() }}</strong>
-                            {{ Str::plural('entry', $logs->count()) }}
-                            @endif
-                        </span>
-                        <div class="global-page-size-control">
-                            <label for="perPageSelect">Show</label>
-
-                            <div class="global-page-size-select" data-global-page-size
-                                data-page-size-input="#perPageSelect"
-                                data-page-size-callback="handleSystemLogsPerPageChange">
-                                <select id="perPageSelect" class="global-page-size-native" tabindex="-1"
-                                    aria-hidden="true">
-                                    @foreach ([10, 20, 50, 100] as $size)
-                                    <option value="{{ $size }}" {{ (int) $perPage===$size ? 'selected' : '' }}>
-                                        {{ $size }}</option>
-                                    @endforeach
-                                </select>
-
-                                <button type="button" class="global-page-size-trigger" data-page-size-trigger
-                                    aria-haspopup="listbox" aria-expanded="false">
-                                    <span data-page-size-value>{{ (int) $perPage }}</span>
-                                    <i class="fa-solid fa-chevron-down"></i>
-                                </button>
-
-                                <div class="global-page-size-menu" role="listbox">
-                                    @foreach ([10, 20, 50, 100] as $size)
-                                    <button type="button"
-                                        class="global-page-size-option {{ (int) $perPage === $size ? 'is-selected' : '' }}"
-                                        data-page-size-option data-value="{{ $size }}" role="option"
-                                        aria-selected="{{ (int) $perPage === $size ? 'true' : 'false' }}">
-                                        <span>{{ $size }}</span>
-                                        <i class="fa-solid fa-check"></i>
-                                    </button>
-                                    @endforeach
-                                </div>
-                            </div>
-
-                            <span>per page</span>
-                        </div>
-                    </div>
-                    <div class="global-pagination-wrap"></div>
-                </div>
+                <x-pagination-bar id="systemLogsPaginationTopBar" info-id="systemLogsPageInfoTop"
+                    pagination-id="systemLogsPaginationTop" position="top" :show-entries="true"
+                    page-size-id="perPageSelect" page-size-callback="handleSystemLogsPerPageChange"
+                    :page-size-value="$perPage" page-size-label="per page" label="entries" />
 
                 <div class="sl-view" id="slListView">
                     <div class="sl-table-wrap">
@@ -454,17 +402,9 @@ $status = $status ?? 'active';
 
                 <div id="emptyState" class="empty-state-host"></div>
 
-                <div class="global-pagebar global-pagebar-bottom">
-                    <span class="global-pagebar-info">
-                        @if (method_exists($logs, 'total'))
-                        Showing <strong>{{ $logs->firstItem() }}–{{ $logs->lastItem() }}</strong>
-                        of <strong>{{ $logs->total() }}</strong> entries
-                        @else
-                        Showing <strong>{{ $logs->count() }}</strong> {{ Str::plural('entry', $logs->count()) }}
-                        @endif
-                    </span>
-                    <div class="global-pagination-wrap"></div>
-                </div>
+                <x-pagination-bar id="systemLogsPaginationBottomBar" info-id="systemLogsPageInfoBottom"
+                    pagination-id="systemLogsPaginationBottom" position="bottom" :page-size-value="$perPage"
+                    label="entries" />
             </div>
 
         </div>
@@ -757,7 +697,7 @@ $status = $status ?? 'active';
         });
 
         window.location.assign(
-            @json(route("admin.system_logs.export")) +
+            @json(route('admin.system_logs.export')) +
             "?" +
             params.toString()
         );
@@ -793,26 +733,24 @@ $status = $status ?? 'active';
         };
 
     var slOverallTotal = {{ (int)($totalCount ?? 0) }};
-    var slSearchTimer = null;
+
+    window.handleSystemLogsSearch =
+        function (value) {
+            slState.search =
+                String(value || '')
+                    .trim();
+
+            slState.page = 1;
+
+            slFetch(true);
+        };
+
     var slController = null;
     var slDraftCountController = null;
     var slDraftCountTimer = null;
     var systemLogsRefreshWatcher = null;
 
     document.addEventListener('DOMContentLoaded', function () {
-        window.handleSystemLogsPerPageChange = function (value) {
-            const nextPerPage = Number(value) || 10;
-
-            if (slState.perPage === nextPerPage) {
-                return;
-            }
-
-            slState.perPage = nextPerPage;
-            slState.page = 1;
-
-            slFetch();
-        };
-
         syncSlFilterInputs();
         updateSlClearFilterButton();
 
@@ -883,7 +821,7 @@ $status = $status ?? 'active';
         current_page: {{ (int) $logs -> currentPage() }},
         last_page: {{ (int) $logs -> lastPage() }},
         per_page: {{ (int) $logs -> perPage() }},
-                        });
+                });
     @else
     slRenderPagebar({
         total: {{ method_exists($logs, 'count') ? (int) $logs -> count() : 0 }},
@@ -892,7 +830,7 @@ $status = $status ?? 'active';
         current_page: 1,
         last_page: 1,
         per_page: {{ (int)($perPage ?? 10) }},
-                        });
+                });
     @endif
 
     @if (method_exists($logs, 'count') && $logs -> count() === 0)
@@ -903,27 +841,6 @@ $status = $status ?? 'active';
     var slArchiveDaysInput = document.getElementById('slArchiveDaysInput');
     var slArchiveError = document.getElementById('slArchiveError');
     var slArchiveConfirmBtn = document.getElementById('slArchiveConfirmBtn');
-    if (searchInput) {
-        searchInput.addEventListener('keydown', function (event) {
-            if (event.key !== 'Enter') return;
-
-            event.preventDefault();
-            clearTimeout(slSearchTimer);
-            slState.search = searchInput.value.trim();
-            slState.page = 1;
-            slFetch();
-        });
-
-        searchInput.addEventListener('input', function () {
-            clearTimeout(slSearchTimer);
-            slSearchTimer = setTimeout(function () {
-                slState.search = searchInput.value.trim();
-                slState.page = 1;
-                slFetch(true);
-            }, 400);
-        });
-    }
-
     var perPageSelect =
         document.getElementById('perPageSelect');
 
@@ -974,11 +891,9 @@ $status = $status ?? 'active';
             var latestId =
                 Number(payload?.latest_id || 0);
 
-            return latestId > 0 ?
-                [{
-                    id: latestId
-                }] :
-                [];
+            return latestId > 0 ? [{
+                id: latestId
+            }] : [];
         },
 
         getItemId: function (item) {
@@ -1016,27 +931,6 @@ $status = $status ?? 'active';
             .replaceAll('>', '&gt;')
             .replaceAll('"', '&quot;')
             .replaceAll("'", '&#039;');
-    }
-
-    function clearSearch() {
-        var input = document.getElementById('slSearch');
-
-        if (!input) return;
-
-        if (window.clearSearchInput) {
-            window.clearSearchInput(input);
-        } else {
-            input.value = '';
-            input.dispatchEvent(new Event('input', {
-                bubbles: true
-            }));
-        }
-
-        clearTimeout(slSearchTimer);
-        slState.search = '';
-        slState.page = 1;
-        slFetch();
-        input.focus();
     }
 
     function slSetTab(el, role) {
@@ -1206,15 +1100,6 @@ $status = $status ?? 'active';
             systemLogsRefreshWatcher?.start();
         }
 
-        slFetch();
-    }
-
-    function slGoPage(page) {
-        page = Number(page) || 1;
-
-        if (page < 1 || page === slState.page) return;
-
-        slState.page = page;
         slFetch();
     }
 
@@ -1710,17 +1595,15 @@ $status = $status ?? 'active';
 
         var tableBody = document.getElementById('slTableBody');
         var gridBody = document.getElementById('slGridBody');
-        var emptyState = document.getElementById('emptyState');
 
         if (!silent) {
             if (tableBody) tableBody.innerHTML = slSkeletonRows(slState.perPage);
             if (gridBody) gridBody.innerHTML = slSkeletonCards(slState.perPage);
         }
 
-        if (emptyState) {
-            emptyState.className = 'empty-state-host';
-            emptyState.innerHTML = '';
-        }
+        window.EmptyState?.hide(
+            '#emptyState'
+        );
 
         fetch('{{ route('admin.system_logs') }}?' + params.toString(), {
             headers: {
@@ -1901,90 +1784,100 @@ $status = $status ?? 'active';
 
         var emptyState = document.getElementById('emptyState');
         if (emptyState) {
-            emptyState.className = 'empty-state-host';
-            emptyState.innerHTML = '';
+            window.EmptyState?.hide(
+                '#emptyState'
+            );
         }
     }
 
     function slRenderPagebar(p) {
-        if (!p) return;
+        if (!p) {
+            return;
+        }
 
-        var from = Number(p.from || 0);
-        var to = Number(p.to || 0);
-        var total = Number(p.total || 0);
-        var infoHtml = total > 0 ?
-            'Showing <strong>' + from + '–' + to + '</strong> of <strong>' + total + '</strong> entries' :
-            'Showing <strong>0</strong> entries';
+        window.renderGlobalPagination?.({
+            currentPage: Number(
+                p.current_page
+            ) || 1,
 
-        document.querySelectorAll(
-            '.system-logs-page .global-pagebar-info'
-        ).forEach(function (el) {
-            el.innerHTML = infoHtml;
+            lastPage: Number(
+                p.last_page
+            ) || 1,
+
+            total: Number(
+                p.total
+            ) || 0,
+
+            from: p.from ?? null,
+
+            to: p.to ?? null,
+
+            containers: [
+                document.getElementById(
+                    'systemLogsPaginationTop'
+                ),
+                document.getElementById(
+                    'systemLogsPaginationBottom'
+                ),
+            ],
+
+            bars: [
+                document.getElementById(
+                    'systemLogsPaginationTopBar'
+                ),
+                document.getElementById(
+                    'systemLogsPaginationBottomBar'
+                ),
+            ],
+
+            infoElements: [
+                document.getElementById(
+                    'systemLogsPageInfoTop'
+                ),
+                document.getElementById(
+                    'systemLogsPageInfoBottom'
+                ),
+            ],
+
+            itemLabel: 'entries',
+
+            onPageChange(page) {
+                slState.page = page;
+                slFetch();
+            },
         });
 
-        var navHtml = slBuildPagination(p);
-        document.querySelectorAll(
-            '.system-logs-page .global-pagination-wrap'
-        ).forEach(function (el) {
-            el.innerHTML = navHtml;
-        });
+        const perPageSelect =
+            document.getElementById(
+                'perPageSelect'
+            );
 
-        var perPageSelect = document.getElementById('perPageSelect');
-        if (perPageSelect && p.per_page) {
-            perPageSelect.value = String(p.per_page);
-            window.syncGlobalPageSizeSelect?.(perPageSelect, p.per_page);
+        if (
+            perPageSelect &&
+            p.per_page
+        ) {
+            perPageSelect.value =
+                String(p.per_page);
+
+            window
+                .syncGlobalPageSizeSelect?.(
+                    perPageSelect,
+                    p.per_page
+                );
         }
 
-        var badge = document.getElementById('entryBadge');
-        if (badge) badge.textContent = slOverallTotal + ' ' + (slOverallTotal === 1 ? 'entry' : 'entries');
-    }
+        const badge =
+            document.getElementById(
+                'entryBadge'
+            );
 
-    function slBuildPagination(p) {
-        if (!p || Number(p.last_page || 1) <= 1) return '';
-
-        var current = Number(p.current_page || 1);
-        var last = Number(p.last_page || 1);
-        var winSize = 5;
-        var half = Math.floor(winSize / 2);
-        var start = Math.max(1, current - half);
-        var end = Math.min(last, start + winSize - 1);
-
-        if (end - start + 1 < winSize) start = Math.max(1, end - winSize + 1);
-
-        var html = '<nav class="global-pagination" aria-label="System logs pagination">';
-
-        html += current <= 1 ?
-            '<button type="button" disabled class="global-page-disabled" aria-label="Previous page"><i class="fa-solid fa-chevron-left global-page-icon"></i></button>' :
-            '<button type="button" onclick="slGoPage(' + (current - 1) +
-            ')" class="global-page-btn" aria-label="Previous page"><i class="fa-solid fa-chevron-left global-page-icon"></i></button>';
-
-        if (start > 1) {
-            html += '<button type="button" onclick="slGoPage(1)" class="global-page-btn">1</button>';
-            if (start > 2) html += '<span class="global-page-ellipsis" aria-hidden="true">&hellip;</span>';
+        if (badge) {
+            badge.textContent =
+                `${slOverallTotal} ${slOverallTotal === 1
+                    ? 'entry'
+                    : 'entries'
+                }`;
         }
-
-        for (var i = start; i <= end; i++) {
-            html += i === current ?
-                '<span class="global-page-current" aria-current="page">' + i + '</span>' :
-                '<button type="button" onclick="slGoPage(' + i + ')" class="global-page-btn">' + i +
-                '</button>';
-        }
-
-        if (end < last) {
-            if (end < last - 1) html +=
-                '<span class="global-page-ellipsis" aria-hidden="true">&hellip;</span>';
-            html += '<button type="button" onclick="slGoPage(' + last + ')" class="global-page-btn">' +
-                last +
-                '</button>';
-        }
-
-        html += current >= last ?
-            '<button type="button" disabled class="global-page-disabled" aria-label="Next page"><i class="fa-solid fa-chevron-right global-page-icon"></i></button>' :
-            '<button type="button" onclick="slGoPage(' + (current + 1) +
-            ')" class="global-page-btn" aria-label="Next page"><i class="fa-solid fa-chevron-right global-page-icon"></i></button>';
-
-        html += '</nav>';
-        return html;
     }
 
     function slRenderCounts(counts) {
@@ -2042,96 +1935,159 @@ $status = $status ?? 'active';
     }
 
     function showEmptyState(query) {
-        var emptyState = document.getElementById('emptyState');
-        var listView = document.getElementById('slListView');
-        var gridView = document.getElementById('slGridView');
+        var listView =
+            document.getElementById(
+                'slListView'
+            );
 
-        if (!emptyState) return;
+        var gridView =
+            document.getElementById(
+                'slGridView'
+            );
 
-        if (listView) listView.hidden = true;
-        if (gridView) gridView.hidden = true;
+        if (listView) {
+            listView.hidden = true;
+        }
 
-        emptyState.className = 'empty-state-host show';
-
-        var icon = 'fa-clipboard-list';
-        var title = 'No system logs yet';
-        var sub = 'Activity will appear here once users interact with the system.';
-        var actionHtml = '';
-
-        if (slState.status === 'archived' && !query && !hasActiveSlFilters() && slState.role === 'all') {
-            icon = 'fa-box-archive';
-            title = 'No archived logs yet';
-            sub = 'Archive older records to keep the active log view easier to manage.';
+        if (gridView) {
+            gridView.hidden = true;
         }
 
         if (query) {
-            icon = 'fa-magnifying-glass';
-            title = 'No results for “' + escapeSlHtml(query) + '”';
-            sub = 'Try a different name, action, module, or user.';
-            actionHtml =
-                '<button type="button" class="empty-state-btn" data-empty-action="clear-search">' +
-                '<i class="fa-solid fa-xmark"></i>' +
-                'Clear search' +
-                '</button>';
-        } else if (hasActiveSlFilters()) {
-            icon = 'fa-filter-circle-xmark';
-            title = 'No logs match the selected filters';
-            sub = 'Try adjusting the filter panel or clearing all filters.';
-            actionHtml =
-                '<button type="button" class="empty-state-btn" data-empty-action="clear-filters">' +
-                '<i class="fa-solid fa-filter-circle-xmark"></i>' +
-                'Clear filters' +
-                '</button>';
-        } else if (slState.role !== 'all') {
+            window.EmptyState?.renderSearch({
+                host: '#emptyState',
+
+                input: '#slSearch',
+
+                query,
+
+                message: 'Try a different name, action, module, or user.',
+            });
+
+            return;
+        }
+
+        if (
+            slState.status === 'archived' &&
+            !hasActiveSlFilters() &&
+            slState.role === 'all'
+        ) {
+            window.EmptyState?.render({
+                host: '#emptyState',
+
+                icon: 'fa-box-archive',
+
+                title: 'No archived logs yet',
+
+                message: 'Archive older records to keep the active log view easier to manage.',
+            });
+
+            return;
+        }
+
+        if (hasActiveSlFilters()) {
+            window.EmptyState?.render({
+                host: '#emptyState',
+
+                icon: 'fa-filter-circle-xmark',
+
+                title: 'No logs match the selected filters',
+
+                message: 'Try adjusting the filter panel or clearing all filters.',
+
+                actionHtml: `
+                <button
+                    type="button"
+                    class="empty-state-btn"
+                    data-empty-action="clear-filters"
+                >
+                    <i class="fa-solid fa-filter-circle-xmark"></i>
+                    Clear filters
+                </button>
+            `,
+            });
+
+            document
+                .querySelector(
+                    '#emptyState [data-empty-action="clear-filters"]'
+                )
+                ?.addEventListener(
+                    'click',
+                    clearOnlySlFilters
+                );
+
+            return;
+        }
+
+        if (slState.role !== 'all') {
             var labels = {
                 admin: 'Admin',
                 dentist: 'Dentist',
                 patient: 'Patient',
                 login: 'Login',
-                error: 'Error'
+                error: 'Error',
             };
 
-            icon = 'fa-filter';
-            title = 'No ' + escapeSlHtml(labels[slState.role] || slState.role) + ' logs found';
-            sub = 'There are no logs matching this tab yet.';
-            actionHtml =
-                '<button type="button" class="empty-state-btn" data-empty-action="show-all">' +
-                '<i class="fa-solid fa-layer-group"></i>' +
-                'Show all logs' +
-                '</button>';
+            window.EmptyState?.render({
+                host: '#emptyState',
+
+                icon: 'fa-filter',
+
+                title: 'No ' +
+                    (
+                        labels[
+                        slState.role
+                        ] ||
+                        slState.role
+                    ) +
+                    ' logs found',
+
+                message: 'There are no logs matching this tab yet.',
+
+                actionHtml: `
+                <button
+                    type="button"
+                    class="empty-state-btn"
+                    data-empty-action="show-all"
+                >
+                    <i class="fa-solid fa-layer-group"></i>
+                    Show all logs
+                </button>
+            `,
+            });
+
+            document
+                .querySelector(
+                    '#emptyState [data-empty-action="show-all"]'
+                )
+                ?.addEventListener(
+                    'click',
+                    function () {
+                        slSetTab(
+                            document.querySelector(
+                                '.sl-role-tabs .tab-btn'
+                            ),
+                            'all'
+                        );
+                    }
+                );
+
+            return;
         }
 
-        emptyState.innerHTML =
-            '<div class="empty-state">' +
-            '<div class="empty-state-icon">' +
-            '<i class="fa-solid ' + icon + '"></i>' +
-            '</div>' +
-            '<h3 class="empty-state-title">' + title + '</h3>' +
-            '<p class="empty-state-sub">' + sub + '</p>' +
-            actionHtml +
-            '</div>';
+        window.EmptyState?.render({
+            host: '#emptyState',
 
-        emptyState.querySelector('[data-empty-action="clear-search"]')?.addEventListener('click',
-            clearSearch);
+            icon: 'fa-clipboard-list',
 
-        emptyState.querySelector('[data-empty-action="clear-filters"]')?.addEventListener('click',
-            clearOnlySlFilters);
+            title: 'No system logs yet',
 
-        emptyState.querySelector(
-            '[data-empty-action="show-all"]'
-        )?.addEventListener('click', function () {
-            slSetTab(
-                document.querySelector(
-                    '.sl-role-tabs .tab-btn'
-                ),
-                'all'
-            );
+            message: 'Activity will appear here once users interact with the system.',
         });
     }
 
     window.slSetTab = slSetTab;
     window.slSetStatus = slSetStatus;
-    window.slGoPage = slGoPage;
 
     window.openSlFilterPanel = openSlFilterPanel;
     window.closeSlFilterPanel = closeSlFilterPanel;
@@ -2150,6 +2106,6 @@ $status = $status ?? 'active';
 
     window.exportSystemLogsPdf =
         exportSystemLogsPdf;
-});
+        });
 </script>
 @endsection

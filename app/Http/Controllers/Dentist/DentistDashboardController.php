@@ -29,7 +29,6 @@ class DentistDashboardController extends Controller
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        // COUNT PER DAY
         $appointmentCountsPerDay = $calendarAppointments
             ->groupBy(function ($appointment) {
                 return Carbon::parse($appointment->appointment_date)->format('Y-m-d');
@@ -39,7 +38,6 @@ class DentistDashboardController extends Controller
             })
             ->toArray();
 
-        // FULL DETAILS PER DAY
         $calendarAppointmentDetails = $calendarAppointments
             ->groupBy(function ($appointment) {
                 return Carbon::parse($appointment->appointment_date)->format('Y-m-d');
@@ -68,6 +66,49 @@ class DentistDashboardController extends Controller
             })
             ->toArray();
 
+        $dashboardAppointmentWindow = Appointment::with('patient')
+            ->whereBetween('appointment_date', [
+                Carbon::today()->subDays(90)->toDateString(),
+                Carbon::today()->addDays(90)->toDateString(),
+            ])
+            ->whereIn('status', [
+                'upcoming',
+                'rescheduled',
+                'completed',
+                'cancelled',
+            ])
+            ->orderBy('appointment_date', 'asc')
+            ->orderBy('appointment_time', 'asc')
+            ->get();
+
+        $dashboardAppointmentDetails = $dashboardAppointmentWindow
+            ->groupBy(function ($appointment) {
+                return Carbon::parse($appointment->appointment_date)->format('Y-m-d');
+            })
+            ->map(function ($items) {
+                return $items->map(function ($appointment) {
+                    $name = $appointment->patient->name ?? 'Unknown Patient';
+
+                    $time = !empty($appointment->appointment_time)
+                        ? Carbon::parse($appointment->appointment_time)->format('h:i A')
+                        : '—';
+
+                    $service = $appointment->service_type === 'others'
+                        ? ($appointment->other_services ?? 'Other Service')
+                        : ($appointment->service_type ?? 'General Service');
+
+                    return [
+                        'id' => $appointment->id,
+                        'name' => $name,
+                        'time' => $time,
+                        'service' => ucwords($service),
+                        'status' => $appointment->status ?? 'upcoming',
+                        'date' => Carbon::parse($appointment->appointment_date)->format('Y-m-d'),
+                    ];
+                })->values()->toArray();
+            })
+            ->toArray();
+
         $blockedDates = BlockedDate::pluck('date')
             ->map(fn($d) => Carbon::parse($d)->toDateString())
             ->toArray();
@@ -85,104 +126,103 @@ class DentistDashboardController extends Controller
             'blockedDates',
             'philippineHolidays',
             'schedules',
-            'calendarAppointmentDetails'
+            'calendarAppointmentDetails',
+            'dashboardAppointmentDetails'
         ));
     }
 
     public function updateClinicStatus(Request $request)
-        {
-            $request->validate([
-                'status' => ['required', 'in:in,out'],
-            ]);
+    {
+        $request->validate([
+            'status' => ['required', 'in:in,out'],
+        ]);
 
-            $oldStatus = SystemSetting::getSetting('clinic_status', 'in');
-            $newStatus = strtolower($request->status);
+        $oldStatus = SystemSetting::getSetting('clinic_status', 'in');
+        $newStatus = strtolower($request->status);
 
-            SystemSetting::setSetting('clinic_status', $newStatus, 'clinic');
+        SystemSetting::setSetting('clinic_status', $newStatus, 'clinic');
 
-            if ($oldStatus !== 'out' && $newStatus === 'out') {
-                $this->notifyPatientsWithAppointmentsToday();
-            }
-
-            return response()->json([
-                'success' => true,
-                'status' => $newStatus,
-                'message' => $newStatus === 'out'
-                    ? 'Clinic marked as closed.'
-                    : 'Clinic marked as open.',
-            ]);
+        if ($oldStatus !== 'out' && $newStatus === 'out') {
+            $this->notifyPatientsWithAppointmentsToday();
         }
 
-        private function notifyPatientsWithAppointmentsToday(): void
-        {
-            $appointments = Appointment::query()
-                ->with('patient')
-                ->whereDate('appointment_date', Carbon::today())
-                ->whereIn('status', ['upcoming', 'rescheduled'])
-                ->get();
+        return response()->json([
+            'success' => true,
+            'status' => $newStatus,
+            'message' => $newStatus === 'out'
+                ? 'Clinic marked as closed.'
+                : 'Clinic marked as open.',
+        ]);
+    }
 
-            $notifiedUserIds = [];
+    private function notifyPatientsWithAppointmentsToday(): void
+    {
+        $appointments = Appointment::query()
+            ->with('patient')
+            ->whereDate('appointment_date', Carbon::today())
+            ->whereIn('status', ['upcoming', 'rescheduled'])
+            ->get();
 
-            foreach ($appointments as $appointment) {
-                $patient = $appointment->patient;
+        $notifiedUserIds = [];
 
-                if (!$patient) {
-                    Log::warning('Emergency OUT notification skipped because patient was not found.', [
-                        'appointment_id' => $appointment->id,
-                        'patient_id' => $appointment->patient_id,
-                    ]);
+        foreach ($appointments as $appointment) {
+            $patient = $appointment->patient;
 
-                    continue;
-                }
+            if (!$patient) {
+                Log::warning('Emergency OUT notification skipped because patient was not found.', [
+                    'appointment_id' => $appointment->id,
+                    'patient_id' => $appointment->patient_id,
+                ]);
 
-                $patientUser = $this->resolvePatientUser($patient);
-
-                if (!$patientUser) {
-                    Log::warning('Emergency OUT notification skipped because patient user was not found.', [
-                        'appointment_id' => $appointment->id,
-                        'patient_id' => $patient->id,
-                    ]);
-
-                    continue;
-                }
-
-                // Prevent duplicate notification in the same request
-                if (in_array($patientUser->id, $notifiedUserIds, true)) {
-                    continue;
-                }
-
-                // Prevent duplicate notification already saved today
-                $alreadyNotifiedToday = DB::table('notifications')
-                    ->where('notifiable_type', User::class)
-                    ->where('notifiable_id', $patientUser->id)
-                    ->whereDate('created_at', Carbon::today())
-                    ->where('data->type', 'dentist_emergency_out')
-                    ->exists();
-
-                if ($alreadyNotifiedToday) {
-                    continue;
-                }
-
-                $patientUser->notify(new DentistEmergencyOutNotification($appointment));
-
-                $notifiedUserIds[] = $patientUser->id;
+                continue;
             }
+
+            $patientUser = $this->resolvePatientUser($patient);
+
+            if (!$patientUser) {
+                Log::warning('Emergency OUT notification skipped because patient user was not found.', [
+                    'appointment_id' => $appointment->id,
+                    'patient_id' => $patient->id,
+                ]);
+
+                continue;
+            }
+
+            if (in_array($patientUser->id, $notifiedUserIds, true)) {
+                continue;
+            }
+
+            $alreadyNotifiedToday = DB::table('notifications')
+                ->where('notifiable_type', User::class)
+                ->where('notifiable_id', $patientUser->id)
+                ->whereDate('created_at', Carbon::today())
+                ->where('data->type', 'dentist_emergency_out')
+                ->exists();
+
+            if ($alreadyNotifiedToday) {
+                continue;
+            }
+
+            $patientUser->notify(new DentistEmergencyOutNotification($appointment));
+
+            $notifiedUserIds[] = $patientUser->id;
+        }
+    }
+
+    private function resolvePatientUser($patient): ?User
+    {
+        if (isset($patient->user) && $patient->user instanceof User) {
+            return $patient->user;
         }
 
-        private function resolvePatientUser($patient): ?User
-        {
-            if (isset($patient->user) && $patient->user instanceof User) {
-                return $patient->user;
-            }
-
-            if (!empty($patient->user_id)) {
-                return User::find($patient->user_id);
-            }
-
-            if (!empty($patient->email)) {
-                return User::where('email', $patient->email)->first();
-            }
-
-            return User::where('patient_id', $patient->id)->first();
+        if (!empty($patient->user_id)) {
+            return User::find($patient->user_id);
         }
+
+        if (!empty($patient->email)) {
+            return User::where('email', $patient->email)->first();
+        }
+
+        return User::where('patient_id', $patient->id)->first();
+    }
 }

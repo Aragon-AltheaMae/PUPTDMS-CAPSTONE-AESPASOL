@@ -117,6 +117,10 @@ class WalkInController extends Controller
         try {
             $hasMeaningfulSearch = mb_strlen($search) >= 2;
 
+            $shouldLoadConnectedSources =
+                $hasMeaningfulSearch ||
+                $showAll;
+
             $patients = collect()
                 ->merge(
                     $this->searchLocalPatients(
@@ -125,7 +129,7 @@ class WalkInController extends Controller
                     )
                 )
                 ->merge(
-                    $hasMeaningfulSearch
+                    $shouldLoadConnectedSources
                         ? $this->searchOgosPatients(
                             $search,
                             $sourceLimit,
@@ -134,7 +138,7 @@ class WalkInController extends Controller
                         : []
                 )
                 ->merge(
-                    $hasMeaningfulSearch
+                    $shouldLoadConnectedSources
                         ? $this->searchFacultyPatients(
                             $search,
                             $sourceLimit,
@@ -143,7 +147,7 @@ class WalkInController extends Controller
                         : []
                 )
                 ->merge(
-                    $hasMeaningfulSearch
+                    $shouldLoadConnectedSources
                         ? $this->searchExternalAdminPatients(
                             $search,
                             $sourceLimit
@@ -171,7 +175,32 @@ class WalkInController extends Controller
                     $search === '' ||
                         (($patient['_score'] ?? -1) >= 0)
                 )
-                ->sortByDesc('_score')
+                ->sort(function (
+                    array $a,
+                    array $b
+                ) use ($search) {
+
+                    if ($search === '') {
+                        return strcasecmp(
+                            (string) ($a['name'] ?? ''),
+                            (string) ($b['name'] ?? '')
+                        );
+                    }
+
+                    $scoreCompare =
+                        ($b['_score'] ?? -1)
+                        <=>
+                        ($a['_score'] ?? -1);
+
+                    if ($scoreCompare !== 0) {
+                        return $scoreCompare;
+                    }
+
+                    return strcasecmp(
+                        (string) ($a['name'] ?? ''),
+                        (string) ($b['name'] ?? '')
+                    );
+                })
                 ->map(function (array $patient) {
                     unset($patient['_score']);
 
@@ -248,7 +277,7 @@ class WalkInController extends Controller
                         'type' => 'Student',
                         'student_number' => $student['student_number'] ?? null,
                         'program' => $student['program'] ?? null,
-                        'record_url' => route('dentist.odontogram.historical.create', ['patient' => $patient->id]),
+                        'record_url' => route('dentist.odontogram.existing-appointment.create', ['patient' => $patient->id]),
                         'avatar_url' =>
                         $this->resolvePatientAvatarUrl(
                             $patient,
@@ -468,7 +497,7 @@ class WalkInController extends Controller
 
                     'record_url' =>
                     route(
-                        'dentist.odontogram.historical.create',
+                        'dentist.odontogram.existing-appointment.create',
                         [
                             'patient' =>
                             $patient->id,
@@ -548,7 +577,7 @@ class WalkInController extends Controller
                     'student_number' => null,
                     'program' => $faculty['faculty_code'] ?? $faculty['department'] ?? data_get($faculty, 'profile.department'),
                     'faculty_code' => $faculty['faculty_code'] ?? null,
-                    'record_url' => route('dentist.odontogram.historical.create', ['patient' => $patient->id]),
+                    'record_url' => route('dentist.odontogram.existing-appointment.create', ['patient' => $patient->id]),
                     'avatar_url' =>
                     $this->resolvePatientAvatarUrl(
                         $patient,
@@ -619,7 +648,7 @@ class WalkInController extends Controller
                     'type' => 'Administrative',
                     'student_number' => null,
                     'program' => $office !== '' ? $office : null,
-                    'record_url' => route('dentist.odontogram.historical.create', ['patient' => $patient->id]),
+                    'record_url' => route('dentist.odontogram.existing-appointment.create', ['patient' => $patient->id]),
                     'avatar_url' =>
                     $this->resolvePatientAvatarUrl(
                         $patient,

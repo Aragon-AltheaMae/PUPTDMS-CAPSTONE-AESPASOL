@@ -2099,15 +2099,19 @@
     display: grid;
     grid-template-columns:
         58px minmax(0, 1fr);
-    align-items: center;
+    align-items: flex-start;
     min-width: 0;
     gap: 13px;
+}
+
+.patient-grid-card-identity>.patient-avatar {
+    margin-top: 0;
 }
 
 .patient-grid-card-person {
     display: flex;
     flex-direction: column;
-
+    flex: 1 1 auto;
     min-width: 0;
     gap: 5px;
 }
@@ -2175,6 +2179,10 @@
     font-weight: 850;
     line-height: 1.2;
     white-space: nowrap;
+}
+
+.patient-grid-name-row {
+    align-items: flex-start;
 }
 
 .patient-grid-card-schedule>span:not(.urgency-chip) {
@@ -2269,9 +2277,7 @@
     display: grid;
     grid-template-columns:
         56px minmax(0, 1fr);
-
-    align-items: center;
-
+    align-items: flex-start;
     min-width: 0;
     gap: 14px;
 }
@@ -2279,7 +2285,7 @@
 .patient-list-person {
     display: flex;
     flex-direction: column;
-
+    flex: 1;
     min-width: 0;
     gap: 6px;
 }
@@ -2478,9 +2484,7 @@
     }
 
     .patient-grid-card-identity {
-        grid-template-columns:
-            42px minmax(0, 1fr);
-
+        grid-template-columns: 42px minmax(0, 1fr);
         gap: 9px;
     }
 

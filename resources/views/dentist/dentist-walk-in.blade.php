@@ -9,16 +9,15 @@
 
 @section('content')
 
-<main id="mainContent" class="book-container min-h-screen bg-[#F4F4F4] dark:bg-[#020b14] py-6">
+<main id="mainContent" class=" book-container min-h-screen py-6 page-enter">
     <div id="dentistWalkInPage" class="walkin-page">
         <div class="book-page-wrap">
 
             <div class="w-full pt-10 pb-2 animate-fade-up">
 
                 <div class="flex items-center justify-between mt-8 mb-4">
-                    <a href="{{ route('dentist.dentist.appointments') }}"
-                        class="back-home-btn flex items-center gap-2 bg-[#8B0000] hover:bg-[#660000] text-white px-4 py-2 rounded-xl text-xs font-bold border border-[#660000] transition shadow-sm">
-                        <i class="fa-solid fa-arrow-left text-xs"></i>
+                    <a href="{{ route('dentist.dentist.appointments') }}" class="ui-btn ui-btn-primary ui-btn-sm">
+                        <i class="fa-solid fa-arrow-left"></i>
                         Back to Appointments
                     </a>
                     <span
@@ -168,24 +167,11 @@
 
                                                 <div class="patient-picker-toolbar">
 
-                                                    <div class="search-wrap global-search patient-picker-search"
-                                                        data-search-wrapper>
-
-                                                        <i class="fa-solid fa-magnifying-glass search-icon"
-                                                            aria-hidden="true">
-                                                        </i>
-
-                                                        <input type="text" id="patientSearch" class="search-input"
-                                                            placeholder="Search by name, ID, or email..."
-                                                            autocomplete="off" inputmode="search" data-search-input>
-
-                                                        <button type="button" class="search-clear" data-search-clear
-                                                            aria-label="Clear patient search" title="Clear search">
-
-                                                            <i class="fa-solid fa-xmark" aria-hidden="true">
-                                                            </i>
-                                                        </button>
-                                                    </div>
+                                                    <x-search-bar id="patientSearch"
+                                                        placeholder="Search by name, ID, or email..."
+                                                        callback="handleWalkInPatientSearch" :debounce="350"
+                                                        clear-label="Clear patient search"
+                                                        class="patient-picker-search" />
 
                                                     <div class="global-page-size-control">
                                                         <label for="patientPageSize">
@@ -235,28 +221,15 @@
 
                                                 </div>
 
-                                                <div class="patient-picker-status">
-                                                    <span id="patientEntriesInfo" class="global-pagebar-info">
-                                                        Showing 0 patient records
-                                                    </span>
-                                                </div>
+                                                <x-pagination-bar id="patientPaginationTopBar"
+                                                    info-id="patientEntriesInfo" pagination-id="patientPaginationTop"
+                                                    position="top" label="patients" hidden />
 
-                                                <div id="patientResults" class="patient-results table-grid-view"
-                                                    aria-live="polite">
-                                                </div>
+                                                <div id="patientResults" class="mt-5 mb-5" aria-live="polite"></div>
 
-                                                <div id="patientPaginationBar"
-                                                    class="global-pagebar global-pagebar-bottom" hidden>
-
-                                                    <div id="patientPaginationInfo" class="global-pagebar-info">
-                                                    </div>
-
-                                                    <div class="global-pagination-wrap">
-                                                        <div id="patientPagination" class="global-pagination"
-                                                            aria-label="Patient record pagination">
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <x-pagination-bar id="patientPaginationBar"
+                                                    info-id="patientEntriesInfoBottom" pagination-id="patientPagination"
+                                                    position="bottom" label="patients" hidden />
                                             </div>
                                             <div class="tab-panel" id="guestPanel">
                                                 <div class="guest-fields-grid">
@@ -304,7 +277,8 @@
                                                     </div>
                                                 </div>
 
-                                                <button type="button" class="guest-create-btn" id="createGuestBtn">
+                                                <button type="button" id="createGuestBtn" class="ui-btn ui-btn-primary">
+
                                                     <i class="fa-solid fa-user-plus"></i>
                                                     Create guest account
                                                 </button>
@@ -321,7 +295,7 @@
                                                 <small id="selectedPatientMeta"></small>
 
                                                 <button type="button" id="clearSelectedPatientBtn"
-                                                    class="btn-secondary-global">
+                                                    class="ui-btn ui-btn-secondary ui-btn-sm">
 
                                                     <i class="fa-solid fa-xmark"></i>
                                                     <span>Clear Selection</span>
@@ -407,14 +381,18 @@
                                                     Last Dental Visit
                                                 </label>
 
-                                                <div class="date-input-wrap compact">
+                                                <div class="global-control-wrap">
+
+                                                    <i class="fa-regular fa-calendar global-control-icon"
+                                                        aria-hidden="true">
+                                                    </i>
+
                                                     <input type="text" id="lastDentalVisit" name="last_dental_visit"
-                                                        class="js-flatpickr-date-max-today form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
+                                                        class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
                                                         placeholder="Select date"
-                                                        data-required-message="Please select the patient's last dental visit."
+                                                        data-required-message="Please select your last dental visit."
                                                         readonly required>
 
-                                                    <i class="fa-regular fa-calendar date-input-icon"></i>
                                                 </div>
                                             </div>
 
@@ -470,24 +448,7 @@
                                         ];
                                         @endphp
                                         @foreach ($dentalQ1 as $q)
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">{{ $q['q'] }}</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="{{ $q['q'] }}">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="{{ $q['name'] }}" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="{{ $q['name'] }}" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question :name="$q['name']" :label="$q['q']" required />
                                         @endforeach
                                     </div>
 
@@ -528,24 +489,8 @@
                                         ];
                                         @endphp
                                         @foreach ($dentalQ2 as $q)
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">{{ $q['q'] }}</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="{{ $q['q'] }}">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="{{ $q['name'] }}" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="{{ $q['name'] }}" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question :name="$q['name']" :label="$q['q']"
+                                            :checked-value="old($q['name'])" required />
                                         @endforeach
                                         <p class="text-xs text-[#8B0000] mt-2 italic pl-4">
                                             <i class="fa-solid fa-circle-info mr-1"></i> If <b>YES</b>, please
@@ -563,135 +508,68 @@
                                             <span class="flex-1 h-px bg-[#f9e8e8]"></span>
                                         </p>
 
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Have you had any periodontal (gum)
-                                                treatment?</span>
+                                        <x-booking-question name="periodontal"
+                                            label="Have you had any periodontal (gum) treatment?"
+                                            :checked-value="old('periodontal')" required />
 
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Have you had any periodontal (gum) treatment?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="periodontal" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="periodontal" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
-
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Have you had a difficult tooth
-                                                extraction?</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Have you had a difficult tooth extraction?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="difficult_extraction" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="difficult_extraction" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question name="difficult_extraction"
+                                            label="Have you had a difficult tooth extraction?"
+                                            :checked-value="old('difficult_extraction')" required />
                                         <div class="ml-6 mt-2 mb-2 hidden" id="extraction_date_box">
                                             <label class="text-xs text-[#8B0000] italic block mb-1">Date of
                                                 extraction:</label>
-                                            <div class="date-input-wrap compact">
+                                            <div class="global-control-wrap">
+
+                                                <i class="fa-regular fa-calendar global-control-icon"
+                                                    aria-hidden="true">
+                                                </i>
+
                                                 <input type="text" id="extractionDate" name="extraction_date"
-                                                    class="js-flatpickr-date-max-today w-full form-input voice-small border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full"
+                                                    class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
                                                     placeholder="Select date" readonly>
-                                                <i class="fa-regular fa-calendar date-input-icon"></i>
+
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Have you had prolonged bleeding
-                                                following
-                                                tooth
-                                                extractions?</span>
+                                        <x-booking-question name="prolonged_bleeding"
+                                            label="Have you had prolonged bleeding following tooth extractions?"
+                                            :checked-value="old('prolonged_bleeding')" required />
 
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Have you had prolonged bleeding following tooth extractions?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="prolonged_bleeding" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="prolonged_bleeding" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
-
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Do you wear complete or partial
-                                                dentures?</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Do you wear complete or partial dentures?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="dentures" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="dentures" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question name="dentures"
+                                            label="Do you wear complete or partial dentures?"
+                                            :checked-value="old('dentures')" required />
                                         <div class="ml-6 mt-2 mb-2 hidden" id="dentures_date_box">
                                             <label class="text-xs text-[#8B0000] italic block mb-1">Date of
                                                 placement:</label>
-                                            <div class="date-input-wrap compact">
+                                            <div class="global-control-wrap">
+
+                                                <i class="fa-regular fa-calendar global-control-icon"
+                                                    aria-hidden="true">
+                                                </i>
+
                                                 <input type="text" id="denturesDate" name="dentures_date"
-                                                    class="js-flatpickr-date-max-today w-full form-input voice-small border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full"
+                                                    class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
                                                     placeholder="Select date" readonly>
-                                                <i class="fa-regular fa-calendar date-input-icon"></i>
+
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Have you had orthodontic
-                                                treatment?</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Have you had orthodontic treatment?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="ortho_treatment" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="ortho_treatment" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question name="ortho_treatment"
+                                            label="Have you had orthodontic treatment?"
+                                            :checked-value="old('ortho_treatment')" required />
                                         <div class="ml-6 mt-2 mb-2 hidden" id="ortho_date_box">
                                             <label class="text-xs text-[#8B0000] italic block mb-1">Date of
                                                 completion:</label>
-                                            <div class="date-input-wrap compact">
+                                            <div class="global-control-wrap">
+
+                                                <i class="fa-regular fa-calendar global-control-icon"
+                                                    aria-hidden="true">
+                                                </i>
+
                                                 <input type="text" id="orthoDate" name="ortho_date"
-                                                    class="js-flatpickr-date-max-today w-full form-input voice-small border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full"
+                                                    class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
                                                     placeholder="Select date" readonly>
-                                                <i class="fa-regular fa-calendar date-input-icon"></i>
+
                                             </div>
                                         </div>
                                     </div>
@@ -704,7 +582,7 @@
                                         </p>
                                         <textarea name="additional_concerns" id="additional_concerns" rows="4"
                                             maxlength="150"
-                                            class="form-input voice-full w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none resize-none"
+                                            class="form-input-custom voice-full w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none resize-none"
                                             placeholder="Write any additional concerns here..."></textarea>
                                         <div class="flex justify-between items-center text-xs mt-1">
                                             <span id="concernWarning" class="text-red-500 hidden">
@@ -736,24 +614,8 @@
                                             <span class="section-card-title-line"></span>
                                         </p>
 
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Are you in good health?</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Are you in good health?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="good_health" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="good_health" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question name="good_health" label="Are you in good health?"
+                                            :checked-value="old('good_health')" required />
                                         <div class="ml-6 mt-1 mb-2 hidden" id="good_health_box">
                                             <label class="text-xs text-[#8B0000] italic">If NO, please provide
                                                 details:</label>
@@ -765,58 +627,25 @@
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">When was your last medical
-                                                examination?</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="When was your last medical examination?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="had_medical_exam" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="had_medical_exam" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question name="had_medical_exam"
+                                            label="When was your last medical examination?"
+                                            :checked-value="old('had_medical_exam')" required />
                                         <div class="ml-6 mt-1 mb-2 hidden" id="medical_exam_box">
                                             <label class="text-xs text-[#8B0000] italic block mb-1">If YES, when was
                                                 your
                                                 last medical examination?</label>
-                                            <div class="date-input-wrap compact">
+                                            <div class="global-control-wrap">
+                                                <i class="fa-regular fa-calendar global-control-icon"></i>
+
                                                 <input type="text" id="medicalExamDate" name="medical_exam_date"
-                                                    class="js-flatpickr-date-max-today w-full form-input voice-small border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full"
+                                                    class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
                                                     placeholder="Select date" readonly>
-                                                <i class="fa-regular fa-calendar date-input-icon"></i>
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Are you currently receiving treatment
-                                                for
-                                                any
-                                                illness?</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Are you currently receiving treatment for any illness?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="under_treatment" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="under_treatment" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question name="under_treatment"
+                                            label="Are you currently receiving treatment for any illness?"
+                                            :checked-value="old('under_treatment')" required />
                                         <div class="ml-6 mt-1 mb-2 hidden" id="treatment_box">
                                             <label class="text-xs text-[#8B0000] italic">If YES, please
                                                 specify:</label>
@@ -828,25 +657,8 @@
                                             </div>
                                         </div>
 
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Have you ever been
-                                                hospitalized?</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Have you ever been hospitalized?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="hospitalized" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="hospitalized" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question name="hospitalized" label="Have you ever been hospitalized?"
+                                            :checked-value="old('hospitalized')" required />
                                         <div class="ml-6 mt-1 mb-2 hidden" id="hospital_box">
                                             <label class="text-xs text-[#8B0000] italic">If YES, please provide
                                                 details:</label>
@@ -864,42 +676,11 @@
                                             <i class="fa-solid fa-triangle-exclamation text-xs"></i> Allergies
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Medicines</span>
+                                        <x-booking-question name="allergy_medicine" label="Medicines"
+                                            :checked-value="old('allergy_medicine')" required />
 
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Medicines">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="allergy_medicine" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="allergy_medicine" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Food</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Food">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="allergy_food" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="allergy_food" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question name="allergy_food" label="Food"
+                                            :checked-value="old('allergy_food')" required />
                                         <div class="mt-3">
                                             <label class="text-xs text-[#8B0000] italic block mb-1">Others (please
                                                 specify):</label>
@@ -914,26 +695,9 @@
                                             <i class="fa-solid fa-pills text-xs"></i> Medications
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Are you taking any prescription or
-                                                non-prescription
-                                                medication?</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Are you taking any prescription or non-prescription medication?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="medication" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="medication" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question name="medication"
+                                            label="Are you taking any prescription or non-prescription medication?"
+                                            :checked-value="old('medication')" required />
                                         <div class="ml-6 mt-1 mb-2 hidden" id="medication_box">
                                             <label class="text-xs text-[#8B0000] italic">If YES, please
                                                 specify:</label>
@@ -955,44 +719,16 @@
                                         </p>
 
                                         @foreach ([
-                                        [
-                                        'name' => 'pregnant',
-                                        'q' => 'Are you pregnant?',
-                                        ],
-                                        [
-                                        'name' => 'nursing',
-                                        'q' => 'Are you nursing?',
-                                        ],
+                                        ['name' => 'pregnant', 'q' => 'Are you pregnant?'],
+                                        ['name' => 'nursing', 'q' => 'Are you nursing?'],
                                         [
                                         'name' => 'birth_control',
-                                        'q' => 'Are you taking birth control pills?',
+                                        'q' => 'Are
+                                        you taking birth control pills?',
                                         ],
                                         ] as $q)
-
-                                        <div class="global-question-row" data-global-field>
-
-                                            <span class="global-question-text">
-                                                {{ $q['q'] }}
-                                            </span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="{{ $q['q'] }}">
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="{{ $q['name'] }}" value="YES"
-                                                        class="global-radio-input" disabled>
-
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="{{ $q['name'] }}" value="NO"
-                                                        class="global-radio-input" disabled>
-
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question :name="$q['name']" :label="$q['q']"
+                                            :checked-value="old($q['name'])" required />
                                         @endforeach
                                     </div>
 
@@ -1030,25 +766,9 @@
                                             <i class="fa-solid fa-smoking text-xs"></i> Tobacco Use
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">Do you use tobacco products or any
-                                                derivatives?</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="Do you use tobacco products or any derivatives?">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="tobacco_use" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="tobacco_use" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        <x-booking-question name="tobacco_use"
+                                            label="Do you use tobacco products or any derivatives?"
+                                            :checked-value="old('tobacco_use')" required />
                                         <div id="tobacco_details" class="ml-6 mt-2 space-y-2 hidden text-sm">
                                             <div class="flex items-center gap-3 flex-wrap">
                                                 <span class="text-xs text-[#8B0000] italic w-28">How much per
@@ -1069,28 +789,22 @@
                                             <i class="fa-solid fa-head-side-mask text-xs"></i> Do You Suffer From
                                             <span class="section-card-title-line"></span>
                                         </p>
-                                        @foreach ([['name' => 'headaches', 'q' => 'Headaches'], ['name' =>
-                                        'earaches',
-                                        'q'
-                                        => 'Earaches'], ['name' => 'neck_aches', 'q' => 'Neck aches']] as $i => $q)
-                                        <div class="global-question-row" data-global-field>
-                                            <span class="global-question-text">{{ $q['q'] }}</span>
-
-                                            <div class="global-question-options global-choice-group" role="radiogroup"
-                                                aria-label="{{ $q['q'] }}">
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="{{ $q['name'] }}" value="YES"
-                                                        class="global-radio-input" required>
-                                                    <span>Yes</span>
-                                                </label>
-
-                                                <label class="global-radio-option">
-                                                    <input type="radio" name="{{ $q['name'] }}" value="NO"
-                                                        class="global-radio-input">
-                                                    <span>No</span>
-                                                </label>
-                                            </div>
-                                        </div>
+                                        @foreach ([
+                                        [
+                                        'name' => 'headaches',
+                                        'q' => 'Headaches',
+                                        ],
+                                        [
+                                        'name' => 'earaches',
+                                        'q' => 'Earaches',
+                                        ],
+                                        [
+                                        'name' => 'neck_aches',
+                                        'q' => 'Neck aches',
+                                        ],
+                                        ] as $q)
+                                        <x-booking-question :name="$q['name']" :label="$q['q']"
+                                            :checked-value="old($q['name'])" required />
                                         @endforeach
                                     </div>
 
@@ -1115,15 +829,16 @@
                                             </div>
 
                                             <div data-global-field>
-                                                <label class="block text-xs font-semibold text-[#333] mb-1.5">
+                                                <label for="emergency_number" class="global-form-label">
                                                     Contact Number
                                                 </label>
 
                                                 <input type="tel" id="emergency_number" name="emergency_number"
                                                     inputmode="numeric" autocomplete="tel" maxlength="13"
+                                                    class="form-input-custom" placeholder="09xx xxx xxxx"
+                                                    data-validation-rule="philippineMobile"
                                                     data-required-message="Please enter an emergency contact number."
-                                                    class="form-input border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full"
-                                                    placeholder="09xx xxx xxxx" required>
+                                                    required>
                                             </div>
 
                                             <div data-global-field>
@@ -1150,7 +865,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="section-card signature-section-card">
+                                    <div class="section-card signature-section-card" data-global-field>
                                         <div class="signature-full-row">
                                             <label class="block text-xs font-semibold text-[#333] mb-1.5">
                                                 Patient's Signature <span class="required-star">*</span>
@@ -1184,17 +899,20 @@
 
                                                         <div class="signature-pad-actions">
                                                             <button type="button" id="signatureUndoBtn"
-                                                                class="signature-pad-btn">
+                                                                class="ui-btn ui-btn-secondary ui-btn-sm">
+                                                                <i class="fa-solid fa-rotate-left"></i>
                                                                 Undo
                                                             </button>
 
                                                             <button type="button" id="signatureClearBtn"
-                                                                class="signature-pad-btn">
+                                                                class="ui-btn ui-btn-secondary ui-btn-sm">
+                                                                <i class="fa-solid fa-eraser"></i>
                                                                 Clear Signature
                                                             </button>
 
                                                             <button type="button" id="signatureUseDrawnBtn"
-                                                                class="signature-pad-btn primary">
+                                                                class="ui-btn ui-btn-primary ui-btn-sm">
+                                                                <i class="fa-solid fa-check"></i>
                                                                 Use Drawn Signature
                                                             </button>
                                                         </div>
@@ -1239,13 +957,13 @@
                                     <div id="summaryBox" class="space-y-4"></div>
 
                                     <div class="flex justify-center gap-3 mt-8 nav-btns-row">
-                                        <button type="button" id="summaryBackBtn"
-                                            class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-6 py-2.5 text-sm font-semibold text-[#5c5550] bg-transparent">
-                                            <i class="fa-solid fa-chevron-left text-xs"></i> Back
+                                        <button type="button" id="summaryBackBtn" class="ui-btn ui-btn-secondary">
+                                            <i class="fa-solid fa-chevron-left"></i>
+                                            Back
                                         </button>
-                                        <button type="button" id="goToConfirmationBtn"
-                                            class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-6 py-2.5 text-sm font-bold">
-                                            Proceed to Confirm <i class="fa-solid fa-chevron-right text-xs"></i>
+                                        <button type="button" id="goToConfirmationBtn" class="ui-btn ui-btn-primary">
+                                            Proceed
+                                            <i class="fa-solid fa-chevron-right"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -1290,30 +1008,32 @@
                                     </div>
 
                                     <div class="flex justify-center gap-3 mt-8 nav-btns-row">
-                                        <button type="button" id="confirmBackBtn"
-                                            class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-6 py-2.5 text-sm font-semibold text-[#5c5550] bg-transparent">
-                                            <i class="fa-solid fa-chevron-left text-xs"></i> Back
+                                        <button type="button" id="confirmBackBtn" class="ui-btn ui-btn-secondary">
+                                            <i class="fa-solid fa-chevron-left"></i>
+                                            Back
                                         </button>
-                                        <button type="submit" id="finalSubmitBtn"
-                                            class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-6 py-2.5 text-sm font-bold">
+                                        <button type="submit" id="finalSubmitBtn" class="ui-btn ui-btn-primary">
                                             <i class="fa-solid fa-play"></i>
-                                            Start Procedure
+                                            <span>Start Procedure</span>
                                         </button>
                                     </div>
                                 </div>
                             </div>
                             <div id="navBtns" class="walkin-form-navigation nav-btns-row">
+
                                 <button type="button" id="prevBtn" style="display:none;"
-                                    class="btn-secondary-custom walkin-nav-btn walkin-nav-prev">
-                                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                                    class="ui-btn ui-btn-secondary walkin-nav-prev">
+
+                                    <i class="fa-solid fa-chevron-left"></i>
                                     <span>Previous</span>
                                 </button>
 
-                                <button type="button" id="nextBtn"
-                                    class="btn-primary-custom walkin-nav-btn walkin-nav-next">
+                                <button type="button" id="nextBtn" class="ui-btn ui-btn-primary walkin-nav-next">
+
                                     <span>Next</span>
-                                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                                    <i class="fa-solid fa-chevron-right"></i>
                                 </button>
+
                             </div>
                         </form>
                     </div>
@@ -1323,125 +1043,242 @@
                     <i class="fa-solid fa-circle-exclamation text-red-400" aria-hidden="true"></i>
                     <span id="miniTabText">Please complete all required fields.</span>
                 </div>
-
-                <dialog id="introBookingModal" class="m-auto w-[calc(100vw-1.5rem)] max-w-[620px]">
-                    <div class="intro-booking-modal-panel">
-                        <div class="intro-booking-modal-hero">
-                            <p class="intro-booking-modal-eyebrow">Dentist Walk-in Workflow</p>
-                            <h2 class="intro-booking-modal-title">Prepare the walk-in patient for treatment.</h2>
-                            <p class="intro-booking-modal-subtitle">
-                                Complete the patient intake, service selection, clinical history, and signature before
-                                starting
-                                the
-                                procedure.
-                            </p>
-                        </div>
-
-                        <div class="intro-booking-modal-body">
-                            <div class="intro-step-strip">
-                                <div class="intro-step-pill">1<span>Patient</span></div>
-                                <div class="intro-step-pill">2<span>Service</span></div>
-                                <div class="intro-step-pill">3<span>Dental</span></div>
-                                <div class="intro-step-pill">4<span>Medical</span></div>
-                                <div class="intro-step-pill">5<span>Start</span></div>
-                            </div>
-
-                            <div class="intro-checklist">
-                                <div class="intro-check-item">
-                                    <div class="intro-check-icon"><i class="fa-solid fa-check"></i></div>
-                                    <p>Select an existing patient or create a guest record for today's walk-in visit.
-                                    </p>
-                                </div>
-                                <div class="intro-check-item">
-                                    <div class="intro-check-icon"><i class="fa-solid fa-phone-volume"></i></div>
-                                    <p>Choose the requested dental service and complete the patient's dental and medical
-                                        history.
-                                    </p>
-                                </div>
-                                <div class="intro-check-item">
-                                    <div class="intro-check-icon"><i class="fa-solid fa-signature"></i></div>
-                                    <p>Ask the patient to review the information and provide a drawn signature.</p>
-                                </div>
-                                <div class="intro-check-item">
-                                    <div class="intro-check-icon"><i class="fa-solid fa-list-check"></i></div>
-                                    <p>Verify the intake summary before starting the dental procedure.</p>
-                                </div>
-                            </div>
-
-                            <div class="intro-modal-actions">
-                                <button type="button" id="introStartBtn" class="intro-action-btn intro-action-primary">
-                                    <i class="fa-solid fa-play"></i>
-                                    <span>Begin Walk-in Intake</span>
-                                </button>
-
-                                <button type="button" id="introContinueDraftBtn"
-                                    class="hidden intro-action-btn intro-action-secondary">
-                                    <i class="fa-solid fa-clock-rotate-left"></i>
-                                    <span>Continue Walk-in Draft</span>
-                                </button>
-
-                                <a href="{{ route('dentist.dentist.appointments') }}"
-                                    class="intro-action-btn intro-action-muted">
-                                    <i class="fa-solid fa-house"></i>
-                                    <span>Back to Appointments</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </dialog>
-
-                <dialog id="confirmModal"
-                    class="border-0 p-0 rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.25)] max-w-[480px] w-[calc(100vw-2rem)]">
-                    <div class="bg-[#8B0000] px-8 py-10 text-center">
-                        <div
-                            class="confirm-modal-icon w-16 h-16 rounded-full bg-white/15 flex items-center justify-center mx-auto mb-6">
-                            <i class="fa-solid fa-calendar-check text-white text-2xl"></i>
-                        </div>
-
-                        <h2 class="confirm-modal-title text-2xl font-extrabold text-white mb-4">
-                            Appointment Confirmed!
-                        </h2>
-
-                        <p id="confirmMessage" class="confirm-modal-message text-white/85 text-sm leading-7 mb-6"></p>
-
-                        <button type="button" id="okBtn" class="confirm-modal-button">
-                            <i class="fa-solid fa-play"></i>
-                            Start Procedure
-                        </button>
-                    </div>
-                </dialog>
-
-                <dialog id="leaveModal"
-                    class="m-auto border-0 p-0 rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.25)] max-w-[440px] w-[calc(100vw-2rem)]">
-                    <div class="bg-[#8B0000] px-6 py-5">
-                        <h3 class="text-lg font-bold text-white mb-0.5">Leave this page?</h3>
-                        <p class="text-sm text-white/80">Your appointment form has unsaved changes. You can save your
-                            draft,
-                            discard it, or continue editing.</p>
-                    </div>
-                    <div class="bg-white px-6 py-5 flex justify-end gap-3 flex-wrap">
-                        <button type="button" id="cancelLeaveBtn"
-                            class="btn-secondary-custom inline-flex items-center gap-2 border border-[#e8e2dd] rounded-xl px-4 py-2 text-sm font-semibold text-[#5c5550] bg-transparent">
-                            Cancel
-                        </button>
-                        <button type="button" id="discardDraftBtn"
-                            class="btn-secondary-custom inline-flex items-center gap-2 border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 rounded-xl px-4 py-2 text-sm font-semibold transition-colors">
-                            Discard
-                        </button>
-                        <button type="button" id="saveDraftBtn"
-                            class="btn-primary-custom inline-flex items-center gap-2 bg-[#8B0000] text-white rounded-xl px-5 py-2 text-sm font-bold">
-                            Save Draft
-                        </button>
-                    </div>
-                </dialog>
             </div>
         </div>
 </main>
 
+<div id="introBookingModal" class="ui-modal" aria-hidden="true">
+    <div class="ui-modal-card modal-md">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-person-walking-arrow-right"></i>
+                </div>
+
+                <div class="modal-copy">
+                    <h2 class="modal-title">
+                        Prepare the walk-in patient for treatment
+                    </h2>
+
+                    <p class="modal-subtitle">
+                        Complete the patient intake, service selection,
+                        clinical history, and signature before starting
+                        the procedure.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-bd">
+            <div class="booking-intro-steps">
+                <div class="booking-intro-step">
+                    <strong>1</strong>
+                    <span>Patient</span>
+                </div>
+
+                <div class="booking-intro-step">
+                    <strong>2</strong>
+                    <span>Service</span>
+                </div>
+
+                <div class="booking-intro-step">
+                    <strong>3</strong>
+                    <span>Dental</span>
+                </div>
+
+                <div class="booking-intro-step">
+                    <strong>4</strong>
+                    <span>Medical</span>
+                </div>
+
+                <div class="booking-intro-step">
+                    <strong>5</strong>
+                    <span>Start</span>
+                </div>
+            </div>
+
+            <div class="booking-intro-checklist">
+
+                <div class="booking-intro-item">
+                    <div class="global-icon-box global-icon-box-sm">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+
+                    <p>
+                        Select an existing patient or create a guest
+                        record for today's walk-in visit.
+                    </p>
+                </div>
+
+                <div class="booking-intro-item">
+                    <div class="global-icon-box global-icon-box-sm">
+                        <i class="fa-solid fa-tooth"></i>
+                    </div>
+
+                    <p>
+                        Choose the requested dental service and complete
+                        the patient's dental and medical history.
+                    </p>
+                </div>
+
+                <div class="booking-intro-item">
+                    <div class="global-icon-box global-icon-box-sm">
+                        <i class="fa-solid fa-signature"></i>
+                    </div>
+
+                    <p>
+                        Ask the patient to review the information and
+                        provide a drawn signature.
+                    </p>
+                </div>
+
+                <div class="booking-intro-item">
+                    <div class="global-icon-box global-icon-box-sm">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+
+                    <p>
+                        Verify the intake summary before starting the
+                        dental procedure.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-ft">
+            <a href="{{ route('dentist.dentist.appointments') }}" class="ui-btn ui-btn-secondary">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Appointments
+            </a>
+
+            <button type="button" id="introContinueDraftBtn" class="hidden ui-btn ui-btn-secondary">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                Continue Draft
+            </button>
+
+            <button type="button" id="introStartBtn" class="ui-btn ui-btn-primary">
+                <i class="fa-solid fa-play"></i>
+                Begin Walk-in Intake
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="confirmModal" class="ui-modal" aria-hidden="true">
+    <div class="ui-modal-card modal-md">
+        <div class="modal-hd appointment-modal-header">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="appointment-modal-header-icon">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+
+                <div class="appointment-modal-header-copy">
+                    <span class="appointment-modal-eyebrow">
+                        Walk-in Appointment
+                    </span>
+
+                    <h2 class="appointment-modal-title">
+                        Appointment Confirmed
+                    </h2>
+
+                    <p class="appointment-modal-subtitle">
+                        The walk-in intake was saved successfully.
+                    </p>
+                </div>
+            </div>
+            <button type="button" class="ui-btn ui-btn-secondary" onclick="closeModal('confirmModal')">
+                <i class="fa-solid fa-xmark"></i>
+                Close
+            </button>
+        </div>
+
+        <div class="modal-bd">
+            <div class="global-confirm-alert">
+                <i class="fa-solid fa-circle-check"></i>
+                <div>
+                    <strong>Ready to begin treatment</strong>
+
+                    <p id="confirmMessage">
+                        The walk-in appointment was recorded successfully.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-ft">
+            <button type="button" class="ui-btn ui-btn-secondary" onclick="closeModal('confirmModal')">
+                <i class="fa-solid fa-xmark"></i>
+                Close
+            </button>
+            <button type="button" id="okBtn" class="ui-btn ui-btn-primary">
+                <i class="fa-solid fa-play"></i>
+                Start Procedure
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="leaveModal" class="ui-modal modal-theme-warning" aria-hidden="true">
+    <div class="ui-modal-card modal-sm">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div class="modal-copy">
+                    <h2 class="modal-title">
+                        Leave this page?
+                    </h2>
+
+                    <p class="modal-subtitle">
+                        Your appointment form has unsaved changes.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-bd">
+            <div class="modal-form-section">
+                <div class="modal-section-heading">
+                    <div class="modal-section-icon">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                    </div>
+                    <div>
+                        <h4>
+                            Unsaved appointment draft
+                        </h4>
+
+                        <p>
+                            You can save your draft, discard it,
+                            or continue editing.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-ft">
+            <button type="button" id="cancelLeaveBtn" class="ui-btn ui-btn-secondary">
+
+                Cancel
+            </button>
+            <button type="button" id="discardDraftBtn" class="ui-btn ui-btn-danger">
+
+                <i class="fa-solid fa-trash"></i>
+                Discard
+            </button>
+            <button type="button" id="saveDraftBtn" class="ui-btn ui-btn-primary">
+
+                <i class="fa-solid fa-floppy-disk"></i>
+                Save Draft
+            </button>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('scripts')
-@include('partials.voice-logic')
 
 <script>
     const diseaseLabelByCode = @json($diseases -> pluck('label', 'code'));
@@ -1576,8 +1413,7 @@
                 );
 
             radios.forEach((radio, index) => {
-                radio.disabled =
-                    !showWomenSection;
+                radio.disabled = !showWomenSection;
 
                 radio.required =
                     showWomenSection &&
@@ -1597,7 +1433,9 @@
 
     function clearSelectedPatientUI({
         clearSearch = true,
-        reloadPatients = true, } = {}) {
+        reloadPatients = true,
+        markDirty = true,
+    } = {}) {
 
         selectedWalkInPatient = null;
         updateWomenSection(null);
@@ -1659,7 +1497,9 @@
             loadPatients("", true);
         }
 
-        markFormDirty();
+        if (markDirty) {
+            markFormDirty();
+        }
     }
 
     clearSelectedPatientBtn
@@ -1732,10 +1572,6 @@
         }
 
         selectedPatientBox?.removeAttribute("hidden");
-
-        if (patientSearch) {
-            patientSearch.value = patient.name || "";
-        }
 
         [guestName, guestEmail, guestPhone].forEach(input => {
             if (input) input.value = "";
@@ -1903,8 +1739,6 @@
         createGuestPatientOnServer();
     });
 
-    let patientSearchTimer = null;
-
     let patientCurrentPage = 1;
     let patientPageSize = 10;
 
@@ -1921,14 +1755,24 @@
             'patientEntriesInfo'
         );
 
+    const patientEntriesInfoBottom =
+        document.getElementById(
+            'patientEntriesInfoBottom'
+        );
+
+    const patientPaginationTopBar =
+        document.getElementById(
+            'patientPaginationTopBar'
+        );
+
+    const patientPaginationTop =
+        document.getElementById(
+            'patientPaginationTop'
+        );
+
     const patientPaginationBar =
         document.getElementById(
             'patientPaginationBar'
-        );
-
-    const patientPaginationInfo =
-        document.getElementById(
-            'patientPaginationInfo'
         );
 
     const patientPagination =
@@ -1936,123 +1780,119 @@
             'patientPagination'
         );
 
-    let patientLoadingMessageTimer = null;
+    function buildWalkInPatientSkeletons(
+        count = patientPageSize
+    ) {
+        const skeletonCount =
+            Math.min(
+                Math.max(
+                    Number(count) || 10,
+                    4
+                ),
+                12
+            );
 
-    function clearPatientLoadingMessageTimer() {
-        window.clearTimeout(patientLoadingMessageTimer);
-        patientLoadingMessageTimer = null;
+        const cards =
+            Array
+                .from({
+                    length: skeletonCount
+                },
+                    () => `
+                    <div
+                        class="
+                            table-record-card
+                            skeleton-shell
+                            p-4
+                        "
+                        aria-hidden="true"
+                    >
+                        <div
+                            class="
+                                flex
+                                items-start
+                                gap-3
+                            "
+                        >
+                            <div
+                                class="
+                                    skeleton-circle
+                                    w-[54px]
+                                    h-[54px]
+                                    flex-shrink-0
+                                "
+                            ></div>
+
+                            <div
+                                class="
+                                    flex-1
+                                    min-w-0
+                                "
+                            >
+                                <div
+                                    class="
+                                        skeleton-line
+                                        h-4
+                                        w-3/5
+                                        mb-3
+                                    "
+                                ></div>
+
+                                <div
+                                    class="
+                                        skeleton-pill
+                                        h-5
+                                        w-20
+                                        mb-4
+                                    "
+                                ></div>
+
+                                <div
+                                    class="
+                                        skeleton-line
+                                        h-3
+                                        w-2/3
+                                        mb-2
+                                    "
+                                ></div>
+
+                                <div
+                                    class="
+                                        skeleton-line
+                                        h-3
+                                        w-4/5
+                                    "
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+                `
+                )
+                .join('');
+
+        return `
+    <div
+        class="
+            table-record-grid
+            patient-record-grid
+            gap-5
+        "
+    >
+            ${cards}
+        </div>
+    `;
     }
 
-    function renderPatientMessage(
-        message,
-        {
-            title = "",
-            icon = "fa-user-magnifying-glass",
-            loading = false,
-        } = {}
-    ) {
-        if (!patientResults) return;
+    function renderWalkInPatientSkeletons() {
+        if (!patientResults) {
+            return;
+        }
 
-        const stateTitle = title || (
-            loading
-                ? "Loading patient records"
-                : message
+        window.EmptyState?.hide(
+            patientResults
         );
 
-        const stateMessage = title
-            ? message
-            : loading
-                ? message
-                : "";
-
-        patientResults.innerHTML = `
-            <div class="empty-state ${loading ? "is-loading" : ""}">
-                <div class="patient-empty-icon">
-                    <i class="fa-solid ${icon} ${loading ? "fa-spin" : ""}"
-                        aria-hidden="true"></i>
-                </div>
-
-                <p class="empty-state-title">
-                    ${safePatientText(stateTitle)}
-                </p>
-
-                ${stateMessage ? `
-                    <p class="empty-state-sub" data-patient-state-message>
-                        ${safePatientText(stateMessage)}
-                    </p>
-                ` : ""}
-            </div>
-        `;
-    }
-
-    function updatePatientLoadingMessage(requestId) {
-        clearPatientLoadingMessageTimer();
-
-        const delayedMessages = [
-            {
-                delay: 2500,
-                message: "Still loading. The clinic database may be responding slowly.",
-            },
-            {
-                delay: 6000,
-                message: "This is taking longer than usual. Please keep this page open.",
-            },
-            {
-                delay: 10000,
-                message: "Patient records are still being retrieved. You may retry the search shortly.",
-            },
-        ];
-
-        let index = 0;
-
-        const showNextMessage = () => {
-            if (
-                requestId !== patientSearchRequestId ||
-                index >= delayedMessages.length
-            ) {
-                return;
-            }
-
-            const messageElement = patientResults?.querySelector(
-                "[data-patient-state-message]"
-            );
-
-            if (messageElement) {
-                messageElement.textContent =
-                    delayedMessages[index].message;
-            }
-
-            index += 1;
-
-            if (index < delayedMessages.length) {
-                const nextDelay =
-                    delayedMessages[index].delay -
-                    delayedMessages[index - 1].delay;
-
-                patientLoadingMessageTimer =
-                    window.setTimeout(showNextMessage, nextDelay);
-            }
-        };
-
-        patientLoadingMessageTimer =
-            window.setTimeout(
-                showNextMessage,
-                delayedMessages[0].delay
-            );
-    }
-
-    function getPatientInitials(name) {
-        const parts = String(name || "Patient")
-            .trim()
-            .split(/\s+/)
-            .filter(Boolean);
-
-        if (!parts.length) return "P";
-
-        return parts
-            .slice(0, 2)
-            .map(part => part.charAt(0).toUpperCase())
-            .join("");
+        patientResults.innerHTML =
+            buildWalkInPatientSkeletons();
     }
 
     function safePatientText(value) {
@@ -2064,255 +1904,48 @@
             .replaceAll("'", "&#039;");
     }
 
-    function safePatientUrl(value) {
-        const rawValue =
-            String(value ?? '').trim();
+    function renderPatientPagination() {
+        window.renderGlobalPagination?.({
+            ...patientPaginationMeta,
 
-        if (!rawValue) {
-            return '';
-        }
+            containers: [
+                patientPaginationTop,
+                patientPagination,
+            ],
 
-        try {
-            const url = new URL(
-                rawValue,
-                window.location.origin
-            );
+            bars: [
+                patientPaginationTopBar,
+                patientPaginationBar,
+            ],
 
-            if (
-                !['http:', 'https:']
-                    .includes(url.protocol)
-            ) {
-                return '';
-            }
+            infoElements: [
+                patientEntriesInfo,
+                patientEntriesInfoBottom,
+            ],
 
-            return url.href;
-        } catch {
-            return '';
-        }
-    }
+            itemLabel: 'patients',
 
-    function createPatientPageButton({
-        label,
-        page,
-        current = false,
-        disabled = false,
-        ariaLabel = '',
-    }) {
-        const element =
-            document.createElement(
-                disabled || current
-                    ? 'button'
-                    : 'button'
-            );
+            onPageChange(page) {
+                patientCurrentPage =
+                    page;
 
-        element.type = 'button';
+                const query =
+                    patientSearch
+                        ?.value
+                        .trim() || '';
 
-        element.className = disabled
-            ? 'global-page-disabled'
-            : current
-                ? 'global-page-current'
-                : 'global-page-btn';
+                loadPatients(
+                    query,
+                    query === ''
+                );
 
-        element.innerHTML = label;
-
-        if (ariaLabel) {
-            element.setAttribute(
-                'aria-label',
-                ariaLabel
-            );
-        }
-
-        if (current) {
-            element.setAttribute(
-                'aria-current',
-                'page'
-            );
-        }
-
-        element.disabled =
-            disabled || current;
-
-        if (!disabled && !current) {
-            element.addEventListener(
-                'click',
-                () => {
-                    patientCurrentPage = page;
-
-                    loadPatients(
-                        patientSearch?.value.trim() || '',
-                        !(patientSearch?.value.trim())
-                    );
-
-                    patientResults?.scrollIntoView({
+                patientResults
+                    ?.scrollIntoView({
                         behavior: 'smooth',
                         block: 'start',
                     });
-                }
-            );
-        }
-
-        return element;
-    }
-
-    function renderPatientPagination() {
-        if (
-            !patientPagination ||
-            !patientPaginationBar
-        ) {
-            return;
-        }
-
-        patientPagination.replaceChildren();
-
-        const {
-            currentPage,
-            lastPage,
-            total,
-            from,
-            to,
-        } = patientPaginationMeta;
-
-        if (!total) {
-            patientPaginationBar.hidden = true;
-            return;
-        }
-
-        patientPaginationBar.hidden = false;
-
-        if (patientEntriesInfo) {
-            patientEntriesInfo.innerHTML =
-                `Showing <strong>${from}</strong>–` +
-                `<strong>${to}</strong> of ` +
-                `<strong>${total}</strong> patients`;
-        }
-
-        if (patientPaginationInfo) {
-            patientPaginationInfo.textContent =
-                `Page ${currentPage} of ${lastPage}`;
-        }
-
-        patientPagination.appendChild(
-            createPatientPageButton({
-                label:
-                    '<i class="fa-solid fa-chevron-left global-page-icon"></i>',
-                page:
-                    Math.max(
-                        1,
-                        currentPage - 1
-                    ),
-                disabled:
-                    currentPage === 1,
-                ariaLabel: 'Previous page',
-            })
-        );
-
-        const pageWindow = 5;
-        const halfWindow =
-            Math.floor(pageWindow / 2);
-
-        let startPage = Math.max(
-            1,
-            currentPage - halfWindow
-        );
-
-        let endPage = Math.min(
-            lastPage,
-            startPage + pageWindow - 1
-        );
-
-        if (
-            endPage - startPage + 1 <
-            pageWindow
-        ) {
-            startPage = Math.max(
-                1,
-                endPage - pageWindow + 1
-            );
-        }
-
-        if (startPage > 1) {
-            patientPagination.appendChild(
-                createPatientPageButton({
-                    label: '1',
-                    page: 1,
-                    current:
-                        currentPage === 1,
-                })
-            );
-
-            if (startPage > 2) {
-                const ellipsis =
-                    document.createElement(
-                        'span'
-                    );
-
-                ellipsis.className =
-                    'global-page-ellipsis';
-
-                ellipsis.textContent = '…';
-
-                patientPagination.appendChild(
-                    ellipsis
-                );
-            }
-        }
-
-        for (
-            let page = startPage;
-            page <= endPage;
-            page += 1
-        ) {
-            patientPagination.appendChild(
-                createPatientPageButton({
-                    label: String(page),
-                    page,
-                    current:
-                        page === currentPage,
-                })
-            );
-        }
-
-        if (endPage < lastPage) {
-            if (endPage < lastPage - 1) {
-                const ellipsis =
-                    document.createElement(
-                        'span'
-                    );
-
-                ellipsis.className =
-                    'global-page-ellipsis';
-
-                ellipsis.textContent = '…';
-
-                patientPagination.appendChild(
-                    ellipsis
-                );
-            }
-
-            patientPagination.appendChild(
-                createPatientPageButton({
-                    label: String(lastPage),
-                    page: lastPage,
-                    current:
-                        currentPage === lastPage,
-                })
-            );
-        }
-
-        patientPagination.appendChild(
-            createPatientPageButton({
-                label:
-                    '<i class="fa-solid fa-chevron-right global-page-icon"></i>',
-                page:
-                    Math.min(
-                        lastPage,
-                        currentPage + 1
-                    ),
-                disabled:
-                    currentPage === lastPage,
-                ariaLabel: 'Next page',
-            })
-        );
+            },
+        });
     }
 
     function createPatientCard(patient) {
@@ -2331,6 +1964,11 @@
             '0'
         );
 
+        card.setAttribute(
+            'aria-pressed',
+            'false'
+        );
+
         card.className = [
             'table-record-card',
             'patient-record-card',
@@ -2347,6 +1985,13 @@
             patient.type ||
             'Patient';
 
+        const roleClass =
+            window.PatientUI
+                ?.getRoleClass(
+                    patientType
+                ) ||
+            'role-none';
+
         const patientEmail =
             patient.email || '';
 
@@ -2357,33 +2002,35 @@
             patient.program || '';
 
         const avatarUrl =
-            safePatientUrl(
-                patient.avatar_url
-            );
+            window.PatientUI
+                ?.safeUrl(
+                    patient.avatar_url
+                ) || '';
 
         card.innerHTML = `
         <span class="patient-avatar patient-avatar-md">
     ${avatarUrl
                 ? `
-            <img
-                src="${safePatientText(
+                            <img
+                                src="${safePatientText(
                     avatarUrl
                 )}"
-                alt="${safePatientText(
+                                alt="${safePatientText(
                     patientName
                 )}"
-                loading="lazy"
-            >
-        `
+                                loading="lazy"
+                            >
+                        `
                 : `
-            <span>
-                ${safePatientText(
-                    getPatientInitials(
-                        patientName
-                    )
+                            <span>
+                                ${safePatientText(
+                    window.PatientUI
+                        ?.getInitials(
+                            patientName
+                        ) || 'P'
                 )}
-            </span>
-        `
+                            </span>
+                        `
             }
 </span>
 
@@ -2395,47 +2042,45 @@
             )}
                 </strong>
 
-                <span class="table-status table-status-info">
-                    ${safePatientText(
-                patientType
-            )}
-                </span>
+                <span class="badge-role ${roleClass}">
+    ${safePatientText(patientType)}
+</span>
             </span>
 
             <span class="patient-card-meta">
                 ${studentNumber
                 ? `
-                            <span>
-                                <i class="fa-solid fa-id-card"></i>
-                                ${safePatientText(
+                                            <span>
+                                                <i class="fa-solid fa-id-card"></i>
+                                                ${safePatientText(
                     studentNumber
                 )}
-                            </span>
-                        `
+                                            </span>
+                                        `
                 : ''
             }
 
                 ${program
                 ? `
-                            <span>
-                                <i class="fa-solid fa-graduation-cap"></i>
-                                ${safePatientText(
+                                            <span>
+                                                <i class="fa-solid fa-graduation-cap"></i>
+                                                ${safePatientText(
                     program
                 )}
-                            </span>
-                        `
+                                            </span>
+                                        `
                 : ''
             }
 
                 ${patientEmail
                 ? `
-                            <span>
-                                <i class="fa-solid fa-envelope"></i>
-                                ${safePatientText(
+                                            <span>
+                                                <i class="fa-solid fa-envelope"></i>
+                                                ${safePatientText(
                     patientEmail
                 )}
-                            </span>
-                        `
+                                            </span>
+                                        `
                 : ''
             }
             </span>
@@ -2470,14 +2115,55 @@
             }
         }
 
-        function selectPatientCard() {
+        function isThisPatientSelected() {
+            return (
+                String(
+                    selectedPatientId?.value || ''
+                ) ===
+                String(
+                    patient.id || ''
+                )
+            );
+        }
+
+        function syncCardSelectionState(
+            selected
+        ) {
+            card.classList.toggle(
+                'is-selected',
+                selected
+            );
+
+            card.setAttribute(
+                'aria-pressed',
+                selected ?
+                    'true' :
+                    'false'
+            );
+
+            if (patientCheckbox) {
+                patientCheckbox.checked =
+                    selected;
+            }
+        }
+
+        function clearOtherPatientCards() {
             document
                 .querySelectorAll(
                     '.patient-record-card'
                 )
                 .forEach(item => {
+                    if (item === card) {
+                        return;
+                    }
+
                     item.classList.remove(
                         'is-selected'
+                    );
+
+                    item.setAttribute(
+                        'aria-pressed',
+                        'false'
                     );
 
                     const checkbox =
@@ -2489,186 +2175,182 @@
                         checkbox.checked = false;
                     }
                 });
-
-            selectWalkInPatient(patient);
-
-            card.classList.add(
-                'is-selected'
-            );
-
-            if (patientCheckbox) {
-                patientCheckbox.checked = true;
-            }
         }
 
-        card.addEventListener(
-            'click',
-            event => {
-                if (
-                    event.target.closest(
-                        '.patient-card-checkbox-wrap'
-                    )
-                ) {
-                    return;
-                }
+        function selectThisPatient() {
+            clearOtherPatientCards();
 
-                selectPatientCard();
+            selectWalkInPatient(
+                patient
+            );
+
+            syncCardSelectionState(
+                true
+            );
+        }
+
+        function unselectThisPatient() {
+            clearSelectedPatientUI({
+                clearSearch: false,
+                reloadPatients: false,
+            });
+
+            syncCardSelectionState(
+                false
+            );
+        }
+
+        function togglePatientSelection() {
+            if (
+                isThisPatientSelected()
+            ) {
+                unselectThisPatient();
+                return;
             }
+
+            selectThisPatient();
+        }
+
+        syncCardSelectionState(
+            isThisPatientSelected()
         );
 
-        card.addEventListener(
-            'keydown',
-            event => {
-                if (
-                    event.key !== 'Enter' &&
-                    event.key !== ' '
-                ) {
-                    return;
-                }
-
-                event.preventDefault();
-
-                selectPatientCard();
+        card.addEventListener('click', event => {
+            if (event.target.closest('.patient-card-checkbox-wrap')) {
+                return;
             }
-        );
+            togglePatientSelection();
+        });
 
-        patientCheckbox?.addEventListener(
-            'change',
-            function (event) {
-                event.stopPropagation();
-
-                if (this.checked) {
-                    selectPatientCard();
-                    return;
-                }
-
-                card.classList.remove(
-                    'is-selected'
-                );
-
-                if (
-                    String(
-                        selectedPatientId?.value
-                    ) ===
-                    String(patient.id)
-                ) {
-                    clearSelectedPatientUI({
-                        clearSearch: false,
-                        reloadPatients: false,
-                    });
-                }
+        card.addEventListener('keydown', event => {
+            if (event.key !== 'Enter' && event.key !== ' ') {
+                return;
             }
-        );
+            event.preventDefault();
+            togglePatientSelection();
+        });
 
-        patientCheckbox?.addEventListener(
-            'click',
-            event => {
-                event.stopPropagation();
-            }
-        );
-
+        patientCheckbox?.addEventListener('click', event => {
+            event.stopPropagation();
+            event.preventDefault();
+            togglePatientSelection();
+        });
         return card;
     }
 
     function renderPatients(responseData) {
         const patients =
-            Array.isArray(responseData?.data)
-                ? responseData.data
-                : [];
+            Array.isArray(responseData?.data) ?
+                responseData.data : [];
 
         patientPaginationMeta = {
-            currentPage:
-                Number(
-                    responseData?.current_page
-                ) || 1,
+            currentPage: Number(
+                responseData?.current_page
+            ) || 1,
 
-            lastPage:
-                Number(
-                    responseData?.last_page
-                ) || 1,
+            lastPage: Number(
+                responseData?.last_page
+            ) || 1,
 
-            total:
-                Number(
-                    responseData?.total
-                ) || 0,
+            total: Number(
+                responseData?.total
+            ) || 0,
 
-            from:
-                responseData?.from ?? null,
+            from: responseData?.from ?? null,
 
-            to:
-                responseData?.to ?? null,
+            to: responseData?.to ?? null,
         };
 
         patientCurrentPage =
             patientPaginationMeta.currentPage;
 
         if (!patients.length) {
-            renderPatientMessage(
-                'Try another name, ID, or email address.',
-                {
+            const query =
+                patientSearch
+                    ?.value
+                    .trim() || '';
+
+            patientResults.innerHTML = '';
+
+            if (query) {
+                window.EmptyState?.renderSearch({
+                    host:
+                        patientResults,
+
+                    input:
+                        patientSearch,
+
+                    query,
+
                     title:
                         'No patient record found',
+
+                    message:
+                        'Try another name, ID, or email address.',
+                });
+            } else {
+                window.EmptyState?.render({
+                    host:
+                        patientResults,
+
                     icon:
                         'fa-user-slash',
-                }
-            );
 
-            if (patientEntriesInfo) {
-                patientEntriesInfo.textContent =
-                    'Showing 0 patient records';
+                    title:
+                        'No patient records found',
+
+                    message:
+                        'There are currently no patient records available.',
+                });
             }
 
-            if (patientPaginationBar) {
-                patientPaginationBar.hidden =
-                    true;
-            }
+            renderPatientPagination();
 
             return;
         }
 
-        const grid =
-            document.createElement('div');
+        window.EmptyState?.hide(patientResults);
 
-        grid.className =
-            'table-record-grid patient-record-grid';
+        const grid = document.createElement('div');
+        grid.className = 'table-record-grid patient-record-grid';
 
         patients.forEach(patient => {
-            grid.appendChild(
-                createPatientCard(patient)
-            );
+            grid.appendChild(createPatientCard(patient));
         });
 
         patientResults.replaceChildren(grid);
-
         renderPatientPagination();
     }
 
     window.handleWalkInPatientPerPageChange =
-        function handleWalkInPatientPerPageChange(
-            value
-        ) {
-            const allowedPageSizes = [
+        function (value) {
+            const allowed = [
                 10,
                 20,
                 50,
                 100,
             ];
 
-            const requestedPageSize =
+            const requested =
                 Number(value);
 
             patientPageSize =
-                allowedPageSizes.includes(
-                    requestedPageSize
-                )
-                    ? requestedPageSize
-                    : 10;
+                allowed.includes(
+                    requested
+                ) ?
+                    requested :
+                    10;
 
             patientCurrentPage = 1;
 
+            const query =
+                patientSearch
+                    ?.value
+                    .trim() || '';
+
             loadPatients(
-                patientSearch?.value.trim() || '',
-                !patientSearch?.value.trim()
+                query,
+                query === ''
             );
         };
 
@@ -2678,17 +2360,7 @@
         if (!patientResults) return;
 
         const requestId = ++patientSearchRequestId;
-
-        renderPatientMessage(
-            "Please wait while the clinic database is checked.",
-            {
-                title: "Loading patient records",
-                icon: "fa-circle-notch",
-                loading: true,
-            }
-        );
-
-        updatePatientLoadingMessage(requestId);
+        renderWalkInPatientSkeletons();
 
         try {
             const params = new URLSearchParams();
@@ -2736,8 +2408,6 @@
                 return;
             }
 
-            clearPatientLoadingMessageTimer();
-
             renderPatients(responseData);
 
         } catch (error) {
@@ -2748,23 +2418,27 @@
                 return;
             }
 
-            clearPatientLoadingMessageTimer();
-
             console.error(
                 'Walk-in patient loading error:',
                 error
             );
 
-            renderPatientMessage(
-                error.message ||
-                "Check your connection, then search again.",
-                {
-                    title:
-                        "Unable to load patient records",
-                    icon:
-                        "fa-triangle-exclamation",
-                }
-            );
+            patientResults.innerHTML = '';
+
+            window.EmptyState?.render({
+                host:
+                    patientResults,
+
+                icon:
+                    'fa-triangle-exclamation',
+
+                title:
+                    'Unable to load patient records',
+
+                message:
+                    error.message ||
+                    'Check your connection, then try again.',
+            });
         }
     }
 
@@ -2783,25 +2457,19 @@
         loadPatients("", true);
     }
 
-    patientSearch?.addEventListener(
-        'input',
-        function () {
-            clearTimeout(patientSearchTimer);
-
-            const query =
-                this.value.trim();
-
+    window.handleWalkInPatientSearch =
+        function (value) {
             patientCurrentPage = 1;
 
-            patientSearchTimer =
-                setTimeout(() => {
-                    loadPatients(
-                        query,
-                        !query
-                    );
-                }, 350);
-        }
-    );
+            const query =
+                String(value || '')
+                    .trim();
+
+            loadPatients(
+                query,
+                query === ''
+            );
+        };
 
     function hasSavedDraft() {
         const raw = localStorage.getItem(DRAFT_KEY);
@@ -2967,9 +2635,24 @@
             }
         });
         const isLast = i === steps.length - 1;
-        navBtns.style.display = isLast ? "none" : "flex";
-        prevBtn.style.display = i === 0 ? "none" : "inline-flex";
-        nextBtn.style.display = isLast ? "none" : "inline-flex";
+        if (navBtns) {
+            navBtns.style.display =
+                isLast ? "none" : "flex";
+        }
+
+        if (prevBtn) {
+            prevBtn.style.display =
+                i === 0 ?
+                    "none" :
+                    "inline-flex";
+        }
+
+        if (nextBtn) {
+            nextBtn.style.display =
+                isLast ?
+                    "none" :
+                    "inline-flex";
+        }
         if (isLast) {
             buildSummary();
             resetStep5View();
@@ -3164,20 +2847,57 @@
         }
 
         if (s === 3) {
-            const signatureInput = document.getElementById("patient_signature");
-            const signatureBlock = document.querySelector(".signature-section-card") || signatureInput;
+            const signatureInput =
+                document.getElementById(
+                    "patient_signature"
+                );
 
-            if (typeof isDrawnSignatureBlank === "function" && isDrawnSignatureBlank()) {
-                showMiniTab("Please draw the patient's signature first.");
-                scrollToInvalidTarget(signatureBlock);
+            const signatureBlock =
+                document.querySelector(
+                    ".signature-section-card"
+                ) || signatureInput;
+
+            if (
+                typeof isDrawnSignatureBlank ===
+                "function" &&
+                isDrawnSignatureBlank()
+            ) {
+                window.showGlobalGroupError?.(
+                    signatureBlock,
+                    "patient_signature",
+                    "Please draw the patient's signature."
+                );
+
+                signatureBlock?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                });
+
                 return false;
             }
 
-            if (!drawnSignatureWasUsed || !signatureInput?.files?.length) {
-                showMiniTab("Please click Use Drawn Signature before proceeding.");
-                scrollToInvalidTarget(signatureBlock);
+            if (
+                !drawnSignatureWasUsed ||
+                !signatureInput?.files?.length
+            ) {
+                window.showGlobalGroupError?.(
+                    signatureBlock,
+                    "patient_signature",
+                    "Please click Use Drawn Signature before proceeding."
+                );
+
+                signatureBlock?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                });
+
                 return false;
             }
+
+            window.clearGlobalGroupError?.(
+                signatureBlock,
+                "patient_signature"
+            );
         }
 
         return true;
@@ -3339,77 +3059,77 @@
         const patientGender = selectedWalkInPatient?.gender || selectedWalkInPatient?.type || "N/A";
         const dentalHistoryBody = `
     ${subSection("Basic Info", `
-                                                                                                                                                                                            ${row("Last Dental Visit", get("last_dental_visit"))}
-                                                                                                                                                                                            ${row("Previous Dentist", get("previous_dentist"))}
-                                                                                                                                                                                        `)}
+                                                                                                                                                                                                            ${row("Last Dental Visit", get("last_dental_visit"))}
+                                                                                                                                                                                                            ${row("Previous Dentist", get("previous_dentist"))}
+                                                                                                                                                                                                        `)}
 
     ${subSection("Dental Symptoms", `
-                                                                                                                                                                                            ${row("Bleeding Gums", get("bleeding_gums"))}
-                                                                                                                                                                                            ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
-                                                                                                                                                                                            ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
-                                                                                                                                                                                            ${row("Tooth Pain", get("tooth_pain"))}
-                                                                                                                                                                                            ${row("Sores/Lumps", get("sores"))}
-                                                                                                                                                                                            ${row("Jaw Injuries", get("injuries"))}
-                                                                                                                                                                                        `)}
+                                                                                                                                                                                                            ${row("Bleeding Gums", get("bleeding_gums"))}
+                                                                                                                                                                                                            ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
+                                                                                                                                                                                                            ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
+                                                                                                                                                                                                            ${row("Tooth Pain", get("tooth_pain"))}
+                                                                                                                                                                                                            ${row("Sores/Lumps", get("sores"))}
+                                                                                                                                                                                                            ${row("Jaw Injuries", get("injuries"))}
+                                                                                                                                                                                                        `)}
 
     ${subSection("Jaw & Bite Symptoms", `
-                                                                                                                                                                                            ${row("Clicking", get("clicking"))}
-                                                                                                                                                                                            ${row("Joint Pain", get("joint_pain"))}
-                                                                                                                                                                                            ${row("Difficulty Moving", get("difficulty_moving"))}
-                                                                                                                                                                                            ${row("Difficulty Chewing", get("difficulty_chewing"))}
-                                                                                                                                                                                            ${row("Frequent Headaches", get("jaw_headaches"))}
-                                                                                                                                                                                            ${row("Grinding/Clenching", get("clench_grind"))}
-                                                                                                                                                                                            ${row("Lips/Cheek Biting", get("biting"))}
-                                                                                                                                                                                            ${row("Teeth Loosening", get("teeth_loosening"))}
-                                                                                                                                                                                            ${row("Food Caught Between Teeth", get("food_teeth"))}
-                                                                                                                                                                                            ${row("Medicine Reaction", get("med_reaction"))}
-                                                                                                                                                                                        `)}
+                                                                                                                                                                                                            ${row("Clicking", get("clicking"))}
+                                                                                                                                                                                                            ${row("Joint Pain", get("joint_pain"))}
+                                                                                                                                                                                                            ${row("Difficulty Moving", get("difficulty_moving"))}
+                                                                                                                                                                                                            ${row("Difficulty Chewing", get("difficulty_chewing"))}
+                                                                                                                                                                                                            ${row("Frequent Headaches", get("jaw_headaches"))}
+                                                                                                                                                                                                            ${row("Grinding/Clenching", get("clench_grind"))}
+                                                                                                                                                                                                            ${row("Lips/Cheek Biting", get("biting"))}
+                                                                                                                                                                                                            ${row("Teeth Loosening", get("teeth_loosening"))}
+                                                                                                                                                                                                            ${row("Food Caught Between Teeth", get("food_teeth"))}
+                                                                                                                                                                                                            ${row("Medicine Reaction", get("med_reaction"))}
+                                                                                                                                                                                                        `)}
 
     ${subSection("Dental Procedures", `
-                                                                                                                                                                                            ${row("Periodontal Treatment", get("periodontal"))}
-                                                                                                                                                                                            ${row("Difficult Extraction", get("difficult_extraction"))}
-                                                                                                                                                                                            ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
+                                                                                                                                                                                                            ${row("Periodontal Treatment", get("periodontal"))}
+                                                                                                                                                                                                            ${row("Difficult Extraction", get("difficult_extraction"))}
+                                                                                                                                                                                                            ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
 
-                                                                                                                                                                                            ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
-                                                                                                                                                                                            ${row("Dentures", get("dentures"))}
-                                                                                                                                                                                            ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
+                                                                                                                                                                                                            ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
+                                                                                                                                                                                                            ${row("Dentures", get("dentures"))}
+                                                                                                                                                                                                            ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
 
-                                                                                                                                                                                            ${row("Orthodontic Treatment", get("ortho_treatment"))}
-                                                                                                                                                                                            ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
-                                                                                                                                                                                        `)}
+                                                                                                                                                                                                            ${row("Orthodontic Treatment", get("ortho_treatment"))}
+                                                                                                                                                                                                            ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
+                                                                                                                                                                                                        `)}
 
     ${fullWidthSection("Additional Concerns", `
-                                                                                                                                                                                            ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
+                                                                                                                                                                                                            ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
                 ? get("additional_concerns")
                 : '<span class="text-[#9e9690] italic">No additional concerns provided.</span>'}
-                                                                                                                                                                                        `)}
+                                                                                                                                                                                                        `)}
 `;
 
         const medicalHistoryBody = `
     ${subSection("General Health", `
-                                                                                                                                                                                        ${row("Good Health", get("good_health"))}
-                                                                                                                                                                                        ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
+                                                                                                                                                                                                        ${row("Good Health", get("good_health"))}
+                                                                                                                                                                                                        ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
 
-                                                                                                                                                                                        ${row("Had Medical Exam", get("had_medical_exam"))}
-                                                                                                                                                                                        ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
+                                                                                                                                                                                                        ${row("Had Medical Exam", get("had_medical_exam"))}
+                                                                                                                                                                                                        ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
 
-                                                                                                                                                                                        ${row("Under Treatment", get("under_treatment"))}
-                                                                                                                                                                                        ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
+                                                                                                                                                                                                        ${row("Under Treatment", get("under_treatment"))}
+                                                                                                                                                                                                        ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
 
-                                                                                                                                                                                        ${row("Hospitalized", get("hospitalized"))}
-                                                                                                                                                                                        ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
-                                                                                                                                                                                    `)}
+                                                                                                                                                                                                        ${row("Hospitalized", get("hospitalized"))}
+                                                                                                                                                                                                        ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
+                                                                                                                                                                                                    `)}
 
     ${subSection("Allergies", `
-                                                                                                                                                                                        ${row("Allergy (Medicine)", get("allergy_medicine"))}
-                                                                                                                                                                                        ${row("Allergy (Food)", get("allergy_food"))}
-                                                                                                                                                                                        ${optionalRow("Allergy (Others)", get("allergy_others"))}
-                                                                                                                                                                                    `)}
+                                                                                                                                                                                                        ${row("Allergy (Medicine)", get("allergy_medicine"))}
+                                                                                                                                                                                                        ${row("Allergy (Food)", get("allergy_food"))}
+                                                                                                                                                                                                        ${optionalRow("Allergy (Others)", get("allergy_others"))}
+                                                                                                                                                                                                    `)}
 
     ${subSection("Medications", `
-                                                                                                                                                                                        ${row("Medication", get("medication"))}
-                                                                                                                                                                                        ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
-                                                                                                                                                                                    `)}
+                                                                                                                                                                                                        ${row("Medication", get("medication"))}
+                                                                                                                                                                                                        ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
+                                                                                                                                                                                                    `)}
 
     ${isFemaleGender(
             selectedWalkInPatient?.gender
@@ -3417,61 +3137,61 @@
                 ? subSection(
                     "For Women Only",
                     `
-            ${row(
+                            ${row(
                         "Pregnant",
                         get("pregnant")
                     )}
 
-            ${row(
+                            ${row(
                         "Nursing",
                         get("nursing")
                     )}
 
-            ${row(
+                            ${row(
                         "Birth Control Pills",
                         get("birth_control")
                     )}
-        `
+                        `
                 )
                 : ""}
 
     ${fullWidthSection("Medical Conditions", `
-                                                                                                                                                                                        <b class="text-[#5c5550] dark:text-[#e5e5e5] font-semibold">Selected Conditions:</b> ${diseaseText}
-                                                                                                                                                                                    `)}
+                                                                                                                                                                                                        <b class="text-[#5c5550] dark:text-[#e5e5e5] font-semibold">Selected Conditions:</b> ${diseaseText}
+                                                                                                                                                                                                    `)}
 
     ${subSection("Tobacco Use", `
-                                                                                                                                                                                        ${row("Tobacco Use", get("tobacco_use"))}
-                                                                                                                                                                                        ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
-                                                                                                                                                                                        ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
-                                                                                                                                                                                    `)}
+                                                                                                                                                                                                        ${row("Tobacco Use", get("tobacco_use"))}
+                                                                                                                                                                                                        ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
+                                                                                                                                                                                                        ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
+                                                                                                                                                                                                    `)}
 
     ${subSection("Do You Suffer From", `
-                                                                                                                                                                                        ${row("Headaches", get("headaches"))}
-                                                                                                                                                                                        ${row("Earaches", get("earaches"))}
-                                                                                                                                                                                        ${row("Neck Aches", get("neck_aches"))}
-                                                                                                                                                                                    `)}
+                                                                                                                                                                                                        ${row("Headaches", get("headaches"))}
+                                                                                                                                                                                                        ${row("Earaches", get("earaches"))}
+                                                                                                                                                                                                        ${row("Neck Aches", get("neck_aches"))}
+                                                                                                                                                                                                    `)}
 `;
 
         document.getElementById("summaryBox").innerHTML = `
     ${summaryCard("Patient Information", "fa-user", `
-                                                                                                                                                                                        <div class="grid grid-cols-1 gap-y-1">
-                                                                                                                                                                                            ${row("Name", patientName)}
-                                                                                                                                                                                            ${row("Gender", patientGender)}
-                                                                                                                                                                                        </div>
-                                                                                                                                                                                    `)}
+                                                                                                                                                                                                        <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                                                                                                            ${row("Name", patientName)}
+                                                                                                                                                                                                            ${row("Gender", patientGender)}
+                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                    `)}
 
     <div class="grid grid-cols-2 gap-4 sm-grid-1col">
      ${summaryCard("Walk-in Schedule", "fa-clock", `
-                            <div class="grid grid-cols-1 gap-y-1">
-                                <p><b class="text-[#5c5550] font-semibold">Date & Time:</b> Recorded automatically when Start Procedure is clicked.</p>
-                            </div>
-                        `)}
+                                            <div class="grid grid-cols-1 gap-y-1">
+                                                <p><b class="text-[#5c5550] font-semibold">Date & Time:</b> Recorded automatically when Start Procedure is clicked.</p>
+                                            </div>
+                                        `)}
 
         ${summaryCard("Service", "fa-tooth", `
-                                                                                                                                                                                            <div class="grid grid-cols-1 gap-y-1">
-                                                                                                                                                                                                ${row("Type", get("service_type"))}
-                                                                                                                                                                                            </div>
-                                                                                                                                                                                        `)}
+                                                                                                                                                                                                            <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                                                                                                                ${row("Type", get("service_type"))}
+                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                        `)}
     </div>
 
     ${summaryCard("Dental History", "fa-teeth", dentalHistoryBody)}
@@ -3480,12 +3200,12 @@
 
     <div class="grid grid-cols-2 gap-4 sm-grid-1col">
         ${summaryCard("Emergency Contact", "fa-phone", `
-                                                                                                                                                                                            <div class="grid grid-cols-1 gap-y-1">
-                                                                                                                                                                                                ${row("Name", get("emergency_person"))}
-                                                                                                                                                                                                ${row("Number", get("emergency_number"))}
-                                                                                                                                                                                                ${row("Relation", emergencyRelation)}
-                                                                                                                                                                                            </div>
-                                                                                                                                                                                        `)}
+                                                                                                                                                                                                            <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                                                                                                                ${row("Name", get("emergency_person"))}
+                                                                                                                                                                                                                ${row("Number", get("emergency_number"))}
+                                                                                                                                                                                                                ${row("Relation", emergencyRelation)}
+                                                                                                                                                                                                            </div>
+                                                                                                                                                                                                        `)}
 
         ${summaryCard("Signature", "fa-signature", sigHTML)}
     </div>
@@ -3527,47 +3247,9 @@
         );
 
     const appointmentsRedirectUrl =
-        @json(
-            route(
-                'dentist.dentist.appointments'
-            )
-        );
+        @json(route('dentist.dentist.appointments'));
 
     let appointmentSubmitRunning = false;
-
-    function replayConfirmModalAnimation() {
-        if (!confirmModal) {
-            return;
-        }
-
-        confirmModal.classList.remove(
-            "confirm-modal-animate"
-        );
-
-        void confirmModal.offsetWidth;
-
-        confirmModal.classList.add(
-            "confirm-modal-animate"
-        );
-
-        confirmModal
-            .querySelectorAll(
-                [
-                    ".confirm-modal-icon",
-                    ".confirm-modal-title",
-                    ".confirm-modal-message",
-                    ".confirm-modal-button",
-                ].join(",")
-            )
-            .forEach(element => {
-                element.style.animation =
-                    "none";
-
-                void element.offsetWidth;
-
-                element.style.animation = "";
-            });
-    }
 
     function setFinalSubmitLoading(
         loading
@@ -3578,12 +3260,12 @@
 
         finalSubmitBtn.disabled = loading;
 
-        finalSubmitBtn.innerHTML = loading
-            ? `
+        finalSubmitBtn.innerHTML = loading ?
+            `
             <i class="fa-solid fa-spinner fa-spin"></i>
             <span>Starting Procedure...</span>
-        `
-            : `
+        ` :
+            `
             <i class="fa-solid fa-play"></i>
             <span>Start Procedure</span>
         `;
@@ -3616,25 +3298,20 @@
 
         try {
             const response = await fetch(
-                appointmentForm.action,
-                {
-                    method:
-                        appointmentForm.method ||
-                        "POST",
+                appointmentForm.action, {
+                method: appointmentForm.method ||
+                    "POST",
 
-                    headers: {
-                        Accept:
-                            "application/json",
+                headers: {
+                    Accept: "application/json",
 
-                        "X-Requested-With":
-                            "XMLHttpRequest",
-                    },
+                    "X-Requested-With": "XMLHttpRequest",
+                },
 
-                    body:
-                        new FormData(
-                            appointmentForm
-                        ),
-                }
+                body: new FormData(
+                    appointmentForm
+                ),
+            }
             );
 
             const responseData =
@@ -3682,18 +3359,14 @@
                     `The walk-in appointment for ${patientName} has been recorded successfully.`;
             }
 
-            if (
-                confirmModal &&
-                !confirmModal.open
-            ) {
-                confirmModal.showModal();
-                replayConfirmModalAnimation();
-            }
+            okBtn.dataset.startUrl =
+                responseData?.start_url || '';
+
+            window.openModal?.(
+                'confirmModal'
+            );
 
             okBtn?.focus();
-
-            okBtn.dataset.startUrl =
-                responseData?.start_url || "";
 
         } catch (error) {
             appointmentSubmitRunning = false;
@@ -3718,7 +3391,7 @@
     );
 
     okBtn?.addEventListener(
-        "click",
+        'click',
         () => {
             const startUrl =
                 okBtn.dataset.startUrl;
@@ -3726,6 +3399,10 @@
             if (!startUrl) {
                 return;
             }
+
+            window.closeModal?.(
+                'confirmModal'
+            );
 
             window.location.href =
                 startUrl;
@@ -3795,6 +3472,7 @@
                 "hidden");
         else document.getElementById("tobacco_details")?.classList.add("hidden");
     }));
+
     const sigInput = document.getElementById("patient_signature");
     const sigName = document.getElementById("signature_filename");
     const sigError = document.getElementById("signature_error");
@@ -3810,15 +3488,6 @@
     let drawnSignatureCurrentStroke = [];
     let drawnSignatureIsDrawing = false;
     let drawnSignatureWasUsed = false;
-
-    function escapeHtml(value) {
-        return String(value || "")
-            .replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll('"', "&quot;")
-            .replaceAll("'", "&#039;");
-    }
 
     function clearSignatureDisplay() {
         sigResultBox?.classList.add("hidden");
@@ -3866,7 +3535,7 @@
                     "mt-1 rounded-xl border border-[#e8e2dd] bg-white px-3 py-2 text-xs text-[#5c5550] leading-5 font-semibold";
             }
 
-            sigError.innerHTML = `${icon}${escapeHtml(message)}`;
+            sigError.innerHTML = `${icon}${safePatientText(message)}`;
             sigError.classList.remove("hidden");
         }
     }
@@ -4160,40 +3829,65 @@
     });
 
     function openLeaveModal(onConfirm) {
-        if (window.__SESSION_EXPIRED__) {
+        if (
+            window.__SESSION_EXPIRED__ ||
+            !leaveModal
+        ) {
             return;
         }
 
         pendingNavigation = onConfirm;
 
-        if (!leaveModal.open) {
-            leaveModal.showModal();
-        }
+        window.openModal?.(
+            "leaveModal"
+        );
     }
 
     function closeLeaveModal() {
-        if (leaveModal.open) leaveModal.close();
+        window.closeModal?.(
+            "leaveModal"
+        );
+
         pendingNavigation = null;
     }
 
     document.getElementById('cancelLeaveBtn')?.addEventListener('click', closeLeaveModal);
 
-    document.getElementById('saveDraftBtn')?.addEventListener('click', () => {
-        saveDraftData();
-        formIsDirty = false;
-        leaveModal.close();
+    document
+        .getElementById(
+            "saveDraftBtn"
+        )
+        ?.addEventListener(
+            "click",
+            () => {
+                saveDraftData();
 
-        if (typeof pendingNavigation === "function") {
-            const action = pendingNavigation;
-            pendingNavigation = null;
-            action();
-        }
-    });
+                formIsDirty = false;
+
+                window.closeModal?.(
+                    "leaveModal"
+                );
+
+                if (
+                    typeof pendingNavigation ===
+                    "function"
+                ) {
+                    const action =
+                        pendingNavigation;
+
+                    pendingNavigation = null;
+
+                    action();
+                }
+            }
+        );
 
     document.getElementById('discardDraftBtn')?.addEventListener('click', () => {
         clearDraft();
         formIsDirty = false;
-        leaveModal.close();
+        window.closeModal?.(
+            "leaveModal"
+        );
 
         if (typeof pendingNavigation === "function") {
             const action = pendingNavigation;
@@ -4219,59 +3913,66 @@
     });
 
     function initIntroBookingModal() {
-        const modal = document.getElementById("introBookingModal");
-        const startBtn = document.getElementById("introStartBtn");
-        const continueDraftBtn = document.getElementById("introContinueDraftBtn");
+        const modal =
+            document.getElementById(
+                "introBookingModal"
+            );
+
+        const startBtn =
+            document.getElementById(
+                "introStartBtn"
+            );
+
+        const continueDraftBtn =
+            document.getElementById(
+                "introContinueDraftBtn"
+            );
 
         if (!modal) return;
 
-        const hasDraft = hasSavedDraft();
+        const hasDraft =
+            hasSavedDraft();
 
-        if (hasDraft) {
-            continueDraftBtn?.classList.remove("hidden");
-        } else {
-            continueDraftBtn?.classList.add("hidden");
-        }
+        continueDraftBtn?.classList.toggle(
+            "hidden",
+            !hasDraft
+        );
 
-        function lockPageScroll() {
-            const scrollY = window.scrollY || window.pageYOffset || 0;
-            document.body.dataset.lockedScrollY = String(scrollY);
-            document.body.style.top = `-${scrollY}px`;
-            document.documentElement.classList.add("intro-modal-open");
-            document.body.classList.add("intro-modal-open");
-        }
+        startBtn?.addEventListener(
+            "click",
+            () => {
+                window.closeModal?.(
+                    "introBookingModal"
+                );
+            }
+        );
 
-        function unlockPageScroll() {
-            const scrollY = parseInt(document.body.dataset.lockedScrollY || "0", 10);
-            document.documentElement.classList.remove("intro-modal-open");
-            document.body.classList.remove("intro-modal-open");
-            document.body.style.top = "";
-            delete document.body.dataset.lockedScrollY;
-            window.scrollTo(0, Number.isNaN(scrollY) ? 0 : scrollY);
-        }
+        continueDraftBtn?.addEventListener(
+            "click",
+            async () => {
+                window.closeModal?.(
+                    "introBookingModal"
+                );
 
-        modal.addEventListener("close", unlockPageScroll);
+                await restoreDraft();
 
-        startBtn?.addEventListener("click", () => {
-            modal.close();
-        });
-
-        continueDraftBtn?.addEventListener("click", async () => {
-            modal.close();
-            await restoreDraft();
-            showMiniTab("Saved draft loaded.");
-        });
+                showMiniTab(
+                    "Saved draft loaded."
+                );
+            }
+        );
 
         setTimeout(() => {
             if (
                 window.__SESSION_EXPIRED__ ||
-                modal.open
+                modal.classList.contains("open")
             ) {
                 return;
             }
 
-            lockPageScroll();
-            modal.showModal();
+            window.openModal?.(
+                "introBookingModal"
+            );
         }, 350);
     }
 
@@ -4285,6 +3986,7 @@
             ) || document;
 
         window.initSearchClearButtons?.(page);
+        window.initGlobalSearchBars?.(page);
         window.initCustomSelects?.(page);
         window.initGlobalPageSizeSelects?.(page);
         window.bindFormInputValidation?.(page);
@@ -4308,15 +4010,6 @@
 
     refreshWalkInGlobalControls();
     loadInitialPatientRecords();
-
-    document.addEventListener(
-        "DOMContentLoaded",
-        () => {
-            refreshWalkInGlobalControls();
-            loadInitialPatientRecords();
-        },
-        { once: true }
-    );
 
     window.addEventListener("resize", () => {
         document.querySelectorAll(".sm-grid-1col").forEach(el => {

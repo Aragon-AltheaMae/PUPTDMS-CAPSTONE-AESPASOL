@@ -82,6 +82,7 @@
         disallowToday: @json($disallowToday ?? true),
         allowPastDates: @json($allowPastDates ?? false),
         allowAllDates: @json($allowAllDates ?? false),
+        allowAllDatesExceptHolidays: @json($allowAllDatesExceptHolidays ?? false),
         allowToggleOffDate: @json($allowToggleOffDate ?? true),
         useDynamicScheduleRules: @json($useDynamicScheduleRules ?? false),
         renderStyle: @json($renderStyle ?? 'patient'),
@@ -95,9 +96,9 @@
     let hasCalendarRenderedOnce = false;
     let dashboardLoadingTimer = null;
     const dashboardSlotCache = new Map();
-    const sharedCalendarSource = window.createCalendarSource
-        ? window.createCalendarSource(calendarConfig)
-        : null;
+    const sharedCalendarSource = window.createCalendarSource ?
+        window.createCalendarSource(calendarConfig) :
+        null;
 
     window.__appCalendarSources = window.__appCalendarSources || {};
     window.__appCalendarSources[calendarConfig.dateInputId] = sharedCalendarSource;
@@ -225,6 +226,16 @@
     }
 
     function getLegendItemsForMode(mode) {
+        if (
+            calendarConfig
+            .allowAllDatesExceptHolidays
+        ) {
+            return [
+                'today',
+                'holiday'
+            ];
+        }
+
         if (mode === 'dentist') {
             return ['today', 'hasPatients', 'fullyBooked', 'holiday', 'clinicClosed'];
         }
@@ -411,9 +422,9 @@
 
         const isToday = cellDate.getTime() === todayDate.getTime();
         const isPast = cellDate < todayDate;
-        const isPastOrToday = calendarConfig.allowPastDates
-            ? (calendarConfig.disallowToday ? isToday : false)
-            : (calendarConfig.disallowToday ? cellDate <= todayDate : isPast);
+        const isPastOrToday = calendarConfig.allowPastDates ?
+            (calendarConfig.disallowToday ? isToday : false) :
+            (calendarConfig.disallowToday ? cellDate <= todayDate : isPast);
 
         const holidayName = calendarConfig.holidaysMap?.[iso] || null;
         const isHoliday = !!holidayName;
@@ -434,14 +445,24 @@
 
         const isBookingMode = calendarConfig.mode === 'booking';
 
-        const isDisabled = calendarConfig.allowAllDates
-            ? false
-            : (
+        let isDisabled;
+
+        if (
+            calendarConfig.allowAllDatesExceptHolidays
+        ) {
+            isDisabled = isHoliday;
+        } else if (
+            calendarConfig.allowAllDates
+        ) {
+            isDisabled = false;
+        } else {
+            isDisabled =
                 isPastOrToday ||
                 isHoliday ||
                 isClosed ||
-                isFull
-            );
+                isFull;
+        }
+
         const isSelected = iso === selectedDate;
 
         return {
@@ -492,7 +513,16 @@
 
     function getCalendarDayDecorations(state, variant = 'patient') {
         let cellClass = "cal-cell";
-        const allowAllDates = calendarConfig.allowAllDates === true;
+        const allowAllDates =
+            calendarConfig.allowAllDates === true;
+
+        const allowAllDatesExceptHolidays =
+            calendarConfig
+            .allowAllDatesExceptHolidays === true;
+
+        const ignoreAvailabilityRestrictions =
+            allowAllDates ||
+            allowAllDatesExceptHolidays;
 
         let badgeHtml = "";
         let tooltipHtml = "";
@@ -510,22 +540,56 @@
                 cellClass += " completed-appointment";
             } else if (state.isSelected && !state.isDisabled) {
                 cellClass += " selected";
-            } else if (state.isToday) {
-                if (state.isBookingMode) {
-                    cellClass += " skeleton-block text-gray-500 cursor-not-allowed disabled";
+            } else if (
+                state.isHoliday &&
+                !allowAllDates
+            ) {
+                cellClass +=
+                    "holiday disabled";
+
+            } else if (
+                !ignoreAvailabilityRestrictions &&
+                state.isToday
+            ) {
+                if (
+                    state.isBookingMode &&
+                    calendarConfig.disallowToday
+                ) {
+                    cellClass +=
+                        "skeleton-block text-gray-500 cursor-not-allowed disabled";
                 } else {
                     cellClass += " today";
                 }
-            } else if (!allowAllDates && state.isHoliday) {
-                cellClass += " holiday disabled";
-            } else if (!allowAllDates && state.isFull) {
-                cellClass += " full disabled";
-            } else if (!allowAllDates && state.isClosed) {
-                cellClass += " text-[#d1ccc8] cursor-not-allowed disabled";
-            } else if (!allowAllDates && state.isPastOrToday && state.isBookingMode) {
-                cellClass += " text-[#d1ccc8] cursor-not-allowed disabled";
-            } else if (!allowAllDates && state.isPast && !state.hasCompletedAppointment) {
-                cellClass += " text-gray-400 cursor-default disabled";
+
+            } else if (
+                !ignoreAvailabilityRestrictions &&
+                state.isFull
+            ) {
+                cellClass +=
+                    "full disabled";
+
+            } else if (
+                !ignoreAvailabilityRestrictions &&
+                state.isClosed
+            ) {
+                cellClass +=
+                    "text-[#d1ccc8] cursor-not-allowed disabled";
+
+            } else if (
+                !ignoreAvailabilityRestrictions &&
+                state.isPastOrToday &&
+                state.isBookingMode
+            ) {
+                cellClass +=
+                    "text-[#d1ccc8] cursor-not-allowed disabled";
+
+            } else if (
+                !ignoreAvailabilityRestrictions &&
+                state.isPast &&
+                !state.hasCompletedAppointment
+            ) {
+                cellClass +=
+                    "text-gray-400 cursor-default disabled";
             }
         } else {
             if (state.isSelected && !state.isDisabled) {
@@ -576,7 +640,10 @@
                 tooltipBg = CALENDAR_THEME.statuses.holiday.tooltipBg;
                 tooltipArrow = CALENDAR_THEME.statuses.holiday.tooltipArrow;
             }
-        } else if (state.isFull) {
+        } else if (
+            !ignoreAvailabilityRestrictions &&
+            state.isFull
+        ) {
             if (!state.myAppointment && !state.isClosed) {
                 badgeHtml += makeCalendarDot(CALENDAR_THEME.statuses.fullyBooked.dotClass, state.count > 0 ? String(
                     state.count) : '');
@@ -586,7 +653,11 @@
                 tooltipBg = CALENDAR_THEME.statuses.fullyBooked.tooltipBg;
                 tooltipArrow = CALENDAR_THEME.statuses.fullyBooked.tooltipArrow;
             }
-        } else if (!allowAllDates && state.isClosed && !state.isPast) {
+        } else if (
+            !ignoreAvailabilityRestrictions &&
+            state.isClosed &&
+            !state.isPast
+        ) {
             if (!state.myAppointment) {
                 badgeHtml += CALENDAR_THEME.statuses.clinicClosed.badge();
             }
@@ -599,7 +670,11 @@
                 tooltipBg = CALENDAR_THEME.statuses.clinicClosed.tooltipBg;
                 tooltipArrow = CALENDAR_THEME.statuses.clinicClosed.tooltipArrow;
             }
-        } else if (!allowAllDates && state.isPast && !state.hasCompletedAppointment) {
+        } else if (
+            !ignoreAvailabilityRestrictions &&
+            state.isPast &&
+            !state.hasCompletedAppointment
+        ) {
             if (!tooltip) {
                 tooltip = `
             <i class="fa-solid fa-clock-rotate-left mr-1"></i>
@@ -623,21 +698,35 @@
             }
         }
 
-        if (state.isHoliday && !allowAllDates) {} else if (!allowAllDates && state.isToday && calendarConfig.disallowToday) {
+        if (
+            state.isHoliday &&
+            !allowAllDates
+        ) {} else if (
+            !ignoreAvailabilityRestrictions &&
+            state.isToday &&
+            calendarConfig.disallowToday
+        ) {
             tooltip = `
         <i class="fa-solid fa-calendar-day mr-1"></i>
         Same-day booking is not allowed
     `;
             tooltipBg = "bg-gray-600";
             tooltipArrow = "after:border-t-gray-600";
-        } else if (!allowAllDates && state.isPast && !state.hasCompletedAppointment) {
+        } else if (
+            !ignoreAvailabilityRestrictions &&
+            state.isPast &&
+            !state.hasCompletedAppointment
+        ) {
             tooltip = `
         <i class="fa-solid fa-clock-rotate-left mr-1"></i>
         Past date — booking not allowed
     `;
             tooltipBg = "bg-gray-500";
             tooltipArrow = "after:border-t-gray-500";
-        } else if (!allowAllDates && state.isClosed) {
+        } else if (
+            !ignoreAvailabilityRestrictions &&
+            state.isClosed
+        ) {
             tooltip = `
         <i class="fa-solid fa-circle-minus mr-1"></i>
         Clinic closed on this date
@@ -957,7 +1046,8 @@
             maximum
         } = getMonthBounds();
         const endDate = new Date(maximum.getFullYear(), maximum.getMonth() + 1, 0);
-        const cursor = new Date(calendarConfig.allowPastDates ? minimum.getTime() : Math.max(todayDate.getTime(), minimum.getTime()));
+        const cursor = new Date(calendarConfig.allowPastDates ? minimum.getTime() : Math.max(todayDate.getTime(),
+            minimum.getTime()));
 
         try {
             while (cursor <= endDate) {
@@ -1317,8 +1407,8 @@
             </aside>
         ` : '';
 
-        const markup = isDashboard
-            ? `
+        const markup = isDashboard ?
+            `
                 <div class="cal-shell dashboard-calendar-shell">
                     <div class="dashboard-calendar-layout">
                         <div class="dashboard-calendar-main">
@@ -1328,8 +1418,8 @@
                         ${dashboardSidePanel}
                     </div>
                 </div>
+            ` :
             `
-            : `
                 <div class="cal-shell">
                     ${calendarBody}
                 </div>
@@ -2172,7 +2262,10 @@
             1
         );
 
-        const { minimum, maximum } = getMonthBounds();
+        const {
+            minimum,
+            maximum
+        } = getMonthBounds();
 
         if (candidate < minimum || candidate > maximum) {
             return;

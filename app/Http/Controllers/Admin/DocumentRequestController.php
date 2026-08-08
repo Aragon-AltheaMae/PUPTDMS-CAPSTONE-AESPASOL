@@ -85,12 +85,19 @@ class DocumentRequestController extends Controller
             ]);
         }
 
+        $refreshItems = DocumentRequest::query()
+            ->select('id')
+            ->get()
+            ->map(fn($item) => [
+                'id' => $item->id,
+            ])
+            ->values();
+
         return view('shared.document-requests', [
             'role' => 'admin',
-
             'requests' => $requests,
             'stats' => $stats,
-
+            'refreshItems' => $refreshItems,
             'search' => $search,
             'status' => $status,
             'type' => $type,
@@ -103,16 +110,12 @@ class DocumentRequestController extends Controller
                 'index' => route(
                     'admin.document-requests.index'
                 ),
-
                 'data' => null,
-
                 'approve' => url('/admin/document-requests/__ID__/approve'),
                 'reject' => url('/admin/document-requests/__ID__/reject'),
-
                 'export' => route(
                     'admin.document-requests.export'
                 ),
-
                 'print_queue' => route(
                     'admin.document-requests.print-queue'
                 ),

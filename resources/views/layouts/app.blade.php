@@ -186,8 +186,6 @@
 
     @include('partials.footer')
 
-    @include('partials.voice-logic')
-
     @if ($isAdmin || $isDentist)
         @include('components.discard-changes')
     @endif

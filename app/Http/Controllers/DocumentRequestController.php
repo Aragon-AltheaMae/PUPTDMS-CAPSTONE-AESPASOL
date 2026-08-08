@@ -205,15 +205,21 @@ class DocumentRequestController extends Controller
             ->get()
             : collect();
 
+        $refreshItems = DocumentRequest::query()
+            ->select('id')
+            ->get()
+            ->map(fn($item) => [
+                'id' => $item->id,
+            ])
+            ->values();
         return view(
             'shared.document-requests',
             [
                 'role' => 'dentist',
-
                 'requests' => $requests,
                 'stats' => $stats,
                 'notifications' => $notifications,
-
+                'refreshItems' => $refreshItems,
                 'search' => $search,
                 'status' => $status,
                 'type' => $type,
@@ -228,10 +234,8 @@ class DocumentRequestController extends Controller
                     ),
 
                     'data' => null,
-
                     'approve' => url('/dentist/document-requests/__ID__/approve'),
                     'reject' => url('/dentist/document-requests/__ID__/reject'),
-
                     'export' => null,
                     'print_queue' => null,
                 ],
@@ -295,11 +299,18 @@ class DocumentRequestController extends Controller
 
     public function approve(Request $request, $id)
     {
-        $activeRole = session('impersonated_role') ?: session('role');
+        $activeRole =
+            session('impersonated_role')
+            ?: session('role')
+            ?: optional(optional(Auth::user())->role)->slug;
 
         if ($activeRole !== 'dentist') {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized.',
+            ], 403);
         }
+
         $docRequest = DocumentRequest::with('patient.user')->findOrFail($id);
 
         $docRequest->update([
@@ -323,10 +334,16 @@ class DocumentRequestController extends Controller
 
     public function reject(Request $request, $id)
     {
-        $activeRole = session('impersonated_role') ?: session('role');
+        $activeRole =
+            session('impersonated_role')
+            ?: session('role')
+            ?: optional(optional(Auth::user())->role)->slug;
 
         if ($activeRole !== 'dentist') {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized.',
+            ], 403);
         }
 
         $request->validate([

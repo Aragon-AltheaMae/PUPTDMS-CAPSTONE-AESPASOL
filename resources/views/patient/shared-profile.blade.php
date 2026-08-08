@@ -81,6 +81,7 @@ $patientType = $patient->faculty_code ? 'Faculty' : ($patient->student_no ? 'Stu
 $procedureAppointment = $nextAppointment ?? collect($futureVisits ?? [])->first();
 $odontogramData = optional($patient->odontogram)->odontogram_data ?? [];
 $odontogramLastUpdatedAt = optional($patient->odontogram)->updated_at;
+$odontogramLastUpdatedBy = optional($patient->odontogram)->updated_by;
 $odontogramMetaVisit = $lastVisit ?? ($appointment ?? ($nextAppointment ?? null));
 $odontogramMetaDate = $odontogramMetaVisit?->appointment_date
 ? Carbon::parse($odontogramMetaVisit->appointment_date)->format('M d, Y')
@@ -111,7 +112,7 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
 
             @if ($isDentistProfile)
             <div class="flex items-center gap-2">
-                <a href="{{ route('dentist.odontogram.historical.create', ['patient' => $patient->id]) }}"
+                <a href="{{ route('dentist.odontogram.existing-appointment.create', ['patient' => $patient->id]) }}"
                     class="ui-btn ui-btn-secondary">
                     <i class="fa-solid fa-clock-rotate-left text-xs"></i> Add Existing Appointment
                 </a>

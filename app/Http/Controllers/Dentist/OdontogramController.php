@@ -39,10 +39,10 @@ class OdontogramController extends Controller
         $latestProcedureWithOdontogram = $patientOdontogram
             ? null
             : AppointmentProcedure::where('patient_id', $patient->id)
-                ->whereNotNull('odontogram_data')
-                ->latest('updated_at')
-                ->latest('id')
-                ->first();
+            ->whereNotNull('odontogram_data')
+            ->latest('updated_at')
+            ->latest('id')
+            ->first();
 
         return $patientOdontogram?->odontogram_data
             ?? $latestProcedureWithOdontogram?->odontogram_data
@@ -108,7 +108,7 @@ class OdontogramController extends Controller
         );
     }
 
-    private function getHistoricalCalendarContext(): array
+    private function getExistingAppointmentCalendarContext(): array
     {
         $appointmentCountsPerDay = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
             ->selectRaw('appointment_date, COUNT(*) as count')
@@ -136,7 +136,7 @@ class OdontogramController extends Controller
             ->map(fn($date) => Carbon::parse($date)->toDateString())
             ->toArray();
 
-        $philippineHolidays = PhilippineHolidays::range(2, 2);
+        $philippineHolidays = PhilippineHolidays::range(15, 0);
 
         return compact(
             'appointmentCountsPerDay',
@@ -179,9 +179,9 @@ class OdontogramController extends Controller
         return max(0, ($hours * 3600) + ($minutes * 60) + $seconds);
     }
 
-    private function historicalDraftSessionKey(Patient $patient): string
+    private function existingAppointmentDraftSessionKey(Patient $patient): string
     {
-        return 'historical_appointment_draft_patient_' . $patient->id;
+        return 'existing_appointment_draft_patient_' . $patient->id;
     }
 
     private function yesNoValue($value): string
@@ -190,7 +190,7 @@ class OdontogramController extends Controller
         return $normalized === 'YES' ? 'YES' : 'NO';
     }
 
-    private function getHistoricalDentalQuestions(): array
+    private function getExistingAppointmentDentalQuestions(): array
     {
         return [
             ['code' => 'bleeding_gums', 'label' => 'Do your gums bleed while brushing/flossing?'],
@@ -217,7 +217,7 @@ class OdontogramController extends Controller
         ];
     }
 
-    private function getHistoricalMedicalQuestions(): array
+    private function getExistingAppointmentMedicalQuestions(): array
     {
         return [
             ['code' => 'good_health', 'label' => 'Are you in good health?', 'type' => 'bool'],
@@ -299,12 +299,12 @@ class OdontogramController extends Controller
             'medical_answers' => $medicalAnswers,
             'diseases' => optional($patient->medicalHistory)->diseaseAnswers
                 ? $patient->medicalHistory->diseaseAnswers->filter(fn($row) => $row->has_disease && $row->disease)
-                    ->pluck('disease.code')->values()->all()
+                ->pluck('disease.code')->values()->all()
                 : [],
         ];
     }
 
-    private function validateHistoricalIntake(Request $request): array
+    private function validateExistingAppointmentIntake(Request $request): array
     {
         return $request->validate([
             'appointment_date' => 'required|date|before_or_equal:today',
@@ -327,7 +327,7 @@ class OdontogramController extends Controller
         ]);
     }
 
-    private function persistHistoricalPatientHistory(Patient $patient, array $draft): void
+    private function persistExistingAppointmentPatientHistory(Patient $patient, array $draft): void
     {
         DentalHistory::updateOrCreate(
             ['patient_id' => $patient->id],
@@ -782,13 +782,13 @@ class OdontogramController extends Controller
             'procedure',
             'savedOdontogramData',
         ), $this->getProcedureWorkspaceContext(), [
-            'historicalMode' => false,
+            'existingAppointmentMode' => false,
             'serviceTypes' => ServiceType::activeForBooking()->orderBy('name')->get(['name']),
             'saveProcedureUrl' => route('dentist.odontogram.save', $appointment->id),
         ]));
     }
 
-    public function createHistorical(Patient $patient)
+    public function createExistingAppointment(Patient $patient)
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
@@ -796,7 +796,7 @@ class OdontogramController extends Controller
             return redirect('/login');
         }
 
-        session()->forget($this->historicalDraftSessionKey($patient));
+        session()->forget($this->existingAppointmentDraftSessionKey($patient));
 
         $defaults = [
             'appointment_date' => '',
@@ -817,17 +817,27 @@ class OdontogramController extends Controller
             'diseases' => [],
         ];
 
-        return view('dentist.historical-appointment-intake', [
+        return view('dentist.add-existing-appointment', [
             'patient' => $patient,
-            'serviceTypes' => ServiceType::activeForBooking()->orderBy('name')->get(),
-            'diseases' => Disease::orderBy('sort_order')->get(),
+            'serviceTypes' => ServiceType::activeForBooking()
+                ->orderBy('name')
+                ->get(),
+
+            'diseases' => Disease::orderBy('sort_order')
+                ->get(),
+
             'defaults' => $defaults,
-            'dentalQuestions' => $this->getHistoricalDentalQuestions(),
-            'medicalQuestions' => $this->getHistoricalMedicalQuestions(),
-        ] + $this->getHistoricalCalendarContext());
+
+            'dentalQuestions' =>
+            $this->getExistingAppointmentDentalQuestions(),
+
+            'medicalQuestions' =>
+            $this->getExistingAppointmentMedicalQuestions(),
+
+        ] + $this->getExistingAppointmentCalendarContext());
     }
 
-    public function storeHistoricalIntake(Request $request, Patient $patient)
+    public function storeExistingAppointmentIntake(Request $request, Patient $patient)
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
@@ -835,7 +845,7 @@ class OdontogramController extends Controller
             return redirect('/login');
         }
 
-        $validated = $this->validateHistoricalIntake($request);
+        $validated = $this->validateExistingAppointmentIntake($request);
 
         $serviceExists = ServiceType::where('name', $validated['service_type'])
             ->where('is_active_for_booking', true)
@@ -853,7 +863,7 @@ class OdontogramController extends Controller
 
         $validated['medical_answers'] = collect($validated['medical_answers'] ?? [])
             ->map(function ($value, $code) {
-                if (in_array($code, collect($this->getHistoricalMedicalQuestions())->where('type', 'bool')->pluck('code')->all(), true)) {
+                if (in_array($code, collect($this->getExistingAppointmentMedicalQuestions())->where('type', 'bool')->pluck('code')->all(), true)) {
                     return $this->yesNoValue($value);
                 }
 
@@ -862,13 +872,16 @@ class OdontogramController extends Controller
             ->all();
 
         session([
-            $this->historicalDraftSessionKey($patient) => $validated,
+            $this->existingAppointmentDraftSessionKey($patient) => $validated,
         ]);
 
-        return redirect()->route('dentist.odontogram.historical.odontogram', ['patient' => $patient->id]);
+        return redirect()->route(
+            'dentist.odontogram.existing-appointment.odontogram',
+            ['patient' => $patient->id]
+        );
     }
 
-    public function showHistoricalOdontogram(Patient $patient)
+    public function showExistingAppointmentOdontogram(Patient $patient)
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
@@ -876,11 +889,11 @@ class OdontogramController extends Controller
             return redirect('/login');
         }
 
-        $draft = session($this->historicalDraftSessionKey($patient));
+        $draft = session($this->existingAppointmentDraftSessionKey($patient));
 
         if (!$draft) {
             return redirect()
-                ->route('dentist.odontogram.historical.create', ['patient' => $patient->id])
+                ->route('dentist.odontogram.existing-appointment.create', ['patient' => $patient->id])
                 ->with('error', 'Please complete the existing appointment details first.');
         }
 
@@ -889,9 +902,10 @@ class OdontogramController extends Controller
             'appointment' => null,
             'procedure' => null,
             'savedOdontogramData' => $this->getSavedOdontogramDataForPatient($patient),
-            'historicalMode' => true,
-            'historicalDraft' => $draft,
-            'saveProcedureUrl' => route('dentist.odontogram.historical.store', $patient->id),
+            'existingAppointmentMode' => true,
+            'existingAppointmentDraft' => $draft,
+            'isExistingAppointment' => true,
+            'saveProcedureUrl' => route('dentist.odontogram.existing-appointment.store', $patient->id),
             'appointmentCountsPerDay' => [],
             'appointmentCountsPerSlot' => [],
             'calendarAppointmentDetails' => [],
@@ -901,7 +915,7 @@ class OdontogramController extends Controller
         ]);
     }
 
-    public function historicalSlotsForDate(Request $request)
+    public function existingAppointmentSlotsForDate(Request $request)
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
@@ -1037,7 +1051,7 @@ class OdontogramController extends Controller
         ]);
     }
 
-    public function storeHistorical(Request $request, Patient $patient)
+    public function storeExistingAppointment(Request $request, Patient $patient)
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
@@ -1047,7 +1061,7 @@ class OdontogramController extends Controller
             ], 403);
         }
 
-        $draft = session($this->historicalDraftSessionKey($patient));
+        $draft = session($this->existingAppointmentDraftSessionKey($patient));
 
         if (!$draft) {
             return response()->json([
@@ -1110,7 +1124,7 @@ class OdontogramController extends Controller
             $procedureCompletedAt,
             &$result
         ) {
-            $this->persistHistoricalPatientHistory($patient, $draft);
+            $this->persistExistingAppointmentPatientHistory($patient, $draft);
 
             $appointment = Appointment::create($appointmentPayload);
 
@@ -1124,7 +1138,7 @@ class OdontogramController extends Controller
             );
         });
 
-        session()->forget($this->historicalDraftSessionKey($patient));
+        session()->forget($this->existingAppointmentDraftSessionKey($patient));
 
         return response()->json([
             'message' => 'Existing appointment saved successfully.',

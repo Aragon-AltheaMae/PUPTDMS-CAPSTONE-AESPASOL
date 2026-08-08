@@ -122,26 +122,12 @@ $notifCount = $notifications->count();
                                 class="patient-toolbar-actions flex items-center gap-2 order-1 md:order-2 w-full md:w-auto justify-end">
 
                                 <div class="patient-search-row relative flex-1 md:flex-none flex items-center gap-2">
-                                    <div class="search-wrap global-search flex-1 md:w-64" data-search-wrapper>
-                                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                                    <x-search-bar id="searchInput" placeholder="Search patient"
+                                        callback="handlePatientDirectorySearch" :debounce="250"
+                                        class="flex-1 md:w-64" />
 
-                                        <input id="searchInput" type="text" placeholder="Search patient"
-                                            data-search-input class="search-input" />
-
-                                        <button type="button" class="search-clear" data-search-clear
-                                            aria-label="Clear search">
-                                            <i class="fa-solid fa-xmark text-xs"></i>
-                                        </button>
-                                    </div>
-
-                                    <div class="voice-input-toggle">
-                                        <span class="voice-status hidden" data-voice-status></span>
-                                        <button type="button" class="voice-search-mic external"
-                                            data-global-voice-trigger data-voice-target="#searchInput"
-                                            aria-label="Use voice search" title="Voice search">
-                                            <i class="fa-solid fa-microphone"></i>
-                                        </button>
-                                    </div>
+                                    <x-voice-input target="#searchInput" status-id="patientSearchVoiceStatus"
+                                        label="Use voice search" title="Voice search" />
                                 </div>
                                 <div class="patient-sort-row">
 
@@ -243,20 +229,8 @@ $notifCount = $notifications->count();
                                     </button>
                                 </div>
 
-                                <div class="view-toggle-container" data-global-view-toggle data-view-root="#mainContent"
-                                    data-storage-key="patientListViewMode" aria-label="View options">
-                                    <span class="view-slider" aria-hidden="true"></span>
-
-                                    <button type="button" class="btn-view-mode active" title="List view"
-                                        aria-label="List view" aria-pressed="true" data-view-mode="list">
-                                        <i class="fa-solid fa-list"></i>
-                                    </button>
-
-                                    <button type="button" class="btn-view-mode" title="Grid view" aria-label="Grid view"
-                                        aria-pressed="false" data-view-mode="grid">
-                                        <i class="fa-solid fa-grip"></i>
-                                    </button>
-                                </div>
+                                <x-view-toggle id="patientListViewToggle" root="#mainContent"
+                                    storage-key="patientListViewMode" list-label="List" grid-label="Grid" />
 
                                 <button id="externalClearFilterBtn" type="button" class="global-filter-reset-btn hidden"
                                     title="Reset filters">
@@ -266,49 +240,10 @@ $notifCount = $notifications->count();
                         </div>
                     </div>
 
-                    <div class="global-pagebar global-pagebar-top patient-pagebar">
-                        <div class="global-pagebar-left">
-                            <span id="patientPageInfoTop" class="global-pagebar-info">
-                                Showing <strong>0</strong> patients
-                            </span>
-
-                            <div class="global-page-size-control">
-                                <label for="patientPerPage">Show</label>
-
-                                <div class="global-page-size-select" data-global-page-size
-                                    data-page-size-input="#patientPerPage"
-                                    data-page-size-callback="changePatientPageSize">
-
-                                    <input type="hidden" id="patientPerPage" class="global-page-size-native" value="10">
-
-                                    <button type="button" class="global-page-size-trigger" data-page-size-trigger
-                                        aria-haspopup="listbox" aria-expanded="false">
-
-                                        <span data-page-size-value>10</span>
-                                        <i class="fa-solid fa-chevron-down"></i>
-                                    </button>
-
-                                    <div class="global-page-size-menu" role="listbox">
-                                        @foreach ([10, 20, 50, 100] as $size)
-                                        <button type="button"
-                                            class="global-page-size-option {{ $size === 10 ? 'is-selected' : '' }}"
-                                            data-page-size-option data-value="{{ $size }}" role="option"
-                                            aria-selected="{{ $size === 10 ? 'true' : 'false' }}">
-
-                                            <span>{{ $size }}</span>
-                                            <i class="fa-solid fa-check"></i>
-                                        </button>
-                                        @endforeach
-                                    </div>
-                                </div>
-
-                                <span>per page</span>
-                            </div>
-                        </div>
-
-                        <div id="patientPaginationTop" class="global-pagination-wrap">
-                        </div>
-                    </div>
+                    <x-pagination-bar id="patientPaginationTopBar" info-id="patientPageInfoTop"
+                        pagination-id="patientPaginationTop" position="top" :show-entries="true"
+                        page-size-id="patientPerPage" page-size-callback="changePatientPageSize" :page-size-value="10"
+                        page-size-label="per page" label="patients" class="patient-pagebar" />
 
                     <div class="table-scroll-wrapper">
                         <div class="table-scroll-inner">
@@ -395,7 +330,7 @@ $notifCount = $notifications->count();
 
                     <div id="patientContainer" class="space-y-3 px-3 md:px-6 pb-6 pt-4">
 
-                        @forelse($appointments as $appt)
+                        @foreach($appointments as $appt)
                         @php
                         $status = strtolower($appt->status ?? '');
                         $isCancelled = $status === 'cancelled';
@@ -424,8 +359,7 @@ $notifCount = $notifications->count();
                         : 'all'))));
 
                         $patient = $appt->patient;
-                        $isWalkInAppointment =
-                        (bool) ($appt->is_walk_in ?? false);
+                        $isWalkInAppointment = (bool) ($appt->is_walk_in ?? false);
                         $patientId = $patient?->id ?? $appt->patient_id;
                         $patientName = $patient?->name ?? 'Unknown Patient';
                         $patientStudentNo = filled($patient?->student_no)
@@ -462,11 +396,6 @@ $notifCount = $notifications->count();
                         ? asset('storage/' . $patient->profile_image)
                         : null;
 
-                        $patientInitials = collect(preg_split('/\s+/', trim($patientName)))
-                        ->filter()
-                        ->take(2)
-                        ->map(fn($part) => strtoupper(substr($part, 0, 1)))
-                        ->implode('');
                         $dateLabel = Carbon::parse($appt->appointment_date)->format('d M Y');
                         $timeLabel = Carbon::parse($appt->appointment_time)->format('g:i A');
                         $serviceLabel =
@@ -553,14 +482,9 @@ $notifCount = $notifications->count();
 
                                 <div class="patient-list-card-body">
                                     <div class="patient-list-main">
-                                        <span class="patient-avatar patient-avatar-md">
-                                            @if ($patientImage)
-                                            <img src="{{ $patientImage }}" alt="{{ $patientName }}">
-                                            @else
-                                            <span>{{ $patientInitials ?: '?' }}</span>
-                                            @endif
-                                        </span>
-
+                                        <span class="patient-avatar patient-avatar-md" data-patient-avatar
+                                            data-patient-name="{{ $patientName }}"
+                                            data-patient-url="{{ $patientImage }}"></span>
                                         <div class="patient-list-person">
                                             <div class="patient-list-name-row">
 
@@ -656,13 +580,9 @@ $notifCount = $notifications->count();
                                 <div class="patient-grid-card-body">
                                     <div class="patient-grid-card-header">
                                         <div class="patient-grid-card-identity">
-                                            <span class="patient-avatar patient-avatar-lg">
-                                                @if ($patientImage)
-                                                <img src="{{ $patientImage }}" alt="{{ $patientName }}">
-                                                @else
-                                                <span>{{ $patientInitials ?: '?' }}</span>
-                                                @endif
-                                            </span>
+                                            <span class="patient-avatar patient-avatar-md" data-patient-avatar
+                                                data-patient-name="{{ $patientName }}"
+                                                data-patient-url="{{ $patientImage }}"></span>
 
                                             <div class="patient-grid-card-person">
                                                 <div class="patient-grid-name-row">
@@ -730,73 +650,20 @@ $notifCount = $notifications->count();
                         @else
                     </div>
                     @endif
-                    @empty
-                    <div class="empty-state col-span-full w-full">
-                        <div class="empty-state-icon">
-                            <i class="fa-solid fa-tooth"></i>
-                        </div>
+                    @endforeach
 
-                        <p class="empty-state-title">No patients found</p>
-                        <p class="empty-state-sub">
-                            There are no patient appointments in the system yet.
-                        </p>
-                    </div>
-                    @endforelse
+                    <div id="patientBaseEmptyState" class="empty-state-host"></div>
 
-                    <div id="patientSearchEmptyState"
-                        class="empty-state empty-state-controlled col-span-full w-full hidden" hidden>
+                    <div id="patientSearchEmptyState" class="empty-state-host"></div>
 
-                        <div class="empty-state-icon patient-empty-icon">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </div>
-
-                        <p id="patientSearchEmptyTitle" class="empty-state-title">
-                            No results found
-                        </p>
-
-                        <p class="empty-state-sub">
-                            Try a different patient name, student number, program, or service.
-                        </p>
-
-                        <button type="button" id="clearPatientSearchBtn" class="empty-state-btn">
-
-                            <i class="fa-solid fa-xmark"></i>
-                            Clear search
-                        </button>
-                    </div>
-
-                    <div id="patientStatusEmptyState"
-                        class="empty-state empty-state-controlled col-span-full w-full hidden" hidden>
-
-                        <div class="empty-state-icon patient-empty-icon">
-                            <i id="patientStatusEmptyIcon" class="fa-regular fa-calendar-xmark"></i>
-                        </div>
-
-                        <p id="patientStatusEmptyTitle" class="empty-state-title">
-                            No patients found
-                        </p>
-
-                        <p id="patientStatusEmptyText" class="empty-state-sub">
-                            There are currently no patients under this appointment status.
-                        </p>
-
-                        <button type="button" id="resetPatientFiltersBtn" class="empty-state-btn hidden" hidden>
-
-                            <i class="fa-solid fa-rotate-left"></i>
-                            Clear filters
-                        </button>
-                    </div>
+                    <div id="patientStatusEmptyState" class="empty-state-host"></div>
                 </div>
             </div>
         </div>
-        <div class="global-pagebar global-pagebar-bottom patient-pagebar">
-            <span id="patientPageInfoBottom" class="global-pagebar-info">
-                Showing <strong>0</strong> patients
-            </span>
 
-            <div id="patientPaginationBottom" class="global-pagination-wrap">
-            </div>
-        </div>
+        <x-pagination-bar id="patientPaginationBottomBar" info-id="patientPageInfoBottom"
+            pagination-id="patientPaginationBottom" position="bottom" label="patients" class="patient-pagebar" />
+
     </div>
     </div>
     </div>
@@ -1133,6 +1000,16 @@ $notifCount = $notifications->count();
         updatePatientStatsDropdownLabel();
     });
 
+    window.handlePatientDirectorySearch =
+        function (value) {
+            searchKeyword =
+                String(value || '')
+                    .trim()
+                    .toLowerCase();
+
+            applyFilters();
+        };
+
     document.addEventListener("DOMContentLoaded", function () {
         let patientFilterModal = null;
         let patientSearchInput = null;
@@ -1222,26 +1099,13 @@ $notifCount = $notifications->count();
             var patientSearchEmptyState =
                 document.getElementById("patientSearchEmptyState");
 
-            var patientSearchEmptyTitle =
-                document.getElementById("patientSearchEmptyTitle");
-
             var patientStatusEmptyState =
                 document.getElementById("patientStatusEmptyState");
 
-            var patientStatusEmptyIcon =
-                document.getElementById("patientStatusEmptyIcon");
-
-            var patientStatusEmptyTitle =
-                document.getElementById("patientStatusEmptyTitle");
-
-            var patientStatusEmptyText =
-                document.getElementById("patientStatusEmptyText");
-
-            var clearPatientSearchBtn =
-                document.getElementById("clearPatientSearchBtn");
-
-            var resetPatientFiltersBtn =
-                document.getElementById("resetPatientFiltersBtn");
+            var patientBaseEmptyState =
+                document.getElementById(
+                    "patientBaseEmptyState"
+                );
 
             patientFilterModal = filterModal;
             patientSearchInput = searchInput;
@@ -1284,38 +1148,6 @@ $notifCount = $notifications->count();
             var yearRadios = Array.from(document.querySelectorAll('input[name="year"]'));
             var sectionRadios = Array.from(document.querySelectorAll('input[name="section"]'));
             var otherRadios = courseRadios.concat(yearRadios, sectionRadios);
-
-            if (clearPatientSearchBtn) {
-                clearPatientSearchBtn.addEventListener(
-                    "click",
-                    function () {
-                        searchKeyword = "";
-
-                        if (searchInput) {
-                            searchInput.value = "";
-
-                            searchInput.dispatchEvent(
-                                new Event("input", {
-                                    bubbles: true
-                                })
-                            );
-
-                            searchInput.focus();
-                        }
-
-                        applyFilters();
-                    }
-                );
-            }
-
-            if (resetPatientFiltersBtn) {
-                resetPatientFiltersBtn.addEventListener(
-                    "click",
-                    function () {
-                        resetPatientPanelFilters();
-                    }
-                );
-            }
 
             if (filterBtn) {
                 filterBtn.onclick = function (e) {
@@ -1929,13 +1761,6 @@ $notifCount = $notifications->count();
                 };
             }
 
-            if (searchInput) {
-                searchInput.addEventListener("input", function () {
-                    searchKeyword = searchInput.value.trim().toLowerCase();
-                    applyFilters();
-                });
-            }
-
             window.bindFilterTagGroup({
                 groupId: "fSortGroup",
                 onChange: function () {
@@ -2038,168 +1863,120 @@ $notifCount = $notifications->count();
             var currentPage = 1;
             var currentItems = [];
 
-            function patientBuildPagination() {
-                var totalItems = currentItems.length;
-                var lastPage = Math.max(1, Math.ceil(totalItems / PER_PAGE));
-                var current = Math.min(Math.max(currentPage, 1), lastPage);
-
-                if (totalItems === 0 || lastPage <= 1) {
-                    return "";
-                }
-
-                var windowSize = 5;
-                var half = Math.floor(windowSize / 2);
-
-                var start = Math.max(1, current - half);
-                var end = Math.min(lastPage, start + windowSize - 1);
-
-                if (end - start + 1 < windowSize) {
-                    start = Math.max(1, end - windowSize + 1);
-                }
-
-                var html =
-                    '<nav class="global-pagination" aria-label="Patient pagination">';
-
-                if (current <= 1) {
-                    html +=
-                        '<button type="button" class="global-page-disabled" ' +
-                        'aria-label="Previous page" disabled>' +
-                        '<i class="fa-solid fa-chevron-left global-page-icon"></i>' +
-                        '</button>';
-                } else {
-                    html +=
-                        '<button type="button" class="global-page-btn" ' +
-                        'aria-label="Previous page" ' +
-                        'onclick="patientGoPage(' + (current - 1) + ')">' +
-                        '<i class="fa-solid fa-chevron-left global-page-icon"></i>' +
-                        '</button>';
-                }
-
-                if (start > 1) {
-                    html +=
-                        '<button type="button" class="global-page-btn" ' +
-                        'onclick="patientGoPage(1)">1</button>';
-
-                    if (start > 2) {
-                        html +=
-                            '<span class="global-page-ellipsis" aria-hidden="true">' +
-                            '&hellip;' +
-                            '</span>';
-                    }
-                }
-
-                for (var page = start; page <= end; page++) {
-                    if (page === current) {
-                        html +=
-                            '<span class="global-page-current" aria-current="page">' +
-                            page +
-                            '</span>';
-                    } else {
-                        html +=
-                            '<button type="button" class="global-page-btn" ' +
-                            'onclick="patientGoPage(' + page + ')">' +
-                            page +
-                            '</button>';
-                    }
-                }
-
-                if (end < lastPage) {
-                    if (end < lastPage - 1) {
-                        html +=
-                            '<span class="global-page-ellipsis" aria-hidden="true">' +
-                            '&hellip;' +
-                            '</span>';
-                    }
-
-                    html +=
-                        '<button type="button" class="global-page-btn" ' +
-                        'onclick="patientGoPage(' + lastPage + ')">' +
-                        lastPage +
-                        '</button>';
-                }
-
-                if (current >= lastPage) {
-                    html +=
-                        '<button type="button" class="global-page-disabled" ' +
-                        'aria-label="Next page" disabled>' +
-                        '<i class="fa-solid fa-chevron-right global-page-icon"></i>' +
-                        '</button>';
-                } else {
-                    html +=
-                        '<button type="button" class="global-page-btn" ' +
-                        'aria-label="Next page" ' +
-                        'onclick="patientGoPage(' + (current + 1) + ')">' +
-                        '<i class="fa-solid fa-chevron-right global-page-icon"></i>' +
-                        '</button>';
-                }
-
-                html += "</nav>";
-
-                return html;
-            }
-
             function renderPatientPagebars() {
-                var totalItems = currentItems.length;
-                var lastPage = Math.max(1, Math.ceil(totalItems / PER_PAGE));
+                const totalItems =
+                    currentItems.length;
 
-                if (currentPage > lastPage) {
-                    currentPage = lastPage;
-                }
+                const lastPage =
+                    Math.max(
+                        1,
+                        Math.ceil(
+                            totalItems /
+                            PER_PAGE
+                        )
+                    );
 
-                if (currentPage < 1) {
-                    currentPage = 1;
-                }
+                currentPage =
+                    Math.min(
+                        Math.max(
+                            1,
+                            currentPage
+                        ),
+                        lastPage
+                    );
 
-                var from = totalItems > 0 ?
-                    ((currentPage - 1) * PER_PAGE) + 1 :
-                    0;
+                const from =
+                    totalItems > 0 ?
+                        (
+                            (
+                                currentPage - 1
+                            ) * PER_PAGE
+                        ) + 1 :
+                        null;
 
-                var to = totalItems > 0 ?
-                    Math.min(currentPage * PER_PAGE, totalItems) :
-                    0;
+                const to =
+                    totalItems > 0 ?
+                        Math.min(
+                            currentPage *
+                            PER_PAGE,
+                            totalItems
+                        ) :
+                        null;
 
-                var infoHtml = totalItems > 0 ?
-                    'Showing <strong>' + from + '–' + to +
-                    '</strong> of <strong>' + totalItems +
-                    '</strong> ' + (totalItems === 1 ? 'patient' : 'patients') :
-                    'Showing <strong>0</strong> patients';
+                window.renderGlobalPagination?.({
+                    currentPage,
 
-                if (pageInfoTop) {
-                    pageInfoTop.innerHTML = infoHtml;
-                }
+                    lastPage,
 
-                if (pageInfoBottom) {
-                    pageInfoBottom.innerHTML = infoHtml;
-                }
+                    total: totalItems,
 
-                var paginationHtml = patientBuildPagination();
+                    from,
 
-                if (paginationTop) {
-                    paginationTop.innerHTML = paginationHtml;
-                }
+                    to,
 
-                if (paginationBottom) {
-                    paginationBottom.innerHTML = paginationHtml;
-                }
+                    containers: [
+                        document.getElementById(
+                            'patientPaginationTop'
+                        ),
+                        document.getElementById(
+                            'patientPaginationBottom'
+                        ),
+                    ],
+
+                    bars: [
+                        document.getElementById(
+                            'patientPaginationTopBar'
+                        ),
+                        document.getElementById(
+                            'patientPaginationBottomBar'
+                        ),
+                    ],
+
+                    infoElements: [
+                        document.getElementById(
+                            'patientPageInfoTop'
+                        ),
+                        document.getElementById(
+                            'patientPageInfoBottom'
+                        ),
+                    ],
+
+                    itemLabel: totalItems === 1 ?
+                        'patient' :
+                        'patients',
+
+                    onPageChange(page) {
+                        currentPage = page;
+
+                        updatePage();
+
+                        document
+                            .querySelector(
+                                '.patient-table-card'
+                            )
+                            ?.scrollIntoView({
+                                behavior: 'smooth',
+
+                                block: 'start',
+                            });
+                    },
+                });
+
+                const perPageInput =
+                    document.getElementById(
+                        'patientPerPage'
+                    );
 
                 if (perPageInput) {
-                    perPageInput.value = String(PER_PAGE);
+                    perPageInput.value =
+                        String(PER_PAGE);
 
-                    window.syncGlobalPageSizeSelect?.(
-                        perPageInput,
-                        PER_PAGE
-                    );
+                    window
+                        .syncGlobalPageSizeSelect?.(
+                            perPageInput,
+                            PER_PAGE
+                        );
                 }
-            }
-
-            function setPatientEmptyVisible(element, visible) {
-                if (!element) return;
-
-                element.hidden = !visible;
-
-                element.classList.toggle("hidden", !visible);
-                element.classList.toggle("show", visible);
-                element.classList.toggle("is-visible", visible);
             }
 
             function getCurrentPatientStatus() {
@@ -2215,39 +1992,69 @@ $notifCount = $notifications->count();
             function getPatientStatusEmptyMeta(status) {
                 var map = {
                     today: {
-                        icon: "fa-solid fa-clock",
-                        title: "No patients today",
-                        text: "There are currently no patient appointments scheduled for today."
+                        icon:
+                            "fa-clock",
+
+                        title:
+                            "No patients today",
+
+                        text:
+                            "There are currently no patient appointments scheduled for today."
                     },
 
                     upcoming: {
-                        icon: "fa-regular fa-calendar-check",
-                        title: "No upcoming patients",
-                        text: "There are currently no upcoming patient appointments."
+                        icon:
+                            "fa-calendar-check",
+
+                        title:
+                            "No upcoming patients",
+
+                        text:
+                            "There are currently no upcoming patient appointments."
                     },
 
                     rescheduled: {
-                        icon: "fa-solid fa-rotate-right",
-                        title: "No rescheduled patients",
-                        text: "There are currently no rescheduled patient appointments."
+                        icon:
+                            "fa-rotate-right",
+
+                        title:
+                            "No rescheduled patients",
+
+                        text:
+                            "There are currently no rescheduled patient appointments."
                     },
 
                     completed: {
-                        icon: "fa-solid fa-circle-check",
-                        title: "No completed patients",
-                        text: "Completed patient appointments will appear here."
+                        icon:
+                            "fa-circle-check",
+
+                        title:
+                            "No completed patients",
+
+                        text:
+                            "Completed patient appointments will appear here."
                     },
 
                     cancelled: {
-                        icon: "fa-regular fa-calendar-xmark",
-                        title: "No cancelled patients",
-                        text: "Cancelled patient appointments will appear here."
+                        icon:
+                            "fa-calendar-xmark",
+
+                        title:
+                            "No cancelled patients",
+
+                        text:
+                            "Cancelled patient appointments will appear here."
                     },
 
                     all: {
-                        icon: "fa-solid fa-sliders",
-                        title: "No patients match your filters",
-                        text: "Try removing or changing the selected filter criteria."
+                        icon:
+                            "fa-sliders",
+
+                        title:
+                            "No patients match your filters",
+
+                        text:
+                            "Try removing or changing the selected filter criteria."
                     }
                 };
 
@@ -2255,116 +2062,134 @@ $notifCount = $notifications->count();
             }
 
             function updateFilteredEmptyState() {
-                var hasResults = currentItems.length > 0;
-                var hasSearch = searchKeyword.trim().length > 0;
+                var hasResults =
+                    currentItems.length > 0;
 
-                var hasAdvancedFilters = Boolean(
-                    selectedProgram ||
-                    selectedYearLevel ||
-                    selectedSection ||
-                    selectedDepartment ||
-                    activeFromDate ||
-                    activeToDate ||
-                    activeDatePreset ||
-                    nameSort ||
-                    dateSort !== "nearest"
-                );
+                var hasSearch =
+                    searchKeyword
+                        .trim()
+                        .length > 0;
 
-                var currentStatus = getCurrentPatientStatus();
-
-                var isStatusOnlyEmptyState = !hasSearch &&
-                    !hasAdvancedFilters &&
-                    currentStatus !== "all";
-
-                setPatientEmptyVisible(
-                    patientSearchEmptyState,
-                    false
-                );
-
-                setPatientEmptyVisible(
-                    patientStatusEmptyState,
-                    false
-                );
-
-                if (resetPatientFiltersBtn) {
-                    var showClearFiltersButton =
-                        hasAdvancedFilters &&
-                        !isStatusOnlyEmptyState;
-
-                    resetPatientFiltersBtn.hidden = !showClearFiltersButton;
-
-                    resetPatientFiltersBtn.classList.toggle(
-                        "hidden",
-                        !showClearFiltersButton
+                var hasAdvancedFilters =
+                    Boolean(
+                        selectedProgram ||
+                        selectedYearLevel ||
+                        selectedSection ||
+                        selectedDepartment ||
+                        activeFromDate ||
+                        activeToDate ||
+                        activeDatePreset ||
+                        nameSort ||
+                        dateSort !== 'nearest'
                     );
 
-                    resetPatientFiltersBtn.classList.toggle(
-                        "is-hidden",
-                        !showClearFiltersButton
-                    );
+                var currentStatus =
+                    getCurrentPatientStatus();
 
-                    resetPatientFiltersBtn.style.display =
-                        showClearFiltersButton ?
-                            "inline-flex" :
-                            "none";
-                }
+                window.EmptyState?.hide(
+                    patientBaseEmptyState
+                );
+
+                window.EmptyState?.hide(
+                    patientSearchEmptyState
+                );
+
+                window.EmptyState?.hide(
+                    patientStatusEmptyState
+                );
 
                 if (hasResults) {
                     return;
                 }
 
                 if (allPatients.length === 0) {
+                    window.EmptyState?.render({
+                        host:
+                            patientBaseEmptyState,
+
+                        icon:
+                            'fa-tooth',
+
+                        title:
+                            'No patients found',
+
+                        message:
+                            'There are no patient appointments in the system yet.',
+                    });
+
                     return;
                 }
 
                 if (hasSearch) {
-                    if (patientSearchEmptyTitle) {
-                        patientSearchEmptyTitle.textContent =
-                            'No results for "' +
-                            searchKeyword +
-                            '"';
-                    }
+                    window.EmptyState?.renderSearch({
+                        host:
+                            patientSearchEmptyState,
 
-                    setPatientEmptyVisible(
-                        patientSearchEmptyState,
-                        true
-                    );
+                        input:
+                            searchInput,
+
+                        query:
+                            searchKeyword,
+
+                        message:
+                            'Try a different patient name, student number, program, or service.',
+                    });
 
                     return;
                 }
 
                 if (
-                    currentStatus === "all" &&
+                    currentStatus === 'all' &&
                     !hasAdvancedFilters
                 ) {
                     return;
                 }
 
-                var meta = getPatientStatusEmptyMeta(
-                    hasAdvancedFilters ?
-                        "all" :
-                        currentStatus
-                );
+                var meta =
+                    getPatientStatusEmptyMeta(
+                        hasAdvancedFilters
+                            ? 'all'
+                            : currentStatus
+                    );
 
-                if (patientStatusEmptyIcon) {
-                    patientStatusEmptyIcon.className =
-                        meta.icon;
-                }
+                window.EmptyState?.render({
+                    host:
+                        patientStatusEmptyState,
 
-                if (patientStatusEmptyTitle) {
-                    patientStatusEmptyTitle.textContent =
-                        meta.title;
-                }
+                    icon:
+                        meta.icon,
 
-                if (patientStatusEmptyText) {
-                    patientStatusEmptyText.textContent =
-                        meta.text;
-                }
+                    title:
+                        meta.title,
 
-                setPatientEmptyVisible(
-                    patientStatusEmptyState,
-                    true
-                );
+                    message:
+                        meta.text,
+
+                    actionHtml:
+                        hasAdvancedFilters
+                            ? `
+                    <button
+                        type="button"
+                        class="empty-state-btn"
+                        data-patient-clear-filters
+                    >
+                        <i class="fa-solid fa-rotate-left"></i>
+                        Clear filters
+                    </button>
+                `
+                            : '',
+                });
+
+                document
+                    .querySelector(
+                        '#patientStatusEmptyState [data-patient-clear-filters]'
+                    )
+                    ?.addEventListener(
+                        'click',
+                        function () {
+                            resetPatientPanelFilters();
+                        }
+                    );
             }
 
             function updatePage() {
@@ -2394,34 +2219,6 @@ $notifCount = $notifications->count();
                 updateFilteredEmptyState();
                 renderPatientPagebars();
             }
-
-            window.patientGoPage = function (page) {
-                var lastPage = Math.max(
-                    1,
-                    Math.ceil(currentItems.length / PER_PAGE)
-                );
-
-                var nextPage = Number(page) || 1;
-
-                if (nextPage < 1 || nextPage > lastPage) {
-                    return;
-                }
-
-                if (nextPage === currentPage) {
-                    return;
-                }
-
-                currentPage = nextPage;
-
-                updatePage();
-
-                document
-                    .querySelector(".patient-table-card")
-                    ?.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start"
-                    });
-            };
 
             window.changePatientPageSize = function (value) {
                 var nextSize = Number(value);

@@ -1,6 +1,11 @@
 import './bootstrap';
 import './odontogram-preview';
 import './header';
+import './pagination-bar';
+import './profile-avatar';
+import './search-bar';
+import './empty-state';
+import './voice-logic';
 
 import '@fontsource/inter/300.css';
 import '@fontsource/inter/400.css';
@@ -175,31 +180,63 @@ window.buildFlatpickrCalendarOptions = function buildFlatpickrCalendarOptions(co
 };
 
 function decorateFlatpickrDays(instance) {
-    if (!instance?.calendarContainer) return;
+    if (!instance?.calendarContainer) {
+        return;
+    }
 
-    const minDate = normalizeDateOnly(instance.config?.minDate);
-    const maxDate = normalizeDateOnly(instance.config?.maxDate);
+    const minDate =
+        normalizeDateOnly(
+            instance.config?.minDate
+        );
 
-    instance.calendarContainer.querySelectorAll('.flatpickr-day').forEach((dayElem) => {
-        dayElem.classList.remove('flatpickr-has-tooltip');
-        delete dayElem.dataset.tooltip;
+    const maxDate =
+        normalizeDateOnly(
+            instance.config?.maxDate
+        );
 
-        if (!dayElem.dateObj) return;
+    instance.calendarContainer
+        .querySelectorAll('.flatpickr-day')
+        .forEach(dayElem => {
 
-        const dayDate = normalizeDateOnly(dayElem.dateObj);
-        if (!dayDate) return;
+            dayElem.removeAttribute(
+                'data-tooltip'
+            );
 
-        if (minDate && dayDate < minDate) {
-            dayElem.classList.add('flatpickr-has-tooltip');
-            dayElem.dataset.tooltip = "You can't select previous date";
-            return;
-        }
+            if (!dayElem.dateObj) {
+                return;
+            }
 
-        if (maxDate && dayDate > maxDate) {
-            dayElem.classList.add('flatpickr-has-tooltip');
-            dayElem.dataset.tooltip = "You can't select future date";
-        }
-    });
+            const dayDate =
+                normalizeDateOnly(
+                    dayElem.dateObj
+                );
+
+            if (!dayDate) {
+                return;
+            }
+
+            if (
+                minDate &&
+                dayDate < minDate
+            ) {
+                dayElem.setAttribute(
+                    'data-tooltip',
+                    "You can't select previous date"
+                );
+
+                return;
+            }
+
+            if (
+                maxDate &&
+                dayDate > maxDate
+            ) {
+                dayElem.setAttribute(
+                    'data-tooltip',
+                    "You can't select future date"
+                );
+            }
+        });
 }
 
 function syncFlatpickrHeader(instance) {
@@ -387,6 +424,9 @@ function initGlobalFlatpickr() {
     );
 
     dateInputs.forEach(el => {
+        if (el._flatpickr) {
+            return;
+        }
         let options = { ...baseOptions };
 
         const parentPopup = el.closest(
@@ -553,34 +593,6 @@ document.addEventListener("DOMContentLoaded", () => {
     initMonthOnlyFlatpickr();
 });
 
-document.addEventListener('mousemove', (e) => {
-    const day = e.target.closest('.flatpickr-day');
-
-    let tooltip = document.querySelector('.flatpickr-floating-tooltip');
-
-    if (!tooltip) {
-        tooltip = document.createElement('div');
-        tooltip.className = 'flatpickr-floating-tooltip';
-        document.body.appendChild(tooltip);
-    }
-
-    const message = day?.dataset?.tooltip || '';
-
-    if (!message) {
-        tooltip.classList.remove('show');
-        return;
-    }
-
-    tooltip.textContent = message;
-    tooltip.style.left = `${e.clientX}px`;
-    tooltip.style.top = `${e.clientY - 12}px`;
-    tooltip.classList.add('show');
-});
-
-document.addEventListener('mouseleave', () => {
-    document.querySelector('.flatpickr-floating-tooltip')?.classList.remove('show');
-});
-
 let activeFlatpickrInstance = null;
 
 function ensureFlatpickrBackdrop() {
@@ -690,14 +702,17 @@ function initBackToTop() {
         button.type = 'button';
         button.className = 'back-to-top floating-btn';
         button.setAttribute('aria-label', 'Back to top');
-        button.setAttribute('title', 'Back to top');
         button.setAttribute('data-tooltip', 'Back to top');
+        button.setAttribute('data-tooltip-tone', 'view');
         button.innerHTML = '<i class="fa-solid fa-arrow-up"></i>';
 
         document.body.appendChild(button);
     }
 
+    button.removeAttribute('title');
     button.setAttribute('data-tooltip', 'Back to top');
+    button.setAttribute('data-tooltip-tone', 'view');
+
     if (button.dataset.backToTopInitialized === 'true') return;
     button.dataset.backToTopInitialized = 'true';
 
@@ -753,14 +768,15 @@ function initBackToTop() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initBackToTop();
-    initAiHelpPopover();
+    initAssistiveHelpPopover();
 });
 
-function initAiHelpPopover() {
-    if (document.querySelector('.ai-help-popover')) return;
+function initAssistiveHelpPopover() {
+    if (document.querySelector('.assistive-help-popover')) return;
 
     const popover = document.createElement('div');
-    popover.className = 'ai-help-popover';
+    popover.className = 'assistive-help-popover';
+
     popover.innerHTML = `
         <strong>Need help?</strong>
         <span>Open assistance tools for chatbot and accessibility options.</span>
@@ -769,10 +785,18 @@ function initAiHelpPopover() {
     document.body.appendChild(popover);
 
     const assistiveBtn = document.getElementById('assistiveMainFab');
+
     if (!assistiveBtn) return;
 
     const showPopover = () => {
-        if (document.getElementById('assistiveFabGroup')?.classList.contains('open')) return;
+        if (
+            document
+                .getElementById('assistiveFabGroup')
+                ?.classList.contains('open')
+        ) {
+            return;
+        }
+
         popover.classList.add('show');
     };
 
@@ -782,7 +806,6 @@ function initAiHelpPopover() {
 
     assistiveBtn.addEventListener('mouseenter', showPopover);
     assistiveBtn.addEventListener('focus', showPopover);
-
     assistiveBtn.addEventListener('mouseleave', hidePopover);
     assistiveBtn.addEventListener('blur', hidePopover);
     assistiveBtn.addEventListener('click', hidePopover);
@@ -2861,10 +2884,6 @@ function initSessionTimeoutModal() {
                 showSessionTimeoutModal();
             }
         } catch (_) {
-            /*
-             * Huwag mag-redirect dahil lamang sa
-             * temporary network error.
-             */
         } finally {
             activityRequestRunning = false;
         }
@@ -4243,6 +4262,77 @@ function registerGlobalValidationRule(name, validator) {
     globalValidationRules.set(name, validator);
 }
 
+registerGlobalValidationRule(
+    'bookingDuration',
+    function (field) {
+        const value =
+            String(
+                field.value || ''
+            ).trim();
+
+        if (!value) {
+            return '';
+        }
+
+        if (
+            !/^\d{2}:\d{2}:\d{2}$/.test(
+                value
+            )
+        ) {
+            return 'Use the HH:MM:SS format.';
+        }
+
+        const [
+            hours,
+            minutes,
+            seconds
+        ] =
+            value
+                .split(':')
+                .map(Number);
+
+        if (
+            minutes > 59 ||
+            seconds > 59
+        ) {
+            return 'Minutes and seconds must be between 00 and 59.';
+        }
+
+        if (
+            hours === 0 &&
+            minutes === 0 &&
+            seconds === 0
+        ) {
+            return 'Procedure duration must be greater than 00:00:00.';
+        }
+
+        return '';
+    }
+);
+
+registerGlobalValidationRule(
+    'philippineMobile',
+    function (field) {
+        const digits =
+            String(field.value || '')
+                .replace(/\D/g, '');
+
+        if (!digits) {
+            return '';
+        }
+
+        if (!digits.startsWith('09')) {
+            return 'Contact number must start with 09.';
+        }
+
+        if (digits.length !== 11) {
+            return 'Contact number must contain exactly 11 digits.';
+        }
+
+        return '';
+    }
+);
+
 function runGlobalValidationRule(field) {
     const ruleName = field?.dataset?.validationRule;
 
@@ -4949,7 +5039,22 @@ function bindGlobalNumberStepper(
         );
 
     if (!input) return;
+    const {
+        min
+    } = getGlobalNumberStepperConfig(
+        stepper,
+        input
+    );
 
+    if (
+        input.value === '' &&
+        Number.isFinite(min) &&
+        min > 0
+    ) {
+        input.value =
+            String(min);
+    }
+    
     stepper.dataset.numberStepperInitialized =
         'true';
 
@@ -6480,86 +6585,170 @@ function syncCustomSelect(wrapper) {
         });
 }
 
-function positionCustomSelectMenu(wrapper) {
+function positionCustomSelectMenu(
+    wrapper
+) {
     if (!wrapper) return;
 
-    const button = wrapper.querySelector('.custom-select-button');
-    const menu = wrapper.querySelector('.custom-select-menu');
-
-    if (!button || !menu) return;
-
-    wrapper.classList.remove('drop-up');
-
-    menu.style.removeProperty('--custom-select-max-height');
-
-    if (wrapper.closest('.flatpickr-calendar')) {
-        const isYearSelect = Boolean(
-            wrapper.querySelector('.custom-flatpickr-year')
+    const button =
+        wrapper.querySelector(
+            '.custom-select-button'
         );
+
+    const menu =
+        wrapper.querySelector(
+            '.custom-select-menu'
+        );
+
+    if (!button || !menu) {
+        return;
+    }
+
+    if (
+        wrapper.closest(
+            '.flatpickr-calendar'
+        )
+    ) {
+        const isYearSelect =
+            Boolean(
+                wrapper.querySelector(
+                    '.custom-flatpickr-year'
+                )
+            );
 
         menu.style.setProperty(
             '--custom-select-max-height',
-            isYearSelect ? '220px' : '210px'
+            isYearSelect
+                ? '220px'
+                : '210px'
         );
 
         return;
     }
 
-    const buttonRect = button.getBoundingClientRect();
+    const buttonRect =
+        button.getBoundingClientRect();
 
-    const scrollContainer = wrapper.closest(
-        '.um-user-modal-body, .modal-body, [data-modal-scroll], dialog'
-    );
+    const scrollContainer =
+        wrapper.closest(
+            [
+                '.um-user-modal-body',
+                '.modal-body',
+                '.modal-bd',
+                '[data-modal-scroll]',
+                '.ui-modal-card',
+                'dialog'
+            ].join(',')
+        );
 
-    const boundaryRect = scrollContainer?.getBoundingClientRect();
+    const boundaryRect =
+        scrollContainer
+            ?.getBoundingClientRect();
 
-    const boundaryTop = boundaryRect
-        ? Math.max(boundaryRect.top, 8)
-        : 8;
+    const boundaryTop =
+        boundaryRect
+            ? Math.max(
+                boundaryRect.top,
+                8
+            )
+            : 8;
 
-    const boundaryBottom = boundaryRect
-        ? Math.min(boundaryRect.bottom, window.innerHeight - 8)
-        : window.innerHeight - 8;
+    const boundaryBottom =
+        boundaryRect
+            ? Math.min(
+                boundaryRect.bottom,
+                window.innerHeight - 8
+            )
+            : window.innerHeight - 8;
 
-    const spaceBelow = boundaryBottom - buttonRect.bottom - 10;
-    const spaceAbove = buttonRect.top - boundaryTop - 10;
+    const spaceBelow =
+        Math.max(
+            0,
+            boundaryBottom -
+            buttonRect.bottom -
+            10
+        );
 
-    const previousDisplay = menu.style.display;
-    const previousVisibility = menu.style.visibility;
-    const previousPointerEvents = menu.style.pointerEvents;
+    const spaceAbove =
+        Math.max(
+            0,
+            buttonRect.top -
+            boundaryTop -
+            10
+        );
 
-    menu.style.display = 'block';
-    menu.style.visibility = 'hidden';
-    menu.style.pointerEvents = 'none';
+    const previousDisplay =
+        menu.style.display;
 
-    const preferredHeight = Math.min(
-        Math.max(menu.scrollHeight, 96),
-        260
-    );
+    const previousVisibility =
+        menu.style.visibility;
 
-    menu.style.display = previousDisplay;
-    menu.style.visibility = previousVisibility;
-    menu.style.pointerEvents = previousPointerEvents;
+    const previousPointerEvents =
+        menu.style.pointerEvents;
+
+    const previousTransition =
+        menu.style.transition;
+
+    menu.style.display =
+        'block';
+
+    menu.style.visibility =
+        'hidden';
+
+    menu.style.pointerEvents =
+        'none';
+
+    menu.style.transition =
+        'none';
+
+    const preferredHeight =
+        Math.min(
+            Math.max(
+                menu.scrollHeight,
+                96
+            ),
+            260
+        );
 
     const shouldOpenUp =
         spaceBelow < preferredHeight &&
         spaceAbove > spaceBelow;
 
-    wrapper.classList.toggle('drop-up', shouldOpenUp);
-
-    const availableSpace = shouldOpenUp
-        ? spaceAbove
-        : spaceBelow;
-
-    const maxHeight = Math.max(
-        96,
-        Math.min(260, availableSpace)
+    wrapper.classList.toggle(
+        'drop-up',
+        shouldOpenUp
     );
+
+    const availableSpace =
+        shouldOpenUp
+            ? spaceAbove
+            : spaceBelow;
+
+    const maxHeight =
+        Math.max(
+            96,
+            Math.min(
+                260,
+                availableSpace
+            )
+        );
 
     menu.style.setProperty(
         '--custom-select-max-height',
         `${maxHeight}px`
     );
+
+    menu.style.display =
+        previousDisplay;
+
+    menu.style.visibility =
+        previousVisibility;
+
+    menu.style.pointerEvents =
+        previousPointerEvents;
+
+    menu.style.transition =
+        previousTransition;
 }
 
 function initCustomSelects(root = document) {
