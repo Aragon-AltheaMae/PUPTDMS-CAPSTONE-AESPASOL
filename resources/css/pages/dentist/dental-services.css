@@ -36,36 +36,12 @@
     z-index: 9999 !important;
 }
 
-.service-card-header,
-.service-records-card>.card-header {
-    align-items: center !important;
-    gap: 1rem !important;
-    padding: 1rem 1.15rem !important;
-}
-
 .service-table-wrap {
     border: 1px solid rgba(139, 0, 0, 0.10);
     border-radius: 14px;
     overflow-x: auto;
     overflow-y: hidden;
     background: #ffffff;
-}
-
-.service-toolbar {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-end !important;
-    gap: 0.65rem !important;
-    flex-wrap: nowrap !important;
-    width: auto !important;
-    min-width: 0 !important;
-}
-
-.service-search-row {
-    flex: 1 1 340px !important;
-    width: 340px !important;
-    max-width: 430px !important;
-    min-width: 260px !important;
 }
 
 [data-theme="dark"] .dental-services-page .name-cell,
@@ -226,7 +202,7 @@
     color: #FCA5A5;
 }
 
-.dental-services-page .service-records-card>.card-header {
+.dental-services-page .service-card-header {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
@@ -334,7 +310,7 @@
 }
 
 @media (max-width: 1199px) {
-    .dental-services-page .service-records-card > .card-header {
+    .dental-services-page .service-card-header {
         flex-direction: column !important;
         align-items: stretch !important;
     }
@@ -404,7 +380,7 @@
         margin-bottom: .8rem !important;
     }
 
-    .dental-services-page .service-records-card > .card-header {
+    .dental-services-page .service-card-header {
         padding: .85rem !important;
         gap: .8rem !important;
     }
@@ -492,7 +468,7 @@
     }
 
     .dental-services-page .dentist-hero,
-    .dental-services-page .service-records-card > .card-header {
+    .dental-services-page .service-card-header {
         padding: .75rem !important;
     }
 
@@ -525,20 +501,6 @@
 #downloadCompleteModal {
     z-index: 99999 !important;
 }
-
-#createReportModal .field-input {
-    width: 100% !important;
-    min-height: 46px !important;
-    border-radius: 14px !important;
-    outline: none !important;
-    transition: border-color .18s ease, box-shadow .18s ease !important;
-}
-
-#createReportModal .field-input:focus {
-    border-color: rgba(139, 0, 0, .36) !important;
-    box-shadow: 0 0 0 3px rgba(139, 0, 0, .08) !important;
-}
-
 
 #createReportModal .fp-date-input-wrap {
     position: relative !important;

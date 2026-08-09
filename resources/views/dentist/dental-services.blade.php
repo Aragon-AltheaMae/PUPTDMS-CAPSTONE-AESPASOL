@@ -102,17 +102,13 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                     </div>
 
                     <div class="voice-search-row service-search-row">
-                        <div class="search-wrap global-search" data-search-wrapper>
-                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-
-                            <input id="searchInput" type="search" class="search-input" data-search-input
-                                placeholder="Search name, program, contact…" autocomplete="off" autocorrect="off"
-                                autocapitalize="off" spellcheck="false">
-
-                            <button type="button" class="search-clear" data-search-clear aria-label="Clear search">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-                        </div>
+                        <x-search-bar
+                            id="searchInput"
+                            placeholder="Search name, program, contact…"
+                            callback="handleDentalServicesSearch"
+                            :debounce="350"
+                            clear-label="Clear search"
+                        />
 
                         <x-voice-input
                             target="#searchInput"
@@ -508,7 +504,7 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
 
                                     <input id="reportQty" name="quantity" type="number" min="1" max="100" step="1"
                                         placeholder="1 – 100"
-                                        class="field-input report-qty-input">
+                                        class="form-input modal-number report-qty-input">
 
                                     <button type="button" class="report-qty-btn" data-qty-plus
                                         aria-label="Increase quantity">
@@ -1128,7 +1124,7 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
             start = Math.max(1, end - winSize + 1);
         }
 
-        let html = '<nav aria-label="Dental services pagination">';
+        let html = '<nav class="global-pagination" aria-label="Dental services pagination">';
 
         html += current <= 1
             ? '<button type="button" disabled class="global-page-disabled" aria-label="Previous page"><i class="fa-solid fa-chevron-left global-page-icon"></i></button>'
@@ -1370,6 +1366,18 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
         return data;
     }
 
+    function handleDentalServicesSearch(value) {
+        searchKeyword = String(value || '')
+            .trim()
+            .toLowerCase();
+
+        serviceCurrentPage = 1;
+
+        applyFilters();
+    }
+
+    window.handleDentalServicesSearch = handleDentalServicesSearch;
+
     function updateShowResultsButton() {
         const count = getFilteredDentalRecords().length;
         window.updateShowResultsText?.(count, 'showResultsText');
@@ -1528,7 +1536,6 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
         });
 
         const clearFilterBtn = document.getElementById('clearFilterBtn');
-        const searchInput = document.getElementById('searchInput');
         const monthPicker = document.getElementById('monthPicker');
         window.initMonthOnlyFlatpickr?.(document);
         const downloadReportBtn = document.getElementById('downloadReportBtn');
@@ -1553,11 +1560,6 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
             resetDentalFilters({
                 closePanel: false
             });
-        });
-
-        searchInput.addEventListener('input', (e) => {
-            searchKeyword = e.target.value.trim().toLowerCase();
-            applyFilters();
         });
 
         document.querySelectorAll("input[name='sort']").forEach(radio => {

@@ -55,18 +55,13 @@
           </div>
 
             <div class="voice-search-row">
-              <div class="search-wrap global-search" data-search-wrapper>
-                  <i class="fa-solid fa-magnifying-glass search-icon"></i>
-
-                  <input id="searchInput" type="search" class="search-input" data-search-input
-                      placeholder="Search patient, program, treatment…" autocomplete="off" autocorrect="off"
-                      autocapitalize="off" spellcheck="false">
-
-                  <button type="button" class="search-clear" data-search-clear
-                        aria-label="Clear search">
-                      <i class="fa-solid fa-xmark"></i>
-                  </button>
-              </div>
+              <x-search-bar
+                  id="searchInput"
+                  placeholder="Search patient, program, treatment…"
+                  callback="handleDailyTreatmentSearch"
+                  :debounce="350"
+                  clear-label="Clear search"
+              />
 
               <x-voice-input
                   target="#searchInput"
@@ -736,7 +731,6 @@
   };
 
   let dtrDraft = { ...dtrState };
-  let dtrSearchTimer = null;
   let dtrListController = null;
   let dtrDraftCountController = null;
   let dtrDraftCountTimer = null;
@@ -1128,6 +1122,15 @@
   }
 
   window.clearDailySearch = clearDailySearch;
+
+  function handleDailyTreatmentSearch(value) {
+    dtrState.search = String(value || '').trim();
+    dtrState.page = 1;
+
+    fetchDailyRecords();
+  }
+
+  window.handleDailyTreatmentSearch = handleDailyTreatmentSearch;
 
   function openDailyFilterPanel() {
     dtrDraft = { ...dtrState };
@@ -2017,19 +2020,6 @@
     }
 
     dtrState.month = currentMonthValue;
-
-    const searchInput = document.getElementById('searchInput');
-
-    searchInput?.addEventListener('input', event => {
-      clearTimeout(dtrSearchTimer);
-      dtrSearchTimer = setTimeout(() => {
-        dtrState.search = event.target.value.trim();
-        dtrState.page = 1;
-        fetchDailyRecords();
-      }, 350);
-    });
-
-    document.querySelector('[data-search-clear]')?.addEventListener('click', clearDailySearch);
 
     monthPicker?.addEventListener('change', event => {
       dtrState.month = event.target.value || '';

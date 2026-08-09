@@ -59,7 +59,6 @@
     justify-content: center !important;
 }
 
-.daily-treatment-page .service-table,
 .daily-treatment-page .dtr-table {
     min-width: var(--service-table-min) !important;
 }
@@ -121,35 +120,6 @@
 
 #filterModal.closing .filter-drawer-overlay {
     opacity: 0 !important;
-}
-
-#createReportModal .voice-search-row {
-    display: flex !important;
-    align-items: center !important;
-    gap: .75rem !important;
-    width: 100% !important;
-    position: relative !important;
-}
-
-#createReportModal .voice-search-row>input {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-}
-
-#createReportModal .voice-search-row>.voice-input-toggle {
-    flex: 0 0 50px !important;
-    width: 50px !important;
-    min-width: 50px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-#createReportModal .voice-search-row .voice-search-mic.external {
-    width: 50px !important;
-    height: 50px !important;
-    min-width: 50px !important;
-    min-height: 50px !important;
 }
 
 #createReportModal .fp-date-input-wrap {
@@ -435,28 +405,6 @@
     }
 }
 
-[data-theme="dark"] .daily-treatment-page .dtr-pagebar,
-.dark .daily-treatment-page .dtr-pagebar {
-    background: rgba(13, 17, 23, .82) !important;
-    border-color: rgba(255, 255, 255, .10) !important;
-}
-
-[data-theme="dark"] .daily-treatment-page .dtr-pagebar-info,
-.dark .daily-treatment-page .dtr-pagebar-info,
-[data-theme="dark"] .daily-treatment-page .dtr-page-size-control,
-.dark .daily-treatment-page .dtr-page-size-control {
-    color: #8B949E !important;
-}
-
-[data-theme="dark"] .daily-treatment-page .dtr-pagebar-info strong,
-.dark .daily-treatment-page .dtr-pagebar-info strong {
-    color: #F3F4F6 !important;
-}
-
-[data-theme="dark"] .daily-treatment-page .dtr-page-size-trigger,
-.dark .daily-treatment-page .dtr-page-size-trigger,
-[data-theme="dark"] .daily-treatment-page .dtr-page-size-menu,
-.dark .daily-treatment-page .dtr-page-size-menu,
 [data-theme="dark"] .report-select-trigger,
 .dark .report-select-trigger,
 [data-theme="dark"] .report-select-menu,
@@ -466,17 +414,11 @@
     color: #E5E7EB !important;
 }
 
-[data-theme="dark"] .daily-treatment-page .dtr-page-size-option,
-.dark .daily-treatment-page .dtr-page-size-option,
 [data-theme="dark"] .report-select-option,
 .dark .report-select-option {
     color: #E5E7EB !important;
 }
 
-[data-theme="dark"] .daily-treatment-page .dtr-page-size-option:hover,
-[data-theme="dark"] .daily-treatment-page .dtr-page-size-option.is-active,
-.dark .daily-treatment-page .dtr-page-size-option:hover,
-.dark .daily-treatment-page .dtr-page-size-option.is-active,
 [data-theme="dark"] .report-select-option:hover,
 [data-theme="dark"] .report-select-option.is-active,
 .dark .report-select-option:hover,
