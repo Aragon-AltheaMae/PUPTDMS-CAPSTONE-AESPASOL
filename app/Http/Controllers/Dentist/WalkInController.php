@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\Helpers\BookingQuestions;
 
 class WalkInController extends Controller
 {
@@ -66,14 +67,21 @@ class WalkInController extends Controller
 
         $philippineHolidays = PhilippineHolidays::range(yearsBefore: 1, yearsAfter: 5);
 
-        return view('dentist.dentist-walk-in', compact(
-            'serviceTypes',
-            'diseases',
-            'schedules',
-            'blockedDates',
-            'appointmentCountsPerDay',
-            'philippineHolidays'
-        ));
+        $dentalQuestions = BookingQuestions::dental();
+        $medicalQuestions = BookingQuestions::medical();
+
+        return view(
+            'dentist.dentist-walk-in',
+            compact(
+                'serviceTypes',
+                'diseases',
+                'schedules',
+                'blockedDates',
+                'appointmentCountsPerDay',
+                'philippineHolidays',
+                'dentalQuestions',
+                'medicalQuestions'
+            ));
     }
 
     public function searchPatient(

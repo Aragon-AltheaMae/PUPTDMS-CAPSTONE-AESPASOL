@@ -48,12 +48,6 @@ body.layout-no-sidebar #mainContent {
     padding-left: 0;
 }
 
-body.layout-no-sidebar .book-container {
-    margin-left: 0 !important;
-    width: 100% !important;
-    max-width: none;
-}
-
 body.role-patient.layout-no-sidebar #mainContent {
     margin-left: 0 !important;
 }

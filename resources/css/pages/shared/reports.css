@@ -1293,49 +1293,6 @@ hr.section-divider {
     transition: width .8s cubic-bezier(.4, 0, .2, 1);
 }
 
-.chart-empty {
-    min-height: 160px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    gap: 10px;
-    color: #9CA3AF;
-    text-align: center;
-}
-
-.chart-empty>i {
-    font-size: 2.5rem;
-    color: #E5E7EB;
-    margin-bottom: 4px;
-}
-
-.chart-empty p {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #6B7280;
-    margin: 0;
-}
-
-.chart-empty span {
-    font-size: 0.75rem;
-}
-
-.chart-empty,
-.chart-loading {
-    height: 100%;
-}
-
-.chart-empty:not(.hidden) {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
 .chart-loading:not(.hidden) {
     display: flex;
     align-items: center;
@@ -1596,13 +1553,9 @@ hr.section-divider {
 }
 
 [data-theme="dark"] #mainContent .kpi-label,
-[data-theme="dark"] #mainContent .chart-empty p,
-[data-theme="dark"] #mainContent .chart-empty span,
 [data-theme="dark"] #mainContent .text-gray-500,
 [data-theme="dark"] #mainContent .text-gray-400,
 .dark #mainContent .kpi-label,
-.dark #mainContent .chart-empty p,
-.dark #mainContent .chart-empty span,
 .dark #mainContent .text-gray-500,
 .dark #mainContent .text-gray-400 {
     color: #C9D1D9 !important;
@@ -1646,11 +1599,6 @@ hr.section-divider {
     color: #FFFFFF !important;
 }
 
-[data-theme="dark"] #mainContent .chart-empty>i,
-.dark #mainContent .chart-empty>i {
-    color: #FCA5A5 !important;
-}
-
 [data-theme="dark"] #mainContent .summary-tag,
 .dark #mainContent .summary-tag {
     background: rgba(13, 17, 23, 0.70) !important;
@@ -1682,39 +1630,9 @@ hr.section-divider {
         inset 0 1px 0 rgba(255, 255, 255, 0.78) !important;
 }
 
-#mainContent .chart-empty,
 #mainContent .chart-loading {
     background: transparent !important;
     border-radius: 16px !important;
-}
-
-#mainContent .chart-empty>i {
-    width: 74px !important;
-    height: 74px !important;
-    border-radius: 22px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin-bottom: 8px !important;
-    background:
-        radial-gradient(circle at top left, rgba(139, 0, 0, 0.12), transparent 42%),
-        linear-gradient(145deg, #FFFFFF, #FFF5F5) !important;
-    border: 1px solid rgba(139, 0, 0, 0.10) !important;
-    box-shadow:
-        0 14px 28px rgba(139, 0, 0, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.80) !important;
-    color: #8B0000 !important;
-    font-size: 30px !important;
-}
-
-#mainContent .chart-empty p {
-    color: #4B5563 !important;
-    font-weight: 850 !important;
-}
-
-#mainContent .chart-empty span {
-    color: #8B949E !important;
-    font-weight: 600 !important;
 }
 
 #mainContent .service-name,
@@ -1745,41 +1663,23 @@ hr.section-divider {
     color: #F8FAFC !important;
 }
 
-[data-theme="dark"] #mainContent .chart-empty,
 [data-theme="dark"] #mainContent .chart-loading,
-.dark #mainContent .chart-empty,
 .dark #mainContent .chart-loading {
     background: transparent !important;
     color: #C9D1D9 !important;
 }
 
-[data-theme="dark"] #mainContent .chart-empty>i,
-.dark #mainContent .chart-empty>i {
-    background:
-        radial-gradient(circle at top left, rgba(139, 0, 0, 0.28), transparent 42%),
-        linear-gradient(145deg, rgba(22, 27, 34, 0.95), rgba(13, 17, 23, 0.92)) !important;
-    color: #FCA5A5 !important;
-    border-color: rgba(252, 165, 165, 0.20) !important;
-    box-shadow:
-        0 18px 36px rgba(0, 0, 0, 0.28),
-        inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
-}
-
-[data-theme="dark"] #mainContent .chart-empty p,
 [data-theme="dark"] #mainContent .service-name,
 [data-theme="dark"] #mainContent .stock-name,
 [data-theme="dark"] #mainContent .text-gray-800,
-.dark #mainContent .chart-empty p,
 .dark #mainContent .service-name,
 .dark #mainContent .stock-name,
 .dark #mainContent .text-gray-800 {
     color: #F8FAFC !important;
 }
 
-[data-theme="dark"] #mainContent .chart-empty span,
 [data-theme="dark"] #mainContent .text-gray-400,
 [data-theme="dark"] #mainContent .text-gray-500,
-.dark #mainContent .chart-empty span,
 .dark #mainContent .text-gray-400,
 .dark #mainContent .text-gray-500 {
     color: #C9D1D9 !important;
@@ -2385,7 +2285,6 @@ hr.section-divider {
         0 14px 28px rgba(0, 0, 0, 0.24) !important;
 }
 
-#mainContent.dentist-page-shell .chart-empty.hidden,
 #mainContent.dentist-page-shell .chart-loading.hidden {
     display: none !important;
 }

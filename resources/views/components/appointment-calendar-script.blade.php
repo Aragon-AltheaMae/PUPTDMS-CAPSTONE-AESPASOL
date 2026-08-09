@@ -83,6 +83,7 @@
         allowPastDates: @json($allowPastDates ?? false),
         allowAllDates: @json($allowAllDates ?? false),
         allowAllDatesExceptHolidays: @json($allowAllDatesExceptHolidays ?? false),
+        allowHolidaySelection: @json($allowHolidaySelection ?? false),
         allowToggleOffDate: @json($allowToggleOffDate ?? true),
         useDynamicScheduleRules: @json($useDynamicScheduleRules ?? false),
         renderStyle: @json($renderStyle ?? 'patient'),
@@ -448,9 +449,13 @@
         let isDisabled;
 
         if (
-            calendarConfig.allowAllDatesExceptHolidays
+            calendarConfig
+            .allowAllDatesExceptHolidays
         ) {
-            isDisabled = isHoliday;
+            isDisabled =
+                isHoliday &&
+                !calendarConfig
+                .allowHolidaySelection;
         } else if (
             calendarConfig.allowAllDates
         ) {
@@ -545,8 +550,15 @@
                 !allowAllDates
             ) {
                 cellClass +=
-                    "holiday disabled";
+                    " holiday";
 
+                if (
+                    !calendarConfig
+                    .allowHolidaySelection
+                ) {
+                    cellClass +=
+                        " disabled";
+                }
             } else if (
                 !ignoreAvailabilityRestrictions &&
                 state.isToday
@@ -1303,8 +1315,7 @@
 
                     <select
                         ${isDashboard ? 'data-calendar-month-picker' : 'data-calendar-month-select'}
-                        class="calendar-month-picker"
-                    >
+                        class="calendar-month-picker">
                         ${isDashboard ? monthOptions : splitMonthOptions}
                     </select>
 
@@ -1320,8 +1331,7 @@
 
                         <select
                             data-calendar-year-select
-                            class="calendar-month-picker calendar-year-picker"
-                        >
+                            class="calendar-month-picker calendar-year-picker">
                             ${splitYearOptions}
                         </select>
 

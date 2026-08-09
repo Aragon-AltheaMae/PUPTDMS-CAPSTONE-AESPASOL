@@ -395,6 +395,18 @@
     --page-bg: #0d0f12;
     --page-text: #E5E7EB;
 
+    --surface: #111827;
+    --card: #161B22;
+    --border: rgba(255, 255, 255, 0.10);
+
+    --text-1: #F3F4F6;
+    --text-2: #C9D1D9;
+    --text-3: #8B949E;
+
+    --crimson-light: rgba(139, 0, 0, 0.18);
+    --crimson-mid: rgba(139, 0, 0, 0.24);
+    --crimson-soft: rgba(139, 0, 0, 0.14);
+
     --sidebar-bg: #07111F;
     --sidebar-border: #1E293B;
     --sidebar-shadow: 4px 0 24px rgba(0, 0, 0, .35);

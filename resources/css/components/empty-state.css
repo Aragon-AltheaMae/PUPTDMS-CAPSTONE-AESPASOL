@@ -18,6 +18,39 @@
     text-align: center;
 }
 
+.empty-state.empty-state-compact {
+    min-height: 220px;
+    height: 220px;
+    padding: 20px 14px;
+    justify-content: center;
+}
+
+.empty-state.empty-state-compact .empty-state-icon {
+    width: 58px !important;
+    height: 58px !important;
+    min-width: 58px !important;
+    border-radius: 18px !important;
+    margin-bottom: 14px !important;
+}
+
+.empty-state.empty-state-compact .empty-state-icon i {
+    font-size: 24px !important;
+}
+
+.empty-state.empty-state-compact .empty-state-title {
+    font-size: 15px;
+}
+
+.empty-state.empty-state-compact .empty-state-sub {
+    margin-top: 6px;
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.empty-state.empty-state-compact .ui-btn {
+    margin-top: 14px;
+}
+
 .empty-state.is-hidden,
 .empty-state[hidden] {
     display: none !important;

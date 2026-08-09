@@ -331,14 +331,6 @@ function openOdontogramPreviewTooth(
         'color'
     );
 
-    condition.style.removeProperty(
-        'border-color'
-    );
-
-    condition.style.removeProperty(
-        'color'
-    );
-
     if (primary?.colorHex) {
         condition.style.color =
             primary.colorHex;
@@ -483,13 +475,14 @@ function initOdontogramPreviews(
                         [];
                 }
             }
+            showOdontogramPreviewEmptyState(
+                preview
+            );
+
             renderOdontogramPreview(
                 preview
             );
         });
-    showOdontogramPreviewEmptyState(
-        preview
-    );
 }
 
 function showOdontogramPreviewEmptyState(

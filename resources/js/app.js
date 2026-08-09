@@ -6,6 +6,8 @@ import './profile-avatar';
 import './search-bar';
 import './empty-state';
 import './voice-logic';
+import './booking-workflow';
+import './booking-signature';
 
 import '@fontsource/inter/300.css';
 import '@fontsource/inter/400.css';
@@ -4772,26 +4774,47 @@ function validateFormInputField(field) {
     return !message;
 }
 
-function focusGlobalInvalidField(field) {
+function focusGlobalInvalidField(
+    field
+) {
     if (!field) return;
 
-    const customSelect = field.closest?.('.custom-select');
-
     const target =
-        customSelect?.querySelector('.custom-select-button') ||
-        field;
+        field.closest(
+            [
+                '[data-global-field]',
+                '.global-question-row',
+                '.global-form-group',
+                '.global-choice-group'
+            ].join(',')
+        ) || field;
 
     target.scrollIntoView({
         behavior: 'smooth',
-        block: 'center'
+        block: 'center',
     });
 
-    window.setTimeout(() => {
-        target.focus({
-            preventScroll: true
-        });
-    }, 280);
+    window.setTimeout(
+        () => {
+            const focusTarget =
+                field.matches(
+                    'input, select, textarea, button'
+                )
+                    ? field
+                    : target.querySelector(
+                        'input, select, textarea, button'
+                    );
+
+            focusTarget?.focus({
+                preventScroll: true
+            });
+        },
+        320
+    );
 }
+
+window.focusGlobalInvalidField =
+    focusGlobalInvalidField;
 
 function bindFormInputValidation(root = document) {
     const scope =
@@ -5054,7 +5077,7 @@ function bindGlobalNumberStepper(
         input.value =
             String(min);
     }
-    
+
     stepper.dataset.numberStepperInitialized =
         'true';
 

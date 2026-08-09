@@ -380,6 +380,65 @@
             }
         });
 
+        document.addEventListener(
+            'click',
+            event => {
+                const link =
+                    event.target.closest(
+                        '[data-discard-navigation]'
+                    );
+
+                if (!link) {
+                    return;
+                }
+
+                const href =
+                    link.getAttribute(
+                        'href'
+                    );
+
+                if (
+                    !href ||
+                    href === '#' ||
+                    link.target === '_blank'
+                ) {
+                    return;
+                }
+
+                const formSelector =
+                    link.dataset
+                    .discardFormTarget;
+
+                const form =
+                    formSelector ?
+                    document.querySelector(
+                        formSelector
+                    ) :
+                    document.querySelector(
+                        'form[data-discard-form]'
+                    );
+
+                if (
+                    !form ||
+                    !isFormDirty(form)
+                ) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.stopImmediatePropagation();
+
+                openDiscardModal(
+                    form,
+                    () => {
+                        window.location.href =
+                            href;
+                    }
+                );
+            },
+            true
+        );
+
         window.DiscardChanges = {
             captureForm,
             captureModal,
