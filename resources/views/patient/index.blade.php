@@ -133,6 +133,13 @@ $nextVisitText =
 isset($upcomingAppointment) && $upcomingAppointment
 ? \Carbon\Carbon::parse($upcomingAppointment->appointment_date)->format('M d, Y')
 : 'No appointment yet';
+
+$resolvedBirthdate = optional($patient)->birthdate ?: optional(optional($patient)->user)->birthdate;
+$resolvedGender = optional($patient)->gender ?: optional(optional($patient)->user)->gender;
+$resolvedAge = $resolvedBirthdate ? \Carbon\Carbon::parse($resolvedBirthdate)->age : null;
+$resolvedBirthdateDisplay = $resolvedBirthdate
+? \Carbon\Carbon::parse($resolvedBirthdate)->format('M d, Y')
+: 'N/A';
 @endphp
 
 <main id="mainContent" class="patient-page-shell patient-dashboard-page page-enter">
@@ -563,9 +570,9 @@ isset($upcomingAppointment) && $upcomingAppointment
         roleLabel: "{{ $patient->faculty_code ? 'Faculty' : ($patient->student_no ? 'Student' : 'Patient') }}",
         facultyCode: "{{ $patient->faculty_code ?? '' }}",
         studentNo: "{{ $patient->student_no ?? '' }}",
-        age: "{{ $patient->age ?? (\Carbon\Carbon::parse($patient->birthdate ?? now())->age ?? 'N/A') }}",
-        birthdate: "{{ isset($patient->birthdate) ? \Carbon\Carbon::parse($patient->birthdate)->format('M d, Y') : 'N/A' }}",
-        gender: "{{ $patient->gender ?? 'N/A' }}",
+        age: "{{ $resolvedAge ?? '' }}",
+        birthdate: "{{ $resolvedBirthdateDisplay }}",
+        gender: "{{ $resolvedGender ?? 'N/A' }}",
         contact: "{{ $patient->phone ?? 'N/A' }}",
         email: "{{ $patient->email ?? 'N/A' }}",
         emergencyName: "{{ optional($patient->medicalHistory)->emergency_person ?? 'Not specified' }}",

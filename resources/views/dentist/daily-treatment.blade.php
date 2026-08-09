@@ -25,10 +25,15 @@
         </div>
       </div>
 
-      <div class="dentist-hero-actions">
-        <button type="button" class="btn-primary-global" onclick="openDailyCreateReportModal()">
+      <div class="dentist-hero-actions flex flex-wrap gap-3">
+        <button type="button" class="btn-primary-global" onclick="openDailyRecordModal()">
           <i class="fa-solid fa-plus"></i>
-          Create Report
+          Add Record
+        </button>
+
+        <button type="button" class="btn-primary-global" onclick="openDailyCreateReportModal()">
+          <i class="fa-solid fa-download"></i>
+          Download Report
         </button>
       </div>
     </section>
@@ -289,6 +294,215 @@
   </aside>
 </div>
 
+<div id="dailyRecordModal" class="ui-modal modal-overlay" aria-hidden="true"
+  onclick="closeModalOnBackdrop(event, 'dailyRecordModal')">
+  <div class="modal-box-inner um-user-modal report-create-modal max-w-5xl" onclick="event.stopPropagation()">
+    <div
+      class="um-user-modal-header px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
+      <div class="flex items-center gap-3 min-w-0">
+        <div
+          class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#8B0000] via-[#a40000] to-[#6B0000] flex items-center justify-center shadow-lg shadow-red-900/20 flex-shrink-0">
+          <i class="fa-solid fa-user-pen text-white text-sm"></i>
+        </div>
+
+        <div class="min-w-0">
+          <h3 class="font-extrabold text-gray-800 text-lg leading-tight">Add Daily Treatment Record</h3>
+          <p class="text-xs text-gray-500 mt-0.5">Cleaner entry form with live procedure timer and signature upload.</p>
+        </div>
+      </div>
+
+      <button type="button" onclick="closeDailyRecordModal()" class="um-modal-x" aria-label="Close add record modal">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <form id="dailyRecordForm" class="flex-1 flex flex-col min-h-0" novalidate>
+      <div class="um-user-modal-body">
+        <div class="um-user-main-card space-y-6">
+          <div class="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,0.9fr)]">
+            <section class="rounded-2xl border border-[#ead9d9] bg-[#fffafa] p-4 sm:p-5">
+              <div class="flex items-start justify-between gap-3 mb-4">
+                <div>
+                  <h4 class="text-base font-extrabold text-gray-800 leading-tight">Patient and Treatment Details</h4>
+                  <p class="text-xs text-gray-500 mt-1">Fields are spaced out para mas madaling basahin at encode-an.</p>
+                </div>
+                <span class="inline-flex items-center rounded-full bg-white px-3 py-1 text-[11px] font-bold text-[#8B0000] border border-[#f1d7d7]">
+                  Record Entry
+                </span>
+              </div>
+
+              <div class="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label for="recordTreatmentDate" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                    Treatment Date <span class="text-red-500">*</span>
+                  </label>
+                  <input id="recordTreatmentDate" name="treatment_date" type="date"
+                    class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white">
+                </div>
+
+                <div>
+                  <label for="recordGender" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                    Gender
+                  </label>
+                  <select id="recordGender" name="gender" class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white">
+                    <option value="">Select gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div class="md:col-span-2">
+                  <label for="recordPatientName" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                    Patient Name <span class="text-red-500">*</span>
+                  </label>
+                  <input id="recordPatientName" name="patient_name" type="text" maxlength="150"
+                    placeholder="Enter patient full name"
+                    class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white">
+                </div>
+
+                <div>
+                  <label for="recordPatientEmail" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                    Email Address
+                  </label>
+                  <input id="recordPatientEmail" name="patient_email" type="email" maxlength="190"
+                    placeholder="name@example.com"
+                    class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white">
+                </div>
+
+                <div>
+                  <label for="recordPatientPhone" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                    Contact Number
+                  </label>
+                  <input id="recordPatientPhone" name="patient_phone" type="text" maxlength="30"
+                    placeholder="09XXXXXXXXX"
+                    class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white">
+                </div>
+
+                <div>
+                  <label for="recordOfficeType" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                    Office
+                  </label>
+                  <select id="recordOfficeType" name="office_type" class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white">
+                    <option value="">Select office</option>
+                    <option value="Administrative">Administrative</option>
+                    <option value="Faculty">Faculty</option>
+                    <option value="Dependent">Dependent</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="recordProgramCode" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                    Program / Course
+                  </label>
+                  <input id="recordProgramCode" name="program_code" type="text" maxlength="50"
+                    placeholder="e.g. BSIT"
+                    class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white">
+                </div>
+
+                <div class="md:col-span-2">
+                  <label for="recordTreatmentDone" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                    Treatment Done <span class="text-red-500">*</span>
+                  </label>
+                  <textarea id="recordTreatmentDone" name="treatment_done" rows="4" maxlength="150"
+                    placeholder="Describe the treatment performed"
+                    class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white resize-none"></textarea>
+                </div>
+              </div>
+            </section>
+
+            <section class="rounded-2xl border border-[#ead9d9] bg-white p-4 sm:p-5">
+              <div class="flex items-start justify-between gap-3 mb-4">
+                <div>
+                  <h4 class="text-base font-extrabold text-gray-800 leading-tight">Procedure Timer and Signature</h4>
+                  <p class="text-xs text-gray-500 mt-1">Mag-start ito once pinindot ang procedure start.</p>
+                </div>
+                <i class="fa-solid fa-clock text-[#8B0000] text-lg"></i>
+              </div>
+
+              <div class="rounded-2xl bg-gradient-to-br from-[#8B0000] via-[#a10000] to-[#6B0000] text-white p-5 shadow-lg">
+                <p class="text-[11px] uppercase tracking-[0.22em] text-white/70 font-bold mb-2">Live Procedure Time</p>
+                <div id="dailyTimerDisplay" class="text-3xl sm:text-[2rem] font-black tracking-[0.18em]">00:00:00</div>
+                <p id="dailyTimerStatus" class="text-xs text-white/80 mt-3">Timer has not started yet.</p>
+              </div>
+
+              <div class="grid gap-3 sm:grid-cols-2 mt-4">
+                <button type="button" id="dailyTimerStartBtn"
+                  class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#8B0000] px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#6B0000]">
+                  <i class="fa-solid fa-play"></i>
+                  Start Procedure
+                </button>
+
+                <button type="button" id="dailyTimerStopBtn"
+                  class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-bold text-gray-700 transition hover:border-[#8B0000] hover:text-[#8B0000]">
+                  <i class="fa-solid fa-stop"></i>
+                  Stop Procedure
+                </button>
+              </div>
+
+              <div class="grid gap-4 sm:grid-cols-2 mt-4">
+                <div>
+                  <label for="recordTimeInDisplay" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                    Started At
+                  </label>
+                  <input id="recordTimeInDisplay" type="text" readonly
+                    class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-gray-50 text-gray-700">
+                </div>
+
+                <div>
+                  <label for="recordTimeOutDisplay" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                    Stopped At
+                  </label>
+                  <input id="recordTimeOutDisplay" type="text" readonly
+                    class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-gray-50 text-gray-700">
+                </div>
+
+                <div class="sm:col-span-2">
+                  <label for="recordMinutesProcessed" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                    Number of Minutes Processed
+                  </label>
+                  <input id="recordMinutesProcessed" name="minutes_processed" type="number" min="0" max="1440" readonly
+                    class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-gray-50 text-gray-700">
+                </div>
+              </div>
+
+              <input id="recordTimeIn" name="time_in" type="hidden">
+              <input id="recordTimeOut" name="time_out" type="hidden">
+
+              <div class="mt-4">
+                <label for="recordPatientSignature" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                  Patient Signature
+                </label>
+                <input id="recordPatientSignature" name="patient_signature" type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg"
+                  class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white file:mr-3 file:rounded-lg file:border-0 file:bg-[#fff0f0] file:px-3 file:py-2 file:text-xs file:font-bold file:text-[#8B0000]">
+                <p class="text-[11px] text-gray-400 mt-2">Optional. Accepted formats: PNG, JPG, JPEG up to 5 MB.</p>
+              </div>
+
+              <div id="dailyRecordErrorBanner" class="report-modal-error hidden mt-4">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Please complete the required fields before saving.</span>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-ft um-user-modal-footer">
+        <button type="button" onclick="closeDailyRecordModal()" class="modal-btn-ghost">
+          Cancel
+        </button>
+
+        <button type="button" id="saveDailyRecordBtn" class="modal-btn-confirm-reject um-save-user-btn">
+          <span class="btn-confirm-icon">
+            <i class="fa-solid fa-floppy-disk"></i>
+          </span>
+          <span>Save Record</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div id="createReportModal" class="ui-modal modal-overlay" aria-hidden="true"
   onclick="closeModalOnBackdrop(event, 'createReportModal')">
   <div class="modal-box-inner um-user-modal um-user-modal-md report-create-modal" onclick="event.stopPropagation()">
@@ -367,9 +581,15 @@
               </label>
 
               <div class="report-custom-select report-template-select" data-report-select>
-                <select id="reportType" name="document_type" class="report-native-select" data-report-select-native>
-                  <option value="daily_treatment_record" data-document-type="daily_treatment_record" selected>Daily
-                    Treatment Record</option>
+                <select id="reportType" name="document_template_id" class="report-native-select" data-report-select-native>
+                  <option value="" data-document-type="" selected disabled>Select a report type...</option>
+                  @forelse (($dailyTreatmentTemplates ?? collect()) as $template)
+                  <option value="{{ $template->id }}" data-document-type="{{ $template->document_type }}">
+                    {{ $template->name }}
+                  </option>
+                  @empty
+                  <option value="" data-document-type="" disabled>No active daily treatment templates available</option>
+                  @endforelse
                 </select>
 
                 <button type="button" class="report-select-trigger" data-report-select-trigger
@@ -378,17 +598,24 @@
                     <span class="report-select-icon">
                       <i class="fa-solid fa-file-lines"></i>
                     </span>
-                    <span data-report-select-label>Daily Treatment Record</span>
+                    <span data-report-select-label>Select a report type...</span>
                   </span>
                   <i class="fa-solid fa-chevron-down report-select-chevron"></i>
                 </button>
 
                 <div class="report-select-menu" data-report-select-menu>
-                  <button type="button" class="report-select-option is-active" data-report-select-option
-                    data-value="daily_treatment_record" data-document-type="daily_treatment_record">
-                    <span>Daily Treatment Record</span>
+                  @forelse (($dailyTreatmentTemplates ?? collect()) as $index => $template)
+                  <button type="button" class="report-select-option {{ $index === 0 ? 'is-active' : '' }}" data-report-select-option
+                    data-value="{{ $template->id }}" data-document-type="{{ $template->document_type }}">
+                    <span>{{ $template->name }}</span>
                     <i class="fa-solid fa-check"></i>
                   </button>
+                  @empty
+                  <button type="button" class="report-select-option" disabled>
+                    <span>No active daily treatment templates available</span>
+                    <i class="fa-solid fa-check"></i>
+                  </button>
+                  @endforelse
                 </div>
               </div>
 
@@ -521,6 +748,7 @@
 @section('scripts')
 <script>
   const DTR_LIST_URL = "{{ route('dentist.dentist.reports.daily-treatment-record.list') }}";
+  const DTR_STORE_URL = "{{ route('dentist.dentist.reports.daily-treatment-record.store') }}";
   const DTR_DOWNLOAD_URL = "{{ route('dentist.dentist.report.daily-treatment-record-download') }}";
   const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || "{{ csrf_token() }}";
 
@@ -541,6 +769,9 @@
   let dtrListController = null;
   let dtrDraftCountController = null;
   let dtrDraftCountTimer = null;
+  let dailyTimerInterval = null;
+  let dailyTimerStartedAt = null;
+  let dailyTimerStoppedAt = null;
 
   function escapeDtrHtml(value) {
     return String(value ?? '')
@@ -574,6 +805,39 @@
       month: 'long',
       year: 'numeric',
     });
+  }
+
+  function formatDtrClock(value) {
+    if (!value) return '—';
+    return escapeDtrHtml(value);
+  }
+
+  function formatDtrDateTimeDisplay(date) {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
+
+    return date.toLocaleString('en-US', {
+      month: 'short',
+      day: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+    });
+  }
+
+  function toLocalDateInputValue(date) {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
+
+    const pad = (value) => String(value).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+    const hour = pad(date.getHours());
+    const minute = pad(date.getMinutes());
+    const second = pad(date.getSeconds());
+
+    return `${year}-${month}-${day}T${hour}:${minute}:${second}`;
   }
 
   function buildDtrParams(source = dtrState, options = {}) {
@@ -637,17 +901,32 @@
       const signature = record.has_signature
         ? '<span class="dtr-signature yes"><i class="fa-solid fa-check"></i> Signed</span>'
         : '<span class="dtr-signature no">No signature</span>';
+      const timeRange = record.time_in || record.time_out
+        ? `<div class="text-[11px] text-gray-500 mt-1">${formatDtrClock(record.time_in)}${record.time_out ? ` - ${formatDtrClock(record.time_out)}` : ''}</div>`
+        : '';
 
       if (tbody) {
         tbody.insertAdjacentHTML('beforeend', `
           <tr>
-            <td>${formatDateToMMDDYY(record.treatment_date)}</td>
-            <td>${escapeDtrHtml(record.patient_name || '—')}</td>
-            <td>${escapeDtrHtml(contact)}</td>
-            <td>${escapeDtrHtml(officeOrProgram)}</td>
-            <td>${escapeDtrHtml(record.gender || '—')}</td>
-            <td>${escapeDtrHtml(record.treatment_done || '—')}</td>
-            <td class="text-center">${escapeDtrHtml(record.minutes_processed ?? 0)}</td>
+            <td class="whitespace-nowrap">
+              <div class="font-semibold text-gray-800">${formatDateToMMDDYY(record.treatment_date)}</div>
+              ${timeRange}
+            </td>
+            <td class="min-w-[220px]">
+              <div class="font-semibold text-gray-800">${escapeDtrHtml(record.patient_name || '—')}</div>
+              <div class="text-[11px] text-gray-500 mt-1">${escapeDtrHtml(record.gender || 'Gender not set')}</div>
+            </td>
+            <td class="min-w-[240px] text-[12px] leading-5">${escapeDtrHtml(contact)}</td>
+            <td class="min-w-[140px]">
+              <div class="font-semibold text-gray-800">${escapeDtrHtml(officeOrProgram)}</div>
+            </td>
+            <td class="text-center">${escapeDtrHtml(record.gender || '—')}</td>
+            <td class="min-w-[220px] text-[12px] leading-5">${escapeDtrHtml(record.treatment_done || '—')}</td>
+            <td class="text-center whitespace-nowrap">
+              <span class="inline-flex min-w-[56px] items-center justify-center rounded-full bg-[#fff5f5] px-3 py-1 text-xs font-bold text-[#8B0000]">
+                ${escapeDtrHtml(record.minutes_processed ?? 0)} mins
+              </span>
+            </td>
             <td class="text-center">${signature}</td>
           </tr>
         `);
@@ -1305,10 +1584,243 @@
     input.classList.toggle('border-gray-300', !show);
   }
 
+  function formatDailyElapsedTime(totalSeconds) {
+    const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+    const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+    const seconds = String(totalSeconds % 60).padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+  }
+
+  function getDailyTimerElements() {
+    return {
+      display: document.getElementById('dailyTimerDisplay'),
+      status: document.getElementById('dailyTimerStatus'),
+      timeIn: document.getElementById('recordTimeIn'),
+      timeOut: document.getElementById('recordTimeOut'),
+      timeInDisplay: document.getElementById('recordTimeInDisplay'),
+      timeOutDisplay: document.getElementById('recordTimeOutDisplay'),
+      minutes: document.getElementById('recordMinutesProcessed'),
+      startBtn: document.getElementById('dailyTimerStartBtn'),
+      stopBtn: document.getElementById('dailyTimerStopBtn'),
+    };
+  }
+
+  function syncDailyTimerButtons(isRunning) {
+    const { startBtn, stopBtn } = getDailyTimerElements();
+    startBtn?.classList.toggle('opacity-60', isRunning);
+    startBtn?.classList.toggle('cursor-not-allowed', isRunning);
+    stopBtn?.classList.toggle('opacity-60', !isRunning && !dailyTimerStartedAt);
+    stopBtn?.classList.toggle('cursor-not-allowed', !isRunning && !dailyTimerStartedAt);
+
+    if (startBtn) startBtn.disabled = isRunning;
+    if (stopBtn) stopBtn.disabled = !isRunning;
+  }
+
+  function updateDailyTimerDisplay() {
+    const elements = getDailyTimerElements();
+    if (!elements.display || !elements.minutes) return;
+
+    if (!dailyTimerStartedAt) {
+      elements.display.textContent = '00:00:00';
+      elements.minutes.value = 0;
+      elements.status.textContent = 'Timer has not started yet.';
+      syncDailyTimerButtons(false);
+      return;
+    }
+
+    const endDate = dailyTimerStoppedAt || new Date();
+    const elapsedSeconds = Math.max(0, Math.floor((endDate.getTime() - dailyTimerStartedAt.getTime()) / 1000));
+    elements.display.textContent = formatDailyElapsedTime(elapsedSeconds);
+    elements.minutes.value = Math.floor(elapsedSeconds / 60);
+    elements.status.textContent = dailyTimerStoppedAt
+      ? 'Procedure timer stopped and ready to save.'
+      : 'Procedure is running live.';
+    syncDailyTimerButtons(!dailyTimerStoppedAt);
+  }
+
+  function startDailyProcedureTimer() {
+    if (dailyTimerInterval) {
+      clearInterval(dailyTimerInterval);
+      dailyTimerInterval = null;
+    }
+
+    dailyTimerStartedAt = new Date();
+    dailyTimerStoppedAt = null;
+
+    const elements = getDailyTimerElements();
+    if (elements.timeIn) elements.timeIn.value = toLocalDateInputValue(dailyTimerStartedAt);
+    if (elements.timeOut) elements.timeOut.value = '';
+    if (elements.timeInDisplay) elements.timeInDisplay.value = formatDtrDateTimeDisplay(dailyTimerStartedAt);
+    if (elements.timeOutDisplay) elements.timeOutDisplay.value = '';
+
+    updateDailyTimerDisplay();
+    dailyTimerInterval = setInterval(updateDailyTimerDisplay, 1000);
+  }
+
+  function stopDailyProcedureTimer() {
+    if (!dailyTimerStartedAt) return;
+
+    dailyTimerStoppedAt = new Date();
+
+    const elements = getDailyTimerElements();
+    if (elements.timeOut) elements.timeOut.value = toLocalDateInputValue(dailyTimerStoppedAt);
+    if (elements.timeOutDisplay) elements.timeOutDisplay.value = formatDtrDateTimeDisplay(dailyTimerStoppedAt);
+
+    if (dailyTimerInterval) {
+      clearInterval(dailyTimerInterval);
+      dailyTimerInterval = null;
+    }
+
+    updateDailyTimerDisplay();
+  }
+
+  function resetDailyRecordForm() {
+    const form = document.getElementById('dailyRecordForm');
+    const today = new Date();
+    if (form) form.reset();
+
+    dailyTimerStartedAt = null;
+    dailyTimerStoppedAt = null;
+
+    if (dailyTimerInterval) {
+      clearInterval(dailyTimerInterval);
+      dailyTimerInterval = null;
+    }
+
+    const elements = getDailyTimerElements();
+    if (elements.timeIn) elements.timeIn.value = '';
+    if (elements.timeOut) elements.timeOut.value = '';
+    if (elements.timeInDisplay) elements.timeInDisplay.value = '';
+    if (elements.timeOutDisplay) elements.timeOutDisplay.value = '';
+
+    const dateInput = document.getElementById('recordTreatmentDate');
+    if (dateInput) dateInput.value = today.toISOString().split('T')[0];
+
+    document.getElementById('dailyRecordErrorBanner')?.classList.add('hidden');
+    document.getElementById('dailyRecordErrorBanner')?.classList.remove('flex');
+
+    ['recordTreatmentDate', 'recordPatientName', 'recordTreatmentDone'].forEach(id => {
+      const input = document.getElementById(id);
+      input?.classList.remove('border-red-400');
+      input?.classList.add('border-gray-300');
+    });
+
+    updateDailyTimerDisplay();
+  }
+
+  function openDailyRecordModal() {
+    const modal = document.getElementById('dailyRecordModal');
+    if (!modal) return;
+
+    resetDailyRecordForm();
+    modal.classList.remove('closing');
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.documentElement.classList.add('modal-lock');
+    document.body.classList.add('modal-lock');
+  }
+
+  function closeDailyRecordModal() {
+    if (typeof window.closeModal === 'function') {
+      window.closeModal('dailyRecordModal');
+    } else {
+      forceCloseDailyModal('dailyRecordModal');
+    }
+
+    resetDailyRecordForm();
+  }
+
+  window.openDailyRecordModal = openDailyRecordModal;
+  window.closeDailyRecordModal = closeDailyRecordModal;
+
+  async function saveDailyRecord() {
+    const saveBtn = document.getElementById('saveDailyRecordBtn');
+    const banner = document.getElementById('dailyRecordErrorBanner');
+    const treatmentDate = document.getElementById('recordTreatmentDate');
+    const patientName = document.getElementById('recordPatientName');
+    const treatmentDone = document.getElementById('recordTreatmentDone');
+
+    const requiredFields = [
+      treatmentDate,
+      patientName,
+      treatmentDone,
+    ];
+
+    let valid = true;
+
+    requiredFields.forEach(field => {
+      const hasValue = !!field?.value?.trim();
+      field?.classList.toggle('border-red-400', !hasValue);
+      field?.classList.toggle('border-gray-300', hasValue);
+      if (!hasValue) valid = false;
+    });
+
+    if (!valid) {
+      banner.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i><span>Please complete the treatment date, patient name, and treatment details.</span>';
+      banner.classList.remove('hidden');
+      banner.classList.add('flex');
+      return;
+    }
+
+    banner.classList.add('hidden');
+    banner.classList.remove('flex');
+
+    const form = document.getElementById('dailyRecordForm');
+    const formData = new FormData(form);
+    formData.append('_token', CSRF_TOKEN);
+
+    const originalHtml = saveBtn?.innerHTML || '';
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.classList.add('opacity-70', 'cursor-not-allowed');
+      saveBtn.innerHTML = '<span class="btn-confirm-icon"><i class="fa-solid fa-spinner fa-spin"></i></span><span>Saving...</span>';
+    }
+
+    try {
+      const response = await fetch(DTR_STORE_URL, {
+        method: 'POST',
+        headers: {
+          'X-CSRF-TOKEN': CSRF_TOKEN,
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json',
+        },
+        body: formData,
+        credentials: 'same-origin',
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        let message = payload.message || 'Unable to save the daily treatment record.';
+        if (payload.errors) {
+          const firstError = Object.values(payload.errors)[0];
+          if (Array.isArray(firstError) && firstError.length > 0) {
+            message = firstError[0];
+          }
+        }
+        throw new Error(message);
+      }
+
+      closeDailyRecordModal();
+      dtrState.page = 1;
+      await fetchDailyRecords();
+    } catch (error) {
+      banner.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i><span>${escapeDtrHtml(error.message || 'Unable to save the daily treatment record.')}</span>`;
+      banner.classList.remove('hidden');
+      banner.classList.add('flex');
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+        saveBtn.innerHTML = originalHtml;
+      }
+    }
+  }
+
   async function downloadDailyReport() {
     const btn = document.getElementById('downloadReportBtn');
     const name = document.getElementById('reportName')?.value.trim() || '';
-    const type = document.getElementById('reportType')?.value || '';
+    const templateId = document.getElementById('reportType')?.value || '';
     const from = document.getElementById('dateFrom')?.value || '';
     const to = document.getElementById('dateTo')?.value || '';
     const qty = parseInt(document.getElementById('reportQty')?.value, 10);
@@ -1333,8 +1845,8 @@
     setDailyModalError('reportName', 'reportNameErr', !name);
     if (!name) valid = false;
 
-    setDailyModalError('reportType', 'reportTypeErr', !type);
-    if (!type) valid = false;
+    setDailyModalError('reportType', 'reportTypeErr', !templateId);
+    if (!templateId) valid = false;
 
     ['dateFromErr', 'dateFutureErr', 'dateRangeErr'].forEach(id => {
       const el = document.getElementById(id);
@@ -1394,7 +1906,7 @@
       const formData = new FormData();
       formData.append('_token', CSRF_TOKEN);
       formData.append('report_name', name);
-      formData.append('document_type', type);
+      formData.append('document_template_id', templateId);
       formData.append('date_from', from);
       formData.append('quantity', String(qty));
 
@@ -1470,6 +1982,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     initDailyReportCustomSelects(document);
     initDailyReportQtyButtons();
+    resetDailyRecordForm();
 
     const monthPicker = document.getElementById('monthPicker');
     const now = new Date();
@@ -1520,6 +2033,10 @@
       counter.classList.toggle('text-gray-400', length < 100);
     });
 
+    document.getElementById('recordTreatmentDate')?.setAttribute('max', now.toISOString().split('T')[0]);
+    document.getElementById('dailyTimerStartBtn')?.addEventListener('click', startDailyProcedureTimer);
+    document.getElementById('dailyTimerStopBtn')?.addEventListener('click', stopDailyProcedureTimer);
+    document.getElementById('saveDailyRecordBtn')?.addEventListener('click', saveDailyRecord);
     document.getElementById('downloadReportBtn')?.addEventListener('click', downloadDailyReport);
 
     window.initGlobalVoiceInputs?.(document);

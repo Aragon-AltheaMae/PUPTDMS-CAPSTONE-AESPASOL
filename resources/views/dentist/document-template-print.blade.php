@@ -33,6 +33,14 @@
             'page_size' => '8.5in 14in',
             'orientation' => 'portrait',
         ],
+
+        'DTR-FACULTY' => [
+            'label' => 'Legal Portrait',
+            'width' => '8.5in',
+            'height' => '14in',
+            'page_size' => '8.5in 14in',
+            'orientation' => 'portrait',
+        ],
     ];
 
     $templateCode = strtoupper(trim($template->code ?? ''));

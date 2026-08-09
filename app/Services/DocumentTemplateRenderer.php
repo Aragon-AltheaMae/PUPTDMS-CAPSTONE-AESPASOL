@@ -49,7 +49,7 @@ class DocumentTemplateRenderer
         }
 
         if ($template->document_type === 'gad_report') {
-            return array_merge($this->buildGadReportContext(), $context);
+            return array_merge($this->buildGadReportContext($context), $context);
         }
 
         if ($template->document_type === 'dental_supplies_inventory') {
@@ -150,15 +150,14 @@ class DocumentTemplateRenderer
         ];
     }
 
-    private function buildGadReportContext(): array
+    private function buildGadReportContext(array $context = []): array
     {
-        $currentMonth = now();
-        $monthYear = strtoupper($currentMonth->format('F Y'));
+        [$from, $to] = $this->resolveGadReportRange($context);
+        $monthYear = $this->formatGadReportPeriod($from, $to);
         $campusName = strtoupper(setting('clinic_name', 'Taguig Dental Clinic'));
 
         $records = DentalServiceRecord::query()
-            ->whereYear('time_in', $currentMonth->year)
-            ->whereMonth('time_in', $currentMonth->month)
+            ->whereBetween('time_in', [$from, $to])
             ->get();
 
         $departmentLabels = [
@@ -192,8 +191,6 @@ class DocumentTemplateRenderer
 
         $maleRows = [];
         $femaleRows = [];
-        $rowLabels = ['—', 'Senior Citizen', 'PWD'];
-
         foreach ($groupFilters as $index => $filter) {
             $maleRows[$index] = $countByDepartmentAndGender('male', $filter);
             $femaleRows[$index] = $countByDepartmentAndGender('female', $filter);
@@ -208,13 +205,15 @@ class DocumentTemplateRenderer
 
         $headers['total'] = (int) $records->count();
 
-        $rowTotals = function (array $rows, int $index): string {
-            return (string) array_sum([
+        $rowTotals = function (array $rows, int $index): ?string {
+            $total = array_sum([
                 $rows[$index]['students'] ?? 0,
                 $rows[$index]['faculty'] ?? 0,
                 $rows[$index]['administrative'] ?? 0,
                 $rows[$index]['dependent'] ?? 0,
             ]);
+
+            return $this->formatGadCount($total);
         };
 
         $grandTotal = (int) $records->count();
@@ -226,49 +225,49 @@ class DocumentTemplateRenderer
             'iab_logo' => asset('images/iso9001.png'),
             'report_month_year' => $monthYear,
             'campus_name' => $campusName,
-            'header_students' => (string) $headers['students'],
-            'header_faculty' => (string) $headers['faculty'],
-            'header_administrative' => (string) $headers['administrative'],
-            'header_dependent' => (string) $headers['dependent'],
-            'header_total' => (string) $grandTotal,
+            'header_students' => $this->formatGadCount($headers['students'] ?? 0),
+            'header_faculty' => $this->formatGadCount($headers['faculty'] ?? 0),
+            'header_administrative' => $this->formatGadCount($headers['administrative'] ?? 0),
+            'header_dependent' => $this->formatGadCount($headers['dependent'] ?? 0),
+            'header_total' => $this->formatGadCount($grandTotal),
             'gad_category_1' => '—',
             'gad_category_2' => 'Senior Citizen',
             'gad_category_3' => 'PWD',
-            'cat1_male_students' => (string) ($maleRows[0]['students'] ?? 0),
-            'cat1_male_faculty' => (string) ($maleRows[0]['faculty'] ?? 0),
-            'cat1_male_administrative' => (string) ($maleRows[0]['administrative'] ?? 0),
-            'cat1_male_dependent' => (string) ($maleRows[0]['dependent'] ?? 0),
+            'cat1_male_students' => $this->formatGadCount($maleRows[0]['students'] ?? 0),
+            'cat1_male_faculty' => $this->formatGadCount($maleRows[0]['faculty'] ?? 0),
+            'cat1_male_administrative' => $this->formatGadCount($maleRows[0]['administrative'] ?? 0),
+            'cat1_male_dependent' => $this->formatGadCount($maleRows[0]['dependent'] ?? 0),
             'cat1_male_total' => $rowTotals($maleRows, 0),
-            'cat1_female_students' => (string) ($femaleRows[0]['students'] ?? 0),
-            'cat1_female_faculty' => (string) ($femaleRows[0]['faculty'] ?? 0),
-            'cat1_female_administrative' => (string) ($femaleRows[0]['administrative'] ?? 0),
-            'cat1_female_dependent' => (string) ($femaleRows[0]['dependent'] ?? 0),
+            'cat1_female_students' => $this->formatGadCount($femaleRows[0]['students'] ?? 0),
+            'cat1_female_faculty' => $this->formatGadCount($femaleRows[0]['faculty'] ?? 0),
+            'cat1_female_administrative' => $this->formatGadCount($femaleRows[0]['administrative'] ?? 0),
+            'cat1_female_dependent' => $this->formatGadCount($femaleRows[0]['dependent'] ?? 0),
             'cat1_female_total' => $rowTotals($femaleRows, 0),
-            'cat2_male_students' => (string) ($maleRows[1]['students'] ?? 0),
-            'cat2_male_faculty' => (string) ($maleRows[1]['faculty'] ?? 0),
-            'cat2_male_administrative' => (string) ($maleRows[1]['administrative'] ?? 0),
-            'cat2_male_dependent' => (string) ($maleRows[1]['dependent'] ?? 0),
+            'cat2_male_students' => $this->formatGadCount($maleRows[1]['students'] ?? 0),
+            'cat2_male_faculty' => $this->formatGadCount($maleRows[1]['faculty'] ?? 0),
+            'cat2_male_administrative' => $this->formatGadCount($maleRows[1]['administrative'] ?? 0),
+            'cat2_male_dependent' => $this->formatGadCount($maleRows[1]['dependent'] ?? 0),
             'cat2_male_total' => $rowTotals($maleRows, 1),
-            'cat2_female_students' => (string) ($femaleRows[1]['students'] ?? 0),
-            'cat2_female_faculty' => (string) ($femaleRows[1]['faculty'] ?? 0),
-            'cat2_female_administrative' => (string) ($femaleRows[1]['administrative'] ?? 0),
-            'cat2_female_dependent' => (string) ($femaleRows[1]['dependent'] ?? 0),
+            'cat2_female_students' => $this->formatGadCount($femaleRows[1]['students'] ?? 0),
+            'cat2_female_faculty' => $this->formatGadCount($femaleRows[1]['faculty'] ?? 0),
+            'cat2_female_administrative' => $this->formatGadCount($femaleRows[1]['administrative'] ?? 0),
+            'cat2_female_dependent' => $this->formatGadCount($femaleRows[1]['dependent'] ?? 0),
             'cat2_female_total' => $rowTotals($femaleRows, 1),
-            'cat3_male_students' => (string) ($maleRows[2]['students'] ?? 0),
-            'cat3_male_faculty' => (string) ($maleRows[2]['faculty'] ?? 0),
-            'cat3_male_administrative' => (string) ($maleRows[2]['administrative'] ?? 0),
-            'cat3_male_dependent' => (string) ($maleRows[2]['dependent'] ?? 0),
+            'cat3_male_students' => $this->formatGadCount($maleRows[2]['students'] ?? 0),
+            'cat3_male_faculty' => $this->formatGadCount($maleRows[2]['faculty'] ?? 0),
+            'cat3_male_administrative' => $this->formatGadCount($maleRows[2]['administrative'] ?? 0),
+            'cat3_male_dependent' => $this->formatGadCount($maleRows[2]['dependent'] ?? 0),
             'cat3_male_total' => $rowTotals($maleRows, 2),
-            'cat3_female_students' => (string) ($femaleRows[2]['students'] ?? 0),
-            'cat3_female_faculty' => (string) ($femaleRows[2]['faculty'] ?? 0),
-            'cat3_female_administrative' => (string) ($femaleRows[2]['administrative'] ?? 0),
-            'cat3_female_dependent' => (string) ($femaleRows[2]['dependent'] ?? 0),
+            'cat3_female_students' => $this->formatGadCount($femaleRows[2]['students'] ?? 0),
+            'cat3_female_faculty' => $this->formatGadCount($femaleRows[2]['faculty'] ?? 0),
+            'cat3_female_administrative' => $this->formatGadCount($femaleRows[2]['administrative'] ?? 0),
+            'cat3_female_dependent' => $this->formatGadCount($femaleRows[2]['dependent'] ?? 0),
             'cat3_female_total' => $rowTotals($femaleRows, 2),
-            'total_students' => (string) ($headers['students'] ?? 0),
-            'total_faculty' => (string) ($headers['faculty'] ?? 0),
-            'total_administrative' => (string) ($headers['administrative'] ?? 0),
-            'total_dependent' => (string) ($headers['dependent'] ?? 0),
-            'grand_total' => (string) $grandTotal,
+            'total_students' => $this->formatGadCount($headers['students'] ?? 0),
+            'total_faculty' => $this->formatGadCount($headers['faculty'] ?? 0),
+            'total_administrative' => $this->formatGadCount($headers['administrative'] ?? 0),
+            'total_dependent' => $this->formatGadCount($headers['dependent'] ?? 0),
+            'grand_total' => $this->formatGadCount($grandTotal),
             'prepared_by_signature' => asset('images/sir.lim-sign.png'),
             'prepared_by' => 'Ronilo I. Lim',
             'prepared_by_role' => 'Dental Aide',
@@ -276,6 +275,48 @@ class DocumentTemplateRenderer
             'submitted_by' => 'Nelson P. Angeles, DMD',
             'submitted_by_role' => 'Dentist II',
         ];
+    }
+
+    private function resolveGadReportRange(array $context): array
+    {
+        $fromInput = $context['date_from'] ?? request()->input('date_from');
+        $toInput = $context['date_to'] ?? request()->input('date_to');
+
+        $from = $fromInput
+            ? Carbon::parse((string) $fromInput)->startOfDay()
+            : now()->startOfMonth();
+
+        $to = $toInput
+            ? Carbon::parse((string) $toInput)->endOfDay()
+            : ($fromInput ? Carbon::parse((string) $fromInput)->endOfDay() : now()->endOfMonth());
+
+        if ($to->lt($from)) {
+            $to = $from->copy()->endOfDay();
+        }
+
+        return [$from, $to];
+    }
+
+    private function formatGadReportPeriod(Carbon $from, Carbon $to): string
+    {
+        if ($from->isSameDay($to)) {
+            return strtoupper($from->format('F Y'));
+        }
+
+        if ($from->year === $to->year) {
+            if ($from->month === $to->month) {
+                return strtoupper($from->format('F Y'));
+            }
+
+            return strtoupper($from->format('F') . ' TO ' . $to->format('F Y'));
+        }
+
+        return strtoupper($from->format('F Y') . ' TO ' . $to->format('F Y'));
+    }
+
+    private function formatGadCount(int $value): string
+    {
+        return $value > 0 ? (string) $value : '';
     }
 
     private function buildDentalSuppliesInventoryContext(): array

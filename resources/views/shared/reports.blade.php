@@ -2568,14 +2568,16 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
     function buildPatientSegmentChart() {
         const total = PATIENT_SEGMENT_DATA.values.reduce((a, b) => a + b, 0);
-        if (total === 0) return;
+        const canvas = document.getElementById('patientSegmentChart');
+
+        if (total === 0 || !canvas || !window.Chart) return;
 
         if (patientSegmentChartInstance) {
             patientSegmentChartInstance.destroy();
             patientSegmentChartInstance = null;
         }
 
-        patientSegmentChartInstance = new Chart(document.getElementById('patientSegmentChart'), {
+        patientSegmentChartInstance = new Chart(canvas, {
             type: 'doughnut',
             data: {
                 labels: PATIENT_SEGMENT_DATA.labels,
@@ -2686,15 +2688,15 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
         form.reset();
 
-        const quantity =
+        const quantityField =
             document.getElementById(
                 'reportQty'
             );
 
-        if (quantity) {
-            quantity.value = '1';
+        if (quantityField) {
+            quantityField.value = '1';
 
-            quantity.dispatchEvent(
+            quantityField.dispatchEvent(
                 new Event(
                     'input',
                     {
@@ -2743,12 +2745,12 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
         banner?.classList.add('hidden');
 
-        const quantity =
+        const quantityInput =
             document.getElementById('reportQty');
 
-        if (quantity) {
-            quantity.disabled = false;
-            quantity.placeholder = '1–100';
+        if (quantityInput) {
+            quantityInput.disabled = false;
+            quantityInput.placeholder = '1–100';
         }
 
         const counter =
@@ -2834,11 +2836,17 @@ $customReportTemplates = collect($customReportTemplates ?? []);
     }
 
     function buildGadChart(labels, female, male) {
+        const canvas = document.getElementById('gadChart');
+
+        if (!canvas || !window.Chart) {
+            return;
+        }
+
         if (gadChartInstance) {
             gadChartInstance.destroy();
             gadChartInstance = null;
         }
-        gadChartInstance = new Chart(document.getElementById('gadChart'), {
+        gadChartInstance = new Chart(canvas, {
             type: 'bar',
             data: {
                 labels,
@@ -2911,11 +2919,17 @@ $customReportTemplates = collect($customReportTemplates ?? []);
     }
 
     function buildWeeklyChart(labels, datasets) {
+        const canvas = document.getElementById('weeklyDentalCasesChart');
+
+        if (!canvas || !window.Chart) {
+            return;
+        }
+
         if (weeklyChartInstance) {
             weeklyChartInstance.destroy();
             weeklyChartInstance = null;
         }
-        weeklyChartInstance = new Chart(document.getElementById('weeklyDentalCasesChart'), {
+        weeklyChartInstance = new Chart(canvas, {
             type: 'line',
             data: {
                 labels,
@@ -3123,10 +3137,17 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             initReportCharts();
         });
 
-        document.getElementById('gadPeriodSelect').addEventListener('change', function () {
+        const gadPeriodSelect =
+            document.getElementById('gadPeriodSelect');
+
+        const weeklyPeriodSelect =
+            document.getElementById('weeklyPeriodSelect');
+
+        gadPeriodSelect?.addEventListener('change', function () {
             reloadGadChart(this.value);
         });
-        document.getElementById('weeklyPeriodSelect').addEventListener('change', function () {
+
+        weeklyPeriodSelect?.addEventListener('change', function () {
             reloadWeeklyChart(this.value);
         });
 
@@ -3409,17 +3430,27 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
         syncReportQuantityState();
 
-        document.getElementById('reportName').addEventListener('input', function () {
+        const reportNameInput = document.getElementById('reportName');
+        const reportTypeInput = document.getElementById('reportType');
+        const dateFromInput = document.getElementById('dateFrom');
+        const dateToInput = document.getElementById('dateTo');
+        const qtyInput = document.getElementById('reportQty');
+
+        reportNameInput?.addEventListener('input', function () {
             const len = this.value.length,
                 counter = document.getElementById('reportNameCounter');
-            counter.textContent = `${len} / 100`;
-            counter.classList.toggle('text-red-500', len >= 90);
-            counter.classList.toggle('text-gray-400', len < 90);
+
+            if (counter) {
+                counter.textContent = `${len} / 100`;
+                counter.classList.toggle('text-red-500', len >= 90);
+                counter.classList.toggle('text-gray-400', len < 90);
+            }
+
             if (this.value.trim()) clearError('reportName', 'reportNameErr');
             document.getElementById('formErrorBanner').classList.add('hidden');
         });
 
-        document.getElementById('reportType').addEventListener('change', function () {
+        reportTypeInput?.addEventListener('change', function () {
             if (this.value) clearError('reportType', 'reportTypeErr');
 
             const selectedOption = this.selectedOptions[0];
@@ -3513,14 +3544,13 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             }
             document.getElementById('formErrorBanner').classList.add('hidden');
         }
-        document.getElementById('dateFrom').addEventListener('change', checkDates);
-        document.getElementById('dateTo').addEventListener('change', checkDates);
+        dateFromInput?.addEventListener('change', checkDates);
+        dateToInput?.addEventListener('change', checkDates);
 
-        const qtyInput = document.getElementById('reportQty');
-        qtyInput.addEventListener('keydown', e => {
+        qtyInput?.addEventListener('keydown', e => {
             if (['-', '+', 'e', 'E', '.', ','].includes(e.key)) e.preventDefault();
         });
-        qtyInput.addEventListener('input', function () {
+        qtyInput?.addEventListener('input', function () {
             let val = this.value.replace(/[^0-9]/g, '');
             if (val !== '' && parseInt(val, 10) > 100) val = '100';
             this.value = val;
@@ -3528,7 +3558,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             if (!isNaN(qty) && qty >= 1 && qty <= 100) clearError('reportQty', 'reportQtyErr');
             document.getElementById('formErrorBanner').classList.add('hidden');
         });
-        qtyInput.addEventListener('paste', e => {
+        qtyInput?.addEventListener('paste', e => {
             e.preventDefault();
             const num = parseInt((e.clipboardData || window.clipboardData).getData('text').replace(
                 /[^0-9]/g, ''), 10);

@@ -2630,6 +2630,27 @@ hr.section-divider {
     pointer-events: none !important;
 }
 
+#mainContent.dentist-report-page .card,
+#mainContent.dentist-report-page .card-header {
+    overflow: visible !important;
+}
+
+#mainContent.dentist-report-page .card-header {
+    position: relative;
+    z-index: 20;
+}
+
+#mainContent.dentist-report-page .card-body {
+    position: relative;
+    z-index: 1;
+}
+
+#mainContent.dentist-report-page .card-header-right,
+#mainContent.dentist-report-page .card-header-right .custom-select {
+    position: relative;
+    z-index: 30;
+}
+
 .printable-template-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));

@@ -10,6 +10,8 @@ use Illuminate\Support\Str;
 
 class StudentApiService
 {
+    private const DIRECTORY_CACHE_KEY = 'ogos_student_directory_cache';
+
     protected string $baseUrl;
     protected string $tokenUrl;
     protected string $clientId;
@@ -118,118 +120,225 @@ class StudentApiService
 
     public function searchStudents(?string $search = null, int $limit = 30): array
     {
-        $token = $this->getAccessToken();
-
         $limit = max(1, min($limit, 80));
+        try {
+            $token = $this->getAccessToken();
 
-        $url = $this->baseUrl . $this->studentSearchPath;
+            $url = $this->baseUrl . $this->studentSearchPath;
 
-        $query = [
-            'page' => 1,
-            'page_size' => $limit,
-        ];
+            $query = [
+                'page' => 1,
+                'page_size' => $limit,
+            ];
 
-        $trimmedSearch = $search !== null ? trim($search) : '';
-        if ($trimmedSearch !== '') {
-            $query['search'] = $trimmedSearch;
-        }
+            $trimmedSearch = $search !== null ? trim($search) : '';
+            if ($trimmedSearch !== '') {
+                $query['search'] = $trimmedSearch;
+            }
 
-        Log::info('Student API search request', [
-            'url' => $url,
-            'query' => $query,
-        ]);
+            Log::info('Student API search request', [
+                'url' => $url,
+                'query' => $query,
+            ]);
 
-        $response = Http::acceptJson()
-            ->withToken($token)
-            ->timeout(15)
-            ->get($url, $query);
+            $response = Http::acceptJson()
+                ->withToken($token)
+                ->timeout(15)
+                ->get($url, $query);
 
-        Log::info('Student API search response', [
-            'url' => $url,
-            'status' => $response->status(),
-            'body' => $response->body(),
-        ]);
-
-        if (! $response->successful()) {
-            Log::error('Student API search failed', [
+            Log::info('Student API search response', [
                 'url' => $url,
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
 
-            throw new Exception('Failed to search students from Student API.');
+            if (! $response->successful()) {
+                Log::error('Student API search failed', [
+                    'url' => $url,
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+
+                throw new Exception('Failed to search students from Student API.');
+            }
+
+            $payload = $response->json();
+
+            if (! is_array($payload)) {
+                Log::error('Student API returned non-JSON or empty response', [
+                    'url' => $url,
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+
+                return [];
+            }
+
+            $students = $this->extractStudentList($payload);
+            $this->cacheStudentDirectory($students);
+
+            return $students;
+        } catch (\Throwable $e) {
+            $fallbackStudents = $this->fallbackStudentDirectory($search, $limit);
+
+            if (! empty($fallbackStudents)) {
+                Log::warning('Student API search falling back to cached or logged directory', [
+                    'search' => $search,
+                    'count' => count($fallbackStudents),
+                    'message' => $e->getMessage(),
+                ]);
+
+                return $fallbackStudents;
+            }
+
+            throw $e;
         }
-
-        $payload = $response->json();
-
-        if (! is_array($payload)) {
-            Log::error('Student API returned non-JSON or empty response', [
-                'url' => $url,
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
-
-            return [];
-        }
-
-        return $this->extractStudentList($payload);
     }
 
     public function getStudentByEmail(string $email): array
     {
-        $token = $this->getAccessToken();
+        try {
+            $token = $this->getAccessToken();
 
-        $url = $this->baseUrl . '/integrations/students/profile';
+            $url = $this->baseUrl . '/integrations/students/profile';
 
-        $response = Http::acceptJson()
-            ->withToken($token)
-            ->timeout(15)
-            ->get($url, [
-                'email' => $email,
+            $response = Http::acceptJson()
+                ->withToken($token)
+                ->timeout(15)
+                ->get($url, [
+                    'email' => $email,
+                ]);
+
+            if (! $response->successful()) {
+                Log::error('Student fetch by email failed', [
+                    'email' => $email,
+                    'url' => $url,
+                    'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+
+                throw new Exception('Failed to fetch student by email.');
+            }
+
+            $payload = $response->json() ?? [];
+            $studentData = is_array(data_get($payload, 'data')) ? data_get($payload, 'data') : [];
+
+            if (! empty($studentData)) {
+                $this->cacheStudentDirectory([$studentData]);
+                Cache::put($this->personalInfoCacheKey((string) $this->extractStudentNumber($studentData)), $payload, now()->addDays(7));
+            }
+
+            return $payload;
+        } catch (\Throwable $e) {
+            $student = $this->findStudentByEmailFromFallbacks($email);
+
+            if ($student !== null) {
+                Log::warning('Student fetch by email falling back to cached or logged directory', [
+                    'email' => $email,
+                    'message' => $e->getMessage(),
+                ]);
+
+                return ['data' => $student];
+            }
+
+            throw $e;
+        }
+    }
+
+    public function getPersonalInfoByStudentNumber(string $studentNumber): array
+    {
+        try {
+            $token = $this->getAccessToken();
+
+            $url = $this->baseUrl . '/integrations/students/' . urlencode($studentNumber) . '/personal-info';
+
+            Log::info('DEBUG Personal Info Request', [
+                'student_number' => $studentNumber,
+                'url' => $url,
             ]);
 
-        if (! $response->successful()) {
-            Log::error('Student fetch by email failed', [
-                'email' => $email,
+            $response = Http::acceptJson()
+                ->withToken($token)
+                ->timeout(15)
+                ->get($url);
+
+            Log::info('DEBUG Personal Info Response', [
+                'student_number' => $studentNumber,
                 'url' => $url,
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
 
-            throw new Exception('Failed to fetch student by email.');
-        }
+            if (! $response->successful()) {
+                throw new Exception('Failed to fetch student personal info.');
+            }
 
-        return $response->json() ?? [];
+            $payload = $response->json() ?? [];
+            Cache::put($this->personalInfoCacheKey($studentNumber), $payload, now()->addDays(7));
+
+            return $payload;
+        } catch (\Throwable $e) {
+            $cachedPayload = Cache::get($this->personalInfoCacheKey($studentNumber));
+
+            if (is_array($cachedPayload)) {
+                Log::warning('Student personal info falling back to cached payload', [
+                    'student_number' => $studentNumber,
+                    'message' => $e->getMessage(),
+                ]);
+
+                return $cachedPayload;
+            }
+
+            throw $e;
+        }
     }
 
-    public function getPersonalInfoByStudentNumber(string $studentNumber): array
+    public function getAddressesByStudentNumber(string $studentNumber): array
     {
-        $token = $this->getAccessToken();
+        try {
+            $token = $this->getAccessToken();
 
-        $url = $this->baseUrl . '/integrations/students/' . urlencode($studentNumber) . '/personal-info';
+            $url = $this->baseUrl . '/integrations/students/' . urlencode($studentNumber) . '/addresses';
 
-        Log::info('DEBUG Personal Info Request', [
-            'student_number' => $studentNumber,
-            'url' => $url,
-        ]);
+            Log::info('DEBUG Student Addresses Request', [
+                'student_number' => $studentNumber,
+                'url' => $url,
+            ]);
 
-        $response = Http::acceptJson()
-            ->withToken($token)
-            ->timeout(15)
-            ->get($url);
+            $response = Http::acceptJson()
+                ->withToken($token)
+                ->timeout(15)
+                ->get($url);
 
-        Log::info('DEBUG Personal Info Response', [
-            'student_number' => $studentNumber,
-            'url' => $url,
-            'status' => $response->status(),
-            'body' => $response->body(),
-        ]);
+            Log::info('DEBUG Student Addresses Response', [
+                'student_number' => $studentNumber,
+                'url' => $url,
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
 
-        if (! $response->successful()) {
-            throw new Exception('Failed to fetch student personal info.');
+            if (! $response->successful()) {
+                throw new Exception('Failed to fetch student addresses.');
+            }
+
+            $payload = $response->json() ?? [];
+            Cache::put($this->addressCacheKey($studentNumber), $payload, now()->addDays(7));
+
+            return $payload;
+        } catch (\Throwable $e) {
+            $cachedPayload = Cache::get($this->addressCacheKey($studentNumber));
+
+            if (is_array($cachedPayload)) {
+                Log::warning('Student addresses falling back to cached payload', [
+                    'student_number' => $studentNumber,
+                    'message' => $e->getMessage(),
+                ]);
+
+                return $cachedPayload;
+            }
+
+            throw $e;
         }
-
-        return $response->json() ?? [];
     }
 
     public function normalizeStudent(array $student): ?array
@@ -334,5 +443,169 @@ class StudentApiService
         }
 
         return [];
+    }
+
+    private function cacheStudentDirectory(array $students): void
+    {
+        if (empty($students)) {
+            return;
+        }
+
+        $existing = Cache::get(self::DIRECTORY_CACHE_KEY, []);
+        $indexed = [];
+
+        foreach (array_merge($existing, $students) as $student) {
+            if (! is_array($student)) {
+                continue;
+            }
+
+            $email = strtolower((string) (
+                data_get($student, 'email')
+                ?? data_get($student, 'emailAddress')
+                ?? data_get($student, 'email_address')
+                ?? data_get($student, 'institutional_email')
+                ?? data_get($student, 'institutionalEmail')
+            ));
+
+            if ($email === '') {
+                continue;
+            }
+
+            $indexed[$email] = $student;
+        }
+
+        Cache::put(self::DIRECTORY_CACHE_KEY, array_values($indexed), now()->addDays(7));
+    }
+
+    private function fallbackStudentDirectory(?string $search, int $limit): array
+    {
+        $students = Cache::get(self::DIRECTORY_CACHE_KEY, []);
+
+        if (empty($students)) {
+            $students = $this->readStudentDirectoryFromLogs();
+        }
+
+        if (! is_array($students)) {
+            return [];
+        }
+
+        $trimmedSearch = strtolower(trim((string) $search));
+
+        $filtered = collect($students)
+            ->filter(function ($student) use ($trimmedSearch) {
+                if (! is_array($student)) {
+                    return false;
+                }
+
+                if ($trimmedSearch === '') {
+                    return true;
+                }
+
+                $haystacks = [
+                    strtolower((string) (data_get($student, 'email') ?? '')),
+                    strtolower((string) (data_get($student, 'studentNumber') ?? data_get($student, 'student_number') ?? '')),
+                    strtolower((string) (data_get($student, 'firstName') ?? data_get($student, 'first_name') ?? '')),
+                    strtolower((string) (data_get($student, 'middleName') ?? data_get($student, 'middle_name') ?? '')),
+                    strtolower((string) (data_get($student, 'lastName') ?? data_get($student, 'last_name') ?? '')),
+                ];
+
+                foreach ($haystacks as $value) {
+                    if ($value !== '' && str_contains($value, $trimmedSearch)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            })
+            ->take($limit)
+            ->values()
+            ->all();
+
+        return $filtered;
+    }
+
+    private function findStudentByEmailFromFallbacks(string $email): ?array
+    {
+        $normalizedEmail = strtolower(trim($email));
+
+        foreach ($this->fallbackStudentDirectory($normalizedEmail, 80) as $student) {
+            $studentEmail = strtolower((string) (
+                data_get($student, 'email')
+                ?? data_get($student, 'emailAddress')
+                ?? data_get($student, 'email_address')
+                ?? data_get($student, 'institutional_email')
+                ?? data_get($student, 'institutionalEmail')
+            ));
+
+            if ($studentEmail === $normalizedEmail) {
+                return $student;
+            }
+        }
+
+        return null;
+    }
+
+    private function readStudentDirectoryFromLogs(): array
+    {
+        $logPath = storage_path('logs/laravel.log');
+
+        if (! is_file($logPath) || ! is_readable($logPath)) {
+            return [];
+        }
+
+        $lines = @file($logPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+        if (! is_array($lines)) {
+            return [];
+        }
+
+        for ($index = count($lines) - 1; $index >= 0; $index--) {
+            $line = $lines[$index];
+
+            if (! str_contains($line, 'Student API search response')) {
+                continue;
+            }
+
+            $jsonStart = strpos($line, '{');
+
+            if ($jsonStart === false) {
+                continue;
+            }
+
+            $context = json_decode(substr($line, $jsonStart), true);
+            $body = is_array($context) ? ($context['body'] ?? null) : null;
+
+            if (! is_string($body) || $body === '') {
+                continue;
+            }
+
+            $payload = json_decode($body, true);
+            $students = is_array($payload) ? $this->extractStudentList($payload) : [];
+
+            if (! empty($students)) {
+                $this->cacheStudentDirectory($students);
+                return $students;
+            }
+        }
+
+        return [];
+    }
+
+    private function extractStudentNumber(array $student): ?string
+    {
+        return data_get($student, 'studentNumber')
+            ?? data_get($student, 'student_number')
+            ?? data_get($student, 'studentNo')
+            ?? data_get($student, 'student_no');
+    }
+
+    private function personalInfoCacheKey(string $studentNumber): string
+    {
+        return 'ogos_student_personal_info_' . Str::lower(trim($studentNumber));
+    }
+
+    private function addressCacheKey(string $studentNumber): string
+    {
+        return 'ogos_student_addresses_' . Str::lower(trim($studentNumber));
     }
 }

@@ -17,11 +17,13 @@ use App\Models\DentalHistory;
 use App\Models\DentalHistoryAnswer;
 use App\Models\DentalHistoryConcern;
 use App\Models\DentalHistoryConditionDate;
+use App\Models\DentalServiceRecord;
 use App\Models\MedicalHistory;
 use App\Models\MedicalHistoryAnswer;
 use App\Models\MedicalHistoryDiseaseAnswer;
 use App\Models\AppointmentProcedure;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use setasign\Fpdi\Fpdi;
 
 class DentistReportController extends Controller
@@ -286,6 +288,7 @@ class DentistReportController extends Controller
 
         $pathsByCode = [
             'DTR-DEFAULT' => 'daily-treatment-record-template.pdf',
+            'DTR-FACULTY' => 'dental treatment-record-faculty.pdf',
             'DSRV-DEFAULT' => 'dental-services-template.pdf',
             'DHREC-DEFAULT' => 'dental-health-record-template.pdf',
             'ADCL-DEFAULT' => 'annual-dental-clearance-template.pdf',
@@ -660,7 +663,10 @@ class DentistReportController extends Controller
             ], 404);
         }
 
-        $records = Appointment::with('patient')
+        $records = Appointment::with([
+            'patient.medicalHistory',
+            'procedure',
+        ])
             ->where('status', 'completed')
             ->whereDate('appointment_date', '>=', $from->toDateString())
             ->whereDate('appointment_date', '<=', $to->toDateString())
@@ -913,9 +919,9 @@ class DentistReportController extends Controller
             ? Carbon::parse($validated['date_to'])->endOfDay()
             : $from->copy()->endOfDay();
 
-        $templatePath = storage_path('app/report-templates/daily-treatment-record-template.pdf');
+        $templatePath = $this->getPrintableTemplatePdfPath($templateRecord);
 
-        if (!file_exists($templatePath)) {
+        if (!$templatePath || !file_exists($templatePath)) {
             return response()->json([
                 'message' => 'Daily Treatment Record PDF template was not found.',
             ], 404);
@@ -951,7 +957,11 @@ class DentistReportController extends Controller
                 $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
                 $pdf->useTemplate($template, 0, 0, $size['width'], $size['height'], true);
 
-                $this->drawDailyTreatmentRecordRows($pdf, $chunk->values());
+                $this->drawDailyTreatmentRecordRows(
+                    $pdf,
+                    $chunk->values(),
+                    strtoupper(trim((string) ($templateRecord->code ?? '')))
+                );
             }
         }
 
@@ -1231,6 +1241,13 @@ class DentistReportController extends Controller
                     : [];
 
                 $patientTreatments = $treatmentsByPatient->get($patient->id, collect());
+                $procedureDiagnosisByAppointment = AppointmentProcedure::query()
+                    ->whereIn('appointment_id', $patientTreatments->pluck('id')->filter()->all())
+                    ->get()
+                    ->groupBy('appointment_id')
+                    ->map(function ($procedures) {
+                        return trim((string) ($procedures->last()->diagnosis ?? ''));
+                    });
 
                 $patientAppointmentIds = $patientTreatments->pluck('id')->filter()->values();
 
@@ -1256,7 +1273,12 @@ class DentistReportController extends Controller
                 $this->drawDentalHealthRecordPageTwo($pdf, $dentalAnswers, $dentalConcern, $dentalDates, $medicalHistory, $medicalAnswers, $diseaseAnswers);
 
                 $this->addDentalHealthTemplatePage($pdf, 3);
-                $this->drawDentalHealthRecordPageThree($pdf, $medicalHistory, $patientTreatments);
+                $this->drawDentalHealthRecordPageThree(
+                    $pdf,
+                    $medicalHistory,
+                    $patientTreatments,
+                    $procedureDiagnosisByAppointment
+                );
             }
 
             $fileName = 'dental-health-record-' . $from->format('Ymd') . '-to-' . $to->format('Ymd') . '.pdf';
@@ -1697,6 +1719,7 @@ class DentistReportController extends Controller
         $pdf->SetFont('Helvetica', '', 8);
 
         $patientName = trim((string) ($patient->name ?? ''));
+        [$lastName, $firstName, $middleName] = $this->splitDentalHealthRecordNameParts($patient, $patientName);
 
         $yearSection = '';
 
@@ -1716,15 +1739,10 @@ class DentistReportController extends Controller
 
         $adminDept = trim((string) ($patient->faculty_code ?? ''));
 
-        $birthdate = !empty($patient->birthdate)
-            ? Carbon::parse($patient->birthdate)->format('m/d/y')
-            : '';
-
-        $age = !empty($patient->birthdate)
-            ? (string) Carbon::parse($patient->birthdate)->age
-            : '';
-
-        $sex = trim((string) ($patient->gender ?? ''));
+        $demographics = $this->resolvePatientDemographics($patient);
+        $birthdate = $demographics['birthdate_short'];
+        $age = $demographics['age'];
+        $sex = $demographics['gender'];
 
         $lastDentalVisit = $dentalHistory && $dentalHistory->last_dental_visit
             ? Carbon::parse($dentalHistory->last_dental_visit)->format('m/d/y')
@@ -1732,17 +1750,20 @@ class DentistReportController extends Controller
 
         $previousDentist = trim((string) ($dentalHistory->previous_dentist ?? ''));
 
-        $this->drawPdfCell($pdf, 333, 167, $patientName, 470, 8, 'L');
-        $this->drawPdfCell($pdf, 157, 193, $yearSection, 95, 8, 'L');
-        $this->drawPdfCell($pdf, 313, 193, $facultyCollege, 125, 8, 'L');
-        $this->drawPdfCell($pdf, 510, 193, $adminDept, 100, 8, 'L');
-        $this->drawPdfCell($pdf, 158, 208, $birthdate, 130, 8, 'L');
-        $this->drawPdfCell($pdf, 250, 208, $age, 45, 8, 'C');
-        $this->drawPdfCell($pdf, 385, 208, $sex, 110, 8, 'L');
+        $this->drawPdfCellAutoFont($pdf, 182, 167, $patientName, 485, 8, 'L', 'Helvetica', '', 8, 5.8);
+        $this->drawPdfCellAutoFont($pdf, 178, 179, $lastName, 150, 8, 'C', 'Helvetica', '', 7.2, 5.4);
+        $this->drawPdfCellAutoFont($pdf, 348, 179, $firstName, 150, 8, 'C', 'Helvetica', '', 7.2, 5.4);
+        $this->drawPdfCellAutoFont($pdf, 505, 179, $middleName, 120, 8, 'C', 'Helvetica', '', 7.2, 5.4);
+        $this->drawPdfCellAutoFont($pdf, 190, 193, $yearSection, 90, 8, 'L', 'Helvetica', '', 7.8, 5.6);
+        $this->drawPdfCellAutoFont($pdf, 355, 193, $facultyCollege, 125, 8, 'L', 'Helvetica', '', 7.2, 5.4);
+        $this->drawPdfCellAutoFont($pdf, 565, 193, $adminDept, 85, 8, 'L', 'Helvetica', '', 7.2, 5.4);
+        $this->drawPdfCellAutoFont($pdf, 195, 208, $birthdate, 100, 8, 'L', 'Helvetica', '', 7.8, 5.6);
+        $this->drawPdfCellAutoFont($pdf, 355, 208, $age, 35, 8, 'C', 'Helvetica', '', 7.8, 5.6);
+        $this->drawPdfCellAutoFont($pdf, 475, 208, $sex, 85, 8, 'L', 'Helvetica', '', 7.2, 5.4);
         $this->drawDentalHealthOdontogram($pdf, $appointmentProcedure?->odontogram_data ?? []);
 
-        $this->drawPdfCell($pdf, 250, 587, $previousDentist, 215, 8, 'L');
-        $this->drawPdfCell($pdf, 205, 600, $lastDentalVisit, 205, 8, 'L');
+        $this->drawPdfCellAutoFont($pdf, 250, 587, $previousDentist, 215, 8, 'L', 'Helvetica', '', 8, 5.8);
+        $this->drawPdfCellAutoFont($pdf, 205, 600, $lastDentalVisit, 205, 8, 'L', 'Helvetica', '', 8, 5.8);
 
         $pdf->SetFont('Helvetica', '', 7);
 
@@ -1768,8 +1789,10 @@ class DentistReportController extends Controller
         $pdf->SetTextColor(0, 0, 0);
         $pdf->SetFont('Helvetica', '', 6.2);
 
-        $lastMedicalExam = $this->findDhrMedicalTextOnly($medicalAnswers, ['last', 'medical'])
-            ?: $this->findDhrMedicalTextOnly($medicalAnswers, ['medical', 'examination'])
+        $goodHealth = $this->dhrMedicalBoolByKeys($medicalAnswers, ['good_health']);
+        $goodHealthDetails = $this->dhrMedicalTextByKeys($medicalAnswers, ['good_health_details']);
+
+        $lastMedicalExam = $this->dhrMedicalTextByKeys($medicalAnswers, ['medical_exam_date'])
             ?: $this->pickMedicalHistoryValue($medicalHistory, [
                 'last_medical_examination',
                 'last_medical_exam',
@@ -1780,40 +1803,20 @@ class DentistReportController extends Controller
                 'last_checkup',
             ]);
 
-        $medicineAllergy = $this->pickMedicalHistoryValue($medicalHistory, [
-            'medicine_allergy',
-            'medicines_allergy',
-            'allergy_medicines',
-            'allergies_medicines',
-            'medicine_allergies',
-            'medication_allergy',
-        ]);
-
-        $foodAllergy = $this->pickMedicalHistoryValue($medicalHistory, [
-            'food_allergy',
-            'foods_allergy',
-            'allergy_foods',
-            'allergies_foods',
-            'food_allergies',
-        ]);
-
-        $otherAllergy = $this->pickMedicalHistoryValue($medicalHistory, [
-            'other_allergy',
-            'others_allergy',
-            'allergy_others',
-            'allergies_others',
-            'other_allergies',
-        ]);
-
-        if ($medicineAllergy === '' && $foodAllergy === '' && $otherAllergy === '') {
-            $medicineAllergy = $this->findDhrMedicalTextOnly($medicalAnswers, ['allerg'])
-                ?: $this->pickMedicalHistoryValue($medicalHistory, [
-                    'allergies',
-                    'allergy',
-                    'allergy_details',
-                    'allergies_details',
-                ]);
-        }
+        $receivingTreatment = $this->dhrMedicalTextByKeys($medicalAnswers, ['treatment_details']);
+        $hospitalized = $this->dhrMedicalBoolByKeys($medicalAnswers, ['hospitalized']);
+        $hospitalDetails = $this->dhrMedicalTextByKeys($medicalAnswers, ['hospital_details']);
+        $medicineAllergy = $this->dhrMedicalTextByKeys($medicalAnswers, ['allergy_medicine']);
+        $foodAllergy = $this->dhrMedicalTextByKeys($medicalAnswers, ['allergy_food']);
+        $otherAllergy = $this->dhrMedicalTextByKeys($medicalAnswers, ['allergy_others']);
+        $takingMedication = $this->dhrMedicalBoolByKeys($medicalAnswers, ['medication']);
+        $medicationDetails = $this->dhrMedicalTextByKeys($medicalAnswers, ['medication_details']);
+        $pregnant = $this->dhrMedicalBoolByKeys($medicalAnswers, ['pregnant']);
+        $nursing = $this->dhrMedicalBoolByKeys($medicalAnswers, ['nursing']);
+        $birthControl = $this->dhrMedicalBoolByKeys($medicalAnswers, ['birth_control']);
+        $tobaccoSummary = $this->buildDhrTobaccoSummary($medicalAnswers);
+        $headacheText = $this->dhrMedicalTextByKeys($medicalAnswers, ['headaches']);
+        $additionalHealthInfo = $this->buildDhrAdditionalHealthInfo($medicalAnswers);
 
         $this->drawPdfCell($pdf, 162, 42, $this->dhrDentalAnswer($dentalAnswers, 'opening_closing'), 26, 8, 'C');
         $this->drawPdfCell($pdf, 130, 55, $this->dhrDentalAnswer($dentalAnswers, 'chewing_difficulty'), 26, 8, 'C');
@@ -1823,13 +1826,13 @@ class DentistReportController extends Controller
         $this->drawPdfCell($pdf, 210, 109, $this->dhrDentalAnswer($dentalAnswers, 'loosening_teeth'), 22, 8, 'C');
         $this->drawPdfCell($pdf, 220, 122, $this->dhrDentalAnswer($dentalAnswers, 'food_caught'), 23, 8, 'C');
 
-        $this->drawPdfCell($pdf, 300, 149, $this->dhrDentalAnswer($dentalAnswers, 'reaction_medicine_anesthetic'), 380, 8, 'L');
-        $this->drawPdfCell($pdf, 325, 162, $this->dhrDentalAnswer($dentalAnswers, 'periodontal_treatment'), 170, 8, 'L');
+        $this->drawPdfCellAutoFont($pdf, 300, 149, $this->dhrDentalAnswer($dentalAnswers, 'reaction_medicine_anesthetic'), 380, 8, 'L', 'Helvetica', '', 6.2, 4.8);
+        $this->drawPdfCellAutoFont($pdf, 325, 162, $this->dhrDentalAnswer($dentalAnswers, 'periodontal_treatment'), 170, 8, 'L', 'Helvetica', '', 6.2, 4.8);
 
-        $this->drawPdfCell($pdf, 260, 175, $this->dhrDentalAnswer($dentalAnswers, 'difficult_extraction'), 70, 8, 'L');
-        $this->drawPdfCell($pdf, 382, 175, $this->formatDhrDate($dentalDates?->extraction_date), 100, 8, 'L');
+        $this->drawPdfCellAutoFont($pdf, 260, 175, $this->dhrDentalAnswer($dentalAnswers, 'difficult_extraction'), 70, 8, 'L', 'Helvetica', '', 6.2, 4.8);
+        $this->drawPdfCellAutoFont($pdf, 382, 175, $this->formatDhrDate($dentalDates?->extraction_date), 100, 8, 'L', 'Helvetica', '', 6.2, 4.8);
 
-        $this->drawPdfCell($pdf, 390, 189, $this->dhrDentalAnswer($dentalAnswers, 'prolonged_bleeding'), 130, 8, 'L');
+        $this->drawPdfCellAutoFont($pdf, 390, 189, $this->dhrDentalAnswer($dentalAnswers, 'prolonged_bleeding'), 130, 8, 'L', 'Helvetica', '', 6.2, 4.8);
 
         $this->drawPdfCell($pdf, 216.5, 202, $this->dhrDentalAnswer($dentalAnswers, 'dentures'), 48, 8, 'C');
         $this->drawPdfCell($pdf, 370.0, 202, $this->formatDhrDate($dentalDates?->dentures_date), 65, 8, 'C');
@@ -1837,44 +1840,40 @@ class DentistReportController extends Controller
         $this->drawPdfCell($pdf, 196.8, 215, $this->dhrDentalAnswer($dentalAnswers, 'orthodontic'), 48, 8, 'C');
         $this->drawPdfCell($pdf, 353.7, 215, $this->formatDhrDate($dentalDates?->ortho_date), 65, 8, 'C');
 
-        $this->drawPdfMultiCell($pdf, 305, 244, trim((string) ($dentalConcern->additional_concerns ?? '')), 520, 12, 'L');
+        $this->drawPdfWrappedCell($pdf, 305, 244, trim((string) ($dentalConcern->additional_concerns ?? '')), 520, 12, 'L', 3);
 
         $pdf->SetFont('Helvetica', '', 6.2);
 
-        $goodHealth = $this->findDhrMedicalBool($medicalAnswers, ['good', 'health']);
-        $hospitalized = $this->findDhrMedicalBool($medicalAnswers, ['hospitalized']);
-        $takingMedication = $this->findDhrMedicalBool($medicalAnswers, ['medication']);
-
-        $pregnant = $this->findDhrMedicalBool($medicalAnswers, ['pregnant']);
-        $nursing = $this->findDhrMedicalBool($medicalAnswers, ['nursing']);
-        $birthControl = $this->findDhrMedicalBool($medicalAnswers, ['birth', 'control']);
-
         $this->drawPdfCell($pdf, 153, 303, $this->dhrBoolMark($goodHealth, true), 16, 8, 'C');
         $this->drawPdfCell($pdf, 200, 303, $this->dhrBoolMark($goodHealth, false), 16, 8, 'C');
-        $this->drawPdfCell($pdf, 384, 303, $this->findDhrMedicalTextOnly($medicalAnswers, ['good', 'health']), 115, 8, 'L');
+        $this->drawPdfCellAutoFont($pdf, 384, 303, $goodHealthDetails, 115, 8, 'L', 'Helvetica', '', 6.2, 4.8);
 
 
-        $this->drawPdfCell(
+        $this->drawPdfCellAutoFont(
             $pdf,
             312,
             316,
             $lastMedicalExam,
             185,
             8,
-            'L'
+            'L',
+            'Helvetica',
+            '',
+            6.2,
+            4.8
         );
 
-        $this->drawPdfCell($pdf, 230, 343, $this->findDhrMedicalTextOnly($medicalAnswers, ['receiving']), 330, 8, 'L');
+        $this->drawPdfCellAutoFont($pdf, 230, 343, $receivingTreatment, 330, 8, 'L', 'Helvetica', '', 6.2, 4.8);
 
         $this->drawPdfCell($pdf, 205, 356, $this->dhrBoolText($hospitalized), 65, 8, 'C');
-        $this->drawPdfCell($pdf, 252, 369, $this->findDhrMedicalTextOnly($medicalAnswers, ['hospitalized']), 430, 8, 'L');
+        $this->drawPdfCellAutoFont($pdf, 252, 369, $hospitalDetails, 430, 8, 'L', 'Helvetica', '', 6.2, 4.8);
 
-        $this->drawPdfCell($pdf, 165, 396, $medicineAllergy, 115, 8, 'L');
-        $this->drawPdfCell($pdf, 295, 396, $foodAllergy, 125, 8, 'L');
-        $this->drawPdfCell($pdf, 445, 396, $otherAllergy, 145, 8, 'L');
+        $this->drawPdfCellAutoFont($pdf, 165, 396, $medicineAllergy, 115, 8, 'L', 'Helvetica', '', 6.2, 4.8);
+        $this->drawPdfCellAutoFont($pdf, 295, 396, $foodAllergy, 125, 8, 'L', 'Helvetica', '', 6.2, 4.8);
+        $this->drawPdfCellAutoFont($pdf, 445, 396, $otherAllergy, 145, 8, 'L', 'Helvetica', '', 6.2, 4.8);
 
         $this->drawPdfCell($pdf, 286, 410, $this->dhrBoolText($takingMedication), 32, 8, 'C');
-        $this->drawPdfCell($pdf, 184, 423, $this->findDhrMedicalTextOnly($medicalAnswers, ['medication']), 140, 8, 'L');
+        $this->drawPdfCellAutoFont($pdf, 184, 423, $medicationDetails, 140, 8, 'L', 'Helvetica', '', 6.2, 4.8);
 
         $this->drawPdfCell($pdf, 356, 438, $this->dhrBoolMark($pregnant, true), 20, 8, 'C');
         $this->drawPdfCell($pdf, 417, 438, $this->dhrBoolMark($pregnant, false), 20, 8, 'C');
@@ -1919,19 +1918,24 @@ class DentistReportController extends Controller
 
         $pdf->SetFont('Helvetica', '', 7);
 
-        $this->drawPdfCell($pdf, 222, 644, $this->findDhrMedicalText($medicalAnswers, ['tobacco']), 32, 8, 'C');
-        $this->drawPdfCell($pdf, 172, 672, $this->findDhrMedicalText($medicalAnswers, ['headache']), 24, 8, 'C');
-        $this->drawPdfMultiCell($pdf, 305, 698, $this->findDhrMedicalText($medicalAnswers, ['additional']), 520, 12, 'L');
+        $this->drawPdfCellAutoFont($pdf, 222, 644, $tobaccoSummary, 32, 8, 'C', 'Helvetica', '', 7, 5.2);
+        $this->drawPdfCellAutoFont($pdf, 172, 672, $headacheText, 24, 8, 'C', 'Helvetica', '', 7, 5.2);
+        $this->drawPdfWrappedCell($pdf, 305, 698, $additionalHealthInfo, 520, 12, 'L', 3);
     }
 
-    private function drawDentalHealthRecordPageThree(Fpdi $pdf, ?MedicalHistory $medicalHistory, $patientTreatments): void
+    private function drawDentalHealthRecordPageThree(
+        Fpdi $pdf,
+        ?MedicalHistory $medicalHistory,
+        $patientTreatments,
+        $procedureDiagnosisByAppointment
+    ): void
     {
         $pdf->SetTextColor(0, 0, 0);
         $pdf->SetFont('Helvetica', '', 7.2);
 
-        $this->drawPdfCell($pdf, 255, 55.7, trim((string) ($medicalHistory->emergency_person ?? '')), 105, 7, 'L');
-        $this->drawPdfCell($pdf, 430, 55.7, trim((string) ($medicalHistory->emergency_relation ?? '')), 95, 7, 'L');
-        $this->drawPdfCell($pdf, 176, 68.6, trim((string) ($medicalHistory->emergency_number ?? '')), 105, 7, 'L');
+        $this->drawPdfCellAutoFont($pdf, 255, 55.7, trim((string) ($medicalHistory->emergency_person ?? '')), 105, 7, 'L', 'Helvetica', '', 7.2, 5.6);
+        $this->drawPdfCellAutoFont($pdf, 430, 55.7, trim((string) ($medicalHistory->emergency_relation ?? '')), 95, 7, 'L', 'Helvetica', '', 7.2, 5.6);
+        $this->drawPdfCellAutoFont($pdf, 176, 68.6, trim((string) ($medicalHistory->emergency_number ?? '')), 105, 7, 'L', 'Helvetica', '', 7.2, 5.6);
         $rowStartY = 151.0;
         $rowHeight = 18.25;
         $maxRows = 13;
@@ -1943,7 +1947,16 @@ class DentistReportController extends Controller
                 ? Carbon::parse($appointment->appointment_date)->format('m/d/y')
                 : '';
 
-            $diagnosis = '';
+            $diagnosis = trim((string) ($procedureDiagnosisByAppointment[$appointment->id] ?? ''));
+
+            if ($diagnosis === '' && !empty($appointment->procedure?->diagnosis)) {
+                $diagnosis = trim((string) $appointment->procedure->diagnosis);
+            }
+
+            if ($diagnosis === '') {
+                $diagnosis = trim((string) ($appointment->service_type ?? ''));
+            }
+
             $treatment = trim((string) ($appointment->service_type ?? ''));
 
             if ($treatment === '') {
@@ -1958,36 +1971,53 @@ class DentistReportController extends Controller
 
             $pdf->SetFont('Helvetica', '', 6.2);
 
-            $this->drawPdfCell($pdf, 59.9, $y, $date, 42, 7, 'C');
-            $this->drawPdfMultiCell($pdf, 153.5, $y, $diagnosis, 128, 8, 'L');
-            $this->drawPdfMultiCell($pdf, 293.9, $y, $treatment, 128, 8, 'L');
-            $this->drawPdfMultiCell($pdf, 434.3, $y, $attending, 128, 8, 'L');
+            $this->drawPdfCellAutoFont($pdf, 59.9, $y, $date, 42, 7, 'C', 'Helvetica', '', 6.2, 5.4);
+            $this->drawPdfWrappedCell($pdf, 153.5, $y, $diagnosis, 128, 12, 'L', 2);
+            $this->drawPdfWrappedCell($pdf, 293.9, $y, $treatment, 128, 12, 'L', 2);
+            $this->drawPdfWrappedCell($pdf, 434.3, $y, $attending, 128, 12, 'L', 2);
         }
     }
     private function getDentalHealthAnswerMap(int $patientId): array
     {
         $orderedKeys = [
-            'gum_bleeding',
-            'hot_cold_sensitive',
-            'sweet_sour_sensitive',
+            'bleeding_gums',
+            'sensitive_temp',
+            'sensitive_taste',
             'tooth_pain',
-            'sores_lumps',
-            'head_neck_jaw_injuries',
+            'sores',
+            'injuries',
             'clicking',
             'joint_pain',
-            'opening_closing',
-            'chewing_difficulty',
-            'frequent_headaches',
+            'difficulty_moving',
+            'difficulty_chewing',
+            'jaw_headaches',
             'clench_grind',
-            'lip_cheek_biting',
-            'loosening_teeth',
-            'food_caught',
-            'reaction_medicine_anesthetic',
-            'periodontal_treatment',
+            'biting',
+            'teeth_loosening',
+            'food_teeth',
+            'med_reaction',
+            'periodontal',
             'difficult_extraction',
             'prolonged_bleeding',
             'dentures',
-            'orthodontic',
+            'ortho_treatment',
+        ];
+
+        $legacyAliases = [
+            'bleeding_gums' => 'gum_bleeding',
+            'sensitive_temp' => 'hot_cold_sensitive',
+            'sensitive_taste' => 'sweet_sour_sensitive',
+            'sores' => 'sores_lumps',
+            'injuries' => 'head_neck_jaw_injuries',
+            'difficulty_moving' => 'opening_closing',
+            'difficulty_chewing' => 'chewing_difficulty',
+            'jaw_headaches' => 'frequent_headaches',
+            'biting' => 'lip_cheek_biting',
+            'teeth_loosening' => 'loosening_teeth',
+            'food_teeth' => 'food_caught',
+            'med_reaction' => 'reaction_medicine_anesthetic',
+            'periodontal' => 'periodontal_treatment',
+            'ortho_treatment' => 'orthodontic',
         ];
 
         $answers = DentalHistoryAnswer::with('condition')
@@ -2025,6 +2055,9 @@ class DentistReportController extends Controller
 
                 if ($codeKey !== '') {
                     $map[$codeKey] = $value;
+                    if (isset($legacyAliases[$codeKey])) {
+                        $map[$legacyAliases[$codeKey]] = $value;
+                    }
                 }
 
                 if ($questionKey !== '') {
@@ -2045,17 +2078,27 @@ class DentistReportController extends Controller
     {
         $orderedKeys = [
             'good_health',
-            'last_medical_examination',
-            'receiving_treatment',
+            'had_medical_exam',
+            'good_health_details',
+            'medical_exam_date',
+            'under_treatment',
+            'treatment_details',
             'hospitalized',
-            'allergies',
-            'taking_medication',
+            'hospital_details',
+            'allergy_medicine',
+            'allergy_food',
+            'allergy_others',
+            'medication',
+            'medication_details',
             'pregnant',
             'nursing',
             'birth_control',
-            'tobacco',
-            'headache',
-            'additional_health_information',
+            'tobacco_use',
+            'tobacco_per_day',
+            'tobacco_per_week',
+            'headaches',
+            'earaches',
+            'neck_aches',
         ];
 
         $answers = MedicalHistoryAnswer::with('question')
@@ -2206,6 +2249,112 @@ class DentistReportController extends Controller
         return '';
     }
 
+    private function dhrMedicalBoolByKeys(array $map, array $keys): ?bool
+    {
+        foreach ($keys as $key) {
+            $value = $map[$this->normalizeDhrKey($key)] ?? null;
+
+            if (is_array($value) && array_key_exists('bool', $value)) {
+                return $value['bool'];
+            }
+        }
+
+        return null;
+    }
+
+    private function dhrMedicalTextByKeys(array $map, array $keys): string
+    {
+        foreach ($keys as $key) {
+            $value = $map[$this->normalizeDhrKey($key)] ?? null;
+
+            if (!is_array($value)) {
+                continue;
+            }
+
+            if (!empty($value['date'])) {
+                return $this->formatDhrDate($value['date']);
+            }
+
+            if (!empty($value['text'])) {
+                return trim((string) $value['text']);
+            }
+
+            if (array_key_exists('bool', $value) && $value['bool'] !== null) {
+                return $this->dhrBoolText($value['bool']);
+            }
+        }
+
+        return '';
+    }
+
+    private function buildDhrTobaccoSummary(array $medicalAnswers): string
+    {
+        $perDay = $this->dhrMedicalTextByKeys($medicalAnswers, ['tobacco_per_day']);
+        $perWeek = $this->dhrMedicalTextByKeys($medicalAnswers, ['tobacco_per_week']);
+
+        if ($perDay !== '' && $perWeek !== '') {
+            return $perDay . '/' . $perWeek;
+        }
+
+        if ($perDay !== '') {
+            return $perDay;
+        }
+
+        if ($perWeek !== '') {
+            return $perWeek;
+        }
+
+        return $this->dhrMedicalTextByKeys($medicalAnswers, ['tobacco_use']);
+    }
+
+    private function buildDhrAdditionalHealthInfo(array $medicalAnswers): string
+    {
+        $notes = [];
+
+        foreach ([
+            'earaches' => 'Earaches',
+            'neck_aches' => 'Neck aches',
+        ] as $key => $label) {
+            $value = $this->dhrMedicalTextByKeys($medicalAnswers, [$key]);
+
+            if ($value !== '') {
+                $notes[] = $label . ': ' . $value;
+            }
+        }
+
+        return implode(', ', $notes);
+    }
+
+    private function splitDentalHealthRecordNameParts($patient, string $patientName): array
+    {
+        $patient->loadMissing('user');
+
+        $lastName = trim((string) (data_get($patient, 'user.last_name') ?? ''));
+        $firstName = trim((string) (data_get($patient, 'user.first_name') ?? ''));
+        $middleName = trim((string) (data_get($patient, 'user.middle_name') ?? ''));
+
+        if ($lastName !== '' || $firstName !== '' || $middleName !== '') {
+            return [$lastName, $firstName, $middleName];
+        }
+
+        $parts = preg_split('/\s+/', trim($patientName)) ?: [];
+        $parts = array_values(array_filter($parts, fn($part) => $part !== ''));
+
+        if (count($parts) === 0) {
+            return ['', '', ''];
+        }
+
+        if (count($parts) === 1) {
+            return ['', $parts[0], ''];
+        }
+
+        $firstName = array_shift($parts);
+        $lastName = array_pop($parts);
+        $middleName = implode(' ', $parts);
+
+        return [$lastName, $firstName, $middleName];
+    }
+
     private function findDhrDiseaseMark(array $map, array $needles): string
     {
         foreach ($map as $key => $value) {
@@ -2350,7 +2499,102 @@ class DentistReportController extends Controller
             'Dentist viewed daily treatment record'
         );
 
-        return view('dentist.daily-treatment');
+        $dailyTreatmentTemplates = DocumentTemplate::query()
+            ->active()
+            ->where('document_type', 'daily_treatment_record')
+            ->orderByRaw("
+                CASE
+                    WHEN code = 'DTR-DEFAULT' THEN 0
+                    WHEN code = 'DTR-FACULTY' THEN 1
+                    ELSE 2
+                END
+            ")
+            ->orderBy('name')
+            ->get();
+
+        return view('dentist.daily-treatment', [
+            'dailyTreatmentTemplates' => $dailyTreatmentTemplates,
+        ]);
+    }
+
+    public function storeDailyTreatmentRecord(Request $request)
+    {
+        $activeRole = session('impersonated_role') ?: session('role');
+
+        if ($activeRole !== 'dentist') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $validated = $request->validate([
+            'treatment_date' => ['required', 'date', 'before_or_equal:today'],
+            'patient_name' => ['required', 'string', 'max:150'],
+            'patient_email' => ['nullable', 'email', 'max:190'],
+            'patient_phone' => ['nullable', 'string', 'max:30'],
+            'office_type' => ['nullable', Rule::in(['Administrative', 'Faculty', 'Dependent'])],
+            'program_code' => ['nullable', 'string', 'max:50'],
+            'gender' => ['nullable', Rule::in(['Male', 'Female', 'Other'])],
+            'treatment_done' => ['required', 'string', 'max:150'],
+            'minutes_processed' => ['nullable', 'integer', 'min:0', 'max:1440'],
+            'time_in' => ['nullable', 'date'],
+            'time_out' => ['nullable', 'date', 'after_or_equal:time_in'],
+            'patient_signature' => ['nullable', 'file', 'image', 'mimes:png,jpg,jpeg', 'max:5120'],
+        ]);
+
+        $timeIn = !empty($validated['time_in']) ? Carbon::parse($validated['time_in']) : null;
+        $timeOut = !empty($validated['time_out']) ? Carbon::parse($validated['time_out']) : null;
+
+        $minutesProcessed = (int) ($validated['minutes_processed'] ?? 0);
+
+        if ($timeIn && $timeOut) {
+            $minutesProcessed = max(0, $timeIn->diffInMinutes($timeOut));
+        }
+
+        $signaturePath = null;
+        if ($request->hasFile('patient_signature')) {
+            $signaturePath = $request->file('patient_signature')->store('daily-treatment-signatures', 'public');
+        }
+
+        $record = DailyTreatmentRecord::create([
+            'treatment_date' => $validated['treatment_date'],
+            'time_in' => $timeIn?->format('H:i:s'),
+            'time_out' => $timeOut?->format('H:i:s'),
+            'patient_name' => $validated['patient_name'],
+            'patient_email' => $validated['patient_email'] ?? null,
+            'patient_phone' => $validated['patient_phone'] ?? null,
+            'office_type' => $validated['office_type'] ?? null,
+            'program_code' => $validated['program_code'] ?? null,
+            'gender' => $validated['gender'] ?? null,
+            'treatment_done' => $validated['treatment_done'],
+            'minutes_processed' => $minutesProcessed,
+            'has_signature' => !empty($signaturePath),
+            'signature_path' => $signaturePath,
+        ]);
+
+        AuditLogger::log(
+            'create',
+            'dentist_daily_treatment_record',
+            'Dentist created a daily treatment record'
+        );
+
+        return response()->json([
+            'message' => 'Daily treatment record saved successfully.',
+            'record' => [
+                'id' => $record->id,
+                'treatment_date' => optional($record->treatment_date)->format('Y-m-d'),
+                'patient_name' => $record->patient_name,
+                'patient_email' => $record->patient_email,
+                'patient_phone' => $record->patient_phone,
+                'office_type' => $record->office_type,
+                'program_code' => $record->program_code,
+                'gender' => $record->gender,
+                'treatment_done' => $record->treatment_done,
+                'minutes_processed' => $record->minutes_processed,
+                'time_in' => $timeIn?->format('h:i A'),
+                'time_out' => $timeOut?->format('h:i A'),
+                'has_signature' => (bool) $record->has_signature,
+                'signature_path' => $record->signature_path,
+            ],
+        ], 201);
     }
 
     public function dailyTreatmentRecordList(Request $request)
@@ -2363,7 +2607,7 @@ class DentistReportController extends Controller
 
         $query = DB::table('daily_treatment_records');
 
-        if ($request->filled('month')) {
+        if ($request->filled('month') && preg_match('/^\d{4}-\d{2}$/', (string) $request->input('month'))) {
             [$year, $month] = explode('-', $request->input('month'));
 
             $query->whereYear('treatment_date', $year)
@@ -2401,8 +2645,19 @@ class DentistReportController extends Controller
             $query->orderBy('treatment_date', 'desc');
         }
 
-        $records = $query->get()->map(function ($record) {
+        $allowedPerPage = [10, 20, 50, 100];
+        $perPage = (int) $request->input('per_page', 10);
+
+        if (!in_array($perPage, $allowedPerPage, true)) {
+            $perPage = 10;
+        }
+
+        $records = $query
+            ->orderByDesc('id')
+            ->paginate($perPage)
+            ->through(function ($record) {
             return [
+                'id' => $record->id ?? null,
                 'treatment_date' => $record->treatment_date ?? null,
                 'patient_name' => $record->patient_name ?? '',
                 'patient_email' => $record->patient_email ?? '',
@@ -2412,32 +2667,46 @@ class DentistReportController extends Controller
                 'gender' => $record->gender ?? '',
                 'treatment_done' => $record->treatment_done ?? '',
                 'minutes_processed' => $record->minutes_processed ?? 0,
-                'has_signature' => !empty($record->patient_signature ?? null),
+                'time_in' => !empty($record->time_in) ? Carbon::parse($record->time_in)->format('h:i A') : null,
+                'time_out' => !empty($record->time_out) ? Carbon::parse($record->time_out)->format('h:i A') : null,
+                'has_signature' => (bool) ($record->has_signature ?? false),
+                'signature_path' => $record->signature_path ?? null,
             ];
         });
 
         return response()->json([
-            'data' => $records,
+            'data' => $records->items(),
+            'meta' => [
+                'total' => $records->total(),
+                'per_page' => $records->perPage(),
+                'current_page' => $records->currentPage(),
+                'last_page' => $records->lastPage(),
+                'from' => $records->firstItem(),
+                'to' => $records->lastItem(),
+            ],
         ]);
     }
 
     private function buildGadData(int $year, int $month): array
     {
-        $gadRaw = DB::table('daily_treatment_records')
-            ->whereYear('treatment_date', $year)
-            ->whereMonth('treatment_date', $month)
-            ->select('office_type', 'gender', DB::raw('COUNT(*) as total'))
-            ->groupBy('office_type', 'gender')
-            ->get();
+        $from = Carbon::create($year, $month, 1)->startOfMonth();
+        $to = $from->copy()->endOfMonth();
+        $counts = $this->buildGadPdfCounts($from, $to);
 
-        $gadLabels = ['Student', 'Administrative', 'Faculty', 'Dependent'];
+        $gadLabels = ['Student', 'Faculty', 'Administrative', 'Dependent'];
         $gadFemale = [];
-        $gadMale   = [];
+        $gadMale = [];
 
-        foreach ($gadLabels as $label) {
-            $key       = $label === 'Student' ? null : $label;
-            $gadFemale[] = (int) $gadRaw->where('office_type', $key)->where('gender', 'Female')->sum('total');
-            $gadMale[]   = (int) $gadRaw->where('office_type', $key)->where('gender', 'Male')->sum('total');
+        for ($index = 0; $index < 4; $index++) {
+            $gadFemale[] =
+                (int) ($counts['gad_female'][$index] ?? 0)
+                + (int) ($counts['senior_female'][$index] ?? 0)
+                + (int) ($counts['pwd_female'][$index] ?? 0);
+
+            $gadMale[] =
+                (int) ($counts['gad_male'][$index] ?? 0)
+                + (int) ($counts['senior_male'][$index] ?? 0)
+                + (int) ($counts['pwd_male'][$index] ?? 0);
         }
 
         return [$gadLabels, $gadFemale, $gadMale];
@@ -2538,13 +2807,13 @@ class DentistReportController extends Controller
         $pdf->SetFont('Helvetica', 'B', 10);
 
         foreach ($rows as $rowKey => $y) {
-            $values = $counts[$rowKey] ?? [0, 0, 0, 0, 0];
+            $values = $counts[$rowKey] ?? [null, null, null, null, null];
 
-            $this->drawCenteredPdfText($pdf, $columns['students'], $y, (string) $values[0]);
-            $this->drawCenteredPdfText($pdf, $columns['faculty'], $y, (string) $values[1]);
-            $this->drawCenteredPdfText($pdf, $columns['administrative'], $y, (string) $values[2]);
-            $this->drawCenteredPdfText($pdf, $columns['dependent'], $y, (string) $values[3]);
-            $this->drawCenteredPdfText($pdf, $columns['total'], $y, (string) $values[4]);
+            $this->drawCenteredPdfText($pdf, $columns['students'], $y, $this->formatGadPdfValue($values[0] ?? null));
+            $this->drawCenteredPdfText($pdf, $columns['faculty'], $y, $this->formatGadPdfValue($values[1] ?? null));
+            $this->drawCenteredPdfText($pdf, $columns['administrative'], $y, $this->formatGadPdfValue($values[2] ?? null));
+            $this->drawCenteredPdfText($pdf, $columns['dependent'], $y, $this->formatGadPdfValue($values[3] ?? null));
+            $this->drawCenteredPdfText($pdf, $columns['total'], $y, $this->formatGadPdfValue($values[4] ?? null));
         }
     }
 
@@ -2572,9 +2841,8 @@ class DentistReportController extends Controller
             'total' => [0, 0, 0, 0, 0],
         ];
 
-        $records = DB::table('daily_treatment_records')
-            ->whereDate('treatment_date', '>=', $from->toDateString())
-            ->whereDate('treatment_date', '<=', $to->toDateString())
+        $records = DentalServiceRecord::query()
+            ->whereBetween('time_in', [$from, $to])
             ->get();
 
         $columnIndexes = [
@@ -2591,20 +2859,11 @@ class DentistReportController extends Controller
                 continue;
             }
 
-            $officeType = $this->normalizeGadOfficeType($record->office_type ?? null);
+            $officeType = $this->normalizeGadOfficeType($record->department ?? null);
             $columnIndex = $columnIndexes[$officeType] ?? 0;
 
-            $isSenior = $this->recordHasTruthyValue($record, [
-                'is_senior_citizen',
-                'senior_citizen',
-                'is_senior',
-            ]);
-
-            $isPwd = $this->recordHasTruthyValue($record, [
-                'is_pwd',
-                'pwd',
-                'is_person_with_disability',
-            ]);
+            $isSenior = (bool) ($record->is_senior ?? false);
+            $isPwd = (bool) ($record->is_pwd ?? false);
 
             if ($isSenior) {
                 $rowKey = 'senior_' . $gender;
@@ -2622,6 +2881,13 @@ class DentistReportController extends Controller
         }
 
         return $counts;
+    }
+
+    private function formatGadPdfValue(mixed $value): string
+    {
+        $count = (int) ($value ?? 0);
+
+        return $count > 0 ? (string) $count : '';
     }
 
     private function normalizeGadGender(?string $gender): ?string
@@ -2802,7 +3068,7 @@ class DentistReportController extends Controller
 
             $timeIn = $this->formatPdfTime($appointment->appointment_time ?? null);
 
-            $patientName = trim((string) ($patient->name ?? ''));
+            $patientName = $this->formatPdfPatientNameSurnameFirst($patient?->name);
             $patientName = $patientName !== '' ? $patientName : 'Unknown Patient';
 
             $programOrDept = trim((string) ($patient->course_code ?? ''));
@@ -2824,16 +3090,12 @@ class DentistReportController extends Controller
             }
 
             if ($programOrDept === '') {
-                $programOrDept = '—';
+                $programOrDept = '';
             }
 
-            $age = '';
-
-            if (!empty($patient->birthdate)) {
-                $age = (string) Carbon::parse($patient->birthdate)->age;
-            }
-
-            $gender = strtolower(trim((string) ($patient->gender ?? '')));
+            $demographics = $this->resolvePatientDemographics($patient);
+            $age = $demographics['age'];
+            $gender = strtolower(trim((string) ($demographics['gender'] ?? '')));
             $email = trim((string) ($patient->email ?? ''));
             $contact = trim((string) ($patient->phone ?? ''));
 
@@ -2842,12 +3104,21 @@ class DentistReportController extends Controller
             $isSenior = (bool) ($patient->is_senior ?? false);
             $isPwd = (bool) ($patient->is_pwd ?? false);
 
-            $isEmergency = false;
-            $isNonEmergency = true;
+            $procedure = $appointment->procedure;
+            $visitType = strtolower(trim((string) ($appointment->visit_type ?? $appointment->concern ?? '')));
 
-            $timeProcessed = '';
-            $processingTime = '';
-            $signatureText = '';
+            $isEmergency = str_contains($visitType, 'emergency');
+            $isNonEmergency = !$isEmergency;
+
+            $timeProcessed = $procedure?->procedure_started_at
+                ? $procedure->procedure_started_at->format('h:i A')
+                : $timeIn;
+
+            $processingTime = $this->formatPdfDurationMinutes(
+                (int) ($procedure?->procedure_duration_seconds ?? 0)
+            );
+
+            $signaturePath = $this->resolveStoredSignaturePath($patient?->medicalHistory?->patient_signature);
 
             $pdf->SetFont('Helvetica', '', 4.2);
 
@@ -2866,7 +3137,7 @@ class DentistReportController extends Controller
 
             $pdf->SetFont('Helvetica', '', 4.0);
 
-            $this->drawPdfCell($pdf, 447.2, $y, $email, 54, 5.5, 'L');
+            $this->drawPdfCellAutoFont($pdf, 447.2, $y, $email, 54, 5.5, 'L', 'Helvetica', '', 4.0, 2.1);
             $this->drawPdfCell($pdf, 498.6, $y, $contact, 40, 5.5);
             $this->drawPdfCell($pdf, 538.3, $y, $timeProcessed, 32, 5.5);
             $this->drawPdfCell($pdf, 573.5, $y, $processingTime, 32, 5.5);
@@ -2875,16 +3146,44 @@ class DentistReportController extends Controller
 
             $this->drawPdfCell($pdf, 609.4, $y, $isEmergency ? 'X' : '', 32, 5.5);
             $this->drawPdfCell($pdf, 649.5, $y, $isNonEmergency ? 'X' : '', 39, 5.5);
-            $this->drawPdfCell($pdf, 706.4, $y, $signatureText, 65, 5.5);
+
+            if ($signaturePath) {
+                $this->drawPdfImageInBox($pdf, $signaturePath, 706.4, $y, 65, 5.0);
+            }
         }
     }
 
-    private function drawDailyTreatmentRecordRows(Fpdi $pdf, $records): void
+    private function drawDailyTreatmentRecordRows(Fpdi $pdf, $records, string $templateCode = 'DTR-DEFAULT'): void
     {
         $pdf->SetTextColor(0, 0, 0);
 
         $startY = 211.0;
         $rowHeight = 10.2;
+        $isStudentTemplate = $templateCode === 'DTR-DEFAULT';
+
+        $columnLayout = $isStudentTemplate
+            ? [
+                'requested' => ['x' => 118, 'width' => 62],
+                'patient' => ['x' => 199, 'width' => 96],
+                'contact' => ['x' => 299, 'width' => 102],
+                'office' => ['x' => 370, 'width' => 48],
+                'gender' => ['x' => 409, 'width' => 36],
+                'treatment' => ['x' => 467, 'width' => 72],
+                'processed' => ['x' => 534, 'width' => 64],
+                'minutes' => ['x' => 604, 'width' => 62],
+                'signature' => ['x' => 692, 'width' => 48, 'height' => 6.4],
+            ]
+            : [
+                'requested' => ['x' => 118, 'width' => 62],
+                'patient' => ['x' => 199, 'width' => 96],
+                'contact' => ['x' => 299, 'width' => 102],
+                'office' => ['x' => 370, 'width' => 48],
+                'gender' => ['x' => 411, 'width' => 38],
+                'treatment' => ['x' => 469, 'width' => 76],
+                'processed' => ['x' => 539, 'width' => 70],
+                'minutes' => ['x' => 613, 'width' => 76],
+                'signature' => ['x' => 704, 'width' => 76, 'height' => 8.0],
+            ];
 
         foreach ($records as $index => $appointment) {
             $y = $startY + ($index * $rowHeight);
@@ -2898,7 +3197,8 @@ class DentistReportController extends Controller
             }
 
             if (!empty($appointment->appointment_time)) {
-                $requestedDateTime .= "\n" . $this->formatPdfTime($appointment->appointment_time);
+                $timeText = $this->formatPdfTime($appointment->appointment_time);
+                $requestedDateTime .= $requestedDateTime !== '' ? '  |  ' . $timeText : $timeText;
             }
 
             $patientName = trim((string) ($patient->name ?? 'Unknown Patient'));
@@ -2906,48 +3206,62 @@ class DentistReportController extends Controller
             $email = trim((string) ($patient->email ?? ''));
             $contact = trim((string) ($patient->phone ?? ''));
 
-            $emailContact = $email;
+            $emailContact = $this->buildPdfContactBlock($email, $contact);
 
-            if ($contact !== '') {
-                $emailContact .= $emailContact !== '' ? "\n" . $contact : $contact;
-            }
+            $office = '';
 
-            $office = trim((string) ($patient->course_code ?? ''));
-
-            if ($office === '') {
-                $office = trim((string) ($patient->course_name ?? ''));
-            }
-
-            if ($office === '') {
+            if ($templateCode !== 'DTR-DEFAULT') {
                 $office = trim((string) ($patient->faculty_code ?? ''));
             }
 
-            if ($office === '') {
-                $office = '—';
-            }
-
-            $gender = trim((string) ($patient->gender ?? ''));
+            $demographics = $this->resolvePatientDemographics($patient);
+            $gender = trim((string) ($demographics['gender'] ?? ''));
             $treatmentDone = trim((string) ($appointment->service_type ?? ''));
 
             if ($treatmentDone === '') {
                 $treatmentDone = 'Dental Service';
             }
 
-            $processedDateTime = $requestedDateTime;
-            $minutesProcessed = '';
-            $signatureText = '';
+            $procedure = $appointment->procedure;
+            $processedDateTime = '';
 
-            $pdf->SetFont('Helvetica', '', 4.6);
+            if ($procedure?->procedure_completed_at) {
+                $processedDateTime = Carbon::parse($procedure->procedure_completed_at)->format('m/d/y')
+                    . '  |  '
+                    . Carbon::parse($procedure->procedure_completed_at)->format('h:i A');
+            } elseif (!empty($appointment->updated_at)) {
+                $processedDateTime = Carbon::parse($appointment->updated_at)->format('m/d/y')
+                    . '  |  '
+                    . Carbon::parse($appointment->updated_at)->format('h:i A');
+            }
 
-            $this->drawPdfMultiCell($pdf, 118, $y, $requestedDateTime, 58, 10, 'C');
-            $this->drawPdfMultiCell($pdf, 199, $y, $patientName, 92, 10, 'L');
-            $this->drawPdfMultiCell($pdf, 299, $y, $emailContact, 94, 10, 'L');
-            $this->drawPdfMultiCell($pdf, 370, $y, $office, 46, 10, 'C');
-            $this->drawPdfMultiCell($pdf, 411, $y, $gender, 36, 10, 'C');
-            $this->drawPdfMultiCell($pdf, 469, $y, $treatmentDone, 70, 10, 'L');
-            $this->drawPdfMultiCell($pdf, 539, $y, $processedDateTime, 62, 10, 'C');
-            $this->drawPdfMultiCell($pdf, 613, $y, $minutesProcessed, 76, 10, 'C');
-            $this->drawPdfMultiCell($pdf, 704, $y, $signatureText, 76, 10, 'C');
+            $minutesProcessed = $this->formatPdfDurationMinutes(
+                (int) ($procedure?->procedure_duration_seconds ?? 0)
+            );
+
+            $signaturePath = $this->resolveStoredSignaturePath($patient?->medicalHistory?->patient_signature);
+
+            $pdf->SetFont('Helvetica', '', 4.0);
+
+            $this->drawPdfWrappedCell($pdf, $columnLayout['requested']['x'], $y, $requestedDateTime, $columnLayout['requested']['width'], 9.2, 'C', 1);
+            $this->drawPdfWrappedCell($pdf, $columnLayout['patient']['x'], $y, $patientName, $columnLayout['patient']['width'], 9.2, 'C', 1);
+            $this->drawPdfWrappedCell($pdf, $columnLayout['contact']['x'], $y, $emailContact, $columnLayout['contact']['width'], 9.2, 'C', 1);
+            $this->drawPdfWrappedCell($pdf, $columnLayout['office']['x'], $y, $office, $columnLayout['office']['width'], 9.2, 'C', 1);
+            $this->drawPdfWrappedCell($pdf, $columnLayout['gender']['x'], $y, $gender, $columnLayout['gender']['width'], 9.2, 'C', 1);
+            $this->drawPdfWrappedCell($pdf, $columnLayout['treatment']['x'], $y, $treatmentDone, $columnLayout['treatment']['width'], 9.2, 'C', 1);
+            $this->drawPdfWrappedCell($pdf, $columnLayout['processed']['x'], $y, $processedDateTime, $columnLayout['processed']['width'], 9.2, 'C', 1);
+            $this->drawPdfWrappedCell($pdf, $columnLayout['minutes']['x'], $y, $minutesProcessed, $columnLayout['minutes']['width'], 9.2, 'C', 1);
+
+            if ($signaturePath) {
+                $this->drawPdfImageInBox(
+                    $pdf,
+                    $signaturePath,
+                    $columnLayout['signature']['x'],
+                    $y,
+                    $columnLayout['signature']['width'],
+                    $columnLayout['signature']['height']
+                );
+            }
         }
     }
 
@@ -2964,6 +3278,46 @@ class DentistReportController extends Controller
 
         $pdf->SetXY($centerX - ($width / 2), $centerY - ($height / 2));
         $pdf->Cell($width, $height, $text, 0, 0, $align);
+    }
+
+    private function drawPdfCellAutoFont(
+        Fpdi $pdf,
+        float $centerX,
+        float $centerY,
+        string $text,
+        float $width,
+        float $height,
+        string $align = 'C',
+        string $fontFamily = 'Helvetica',
+        string $fontStyle = '',
+        float $startFontSize = 4.0,
+        float $minFontSize = 2.7
+    ): void {
+        $text = trim($text);
+
+        if ($text === '') {
+            return;
+        }
+
+        $fontSize = $startFontSize;
+
+        while ($fontSize > $minFontSize) {
+            $pdf->SetFont($fontFamily, $fontStyle, $fontSize);
+
+            if ($pdf->GetStringWidth($text) <= $width) {
+                break;
+            }
+
+            $fontSize -= 0.05;
+        }
+
+        if ($pdf->GetStringWidth($text) > $width) {
+            $text = $this->fitPdfText($pdf, $text, $width);
+        }
+
+        $pdf->SetXY($centerX - ($width / 2), $centerY - ($height / 2));
+        $pdf->Cell($width, $height, $text, 0, 0, $align);
+        $pdf->SetFont($fontFamily, $fontStyle, $startFontSize);
     }
 
     private function drawPdfMultiCell(
@@ -2990,6 +3344,179 @@ class DentistReportController extends Controller
 
             $pdf->SetXY($centerX - ($width / 2), $startY + ($lineIndex * $lineHeight));
             $pdf->Cell($width, $lineHeight, $line, 0, 0, $align);
+        }
+    }
+
+    private function drawPdfWrappedCell(
+        Fpdi $pdf,
+        float $centerX,
+        float $centerY,
+        string $text,
+        float $width,
+        float $height,
+        string $align = 'C',
+        int $maxLines = 2
+    ): void {
+        $lines = $this->wrapPdfText($pdf, $text, $width, $maxLines);
+
+        if (count($lines) === 0) {
+            return;
+        }
+
+        $lineHeight = min(3.2, max(2.8, ($height - 0.6) / max(count($lines), 1)));
+        $totalHeight = count($lines) * $lineHeight;
+        $startY = $centerY - ($totalHeight / 2);
+
+        foreach ($lines as $lineIndex => $line) {
+            $pdf->SetXY($centerX - ($width / 2), $startY + ($lineIndex * $lineHeight));
+            $pdf->Cell($width, $lineHeight, $line, 0, 0, $align);
+        }
+    }
+
+    private function wrapPdfText(Fpdi $pdf, string $text, float $maxWidth, int $maxLines = 2): array
+    {
+        $text = trim((string) $text);
+
+        if ($text === '') {
+            return [];
+        }
+
+        $paragraphs = preg_split('/\r\n|\r|\n/', $text) ?: [];
+        $lines = [];
+
+        foreach ($paragraphs as $paragraph) {
+            $paragraph = trim((string) $paragraph);
+
+            if ($paragraph === '') {
+                continue;
+            }
+
+            $words = preg_split('/\s+/', $paragraph) ?: [];
+            $current = '';
+
+            foreach ($words as $word) {
+                $candidate = $current === '' ? $word : $current . ' ' . $word;
+
+                if ($pdf->GetStringWidth($candidate) <= $maxWidth) {
+                    $current = $candidate;
+                    continue;
+                }
+
+                if ($current !== '') {
+                    $lines[] = $this->fitPdfText($pdf, $current, $maxWidth);
+                    $current = '';
+
+                    if (count($lines) >= $maxLines) {
+                        return array_slice($lines, 0, $maxLines);
+                    }
+                }
+
+                $current = $this->fitPdfText($pdf, $word, $maxWidth);
+            }
+
+            if ($current !== '') {
+                $lines[] = $this->fitPdfText($pdf, $current, $maxWidth);
+
+                if (count($lines) >= $maxLines) {
+                    return array_slice($lines, 0, $maxLines);
+                }
+            }
+        }
+
+        return array_slice($lines, 0, $maxLines);
+    }
+
+    private function buildPdfContactBlock(string $email, string $contact): string
+    {
+        $parts = array_values(array_filter([
+            trim($email),
+            trim($contact),
+        ], fn($value) => $value !== ''));
+
+        return implode('  |  ', $parts);
+    }
+
+    private function formatPdfPatientNameSurnameFirst(?string $fullName): string
+    {
+        $fullName = trim((string) $fullName);
+
+        if ($fullName === '') {
+            return '';
+        }
+
+        $parts = preg_split('/\s+/', $fullName) ?: [];
+        $parts = array_values(array_filter($parts, fn($part) => trim((string) $part) !== ''));
+
+        if (count($parts) === 1) {
+            return $parts[0];
+        }
+
+        $surname = array_pop($parts);
+        $firstName = array_shift($parts) ?? '';
+        $middleInitial = '';
+
+        if (!empty($parts)) {
+            $middleSource = trim((string) $parts[0]);
+
+            if ($middleSource !== '') {
+                $middleInitial = ' ' . strtoupper(mb_substr($middleSource, 0, 1)) . '.';
+            }
+        }
+
+        return trim($surname . ', ' . $firstName . $middleInitial);
+    }
+
+    private function formatPdfDurationMinutes(int $seconds): string
+    {
+        if ($seconds <= 0) {
+            return '';
+        }
+
+        return (string) (int) ceil($seconds / 60);
+    }
+
+    private function resolveStoredSignaturePath(?string $relativePath): ?string
+    {
+        $relativePath = trim((string) $relativePath);
+
+        if ($relativePath === '') {
+            return null;
+        }
+
+        $absolutePath = storage_path('app/public/' . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $relativePath));
+
+        return file_exists($absolutePath) ? $absolutePath : null;
+    }
+
+    private function drawPdfImageInBox(
+        Fpdi $pdf,
+        string $imagePath,
+        float $centerX,
+        float $centerY,
+        float $boxWidth,
+        float $boxHeight
+    ): void {
+        try {
+            [$imageWidth, $imageHeight] = @getimagesize($imagePath) ?: [0, 0];
+
+            if ($imageWidth <= 0 || $imageHeight <= 0) {
+                return;
+            }
+
+            $fitRatio = min($boxWidth / $imageWidth, $boxHeight / $imageHeight);
+            $drawWidth = $imageWidth * $fitRatio;
+            $drawHeight = $imageHeight * $fitRatio;
+            $x = $centerX - ($drawWidth / 2);
+            $y = $centerY - ($drawHeight / 2);
+
+            $pdf->SetFillColor(255, 255, 255);
+            $pdf->Rect($centerX - ($boxWidth / 2), $centerY - ($boxHeight / 2), $boxWidth, $boxHeight, 'F');
+            $pdf->Image($imagePath, $x, $y, $drawWidth, $drawHeight);
+            $pdf->Image($imagePath, $x + 0.10, $y, $drawWidth, $drawHeight);
+            $pdf->Image($imagePath, $x, $y + 0.08, $drawWidth, $drawHeight);
+            $pdf->Image($imagePath, $x + 0.10, $y + 0.08, $drawWidth, $drawHeight);
+        } catch (\Throwable $e) {
+            // Skip signature rendering when the stored image cannot be loaded.
         }
     }
 
@@ -3023,6 +3550,35 @@ class DentistReportController extends Controller
         } catch (\Throwable $e) {
             return '';
         }
+    }
+
+    private function resolvePatientDemographics($patient): array
+    {
+        $birthdateValue = $patient->birthdate ?? $patient->user?->birthdate ?? null;
+        $genderValue = trim((string) ($patient->gender ?? $patient->user?->gender ?? ''));
+
+        $birthdateShort = '';
+        $age = '';
+
+        if (!empty($birthdateValue)) {
+            try {
+                $parsedBirthdate = $birthdateValue instanceof Carbon
+                    ? $birthdateValue
+                    : Carbon::parse($birthdateValue);
+
+                $birthdateShort = $parsedBirthdate->format('m/d/y');
+                $age = (string) $parsedBirthdate->age;
+            } catch (\Throwable) {
+                $birthdateShort = '';
+                $age = '';
+            }
+        }
+
+        return [
+            'birthdate_short' => $birthdateShort,
+            'age' => $age,
+            'gender' => $genderValue,
+        ];
     }
 
     private function drawDentalSuppliesInventoryRows(Fpdi $pdf, $items, Carbon $from, Carbon $to): void

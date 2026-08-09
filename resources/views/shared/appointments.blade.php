@@ -473,14 +473,37 @@ $notifCount = $notifications->count();
                         ? 'Cancelled' . ($cancelReasonLabel ? ' - ' . $cancelReasonLabel : '')
                         : 'Completed';
                         $pastStatusClass = $isCancelledPast ? 'status-cancelled' : 'status-completed';
-                        $recordDuration =
-                        $appt->duration ??
-                        ($appt->procedure_duration ?? ($appt->treatment_duration ?? ''));
+                        $recordProcedure = $appt->procedure;
+                        $recordFollowUp = $appt->followUpAppointments
+                        ->sortBy(fn ($followUpAppt) => sprintf(
+                        '%s %s',
+                        $followUpAppt->appointment_date ?? '',
+                        $followUpAppt->appointment_time ?? ''
+                        ))
+                        ->first();
+                        $recordDuration = $recordProcedure?->procedure_duration_seconds;
                         $recordRemarks =
+                        $recordProcedure?->completion_action ??
                         $appt->remarks ?? ($appt->treatment_notes ?? ($appt->notes ?? ''));
-                        $recordOral = $appt->oral_examination ?? ($appt->oral ?? '');
-                        $recordDiagnosis = $appt->diagnosis ?? '';
-                        $recordPrescription = $appt->prescription ?? '';
+                        $recordOral = $recordProcedure?->oral_examination ?? '';
+                        $recordDiagnosis = $recordProcedure?->diagnosis ?? '';
+                        $recordPrescription = $recordProcedure?->prescriptions ?? '';
+                        $recordFollowUpPayload = $recordFollowUp
+                        ? [
+                        'date' => $recordFollowUp->appointment_date
+                        ? \Carbon\Carbon::parse($recordFollowUp->appointment_date)->format('F j, Y')
+                        : 'N/A',
+                        'time' => $recordFollowUp->appointment_time
+                        ? \Carbon\Carbon::parse($recordFollowUp->appointment_time)->format('g:i A')
+                        : 'N/A',
+                        'service' => (($recordFollowUp->service_type ?? '') === 'Others'
+                        ? ($recordFollowUp->other_services ?: 'Others')
+                        : ($recordFollowUp->service_type ?? 'Follow-up')),
+                        'status' => $recordFollowUp->status ?? 'upcoming',
+                        'reason' => $recordFollowUp->follow_up_reason,
+                        ]
+                        : null;
+                        $recordOdontogramData = $recordProcedure?->odontogram_data ?? [];
                         @endphp
 
                         <div class="appt-card {{ $isToday ? 'is-today' : '' }}" data-appt-id="{{ $appt->id }}"
@@ -755,13 +778,37 @@ $notifCount = $notifications->count();
                     ? 'Cancelled' . ($cancelReasonLabel ? ' - ' . $cancelReasonLabel : '')
                     : 'Completed';
                     $pastStatusClass = $isCancelledPast ? 'status-cancelled' : 'status-completed';
-                    $recordDuration =
-                    $appt->duration ??
-                    ($appt->procedure_duration ?? ($appt->treatment_duration ?? ''));
-                    $recordRemarks = $appt->remarks ?? ($appt->treatment_notes ?? ($appt->notes ?? ''));
-                    $recordOral = $appt->oral_examination ?? ($appt->oral ?? '');
-                    $recordDiagnosis = $appt->diagnosis ?? '';
-                    $recordPrescription = $appt->prescription ?? '';
+                    $recordProcedure = $appt->procedure;
+                    $recordFollowUp = $appt->followUpAppointments
+                    ->sortBy(fn ($followUpAppt) => sprintf(
+                    '%s %s',
+                    $followUpAppt->appointment_date ?? '',
+                    $followUpAppt->appointment_time ?? ''
+                    ))
+                    ->first();
+                    $recordDuration = $recordProcedure?->procedure_duration_seconds;
+                    $recordRemarks =
+                    $recordProcedure?->completion_action ??
+                    $appt->remarks ?? ($appt->treatment_notes ?? ($appt->notes ?? ''));
+                    $recordOral = $recordProcedure?->oral_examination ?? '';
+                    $recordDiagnosis = $recordProcedure?->diagnosis ?? '';
+                    $recordPrescription = $recordProcedure?->prescriptions ?? '';
+                    $recordFollowUpPayload = $recordFollowUp
+                    ? [
+                    'date' => $recordFollowUp->appointment_date
+                    ? \Carbon\Carbon::parse($recordFollowUp->appointment_date)->format('F j, Y')
+                    : 'N/A',
+                    'time' => $recordFollowUp->appointment_time
+                    ? \Carbon\Carbon::parse($recordFollowUp->appointment_time)->format('g:i A')
+                    : 'N/A',
+                    'service' => (($recordFollowUp->service_type ?? '') === 'Others'
+                    ? ($recordFollowUp->other_services ?: 'Others')
+                    : ($recordFollowUp->service_type ?? 'Follow-up')),
+                    'status' => $recordFollowUp->status ?? 'upcoming',
+                    'reason' => $recordFollowUp->follow_up_reason,
+                    ]
+                    : null;
+                    $recordOdontogramData = $recordProcedure?->odontogram_data ?? [];
                     @endphp
 
                     <div class="mobile-appt-card {{ $isToday ? 'is-today' : '' }}" data-appt-id="{{ $appt->id }}"
@@ -1120,14 +1167,37 @@ $notifCount = $notifications->count();
                         ? 'Cancelled' . ($cancelReasonLabel ? ' - ' . $cancelReasonLabel : '')
                         : 'Completed';
                         $pastStatusClass = $isCancelledPast ? 'status-cancelled' : 'status-completed';
-                        $recordDuration =
-                        $appt->duration ??
-                        ($appt->procedure_duration ?? ($appt->treatment_duration ?? ''));
+                        $recordProcedure = $appt->procedure;
+                        $recordFollowUp = $appt->followUpAppointments
+                        ->sortBy(fn ($followUpAppt) => sprintf(
+                        '%s %s',
+                        $followUpAppt->appointment_date ?? '',
+                        $followUpAppt->appointment_time ?? ''
+                        ))
+                        ->first();
+                        $recordDuration = $recordProcedure?->procedure_duration_seconds;
                         $recordRemarks =
+                        $recordProcedure?->completion_action ??
                         $appt->remarks ?? ($appt->treatment_notes ?? ($appt->notes ?? ''));
-                        $recordOral = $appt->oral_examination ?? ($appt->oral ?? '');
-                        $recordDiagnosis = $appt->diagnosis ?? '';
-                        $recordPrescription = $appt->prescription ?? '';
+                        $recordOral = $recordProcedure?->oral_examination ?? '';
+                        $recordDiagnosis = $recordProcedure?->diagnosis ?? '';
+                        $recordPrescription = $recordProcedure?->prescriptions ?? '';
+                        $recordFollowUpPayload = $recordFollowUp
+                        ? [
+                        'date' => $recordFollowUp->appointment_date
+                        ? \Carbon\Carbon::parse($recordFollowUp->appointment_date)->format('F j, Y')
+                        : 'N/A',
+                        'time' => $recordFollowUp->appointment_time
+                        ? \Carbon\Carbon::parse($recordFollowUp->appointment_time)->format('g:i A')
+                        : 'N/A',
+                        'service' => (($recordFollowUp->service_type ?? '') === 'Others'
+                        ? ($recordFollowUp->other_services ?: 'Others')
+                        : ($recordFollowUp->service_type ?? 'Follow-up')),
+                        'status' => $recordFollowUp->status ?? 'upcoming',
+                        'reason' => $recordFollowUp->follow_up_reason,
+                        ]
+                        : null;
+                        $recordOdontogramData = $recordProcedure?->odontogram_data ?? [];
                         @endphp
 
                         <div class="appt-card" data-appt-id="{{ $appt->id }}" data-period="past"
@@ -1221,10 +1291,13 @@ $notifCount = $notifications->count();
                                         data-tooltip="View details" onclick="openRecordModal(this)"
                                         data-appt-id="{{ $appt->id }}" data-service="{{ $serviceLabel }}"
                                         data-date="{{ $dateLabel }}" data-time="{{ $timeLabel }}"
-                                        data-status="{{ $pastStatusLabel }}" data-duration="{{ $recordDuration }}"
+                                        data-status="{{ $pastStatusLabel }}"
+                                        data-duration-seconds="{{ $recordDuration }}"
                                         data-remarks="{{ $recordRemarks }}" data-oral="{{ $recordOral }}"
                                         data-diagnosis="{{ $recordDiagnosis }}"
-                                        data-prescription="{{ $recordPrescription }}">
+                                        data-prescription="{{ $recordPrescription }}"
+                                        data-follow-up='@json($recordFollowUpPayload, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT)'
+                                        data-odontogram-data='@json($recordOdontogramData, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT)'>
 
                                         <i class="fa-regular fa-eye"></i>
                                     </button>
@@ -1365,13 +1438,37 @@ $notifCount = $notifications->count();
                     ? 'Cancelled' . ($cancelReasonLabel ? ' - ' . $cancelReasonLabel : '')
                     : 'Completed';
                     $pastStatusClass = $isCancelledPast ? 'status-cancelled' : 'status-completed';
-                    $recordDuration =
-                    $appt->duration ??
-                    ($appt->procedure_duration ?? ($appt->treatment_duration ?? ''));
-                    $recordRemarks = $appt->remarks ?? ($appt->treatment_notes ?? ($appt->notes ?? ''));
-                    $recordOral = $appt->oral_examination ?? ($appt->oral ?? '');
-                    $recordDiagnosis = $appt->diagnosis ?? '';
-                    $recordPrescription = $appt->prescription ?? '';
+                    $recordProcedure = $appt->procedure;
+                    $recordFollowUp = $appt->followUpAppointments
+                    ->sortBy(fn ($followUpAppt) => sprintf(
+                    '%s %s',
+                    $followUpAppt->appointment_date ?? '',
+                    $followUpAppt->appointment_time ?? ''
+                    ))
+                    ->first();
+                    $recordDuration = $recordProcedure?->procedure_duration_seconds;
+                    $recordRemarks =
+                    $recordProcedure?->completion_action ??
+                    $appt->remarks ?? ($appt->treatment_notes ?? ($appt->notes ?? ''));
+                    $recordOral = $recordProcedure?->oral_examination ?? '';
+                    $recordDiagnosis = $recordProcedure?->diagnosis ?? '';
+                    $recordPrescription = $recordProcedure?->prescriptions ?? '';
+                    $recordFollowUpPayload = $recordFollowUp
+                    ? [
+                    'date' => $recordFollowUp->appointment_date
+                    ? \Carbon\Carbon::parse($recordFollowUp->appointment_date)->format('F j, Y')
+                    : 'N/A',
+                    'time' => $recordFollowUp->appointment_time
+                    ? \Carbon\Carbon::parse($recordFollowUp->appointment_time)->format('g:i A')
+                    : 'N/A',
+                    'service' => (($recordFollowUp->service_type ?? '') === 'Others'
+                    ? ($recordFollowUp->other_services ?: 'Others')
+                    : ($recordFollowUp->service_type ?? 'Follow-up')),
+                    'status' => $recordFollowUp->status ?? 'upcoming',
+                    'reason' => $recordFollowUp->follow_up_reason,
+                    ]
+                    : null;
+                    $recordOdontogramData = $recordProcedure?->odontogram_data ?? [];
                     @endphp
 
                     <div class="mobile-appt-card" data-appt-id="{{ $appt->id }}" data-period="past"
@@ -1462,10 +1559,13 @@ $notifCount = $notifications->count();
                                     data-tooltip="View details" onclick="openRecordModal(this)"
                                     data-appt-id="{{ $appt->id }}" data-service="{{ $serviceLabel }}"
                                     data-date="{{ $dateLabel }}" data-time="{{ $timeLabel }}"
-                                    data-status="{{ $pastStatusLabel }}" data-duration="{{ $recordDuration }}"
+                                    data-status="{{ $pastStatusLabel }}"
+                                    data-duration-seconds="{{ $recordDuration }}"
                                     data-remarks="{{ $recordRemarks }}" data-oral="{{ $recordOral }}"
                                     data-diagnosis="{{ $recordDiagnosis }}"
-                                    data-prescription="{{ $recordPrescription }}">
+                                    data-prescription="{{ $recordPrescription }}"
+                                    data-follow-up='@json($recordFollowUpPayload, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT)'
+                                    data-odontogram-data='@json($recordOdontogramData, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT)'>
                                     <i class="fa-regular fa-eye"></i>
                                 </button>
                                 @endif

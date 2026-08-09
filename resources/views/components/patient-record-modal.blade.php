@@ -151,8 +151,28 @@
 </div>
 
 <script>
+    function parseRecordDatasetJson(value, fallback) {
+        if (!value) {
+            return fallback;
+        }
+
+        try {
+            return JSON.parse(value);
+        } catch (_) {
+            return fallback;
+        }
+    }
+
     function normalizeRecordData(source) {
         if (source instanceof HTMLElement) {
+            if (source.dataset.record) {
+                try {
+                    return normalizeRecordData(JSON.parse(source.dataset.record));
+                } catch (_) {
+                    // Fall back to legacy data attributes when JSON parsing fails.
+                }
+            }
+
             return {
                 service: source.dataset.service ||
                     source.dataset.type ||
@@ -166,6 +186,9 @@
 
                 status: source.dataset.status ||
                     '',
+
+                durationSeconds: source.dataset.durationSeconds ??
+                    null,
 
                 duration: source.dataset.duration ||
                     '',
@@ -185,8 +208,15 @@
                     source.dataset.prescriptions ||
                     '',
 
-                followUp: null,
-                odontogramData: []
+                followUp: parseRecordDatasetJson(
+                    source.dataset.followUp,
+                    null
+                ),
+
+                odontogramData: parseRecordDatasetJson(
+                    source.dataset.odontogramData,
+                    []
+                )
             };
         }
 
@@ -451,7 +481,7 @@
 
                 treatments.set(
                     `${code}|${label}`,
-                    `${code} - ${label}`
+                    label
                 );
             };
 
@@ -500,7 +530,13 @@
         setText('m_service', data.service);
         setText('m_date', data.date);
         setText('m_time', formatRecordTime(data.time));
-        setText('m_duration', formatRecordDuration(data.duration));
+        setText(
+            'm_duration',
+            data.durationSeconds !== null &&
+            data.durationSeconds !== undefined
+                ? formatRecordDurationSeconds(data.durationSeconds)
+                : formatRecordDuration(data.duration)
+        );
 
         var status = String(data.status || '').trim().toLowerCase();
         var sEl = document.getElementById('m_status');
@@ -531,11 +567,20 @@
     `;
         }
 
-        setText(
-            'm_remarks',
+        const treatmentSummary =
             formatRecordTreatments(
                 data.odontogramData
-            )
+            );
+
+        setText(
+            'm_remarks',
+            treatmentSummary !==
+                'No treatment record yet.'
+                ? treatmentSummary
+                : (
+                    data.remarks ||
+                    'No treatment record yet.'
+                )
         );
 
         setText(

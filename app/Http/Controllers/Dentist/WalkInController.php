@@ -8,6 +8,7 @@ use App\Models\Appointment;
 use App\Models\BlockedDate;
 use App\Models\ClinicSchedule;
 use App\Models\Disease;
+use App\Models\MedicalHistory;
 use App\Models\Patient;
 use App\Models\ServiceType;
 use App\Models\User;
@@ -738,6 +739,7 @@ class WalkInController extends Controller
 
         $patient = Patient::findOrFail($validated['patient_id']);
         $now = Carbon::now();
+        $signaturePath = $request->file('patient_signature')->store('signatures', 'public');
 
         $appointmentData = [
             'patient_id' => $patient->id,
@@ -756,9 +758,21 @@ class WalkInController extends Controller
             $appointmentData['concern'] = $validated['concern'] ?? null;
         }
 
-        $appointment = Appointment::create(
+        DB::transaction(function () use ($patient, $validated, $appointmentData, $signaturePath, &$appointment) {
+            $appointment = Appointment::create(
             $appointmentData
         );
+
+            MedicalHistory::updateOrCreate(
+                ['patient_id' => $patient->id],
+                [
+                    'emergency_person' => $validated['emergency_person'],
+                    'emergency_number' => $validated['emergency_number'],
+                    'emergency_relation' => $validated['emergency_relation'],
+                    'patient_signature' => $signaturePath,
+                ]
+            );
+        });
 
         if ($request->expectsJson()) {
             return response()->json([
