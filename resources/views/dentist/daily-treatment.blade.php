@@ -25,15 +25,10 @@
         </div>
       </div>
 
-      <div class="dentist-hero-actions flex flex-wrap gap-3">
-        <button type="button" class="btn-primary-global" onclick="openDailyRecordModal()">
+      <div class="dentist-hero-actions">
+        <button type="button" class="ui-btn ui-btn-primary" onclick="openDailyCreateReportModal()">
           <i class="fa-solid fa-plus"></i>
-          Add Record
-        </button>
-
-        <button type="button" class="btn-primary-global" onclick="openDailyCreateReportModal()">
-          <i class="fa-solid fa-download"></i>
-          Download Report
+          <span>Create Report</span>
         </button>
       </div>
     </section>
@@ -52,31 +47,33 @@
         </div>
 
         <div class="card-header-right dtr-toolbar search-filter-row">
-          <div class="service-month-picker dtr-month-picker">
-            <input type="text" id="monthPicker" class="form-input-custom service-period-input" data-month-only-picker
-              placeholder="Select month" readonly>
-            <i class="fa-solid fa-calendar-days service-month-icon"></i>
+          <div class="dtr-month-picker fp-date-input-wrap">
+          <input type="text" id="monthPicker" class="form-input-custom fp-date-input"
+              data-month-only-picker placeholder="Select month" readonly>
+
+            <i class="fa-solid fa-calendar-days fp-date-icon"></i>
           </div>
 
-          <div class="voice-search-row service-search-row dtr-search-row">
-            <div class="search-wrap global-search dtr-search-wrap" data-search-wrapper>
-              <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <div class="voice-search-row">
+              <div class="search-wrap global-search" data-search-wrapper>
+                  <i class="fa-solid fa-magnifying-glass search-icon"></i>
 
-              <input id="searchInput" type="text" class="search-input" data-search-input
-                placeholder="Search patient, program, treatment…" autocomplete="off" autocorrect="off"
-                autocapitalize="off" spellcheck="false">
+                  <input id="searchInput" type="search" class="search-input" data-search-input
+                      placeholder="Search patient, program, treatment…" autocomplete="off" autocorrect="off"
+                      autocapitalize="off" spellcheck="false">
 
-              <button type="button" class="search-clear" data-search-clear aria-label="Clear search">
-                <i class="fa-solid fa-xmark"></i>
-              </button>
-            </div>
+                  <button type="button" class="search-clear" data-search-clear
+                        aria-label="Clear search">
+                      <i class="fa-solid fa-xmark"></i>
+                  </button>
+              </div>
 
-            <button type="button" class="voice-search-mic external" data-voice-trigger data-voice-target="#searchInput"
-              data-voice-status="#dailySearchVoiceStatus" aria-label="Use voice search">
-              <i class="fa-solid fa-microphone"></i>
-            </button>
-
-            <span id="dailySearchVoiceStatus" class="voice-status hidden" data-voice-status aria-live="polite"></span>
+              <x-voice-input
+                  target="#searchInput"
+                  status-id="dailySearchVoiceStatus"
+                  label="Use voice search"
+                  title="Voice search"
+              />
           </div>
 
           <div class="dtr-filter-actions">
@@ -95,52 +92,17 @@
         </div>
       </div>
 
-      <div class="dtr-pagebar dtr-pagebar-top">
-        <div class="sl-page-size-control">
-          <label for="dtPerPageSelect">Show</label>
-
-          <div class="global-page-size" data-global-page-size data-page-size-input="#dtPerPageSelect">
-
-            <select id="dtPerPageSelect" class="global-page-size-native" tabindex="-1" aria-hidden="true">
-              <option value="10" selected>10</option>
-              <option value="20">20</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-
-            <button type="button" class="global-page-size-trigger" data-global-page-size-trigger aria-haspopup="listbox"
-              aria-expanded="false">
-              <span data-global-page-size-value>10</span>
-              <i class="fa-solid fa-chevron-down"></i>
-            </button>
-
-            <div class="global-page-size-menu" data-global-page-size-menu role="listbox">
-              <button type="button" class="global-page-size-option is-selected" data-value="10" role="option"
-                aria-selected="true">
-                <span>10</span>
-                <i class="fa-solid fa-check"></i>
-              </button>
-              <button type="button" class="global-page-size-option" data-value="20" role="option" aria-selected="false">
-                <span>20</span>
-                <i class="fa-solid fa-check"></i>
-              </button>
-              <button type="button" class="global-page-size-option" data-value="50" role="option" aria-selected="false">
-                <span>50</span>
-                <i class="fa-solid fa-check"></i>
-              </button>
-              <button type="button" class="global-page-size-option" data-value="100" role="option"
-                aria-selected="false">
-                <span>100</span>
-                <i class="fa-solid fa-check"></i>
-              </button>
-            </div>
-          </div>
-
-          <span>per page</span>
-        </div>
-
-        <div class="dtr-pagination-wrap"></div>
-      </div>
+      <x-pagination-bar
+        id="dailyPagebarTop"
+        info-id="dailyPageInfoTop"
+        pagination-id="dailyPaginationTop"
+        position="top"
+        :show-entries="true"
+        page-size-id="dtPerPageSelect"
+        page-size-callback="selectDailyPerPage"
+        :page-size-value="10"
+        label="entries"
+      />
 
       <div class="card-body dtr-card-body">
         <div id="dailyListView" class="table-responsive-fix service-table-wrap dtr-table-wrap">
@@ -164,13 +126,16 @@
 
         <div id="dailyGridView" class="service-record-grid dtr-grid" hidden></div>
 
-        <div id="dailyEmptyState" class="empty-state-host dtr-empty-host" hidden></div>
+        <div id="dailyEmptyState" class="empty-state-host"></div>
       </div>
 
-      <div class="dtr-pagebar dtr-pagebar-bottom">
-        <span class="dtr-pagebar-info">Showing <strong>0</strong> entries</span>
-        <div class="dtr-pagination-wrap"></div>
-      </div>
+      <x-pagination-bar
+        id="dailyPagebarBottom"
+        info-id="dailyPageInfoBottom"
+        pagination-id="dailyPaginationBottom"
+        position="bottom"
+        label="entries"
+      />
     </section>
   </div>
 </main>
@@ -178,31 +143,37 @@
 <div id="filterModal" class="filter-drawer-wrapper" aria-hidden="true">
   <div class="filter-drawer-overlay" onclick="closeDailyFilterPanel()"></div>
 
-  <aside class="filter-drawer-panel service-filter-drawer dtr-filter-drawer"
-    aria-label="Filter daily treatment records">
-    <div class="filter-drawer-header px-6 py-5 flex items-center justify-between border-b border-gray-100">
-      <div class="filter-drawer-title flex items-center gap-2">
-        <i class="fa-solid fa-sliders text-xl"></i>
-        <h2 class="text-xl font-extrabold">Filters</h2>
-      </div>
+  <div class="filter-drawer-panel">
 
-      <button type="button" class="fp-close-btn" onclick="closeDailyFilterPanel()" aria-label="Close filters">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
+        <div class="filter-drawer-header">
+          <div class="filter-drawer-title">
+          <i class="fa-solid fa-sliders"></i>
+          <h2>Filters</h2>
+        </div>
+
+    <button type="button" class="filter-drawer-close"
+      onclick="closeDailyFilterPanel()" aria-label="Close Filters">
+
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+    <div class="filter-drawer-body">
+      <div id="dailyActiveFiltersSection" class="filter-active-section hidden">
+
+        <div class="filter-active-header">
+            <span class="filter-active-title">Active Filters</span>
+
+            <button id="dailyClearAllChipsBtn" type="button" 
+            class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm" onclick="clearDailyFilterPanelDraft()">
+              
+            <i class="fa-solid fa-rotate-left"></i>
+            <span>Clear All</span>
+        </button>
     </div>
 
-    <div class="filter-drawer-body px-6 py-5 flex flex-col gap-6">
-      <div id="dailyActiveFiltersSection" class="daily-active-filters-section hidden">
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-[13px] font-bold text-gray-800">Active Filters</span>
-          <button id="dailyClearAllChipsBtn" type="button" class="clear-all-chips"
-            onclick="clearDailyFilterPanelDraft()">
-            Clear All
-          </button>
-        </div>
-        <div id="dailyActiveChipsContainer"
-          class="active-filters-container flex flex-wrap gap-2 pb-4 border-b border-gray-100"></div>
-      </div>
+        <div id="dailyActiveChipsContainer" class="active-filters-container"></div>
+    </div>
 
       <div>
         <h3 class="filter-section-title">Sort by Name</h3>
@@ -267,31 +238,37 @@
       </div>
     </div>
 
-    <div
-      class="filter-drawer-footer px-6 py-5 flex flex-col sm:flex-row items-center justify-between border-t border-gray-100 gap-4">
+    <div class="filter-drawer-footer">
       <button id="filterResetBtn" type="button"
-        class="filter-clear-btn flex items-center gap-2 transition-colors w-full sm:w-auto justify-center sm:justify-start"
+        class="filter-clear-btn ui-btn ui-btn-secondary ui-btn-sm"
         onclick="clearDailyFilterPanelDraft()">
+
         <i class="fa-regular fa-trash-can text-lg"></i>
-        <span class="text-[13px] font-bold leading-none whitespace-nowrap">Clear Filters</span>
+        <span>Clear Filters</span>
       </button>
 
-      <div class="flex items-center gap-3 w-full sm:w-auto">
+      <div class="filter-footer-actions">
         <button id="filterCloseBtn" type="button"
-          class="filter-cancel-btn flex-1 sm:flex-none px-5 py-2.5 text-sm font-bold rounded-lg transition-colors"
+          class="filter-cancel-btn ui-btn ui-btn-secondary"
           onclick="closeDailyFilterPanel()">
-          Cancel
+
+          <i class="fa-solid fa-xmark"></i>
+          <span>Cancel</span>
         </button>
 
         <button id="filterApplyBtn" type="button"
-          class="filter-show-results-btn filter-apply-btn flex-1 sm:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold rounded-lg transition-colors shadow-sm"
+          class="filter-apply-btn ui-btn ui-btn-primary"
           onclick="applyDailyFilters()">
+
           <i class="fa-solid fa-check"></i>
-          <span id="dailyShowResultsText">Show 0 results</span>
+          <span id="dailyShowResultsText" class="filter-results-text">
+            Show 0 results
+          </span>
         </button>
+
       </div>
     </div>
-  </aside>
+  </div>
 </div>
 
 <div id="dailyRecordModal" class="ui-modal modal-overlay" aria-hidden="true"
@@ -503,70 +480,69 @@
   </div>
 </div>
 
-<div id="createReportModal" class="ui-modal modal-overlay" aria-hidden="true"
+<div id="createReportModal" class="ui-modal" aria-hidden="true"
   onclick="closeModalOnBackdrop(event, 'createReportModal')">
-  <div class="modal-box-inner um-user-modal um-user-modal-md report-create-modal" onclick="event.stopPropagation()">
-    <div
-      class="um-user-modal-header px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
-      <div class="flex items-center gap-3 min-w-0">
-        <div
-          class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#8B0000] via-[#a40000] to-[#6B0000] flex items-center justify-center shadow-lg shadow-red-900/20 flex-shrink-0">
-          <i class="fa-solid fa-file-circle-plus text-white text-sm"></i>
-        </div>
 
-        <div class="min-w-0">
-          <h3 class="font-extrabold text-gray-800 text-lg leading-tight">Create Daily Treatment Report</h3>
-          <p class="text-xs text-gray-500 mt-0.5">
+  <div class="ui-modal-card modal-md"
+      onclick="event.stopPropagation()">
+  
+  <div class="modal-hd">
+    <div class="modal-heading">
+      <div class="modal-icon">
+        <i class="fa-solid fa-file-circle-plus"></i>
+      </div>
+
+        <div class="modal-copy">
+          <h3 class="modal-title">
+            Create Daily Treatment Report
+          </h3>
+
+          <p class="modal-subtitle">
             Fields marked <span class="text-yellow-500 font-bold">*</span> are required.
           </p>
         </div>
       </div>
 
-      <button type="button" onclick="closeDailyCreateReportModal()" data-close-modal="createReportModal"
-        class="um-modal-x" aria-label="Close create report modal">
+      <button type="button" class="modal-x" onclick="closeDailyCreateReportModal()" aria-label="Close create report modal">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
 
     <form id="reportForm" class="flex-1 flex flex-col min-h-0" novalidate>
-      <div class="um-user-modal-body">
-        <div class="um-user-main-card">
-          <div class="um-section-title">
-            <div class="um-section-icon bg-red-50 text-[#8B0000]">
-              <i class="fa-solid fa-file-lines text-sm"></i>
+      <div class="modal-bd">
+        <div class="modal-form-section">
+          <div class="modal-section-heading">
+            <div class="modal-section-icon">
+              <i class="fa-solid fa-file-lines"></i>
             </div>
 
             <div>
-              <h4 class="text-base font-extrabold text-gray-800 leading-tight">Report Details</h4>
-              <p class="text-xs text-gray-500 mt-0.5">Choose the report type, date range, and quantity.</p>
+              <h4>Report Details</h4>
+              <p>Choose the report type, date range, and quantity.</p>
             </div>
           </div>
 
-          <div class="um-field-grid">
-            <div class="um-field-full">
-              <div class="flex items-center justify-between mb-1.5">
-                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide">
+          <div class="modal-form-grid">
+            <div>
+              <div class="modal-inline-control">
+                <label for="reportName" class="form-label">
                   Report Name <span class="text-red-500">*</span>
                 </label>
 
-                <span id="reportNameCounter" class="text-[11px] font-semibold text-gray-400">0 / 100</span>
+                <span id="reportNameCounter" class="modal-helper-text">0 / 100</span>
               </div>
 
-              <div class="voice-search-row" data-voice-field>
+              <div class="modal-inline-control" data-voice-field>
                 <input id="reportName" name="report_name" type="text" maxlength="100"
                   placeholder="e.g. Daily Treatment Report — Dec 2026"
-                  class="field-input flex-1 min-w-0 border border-gray-200 px-3.5 py-3 text-sm bg-white">
+                  class="form-input modal-inline-main">
 
-                <div class="voice-input-toggle">
-                  <button type="button" id="reportNameMicBtn" class="voice-search-mic external" data-voice-trigger
-                    data-voice-target="#reportName" data-voice-status="#reportNameVoiceStatus"
-                    aria-label="Voice input for report name">
-                    <i class="fa-solid fa-microphone"></i>
-                  </button>
-
-                  <span id="reportNameVoiceStatus" class="voice-status hidden" data-voice-status
-                    aria-live="polite"></span>
-                </div>
+                <x-voice-input
+                  target="#reportName"
+                  status-id="reportNameVoiceStatus"
+                  label="Voice input for report name"
+                  title="Voice input"
+                />
               </div>
 
               <p id="reportNameErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1">
@@ -575,21 +551,15 @@
               </p>
             </div>
 
-            <div class="um-field-full">
-              <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+            <div>
+              <label for="reportType" class="form-label">
                 Report Type <span class="text-red-500">*</span>
               </label>
 
               <div class="report-custom-select report-template-select" data-report-select>
-                <select id="reportType" name="document_template_id" class="report-native-select" data-report-select-native>
-                  <option value="" data-document-type="" selected disabled>Select a report type...</option>
-                  @forelse (($dailyTreatmentTemplates ?? collect()) as $template)
-                  <option value="{{ $template->id }}" data-document-type="{{ $template->document_type }}">
-                    {{ $template->name }}
-                  </option>
-                  @empty
-                  <option value="" data-document-type="" disabled>No active daily treatment templates available</option>
-                  @endforelse
+                <select id="reportType" name="document_type" class="report-native-select" data-report-select-native>
+                  <option value="daily_treatment_record" data-document-type="daily_treatment_record" selected>Daily
+                    Treatment Record</option>
                 </select>
 
                 <button type="button" class="report-select-trigger" data-report-select-trigger
@@ -624,15 +594,16 @@
                 Please select a report type.
               </p>
             </div>
-
+            
+          <div class="modal-form-grid modal-form-grid-2">
             <div>
-              <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
-                From <span class="text-red-500">*</span>
+              <label class="form-label">
+              From <span class="text-red-500">*</span>
               </label>
 
               <div class="fp-date-input-wrap">
                 <input id="dateFrom" name="date_from" type="text"
-                  class="field-input w-full border border-gray-200 px-3.5 py-3 pr-10 text-sm bg-white js-flatpickr-date-max-today"
+                  class="form-input js-flatpickr-date-max-today"
                   placeholder="Select start date" readonly>
                 <i class="fa-regular fa-calendar fp-date-icon"></i>
               </div>
@@ -644,20 +615,21 @@
             </div>
 
             <div>
-              <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+              <label class="form-label">
                 To <span class="text-gray-400 normal-case font-normal">(optional)</span>
               </label>
 
               <div class="fp-date-input-wrap">
                 <input id="dateTo" name="date_to" type="text"
-                  class="field-input w-full border border-gray-200 px-3.5 py-3 pr-10 text-sm bg-white js-flatpickr-date-max-today"
+                  class="form-input js-flatpickr-date-max-today"
                   placeholder="Select end date" readonly>
                 <i class="fa-regular fa-calendar fp-date-icon"></i>
               </div>
             </div>
+          </div>
 
-            <div class="um-field-full">
-              <p class="text-[11px] text-gray-400 -mt-2">
+            <div>
+              <p class="modal-helper-text">
                 <i class="fa-solid fa-circle-info mr-1"></i>
                 Leave "To" empty to report on a single date.
               </p>
@@ -673,9 +645,9 @@
               </p>
             </div>
 
-            <div class="um-field-full">
-              <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
-                Quantity <span class="text-red-500">*</span>
+            <div>
+              <label for="reportQty" class="form-label">
+              Quantity <span class="text-red-500">*</span>
               </label>
 
               <div class="report-qty-row">
@@ -685,7 +657,7 @@
                   </button>
 
                   <input id="reportQty" name="quantity" type="number" min="1" max="100" step="1" placeholder="1 – 100"
-                    class="field-input report-qty-input border border-gray-200 px-3.5 py-3 text-sm bg-white">
+                    class="form-input modal-number-input report-qty-input">
 
                   <button type="button" class="report-qty-btn" data-qty-plus aria-label="Increase quantity">
                     <i class="fa-solid fa-plus"></i>
@@ -701,8 +673,8 @@
               </p>
             </div>
 
-            <div class="um-field-full">
-              <div id="formErrorBanner" class="report-modal-error hidden">
+            <div>
+              <div id="formErrorBanner" class="modal-error-banner hidden">
                 <i class="fa-solid fa-triangle-exclamation"></i>
                 <span>Please complete all required fields before downloading.</span>
               </div>
@@ -711,21 +683,20 @@
         </div>
       </div>
 
-      <div class="modal-ft um-user-modal-footer">
-        <button type="button" onclick="closeDailyCreateReportModal()" class="modal-btn-ghost">
+      <div class="modal-ft">
+        <button type="button" class="btn-close-modal" onclick="closeDailyCreateReportModal()" >
           Cancel
         </button>
 
-        <button type="button" id="downloadReportBtn" class="modal-btn-confirm-reject um-save-user-btn">
-          <span class="btn-confirm-icon">
+        <button type="button" id="downloadReportBtn" class="modal-btn-primary">
+          
             <i class="fa-solid fa-download"></i>
-          </span>
-          <span>Download</span>
-        </button>
-      </div>
-    </form>
+            <span>Download</span>
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
-</div>
 
 <div id="downloadCompleteModal" class="ui-modal" onclick="closeModalOnBackdrop(event, 'downloadCompleteModal')">
   <div class="ui-modal-card modal-box p-0 rounded-2xl overflow-hidden bg-white shadow-2xl max-w-sm">
@@ -888,9 +859,7 @@
     }
 
     if (emptyState) {
-      emptyState.hidden = true;
-      emptyState.className = 'empty-state-host dtr-empty-host';
-      emptyState.innerHTML = '';
+      window.hideGlobalEmptyState?.(emptyState);
     }
 
     if (listView) listView.hidden = false;
@@ -1057,21 +1026,48 @@
     const total = Number(meta.total || 0);
     const from = Number(meta.from || 0);
     const to = Number(meta.to || 0);
+
     const infoHtml = total > 0
-      ? `Showing <strong>${from}–${to}</strong> of <strong>${total}</strong> entries`
-      : 'Showing <strong>0</strong> entries';
+        ? `Showing <strong>${from}–${to}</strong> of <strong>${total}</strong> entries`
+        : 'Showing <strong>0</strong> entries';
 
-    document.querySelectorAll('.dtr-pagebar-info').forEach(el => {
-      el.innerHTML = infoHtml;
-    });
+    const topInfo =
+        document.getElementById('dailyPageInfoTop');
 
-    const navHtml = buildDtrPagination(meta);
-    document.querySelectorAll('.dtr-pagination-wrap').forEach(el => {
-      el.innerHTML = navHtml;
-    });
+    const bottomInfo =
+        document.getElementById('dailyPageInfoBottom');
 
-    setDailyPageSizeUI(meta.per_page || dtrState.perPage || 10);
-  }
+    if (topInfo) {
+        topInfo.innerHTML = infoHtml;
+    }
+
+    if (bottomInfo) {
+        bottomInfo.innerHTML = infoHtml;
+    }
+
+    const paginationHtml =
+        buildDtrPagination(meta);
+
+    const topPagination =
+        document.getElementById('dailyPaginationTop');
+
+    const bottomPagination =
+        document.getElementById('dailyPaginationBottom');
+
+    if (topPagination) {
+        topPagination.innerHTML = paginationHtml;
+    }
+
+    if (bottomPagination) {
+        bottomPagination.innerHTML = paginationHtml;
+    }
+
+    setDailyPageSizeUI(
+        meta.per_page ||
+        dtrState.perPage ||
+        10
+    );
+}
 
   function buildDtrPagination(meta = {}) {
     if (Number(meta.last_page || 1) <= 1) return '';
@@ -1085,31 +1081,31 @@
 
     if (end - start + 1 < winSize) start = Math.max(1, end - winSize + 1);
 
-    let html = '<nav class="sl-pagination dtr-pagination" aria-label="Daily treatment pagination">';
+    let html = '<nav class="global-pagination" aria-label="Daily treatment pagination">';
 
     html += current <= 1
-      ? '<button type="button" disabled class="sl-page-disabled" aria-label="Previous page"><i class="fa-solid fa-chevron-left sl-page-icon"></i></button>'
-      : `<button type="button" onclick="goDailyPage(${current - 1})" class="sl-page-btn" aria-label="Previous page"><i class="fa-solid fa-chevron-left sl-page-icon"></i></button>`;
+      ? '<button type="button" disabled class="global-page-disabled" aria-label="Previous page"><i class="fa-solid fa-chevron-left global-page-icon"></i></button>'
+      : `<button type="button" onclick="goDailyPage(${current - 1})" class="global-page-btn" aria-label="Previous page"><i class="fa-solid fa-chevron-left global-page-icon"></i></button>`;
 
     if (start > 1) {
-      html += '<button type="button" onclick="goDailyPage(1)" class="sl-page-btn">1</button>';
-      if (start > 2) html += '<span class="sl-page-ellipsis" aria-hidden="true">&hellip;</span>';
+      html += '<button type="button" onclick="goDailyPage(1)" class="global-page-btn">1</button>';
+      if (start > 2) html += '<span class="global-page-ellipsis" aria-hidden="true">&hellip;</span>';
     }
 
     for (let i = start; i <= end; i++) {
       html += i === current
-        ? `<span class="sl-page-current" aria-current="page">${i}</span>`
-        : `<button type="button" onclick="goDailyPage(${i})" class="sl-page-btn">${i}</button>`;
+        ? `<span class="global-page-current" aria-current="page">${i}</span>`
+        : `<button type="button" onclick="goDailyPage(${i})" class="global-page-btn">${i}</button>`;
     }
 
     if (end < last) {
-      if (end < last - 1) html += '<span class="sl-page-ellipsis" aria-hidden="true">&hellip;</span>';
-      html += `<button type="button" onclick="goDailyPage(${last})" class="sl-page-btn">${last}</button>`;
+      if (end < last - 1) html += '<span class="global-page-ellipsis" aria-hidden="true">&hellip;</span>';
+      html += `<button type="button" onclick="goDailyPage(${last})" class="global-page-btn">${last}</button>`;
     }
 
     html += current >= last
-      ? '<button type="button" disabled class="sl-page-disabled" aria-label="Next page"><i class="fa-solid fa-chevron-right sl-page-icon"></i></button>'
-      : `<button type="button" onclick="goDailyPage(${current + 1})" class="sl-page-btn" aria-label="Next page"><i class="fa-solid fa-chevron-right sl-page-icon"></i></button>`;
+      ? '<button type="button" disabled class="global-page-disabled" aria-label="Next page"><i class="fa-solid fa-chevron-right global-page-icon"></i></button>'
+      : `<button type="button" onclick="goDailyPage(${current + 1})" class="global-page-btn" aria-label="Next page"><i class="fa-solid fa-chevron-right global-page-icon"></i></button>`;
 
     html += '</nav>';
     return html;
@@ -1235,13 +1231,19 @@
     if (dtrDraft.program_code) chips.push({ label: `Course: ${dtrDraft.program_code}`, key: 'program_code' });
 
     section.classList.toggle('hidden', chips.length === 0);
+
     container.innerHTML = chips.map(chip => `
-      <button type="button" class="active-filter-chip" onclick="removeDailyDraftChip('${chip.key}')">
+      <span class="filter-chip">
         <span>${escapeDtrHtml(chip.label)}</span>
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    `).join('');
-  }
+
+        <button type="button" class="filter-chip-remove" onclick="removeDailyDraftChip('${chip.key}')"
+            aria-label="Remove ${escapeDtrHtml(chip.label)} filter">
+
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </span>
+      `).join('');
+    }
 
   function removeDailyDraftChip(key) {
     dtrDraft[key] = '';
@@ -1336,6 +1338,25 @@
     }
   }
 
+  function selectDailyPerPage(value) {
+    const selectedValue =
+        Number(value) || 10;
+
+    dtrState.perPage =
+        selectedValue;
+
+    dtrState.page = 1;
+
+    setDailyPageSizeUI(
+        selectedValue
+    );
+
+    fetchDailyRecords();
+}
+
+  window.selectDailyPerPage =
+    selectDailyPerPage;
+
   function forceCloseDailyModal(id) {
     const modal = document.getElementById(id);
     if (!modal) return;
@@ -1427,7 +1448,6 @@
     ensureDailyReportFlatpickrs();
     initDailyReportQtyButtons();
 
-    window.initGlobalVoiceInputs?.(modal);
     document.dispatchEvent(new CustomEvent('voice:refresh', { detail: { root: modal } }));
   }
 
@@ -2000,12 +2020,6 @@
 
     const searchInput = document.getElementById('searchInput');
 
-    document.getElementById('dtPerPageSelect')?.addEventListener('change', event => {
-      dtrState.perPage = Number(event.target.value) || 10;
-      dtrState.page = 1;
-      fetchDailyRecords();
-    });
-
     searchInput?.addEventListener('input', event => {
       clearTimeout(dtrSearchTimer);
       dtrSearchTimer = setTimeout(() => {
@@ -2039,7 +2053,6 @@
     document.getElementById('saveDailyRecordBtn')?.addEventListener('click', saveDailyRecord);
     document.getElementById('downloadReportBtn')?.addEventListener('click', downloadDailyReport);
 
-    window.initGlobalVoiceInputs?.(document);
     bindDailyChoiceChipFilters();
     fetchDailyRecords();
   });
