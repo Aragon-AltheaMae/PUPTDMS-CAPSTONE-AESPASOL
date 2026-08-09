@@ -16,6 +16,9 @@ class Patient extends Model
         'phone',
         'birthdate',
         'gender',
+        'place_of_birth',
+        'height_m',
+        'weight_kg',
         'faculty_code',
         'student_no',
         'course_code',
@@ -34,6 +37,8 @@ class Patient extends Model
 
     protected $casts = [
         'birthdate' => 'date',
+        'height_m' => 'float',
+        'weight_kg' => 'float',
         'year_level' => 'integer',
         'is_pwd' => 'boolean',
         'is_senior' => 'boolean',

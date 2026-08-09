@@ -61,7 +61,7 @@ class DentistAppointmentController extends Controller
 
         $today = Carbon::today()->toDateString();
 
-        $upcomingAppointments = Appointment::with('patient')
+        $upcomingAppointments = Appointment::with(['patient', 'procedure', 'followUpAppointments'])
             ->whereIn('status', ['upcoming', 'rescheduled'])
             ->whereDate('appointment_date', '>=', $today)
             ->orderBy('appointment_date', 'asc')
@@ -70,7 +70,7 @@ class DentistAppointmentController extends Controller
 
         $appointments = $upcomingAppointments;
 
-        $pastAppointments = Appointment::with('patient')
+        $pastAppointments = Appointment::with(['patient', 'procedure', 'followUpAppointments'])
             ->where(function ($q) use ($today) {
                 $q->whereIn('status', ['completed', 'cancelled'])
                     ->orWhere(function ($sub) use ($today) {

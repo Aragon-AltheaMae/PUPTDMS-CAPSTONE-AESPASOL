@@ -1145,6 +1145,10 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         ->middleware('permission:manage_reports')
         ->name('dentist.dentist.reports.daily-treatment-record.list');
 
+    Route::post('/report/daily-treatment-record/store', [\App\Http\Controllers\Dentist\DentistReportController::class, 'storeDailyTreatmentRecord'])
+        ->middleware('permission:manage_reports')
+        ->name('dentist.dentist.reports.daily-treatment-record.store');
+
     Route::get('/report/templates/{template}/print', [\App\Http\Controllers\Dentist\DentistReportController::class, 'printTemplate'])
         ->middleware('permission:manage_reports')
         ->name('dentist.dentist.report.templates.print');

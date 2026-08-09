@@ -82,7 +82,7 @@ class DefaultDocumentTemplateSeeder extends Seeder
                 'notes' => 'Default template imported from medicine-inventory.blade.php',
             ],
             [
-                'name' => 'Daily Treatment Record',
+                'name' => 'Daily Treatment Record - Student',
                 'code' => 'DTR-DEFAULT',
                 'document_type' => 'daily_treatment_record',
                 'category' => 'Record',
@@ -90,6 +90,16 @@ class DefaultDocumentTemplateSeeder extends Seeder
                 'paper_size' => 'Legal',
                 'orientation' => 'landscape',
                 'notes' => 'Default template imported from daily-treatment.blade.php',
+            ],
+            [
+                'name' => 'Daily Treatment Record - Faculty / Administrative Personnel',
+                'code' => 'DTR-FACULTY',
+                'document_type' => 'daily_treatment_record',
+                'category' => 'Record',
+                'file_path' => resource_path('views/admin/document-templates-defaults/daily-treatment.blade.php'),
+                'paper_size' => 'Legal',
+                'orientation' => 'landscape',
+                'notes' => 'Faculty / Administrative Personnel PDF variant for the daily treatment record.',
             ],
             [
                 'name' => 'Dental Services Record',

@@ -6,6 +6,7 @@ use App\Helpers\AuditLogger;
 use App\Http\Controllers\Controller;
 use App\Models\ExternalAdminAccess;
 use App\Models\Faculty;
+use App\Models\MedicalHistory;
 use App\Models\Patient;
 use App\Models\Role;
 use App\Models\User;
@@ -19,6 +20,7 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -228,24 +230,7 @@ class OIDCController extends Controller
                 ->with('error', 'Email not returned by identity provider.');
         }
 
-        $studentData = [];
-
-        try {
-            $studentProfile = $this->studentApiService->getStudentByEmail($email);
-            $studentData = is_array($studentProfile['data'] ?? null)
-                ? $studentProfile['data']
-                : [];
-
-            Log::info('Student API profile fetched', [
-                'email' => $email,
-                'student_profile' => $studentProfile,
-            ]);
-        } catch (\Throwable $e) {
-            Log::warning('Student API fetch failed', [
-                'email' => $email,
-                'message' => $e->getMessage(),
-            ]);
-        }
+        $studentData = $this->resolveStudentDataForSync($email);
 
         $incomingRoles = $profile['roles'] ?? [];
 
@@ -535,25 +520,22 @@ class OIDCController extends Controller
         ?ExternalAdminAccess $assignedAccess,
         ?Faculty $facultyAccess
     ): Patient {
-        $phone = $studentData['mobileNumber'] ?? '';
+        $phone = $this->extractStudentPhone($studentData);
         $facultyCode = null;
-        $studentNo = $studentData['studentNumber'] ?? null;
-        $programCode = $studentData['program']['code']
-            ?? $studentData['programCode']
-            ?? $studentData['course']['code']
-            ?? $studentData['courseCode']
-            ?? null;
-        $programName = $studentData['program']['name']
-            ?? $studentData['program']
-            ?? $studentData['course']['name']
-            ?? $studentData['course']
-            ?? null;
-        $yearLevel = $studentData['yearLevel'] ?? null;
-        $section = $studentData['section'] ?? null;
+        $studentNo = $this->extractStudentNumber($studentData) ?: $patient?->student_no;
+        $programCode = $this->extractStudentProgramCode($studentData) ?: $patient?->course_code;
+        $programName = $this->extractStudentProgramName($studentData) ?: $patient?->course_name;
+        $yearLevel = $studentData['yearLevel'] ?? $studentData['year_level'] ?? $patient?->year_level;
+        $section = $studentData['section'] ?? $patient?->section;
 
         $personalInfo = [];
+        $studentAddresses = [];
         $birthdate = null;
         $gender = null;
+        $placeOfBirth = null;
+        $heightM = null;
+        $weightKg = null;
+        $address = $patient?->address;
 
         try {
             if (!empty($studentNo)) {
@@ -561,16 +543,36 @@ class OIDCController extends Controller
                 $personalInfo = is_array($personalResponse['data'] ?? null)
                     ? $personalResponse['data']
                     : [];
+
+                $addressResponse = $this->studentApiService->getAddressesByStudentNumber($studentNo);
+                $studentAddresses = is_array($addressResponse['data'] ?? null)
+                    ? $addressResponse['data']
+                    : [];
             }
         } catch (\Throwable $e) {
-            Log::warning('Student personal info fetch failed', [
+            Log::warning('Student personal info or address fetch failed', [
                 'student_no' => $studentNo,
                 'message' => $e->getMessage(),
             ]);
         }
 
-        $birthdate = $this->normalizeDate($personalInfo['dateOfBirth'] ?? null);
-        $gender = $personalInfo['gender']['name'] ?? null;
+        $birthdate = $this->normalizeDate(
+            $personalInfo['dateOfBirth']
+                ?? $personalInfo['birthdate']
+                ?? $studentData['birthdate']
+                ?? $studentData['dateOfBirth']
+                ?? null
+        );
+        $gender = $this->normalizeGenderLabel(
+            $personalInfo['gender']['name']
+                ?? $personalInfo['gender']
+                ?? $studentData['gender']
+                ?? null
+        );
+        $placeOfBirth = $this->cleanStringValue($personalInfo['placeOfBirth'] ?? $personalInfo['place_of_birth'] ?? null);
+        $heightM = $this->normalizeNullableFloat($personalInfo['heightM'] ?? $personalInfo['height_m'] ?? null);
+        $weightKg = $this->normalizeNullableFloat($personalInfo['weightKg'] ?? $personalInfo['weight_kg'] ?? null);
+        $address = $this->formatStudentAddress($studentAddresses) ?: $address;
 
         if ($assignedAccess) {
             try {
@@ -589,10 +591,10 @@ class OIDCController extends Controller
                     $admin = is_array($payload['data'] ?? null) ? $payload['data'] : [];
 
                     $birthdate = $this->normalizeDate($admin['birthday'] ?? $birthdate);
-                    $gender = $admin['gender'] ?? $gender;
+                    $gender = $this->normalizeGenderLabel($admin['gender'] ?? $gender);
                     $phone = $admin['emergency_contact_no'] ?? $phone;
                 } else {
-                    $gender = $assignedAccess->gender ?? $gender;
+                    $gender = $this->normalizeGenderLabel($assignedAccess->gender ?? $gender);
                     $phone = $assignedAccess->contact_number ?? $phone;
                 }
             } catch (\Throwable $e) {
@@ -620,7 +622,7 @@ class OIDCController extends Controller
 
                 if ($matchedFaculty) {
                     $birthdate = $this->normalizeDate($matchedFaculty['profile']['birthday'] ?? $birthdate);
-                    $gender = $matchedFaculty['profile']['gender'] ?? $gender;
+                    $gender = $this->normalizeGenderLabel($matchedFaculty['profile']['gender'] ?? $gender);
                     $phone = $matchedFaculty['contact_number'] ?? $phone;
                     $facultyCode = $matchedFaculty['faculty_code'] ?? null;
                 }
@@ -643,6 +645,21 @@ class OIDCController extends Controller
             'program_name' => $programName,
             'year_level' => $yearLevel,
             'section' => $section,
+            'place_of_birth' => $placeOfBirth,
+            'height_m' => $heightM,
+            'weight_kg' => $weightKg,
+            'address' => $address,
+        ]);
+
+        $user->phone = $phone ?: $user->phone;
+        $user->birthdate = $birthdate ?: $user->birthdate;
+        $user->gender = $gender ?: $user->gender;
+        $user->save();
+
+        $supportsExtendedStudentFields = Schema::hasColumns('patients', [
+            'place_of_birth',
+            'height_m',
+            'weight_kg',
         ]);
 
         if ($patient) {
@@ -652,6 +669,11 @@ class OIDCController extends Controller
             $patient->phone = $phone ?: $patient->phone;
             $patient->birthdate = $birthdate ?: $patient->birthdate;
             $patient->gender = $gender ?: $patient->gender;
+            if ($supportsExtendedStudentFields) {
+                $patient->place_of_birth = $placeOfBirth ?: $patient->place_of_birth;
+                $patient->height_m = $heightM ?? $patient->height_m;
+                $patient->weight_kg = $weightKg ?? $patient->weight_kg;
+            }
             $patient->faculty_code = $facultyCode ?: $patient->faculty_code;
             $patient->student_no = $studentNo ?: $patient->student_no;
             $patient->course_code = $programCode ?: $patient->course_code;
@@ -660,18 +682,19 @@ class OIDCController extends Controller
             $patient->section = $section ?: $patient->section;
             $patient->is_pwd = $patient->is_pwd ?? false;
             $patient->is_senior = $patient->is_senior ?? false;
-            $patient->address = $patient->address ?? null;
+            $patient->address = $address ?: $patient->address;
 
             if (empty($patient->password)) {
                 $patient->password = Hash::make(Str::random(16));
             }
 
             $patient->save();
+            $this->syncStudentMedicalHistory($patient, $personalInfo);
 
             return $patient;
         }
 
-        return Patient::create([
+        $patientPayload = [
             'user_id' => $user->id,
             'name' => $user->name ?: $name ?: $email,
             'email' => $user->email,
@@ -687,8 +710,20 @@ class OIDCController extends Controller
             'section' => $section,
             'is_pwd' => false,
             'is_senior' => false,
-            'address' => null,
-        ]);
+            'address' => $address,
+        ];
+
+        if ($supportsExtendedStudentFields) {
+            $patientPayload['place_of_birth'] = $placeOfBirth;
+            $patientPayload['height_m'] = $heightM;
+            $patientPayload['weight_kg'] = $weightKg;
+        }
+
+        $patient = Patient::create($patientPayload);
+
+        $this->syncStudentMedicalHistory($patient, $personalInfo);
+
+        return $patient;
     }
 
     protected function normalizeDate(?string $value): ?string
@@ -701,6 +736,210 @@ class OIDCController extends Controller
             return \Carbon\Carbon::parse($value)->toDateString();
         } catch (\Throwable $e) {
             return $value;
+        }
+    }
+
+    protected function resolveStudentDataForSync(string $email): array
+    {
+        try {
+            $studentProfile = $this->studentApiService->getStudentByEmail($email);
+            $studentData = is_array($studentProfile['data'] ?? null)
+                ? $studentProfile['data']
+                : [];
+
+            Log::info('Student API profile fetched', [
+                'email' => $email,
+                'student_profile' => $studentProfile,
+            ]);
+
+            if (!empty($studentData)) {
+                return $studentData;
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Student API fetch by email failed; trying search fallback', [
+                'email' => $email,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
+        try {
+            $students = $this->studentApiService->searchStudents($email, 80);
+            $matchedStudent = collect($students)->first(function ($student) use ($email) {
+                return strtolower((string) $this->extractStudentEmail((array) $student)) === strtolower($email);
+            });
+
+            if (is_array($matchedStudent)) {
+                Log::info('Student API search fallback matched profile', [
+                    'email' => $email,
+                    'student_number' => $this->extractStudentNumber($matchedStudent),
+                ]);
+
+                return $matchedStudent;
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Student API search fallback failed', [
+                'email' => $email,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
+        return [];
+    }
+
+    protected function extractStudentEmail(array $studentData): ?string
+    {
+        return $studentData['email']
+            ?? $studentData['emailAddress']
+            ?? $studentData['email_address']
+            ?? $studentData['institutional_email']
+            ?? $studentData['institutionalEmail']
+            ?? null;
+    }
+
+    protected function extractStudentPhone(array $studentData): string
+    {
+        return (string) (
+            $studentData['mobileNumber']
+            ?? $studentData['mobile_number']
+            ?? $studentData['contactNumber']
+            ?? $studentData['contact_number']
+            ?? $studentData['phone']
+            ?? ''
+        );
+    }
+
+    protected function extractStudentNumber(array $studentData): ?string
+    {
+        return $studentData['studentNumber']
+            ?? $studentData['student_number']
+            ?? $studentData['studentNo']
+            ?? $studentData['student_no']
+            ?? null;
+    }
+
+    protected function extractStudentProgramCode(array $studentData): ?string
+    {
+        return $studentData['program']['code']
+            ?? $studentData['programCode']
+            ?? $studentData['program_code']
+            ?? $studentData['course']['code']
+            ?? $studentData['courseCode']
+            ?? $studentData['course_code']
+            ?? null;
+    }
+
+    protected function extractStudentProgramName(array $studentData): ?string
+    {
+        $programName = $studentData['program']['name']
+            ?? $studentData['program']
+            ?? $studentData['course']['name']
+            ?? $studentData['course']
+            ?? null;
+
+        return is_string($programName) ? $programName : null;
+    }
+
+    protected function normalizeGenderLabel(?string $value): ?string
+    {
+        $gender = strtolower(trim((string) $value));
+
+        if ($gender === '') {
+            return null;
+        }
+
+        if (str_starts_with($gender, 'm')) {
+            return 'Male';
+        }
+
+        if (str_starts_with($gender, 'f')) {
+            return 'Female';
+        }
+
+        return $value;
+    }
+
+    protected function normalizeNullableFloat(mixed $value): ?float
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (! is_numeric($value)) {
+            return null;
+        }
+
+        return (float) $value;
+    }
+
+    protected function cleanStringValue(mixed $value): ?string
+    {
+        if (! is_scalar($value)) {
+            return null;
+        }
+
+        $cleaned = trim((string) $value);
+
+        return $cleaned !== '' ? $cleaned : null;
+    }
+
+    protected function formatStudentAddress(array $addresses): ?string
+    {
+        if ($addresses === []) {
+            return null;
+        }
+
+        $preferredAddress = collect($addresses)->first(function ($address) {
+            $type = strtolower(trim((string) data_get($address, 'addressType')));
+
+            return in_array($type, ['current', 'present', 'home', 'permanent'], true);
+        }) ?? $addresses[0];
+
+        $parts = array_filter([
+            $this->cleanStringValue(data_get($preferredAddress, 'streetDetail.string'))
+                ?: $this->cleanStringValue(data_get($preferredAddress, 'streetDetail')),
+            $this->cleanStringValue(data_get($preferredAddress, 'barangay.name')),
+            $this->cleanStringValue(data_get($preferredAddress, 'city.name')),
+            $this->cleanStringValue(data_get($preferredAddress, 'province.name.string'))
+                ?: $this->cleanStringValue(data_get($preferredAddress, 'province.name')),
+            $this->cleanStringValue(data_get($preferredAddress, 'region.name')),
+        ]);
+
+        if ($parts === []) {
+            return null;
+        }
+
+        return implode(', ', array_values($parts));
+    }
+
+    protected function syncStudentMedicalHistory(Patient $patient, array $personalInfo): void
+    {
+        $emergencyPerson = $this->cleanStringValue(
+            $personalInfo['emergencyContactName'] ?? $personalInfo['emergency_contact_name'] ?? null
+        );
+        $emergencyNumber = $this->cleanStringValue(
+            $personalInfo['emergencyContactNumber'] ?? $personalInfo['emergency_contact_number'] ?? null
+        );
+
+        if (! $emergencyPerson && ! $emergencyNumber) {
+            return;
+        }
+
+        $medicalHistory = MedicalHistory::firstOrNew(['patient_id' => $patient->id]);
+
+        if ($emergencyPerson && empty($medicalHistory->emergency_person)) {
+            $medicalHistory->emergency_person = $emergencyPerson;
+        }
+
+        if ($emergencyNumber && empty($medicalHistory->emergency_number)) {
+            $medicalHistory->emergency_number = $emergencyNumber;
+        }
+
+        if (! $medicalHistory->exists && empty($medicalHistory->emergency_relation)) {
+            $medicalHistory->emergency_relation = 'Not specified';
+        }
+
+        if ($medicalHistory->isDirty()) {
+            $medicalHistory->save();
         }
     }
 
