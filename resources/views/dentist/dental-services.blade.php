@@ -31,7 +31,7 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
             </div>
 
             <div class="dentist-hero-actions">
-                <button type="button" onclick="openDentalCreateReportModal()" class="btn-primary-global">
+                <button type="button" onclick="openDentalCreateReportModal()" class="ui-btn ui-btn-primary">
                     <i class="fa-solid fa-plus"></i>
                     Create Report
                 </button>
@@ -102,25 +102,21 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                     </div>
 
                     <div class="voice-search-row service-search-row">
-                        <div class="search-wrap global-search" data-search-wrapper>
-                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <x-search-bar
+                            id="searchInput"
+                            placeholder="Search name, program, contact…"
+                            callback="handleDentalServicesSearch"
+                            :debounce="350"
+                            clear-label="Clear search"
+                        />
 
-                            <input id="searchInput" type="text" class="search-input" data-search-input
-                                placeholder="Search name, program, contact…">
-
-                            <button type="button" class="search-clear" data-search-clear aria-label="Clear search">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
+                        <x-voice-input
+                            target="#searchInput"
+                            status-id="dentalServicesVoiceStatus"
+                            label="Use voice search"
+                            title="Voice search"
+                            />
                         </div>
-
-                        <button type="button" class="voice-search-mic external" data-voice-trigger
-                            data-voice-target="#searchInput" data-voice-status="#dentalServicesVoiceStatus"
-                            aria-label="Use voice search">
-                            <i class="fa-solid fa-microphone"></i>
-                        </button>
-
-                        <span id="dentalServicesVoiceStatus" class="voice-status hidden" data-voice-status></span>
-                    </div>
 
                     <button id="openFilter" type="button" class="global-filter-btn" aria-pressed="false"
                         onclick="openDentalFilterModal()">
@@ -130,64 +126,23 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                     </button>
 
                     <button id="externalClearFilterBtn" type="button"
-                        class="global-filter-reset-btn dental-clear-filter-btn hidden">
+                        class="global-filter-reset-btn hidden">
                         <i class="fa-solid fa-rotate-left"></i>
                     </button>
                 </div>
             </div>
 
-            <div class="card-body service-card-body">
-                <div class="sl-page-size-control">
-                    <label for="servicePerPageSelect">Show</label>
-
-                    <div class="global-page-size" data-global-page-size data-page-size-input="#servicePerPageSelect">
-
-                        <select id="servicePerPageSelect" class="global-page-size-native" tabindex="-1"
-                            aria-hidden="true">
-                            <option value="10" selected>10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-
-                        <button type="button" class="global-page-size-trigger" data-global-page-size-trigger
-                            aria-haspopup="listbox" aria-expanded="false">
-                            <span data-global-page-size-value>10</span>
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </button>
-
-                        <div class="global-page-size-menu" data-global-page-size-menu role="listbox">
-                            <button type="button" class="global-page-size-option is-selected" data-value="10"
-                                role="option" aria-selected="true">
-                                <span>10</span>
-                                <i class="fa-solid fa-check"></i>
-                            </button>
-
-                            <button type="button" class="global-page-size-option" data-value="20" role="option"
-                                aria-selected="false">
-                                <span>20</span>
-                                <i class="fa-solid fa-check"></i>
-                            </button>
-
-                            <button type="button" class="global-page-size-option" data-value="50" role="option"
-                                aria-selected="false">
-                                <span>50</span>
-                                <i class="fa-solid fa-check"></i>
-                            </button>
-
-                            <button type="button" class="global-page-size-option" data-value="100" role="option"
-                                aria-selected="false">
-                                <span>100</span>
-                                <i class="fa-solid fa-check"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <span>per page</span>
-                </div>
-
-                <div class="sl-pagination-wrap service-pagination-wrap"></div>
-            </div>
+            <x-pagination-bar
+                id="dentalServicesPagebarTop"
+                info-id="dentalServicesPageInfoTop"
+                pagination-id="dentalServicesPaginationTop"
+                position="top"
+                :show-entries="true"
+                page-size-id="servicePerPageSelect"
+                page-size-callback="selectDentalServicesPerPage"
+                :page-size-value="10"
+                label="entries"
+            />
 
             <div id="dentalServicesListView" class="table-responsive-fix service-table-wrap">
                 <table class="data-table service-table service-dental-table">
@@ -220,14 +175,14 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
 
             <div id="dentalServicesEmptyState" class="empty-state-host"></div>
 
-            <div class="sl-pagebar service-pagebar">
-                <span class="sl-pagebar-info service-pagebar-info">
-                    Showing <strong>0</strong> entries
-                </span>
-
-                <div class="sl-pagination-wrap service-pagination-wrap"></div>
-            </div>
-    </div>
+            <x-pagination-bar
+                id="dentalServicesPagebarBottom"
+                info-id="dentalServicesPageInfoBottom"
+                pagination-id="dentalServicesPaginationBottom"
+                position="bottom"
+                label="entries"
+            />
+        </div>
     </section>
 </main>
 
@@ -235,28 +190,28 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
     <div class="filter-drawer-overlay" onclick="closeFilterDrawer('filterModal')"></div>
 
     <aside class="filter-drawer-panel flex flex-col bg-white">
-        <div
-            class="filter-drawer-header px-6 py-5 flex items-center justify-between flex-shrink-0 bg-white border-b border-gray-100">
-            <div class="filter-drawer-title flex items-center gap-2">
-                <i class="fa-solid fa-sliders text-xl"></i>
-                <h2 class="text-xl font-extrabold">Filter Records</h2>
+        <div class="filter-drawer-header">
+            <div class="filter-drawer-title">
+                <i class="fa-solid fa-sliders"></i>
+                <h2>Filter Records</h2>
             </div>
 
-            <button id="closeFilterModalBtn" type="button" class="text-gray-400 hover:text-gray-700 transition-colors">
-                <i class="fa-solid fa-xmark text-xl"></i>
+            <button id="closeFilterModalBtn" type="button" class="filter-drawer-close" aria-label="Close filters">
+                <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <div class="filter-drawer-body px-6 py-5 flex flex-col gap-6 flex-1 overflow-y-auto bg-white">
-            <div id="activeFiltersSection" class="hidden">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-[13px] font-bold text-gray-800">Active Filters</span>
-                    <button id="clearAllChipsBtn" type="button" class="clear-all-chips">
-                        Clear All
+        <div class="filter-drawer-body">
+            <div id="activeFiltersSection" class="filter-active-section hidden">
+                <div class="filter-active-header">
+                    <span class="filter-active-title">Active Filters</span>
+                    <button id="clearAllChipsBtn" type="button" class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        <span>Clear All</span>
                     </button>
                 </div>
 
-                <div id="activeChipsContainer" class="flex flex-wrap gap-2 pb-4 border-b border-gray-100"></div>
+                <div id="activeChipsContainer" class="active-filters-container"></div>
             </div>
 
             <div>
@@ -334,7 +289,7 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                 </div>
             </div>
 
-            <div class="pb-6">
+            <div>
                 <h3 class="filter-section-title">Department</h3>
                 <div class="filter-chip-row">
                     <label class="choice-chip">
@@ -355,22 +310,22 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
             </div>
         </div>
 
-        <div
-            class="filter-drawer-footer px-6 py-5 bg-white flex flex-col sm:flex-row items-center justify-between flex-shrink-0 border-t border-gray-100 gap-4 sm:gap-0 relative z-20">
+        <div class="filter-drawer-footer">
             <button id="clearFilterBtn" type="button"
-                class="filter-clear-btn flex items-center gap-2 transition-colors w-full sm:w-auto justify-center sm:justify-start">
-                <i class="fa-regular fa-trash-can text-lg"></i>
-                <span class="text-[13px] font-bold leading-none whitespace-nowrap">Clear Filters</span>
+                class="filter-clear-btn ui-btn ui-btn-secondary ui-btn-sm">
+                <i class="fa-regular fa-trash-can"></i>
+                <span>Clear Filters</span>
             </button>
 
-            <div class="flex items-center gap-3 w-full sm:w-auto">
+            <div class="filter-footer-actions">
                 <button id="cancelFilterBtn" type="button"
-                    class="filter-cancel-btn flex-1 sm:flex-none px-5 py-2.5 text-sm font-bold rounded-lg transition-colors">
-                    Cancel
+                    class="filter-cancel-btn ui-btn ui-btn-secondary">
+                    <i class="fa-solid fa-xmark"></i>
+                    <span>Cancel</span>
                 </button>
 
                 <button id="applyFiltersBtn" type="button"
-                    class="filter-show-results-btn filter-apply-btn flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold rounded-lg transition-colors shadow-sm">
+                    class="filter-apply-btn ui-btn ui-btn-primary">
                     <i class="fa-solid fa-check"></i>
                     <span id="showResultsText">Show 0 results</span>
                 </button>
@@ -379,50 +334,47 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
     </aside>
 </div>
 
-<div id="createReportModal" class="ui-modal modal-overlay" aria-hidden="true"
+<div id="createReportModal" class="ui-modal" aria-hidden="true"
     onclick="closeModalOnBackdrop(event, 'createReportModal')">
-    <div class="modal-box-inner um-user-modal um-user-modal-md report-create-modal" onclick="event.stopPropagation()">
-        <div
-            class="um-user-modal-header px-6 py-5 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
-            <div class="flex items-center gap-3 min-w-0">
-                <div
-                    class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#8B0000] via-[#a40000] to-[#6B0000] flex items-center justify-center shadow-lg shadow-red-900/20 flex-shrink-0">
-                    <i class="fa-solid fa-file-circle-plus text-white text-sm"></i>
+    <div class="ui-modal-card modal-md" onclick="event.stopPropagation()">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-file-circle-plus"></i>
                 </div>
 
-                <div class="min-w-0">
-                    <h3 class="font-extrabold text-gray-800 text-lg leading-tight">Create Dental Services Report</h3>
-                    <p class="text-xs text-gray-500 mt-0.5">
+                <div class="modal-copy">
+                    <h3 class="modal-title">Create Dental Services Report</h3>
+                    <p class="modal-subtitle">
                         Fields marked <span class="text-yellow-500 font-bold">*</span> are required.
                     </p>
                 </div>
             </div>
 
-            <button type="button" onclick="closeCreateModal()" data-close-modal="createReportModal" class="um-modal-x"
+            <button type="button" onclick="closeCreateModal()" class="modal-x"
                 aria-label="Close create report modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <form id="reportForm" class="flex-1 flex flex-col min-h-0" novalidate>
-            <div class="um-user-modal-body">
-                <div class="um-user-main-card">
-                    <div class="um-section-title">
-                        <div class="um-section-icon bg-red-50 text-[#8B0000]">
-                            <i class="fa-solid fa-file-lines text-sm"></i>
+        <form id="reportForm" class="modal-card-form" novalidate>
+            <div class="modal-bd">
+                <div class="modal-form-section">
+                    <div class="modal-section-heading">
+                        <div class="modal-section-icon">
+                            <i class="fa-solid fa-file-lines"></i>
                         </div>
 
                         <div>
-                            <h4 class="text-base font-extrabold text-gray-800 leading-tight">Report Details</h4>
-                            <p class="text-xs text-gray-500 mt-0.5">Choose the report type, date range, and quantity.
-                            </p>
+                            <h4>Report Details</h4>
+                            <p>Choose the report type, date range, and quantity.</p>
                         </div>
                     </div>
 
-                    <div class="um-field-grid">
-                        <div class="um-field-full">
+                    <div class="modal-form-grid">
+                        <div>
                             <div class="flex items-center justify-between mb-1.5">
-                                <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide">
+                                <label for="reportName" class="form-label">
                                     Report Name <span class="text-red-500">*</span>
                                 </label>
 
@@ -430,22 +382,17 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                                     100</span>
                             </div>
 
-                            <div class="voice-search-row" data-voice-field>
+                            <div class="modal-inline-control">
                                 <input id="reportName" name="report_name" type="text" maxlength="100"
                                     placeholder="e.g. Dental Services Report — Dec 2026"
-                                    class="field-input flex-1 min-w-0 border border-gray-200 px-3.5 py-3 text-sm bg-white">
+                                    class="form-input modal-inline-main">
 
-                                <div class="voice-input-toggle">
-                                    <button type="button" id="reportNameMicBtn" class="voice-search-mic external"
-                                        data-voice-trigger data-voice-target="#reportName"
-                                        data-voice-status="#reportNameVoiceStatus"
-                                        aria-label="Voice input for report name">
-                                        <i class="fa-solid fa-microphone"></i>
-                                    </button>
-
-                                    <span id="reportNameVoiceStatus" class="voice-status hidden" data-voice-status
-                                        aria-live="polite"></span>
-                                </div>
+                                <x-voice-input
+                                    target="#reportName"
+                                    status-id="reportNameVoiceStatus"
+                                    label="Voice input for report name"
+                                    title="Voice input"
+                                />
                             </div>
 
                             <p id="reportNameErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1">
@@ -454,8 +401,8 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                             </p>
                         </div>
 
-                        <div class="um-field-full">
-                            <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                        <div>
+                            <label for="reportType" class="form-label">
                                 Report Type <span class="text-red-500">*</span>
                             </label>
 
@@ -493,14 +440,15 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                             </p>
                         </div>
 
+                    <div class="modal-form-grid-2">
                         <div>
-                            <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                            <label for="dateFrom" class="form-label">
                                 From <span class="text-red-500">*</span>
                             </label>
 
                             <div class="fp-date-input-wrap">
                                 <input id="dateFrom" name="date_from" type="text"
-                                    class="field-input w-full border border-gray-200 px-3.5 py-3 pr-10 text-sm bg-white js-flatpickr-date-max-today"
+                                    class="form-input js-flatpickr-date-max-today"
                                     placeholder="Select start date" readonly>
                                 <i class="fa-regular fa-calendar fp-date-icon"></i>
                             </div>
@@ -512,20 +460,21 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                         </div>
 
                         <div>
-                            <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                            <label for="dateTo" class="form-label">
                                 To <span class="text-gray-400 normal-case font-normal">(optional)</span>
                             </label>
 
                             <div class="fp-date-input-wrap">
                                 <input id="dateTo" name="date_to" type="text"
-                                    class="field-input w-full border border-gray-200 px-3.5 py-3 pr-10 text-sm bg-white js-flatpickr-date-max-today"
+                                    class="form-input js-flatpickr-date-max-today"
                                     placeholder="Select end date" readonly>
                                 <i class="fa-regular fa-calendar fp-date-icon"></i>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="um-field-full">
-                            <p class="text-[11px] text-gray-400 -mt-2">
+                        <div>
+                            <p class="modal-helper-text">
                                 <i class="fa-solid fa-circle-info mr-1"></i>
                                 Leave "To" empty to report on a single date.
                             </p>
@@ -541,8 +490,8 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                             </p>
                         </div>
 
-                        <div class="um-field-full">
-                            <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                        <div>
+                            <label for="reportQty" class="form-label">
                                 Quantity <span class="text-red-500">*</span>
                             </label>
 
@@ -555,7 +504,7 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
 
                                     <input id="reportQty" name="quantity" type="number" min="1" max="100" step="1"
                                         placeholder="1 – 100"
-                                        class="field-input report-qty-input border border-gray-200 px-3.5 py-3 text-sm bg-white">
+                                        class="form-input modal-number report-qty-input">
 
                                     <button type="button" class="report-qty-btn" data-qty-plus
                                         aria-label="Increase quantity">
@@ -572,25 +521,21 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                             </p>
                         </div>
 
-                        <div class="um-field-full">
-                            <div id="formErrorBanner" class="report-modal-error hidden">
+                            <div id="formErrorBanner" class="modal-error-banner hidden">
                                 <i class="fa-solid fa-triangle-exclamation"></i>
                                 <span>Please complete all required fields before downloading.</span>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="modal-ft um-user-modal-footer">
-                <button type="button" onclick="closeCreateModal()" class="modal-btn-ghost">
+            <div class="modal-ft">
+                <button type="button" onclick="closeCreateModal()" class="btn-close-modal">
                     Cancel
                 </button>
 
-                <button type="button" id="downloadReportBtn" class="modal-btn-confirm-reject um-save-user-btn">
-                    <span class="btn-confirm-icon">
-                        <i class="fa-solid fa-download"></i>
-                    </span>
+                <button type="button" id="downloadReportBtn" class="modal-btn-primary">
+                    <i class="fa-solid fa-download"></i>
                     <span>Download</span>
                 </button>
             </div>
@@ -1128,19 +1073,39 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
             ? `Showing <strong>${pagination.from}–${pagination.to}</strong> of <strong>${pagination.total}</strong> entries`
             : 'Showing <strong>0</strong> entries';
 
-        document.querySelectorAll('.service-pagebar-info').forEach(el => {
-            el.innerHTML = infoHtml;
-        });
+        const topInfo = document.getElementById('dentalServicesPageInfoTop');
+        const bottomInfo = document.getElementById('dentalServicesPageInfoBottom');
 
-        document.querySelectorAll('.service-pagination-wrap').forEach(el => {
-            el.innerHTML = buildDentalPagination(pagination);
-        });
+        if (topInfo) {
+            topInfo.innerHTML = infoHtml;
+        }
+
+        if (bottomInfo) {
+            bottomInfo.innerHTML = infoHtml;
+        }
+
+        const paginationHtml = buildDentalPagination(pagination);
+
+        const topPagination = document.getElementById('dentalServicesPaginationTop');
+        const bottomPagination = document.getElementById('dentalServicesPaginationBottom');
+
+        if (topPagination) {
+            topPagination.innerHTML = paginationHtml;
+        }
+
+        if (bottomPagination) {
+            bottomPagination.innerHTML = paginationHtml;
+        }
 
         const perPageSelect = document.getElementById('servicePerPageSelect');
 
         if (perPageSelect) {
             perPageSelect.value = String(servicePerPage);
-            window.syncGlobalPageSizeSelect?.(perPageSelect, servicePerPage);
+
+            window.syncGlobalPageSizeSelect?.(
+                perPageSelect,
+                servicePerPage
+            );
         }
     }
 
@@ -1159,31 +1124,31 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
             start = Math.max(1, end - winSize + 1);
         }
 
-        let html = '<nav class="sl-pagination" aria-label="Dental services pagination">';
+        let html = '<nav class="global-pagination" aria-label="Dental services pagination">';
 
         html += current <= 1
-            ? '<button type="button" disabled class="sl-page-disabled" aria-label="Previous page"><i class="fa-solid fa-chevron-left sl-page-icon"></i></button>'
-            : `<button type="button" onclick="dentalServiceGoPage(${current - 1})" class="sl-page-btn" aria-label="Previous page"><i class="fa-solid fa-chevron-left sl-page-icon"></i></button>`;
+            ? '<button type="button" disabled class="global-page-disabled" aria-label="Previous page"><i class="fa-solid fa-chevron-left global-page-icon"></i></button>'
+            : `<button type="button" onclick="dentalServiceGoPage(${current - 1})" class="global-page-btn" aria-label="Previous page"><i class="fa-solid fa-chevron-left global-page-icon"></i></button>`;
 
         if (start > 1) {
-            html += '<button type="button" onclick="dentalServiceGoPage(1)" class="sl-page-btn">1</button>';
-            if (start > 2) html += '<span class="sl-page-ellipsis" aria-hidden="true">&hellip;</span>';
+            html += '<button type="button" onclick="dentalServiceGoPage(1)" class="global-page-btn">1</button>';
+            if (start > 2) html += '<span class="global-page-ellipsis" aria-hidden="true">&hellip;</span>';
         }
 
         for (let page = start; page <= end; page++) {
             html += page === current
-                ? `<span class="sl-page-current" aria-current="page">${page}</span>`
-                : `<button type="button" onclick="dentalServiceGoPage(${page})" class="sl-page-btn">${page}</button>`;
+                ? `<span class="global-page-current" aria-current="page">${page}</span>`
+                : `<button type="button" onclick="dentalServiceGoPage(${page})" class="global-page-btn">${page}</button>`;
         }
 
         if (end < last) {
-            if (end < last - 1) html += '<span class="sl-page-ellipsis" aria-hidden="true">&hellip;</span>';
-            html += `<button type="button" onclick="dentalServiceGoPage(${last})" class="sl-page-btn">${last}</button>`;
+            if (end < last - 1) html += '<span class="global-page-ellipsis" aria-hidden="true">&hellip;</span>';
+            html += `<button type="button" onclick="dentalServiceGoPage(${last})" class="global-page-btn">${last}</button>`;
         }
 
         html += current >= last
-            ? '<button type="button" disabled class="sl-page-disabled" aria-label="Next page"><i class="fa-solid fa-chevron-right sl-page-icon"></i></button>'
-            : `<button type="button" onclick="dentalServiceGoPage(${current + 1})" class="sl-page-btn" aria-label="Next page"><i class="fa-solid fa-chevron-right sl-page-icon"></i></button>`;
+            ? '<button type="button" disabled class="global-page-disabled" aria-label="Next page"><i class="fa-solid fa-chevron-right global-page-icon"></i></button>'
+            : `<button type="button" onclick="dentalServiceGoPage(${current + 1})" class="global-page-btn" aria-label="Next page"><i class="fa-solid fa-chevron-right global-page-icon"></i></button>`;
 
         html += '</nav>';
 
@@ -1194,6 +1159,15 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
         serviceCurrentPage = Number(page) || 1;
         applyFilters();
     }
+
+    function selectDentalServicesPerPage(value) {
+        servicePerPage = Number(value) || 10;
+        serviceCurrentPage = 1;
+
+        applyFilters();
+    }
+
+    window.selectDentalServicesPerPage = selectDentalServicesPerPage;
 
     function renderRecords(data) {
         const tbody = document.getElementById('dentalServicesTableBody');
@@ -1392,6 +1366,18 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
         return data;
     }
 
+    function handleDentalServicesSearch(value) {
+        searchKeyword = String(value || '')
+            .trim()
+            .toLowerCase();
+
+        serviceCurrentPage = 1;
+
+        applyFilters();
+    }
+
+    window.handleDentalServicesSearch = handleDentalServicesSearch;
+
     function updateShowResultsButton() {
         const count = getFilteredDentalRecords().length;
         window.updateShowResultsText?.(count, 'showResultsText');
@@ -1550,8 +1536,6 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
         });
 
         const clearFilterBtn = document.getElementById('clearFilterBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const searchInput = document.getElementById('searchInput');
         const monthPicker = document.getElementById('monthPicker');
         window.initMonthOnlyFlatpickr?.(document);
         const downloadReportBtn = document.getElementById('downloadReportBtn');
@@ -1576,11 +1560,6 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
             resetDentalFilters({
                 closePanel: false
             });
-        });
-
-        searchInput.addEventListener('input', (e) => {
-            searchKeyword = e.target.value.trim().toLowerCase();
-            applyFilters();
         });
 
         document.querySelectorAll("input[name='sort']").forEach(radio => {
@@ -1670,11 +1649,6 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
 
         requestAnimationFrame(() => {
             window.setMonthOnlyPickerValue?.(monthPicker, currentMonthValue, false);
-        });
-
-        document.getElementById('servicePerPageSelect')?.addEventListener('change', (event) => {
-            servicePerPage = Number(event.target.value) || 10;
-            applyFilters(true);
         });
 
         applyFilters(true);
