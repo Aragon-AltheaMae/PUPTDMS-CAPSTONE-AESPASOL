@@ -29,6 +29,7 @@ use Carbon\Carbon;
 use App\Models\ClinicSchedule;
 use App\Models\BlockedDate;
 use App\Helpers\PhilippineHolidays;
+use App\Helpers\BookingQuestions;
 
 class OdontogramController extends Controller
 {
@@ -189,62 +190,6 @@ class OdontogramController extends Controller
         $normalized = strtoupper(trim((string) $value));
         return $normalized === 'YES' ? 'YES' : 'NO';
     }
-
-    private function getExistingAppointmentDentalQuestions(): array
-    {
-        return [
-            ['code' => 'bleeding_gums', 'label' => 'Do your gums bleed while brushing/flossing?'],
-            ['code' => 'sensitive_temp', 'label' => 'Are your teeth sensitive to hot or cold?'],
-            ['code' => 'sensitive_taste', 'label' => 'Are your teeth sensitive to sweets or sour?'],
-            ['code' => 'tooth_pain', 'label' => 'Do you feel any pain in your teeth?'],
-            ['code' => 'sores', 'label' => 'Do you have any sores/lumps in or near your mouth?'],
-            ['code' => 'injuries', 'label' => 'Have you had any head, neck, or jaw injuries?'],
-            ['code' => 'clicking', 'label' => 'Does your jaw click, pop, or make noise when opening?'],
-            ['code' => 'joint_pain', 'label' => 'Do you feel pain near your ears or jaw joints?'],
-            ['code' => 'difficulty_moving', 'label' => 'Do you have difficulty opening or moving your jaw?'],
-            ['code' => 'difficulty_chewing', 'label' => 'Do you have difficulty chewing, speaking, or swallowing?'],
-            ['code' => 'jaw_headaches', 'label' => 'Do you frequently experience jaw-related headaches?'],
-            ['code' => 'clench_grind', 'label' => 'Do you clench or grind your teeth?'],
-            ['code' => 'biting', 'label' => 'Do you bite your lips, cheeks, nails, or tongue?'],
-            ['code' => 'teeth_loosening', 'label' => 'Do your teeth feel loose or shifting?'],
-            ['code' => 'food_teeth', 'label' => 'Does food usually get stuck between your teeth?'],
-            ['code' => 'med_reaction', 'label' => 'Have you had any bad reaction to dental anesthesia or medicine?'],
-            ['code' => 'periodontal', 'label' => 'Have you had periodontal or gum treatment before?'],
-            ['code' => 'difficult_extraction', 'label' => 'Have you experienced difficult tooth extraction?'],
-            ['code' => 'prolonged_bleeding', 'label' => 'Do you experience prolonged bleeding after dental work?'],
-            ['code' => 'dentures', 'label' => 'Do you wear dentures or removable prosthesis?'],
-            ['code' => 'ortho_treatment', 'label' => 'Have you undergone orthodontic treatment?'],
-        ];
-    }
-
-    private function getExistingAppointmentMedicalQuestions(): array
-    {
-        return [
-            ['code' => 'good_health', 'label' => 'Are you in good health?', 'type' => 'bool'],
-            ['code' => 'good_health_details', 'label' => 'If no, describe your current health condition', 'type' => 'text'],
-            ['code' => 'had_medical_exam', 'label' => 'Have you had a medical examination in the last year?', 'type' => 'bool'],
-            ['code' => 'medical_exam_date', 'label' => 'Date of last medical examination', 'type' => 'date'],
-            ['code' => 'under_treatment', 'label' => 'Are you presently under medical treatment?', 'type' => 'bool'],
-            ['code' => 'treatment_details', 'label' => 'If yes, what condition is being treated?', 'type' => 'text'],
-            ['code' => 'hospitalized', 'label' => 'Have you ever been hospitalized?', 'type' => 'bool'],
-            ['code' => 'hospital_details', 'label' => 'If yes, specify the reason', 'type' => 'text'],
-            ['code' => 'allergy_medicine', 'label' => 'Are you allergic to any medicine?', 'type' => 'bool'],
-            ['code' => 'allergy_food', 'label' => 'Are you allergic to food or other substances?', 'type' => 'bool'],
-            ['code' => 'allergy_others', 'label' => 'If yes, specify allergies', 'type' => 'text'],
-            ['code' => 'medication', 'label' => 'Are you taking any medication?', 'type' => 'bool'],
-            ['code' => 'medication_details', 'label' => 'If yes, list the medication', 'type' => 'text'],
-            ['code' => 'pregnant', 'label' => 'Are you pregnant?', 'type' => 'bool'],
-            ['code' => 'nursing', 'label' => 'Are you nursing?', 'type' => 'bool'],
-            ['code' => 'birth_control', 'label' => 'Are you taking birth control pills?', 'type' => 'bool'],
-            ['code' => 'tobacco_use', 'label' => 'Do you use tobacco products?', 'type' => 'bool'],
-            ['code' => 'tobacco_per_day', 'label' => 'If yes, how many per day?', 'type' => 'text'],
-            ['code' => 'tobacco_per_week', 'label' => 'If yes, how many per week?', 'type' => 'text'],
-            ['code' => 'headaches', 'label' => 'Do you frequently have headaches?', 'type' => 'bool'],
-            ['code' => 'earaches', 'label' => 'Do you frequently have earaches or hearing issues?', 'type' => 'bool'],
-            ['code' => 'neck_aches', 'label' => 'Do you frequently have neck pain?', 'type' => 'bool'],
-        ];
-    }
-
     private function getPatientHistoryDefaults(Patient $patient): array
     {
         $patient->loadMissing([
@@ -828,11 +773,8 @@ class OdontogramController extends Controller
 
             'defaults' => $defaults,
 
-            'dentalQuestions' =>
-            $this->getExistingAppointmentDentalQuestions(),
-
-            'medicalQuestions' =>
-            $this->getExistingAppointmentMedicalQuestions(),
+            'dentalQuestions' => BookingQuestions::dental(),
+            'medicalQuestions' => BookingQuestions::medical(),
 
         ] + $this->getExistingAppointmentCalendarContext());
     }
@@ -862,13 +804,30 @@ class OdontogramController extends Controller
             ->all();
 
         $validated['medical_answers'] = collect($validated['medical_answers'] ?? [])
-            ->map(function ($value, $code) {
-                if (in_array($code, collect($this->getExistingAppointmentMedicalQuestions())->where('type', 'bool')->pluck('code')->all(), true)) {
-                    return $this->yesNoValue($value);
-                }
+            ->map(
+                function ($value, $code) {
+                    if (
+                        in_array(
+                            $code,
+                            BookingQuestions::medicalCodesByType(
+                                'bool'
+                            ),
+                            true
+                        )
+                    ) {
+                        return $this
+                            ->yesNoValue(
+                                $value
+                            );
+                    }
 
-                return is_string($value) ? trim($value) : $value;
-            })
+                    return is_string(
+                        $value
+                    )
+                        ? trim($value)
+                        : $value;
+                }
+            )
             ->all();
 
         session([

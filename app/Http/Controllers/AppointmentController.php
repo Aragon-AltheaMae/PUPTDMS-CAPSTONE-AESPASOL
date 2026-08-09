@@ -31,7 +31,7 @@ use App\Notifications\AppointmentBookedNotification;
 use App\Notifications\AppointmentRescheduledNotification;
 use App\Notifications\SignatureReuploadRequiredNotification;
 use App\Services\SignatureAiVerifier;
-
+use App\Helpers\BookingQuestions;
 
 class AppointmentController extends Controller
 {
@@ -276,6 +276,9 @@ class AppointmentController extends Controller
             })
             ->values();
 
+        $dentalQuestions = BookingQuestions::dental();
+        $medicalQuestions = BookingQuestions::medical();
+
         AuditLogger::log(
             'view',
             'appointments',
@@ -291,7 +294,9 @@ class AppointmentController extends Controller
             'philippineHolidays',
             'diseases',
             'serviceTypes',
-            'odontogramTeeth'
+            'odontogramTeeth',
+            'dentalQuestions',
+            'medicalQuestions'
         ));
     }
 

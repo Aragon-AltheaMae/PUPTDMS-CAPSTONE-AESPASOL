@@ -22,7 +22,6 @@ $reportCharts = $reportCharts ?? [];
 $reportInventory = $reportInventory ?? [];
 
 /* Admin */
-$stats = $reportStats['patients'] ?? [];
 $treatments = $reportStats['treatments'] ?? [
 'total' => 0,
 'breakdown' => collect(),
@@ -60,40 +59,22 @@ $appointmentsToday = $reportStats['appointments_today'] ?? 0;
 $appointmentsDelta = $reportStats['appointments_delta'] ?? 0;
 
 $casesThisMonth = $reportStats['cases_this_month'] ?? 0;
-$casesDelta = $reportStats['cases_delta'] ?? null;
 
 $totalAppointmentsThisMonth = $reportStats['total_appointments_this_month'] ?? 0;
-
-$cancelledAppointments = $reportStats['cancelled_appointments'] ?? 0;
-
 $completedAppointments = $reportStats['completed_appointments'] ?? $casesThisMonth;
-
 $cancellationRate = $reportStats['cancellation_rate'] ?? 0;
-
 $avgPatientsPerDay = $reportStats['average_patients_per_day'] ?? 0;
-
 $returningPatients = $reportStats['returning_patients'] ?? 0;
-
 $newPatients = $reportStats['new_patients'] ?? 0;
-
 $lowStockItems = $reportStats['low_stock_items'] ?? 0;
-
 $gadLabels = $reportCharts['gad']['labels'] ?? [];
-
 $gadFemale = $reportCharts['gad']['female'] ?? [];
-
 $gadMale = $reportCharts['gad']['male'] ?? [];
-
 $weekLabels = $reportCharts['weekly']['labels'] ?? [];
-
 $weeklyDatasets = $reportCharts['weekly']['datasets'] ?? [];
-
 $medicineItems = collect($reportInventory['medicine_items'] ?? []);
-
 $suppliesItems = collect($reportInventory['supplies_items'] ?? []);
-
 $lowStockMedicine = collect($reportInventory['low_stock_medicine'] ?? []);
-
 $lowStockSupplies = collect($reportInventory['low_stock_supplies'] ?? []);
 
 $topServices = collect($topServices ?? []);
@@ -258,19 +239,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                     </canvas>
                 </div>
                 @else
-                <div class="empty-state">
-                    <div class="empty-state-icon">
-                        <i class="fa-solid fa-chart-pie"></i>
-                    </div>
-
-                    <div class="empty-state-title">
-                        No treatment data available
-                    </div>
-
-                    <p class="empty-state-sub">
-                        Treatment distribution will appear after completed appointments are recorded.
-                    </p>
-                </div>
+                <div id="treatmentDistributionEmptyState" class="empty-state-host"></div>
                 @endif
             </div>
         </div>
@@ -488,13 +457,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             </table>
                         </div>
                         @else
-                        <div class="empty-state">
-                            <div class="empty-state-icon">
-                                <i class="fa-solid fa-box-open"></i>
-                            </div>
-                            <div class="empty-state-title">No dental supply records available</div>
-                            <div class="empty-state-sub">There are no inventory usage records to display yet.</div>
-                        </div>
+                        <div id="adminInventoryEmptyState" class="empty-state-host"></div>
                         @endif
                     </div>
 
@@ -623,14 +586,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             </table>
                         </div>
                         @else
-                        <div class="empty-state">
-                            <div class="empty-state-icon">
-                                <i class="fa-solid fa-truck-ramp-box"></i>
-                            </div>
-                            <div class="empty-state-title">No stock movement data available</div>
-                            <div class="empty-state-sub">There are no inventory records available for reorder
-                                forecasting yet.</div>
-                        </div>
+                        <div id="adminStockMovementEmptyState" class="empty-state-host"></div>
                         @endif
                     </div>
 
@@ -834,13 +790,10 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                 </div>
             </div>
             <div class="card-body">
-                <div class="report-chart-legend" id="gadChartLegend"></div>
+                <div class="report-chart-legend"></div>
                 <div id="gadChartWrap" class="relative flex-1 min-h-[260px]">
                     <canvas id="gadChart"></canvas>
-                    <div id="gadEmptyState" class="chart-empty hidden absolute inset-0">
-                        <i class="fa-solid fa-chart-column"></i>
-                        <p>No records found</p><span>for the selected period</span>
-                    </div>
+                    <div id="gadEmptyState" class="empty-state-host absolute inset-0"></div>
                     <div id="gadLoadingState" class="chart-loading hidden absolute inset-0"><i
                             class="fa-solid fa-spinner"></i></div>
                 </div>
@@ -876,10 +829,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             <div class="card-body">
                 <div id="weeklyChartWrap" class="relative flex-1 min-h-[260px]">
                     <canvas id="weeklyDentalCasesChart"></canvas>
-                    <div id="weeklyEmptyState" class="chart-empty hidden absolute inset-0">
-                        <i class="fa-solid fa-chart-line"></i>
-                        <p>No appointment data</p><span>for the selected period</span>
-                    </div>
+                    <div id="weeklyEmptyState" class="empty-state-host absolute inset-0"></div>
                     <div id="weeklyLoadingState" class="chart-loading hidden absolute inset-0"><i
                             class="fa-solid fa-spinner"></i></div>
                 </div>
@@ -899,11 +849,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                     @if (($returningPatients ?? 0) > 0 || ($newPatients ?? 0) > 0)
                     <canvas id="patientSegmentChart"></canvas>
                     @else
-                    <div class="chart-empty absolute inset-0">
-                        <i class="fa-solid fa-user-group"></i>
-                        <p>No patient segment data</p>
-                        <span>Returning and new patient insights will appear here.</span>
-                    </div>
+                    <div id="patientSegmentEmptyState" class="empty-state-host"></div>
                     @endif
                 </div>
             </div>
@@ -940,11 +886,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                     @endforeach
                 </div>
                 @else
-                <div class="chart-empty py-6">
-                    <i class="fa-solid fa-tooth"></i>
-                    <p>No service data available</p>
-                    <span>Top performed treatments will appear here.</span>
-                </div>
+                <div id="topServicesEmptyState" class="empty-state-host"></div>
                 @endif
             </div>
         </div>
@@ -1062,19 +1004,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                 @endforeach
             </div>
             @else
-            <div class="empty-state">
-                <div class="empty-state-icon">
-                    <i class="fa-solid fa-file-circle-xmark"></i>
-                </div>
-
-                <div class="empty-state-title">
-                    No active document templates
-                </div>
-
-                <div class="empty-state-sub">
-                    Active clinic forms and certificates will appear here.
-                </div>
-            </div>
+            <div id="printableFormsEmptyState" class="empty-state-host"></div>
             @endif
         </div>
     </section>
@@ -1100,21 +1030,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         @if ($medicineItems->count() > 0)
                         <canvas id="medicinePieChart"></canvas>
                         @else
-                        <div class="chart-empty absolute inset-0">
-                            <i class="fa-solid fa-pills"></i>
-
-                            <p>No medicine stock available</p>
-
-                            <span>
-                                Add medicines to track inventory levels.
-                            </span>
-
-                            <button type="button" class="ui-btn ui-btn-primary ui-btn-sm"
-                                onclick="window.location.assign('{{ route('dentist.dentist.inventory') }}')">
-                                <i class="fa-solid fa-plus"></i>
-                                Add Medicine
-                            </button>
-                        </div>
+                        <div id="medicineInventoryEmptyState" class="empty-state-host"></div>
                         @endif
                     </div>
                 </div>
@@ -1127,21 +1043,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         @if ($suppliesItems->count() > 0)
                         <canvas id="suppliesPieChart"></canvas>
                         @else
-                        <div class="chart-empty absolute inset-0">
-                            <i class="fa-solid fa-box-open"></i>
-
-                            <p>No medical supplies found</p>
-
-                            <span>
-                                Add supplies to monitor usage and stock.
-                            </span>
-
-                            <button type="button" class="ui-btn ui-btn-primary ui-btn-sm"
-                                onclick="window.location.assign('{{ route('dentist.dentist.inventory') }}')">
-                                <i class="fa-solid fa-plus"></i>
-                                Add Supply
-                            </button>
-                        </div>
+                        <div id="medicalSuppliesEmptyState" class="empty-state-host"></div>
                         @endif
                     </div>
                 </div>
@@ -1208,21 +1110,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             <p class="text-xs text-gray-500 mt-1">No items require immediate restocking.</p>
         </div>
         @else
-        <div class="flex flex-col items-center justify-center h-[160px] text-center">
-            <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
-                <i class="fa-solid fa-boxes-stacked text-gray-400 text-lg"></i>
-            </div>
-            <p class="text-sm font-bold text-gray-700">No inventory records yet</p>
-            <p class="text-xs text-gray-500 mt-1">Add medicine or supply items to monitor low
-                stock
-                alerts.</p>
-
-            <button type="button" class="ui-btn ui-btn-primary ui-btn-sm"
-                onclick="window.location.assign('{{ route('dentist.dentist.inventory') }}')">
-                <i class="fa-solid fa-plus"></i>
-                Add Item
-            </button>
-        </div>
+        <div id="inventoryRecordsEmptyState" class="empty-state-host"></div>
         @endif
         @endif
     </div>
@@ -1616,8 +1504,34 @@ $customReportTemplates = collect($customReportTemplates ?? []);
         const lineTotals = @json($charts['line']['totals'] ?? []);
         const lineNew = @json($charts['line']['new_patients'] ?? []);
 
-        const textColor = 'rgba(107,114,128,1)';
-        const gridColor = 'rgba(0,0,0,0.06)';
+        const isAdminReportDark = () =>
+            document.documentElement
+                .getAttribute('data-theme') ===
+            'dark' ||
+            document.documentElement
+                .classList
+                .contains('dark');
+
+        const adminChartTextColor = () =>
+            isAdminReportDark()
+                ? '#C9D1D9'
+                : '#374151';
+
+        const adminChartGridColor = () =>
+            isAdminReportDark()
+                ? 'rgba(255,255,255,0.10)'
+                : 'rgba(148,163,184,0.22)';
+
+        const adminChartBorderColor = () =>
+            isAdminReportDark()
+                ? '#161B22'
+                : '#ffffff';
+
+        const textColor =
+            adminChartTextColor();
+
+        const gridColor =
+            adminChartGridColor();
 
         const sharedScales = {
             x: {
@@ -1650,11 +1564,52 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             }
         };
 
+        const renderEmptyState = (
+            host,
+            options
+        ) => {
+            if (
+                !window.EmptyState ||
+                !document.getElementById(host)
+            ) {
+                return;
+            }
+
+            window.EmptyState.render({
+                host: `#${host}`,
+                ...options
+            });
+        };
+
+        renderEmptyState(
+            'treatmentDistributionEmptyState', {
+            title: 'No treatment data available',
+            message: 'Treatment distribution will appear after completed appointments are recorded.',
+            icon: 'fa-chart-pie'
+        }
+        );
+
+        renderEmptyState(
+            'adminInventoryEmptyState', {
+            title: 'No dental supply records available',
+            message: 'There are no inventory usage records to display yet.',
+            icon: 'fa-box-open'
+        }
+        );
+
+        renderEmptyState(
+            'adminStockMovementEmptyState', {
+            title: 'No stock movement data available',
+            message: 'There are no inventory records available for reorder forecasting yet.',
+            icon: 'fa-truck-ramp-box'
+        }
+        );
+
         const appointmentStatusCanvas =
             document.getElementById('appointmentStatusChart');
 
         if (appointmentStatusCanvas) {
-            new Chart(appointmentStatusCanvas, {
+            new window.Chart(appointmentStatusCanvas, {
                 type: 'doughnut',
 
                 data: {
@@ -1678,7 +1633,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         ],
 
                         borderWidth: 3,
-                        borderColor: '#ffffff',
+                        borderColor: adminChartBorderColor(),
                         hoverOffset: 7
                     }]
                 },
@@ -1693,15 +1648,14 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             display: false
                         },
 
-                        tooltip:
-                            window.getGlobalChartTooltipOptions({
-                                label(context) {
-                                    const value =
-                                        Number(context.raw || 0);
+                        tooltip: window.getGlobalChartTooltipOptions?.({
+                            label(context) {
+                                const value =
+                                    Number(context.raw || 0);
 
-                                    return `${context.label}: ${value}`;
-                                }
-                            })
+                                return `${context.label}: ${value}`;
+                            }
+                        }) || {}
                     }
                 }
             });
@@ -1711,7 +1665,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             document.getElementById('documentRequestChart');
 
         if (documentRequestCanvas) {
-            new Chart(documentRequestCanvas, {
+            new window.Chart(documentRequestCanvas, {
                 type: 'bar',
 
                 data: {
@@ -1750,12 +1704,11 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         legend: {
                             display: false
                         },
-                        tooltip:
-                            window.getGlobalChartTooltipOptions({
-                                label(context) {
-                                    return `${context.dataset.label}: ${context.raw}`;
-                                }
-                            })
+                        tooltip: window.getGlobalChartTooltipOptions?.({
+                            label(context) {
+                                return `${context.dataset.label}: ${context.raw}`;
+                            }
+                        }) || {}
                     },
 
                     scales: {
@@ -1803,7 +1756,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
         const barCanvas = document.getElementById('barChart');
 
         if (barCanvas) {
-            new Chart(barCanvas, {
+            new window.Chart(barCanvas, {
                 type: 'bar',
                 data: {
                     labels: barLabels,
@@ -1823,12 +1776,11 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             display: false
                         },
 
-                        tooltip:
-                            window.getGlobalChartTooltipOptions({
-                                label(context) {
-                                    return `${context.dataset.label}: ${context.formattedValue}`;
-                                }
-                            })
+                        tooltip: window.getGlobalChartTooltipOptions?.({
+                            label(context) {
+                                return `${context.dataset.label}: ${context.formattedValue}`;
+                            }
+                        }) || {}
                     },
                     scales: sharedScales
                 }
@@ -1838,7 +1790,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
         const pieColors = ['#378ADD', '#1D9E75', '#D85A30', '#BA7517', '#7F77DD', '#9ca3af'];
 
         if (document.getElementById('pieChart') && pieLabels.length && pieData.length) {
-            new Chart(document.getElementById('pieChart'), {
+            new window.Chart(document.getElementById('pieChart'), {
                 type: 'doughnut',
                 data: {
                     labels: pieLabels,
@@ -1846,7 +1798,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         data: pieData,
                         backgroundColor: pieColors.slice(0, pieLabels.length),
                         borderWidth: 3,
-                        borderColor: '#ffffff',
+                        borderColor: adminChartBorderColor(),
                         hoverOffset: 7
                     }]
                 },
@@ -1858,12 +1810,11 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         legend: {
                             display: false
                         },
-                        tooltip:
-                            window.getGlobalChartTooltipOptions({
-                                label(context) {
-                                    return `${context.label}: ${context.formattedValue}`;
-                                }
-                            })
+                        tooltip: window.getGlobalChartTooltipOptions?.({
+                            label(context) {
+                                return `${context.label}: ${context.formattedValue}`;
+                            }
+                        }) || {}
                     }
                 }
             });
@@ -1871,7 +1822,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
         const lineCanvas = document.getElementById('lineChart');
         if (lineCanvas) {
-            new Chart(lineCanvas, {
+            new window.Chart(lineCanvas, {
                 type: 'line',
                 data: {
                     labels: lineLabels,
@@ -1912,12 +1863,11 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         legend: {
                             display: false
                         },
-                        tooltip:
-                            window.getGlobalChartTooltipOptions({
-                                label(context) {
-                                    return `${context.dataset.label}: ${context.formattedValue}`;
-                                }
-                            })
+                        tooltip: window.getGlobalChartTooltipOptions?.({
+                            label(context) {
+                                return `${context.dataset.label}: ${context.formattedValue}`;
+                            }
+                        }) || {}
                     },
                     scales: {
                         x: {
@@ -1953,6 +1903,90 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                 }
             });
         }
+
+        function applyAdminReportChartTheme() {
+            if (!window.Chart) {
+                return;
+            }
+
+            const textColor =
+                adminChartTextColor();
+
+            const gridColor =
+                adminChartGridColor();
+
+            const borderColor =
+                adminChartBorderColor();
+
+            [
+                'lineChart',
+                'pieChart',
+                'appointmentStatusChart',
+                'documentRequestChart',
+                'barChart'
+            ].forEach(chartId => {
+                const chart =
+                    window.Chart.getChart?.(
+                        chartId
+                    );
+
+                if (!chart) {
+                    return;
+                }
+
+                const scales =
+                    chart.options?.scales;
+
+                if (scales) {
+                    Object.values(scales)
+                        .forEach(scale => {
+                            if (scale.ticks) {
+                                scale.ticks.color =
+                                    textColor;
+                            }
+
+                            if (scale.grid) {
+                                scale.grid.color =
+                                    gridColor;
+                            }
+
+                            if (scale.title) {
+                                scale.title.color =
+                                    textColor;
+                            }
+                        });
+                }
+
+                const legendLabels =
+                    chart.options
+                        ?.plugins
+                        ?.legend
+                        ?.labels;
+
+                if (legendLabels) {
+                    legendLabels.color =
+                        textColor;
+                }
+
+                if (
+                    chart.config.type ===
+                    'doughnut'
+                ) {
+                    chart.data.datasets
+                        .forEach(dataset => {
+                            dataset.borderColor =
+                                borderColor;
+                        });
+                }
+
+                chart.update('none');
+            });
+        }
+
+        window.addEventListener(
+            'global-theme-change',
+            applyAdminReportChartTheme
+        );
     });
 </script>
 
@@ -2029,15 +2063,15 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             );
 
             if (confirmButtonIcon) {
-                confirmButtonIcon.className = isLoading
-                    ? 'fa-solid fa-spinner fa-spin'
-                    : 'fa-solid fa-wand-magic-sparkles';
+                confirmButtonIcon.className = isLoading ?
+                    'fa-solid fa-spinner fa-spin' :
+                    'fa-solid fa-wand-magic-sparkles';
             }
 
             if (confirmButtonLabel) {
-                confirmButtonLabel.textContent = isLoading
-                    ? 'Generating...'
-                    : 'Generate AI Report';
+                confirmButtonLabel.textContent = isLoading ?
+                    'Generating...' :
+                    'Generate AI Report';
             }
 
             if (cancelButton) {
@@ -2354,10 +2388,99 @@ $customReportTemplates = collect($customReportTemplates ?? []);
     const reportChartGridColor = () => isReportDark() ? 'rgba(255,255,255,0.10)' : 'rgba(148,163,184,0.22)';
     const reportChartBorderColor = () => isReportDark() ? '#161B22' : '#ffffff';
 
-    if (window.Chart) {
-        Chart.defaults.color = reportChartTextColor();
-        Chart.defaults.borderColor = reportChartGridColor();
+    const REPORT_CHART_IDS = [
+        'clinicOverviewChart',
+        'gadChart',
+        'weeklyDentalCasesChart',
+        'patientSegmentChart',
+        'medicinePieChart',
+        'suppliesPieChart'
+    ];
+
+    function applyReportChartTheme() {
+        if (!window.Chart) {
+            return;
+        }
+
+        const textColor =
+            reportChartTextColor();
+
+        const gridColor =
+            reportChartGridColor();
+
+        const borderColor =
+            reportChartBorderColor();
+
+        window.Chart.defaults.color =
+            textColor;
+
+        window.Chart.defaults.borderColor =
+            gridColor;
+
+        REPORT_CHART_IDS.forEach(chartId => {
+            const chart =
+                window.Chart.getChart?.(
+                    chartId
+                );
+
+            if (!chart) {
+                return;
+            }
+
+            const scales =
+                chart.options?.scales;
+
+            if (scales) {
+                Object.values(scales)
+                    .forEach(scale => {
+                        if (scale.ticks) {
+                            scale.ticks.color =
+                                textColor;
+                        }
+
+                        if (scale.grid) {
+                            scale.grid.color =
+                                gridColor;
+                        }
+
+                        if (scale.title) {
+                            scale.title.color =
+                                textColor;
+                        }
+                    });
+            }
+
+            const legendLabels =
+                chart.options
+                    ?.plugins
+                    ?.legend
+                    ?.labels;
+
+            if (legendLabels) {
+                legendLabels.color =
+                    textColor;
+            }
+
+            if (
+                chart.config.type ===
+                'doughnut'
+            ) {
+                chart.data.datasets
+                    .forEach(dataset => {
+                        dataset.borderColor =
+                            borderColor;
+                    });
+            }
+
+            chart.update('none');
+        });
     }
+    window.addEventListener(
+        'global-theme-change',
+        () => {
+            applyReportChartTheme();
+        }
+    );
 </script>
 
 <script>
@@ -2478,7 +2601,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             clinicOverviewChartInstance.destroy();
         }
 
-        clinicOverviewChartInstance = new Chart(canvas, {
+        clinicOverviewChartInstance = new window.Chart(canvas, {
             type: 'bar',
 
             data: {
@@ -2555,12 +2678,11 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         display: false
                     },
 
-                    tooltip:
-                        window.getGlobalChartTooltipOptions({
-                            label(context) {
-                                return `${context.label}: ${context.raw}`;
-                            }
-                        })
+                    tooltip: window.getGlobalChartTooltipOptions?.({
+                        label(context) {
+                            return `${context.label}: ${context.raw}`;
+                        }
+                    }) || {}
                 }
             }
         });
@@ -2577,7 +2699,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             patientSegmentChartInstance = null;
         }
 
-        patientSegmentChartInstance = new Chart(canvas, {
+        patientSegmentChartInstance = new window.Chart(canvas, {
             type: 'doughnut',
             data: {
                 labels: PATIENT_SEGMENT_DATA.labels,
@@ -2608,12 +2730,11 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         }
                     },
 
-                    tooltip:
-                        window.getGlobalChartTooltipOptions({
-                            label(context) {
-                                return `${context.label}: ${context.formattedValue}`;
-                            }
-                        })
+                    tooltip: window.getGlobalChartTooltipOptions?.({
+                        label(context) {
+                            return `${context.label}: ${context.formattedValue}`;
+                        }
+                    }) || {}
                 }
             }
         });
@@ -2698,10 +2819,9 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
             quantityField.dispatchEvent(
                 new Event(
-                    'input',
-                    {
-                        bubbles: true
-                    }
+                    'input', {
+                    bubbles: true
+                }
                 )
             );
         }
@@ -2745,12 +2865,9 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
         banner?.classList.add('hidden');
 
-        const quantityInput =
-            document.getElementById('reportQty');
-
-        if (quantityInput) {
-            quantityInput.disabled = false;
-            quantityInput.placeholder = '1–100';
+        if (quantityField) {
+            quantityField.disabled = false;
+            quantityField.placeholder = '1–100';
         }
 
         const counter =
@@ -2776,43 +2893,191 @@ $customReportTemplates = collect($customReportTemplates ?? []);
     let gadChartInstance = null,
         weeklyChartInstance = null;
 
-    function setReportChartState(canvasId, emptyId, loadingId, state) {
-        const canvas = document.getElementById(canvasId);
-        const empty = document.getElementById(emptyId);
-        const loading = document.getElementById(loadingId);
+    function setReportChartState(
+        canvasId,
+        emptyId,
+        loadingId,
+        state,
+        emptyOptions = {}
+    ) {
+        const canvas =
+            document.getElementById(canvasId);
 
-        if (!canvas || !empty || !loading) return;
+        const empty =
+            document.getElementById(emptyId);
 
-        empty.classList.remove('flex');
-        loading.classList.remove('flex');
+        const loading =
+            document.getElementById(loadingId);
 
-        empty.classList.add('hidden');
+        if (!canvas || !empty || !loading) {
+            return;
+        }
+
         loading.classList.add('hidden');
-
-        empty.style.display = 'none';
+        loading.classList.remove('flex');
         loading.style.display = 'none';
+
+        window.EmptyState?.hide(empty);
 
         if (state === 'empty') {
             canvas.style.display = 'none';
-            empty.classList.remove('hidden');
-            empty.classList.add('flex');
-            empty.style.display = 'flex';
+
+            window.EmptyState?.render({
+                host: empty,
+                title: emptyOptions.title ||
+                    'No records found',
+                message: emptyOptions.message ||
+                    '',
+                icon: emptyOptions.icon ||
+                    'fa-folder-open'
+            });
+
             return;
         }
 
         if (state === 'loading') {
             canvas.style.display = 'none';
+
             loading.classList.remove('hidden');
             loading.classList.add('flex');
             loading.style.display = 'flex';
+
             return;
         }
-
         canvas.style.display = 'block';
     }
 
+    function renderReportEmptyState(host, options) {
+        const element =
+            document.querySelector(host);
+
+        if (!element || !window.EmptyState) {
+            return;
+        }
+
+        window.EmptyState.render({
+            host: element,
+            ...options
+        });
+    }
+
+    function renderDentistReportEmptyStates() {
+        if (!window.EmptyState) {
+            return;
+        }
+
+        renderReportEmptyState(
+            '#inventoryRecordsEmptyState',
+            {
+                title: 'No inventory records yet',
+                message:
+                    'Add medicine or supply items to monitor low stock alerts.',
+                icon: 'fa-boxes-stacked',
+                actionHtml: `
+                <button
+                    type="button"
+                    class="ui-btn ui-btn-primary ui-btn-sm"
+                    onclick="window.location.assign(
+                        '{{ route('dentist.dentist.inventory') }}'
+                    )"
+                >
+                    <i class="fa-solid fa-plus"></i>
+                    Add Item
+                </button>
+            `
+            }
+        );
+
+        renderReportEmptyState(
+            '#printableFormsEmptyState',
+            {
+                title: 'No active document templates',
+                message:
+                    'Active clinic forms and certificates will appear here.',
+                icon: 'fa-file-circle-xmark'
+            }
+        );
+
+        renderReportEmptyState(
+            '#topServicesEmptyState',
+            {
+                title: 'No service data available',
+                message:
+                    'Top performed treatments will appear here.',
+                icon: 'fa-tooth'
+            }
+        );
+
+        renderReportEmptyState(
+            '#medicineInventoryEmptyState',
+            {
+                title: 'No medicine stock available',
+                message:
+                    'Add medicines to track inventory levels.',
+                icon: 'fa-pills',
+                className: 'empty-state-compact',
+
+                actionHtml: `
+            <button
+                type="button"
+                class="ui-btn ui-btn-primary ui-btn-sm"
+                onclick="window.location.assign(
+                    '{{ route('dentist.dentist.inventory') }}'
+                )"
+            >
+                <i class="fa-solid fa-plus"></i>
+                Add Medicine
+            </button>
+        `
+            }
+        );
+
+        renderReportEmptyState(
+            '#patientSegmentEmptyState',
+            {
+                title: 'No patient segment data',
+                message:
+                    'Returning and new patient insights will appear here.',
+                icon: 'fa-user-group'
+            }
+        );
+
+        renderReportEmptyState(
+            '#medicalSuppliesEmptyState',
+            {
+                title: 'No medical supplies found',
+                message:
+                    'Add supplies to monitor usage and stock.',
+                icon: 'fa-box-open',
+                className: 'empty-state-compact',
+
+                actionHtml: `
+            <button
+                type="button"
+                class="ui-btn ui-btn-primary ui-btn-sm"
+                onclick="window.location.assign(
+                    '{{ route('dentist.dentist.inventory') }}'
+                )"
+            >
+                <i class="fa-solid fa-plus"></i>
+                Add Supply
+            </button>
+        `
+            }
+        );
+    }
+
     function showGadEmpty() {
-        setReportChartState('gadChart', 'gadEmptyState', 'gadLoadingState', 'empty');
+        setReportChartState(
+            'gadChart',
+            'gadEmptyState',
+            'gadLoadingState',
+            'empty', {
+            title: 'No records found',
+            message: 'No GAD records are available for the selected period.',
+            icon: 'fa-chart-column'
+        }
+        );
     }
 
     function showGadLoading() {
@@ -2824,7 +3089,16 @@ $customReportTemplates = collect($customReportTemplates ?? []);
     }
 
     function showWeeklyEmpty() {
-        setReportChartState('weeklyDentalCasesChart', 'weeklyEmptyState', 'weeklyLoadingState', 'empty');
+        setReportChartState(
+            'weeklyDentalCasesChart',
+            'weeklyEmptyState',
+            'weeklyLoadingState',
+            'empty', {
+            title: 'No appointment data',
+            message: 'No weekly treatment or appointment activity is available for the selected period.',
+            icon: 'fa-chart-line'
+        }
+        );
     }
 
     function showWeeklyLoading() {
@@ -2846,7 +3120,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             gadChartInstance.destroy();
             gadChartInstance = null;
         }
-        gadChartInstance = new Chart(canvas, {
+        gadChartInstance = new window.Chart(document.getElementById('gadChart'), {
             type: 'bar',
             data: {
                 labels,
@@ -2878,12 +3152,11 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             boxWidth: 8
                         }
                     },
-                    tooltip:
-                        window.getGlobalChartTooltipOptions({
-                            label(context) {
-                                return `${context.dataset.label}: ${context.parsed.x} cases`;
-                            }
-                        })
+                    tooltip: window.getGlobalChartTooltipOptions?.({
+                        label(context) {
+                            return `${context.dataset.label}: ${context.parsed.x} cases`;
+                        }
+                    }) || {}
                 },
                 scales: {
                     x: {
@@ -2929,7 +3202,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             weeklyChartInstance.destroy();
             weeklyChartInstance = null;
         }
-        weeklyChartInstance = new Chart(canvas, {
+        weeklyChartInstance = new window.Chart(document.getElementById('weeklyDentalCasesChart'), {
             type: 'line',
             data: {
                 labels,
@@ -2950,12 +3223,11 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             boxWidth: 8
                         }
                     },
-                    tooltip:
-                        window.getGlobalChartTooltipOptions({
-                            label(context) {
-                                return `${context.dataset.label}: ${context.parsed.y} cases`;
-                            }
-                        })
+                    tooltip: window.getGlobalChartTooltipOptions?.({
+                        label(context) {
+                            return `${context.dataset.label}: ${context.parsed.y} cases`;
+                        }
+                    }) || {}
                 },
                 scales: {
                     x: {
@@ -2997,7 +3269,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
         if (!canvas || !window.Chart || !Array.isArray(items) || items.length === 0) return;
 
-        new Chart(canvas, {
+        new window.Chart(canvas, {
             type: 'doughnut',
             data: {
                 labels: items.map(i => i.name),
@@ -3025,12 +3297,11 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             padding: 12
                         }
                     },
-                    tooltip:
-                        window.getGlobalChartTooltipOptions({
-                            label(context) {
-                                return `${context.label}: ${context.parsed} remaining`;
-                            }
-                        })
+                    tooltip: window.getGlobalChartTooltipOptions?.({
+                        label(context) {
+                            return `${context.label}: ${context.parsed} remaining`;
+                        }
+                    }) || {}
                 }
             }
         });
@@ -3129,11 +3400,27 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
     document.addEventListener('DOMContentLoaded', function () {
 
+        if (window.EmptyState) {
+            renderDentistReportEmptyStates();
+        } else {
+            window.addEventListener(
+                'load',
+                renderDentistReportEmptyStates, {
+                once: true
+            }
+            );
+        }
+
         if (window.initGlobalVoiceInputs) {
             window.initGlobalVoiceInputs(document.getElementById('createReportModal'));
         }
 
-        waitForChartJs().then(() => {
+        waitForChartJs().then(chartReady => {
+            if (!chartReady) {
+                return;
+            }
+
+            applyReportChartTheme();
             initReportCharts();
         });
 
@@ -3272,9 +3559,9 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                 'dental_clearance'
             ].includes(documentType);
 
-            const quantity = automaticQuantity
-                ? 1
-                : Number(quantityField.value);
+            const quantity = automaticQuantity ?
+                1 :
+                Number(quantityField.value);
 
             const endpoint =
                 endpointMap[documentType];
@@ -3429,141 +3716,6 @@ $customReportTemplates = collect($customReportTemplates ?? []);
         });
 
         syncReportQuantityState();
-
-        const reportNameInput = document.getElementById('reportName');
-        const reportTypeInput = document.getElementById('reportType');
-        const dateFromInput = document.getElementById('dateFrom');
-        const dateToInput = document.getElementById('dateTo');
-        const qtyInput = document.getElementById('reportQty');
-
-        reportNameInput?.addEventListener('input', function () {
-            const len = this.value.length,
-                counter = document.getElementById('reportNameCounter');
-
-            if (counter) {
-                counter.textContent = `${len} / 100`;
-                counter.classList.toggle('text-red-500', len >= 90);
-                counter.classList.toggle('text-gray-400', len < 90);
-            }
-
-            if (this.value.trim()) clearError('reportName', 'reportNameErr');
-            document.getElementById('formErrorBanner').classList.add('hidden');
-        });
-
-        reportTypeInput?.addEventListener('change', function () {
-            if (this.value) clearError('reportType', 'reportTypeErr');
-
-            const selectedOption = this.selectedOptions[0];
-            const documentType = selectedOption ? selectedOption.dataset.documentType : '';
-            const qtyInput = document.getElementById('reportQty');
-            const qtyErr = document.getElementById('reportQtyErr');
-            const banner = document.getElementById('formErrorBanner');
-            const qtyButtons = document.querySelectorAll('[data-qty-minus], [data-qty-plus]');
-
-            const isCertificateRequest = ['annual_dental_clearance', 'dental_clearance'].includes(
-                documentType);
-
-            if (isCertificateRequest) {
-                qtyInput.value = '';
-                qtyInput.placeholder = 'Auto';
-                qtyInput.disabled = true;
-                qtyInput.classList.add('bg-gray-100', 'cursor-not-allowed');
-
-                qtyButtons.forEach(btn => {
-                    btn.disabled = true;
-                    btn.classList.add('is-disabled');
-                });
-
-                if (qtyErr) {
-                    qtyErr.classList.add('hidden');
-                    qtyErr.classList.remove('flex');
-                }
-
-                banner.innerHTML = `
-            <i class="fa-solid fa-circle-info text-blue-500 flex-shrink-0"></i>
-            <span>Certificate reports will generate based on approved requests in the selected date range.</span>
-        `;
-                banner.classList.remove('hidden');
-                banner.classList.add('flex');
-                banner.classList.remove('bg-red-50', 'border-red-200', 'text-red-700');
-                banner.classList.add('bg-blue-50', 'border-blue-200', 'text-blue-700');
-            } else {
-                qtyInput.disabled = false;
-                qtyInput.placeholder = '1 – 100';
-                qtyInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
-
-                qtyButtons.forEach(btn => {
-                    btn.disabled = false;
-                    btn.classList.remove('is-disabled');
-                });
-
-                banner.classList.add('hidden');
-                banner.classList.remove('flex', 'bg-blue-50', 'border-blue-200', 'text-blue-700');
-                banner.classList.add('bg-red-50', 'border-red-200', 'text-red-700');
-            }
-        });
-
-        function checkDates() {
-            const from = document.getElementById('dateFrom').value,
-                to = document.getElementById('dateTo').value;
-            ['dateFromErr', 'dateFutureErr', 'dateRangeErr'].forEach(id => {
-                let el = document.getElementById(id);
-                if (el) {
-                    el.classList.add('hidden');
-                    el.classList.remove('flex');
-                }
-            });
-            ['dateFrom', 'dateTo'].forEach(id => {
-                let el = document.getElementById(id);
-                if (el) {
-                    el.classList.remove('border-red-400');
-                    el.classList.add('border-gray-300');
-                }
-            });
-            if (!from && !to) return;
-            const fromFuture = from && from > todayStr,
-                toFuture = to && to > todayStr;
-            if (fromFuture || toFuture) {
-                document.getElementById('dateFutureErr').classList.remove('hidden');
-                document.getElementById('dateFutureErr').classList.add('flex');
-                if (fromFuture) {
-                    document.getElementById('dateFrom').classList.add('border-red-400');
-                    document.getElementById('dateFrom').classList.remove('border-gray-300');
-                }
-                if (toFuture) {
-                    document.getElementById('dateTo').classList.add('border-red-400');
-                    document.getElementById('dateTo').classList.remove('border-gray-300');
-                }
-                return;
-            }
-            if (from && to && new Date(to) < new Date(from)) {
-                document.getElementById('dateRangeErr').classList.remove('hidden');
-                document.getElementById('dateRangeErr').classList.add('flex');
-                document.getElementById('dateTo').classList.add('border-red-400');
-                document.getElementById('dateTo').classList.remove('border-gray-300');
-            }
-            document.getElementById('formErrorBanner').classList.add('hidden');
-        }
-        dateFromInput?.addEventListener('change', checkDates);
-        dateToInput?.addEventListener('change', checkDates);
-
-        qtyInput?.addEventListener('keydown', e => {
-            if (['-', '+', 'e', 'E', '.', ','].includes(e.key)) e.preventDefault();
-        });
-        qtyInput?.addEventListener('input', function () {
-            let val = this.value.replace(/[^0-9]/g, '');
-            if (val !== '' && parseInt(val, 10) > 100) val = '100';
-            this.value = val;
-            const qty = parseInt(val, 10);
-            if (!isNaN(qty) && qty >= 1 && qty <= 100) clearError('reportQty', 'reportQtyErr');
-            document.getElementById('formErrorBanner').classList.add('hidden');
-        });
-        qtyInput?.addEventListener('paste', e => {
-            e.preventDefault();
-            const num = parseInt((e.clipboardData || window.clipboardData).getData('text').replace(
-                /[^0-9]/g, ''), 10);
-            if (!isNaN(num)) qtyInput.value = Math.min(Math.max(num, 1), 100);
-        });
     });
 </script>
 @endif

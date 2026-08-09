@@ -1307,61 +1307,162 @@ textarea.form-input-custom.global-form-textarea {
 }
 
 .global-question-options {
-    display: inline-flex;
-    align-items: center;
-    gap: 1.25rem;
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(82px, 1fr));
+
+    align-items: stretch;
+    gap: .6rem;
+
     flex: 0 0 auto;
+
+    min-width: 190px;
 }
 
 .global-radio-option {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: .5rem;
-    min-height: 36px;
-    padding: .35rem .5rem;
-    border-radius: 10px;
-    color: var(--text-2, #5c5550);
-    font-size: .88rem;
+    justify-content: flex-start;
+    gap: .6rem;
+
+    min-width: 0;
+    min-height: 42px;
+
+    padding: .65rem .75rem;
+
+    border:
+        1px solid var(--border, #e5e7eb);
+
+    border-radius: 12px;
+
+    background:
+        var(--surface, #ffffff);
+
+    color:
+        var(--text-2, #5c5550);
+
+    font-size: .84rem;
     font-weight: 700;
+    line-height: 1.3;
+
     cursor: pointer;
     user-select: none;
+
     transition:
+        border-color .18s ease,
+        background-color .18s ease,
         color .18s ease,
-        background-color .18s ease;
+        box-shadow .18s ease;
 }
 
 .global-radio-option:hover {
-    color: var(--crimson, #8b0000);
-    background: var(--crimson-light, #fef2f2);
+    border-color:
+        rgba(139, 0, 0, .35);
+
+    background:
+        rgba(139, 0, 0, .025);
+
+    color:
+        var(--crimson, #8b0000);
 }
 
 .global-radio-input {
     appearance: none;
     -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
+
+    width: 1.15rem;
+    height: 1.15rem;
+
     margin: 0;
-    flex: 0 0 18px;
-    border: 2px solid #d6d3d1;
+
+    flex: 0 0 1.15rem;
+
+    display: grid;
+    place-content: center;
+
+    border:
+        2px solid var(--border, #d6d3d1);
+
     border-radius: 50%;
-    background: #fff;
+
+    background:
+        var(--surface, #ffffff);
+
     cursor: pointer;
-    transition: border-color .18s ease, background-color .18s ease, box-shadow .18s ease;
+
+    transition:
+        border-color .18s ease,
+        background-color .18s ease,
+        box-shadow .18s ease;
+}
+
+.global-radio-input::before {
+    content: "";
+
+    width: .43rem;
+    height: .43rem;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    transform: scale(0);
+
+    transition:
+        transform .14s ease;
 }
 
 .global-radio-input:hover {
-    border-color: var(--crimson, #8b0000);
+    border-color:
+        var(--crimson, #8b0000);
 }
 
 .global-radio-input:checked {
-    border-color: var(--crimson, #8b0000);
-    background: var(--crimson, #8b0000);
-    box-shadow: inset 0 0 0 3px #fff;
+    border-color:
+        var(--crimson, #8b0000);
+
+    background:
+        var(--crimson, #8b0000);
+}
+
+.global-radio-input:checked::before {
+    transform: scale(1);
+}
+
+.global-radio-option:has(.global-radio-input:checked) {
+    border-color:
+        rgba(139, 0, 0, .38);
+
+    background:
+        rgba(139, 0, 0, .045);
+
+    color:
+        var(--crimson, #8b0000);
+
+    box-shadow:
+        0 0 0 3px rgba(139, 0, 0, .05);
 }
 
 .global-radio-input:focus-visible {
-    outline: 3px solid rgba(139, 0, 0, .16);
-    outline-offset: 3px;
+    outline: none;
+
+    box-shadow:
+        0 0 0 3px rgba(139, 0, 0, .14);
+}
+
+.global-radio-input:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.global-radio-input:disabled+span {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
+.global-radio-option:has(.global-radio-input:disabled) {
+    cursor: not-allowed;
 }
 
 .global-radio-input:disabled,
@@ -1382,26 +1483,54 @@ textarea.form-input-custom.global-form-textarea {
 
 [data-theme="dark"] .global-radio-option,
 .dark .global-radio-option {
-    color: #cbd5e1;
+    border-color:
+        var(--border, #30363d);
+
+    background:
+        var(--surface, #0d1117);
+
+    color:
+        var(--text-2, #cbd5e1);
 }
 
 [data-theme="dark"] .global-radio-option:hover,
 .dark .global-radio-option:hover {
-    color: #fca5a5;
-    background: rgba(139, 0, 0, .18);
+    border-color:
+        rgba(252, 165, 165, .28);
+
+    background:
+        rgba(139, 0, 0, .10);
+
+    color:
+        #fca5a5;
 }
 
 [data-theme="dark"] .global-radio-input,
 .dark .global-radio-input {
-    border-color: #4b5563;
-    background: #0b141c;
+    border-color:
+        var(--border, #4b5563);
+
+    background:
+        var(--surface, #0d1117);
 }
 
 [data-theme="dark"] .global-radio-input:checked,
 .dark .global-radio-input:checked {
     border-color: #fca5a5;
-    background: var(--crimson, #8b0000);
-    box-shadow: inset 0 0 0 3px #0b141c;
+    background:
+        var(--crimson, #8b0000);
+}
+
+[data-theme="dark"] .global-radio-option:has(.global-radio-input:checked),
+.dark .global-radio-option:has(.global-radio-input:checked) {
+    border-color:
+        rgba(252, 165, 165, .32);
+
+    background:
+        rgba(139, 0, 0, .18);
+
+    color:
+        #fca5a5;
 }
 
 @media (max-width: 768px) {
@@ -1413,37 +1542,190 @@ textarea.form-input-custom.global-form-textarea {
 
     .global-question-options {
         width: 100%;
-        gap: .75rem;
+        min-width: 0;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
     }
 
     .global-question-row[data-global-field]>.global-field-error {
         grid-column: 1;
     }
+}
 
-    .global-radio-option {
-        flex: 1 1 0;
-        justify-content: center;
-        min-height: 42px;
-        border: 1px solid var(--border-subtle, #ece7e2);
-        background: var(--card, #fff);
-    }
+.global-checkbox-input {
+    appearance: none;
+    -webkit-appearance: none;
 
-    .global-radio-option:has(.global-radio-input:checked) {
-        border-color: rgba(139, 0, 0, .35);
-        background: var(--crimson-light, #fef2f2);
-        color: var(--crimson, #8b0000);
-    }
+    width: 1.15rem;
+    height: 1.15rem;
 
-    [data-theme="dark"] .global-radio-option,
-    .dark .global-radio-option {
-        border-color: rgba(255, 255, 255, .10);
-        background: #0d1117;
-    }
+    margin: 0;
 
-    [data-theme="dark"] .global-radio-option:has(.global-radio-input:checked),
-    .dark .global-radio-option:has(.global-radio-input:checked) {
-        border-color: rgba(252, 165, 165, .32);
-        background: rgba(139, 0, 0, .18);
-        color: #fca5a5;
+    flex: 0 0 1.15rem;
+
+    display: grid;
+    place-content: center;
+
+    border: 2px solid var(--border);
+    border-radius: 5px;
+
+    background: var(--surface);
+
+    cursor: pointer;
+
+    transition:
+        border-color .18s ease,
+        background-color .18s ease,
+        box-shadow .18s ease;
+}
+
+.global-checkbox-input::before {
+    content: "";
+
+    width: .55rem;
+    height: .32rem;
+
+    border-left: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+
+    transform:
+        rotate(-45deg) scale(0);
+
+    transform-origin: center;
+
+    transition: transform .14s ease;
+}
+
+.global-checkbox-input:hover {
+    border-color: var(--crimson);
+}
+
+.global-checkbox-input:focus-visible {
+    outline: none;
+
+    box-shadow:
+        0 0 0 3px rgba(139, 0, 0, .14);
+}
+
+.global-checkbox-input:checked {
+    border-color: var(--crimson);
+    background: var(--crimson);
+}
+
+.global-checkbox-input:checked::before {
+    transform:
+        rotate(-45deg) scale(1);
+}
+
+.global-checkbox-row:has(.global-checkbox-input:checked) {
+    border-color: rgba(139, 0, 0, .38);
+    background: rgba(139, 0, 0, .045);
+}
+
+.global-checkbox-input:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+[data-theme="dark"] .global-checkbox-input {
+    background: var(--surface);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .global-checkbox-input:hover {
+    border-color: #fca5a5;
+}
+
+[data-theme="dark"] .global-checkbox-input:checked {
+    background: var(--crimson);
+    border-color: #fca5a5;
+}
+
+[data-theme="dark"] .global-checkbox-input:focus-visible {
+    box-shadow:
+        0 0 0 3px rgba(252, 165, 165, .14);
+}
+
+.global-checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+
+    min-width: 0;
+
+    padding: .7rem .8rem;
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    background: var(--surface);
+
+    cursor: pointer;
+
+    transition:
+        border-color .18s ease,
+        background-color .18s ease,
+        box-shadow .18s ease;
+}
+
+.global-checkbox-row:hover {
+    border-color: rgba(139, 0, 0, .35);
+    background: rgba(139, 0, 0, .025);
+}
+
+.global-checkbox-label {
+    min-width: 0;
+
+    color: var(--text-1);
+
+    font-size: .875rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+[data-theme="dark"] .global-checkbox-label {
+    color: var(--text-1);
+}
+
+.medical-condition-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: .65rem;
+}
+
+.booking-section-description {
+    margin:
+        0 0 .85rem;
+
+    color: var(--text-2);
+
+    font-size: .8rem;
+    line-height: 1.5;
+}
+
+.booking-field-spacing {
+    margin-top: .85rem;
+}
+
+.booking-two-field-stack {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: .9rem;
+
+    margin-top: .85rem;
+}
+
+@media (max-width: 640px) {
+
+    .medical-condition-grid,
+    .booking-two-field-stack {
+        grid-template-columns: 1fr;
     }
 }

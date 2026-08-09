@@ -20,462 +20,109 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 @endphp
 
 @section('content')
-<main id="mainContent" class="book-container page-enter">
-    <div class="book-page-wrap">
+<main id="mainContent" class="booking-page page-enter">
+    <div class="booking-page-inner">
+        <x-booking.workflow-header :back-url="route('homepage')" back-label="Back to Home"
+            form-target="#appointmentForm" icon="fa-regular fa-calendar-check" title="Book an Appointment"
+            subtitle="Complete all five steps to schedule your dental visit." :steps="[
+                'Date & Time',
+                'Service',
+                'Dental History',
+                'Medical History',
+                'Confirm',
+            ]" />
 
-        <div class="w-full pt-10 pb-2 animate-fade-up">
+        <div class="w-full">
 
-            <div class="flex items-center justify-between mt-8 mb-4">
-                <a href="{{ route('homepage') }}" class="ui-btn ui-btn-primary ui-btn-sm">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    Back to Home
-                </a>
-                <span
-                    class="step-counter-pill text-xs text-[#9e9690] font-semibold bg-white border border-[#e8e2dd] px-3 py-1.5 rounded-full shadow-sm">
-                    Step <span id="stepCounterText">1</span> <span class="text-[#c4bfba]">of 5</span>
-                </span>
-            </div>
-
-            <div class="w-full h-2 rounded-full bg-[#e8e2dd] overflow-hidden mb-5">
-                <div id="headerProgressFill" class="h-full rounded-full progress-fill progress-fill-initial"></div>
-            </div>
-
-            <div class="text-center mb-1">
-                <p class="text-xs font-semibold uppercase tracking-widest mb-1 text-[#8B0000]">
-                    <i class="fa-regular fa-calendar-check mr-1"></i> PUP TAGUIG DENTAL CLINIC
-                </p>
-                <h1 class="text-3xl sm:text-4xl font-extrabold text-[#660000]">Book an Appointment</h1>
-                <p class="text-sm text-[#9e9690] mt-1">Complete all five steps to schedule your dental visit.</p>
-            </div>
-
-        </div>
-
-        <div class="w-full pb-16">
-
-            <div class="w-full mt-4 mb-0 animate-fade-up-1 py-3 px-2 stepper-wrap-overflow">
-                <div class="flex items-start justify-between w-full stepper-row-padding">
-                    <div class="flex flex-col items-center gap-1 min-w-0 flex-1">
-                        <div id="sc1"
-                            class="step-circle w-10 h-10 rounded-full border-2 border-blue-600 bg-blue-600 flex items-center justify-center text-sm font-bold text-white shadow-[0_0_0_6px_rgba(37,99,235,0.12)] scale-110">
-                            1</div>
-                        <span id="sl1"
-                            class="step-label text-[0.65rem] font-semibold uppercase tracking-wide text-blue-600 text-center hidden sm:block mt-4">Date
-                            &amp; Time</span>
-                    </div>
-                    <div id="conn1"
-                        class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector step-connector-size"></div>
-                    <div class="flex flex-col items-center gap-1 min-w-0 flex-1">
-                        <div id="sc2"
-                            class="step-circle w-10 h-10 rounded-full border-2 border-[#e8e2dd] bg-white flex items-center justify-center text-sm font-bold text-[#9e9690]">
-                            2</div>
-                        <span id="sl2"
-                            class="step-label text-[0.65rem] font-semibold uppercase tracking-wide text-[#9e9690] text-center hidden sm:block mt-4">Service</span>
-                    </div>
-                    <div id="conn2"
-                        class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector step-connector-size"></div>
-                    <div class="flex flex-col items-center gap-1 min-w-0 flex-1">
-                        <div id="sc3"
-                            class="step-circle w-10 h-10 rounded-full border-2 border-[#e8e2dd] bg-white flex items-center justify-center text-sm font-bold text-[#9e9690]">
-                            3</div>
-                        <span id="sl3"
-                            class="step-label text-[0.65rem] font-semibold uppercase tracking-wide text-[#9e9690] text-center hidden sm:block mt-4">Dental
-                            History</span>
-                    </div>
-                    <div id="conn3"
-                        class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector step-connector-size"></div>
-                    <div class="flex flex-col items-center gap-1 min-w-0 flex-1">
-                        <div id="sc4"
-                            class="step-circle w-10 h-10 rounded-full border-2 border-[#e8e2dd] bg-white flex items-center justify-center text-sm font-bold text-[#9e9690]">
-                            4</div>
-                        <span id="sl4"
-                            class="step-label text-[0.65rem] font-semibold uppercase tracking-wide text-[#9e9690] text-center hidden sm:block mt-4">Medical
-                            History</span>
-                    </div>
-                    <div id="conn4"
-                        class="h-0.5 bg-[#e8e2dd] flex-shrink-0 self-start step-connector step-connector-size"></div>
-                    <div class="flex flex-col items-center gap-1 min-w-0 flex-1">
-                        <div id="sc5"
-                            class="step-circle w-10 h-10 rounded-full border-2 border-[#e8e2dd] bg-white flex items-center justify-center text-sm font-bold text-[#9e9690]">
-                            5</div>
-                        <span id="sl5"
-                            class="step-label text-[0.65rem] font-semibold uppercase tracking-wide text-[#9e9690] text-center hidden sm:block mt-4">Confirm</span>
-                    </div>
-                </div>
-            </div>
-
-            <div
-                class="book-card mt-6 w-full mx-auto bg-white rounded-2xl shadow-[0_4px_40px_rgba(0,0,0,0.08),0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden animate-fade-up-2">
-                <div class="h-1 w-full book-card-topline"></div>
-                <div class="p-6 sm:p-8">
+            <div class="booking-workflow-card">
+                <div>
 
                     <form id="appointmentForm" action="{{ route('book.appointment.store') }}" method="POST"
-                        enctype="multipart/form-data" data-global-selects data-global-validation>
+                        enctype="multipart/form-data" data-global-selects data-global-validation data-discard-form
+                        data-discard-title="Discard appointment?"
+                        data-discard-subtitle="You have unsaved appointment information."
+                        data-discard-message="Leaving this page will remove the appointment details you entered. Do you want to discard your changes?">
                         @csrf
-
-                        <div class="step-content hidden">
-                            <div class="booking-step-header">
-                                <p class="booking-step-eyebrow">Step 1 of 5</p>
-                                <h2 class="booking-step-title">Select Date &amp; Time</h2>
-                                <p class="booking-step-subtitle">
-                                    Choose your preferred appointment date and available clinic time slot.
-                                </p>
-                            </div>
-
-                            <div class="booking-step-body">
-                                <input type="hidden" id="appointment_date" name="appointment_date" required>
-                                <input type="hidden" id="appointment_time" name="appointment_time" required>
-
-                                <div class="cal-time-layout grid gap-5 lg:gap-6 mx-auto w-full">
-
-                                    <div class="calendar-shell-no-card" data-global-field>
-                                        <div id="calendarSkeletonContainer"></div>
-                                    </div>
-
-                                    <div class="time-panel flex flex-col is-empty" data-global-field>
-                                        <div class="mb-5">
-                                            <p
-                                                class="text-[0.78rem] font-extrabold text-[#8B0000] uppercase tracking-[0.24em]">
-                                                Pick a Time Slot
-                                            </p>
-                                            <p class="text-sm text-[#8c817a] mt-1 leading-6">
-                                                Choose your preferred schedule for the selected date.
-                                            </p>
-                                        </div>
-
-                                        <div id="dateBanner"
-                                            class="hidden rounded-xl px-3 py-2 text-sm font-semibold text-white mb-3 shadow-md date-banner-gradient">
-                                        </div>
-
-                                        <div id="slotContainer" class="hidden">
-                                            <div id="slotGrid" class="slot-grid-ui grid grid-cols-2 gap-4">
-                                            </div>
-
-                                            <button type="button" id="clearSlotSelectionBtn"
-                                                class="ui-btn ui-btn-secondary ui-btn-sm hidden mt-4 mb-2 w-full">
-                                                <i class="fa-solid fa-xmark"></i>
-                                                Clear selection
-                                            </button>
-
-                                            <div id="selectedSlotDisplay"
-                                                class="hidden rounded-2xl px-4 py-3 text-sm font-semibold text-[#8B0000] bg-[linear-gradient(135deg,#fff5f5,#fffafa)] border border-[#e8caca] shadow-sm">
-                                                <i class="fa-solid fa-circle-check mr-1.5"></i>
-                                                Selected:
-                                                <span id="selectedSlotText" class="font-bold"></span>
-                                            </div>
-                                        </div>
-
-                                        <div id="slotPlaceholder"
-                                            class="slot-placeholder-empty flex flex-col items-center justify-center gap-3 py-8 text-center text-[#9e9690]">
-                                            <div
-                                                class="empty-icon w-12 h-12 rounded-full bg-[#f9e8e8] flex items-center justify-center text-[#8B0000] text-lg">
-                                                <i class="fa-regular fa-calendar"></i>
-                                            </div>
-                                            <div>
-                                                <p class="empty-title text-sm font-semibold text-[#5c5550]">Choose
-                                                    a
-                                                    date</p>
-                                                <p class="empty-subtitle text-xs mt-1">Select an available day to
-                                                    see time slots.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
 
                         <div class="step-content hidden">
                             <div class="booking-step-shell">
                                 <div class="booking-step-header">
-                                    <p class="booking-step-eyebrow">Step 2 of 5</p>
-                                    <h2 class="booking-step-title">Choose Your Dental Service</h2>
+                                    <p class="booking-step-eyebrow">Step 1 of 5</p>
+                                    <h2 class="booking-step-title">Select Date &amp; Time</h2>
                                     <p class="booking-step-subtitle">
-                                        Select the type of service you want to book for your appointment.
+                                        Choose your preferred appointment date and available clinic time slot.
                                     </p>
                                 </div>
 
                                 <div class="booking-step-body">
-                                    <div class="service-step-grid global-choice-group" data-global-field>
-                                        @foreach ($serviceTypes as $service)
-                                        <label class="service-option group">
-                                            <input type="radio" name="service_type" value="{{ $service['name'] }}"
-                                                class="service-option-input"
-                                                data-required-message="Please select a dental service." required>
+                                    <input type="hidden" id="appointment_date" name="appointment_date" required>
+                                    <input type="hidden" id="appointment_time" name="appointment_time" required>
 
-                                            <div class="service-option-card">
-                                                <div class="service-option-main">
-                                                    <div class="service-option-icon">
-                                                        @if (!empty($service['img']))
-                                                        <img src="{{ asset('images/' . $service['img'] . '.png') }}"
-                                                            class="w-6 h-6 service-option-img-red" />
-                                                        @else
-                                                        <i class="fa-solid fa-tooth"></i>
-                                                        @endif
-                                                    </div>
+                                    <div class="cal-time-layout grid gap-5 lg:gap-6 mx-auto w-full">
 
-                                                    <div class="service-option-copy">
-                                                        <div class="service-option-topline">
-                                                            <p class="service-option-title">{{ $service['name'] }}
-                                                            </p>
-                                                            <span class="service-option-badge">Available</span>
-                                                        </div>
-                                                        <p class="service-option-desc">{{ $service['desc'] }}</p>
-                                                    </div>
+                                        <div class="calendar-shell-no-card" data-global-field>
+                                            <div id="calendarSkeletonContainer"></div>
+                                        </div>
+
+                                        <div class="time-panel flex flex-col is-empty" data-global-field>
+                                            <div class="mb-5">
+                                                <p
+                                                    class="text-[0.78rem] font-extrabold text-[#8B0000] uppercase tracking-[0.24em]">
+                                                    Pick a Time Slot
+                                                </p>
+                                                <p class="text-sm text-[#8c817a] mt-1 leading-6">
+                                                    Choose your preferred schedule for the selected date.
+                                                </p>
+                                            </div>
+
+                                            <div id="dateBanner"
+                                                class="hidden rounded-xl px-3 py-2 text-sm font-semibold text-white mb-3 shadow-md date-banner-gradient">
+                                            </div>
+
+                                            <div id="slotContainer" class="hidden">
+                                                <div id="slotGrid" class="slot-grid-ui grid grid-cols-2 gap-4">
                                                 </div>
 
-                                                <div class="service-option-arrow">
-                                                    <i class="fa-solid fa-chevron-right"></i>
+                                                <button type="button" id="clearSlotSelectionBtn"
+                                                    class="ui-btn ui-btn-secondary ui-btn-sm hidden mt-4 mb-2 w-full">
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                    Clear selection
+                                                </button>
+
+                                                <div id="selectedSlotDisplay"
+                                                    class="hidden rounded-2xl px-4 py-3 text-sm font-semibold text-[#8B0000] bg-[linear-gradient(135deg,#fff5f5,#fffafa)] border border-[#e8caca] shadow-sm">
+                                                    <i class="fa-solid fa-circle-check mr-1.5"></i>
+                                                    Selected:
+                                                    <span id="selectedSlotText" class="font-bold"></span>
                                                 </div>
                                             </div>
-                                        </label>
-                                        @endforeach
+
+                                            <div id="slotPlaceholder"
+                                                class="slot-placeholder-empty flex flex-col items-center justify-center gap-3 py-8 text-center text-[#9e9690]">
+                                                <div
+                                                    class="empty-icon w-12 h-12 rounded-full bg-[#f9e8e8] flex items-center justify-center text-[#8B0000] text-lg">
+                                                    <i class="fa-regular fa-calendar"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="empty-title text-sm font-semibold text-[#5c5550]">Choose
+                                                        a
+                                                        date</p>
+                                                    <p class="empty-subtitle text-xs mt-1">Select an available day to
+                                                        see time slots.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="step-content hidden">
-                            <div>
-                                <div class="booking-step-header">
-                                    <p class="booking-step-eyebrow">Step 3 of 5</p>
-                                    <h2 class="booking-step-title">Dental History</h2>
-                                    <p class="booking-step-subtitle">
-                                        Share your past dental records, treatments, and dental concerns for a better
-                                        assessment.
-                                    </p>
-                                </div>
+                        <x-booking.service-step :services="$serviceTypes" title="Choose Your Dental Service"
+                            subtitle="Select the type of service you want to book for your appointment." />
 
-                                <div class="booking-step-body">
-
-                                    <div class="section-card">
-                                        <p class="section-card-title">
-                                            <i class="fa-regular fa-calendar-days text-xs"></i> Basic Info
-                                            <span class="section-card-title-line"></span>
-                                        </p>
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-                                            <div data-global-field>
-                                                <label for="lastDentalVisit"
-                                                    class="block text-xs font-semibold text-[#333] mb-1.5">
-                                                    Last Dental Visit
-                                                </label>
-
-                                                <div class="global-control-wrap">
-                                                    <i class="fa-regular fa-calendar global-control-icon"
-                                                        aria-hidden="true">
-                                                    </i>
-                                                    <input type="text" id="lastDentalVisit" name="last_dental_visit"
-                                                        class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
-                                                        placeholder="Select date"
-                                                        data-required-message="Please select your last dental visit."
-                                                        readonly required>
-                                                </div>
-                                            </div>
-
-                                            <div data-global-field>
-                                                <label for="previous_dentist"
-                                                    class="block text-xs font-semibold text-[#333] mb-1.5">
-                                                    Previous Dentist
-                                                </label>
-
-                                                <input type="text" id="previous_dentist" name="previous_dentist"
-                                                    maxlength="50"
-                                                    class="form-input w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
-                                                    placeholder="Dr. Name"
-                                                    data-required-message="Please enter your previous dentist."
-                                                    required>
-                                            </div>
-
-                                        </div>
-                                    </div>
-
-                                    <div class="section-card">
-                                        <p
-                                            class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
-                                            <i class="fa-solid fa-tooth text-xs"></i> Dental Symptoms <span
-                                                class="flex-1 h-px bg-[#f9e8e8]"></span>
-                                        </p>
-                                        @php
-                                        $dentalQ1 = [
-                                        [
-                                        'name' => 'bleeding_gums',
-                                        'q' => 'Do your gums bleed while brushing/flossing?',
-                                        ],
-                                        [
-                                        'name' => 'sensitive_temp',
-                                        'q' => 'Are your teeth sensitive to hot or cold?',
-                                        ],
-                                        [
-                                        'name' => 'sensitive_taste',
-                                        'q' => 'Are your teeth sensitive to sweets or sour?',
-                                        ],
-                                        [
-                                        'name' => 'tooth_pain',
-                                        'q' => 'Do you feel any pain in your teeth?',
-                                        ],
-                                        [
-                                        'name' => 'sores',
-                                        'q' => 'Do you have any sores/lumps in or near your mouth?',
-                                        ],
-                                        [
-                                        'name' => 'injuries',
-                                        'q' => 'Have you had any head, neck, or jaw injuries?',
-                                        ],
-                                        ];
-                                        @endphp
-                                        @foreach ($dentalQ1 as $q)
-
-                                        <x-booking-question :name="$q['name']" :label="$q['q']"
-                                            :checked-value="old($q['name'])" required />
-
-                                        @endforeach
-                                    </div>
-
-                                    <div class="section-card">
-                                        <p
-                                            class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
-                                            <i class="fa-solid fa-circle-dot text-xs"></i> Jaw &amp; Bite Symptoms
-                                            <span class="flex-1 h-px bg-[#f9e8e8]"></span>
-                                        </p>
-                                        @php
-                                        $dentalQ2 = [
-                                        [
-                                        'name' => 'clicking',
-                                        'q' => 'Clicking',
-                                        ],
-                                        [
-                                        'name' => 'joint_pain',
-                                        'q' => 'Pain (joint, side of the face)',
-                                        ],
-                                        [
-                                        'name' => 'difficulty_moving',
-                                        'q' => 'Difficulty in opening/closing',
-                                        ],
-                                        [
-                                        'name' => 'difficulty_chewing',
-                                        'q' => 'Difficulty in chewing',
-                                        ],
-                                        [
-                                        'name' => 'jaw_headaches',
-                                        'q' => 'Frequent headaches',
-                                        ],
-                                        [
-                                        'name' => 'clench_grind',
-                                        'q' => 'Do you clench or grind your teeth?',
-                                        ],
-                                        [
-                                        'name' => 'biting',
-                                        'q' => 'Frequent lips/cheek biting',
-                                        ],
-                                        [
-                                        'name' => 'teeth_loosening',
-                                        'q' => 'Have you noticed loosening of your teeth?',
-                                        ],
-                                        [
-                                        'name' => 'food_teeth',
-                                        'q' => 'Does food get caught between your teeth?',
-                                        ],
-                                        [
-                                        'name' => 'med_reaction',
-                                        'q' => 'Have you ever had a reaction to any medicine or dental anesthetic?',
-                                        ],
-                                        ];
-                                        @endphp
-
-                                        @foreach ($dentalQ2 as $q)
-
-                                        <x-booking-question :name="$q['name']" :label="$q['q']"
-                                            :checked-value="old($q['name'])" required />
-
-                                        @endforeach
-
-                                        <p class="text-xs text-[#8B0000] mt-2 italic pl-4">
-                                            <i class="fa-solid fa-circle-info mr-1"></i>
-                                            If <b>YES</b>, please provide details during your consultation.
-                                        </p>
-                                    </div>
-
-                                    <div class="section-card">
-                                        <p
-                                            class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
-                                            <i class="fa-solid fa-notes-medical text-xs"></i> Dental Procedures
-                                            <span class="flex-1 h-px bg-[#f9e8e8]"></span>
-                                        </p>
-
-                                        <x-booking-question name="periodontal"
-                                            label="Have you had any periodontal (gum) treatment?"
-                                            :checked-value="old('periodontal')" required />
-
-                                        <x-booking-question name="difficult_extraction"
-                                            label="Have you had a difficult tooth extraction?"
-                                            :checked-value="old('difficult_extraction')" required />
-
-                                        <div class="ml-6 mt-2 mb-2 hidden" id="extraction_date_box">
-                                            <label class="text-xs text-[#8B0000] italic block mb-1">Date of
-                                                extraction:</label>
-                                            <div class="global-control-wrap">
-                                                <i class="fa-regular fa-calendar global-control-icon"></i>
-                                                <input type="text" id="extractionDate" name="extraction_date"
-                                                    class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
-                                                    placeholder="Select date" readonly>
-                                            </div>
-                                        </div>
-
-                                        <x-booking-question name="prolonged_bleeding"
-                                            label="Have you had prolonged bleeding following tooth extractions?"
-                                            :checked-value="old('prolonged_bleeding')" required />
-
-                                        <x-booking-question name="dentures"
-                                            label="Do you wear complete or partial dentures?"
-                                            :checked-value="old('dentures')" required />
-                                        <div class="ml-6 mt-2 mb-2 hidden" id="dentures_date_box">
-                                            <label class="text-xs text-[#8B0000] italic block mb-1">Date of
-                                                placement:</label>
-                                            <div class="global-control-wrap">
-                                                <i class="fa-regular fa-calendar global-control-icon"></i>
-                                                <input type="text" id="denturesDate" name="dentures_date"
-                                                    class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
-                                                    placeholder="Select date" readonly>
-                                            </div>
-                                        </div>
-
-                                        <x-booking-question name="ortho_treatment"
-                                            label="Have you had orthodontic treatment?"
-                                            :checked-value="old('ortho_treatment')" required />
-                                        <div class="ml-6 mt-2 mb-2 hidden" id="ortho_date_box">
-                                            <label class="text-xs text-[#8B0000] italic block mb-1">Date of
-                                                completion:</label>
-                                            <div class="global-control-wrap">
-                                                <i class="fa-regular fa-calendar global-control-icon"
-                                                    aria-hidden="true">
-                                                </i>
-                                                <input type="text" id="orthoDate" name="ortho_date"
-                                                    class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
-                                                    placeholder="Select date" readonly>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="section-card">
-                                        <p
-                                            class="flex items-center gap-2 text-[0.78rem] font-bold text-[#8B0000] uppercase tracking-widest mb-3">
-                                            <i class="fa-regular fa-comment-dots text-xs"></i> Additional Concerns
-                                            <span class="flex-1 h-px bg-[#f9e8e8]"></span>
-                                        </p>
-                                        <textarea name="additional_concerns" id="additional_concerns" rows="4"
-                                            maxlength="150"
-                                            class="form-input voice-full w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none resize-none"
-                                            placeholder="Write any additional concerns here..."></textarea>
-                                        <div class="flex justify-between items-center text-xs mt-1">
-                                            <span id="concernWarning" class="text-red-500 hidden">
-                                                Character limit reached
-                                            </span>
-                                            <span id="concernCount" class="text-[#9e9690]">0/150</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <x-booking.dental-history :questions="$dentalQuestions" mode="flat" :defaults="[]"
+                            subtitle="Share your past dental records, treatments, and dental concerns for a better assessment." />
 
                         <div class="step-content hidden" id="step4">
                             <div class="booking-step-shell">
@@ -491,434 +138,96 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
                                 <div class="booking-step-body">
 
-                                    <div class="section-card">
-                                        <p class="section-card-title">
-                                            <i class="fa-solid fa-heart-pulse text-xs"></i> General Health
-                                            <span class="section-card-title-line"></span>
-                                        </p>
+                                    <x-booking.medical-history-fields :questions="$medicalQuestions"
+                                        :diseases="$diseases" mode="standard" :defaults="[]"
+                                        :selected-diseases="old('diseases', [])" :is-female="$isFemalePatient" />
 
-                                        <x-booking-question name="good_health" label="Are you in good health?"
-                                            :checked-value="old('good_health')" required />
-                                        <div class="ml-6 mt-1 mb-2 hidden" id="good_health_box">
-                                            <label class="text-xs text-[#8B0000] italic">If NO, please provide
-                                                details:</label>
-                                            <input type="text" name="good_health_details" maxlength="150"
-                                                id="good_health_details"
-                                                class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
-                                                placeholder="Input here">
-                                            <div class="text-right text-xs"><span id="goodHealthCount">0/150</span>
-                                            </div>
-                                        </div>
-
-                                        <x-booking-question name="had_medical_exam"
-                                            label="When was your last medical examination?"
-                                            :checked-value="old('had_medical_exam')" required />
-                                        <div class="ml-6 mt-1 mb-2 hidden" id="medical_exam_box">
-                                            <label class="text-xs text-[#8B0000] italic block mb-1">If YES, when was
-                                                your
-                                                last medical examination?</label>
-                                            <div class="global-control-wrap">
-                                                <i class="fa-regular fa-calendar global-control-icon"
-                                                    aria-hidden="true">
-                                                </i>
-                                                <input type="text" id="medicalExamDate" name="medical_exam_date"
-                                                    class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
-                                                    placeholder="Select date" readonly>
-                                            </div>
-                                        </div>
-
-                                        <x-booking-question name="under_treatment"
-                                            label="Are you currently receiving treatment for any illness?"
-                                            :checked-value="old('under_treatment')" required />
-                                        <div class="ml-6 mt-1 mb-2 hidden" id="treatment_box">
-                                            <label class="text-xs text-[#8B0000] italic">If YES, please
-                                                specify:</label>
-                                            <input type="text" name="treatment_details" maxlength="150"
-                                                id="treatment_details"
-                                                class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
-                                                placeholder="Input here">
-                                            <div class="text-right text-xs"><span id="treatmentCount">0/150</span>
-                                            </div>
-                                        </div>
-
-                                        <x-booking-question name="hospitalized" label="Have you ever been hospitalized?"
-                                            :checked-value="old('hospitalized')" required />
-                                        <div class="ml-6 mt-1 mb-2 hidden" id="hospital_box">
-                                            <label class="text-xs text-[#8B0000] italic">If YES, please provide
-                                                details:</label>
-                                            <input type="text" name="hospital_details" maxlength="150"
-                                                id="hospital_details"
-                                                class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
-                                                placeholder="Input here">
-                                            <div class="text-right text-xs"><span id="hospitalCount">0/150</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="section-card">
-                                        <p class="section-card-title">
-                                            <i class="fa-solid fa-triangle-exclamation text-xs"></i> Allergies
-                                            <span class="section-card-title-line"></span>
-                                        </p>
-                                        <x-booking-question name="allergy_medicine" label="Medicines"
-                                            :checked-value="old('allergy_medicine')" required />
-
-                                        <x-booking-question name="allergy_food" label="Food"
-                                            :checked-value="old('allergy_food')" required />
-                                        <div class="mt-3">
-                                            <label class="text-xs text-[#8B0000] italic block mb-1">Others (please
-                                                specify):</label>
-                                            <input type="text" name="allergy_others"
-                                                class="form-input voice-medium border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full"
-                                                placeholder="Input here">
-                                        </div>
-                                    </div>
-
-                                    <div class="section-card">
-                                        <p class="section-card-title">
-                                            <i class="fa-solid fa-pills text-xs"></i> Medications
-                                            <span class="section-card-title-line"></span>
-                                        </p>
-                                        <x-booking-question name="medication"
-                                            label="Are you taking any prescription or non-prescription medication?"
-                                            :checked-value="old('medication')" required />
-                                        <div class="ml-6 mt-1 mb-2 hidden" id="medication_box">
-                                            <label class="text-xs text-[#8B0000] italic">If YES, please
-                                                specify:</label>
-                                            <input type="text" name="medication_details" maxlength="150"
-                                                id="medication_details"
-                                                class="form-input mt-1 w-full border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none"
-                                                placeholder="Input here">
-                                            <div class="text-right text-xs"><span id="medicationCount">0/150</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    @if ($isFemalePatient)
-                                    <div class="section-card" id="forWomenSection">
-                                        <p class="section-card-title">
-                                            <i class="fa-solid fa-venus text-xs"></i> For Women Only
-                                            <span class="section-card-title-line"></span>
-                                        </p>
-
-                                        @foreach ([
-                                        ['name' => 'pregnant', 'q' => 'Are you pregnant?'],
-                                        ['name' => 'nursing', 'q' => 'Are you nursing?'],
-                                        [
-                                        'name' => 'birth_control',
-                                        'q' => 'Are you taking birth control pills?',
-                                        ],
-                                        ] as $q)
-
-                                        <x-booking-question :name="$q['name']" :label="$q['q']"
-                                            :checked-value="old($q['name'])" required />
-
-                                        @endforeach
-                                    </div>
-                                    @else
-                                    <input type="hidden" name="pregnant" value="NO">
-                                    <input type="hidden" name="nursing" value="NO">
-                                    <input type="hidden" name="birth_control" value="NO">
-                                    @endif
-
-                                    <div class="section-card mt-5">
-                                        <p class="section-card-title">
-                                            <i class="fa-solid fa-stethoscope text-xs"></i> Medical Conditions
-                                            <span class="section-card-title-line"></span>
-                                        </p>
-                                        <p class="text-xs text-[#5c5550] mb-3">Please indicate below if you
-                                            presently
-                                            have
-                                            or have ever had any of the following:</p>
-                                        <div
-                                            class="medical-condition-grid grid grid-cols-1 sm:grid-cols-2 gap-y-2.5 gap-x-6">
-                                            @foreach ($diseases as $d)
-                                            <label class="flex items-center gap-2.5 cursor-pointer">
-                                                <input type="checkbox" name="diseases[]" value="{{ $d->code }}"
-                                                    class="w-4 h-4 rounded border-2 border-[#e8e2dd] cursor-pointer accent-[#8B0000] flex-shrink-0">
-                                                <span class="text-[0.82rem] text-[#1a1410]">{{ $d->label }}</span>
-                                            </label>
-                                            @endforeach
-                                        </div>
-                                    </div>
-
-                                    <div class="section-card">
-                                        <p class="section-card-title">
-                                            <i class="fa-solid fa-smoking text-xs"></i> Tobacco Use
-                                            <span class="section-card-title-line"></span>
-                                        </p>
-                                        <x-booking-question name="tobacco_use"
-                                            label="Do you use tobacco products or any derivatives?"
-                                            :checked-value="old('tobacco_use')" required />
-                                        <div id="tobacco_details" class="ml-6 mt-2 space-y-2 hidden text-sm">
-                                            <div class="flex items-center gap-3 flex-wrap">
-                                                <span class="text-xs text-[#8B0000] italic w-28">How much per
-                                                    day:</span>
-                                                <input type="text" name="tobacco_per_day" placeholder="Input here"
-                                                    class="form-input voice-small border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full">
-                                            </div>
-                                            <div class="flex items-center gap-3 flex-wrap">
-                                                <span class="text-xs text-[#8B0000] italic w-28">Per week:</span>
-                                                <input type="text" name="tobacco_per_week" placeholder="Input here"
-                                                    class="form-input voice-small border border-[#e8e2dd] rounded-xl px-3 py-2 text-sm bg-white outline-none w-full">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="section-card">
-                                        <p class="section-card-title">
-                                            <i class="fa-solid fa-head-side-mask text-xs"></i> Do You Suffer From
-                                            <span class="section-card-title-line"></span>
-                                        </p>
-                                        @foreach ([
-                                        ['name' => 'headaches', 'q' => 'Headaches'],
-                                        ['name' => 'earaches', 'q' => 'Earaches'],
-                                        ['name' => 'neck_aches', 'q' => 'Neck aches'],
-                                        ] as $q)
-
-                                        <x-booking-question :name="$q['name']" :label="$q['q']"
-                                            :checked-value="old($q['name'])" required />
-
-                                        @endforeach
-                                    </div>
-
-                                    <div class="section-card">
-                                        <p class="section-card-title">
-                                            <i class="fa-solid fa-phone-volume text-xs"></i> Emergency Contact
-                                            <span class="section-card-title-line"></span>
-                                        </p>
-
-                                        <div class="emergency-fields-stack">
-                                            <div data-global-field>
-                                                <label for="emergency_person" class="global-form-label">
-                                                    Person to contact in case of emergency
-                                                </label>
-
-                                                <input type="text" id="emergency_person" name="emergency_person"
-                                                    maxlength="50" pattern="[A-Za-zÑñ\s.'-]+" class="form-input-custom"
-                                                    placeholder="Full name"
-                                                    data-required-message="Please enter the emergency contact person's name."
-                                                    data-pattern-message="Only letters, spaces, apostrophe, period, and hyphen are allowed."
-                                                    required>
-                                            </div>
-
-                                            <div data-global-field>
-                                                <label for="emergency_number" class="global-form-label">
-                                                    Contact Number
-                                                </label>
-
-                                                <input type="tel" id="emergency_number" name="emergency_number"
-                                                    inputmode="numeric" autocomplete="tel" maxlength="13"
-                                                    class="form-input-custom" placeholder="09xx xxx xxxx"
-                                                    data-validation-rule="philippineMobile"
-                                                    data-required-message="Please enter an emergency contact number."
-                                                    required>
-                                            </div>
-
-                                            <div>
-                                                <label class="block text-xs font-semibold text-[#333] mb-1.5">
-                                                    Relation to Patient <span class="required-star">*</span>
-                                                </label>
-                                                <select name="emergency_relation" id="emergency_relation"
-                                                    class="js-custom-select" data-placeholder="Select relation"
-                                                    aria-label="Relation to patient" required>
-                                                    <option value="" disabled selected>Select relation</option>
-                                                    <option value="Mother">Mother</option>
-                                                    <option value="Father">Father</option>
-                                                    <option value="Sibling">Sibling</option>
-                                                    <option value="Guardian">Guardian</option>
-                                                    <option value="Spouse">Spouse</option>
-                                                    <option value="Grandparent">Grandparent</option>
-                                                    <option value="Aunt">Aunt</option>
-                                                    <option value="Uncle">Uncle</option>
-                                                    <option value="Cousin">Cousin</option>
-                                                    <option value="Child">Child</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="signature-section-card" data-global-field>
-                                        <label class="block text-xs font-semibold text-[#333] mb-1.5">
-                                            Patient's Signature <span class="required-star">*</span>
-                                        </label>
-
-                                        <div class="signature-methods-grid">
-                                            <div
-                                                class="file-upload-zone border-2 border-dashed border-[#e8e2dd] rounded-xl p-5 flex flex-col items-center justify-center text-center cursor-pointer">
-                                                <i class="fa-regular fa-image text-gray-400 text-3xl mb-2"></i>
-
-                                                <p class="text-xs text-[#5c5550] mb-1">
-                                                    Select your file or drag and drop
-                                                </p>
-                                                <p class="text-xs text-[#9e9690] mb-3">
-                                                    JPG, PNG, up to 25 MB
-                                                </p>
-
-                                                <label class="ui-btn ui-btn-primary ui-btn-sm cursor-pointer">
-                                                    <i class="fa-solid fa-upload"></i>
-                                                    Browse
-
-                                                    <input type="file" name="patient_signature" id="patient_signature"
-                                                        class="hidden" accept=".jpg,.jpeg,.png" required>
-
-                                                    <input type="hidden" name="signature_source" id="signature_source"
-                                                        value="">
-                                                </label>
-                                            </div>
-
-                                            <div class="signature-draw-card">
-                                                <p class="signature-draw-title">Or draw your signature here</p>
-
-                                                <div class="signature-pad-wrap">
-                                                    <canvas id="signatureCanvas" class="signature-pad-canvas"></canvas>
-                                                </div>
-
-                                                <div class="signature-pad-footer">
-                                                    <span class="signature-pad-help">Use mouse, touch, or
-                                                        stylus.</span>
-
-                                                    <div class="signature-pad-actions">
-                                                        <button type="button" id="signatureUndoBtn"
-                                                            class="ui-btn ui-btn-secondary ui-btn-sm">
-                                                            <i class="fa-solid fa-rotate-left"></i>
-                                                            Undo
-                                                        </button>
-
-                                                        <button type="button" id="signatureClearBtn"
-                                                            class="ui-btn ui-btn-secondary ui-btn-sm">
-                                                            <i class="fa-solid fa-eraser"></i>
-                                                            Clear Signature
-                                                        </button>
-
-                                                        <button type="button" id="signatureUseDrawnBtn"
-                                                            class="ui-btn ui-btn-primary ui-btn-sm">
-                                                            <i class="fa-solid fa-check"></i>
-                                                            Use Drawn Signature
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div id="signature_result_box" class="mt-3 hidden text-left w-full max-w-full">
-                                            <p id="signature_filename"
-                                                class="text-xs text-[#5c5550] font-semibold truncate">
-                                            </p>
-
-                                            <div id="signature_error"
-                                                class="mt-1 hidden rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 leading-5 font-semibold">
-                                            </div>
-                                        </div>
-
-                                        @error('patient_signature')
-                                        <p class="text-xs text-red-600 mt-3 font-semibold">
-                                            <i class="fa-solid fa-circle-exclamation mr-1"></i>
-                                            {{ $message }}
-                                        </p>
-                                        @enderror
-                                    </div>
+                                    <x-booking.signature mode="patient" label="Patient's Signature" />
                                 </div>
                             </div>
                         </div>
 
                         <div class="step-content hidden" id="step5">
-                            <div id="summarySection">
-                                <div class="booking-step-header">
-                                    <p class="booking-step-eyebrow">Step 5 of 5</p>
-                                    <h2 class="booking-step-title">Review Your Information</h2>
-                                    <p class="booking-step-subtitle">
-                                        Please review all the information you provided before proceeding to
-                                        final
-                                        confirmation.
-                                    </p>
-                                </div>
-
-                                <div id="summaryBox" class="space-y-4"></div>
-
-                                <div class="flex justify-center gap-3 mt-8 nav-btns-row">
-                                    <button type="button" id="summaryBackBtn" class="ui-btn ui-btn-secondary">
-                                        <i class="fa-solid fa-chevron-left"></i>
-                                        Back
-                                    </button>
-                                    <button type="button" id="goToConfirmationBtn" class="ui-btn ui-btn-primary">
-                                        Proceed to Confirm
-                                        <i class="fa-solid fa-chevron-right"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div id="confirmationSection" class="hidden">
-                                <div class="booking-step-header">
-                                    <p class="booking-step-eyebrow">Step 5 of 5</p>
-                                    <h2 class="booking-step-title">Final Confirmation</h2>
-                                    <p class="booking-step-subtitle">
-                                        Confirm that the information is accurate and that you accept the clinic
-                                        terms
-                                        and privacy policy.
-                                    </p>
-                                </div>
-
-
-                                <div class="section-card mb-2">
-                                    <div class="flex items-start gap-2 mb-4">
-                                        <i class="fa-solid fa-shield-halved text-[#8B0000] mt-0.5"></i>
-                                        <p class="text-sm text-[#5c5550]">
-                                            By submitting, you confirm that all the information provided is
-                                            accurate
-                                            and
-                                            complete.
+                            <div class="booking-step-shell">
+                                <div id="summarySection">
+                                    <div class="booking-step-header">
+                                        <p class="booking-step-eyebrow">Step 5 of 5</p>
+                                        <h2 class="booking-step-title">Review Your Information</h2>
+                                        <p class="booking-step-subtitle">
+                                            Please review all the information you provided before proceeding to
+                                            final
+                                            confirmation.
                                         </p>
                                     </div>
 
-                                    <label
-                                        class="confirm-checkbox-wrap flex items-start gap-3 p-4 rounded-xl border border-[#e8e2dd] bg-[#fafaf8] cursor-pointer">
-                                        <input id="finalConfirm" type="checkbox"
-                                            class="w-5 h-5 rounded border-2 border-[#e8e2dd] bg-white cursor-pointer flex-shrink-0 mt-0.5 accent-[#8B0000]"
-                                            required>
-                                        <span class="text-sm text-[#1a1410] leading-relaxed">
-                                            I have reviewed my dental and medical information and agree to the
-                                            <a href="https://www.pup.edu.ph/privacy/" target="_blank"
-                                                rel="noopener noreferrer" data-legal-link class="booking-legal-link">
-                                                Privacy Policy
-                                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                            </a>
-                                            and
-                                            <a href="https://www.pup.edu.ph/terms/" target="_blank"
-                                                rel="noopener noreferrer" data-legal-link class="booking-legal-link">
-                                                Terms and Conditions
-                                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                            </a>.
-                                        </span>
-                                    </label>
+                                    <div id="summaryBox" class="space-y-4"></div>
                                 </div>
 
-                                <div class="flex justify-center gap-3 mt-8 nav-btns-row">
-                                    <button type="button" id="confirmBackBtn" class="ui-btn ui-btn-secondary">
-                                        <i class="fa-solid fa-chevron-left"></i>
-                                        Back
-                                    </button>
-                                    <button type="button" id="finalSubmitBtn" class="ui-btn ui-btn-primary">
-                                        <i class="fa-solid fa-calendar-check"></i>
-                                        Confirm Appointment
-                                    </button>
+                                <div id="confirmationSection" class="hidden">
+                                    <div class="booking-step-header">
+                                        <p class="booking-step-eyebrow">Step 5 of 5</p>
+                                        <h2 class="booking-step-title">Final Confirmation</h2>
+                                        <p class="booking-step-subtitle">
+                                            Confirm that the information is accurate and that you accept the clinic
+                                            terms
+                                            and privacy policy.
+                                        </p>
+                                    </div>
+
+
+                                    <div class="booking-section-card mb-2">
+                                        <div class="flex items-start gap-2 mb-4">
+                                            <i class="fa-solid fa-shield-halved text-[#8B0000] mt-0.5"></i>
+                                            <p class="text-sm text-[#5c5550]">
+                                                By submitting, you confirm that all the information provided is
+                                                accurate
+                                                and
+                                                complete.
+                                            </p>
+                                        </div>
+
+                                        <label
+                                            class="confirm-checkbox-wrap flex items-start gap-3 p-4 rounded-xl border border-[#e8e2dd] bg-[#fafaf8] cursor-pointer">
+                                            <input id="finalConfirm" type="checkbox"
+                                                class="w-5 h-5 rounded border-2 border-[#e8e2dd] bg-white cursor-pointer flex-shrink-0 mt-0.5 accent-[#8B0000]"
+                                                required>
+                                            <span class="text-sm text-[#1a1410] leading-relaxed">
+                                                I have reviewed my dental and medical information and agree to the
+                                                <a href="https://www.pup.edu.ph/privacy/" target="_blank"
+                                                    rel="noopener noreferrer" data-legal-link
+                                                    class="booking-legal-link">
+                                                    Privacy Policy
+                                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                                </a>
+                                                and
+                                                <a href="https://www.pup.edu.ph/terms/" target="_blank"
+                                                    rel="noopener noreferrer" data-legal-link
+                                                    class="booking-legal-link">
+                                                    Terms and Conditions
+                                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                                </a>.
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div class="flex justify-center gap-3 mt-8 nav-btns-row">
+                                        <button type="button" id="confirmBackBtn" class="ui-btn ui-btn-secondary">
+                                            <i class="fa-solid fa-chevron-left"></i>
+                                            Back
+                                        </button>
+                                        <button type="button" id="finalSubmitBtn" class="ui-btn ui-btn-primary">
+                                            <i class="fa-solid fa-calendar-check"></i>
+                                            Confirm Appointment
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
-                        <div id="navBtns" class="flex justify-end mt-8 gap-3 nav-btns-row">
-                            <button type="button" id="prevBtn" class="ui-btn ui-btn-secondary">
-                                <i class="fa-solid fa-chevron-left"></i>
-                                Previous
-                            </button>
-
-                            <button type="button" id="nextBtn" class="ui-btn ui-btn-primary">
-                                Next
-                                <i class="fa-solid fa-chevron-right"></i>
-                            </button>
-                        </div>
                     </form>
                 </div>
+
+                <x-booking.navigation />
+
             </div>
         </div>
 </main>
@@ -1030,9 +339,9 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
         <div class="modal-ft">
 
-            <a href="{{ route('homepage') }}" class="ui-btn ui-btn-secondary">
-
-                <i class="fa-solid fa-house"></i>
+            <a href="{{ route('homepage') }}" class="ui-btn ui-btn-primary ui-btn-sm" data-discard-navigation
+                data-discard-form-target="#appointmentForm">
+                <i class="fa-solid fa-arrow-left"></i>
                 Back to Home
             </a>
 
@@ -1090,62 +399,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
         <div class="modal-ft">
             <button type="button" id="okBtn" class="ui-btn ui-btn-primary">
-
                 <i class="fa-solid fa-house"></i>
                 Back to Home
-            </button>
-        </div>
-    </div>
-</div>
-
-<div id="leaveModal" class="ui-modal modal-theme-warning" aria-hidden="true">
-    <div class="ui-modal-card modal-sm">
-        <div class="modal-hd">
-            <div class="modal-heading">
-                <div class="modal-icon">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                </div>
-                <div class="modal-copy">
-                    <h2 class="modal-title">
-                        Leave this page?
-                    </h2>
-                    <p class="modal-subtitle">
-                        Your appointment form has unsaved changes.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal-bd">
-            <div class="modal-form-section">
-                <div class="modal-section-heading">
-                    <div class="modal-section-icon">
-                        <i class="fa-solid fa-floppy-disk"></i>
-                    </div>
-                    <div>
-                        <h4>
-                            Unsaved appointment draft
-                        </h4>
-                        <p>
-                            You can save your draft, discard it,
-                            or continue editing.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal-ft">
-            <button type="button" id="cancelLeaveBtn" class="ui-btn ui-btn-secondary">
-                Cancel
-            </button>
-            <button type="button" id="discardDraftBtn" class="ui-btn ui-btn-danger">
-                <i class="fa-solid fa-trash"></i>
-                Discard
-            </button>
-            <button type="button" id="saveDraftBtn" class="ui-btn ui-btn-primary">
-                <i class="fa-solid fa-floppy-disk"></i>
-                Save Draft
             </button>
         </div>
     </div>
@@ -1186,6 +441,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     const diseaseLabelByCode = @json($diseases -> pluck('label', 'code'));
     const isFemalePatient = @json($isFemalePatient);
     const DRAFT_KEY = "appointmentDraft:v1";
+
+    let formIsDirty = false;
+    let formSubmitting = false;
+    let pendingNavigation = null;
 
     const appointmentCountsPerDay = @json($appointmentCountsPerDay ?? []);
     const MAX_SLOTS_PER_DAY = 5;
@@ -1228,7 +487,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         }
 
         obj.__meta = {
-            step: typeof step !== "undefined" ? step : 0,
+            step: bookingWorkflow?.getCurrentStep?.() ?? 0,
             savedAt: new Date().toISOString(),
             fieldCount: draftFields.length
         };
@@ -1328,80 +587,17 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         }, 3200);
     }
 
-    let step = 0,
-        completedSteps = [];
-    const steps = document.querySelectorAll(".step-content");
-    const navBtns = document.getElementById("navBtns");
-    const prevBtn = document.getElementById("prevBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const summarySection = document.getElementById("summarySection");
-    const confirmationSection = document.getElementById("confirmationSection");
+    const summarySection =
+        document.getElementById(
+            'summarySection'
+        );
 
-    function updateStepperUI(i) {
-        for (let idx = 0; idx < 5; idx++) {
-            const circle = document.getElementById(`sc${idx + 1}`);
-            const label = document.getElementById(`sl${idx + 1}`);
-            const conn = document.getElementById(`conn${idx + 1}`);
-            if (!circle || !label) continue;
-            circle.className =
-                "step-circle w-10 h-10 rounded-full border-2 flex items-center justify-center text-sm font-bold";
-            label.className =
-                "step-label text-[0.65rem] font-semibold uppercase tracking-wide text-center block w-full mt-4";
-            if (idx < i && completedSteps.includes(idx)) {
-                circle.className += " border-green-700 bg-green-700 text-white";
-                label.className += " text-green-700";
-                circle.innerHTML = `<i class="fa-solid fa-check text-xs"></i>`;
-            } else if (idx === i) {
-                circle.className +=
-                    " border-blue-600 bg-blue-600 text-white shadow-[0_0_0_6px_rgba(37,99,235,0.12)] scale-110";
-                label.className += " text-blue-600";
-                circle.innerHTML = String(idx + 1);
-            } else {
-                circle.className += " border-[#e8e2dd] bg-white text-[#9e9690]";
-                label.className += " text-[#9e9690]";
-                circle.innerHTML = String(idx + 1);
-            }
-            if (conn) {
-                conn.className = "h-0.5 flex-shrink-0 self-start step-connector ";
-                conn.style.width = window.innerWidth < 640 ? "8px" : "40px";
-                conn.style.marginTop = "20px";
-                conn.className += (idx < i && completedSteps.includes(idx)) ? "bg-green-700" : (idx === i ?
-                    "bg-blue-600" : "bg-[#e8e2dd]");
-            }
-        }
-        const fill = document.getElementById("headerProgressFill");
-        if (fill) fill.style.width = (((i + 1) / 5) * 100) + "%";
-        const counter = document.getElementById("stepCounterText");
-        if (counter) counter.textContent = i + 1;
-    }
+    const confirmationSection =
+        document.getElementById(
+            'confirmationSection'
+        );
 
-    function showStep(i) {
-        steps.forEach((s, idx) => {
-            s.classList.remove("show");
-            s.classList.add("hidden");
-            if (idx === i) {
-                s.classList.remove("hidden");
-                setTimeout(() => s.classList.add("show"), 40);
-            }
-        });
-        const isLast = i === steps.length - 1;
-        navBtns.style.display = isLast ? "none" : "flex";
-        prevBtn.style.display = i === 0 ? "none" : "inline-flex";
-        nextBtn.style.display = isLast ? "none" : "inline-flex";
-        if (isLast) {
-            buildSummary();
-            resetStep5View();
-        }
-        updateStepperUI(i);
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-        if (i === 3 && typeof resizeSignatureCanvas === "function") {
-            setTimeout(resizeSignatureCanvas, 120);
-        }
-        step = i;
-    }
+    let bookingWorkflow = null;
 
     function resetStep5View() {
         summarySection?.classList.remove("hidden");
@@ -1415,7 +611,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             target.closest('.custom-select') ||
             target.closest('.grid') ||
             target.closest('.ml-6') ||
-            target.closest('.section-card') ||
+            target.closest('.booking-section-card') ||
             target.closest('.voice-input-wrap') ||
             target.closest('.date-input-wrap') ||
             target;
@@ -1443,71 +639,83 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     }
 
     function isStepComplete(s) {
+        const stepEl =
+            bookingWorkflow
+                ?.getPanels?.()
+            ?.[s];
 
-
-        const stepEl = steps[s];
-        if (!stepEl) return true;
+        if (!stepEl) {
+            return true;
+        }
 
         if (s === 0) {
-            const dateInput = document.getElementById("appointment_date");
-            const timeInput = document.getElementById("appointment_time");
-            const slotArea = document.getElementById("slotContainer") || document.getElementById("slotPlaceholder");
+            const dateInput =
+                document.getElementById(
+                    'appointment_date'
+                );
+
+            const timeInput =
+                document.getElementById(
+                    'appointment_time'
+                );
 
             const calendarGroup =
-                document.querySelector(
-                    ".calendar-shell-no-card"
+                stepEl.querySelector(
+                    '.calendar-shell-no-card'
+                );
+
+            const timeGroup =
+                stepEl.querySelector(
+                    '.time-panel'
                 );
 
             if (!dateInput?.value) {
                 window.showGlobalGroupError?.(
                     calendarGroup,
-                    "appointment_date",
-                    "Please select an appointment date."
+                    'appointment_date',
+                    'Please select an appointment date.'
                 );
 
-                calendarGroup?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
-                });
+                calendarGroup
+                    ?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center',
+                    });
 
                 return false;
             }
 
             window.clearGlobalGroupError?.(
                 calendarGroup,
-                "appointment_date"
+                'appointment_date'
             );
-
-            const timeGroup =
-                document.querySelector(
-                    ".time-panel"
-                );
 
             if (!timeInput?.value) {
                 window.showGlobalGroupError?.(
                     timeGroup,
-                    "appointment_time",
-                    "Please select an available time slot."
+                    'appointment_time',
+                    'Please select an available time slot.'
                 );
 
-                timeGroup?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
-                });
+                timeGroup
+                    ?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center',
+                    });
 
                 return false;
             }
 
             window.clearGlobalGroupError?.(
                 timeGroup,
-                "appointment_time"
+                'appointment_time'
             );
         }
 
         if (s === 1) {
             const serviceGroup =
                 stepEl.querySelector(
-                    ".service-step-grid"
+                    '.service-step-grid'
                 );
 
             const selectedService =
@@ -1518,155 +726,114 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             if (!selectedService) {
                 window.showGlobalGroupError?.(
                     serviceGroup,
-                    "service_type",
-                    "Please select a dental service."
+                    'service_type',
+                    'Please select a dental service.'
                 );
 
-                serviceGroup?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
-                });
+                serviceGroup
+                    ?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center',
+                    });
 
                 return false;
             }
 
             window.clearGlobalGroupError?.(
                 serviceGroup,
-                "service_type"
+                'service_type'
             );
         }
 
-        const fields = Array.from(
-            stepEl.querySelectorAll(
-                [
-                    "input:not([type='hidden'])",
-                    "select",
-                    "textarea",
-                ].join(",")
-            )
-        ).filter(field => {
-            return (
-                !field.disabled &&
-                field.type !== "button" &&
-                field.type !== "submit"
-            );
-        });
+        const fields =
+            Array.from(
+                stepEl.querySelectorAll(
+                    [
+                        'input:not([type="hidden"])',
+                        'textarea',
+                        'select',
+                    ].join(',')
+                )
+            ).filter(field => {
+                return (
+                    !field.disabled &&
+                    field.type !== 'button' &&
+                    field.type !== 'submit' &&
+                    field.type !== 'file'
+                );
+            });
 
-        const processedRadioGroups =
+        const handledRadioGroups =
             new Set();
 
-        let firstInvalid = null;
+        let firstInvalid =
+            null;
 
-        fields.forEach(field => {
-            if (field.type === "radio") {
+        for (const field of fields) {
+            if (
+                field.type === 'radio'
+            ) {
                 if (
-                    processedRadioGroups.has(
+                    handledRadioGroups.has(
                         field.name
                     )
                 ) {
-                    return;
+                    continue;
                 }
 
-                processedRadioGroups.add(
+                handledRadioGroups.add(
                     field.name
                 );
             }
 
             const valid =
-                window.validateFormInputField?.(
-                    field
-                ) ??
+                window
+                    .validateFormInputField?.(
+                        field
+                    ) ??
                 field.checkValidity();
 
             if (
                 !valid &&
                 !firstInvalid
             ) {
-                firstInvalid = field;
+                firstInvalid =
+                    field;
             }
-        });
+        }
 
         if (firstInvalid) {
-            window.focusGlobalInvalidField?.(
-                firstInvalid
-            );
+            window
+                .focusGlobalInvalidField?.(
+                    firstInvalid
+                );
 
             return false;
         }
 
-        const person = stepEl.querySelector("#emergency_person");
-        if (person && !validateEmergencyPerson(true)) {
-            showMiniTab("This name is invalid. Please use letters only.");
-            scrollToInvalidTarget(person);
-            return false;
-        }
-        const phone = stepEl.querySelector("#emergency_number");
-        if (phone) {
-            const digits = phone.value.replace(/\D/g, "");
-            if (!/^09\d{9}$/.test(digits)) {
-                phone.setCustomValidity(
-                    'Please enter a valid mobile number in the format 09xx xxx xxxx.'
-                );
-
-                window.validateFormInputField?.(
-                    phone
-                );
-
-                window.focusGlobalInvalidField?.(
-                    phone
-                );
-
-                return false;
-            }
-
-            phone.setCustomValidity('');
-
-            window.validateFormInputField?.(
-                phone
-            );
-        }
         if (s === 3) {
-            const signatureInput = document.getElementById("patient_signature");
-            const signatureBlock = signatureInput?.closest(".section-card") || signatureInput;
+            const signature =
+                window.BookingSignature?.get(
+                    stepEl
+                );
 
-            if (signatureAiChecking) {
-                showMiniTab("Please wait while we verify your signature.");
-                scrollToInvalidTarget(signatureBlock);
-                return false;
-            }
-
-            if (!signatureInput?.files?.length) {
-                const signatureSection =
-                    document.querySelector(
-                        ".signature-section-card"
+            if (
+                signature &&
+                !signature.validate()
+            ) {
+                const signatureGroup =
+                    stepEl.querySelector(
+                        '[data-booking-signature]'
                     );
 
-                if (!signatureInput?.files?.length) {
-                    window.showGlobalGroupError?.(
-                        signatureSection,
-                        "patient_signature",
-                        "Please upload or draw your patient signature."
-                    );
-
-                    signatureSection?.scrollIntoView({
-                        behavior: "smooth",
-                        block: "center",
+                signatureGroup
+                    ?.scrollIntoView({
+                        behavior:
+                            'smooth',
+                        block:
+                            'center',
                     });
 
-                    return false;
-                }
-
-                window.clearGlobalGroupError?.(
-                    signatureSection,
-                    "patient_signature"
-                );
-                scrollToInvalidTarget(signatureBlock);
-                return false;
-            }
-
-            if (!signatureAiValid) {
-                showMiniTab("Please upload a valid signature image.");
-                scrollToInvalidTarget(signatureBlock);
                 return false;
             }
         }
@@ -1674,16 +841,87 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         return true;
     }
 
-    nextBtn?.addEventListener("click", () => {
-        if (!isStepComplete(step)) {
-            showMiniTab("Please complete all required fields before proceeding.");
+    function initBookingWorkflow() {
+        if (
+            bookingWorkflow ||
+            !window.BookingWorkflow
+        ) {
             return;
         }
-        if (!completedSteps.includes(step)) completedSteps.push(step);
-        showStep(Math.min(step + 1, steps.length - 1));
-    });
-    prevBtn?.addEventListener("click", () => showStep(Math.max(step - 1, 0)));
-    document.getElementById("summaryBackBtn")?.addEventListener("click", () => showStep(3));
+
+        bookingWorkflow =
+            window.BookingWorkflow.create({
+                panels:
+                    '#appointmentForm > .step-content',
+
+                progressFill:
+                    '#headerProgressFill',
+
+                counter:
+                    '#stepCounterText',
+
+                navContainer:
+                    '#navBtns',
+
+                previousButton:
+                    '#prevBtn',
+
+                nextButton:
+                    '#nextBtn',
+
+                hideNavigationOnLast:
+                    true,
+
+                beforeNext:
+                    currentStep => {
+                        return isStepComplete(
+                            currentStep
+                        );
+                    },
+
+                onLastStep: () => {
+                    buildSummary();
+                    resetStep5View();
+                },
+
+                onStepChange:
+                    currentStep => {
+                        if (
+                            currentStep !== 3
+                        ) {
+                            return;
+                        }
+
+                        setTimeout(
+                            () => {
+                                window
+                                    .BookingSignature
+                                    ?.get(
+                                        document
+                                    )
+                                    ?.resize();
+                            },
+                            120
+                        );
+                    },
+            });
+    }
+
+    if (
+        document.readyState ===
+        'loading'
+    ) {
+        document.addEventListener(
+            'DOMContentLoaded',
+            initBookingWorkflow,
+            {
+                once: true
+            }
+        );
+    } else {
+        initBookingWorkflow();
+    }
+
     document.getElementById("goToConfirmationBtn")?.addEventListener("click", () => {
         summarySection?.classList.add("hidden");
         confirmationSection?.classList.remove("hidden");
@@ -1825,122 +1063,122 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         const patientGender = @json($patient -> gender ?? 'N/A');
         const dentalHistoryBody = `
     ${subSection("Basic Info", `
-            ${row("Last Dental Visit", get("last_dental_visit"))}
-            ${row("Previous Dentist", get("previous_dentist"))}
-        `)}
+                ${row("Last Dental Visit", get("last_dental_visit"))}
+                ${row("Previous Dentist", get("previous_dentist"))}
+            `)}
 
     ${subSection("Dental Symptoms", `
-            ${row("Bleeding Gums", get("bleeding_gums"))}
-            ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
-            ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
-            ${row("Tooth Pain", get("tooth_pain"))}
-            ${row("Sores/Lumps", get("sores"))}
-            ${row("Jaw Injuries", get("injuries"))}
-        `)}
+                ${row("Bleeding Gums", get("bleeding_gums"))}
+                ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
+                ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
+                ${row("Tooth Pain", get("tooth_pain"))}
+                ${row("Sores/Lumps", get("sores"))}
+                ${row("Jaw Injuries", get("injuries"))}
+            `)}
 
     ${subSection("Jaw & Bite Symptoms", `
-            ${row("Clicking", get("clicking"))}
-            ${row("Joint Pain", get("joint_pain"))}
-            ${row("Difficulty Moving", get("difficulty_moving"))}
-            ${row("Difficulty Chewing", get("difficulty_chewing"))}
-            ${row("Frequent Headaches", get("jaw_headaches"))}
-            ${row("Grinding/Clenching", get("clench_grind"))}
-            ${row("Lips/Cheek Biting", get("biting"))}
-            ${row("Teeth Loosening", get("teeth_loosening"))}
-            ${row("Food Caught Between Teeth", get("food_teeth"))}
-            ${row("Medicine Reaction", get("med_reaction"))}
-        `)}
+                ${row("Clicking", get("clicking"))}
+                ${row("Joint Pain", get("joint_pain"))}
+                ${row("Difficulty Moving", get("difficulty_moving"))}
+                ${row("Difficulty Chewing", get("difficulty_chewing"))}
+                ${row("Frequent Headaches", get("jaw_headaches"))}
+                ${row("Grinding/Clenching", get("clench_grind"))}
+                ${row("Lips/Cheek Biting", get("biting"))}
+                ${row("Teeth Loosening", get("teeth_loosening"))}
+                ${row("Food Caught Between Teeth", get("food_teeth"))}
+                ${row("Medicine Reaction", get("med_reaction"))}
+            `)}
 
     ${subSection("Dental Procedures", `
-            ${row("Periodontal Treatment", get("periodontal"))}
-            ${row("Difficult Extraction", get("difficult_extraction"))}
-            ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
+                ${row("Periodontal Treatment", get("periodontal"))}
+                ${row("Difficult Extraction", get("difficult_extraction"))}
+                ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
 
-            ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
-            ${row("Dentures", get("dentures"))}
-            ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
+                ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
+                ${row("Dentures", get("dentures"))}
+                ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
 
-            ${row("Orthodontic Treatment", get("ortho_treatment"))}
-            ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
-        `)}
+                ${row("Orthodontic Treatment", get("ortho_treatment"))}
+                ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
+            `)}
 
     ${fullWidthSection("Additional Concerns", `
-            ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
+                ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
                 ? get("additional_concerns")
                 : '<span class="text-[#9e9690] italic">No additional concerns provided.</span>'}
-        `)}
+            `)}
     `;
 
         const medicalHistoryBody = `
     ${subSection("General Health", `
-            ${row("Good Health", get("good_health"))}
-            ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
+                ${row("Good Health", get("good_health"))}
+                ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
 
-            ${row("Had Medical Exam", get("had_medical_exam"))}
-            ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
+                ${row("Had Medical Exam", get("had_medical_exam"))}
+                ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
 
-            ${row("Under Treatment", get("under_treatment"))}
-            ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
+                ${row("Under Treatment", get("under_treatment"))}
+                ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
 
-            ${row("Hospitalized", get("hospitalized"))}
-            ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
-        `)}
+                ${row("Hospitalized", get("hospitalized"))}
+                ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
+            `)}
 
     ${subSection("Allergies", `
-            ${row("Allergy (Medicine)", get("allergy_medicine"))}
-            ${row("Allergy (Food)", get("allergy_food"))}
-            ${optionalRow("Allergy (Others)", get("allergy_others"))}
-        `)}
+                ${row("Allergy (Medicine)", get("allergy_medicine"))}
+                ${row("Allergy (Food)", get("allergy_food"))}
+                ${optionalRow("Allergy (Others)", get("allergy_others"))}
+            `)}
 
     ${subSection("Medications", `
-            ${row("Medication", get("medication"))}
-            ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
-        `)}
+                ${row("Medication", get("medication"))}
+                ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
+            `)}
 
     ${isFemalePatient ? subSection("For Women Only", `
-            ${row("Pregnant", get("pregnant"))}
-            ${row("Nursing", get("nursing"))}
-            ${row("Birth Control Pills", get("birth_control"))}
-        `) : ""}
+                ${row("Pregnant", get("pregnant"))}
+                ${row("Nursing", get("nursing"))}
+                ${row("Birth Control Pills", get("birth_control"))}
+            `) : ""}
 
     ${fullWidthSection("Medical Conditions", `
-            <b class="text-[#5c5550] dark:text-[#e5e5e5] font-semibold">Selected Conditions:</b> ${diseaseText}
-        `)}
+                <b class="text-[#5c5550] dark:text-[#e5e5e5] font-semibold">Selected Conditions:</b> ${diseaseText}
+            `)}
 
     ${subSection("Tobacco Use", `
-            ${row("Tobacco Use", get("tobacco_use"))}
-            ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
-            ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
-        `)}
+                ${row("Tobacco Use", get("tobacco_use"))}
+                ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
+                ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
+            `)}
 
     ${subSection("Do You Suffer From", `
-            ${row("Headaches", get("headaches"))}
-            ${row("Earaches", get("earaches"))}
-            ${row("Neck Aches", get("neck_aches"))}
-        `)}
+                ${row("Headaches", get("headaches"))}
+                ${row("Earaches", get("earaches"))}
+                ${row("Neck Aches", get("neck_aches"))}
+            `)}
     `;
 
         document.getElementById("summaryBox").innerHTML = `
     ${summaryCard("Patient Information", "fa-user", `
-            <div class="grid grid-cols-1 gap-y-1">
-                ${row("Name", patientName)}
-                ${row("Gender", patientGender)}
-            </div>
-        `)}
+                <div class="grid grid-cols-1 gap-y-1">
+                    ${row("Name", patientName)}
+                    ${row("Gender", patientGender)}
+                </div>
+            `)}
 
     <div class="grid grid-cols-2 gap-4 sm-grid-1col">
         ${summaryCard("Appointment Details", "fa-calendar-check", `
-            <div class="grid grid-cols-1 gap-y-1">
-                ${row("Date", get("appointment_date"))}
-                ${row("Time", get("appointment_time"))}
-            </div>
-        `)}
-
-        ${summaryCard("Service", "fa-tooth", `
                 <div class="grid grid-cols-1 gap-y-1">
-                    ${row("Type", get("service_type"))}
+                    ${row("Date", get("appointment_date"))}
+                    ${row("Time", get("appointment_time"))}
                 </div>
             `)}
+
+        ${summaryCard("Service", "fa-tooth", `
+                    <div class="grid grid-cols-1 gap-y-1">
+                        ${row("Type", get("service_type"))}
+                    </div>
+                `)}
     </div>
 
     ${summaryCard("Dental History", "fa-teeth", dentalHistoryBody)}
@@ -1949,12 +1187,12 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
     <div class="grid grid-cols-2 gap-4 sm-grid-1col">
         ${summaryCard("Emergency Contact", "fa-phone", `
-                <div class="grid grid-cols-1 gap-y-1">
-                    ${row("Name", get("emergency_person"))}
-                    ${row("Number", get("emergency_number"))}
-                    ${row("Relation", emergencyRelation)}
-                </div>
-            `)}
+                    <div class="grid grid-cols-1 gap-y-1">
+                        ${row("Name", get("emergency_person"))}
+                        ${row("Number", get("emergency_number"))}
+                        ${row("Relation", emergencyRelation)}
+                    </div>
+                `)}
 
         ${summaryCard("Signature", "fa-signature", sigHTML)}
     </div>
@@ -2026,41 +1264,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     var html = document.documentElement;
     var themeToggleContainer = document.getElementById("themeToggle");
 
-    [{
-        name: "difficult_extraction",
-        boxId: "extraction_date_box",
-        showOn: "YES"
-    }, {
-        name: "dentures",
-        boxId: "dentures_date_box",
-        showOn: "YES"
-    }, {
-        name: "ortho_treatment",
-        boxId: "ortho_date_box",
-        showOn: "YES"
-    }].forEach(({
-        name,
-        boxId,
-        showOn
-    }) => {
-        const radios = document.getElementsByName(name);
-        const box = document.getElementById(boxId);
-        if (!box || !radios.length) return;
-        const inp = box.querySelector("input");
-        radios.forEach(r => r.addEventListener("change", () => {
-            if (r.checked && r.value === showOn) {
-                box.classList.remove("hidden");
-                if (inp) inp.required = true;
-            } else if (r.checked) {
-                box.classList.add("hidden");
-                if (inp) {
-                    inp.required = false;
-                    inp.value = "";
-                }
-            }
-        }));
-    });
-
     function syncMedicalExamBox() {
         const sel = document.querySelector('input[name="had_medical_exam"]:checked');
         const box = document.getElementById("medical_exam_box");
@@ -2124,554 +1327,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                 "hidden");
         else document.getElementById("tobacco_details")?.classList.add("hidden");
     }));
-    const sigInput = document.getElementById("patient_signature");
-    const signatureSourceInput = document.getElementById("signature_source");
-    const sigName = document.getElementById("signature_filename");
-    const sigError = document.getElementById("signature_error");
-    const sigResultBox = document.getElementById("signature_result_box");
-
-    const SIGNATURE_ACCEPTED_MESSAGE = "Signature verified and accepted";
-    const SIGNATURE_DECLINED_MESSAGE = "Signature could not be processed. Please try again.";
-
-    let signatureAiValid = false;
-    let signatureAiChecking = false;
-
-    function escapeHtml(value) {
-        return String(value || "")
-            .replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll('"', "&quot;")
-            .replaceAll("'", "&#039;");
-    }
-
-    function clearSignatureDisplay() {
-        sigResultBox?.classList.add("hidden");
-
-        if (sigName) {
-            sigName.textContent = "";
-            sigName.classList.remove("text-emerald-700", "text-red-600", "text-[#5c5550]");
-        }
-
-        if (sigError) {
-            sigError.innerHTML = "";
-            sigError.classList.add("hidden");
-        }
-    }
-
-    function showSignatureStatus(fileName = "", message = "", type = "neutral") {
-        sigResultBox?.classList.remove("hidden");
-
-        if (sigName) {
-            sigName.textContent = fileName;
-            sigName.classList.remove("text-emerald-700", "text-red-600", "text-[#5c5550]");
-
-            if (type === "success") {
-                sigName.classList.add("text-emerald-700");
-            } else if (type === "error") {
-                sigName.classList.add("text-red-600");
-            } else {
-                sigName.classList.add("text-[#5c5550]");
-            }
-        }
-
-        if (sigError) {
-            let icon = `<i class="fa-solid fa-spinner fa-spin mr-1"></i>`;
-
-            if (type === "success") {
-                icon = `<i class="fa-solid fa-circle-check mr-1"></i>`;
-                sigError.className =
-                    "mt-1 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-700 leading-5 font-semibold";
-            } else if (type === "error") {
-                icon = `<i class="fa-solid fa-circle-exclamation mr-1"></i>`;
-                sigError.className =
-                    "mt-1 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 leading-5 font-semibold";
-            } else {
-                sigError.className =
-                    "mt-1 rounded-xl border border-[#e8e2dd] bg-white px-3 py-2 text-xs text-[#5c5550] leading-5 font-semibold";
-            }
-
-            sigError.innerHTML = `${icon}${escapeHtml(message)}`;
-            sigError.classList.remove("hidden");
-        }
-    }
-
-    function showSignatureError(fileName = "", result = {}) {
-        signatureAiValid = false;
-        signatureAiChecking = false;
-
-        const aiReason = result.reason || "The uploaded image did not pass signature validation.";
-        const detectedType = result.detected_type || "unknown";
-        const confidence = result.confidence !== undefined && result.confidence !== null ?
-            Number(result.confidence).toFixed(2) :
-            "N/A";
-
-        sigResultBox?.classList.remove("hidden");
-
-        if (sigName) {
-            sigName.textContent = fileName;
-            sigName.classList.remove("text-emerald-700", "text-[#5c5550]");
-            sigName.classList.add("text-red-600");
-        }
-
-        if (sigError) {
-            sigError.className =
-                "mt-1 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 leading-5 font-semibold";
-
-            sigError.innerHTML = `
-            <div class="flex items-start gap-2">
-                <i class="fa-solid fa-circle-exclamation mt-0.5"></i>
-                <div>
-                    <p>${escapeHtml(SIGNATURE_DECLINED_MESSAGE)}</p>
-                    <p class="mt-1 font-medium">Reason: ${escapeHtml(aiReason)}</p>
-                    <p class="mt-1 text-[0.7rem] opacity-80">
-                        Detected: ${escapeHtml(detectedType)} · Confidence: ${escapeHtml(confidence)}
-                    </p>
-                </div>
-            </div>
-        `;
-
-            sigError.classList.remove("hidden");
-        }
-
-        if (sigInput) {
-            sigInput.value = "";
-        }
-    }
-
-    function clearSignatureError() {
-        if (sigError) {
-            sigError.innerHTML = "";
-            sigError.classList.add("hidden");
-        }
-    }
-
-    function isDrawnSignatureFile(file) {
-        return file?.name?.startsWith("drawn-signature-");
-    }
-
-    async function validateSignatureWithAi(file) {
-        const formData = new FormData();
-        formData.append("patient_signature", file);
-
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content");
-
-        const response = await fetch("{{ route('book.appointment.validate-signature') }}", {
-            method: "POST",
-            headers: {
-                "X-CSRF-TOKEN": csrfToken,
-                "Accept": "application/json",
-            },
-            body: formData,
-        });
-
-        const data = await response.json().catch(() => ({}));
-
-        if (!response.ok || data.valid === false || data.accepted === false) {
-            const error = new Error(data.message || "Signature could not be processed. Please try again.");
-            error.data = data;
-            throw error;
-        }
-
-        return data;
-    }
-
-    sigInput?.addEventListener("change", () => {
-        const file = sigInput.files?.[0];
-        const isDrawnSignature = isDrawnSignatureFile(file);
-
-        signatureAiValid = false;
-        clearSignatureError();
-
-        if (!file) {
-            if (signatureSourceInput) signatureSourceInput.value = "";
-            clearSignatureDisplay();
-            return;
-        }
-
-        if (signatureSourceInput) {
-            signatureSourceInput.value = isDrawnSignature ? "drawn" : "";
-        }
-
-        if (!isDrawnSignature) {
-            drawnSignatureWasUsed = false;
-        }
-
-        const allowedTypes = ["image/jpeg", "image/png"];
-        const maxSize = 25 * 1024 * 1024;
-
-        if (!allowedTypes.includes(file.type)) {
-            showSignatureError(file?.name || "", {
-                reason: "Signature must be a JPG or PNG file.",
-                detected_type: "invalid_file_type",
-                confidence: 0,
-            });
-            return;
-        }
-
-        if (file.size > maxSize) {
-            showSignatureError(file.name, {
-                reason: "Signature file must not exceed 25 MB.",
-                detected_type: "file_too_large",
-                confidence: 0,
-            });
-            return;
-        }
-
-        if (isDrawnSignature) {
-            drawnSignatureWasUsed = true;
-            signatureAiValid = true;
-            signatureAiChecking = false;
-            showSignatureStatus(file.name, "Drawn signature accepted.", "success");
-            markFormDirty();
-            return;
-        }
-
-        const img = new Image();
-        const objectUrl = URL.createObjectURL(file);
-
-        img.onload = async function () {
-            const {
-                width,
-                height
-            } = img;
-
-            if (width < 120 || height < 60) {
-                URL.revokeObjectURL(objectUrl);
-                showSignatureError(file.name, {
-                    reason: "Signature image is too small. Please upload a clearer signature.",
-                    detected_type: "image_too_small",
-                    confidence: 0,
-                });
-                return;
-            }
-
-            if (width > 5000 || height > 5000) {
-                URL.revokeObjectURL(objectUrl);
-                showSignatureError(file.name, {
-                    reason: "Signature image is too large. Please upload a smaller image.",
-                    detected_type: "image_too_large",
-                    confidence: 0,
-                });
-                return;
-            }
-
-            URL.revokeObjectURL(objectUrl);
-
-            try {
-                signatureAiChecking = true;
-                showSignatureStatus(file.name, "Checking signature image...", "neutral");
-
-                const result = await validateSignatureWithAi(file);
-
-                signatureAiValid = true;
-                signatureAiChecking = false;
-                clearSignatureError();
-
-                showSignatureStatus(file.name, SIGNATURE_ACCEPTED_MESSAGE, "success");
-                markFormDirty();
-
-            } catch (error) {
-                signatureAiValid = false;
-                signatureAiChecking = false;
-
-                showSignatureError(file.name, error.data || {
-                    message: SIGNATURE_DECLINED_MESSAGE,
-                    reason: error.message || "Unable to validate the uploaded image.",
-                    detected_type: "unknown",
-                    confidence: 0,
-                });
-            }
-        };
-
-        img.onerror = function () {
-            URL.revokeObjectURL(objectUrl);
-            showSignatureError(file?.name || "", {
-                reason: "Invalid signature image file.",
-                detected_type: "invalid_image",
-                confidence: 0,
-            });
-        };
-
-        img.src = objectUrl;
-    });
-
-    const signatureCanvas = document.getElementById("signatureCanvas");
-    const signatureCtx = signatureCanvas?.getContext("2d");
-    const signatureUndoBtn = document.getElementById("signatureUndoBtn");
-    const signatureClearBtn = document.getElementById("signatureClearBtn");
-    const signatureUseDrawnBtn = document.getElementById("signatureUseDrawnBtn");
-
-    let drawnSignatureStrokes = [];
-    let drawnSignatureCurrentStroke = [];
-    let drawnSignatureIsDrawing = false;
-    let drawnSignatureWasUsed = false;
-
-    function resizeSignatureCanvas() {
-        if (!signatureCanvas || !signatureCtx) return;
-
-        const rect = signatureCanvas.getBoundingClientRect();
-        if (!rect.width) return;
-
-        const dpr = Math.max(window.devicePixelRatio || 1, 1);
-        const cssWidth = rect.width;
-        const cssHeight = signatureCanvas.offsetHeight || 220;
-
-        signatureCanvas.width = Math.round(cssWidth * dpr);
-        signatureCanvas.height = Math.round(cssHeight * dpr);
-
-        signatureCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-        redrawSignatureCanvas();
-    }
-
-    function paintSignatureCanvasBackground() {
-        if (!signatureCanvas || !signatureCtx) return;
-
-        signatureCtx.save();
-        signatureCtx.setTransform(1, 0, 0, 1, 0, 0);
-        signatureCtx.clearRect(0, 0, signatureCanvas.width, signatureCanvas.height);
-        signatureCtx.fillStyle = "#ffffff";
-        signatureCtx.fillRect(0, 0, signatureCanvas.width, signatureCanvas.height);
-        signatureCtx.restore();
-    }
-
-    function drawSignatureStroke(stroke) {
-        if (!signatureCtx || !stroke || !stroke.length) return;
-
-        signatureCtx.lineWidth = 3.2;
-        signatureCtx.lineCap = "round";
-        signatureCtx.lineJoin = "round";
-        signatureCtx.strokeStyle = "#111827";
-
-        if (stroke.length === 1) {
-            signatureCtx.beginPath();
-            signatureCtx.arc(stroke[0].x, stroke[0].y, 1.8, 0, Math.PI * 2);
-            signatureCtx.fillStyle = "#111827";
-            signatureCtx.fill();
-            return;
-        }
-
-        signatureCtx.beginPath();
-        signatureCtx.moveTo(stroke[0].x, stroke[0].y);
-
-        for (let i = 1; i < stroke.length - 1; i++) {
-            const midX = (stroke[i].x + stroke[i + 1].x) / 2;
-            const midY = (stroke[i].y + stroke[i + 1].y) / 2;
-            signatureCtx.quadraticCurveTo(stroke[i].x, stroke[i].y, midX, midY);
-        }
-
-        const last = stroke[stroke.length - 1];
-        signatureCtx.lineTo(last.x, last.y);
-        signatureCtx.stroke();
-    }
-
-    function redrawSignatureCanvas() {
-        if (!signatureCanvas || !signatureCtx) return;
-
-        paintSignatureCanvasBackground();
-
-        drawnSignatureStrokes.forEach(drawSignatureStroke);
-
-        if (drawnSignatureCurrentStroke.length) {
-            drawSignatureStroke(drawnSignatureCurrentStroke);
-        }
-    }
-
-    function getSignaturePoint(event) {
-        const rect = signatureCanvas.getBoundingClientRect();
-
-        return {
-            x: event.clientX - rect.left,
-            y: event.clientY - rect.top,
-        };
-    }
-
-    function isDrawnSignatureBlank() {
-        return drawnSignatureStrokes.length === 0 && drawnSignatureCurrentStroke.length === 0;
-    }
-
-    function invalidateDrawnSignatureAfterEdit() {
-        if (!drawnSignatureWasUsed) return;
-
-        drawnSignatureWasUsed = false;
-        signatureAiValid = false;
-
-        if (sigInput) {
-            sigInput.value = "";
-        }
-
-        if (signatureSourceInput) {
-            signatureSourceInput.value = "";
-        }
-
-        showSignatureStatus(
-            "",
-            "Draw changed. Click Use Drawn Signature again to verify it.",
-            "neutral"
-        );
-    }
-
-    function startDrawnSignature(event) {
-        if (!signatureCanvas) return;
-        if (event.pointerType === "mouse" && event.button !== 0) return;
-
-        resizeSignatureCanvas();
-
-        event.preventDefault();
-
-        drawnSignatureIsDrawing = true;
-        drawnSignatureCurrentStroke = [getSignaturePoint(event)];
-
-        signatureCanvas.setPointerCapture?.(event.pointerId);
-
-        redrawSignatureCanvas();
-    }
-
-    function moveDrawnSignature(event) {
-        if (!drawnSignatureIsDrawing) return;
-
-        event.preventDefault();
-
-        drawnSignatureCurrentStroke.push(getSignaturePoint(event));
-
-        redrawSignatureCanvas();
-    }
-
-    function endDrawnSignature(event) {
-        if (!drawnSignatureIsDrawing) return;
-
-        event.preventDefault();
-
-        if (drawnSignatureCurrentStroke.length) {
-            drawnSignatureStrokes.push(drawnSignatureCurrentStroke);
-        }
-
-        drawnSignatureCurrentStroke = [];
-        drawnSignatureIsDrawing = false;
-
-        markFormDirty();
-        invalidateDrawnSignatureAfterEdit();
-        redrawSignatureCanvas();
-    }
-
-    function clearDrawnSignature() {
-        drawnSignatureStrokes = [];
-        drawnSignatureCurrentStroke = [];
-        drawnSignatureIsDrawing = false;
-        drawnSignatureWasUsed = false;
-
-        redrawSignatureCanvas();
-
-        signatureAiValid = false;
-
-        if (sigInput) {
-            sigInput.value = "";
-        }
-
-        if (signatureSourceInput) {
-            signatureSourceInput.value = "";
-        }
-
-        clearSignatureDisplay();
-        markFormDirty();
-    }
-
-    function undoDrawnSignature() {
-        if (!drawnSignatureStrokes.length) return;
-
-        drawnSignatureStrokes.pop();
-
-        redrawSignatureCanvas();
-        invalidateDrawnSignatureAfterEdit();
-        markFormDirty();
-
-        if (isDrawnSignatureBlank()) {
-            drawnSignatureWasUsed = false;
-            signatureAiValid = false;
-
-            if (sigInput) {
-                sigInput.value = "";
-            }
-
-            if (signatureSourceInput) {
-                signatureSourceInput.value = "";
-            }
-
-            clearSignatureDisplay();
-        }
-    }
-
-    function attachDrawnSignatureToFileInput(file) {
-        if (!sigInput) return false;
-
-        if (typeof DataTransfer === "undefined") {
-            showMiniTab("Your browser cannot attach the drawn signature. Please upload an image instead.");
-            return false;
-        }
-
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file);
-        sigInput.files = dataTransfer.files;
-
-        return true;
-    }
-
-    function useDrawnSignature() {
-        if (!signatureCanvas) return;
-
-        if (isDrawnSignatureBlank()) {
-            showMiniTab("Please draw your signature first.");
-            return;
-        }
-
-        redrawSignatureCanvas();
-
-        signatureCanvas.toBlob((blob) => {
-            if (!blob) {
-                showMiniTab("Unable to process drawn signature. Please try again.");
-                return;
-            }
-
-            const file = new File(
-                [blob],
-                `drawn-signature-${Date.now()}.png`, {
-                type: "image/png",
-                lastModified: Date.now(),
-            }
-            );
-
-            const attached = attachDrawnSignatureToFileInput(file);
-            if (!attached) return;
-
-            drawnSignatureWasUsed = true;
-            if (signatureSourceInput) {
-                signatureSourceInput.value = "drawn";
-            }
-
-            sigInput.dispatchEvent(new Event("change", {
-                bubbles: true,
-            }));
-        }, "image/png", 0.95);
-    }
-
-    signatureCanvas?.addEventListener("pointerdown", startDrawnSignature);
-    signatureCanvas?.addEventListener("pointermove", moveDrawnSignature);
-    signatureCanvas?.addEventListener("pointerup", endDrawnSignature);
-    signatureCanvas?.addEventListener("pointercancel", endDrawnSignature);
-    signatureCanvas?.addEventListener("pointerleave", endDrawnSignature);
-
-    signatureUndoBtn?.addEventListener("click", undoDrawnSignature);
-    signatureClearBtn?.addEventListener("click", clearDrawnSignature);
-    signatureUseDrawnBtn?.addEventListener("click", useDrawnSignature);
-
-    window.addEventListener("resize", () => {
-        if (step === 3) {
-            resizeSignatureCanvas();
-        }
-    });
-
-    setTimeout(resizeSignatureCanvas, 300);
 
     const emergencyNumber = document.getElementById("emergency_number");
     const emergencyNumberFeedback = document.getElementById("emergency_number_feedback");
@@ -2746,10 +1401,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         return out;
     }
 
-    let formIsDirty = false;
-    let formSubmitting = false;
-    let pendingNavigation = null;
-
     const leaveModal = document.getElementById('leaveModal');
 
     document.querySelectorAll('input, textarea, select').forEach(input => {
@@ -2815,47 +1466,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         const modal = document.getElementById('slotFullModal');
         if (modal) modal.close();
     });
-
-    document
-        .getElementById(
-            "saveDraftBtn"
-        )
-        ?.addEventListener(
-            "click",
-            () => {
-                saveDraftData();
-
-                formIsDirty = false;
-
-                window.closeModal?.(
-                    "leaveModal"
-                );
-
-                if (
-                    typeof pendingNavigation ===
-                    "function"
-                ) {
-                    const action =
-                        pendingNavigation;
-
-                    pendingNavigation = null;
-
-                    action();
-                }
-            }
-        );
-
-    document.getElementById("discardDraftBtn")?.addEventListener("click", () => {
-        clearDraft();
-        formIsDirty = false;
-
-        window.closeModal?.(
-            "leaveModal"
-        );
-
-        runPendingNavigation();
-    }
-    );
 
     document.querySelectorAll('a[href]').forEach(link => {
         link.addEventListener("click", e => {
@@ -3078,7 +1688,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         }, 350);
     }
 
-    showStep(0);
     initIntroBookingModal();
 
     window.addEventListener("resize", () => {
@@ -3101,9 +1710,9 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             const row = q.closest(".global-question-row");
             const hasRequiredRadio = row?.querySelector("input[required]");
 
-            if (hasRequiredRadio && !q.querySelector(".required-star")) {
+            if (hasRequiredRadio && !q.querySelector(".required-mark")) {
                 const star = document.createElement("span");
-                star.className = "required-star";
+                star.className = "required-mark";
                 star.textContent = " *";
                 q.appendChild(star);
             }
@@ -3147,9 +1756,9 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                 }
             }
 
-            if (label && !label.querySelector(".required-star")) {
+            if (label && !label.querySelector(".required-mark")) {
                 const star = document.createElement("span");
-                star.className = "required-star";
+                star.className = "required-mark";
                 star.textContent = " *";
                 label.appendChild(star);
             }

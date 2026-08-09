@@ -276,52 +276,6 @@ textarea {
     white-space: nowrap;
 }
 
-.voice-input-wrap {
-    position: relative;
-    width: 100%;
-    max-width: 420px;
-}
-
-.voice-input-wrap>input,
-.voice-input-wrap>textarea {
-    width: 100%;
-}
-
-.voice-input-wrap.is-full {
-    max-width: 100%;
-}
-
-#additional_concerns {
-    min-height: 136px;
-}
-
-.voice-input-wrap.is-medium {
-    max-width: 320px;
-}
-
-.voice-input-wrap.is-small {
-    max-width: 220px;
-}
-
-.voice-mic-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.75rem;
-    height: 1.75rem;
-    border: 0;
-    background: transparent;
-    cursor: pointer;
-}
-
-.voice-mic-btn:focus {
-    outline: none;
-}
-
-.voice-mic-btn i {
-    pointer-events: none;
-}
-
 @media (max-width: 640px) {
     .sm-grid-1col {
         grid-template-columns: 1fr !important;
@@ -446,8 +400,7 @@ textarea {
 }
 
 [data-theme="dark"] #mainContent .bg-white,
-[data-theme="dark"] #mainContent .booking-step-shell,
-[data-theme="dark"] #mainContent .section-card {
+[data-theme="dark"] #mainContent .booking-step-shell {
     background: linear-gradient(145deg, #0d1117, #111827) !important;
     border-color: rgba(255, 255, 255, 0.10) !important;
     box-shadow: 0 18px 38px rgba(0, 0, 0, 0.38) !important;
@@ -459,16 +412,8 @@ textarea {
 }
 
 [data-theme="dark"] #mainContent .booking-step-eyebrow,
-[data-theme="dark"] #mainContent .section-card-title,
 [data-theme="dark"] #mainContent .text-\[\#8B0000\] {
     color: #fca5a5 !important;
-}
-
-[data-theme="dark"] #mainContent .booking-step-subtitle,
-[data-theme="dark"] #mainContent .text-\[\#8c817a\],
-[data-theme="dark"] #mainContent .text-\[\#9e9690\],
-[data-theme="dark"] #mainContent .text-\[\#5c5550\] {
-    color: #9ca3af !important;
 }
 
 [data-theme="dark"] #mainContent .border-\[\#e8e2dd\],
@@ -578,46 +523,11 @@ textarea {
     width: 100%;
 }
 
-body.layout-no-sidebar #mainContent.book-container {
-    width: 100% !important;
-    max-width: none !important;
-
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-
-    transform: none !important;
-}
-
 body.layout-no-sidebar #mainContent,
 body.layout-no-sidebar #siteFooter {
     margin-left: 0 !important;
     margin-right: 0 !important;
     width: 100% !important;
-}
-
-body.layout-no-sidebar .book-page-wrap {
-    width: min(calc(100% - 2rem), 1180px) !important;
-    max-width: 1180px !important;
-    margin-inline: auto !important;
-    margin-top: 1rem !important;
-}
-
-#mainContent .book-page-wrap {
-    width: min(100% - 2rem, 1180px) !important;
-    max-width: 1180px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-}
-
-@media (max-width: 768px) {
-    #mainContent .book-page-wrap {
-        width: min(100% - 1rem, 1180px) !important;
-    }
 }
 
 [data-theme="dark"] #clearSlotSelectionBtn {
@@ -669,11 +579,11 @@ body.layout-no-sidebar .book-page-wrap {
     flex: 0 0 auto !important;
 }
 
-#slotContainer,
-#slotPlaceholder,
-#slotGrid,
-#dateBanner,
-.slot-chip {
+#mainContent #slotContainer,
+#mainContent #slotPlaceholder,
+#mainContent #slotGrid,
+#mainContent #dateBanner,
+#mainContent .slot-chip {
     transition:
         opacity .28s ease,
         transform .28s ease,
@@ -800,18 +710,12 @@ body.layout-no-sidebar .book-page-wrap {
     background: #0f1720 !important;
 }
 
-#dateBanner:not(.hidden) {
+#mainContent #dateBanner:not(.hidden) {
     display: flex !important;
     align-items: center !important;
     width: 100% !important;
     visibility: visible !important;
     opacity: 1 !important;
-}
-
-[data-theme="dark"] #mainContent .section-card-title-line,
-[data-theme="dark"] #mainContent .section-card-title span.flex-1,
-[data-theme="dark"] #mainContent .section-card p span.flex-1 {
-    background: rgba(255, 255, 255, 0.12) !important;
 }
 
 [data-theme="dark"] #mainContent .border-b,
@@ -1155,23 +1059,6 @@ body.layout-no-sidebar .book-page-wrap {
     width: 100% !important;
 }
 
-#mainContent #navBtns {
-    width: calc(100% - 2.7rem) !important;
-    max-width: calc(100% - 2.7rem) !important;
-    margin: 1rem auto 0 !important;
-    padding: 0 !important;
-    justify-content: flex-end !important;
-    align-items: center !important;
-    gap: 0.75rem !important;
-    position: static !important;
-}
-
-#mainContent #prevBtn,
-#mainContent #nextBtn {
-    min-height: 48px !important;
-    border-radius: 16px !important;
-}
-
 #mainContent .signature-section-card {
     margin-top: 1rem !important;
     width: 100% !important;
@@ -1203,30 +1090,7 @@ body.layout-no-sidebar .book-page-wrap {
     #mainContent .book-card>div:last-child {
         padding: 1rem !important;
     }
-
-    #mainContent #navBtns {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 1rem 0 0 !important;
-        padding: 0 !important;
-        display: flex !important;
-        justify-content: stretch !important;
-        align-items: center !important;
-        gap: 0.65rem !important;
-    }
-
-    #mainContent #prevBtn,
-    #mainContent #nextBtn {
-        flex: 1 1 0 !important;
-        min-width: 0 !important;
-        justify-content: center !important;
-        min-height: 46px !important;
-        padding-left: 0.9rem !important;
-        padding-right: 0.9rem !important;
-        border-radius: 15px !important;
-        font-size: 0.82rem !important;
-    }
-
+    
     #mainContent .signature-methods-grid {
         grid-template-columns: 1fr !important;
         gap: 1rem !important;
@@ -1259,33 +1123,9 @@ body.layout-no-sidebar .book-page-wrap {
     }
 }
 
-@media (max-width: 480px) {
-    #mainContent .book-page-wrap {
-        width: min(100% - 0.75rem, 1180px) !important;
-    }
-
-    #mainContent #navBtns {
-        gap: 0.55rem !important;
-    }
-
-    #mainContent #prevBtn,
-    #mainContent #nextBtn {
-        min-height: 44px !important;
-        font-size: 0.78rem !important;
-    }
-}
-
 #headerProgressFill.progress-fill-initial {
     width: 20%;
     background: linear-gradient(90deg, #8B0000, #c9a84c);
-}
-
-.service-option-img-red {
-    filter: brightness(0) saturate(100%) invert(8%) sepia(80%) saturate(3000%) hue-rotate(345deg);
-}
-
-#prevBtn {
-    display: none;
 }
 
 .booking-legal-link {

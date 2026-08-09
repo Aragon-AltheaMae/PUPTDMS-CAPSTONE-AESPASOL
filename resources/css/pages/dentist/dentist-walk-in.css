@@ -1,10 +1,115 @@
-#mainContent #step5 {
-    margin-top: -3rem !important;
+.patient-record-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    align-items: stretch;
 }
 
-@media (max-width: 768px) {
-    #mainContent #step5 {
-        margin-top: -1.5rem !important;
+.patient-record-card {
+    min-height: 0;
+    height: auto;
+
+    padding: 1rem;
+
+    display: grid;
+    grid-template-columns:
+        auto minmax(0, 1fr);
+    align-items: start;
+
+    gap: .8rem;
+
+    text-align: left;
+    cursor: pointer;
+    position: relative;
+}
+
+.patient-record-card.is-selected {
+    border-color: #15803d;
+    background: #f0fdf4;
+}
+
+.patient-card-content {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: .6rem;
+}
+
+.patient-card-header {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: .45rem;
+
+    padding-right: 1.8rem;
+}
+
+.patient-card-name {
+    min-width: 0;
+
+    color: var(--text-1);
+    font-size: .88rem;
+    font-weight: 800;
+    line-height: 1.3;
+
+    overflow-wrap: anywhere;
+}
+
+.patient-card-meta {
+    min-width: 0;
+
+    display: grid;
+    gap: .35rem;
+
+    color: var(--text-2);
+
+    font-size: .72rem;
+    font-weight: 650;
+}
+
+.patient-card-meta span {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+
+    gap: .4rem;
+}
+
+.patient-card-meta i {
+    width: 14px;
+    flex-shrink: 0;
+
+    color: var(--crimson);
+}
+
+.patient-card-checkbox-wrap {
+    position: absolute;
+
+    top: 1rem;
+    right: 1rem;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 980px) {
+    .patient-record-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .patient-record-grid {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -75,52 +180,6 @@
     white-space: nowrap;
 }
 
-.voice-input-wrap {
-    position: relative;
-    width: 100%;
-    max-width: 420px;
-}
-
-.voice-input-wrap>input,
-.voice-input-wrap>textarea {
-    width: 100%;
-}
-
-.voice-input-wrap.is-full {
-    max-width: 100%;
-}
-
-#additional_concerns {
-    min-height: 136px;
-}
-
-.voice-input-wrap.is-medium {
-    max-width: 320px;
-}
-
-.voice-input-wrap.is-small {
-    max-width: 220px;
-}
-
-.voice-mic-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 1.75rem;
-    height: 1.75rem;
-    border: 0;
-    background: transparent;
-    cursor: pointer;
-}
-
-.voice-mic-btn:focus {
-    outline: none;
-}
-
-.voice-mic-btn i {
-    pointer-events: none;
-}
-
 @media (max-width: 640px) {
     .sm-grid-1col {
         grid-template-columns: 1fr !important;
@@ -170,35 +229,10 @@
     color: #d1d5db !important;
 }
 
-
 [data-theme="dark"] #mainContent .step-counter-pill {
     background: #0d1117 !important;
     border-color: rgba(255, 255, 255, 0.10) !important;
     color: #cbd5e1 !important;
-}
-
-[data-theme="dark"] #mainContent .booking-step-title,
-[data-theme="dark"] #mainContent .text-\[\#660000\] {
-    color: #fecaca !important;
-}
-
-[data-theme="dark"] #mainContent .booking-step-eyebrow,
-[data-theme="dark"] #mainContent .section-card-title,
-[data-theme="dark"] #mainContent .text-\[\#8B0000\] {
-    color: #fca5a5 !important;
-}
-
-[data-theme="dark"] #mainContent .booking-step-subtitle,
-[data-theme="dark"] #mainContent .text-\[\#8c817a\],
-[data-theme="dark"] #mainContent .text-\[\#9e9690\],
-[data-theme="dark"] #mainContent .text-\[\#5c5550\] {
-    color: #9ca3af !important;
-}
-
-[data-theme="dark"] #mainContent .border-\[\#e8e2dd\],
-[data-theme="dark"] #mainContent .border-\[\#ece3de\],
-[data-theme="dark"] #mainContent .border-\[\#f1e8e3\] {
-    border-color: rgba(255, 255, 255, 0.10) !important;
 }
 
 [data-theme="dark"] .book-container {
@@ -208,7 +242,6 @@
 [data-theme="dark"] .book-title {
     color: #E6EDF3;
 }
-
 
 [data-theme="dark"] .book-label {
     color: #9FB3C8;
@@ -237,26 +270,6 @@
 }
 
 
-[data-theme="dark"] .book-btn-primary {
-    background: #8B0000;
-    color: #fff;
-}
-
-[data-theme="dark"] .book-btn-primary:hover {
-    background: #a30000;
-}
-
-
-[data-theme="dark"] .book-btn-secondary {
-    background: #1A2633;
-    color: #C9D6E2;
-}
-
-[data-theme="dark"] .book-btn-secondary:hover {
-    background: #243344;
-}
-
-
 [data-theme="dark"] .book-divider {
     border-color: rgba(255, 255, 255, 0.08);
 }
@@ -264,21 +277,6 @@
 
 [data-theme="dark"] .book-muted {
     color: #7F8C98;
-}
-
-#mainContent .book-page-wrap {
-    width: min(100% - 2rem, 1180px) !important;
-    max-width: 1180px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-}
-
-@media (max-width: 768px) {
-    #mainContent .book-page-wrap {
-        width: min(100% - 1rem, 1180px) !important;
-    }
 }
 
 @keyframes slotFadeIn {
@@ -293,10 +291,21 @@
     }
 }
 
-[data-theme="dark"] #mainContent .section-card-title-line,
-[data-theme="dark"] #mainContent .section-card-title span.flex-1,
-[data-theme="dark"] #mainContent .section-card p span.flex-1 {
-    background: rgba(255, 255, 255, 0.12) !important;
+[data-theme="dark"] .patient-record-card {
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .patient-record-card.is-selected {
+    border-color: #22c55e;
+    background: rgba(21, 128, 61, .12);
+}
+
+[data-theme="dark"] .patient-card-name {
+    color: var(--text-1);
+}
+
+[data-theme="dark"] .patient-card-meta {
+    color: var(--text-2);
 }
 
 [data-theme="dark"] #mainContent .border-b,
@@ -408,7 +417,6 @@
     color: #cbd5e1 !important;
 }
 
-[data-theme="dark"] #mainContent #step5,
 [data-theme="dark"] #mainContent #summarySection,
 [data-theme="dark"] #mainContent #confirmationSection {
     color: #e5e7eb !important;
@@ -626,33 +634,11 @@
     width: 100% !important;
 }
 
-#mainContent .book-card>div:last-child {
-    padding: 1.5rem 1.75rem 5.25rem !important;
-}
-
 #mainContent #appointmentForm {
     display: flex !important;
     flex-direction: column !important;
     width: 100% !important;
 }
-
-#mainContent #navBtns {
-    width: calc(100% - 2.7rem) !important;
-    max-width: calc(100% - 2.7rem) !important;
-    margin: 1rem auto 0 !important;
-    padding: 0 !important;
-    justify-content: flex-end !important;
-    align-items: center !important;
-    gap: 0.75rem !important;
-    position: static !important;
-}
-
-#mainContent #prevBtn,
-#mainContent #nextBtn {
-    min-height: 48px !important;
-    border-radius: 16px !important;
-}
-
 
 #mainContent .signature-section-card {
     margin-top: 1rem !important;
@@ -681,32 +667,6 @@
 }
 
 @media (max-width: 768px) {
-    #mainContent .book-card>div:last-child {
-        padding: 1rem 1rem 4.25rem !important;
-    }
-
-    #mainContent #navBtns {
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 1rem 0 0 !important;
-        padding: 0 !important;
-        display: flex !important;
-        justify-content: stretch !important;
-        align-items: center !important;
-        gap: 0.65rem !important;
-    }
-
-    #mainContent #prevBtn,
-    #mainContent #nextBtn {
-        flex: 1 1 0 !important;
-        min-width: 0 !important;
-        justify-content: center !important;
-        min-height: 46px !important;
-        padding-left: 0.9rem !important;
-        padding-right: 0.9rem !important;
-        border-radius: 15px !important;
-        font-size: 0.82rem !important;
-    }
 
     #mainContent .signature-methods-grid {
         grid-template-columns: 1fr !important;
@@ -742,25 +702,6 @@
     }
 }
 
-@media (max-width: 480px) {
-    #mainContent .book-page-wrap {
-        width: min(100% - 0.75rem, 1180px) !important;
-    }
-
-    #mainContent #navBtns {
-        gap: 0.55rem !important;
-    }
-
-    #mainContent #prevBtn,
-    #mainContent #nextBtn {
-        min-height: 44px !important;
-        font-size: 0.78rem !important;
-    }
-}
-
-
-#dentistWalkInPage .signature-methods-grid.signature-drawing-only,
-#dentistBookAppointmentPage .signature-methods-grid.signature-drawing-only,
 #mainContent .signature-methods-grid.signature-drawing-only {
     display: grid !important;
     grid-template-columns: 1fr !important;
@@ -770,393 +711,6 @@
     padding: 1rem !important;
     border: 1px dashed #e8e2dd !important;
     border-radius: 22px !important;
-}
-
-#dentistWalkInPage .signature-methods-grid.signature-drawing-only .signature-draw-card,
-#dentistBookAppointmentPage .signature-methods-grid.signature-drawing-only .signature-draw-card,
-#mainContent .signature-methods-grid.signature-drawing-only .signature-draw-card {
-    min-height: 340px !important;
-    width: 100% !important;
-}
-
-#dentistWalkInPage .signature-methods-grid.signature-drawing-only .signature-pad-wrap,
-#dentistBookAppointmentPage .signature-methods-grid.signature-drawing-only .signature-pad-wrap,
-#mainContent .signature-methods-grid.signature-drawing-only .signature-pad-wrap {
-    height: 230px !important;
-    min-height: 230px !important;
-}
-
-@media (max-width: 768px) {
-
-    #dentistWalkInPage .signature-methods-grid.signature-drawing-only,
-    #dentistBookAppointmentPage .signature-methods-grid.signature-drawing-only,
-    #mainContent .signature-methods-grid.signature-drawing-only {
-        max-width: 100% !important;
-        padding: 0.85rem !important;
-    }
-}
-
-#dentistWalkInPage.walkin-page {
-    --walkin-accent: #8B0000;
-    --walkin-accent-dark: #660000;
-    --walkin-gold: #c9a84c;
-    --walkin-border: #eadfda;
-    --walkin-muted: #7f746f;
-}
-
-#dentistWalkInPage .walkin-page-hero {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.25rem 1.35rem;
-    border: 1px solid var(--walkin-border);
-    border-radius: 24px;
-    background:
-        radial-gradient(circle at top right, rgba(201, 168, 76, .15), transparent 34%),
-        linear-gradient(145deg, #ffffff 0%, #fff8f6 100%);
-    box-shadow: 0 18px 44px rgba(75, 34, 28, .08);
-    text-align: left;
-}
-
-#dentistWalkInPage .walkin-page-hero-icon {
-    width: 58px;
-    height: 58px;
-    border-radius: 18px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, var(--walkin-accent), var(--walkin-accent-dark));
-    color: #fff;
-    box-shadow: 0 14px 28px rgba(139, 0, 0, .22);
-    font-size: 1.25rem;
-}
-
-#dentistWalkInPage .walkin-page-kicker {
-    margin: 0 0 .3rem;
-    color: var(--walkin-accent);
-    font-size: .7rem;
-    font-weight: 900;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-}
-
-#dentistWalkInPage .walkin-page-title {
-    margin: 0;
-    color: var(--walkin-accent-dark);
-    font-size: clamp(1.75rem, 3vw, 2.65rem);
-    font-weight: 950;
-    line-height: 1.02;
-    letter-spacing: -.035em;
-}
-
-#dentistWalkInPage .walkin-page-description {
-    max-width: 760px;
-    margin: .5rem 0 0;
-    color: var(--walkin-muted);
-    font-size: .9rem;
-    line-height: 1.55;
-}
-
-#dentistWalkInPage .walkin-page-status {
-    min-height: 38px;
-    padding: 0 .85rem;
-    border-radius: 999px;
-    display: inline-flex;
-    align-items: center;
-    gap: .45rem;
-    background: rgba(139, 0, 0, .07);
-    border: 1px solid rgba(139, 0, 0, .12);
-    color: var(--walkin-accent);
-    font-size: .72rem;
-    font-weight: 900;
-    white-space: nowrap;
-}
-
-#dentistWalkInPage #appointmentForm {
-    min-height: 360px;
-}
-
-#dentistWalkInPage .walkin-form-navigation {
-    width: 100%;
-    margin-top: 1.25rem;
-    padding-top: 1.1rem;
-    border-top: 1px solid #f0e6e1;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: .75rem;
-}
-
-#dentistWalkInPage .walkin-nav-btn {
-    min-height: 48px;
-    padding: 0 1.25rem;
-    border-radius: 15px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: .55rem;
-    font-size: .84rem;
-    font-weight: 900;
-}
-
-#dentistWalkInPage .custom-select,
-#dentistWalkInPage .custom-select-button {
-    width: 100%;
-}
-
-#dentistWalkInPage .custom-select-button {
-    min-height: 46px;
-    border-radius: 12px;
-}
-
-[data-theme="dark"] #dentistWalkInPage .walkin-page-hero {
-    background:
-        radial-gradient(circle at top right, rgba(201, 168, 76, .11), transparent 34%),
-        linear-gradient(145deg, #0d1117, #111827);
-    border-color: rgba(255, 255, 255, .1);
-}
-
-[data-theme="dark"] #dentistWalkInPage .walkin-page-title {
-    color: #fecaca;
-}
-
-[data-theme="dark"] #dentistWalkInPage .walkin-page-description {
-    color: #9ca3af;
-}
-
-[data-theme="dark"] #dentistWalkInPage .walkin-page-status {
-    background: rgba(139, 0, 0, .22);
-    border-color: rgba(252, 165, 165, .2);
-    color: #fca5a5;
-}
-
-[data-theme="dark"] #dentistWalkInPage .walkin-form-navigation {
-    border-top-color: rgba(255, 255, 255, .1);
-}
-
-@media (max-width: 768px) {
-    #dentistWalkInPage .walkin-page-hero {
-        grid-template-columns: auto minmax(0, 1fr);
-        padding: 1rem;
-        border-radius: 20px;
-    }
-
-    #dentistWalkInPage .walkin-page-status {
-        grid-column: 1 / -1;
-        width: max-content;
-    }
-
-    #dentistWalkInPage .walkin-form-navigation {
-        justify-content: stretch;
-    }
-
-    #dentistWalkInPage .walkin-nav-btn {
-        flex: 1 1 0;
-        min-width: 0;
-    }
-}
-
-@media (max-width: 480px) {
-    #dentistWalkInPage .walkin-page-hero {
-        grid-template-columns: 1fr;
-    }
-
-    #dentistWalkInPage .walkin-page-title {
-        font-size: 1.55rem;
-    }
-
-    #dentistWalkInPage .walkin-page-description {
-        font-size: .82rem;
-    }
-}
-
-#dentistWalkInPage .walkin-form-navigation,
-#mainContent #navBtns {
-    border-top: 0 !important;
-    padding-top: 0 !important;
-}
-
-#dentistWalkInPage #emergency_relation.custom-select-native {
-    position: absolute !important;
-}
-
-#dentistWalkInPage .emergency-fields-stack .custom-select {
-    width: 100% !important;
-    max-width: 100% !important;
-}
-
-#dentistWalkInPage,
-#dentistBookAppointmentPage,
-#walkInAppointmentPage,
-#dentistWalkInAppointmentPage,
-.dentist-walk-in-page {
-    width: min(100%, 1180px) !important;
-    max-width: 1180px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    padding: 0 !important;
-    box-sizing: border-box !important;
-}
-
-#dentistWalkInPage .book-page-wrap,
-#dentistBookAppointmentPage .book-page-wrap,
-#walkInAppointmentPage .book-page-wrap,
-#dentistWalkInAppointmentPage .book-page-wrap,
-.dentist-walk-in-page .book-page-wrap,
-#dentistWalkInPage .walk-in-page-wrap,
-#dentistBookAppointmentPage .walk-in-page-wrap,
-#walkInAppointmentPage .walk-in-page-wrap,
-#dentistWalkInAppointmentPage .walk-in-page-wrap,
-.dentist-walk-in-page .walk-in-page-wrap {
-    width: 100% !important;
-    max-width: 1180px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-}
-
-#dentistWalkInPage .walk-in-topbar,
-#dentistBookAppointmentPage .walk-in-topbar,
-#walkInAppointmentPage .walk-in-topbar,
-#dentistWalkInAppointmentPage .walk-in-topbar,
-.dentist-walk-in-page .walk-in-topbar,
-#dentistWalkInPage .booking-topbar,
-#dentistBookAppointmentPage .booking-topbar,
-#walkInAppointmentPage .booking-topbar,
-#dentistWalkInAppointmentPage .booking-topbar,
-.dentist-walk-in-page .booking-topbar {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 1rem !important;
-    width: 100% !important;
-    margin: 1.25rem 0 1rem !important;
-}
-
-#dentistWalkInPage .back-home-btn,
-#dentistBookAppointmentPage .back-home-btn,
-#walkInAppointmentPage .back-home-btn,
-#dentistWalkInAppointmentPage .back-home-btn,
-.dentist-walk-in-page .back-home-btn,
-#dentistWalkInPage .back-appointments-btn,
-#dentistBookAppointmentPage .back-appointments-btn,
-#walkInAppointmentPage .back-appointments-btn,
-#dentistWalkInAppointmentPage .back-appointments-btn,
-.dentist-walk-in-page .back-appointments-btn {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 0.5rem !important;
-    min-height: 42px !important;
-    max-width: 100% !important;
-    white-space: nowrap !important;
-    border-radius: 14px !important;
-}
-
-#dentistWalkInPage .step-counter-pill,
-#dentistBookAppointmentPage .step-counter-pill,
-#walkInAppointmentPage .step-counter-pill,
-#dentistWalkInAppointmentPage .step-counter-pill,
-.dentist-walk-in-page .step-counter-pill {
-    flex: 0 0 auto !important;
-    white-space: nowrap !important;
-}
-
-#headerProgressFill {
-    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-#dentistWalkInPage .walk-in-stepper,
-#dentistBookAppointmentPage .walk-in-stepper,
-#walkInAppointmentPage .walk-in-stepper,
-#dentistWalkInAppointmentPage .walk-in-stepper,
-.dentist-walk-in-page .walk-in-stepper,
-#dentistWalkInPage .booking-stepper,
-#dentistBookAppointmentPage .booking-stepper,
-#walkInAppointmentPage .booking-stepper,
-#dentistWalkInAppointmentPage .booking-stepper,
-.dentist-walk-in-page .booking-stepper {
-    width: 100% !important;
-    overflow: visible !important;
-    padding: 0.75rem 0.5rem 0.95rem !important;
-    margin: 1rem 0 0 !important;
-}
-
-#dentistWalkInPage .book-card,
-#dentistBookAppointmentPage .book-card,
-#walkInAppointmentPage .book-card,
-#dentistWalkInAppointmentPage .book-card,
-.dentist-walk-in-page .book-card,
-#dentistWalkInPage .walk-in-card,
-#dentistBookAppointmentPage .walk-in-card,
-#walkInAppointmentPage .walk-in-card,
-#dentistWalkInAppointmentPage .walk-in-card,
-.dentist-walk-in-page .walk-in-card {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    border-radius: 24px !important;
-    overflow: hidden !important;
-}
-
-#dentistWalkInPage .book-card>div:last-child,
-#dentistBookAppointmentPage .book-card>div:last-child,
-#walkInAppointmentPage .book-card>div:last-child,
-#dentistWalkInAppointmentPage .book-card>div:last-child,
-.dentist-walk-in-page .book-card>div:last-child {
-    padding-bottom: 5.25rem !important;
-}
-
-.booking-step-shell,
-.walk-in-step-shell {
-    width: 100% !important;
-    max-width: 100% !important;
-    background: linear-gradient(180deg, #ffffff 0%, #fffafa 100%) !important;
-    border: 1px solid #ece3de !important;
-    border-radius: 28px !important;
-    padding: 1.35rem !important;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.05) !important;
-    overflow: visible !important;
-}
-
-.booking-step-header,
-.walk-in-step-header {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 0.35rem !important;
-    margin-bottom: 1.15rem !important;
-    padding-bottom: 1rem !important;
-    border-bottom: 1px solid #f1e8e3 !important;
-}
-
-.booking-step-eyebrow,
-.walk-in-step-eyebrow {
-    font-size: 0.72rem !important;
-    font-weight: 900 !important;
-    letter-spacing: 0.18em !important;
-    text-transform: uppercase !important;
-    color: #8B0000 !important;
-}
-
-.booking-step-title,
-.walk-in-step-title {
-    font-size: clamp(1.7rem, 2.5vw, 2.45rem) !important;
-    font-weight: 900 !important;
-    line-height: 1.06 !important;
-    color: #660000 !important;
-    margin: 0 !important;
-}
-
-.booking-step-subtitle,
-.walk-in-step-subtitle {
-    font-size: 0.95rem !important;
-    line-height: 1.65 !important;
-    color: #8c817a !important;
-    margin: 0 !important;
-    max-width: 760px !important;
 }
 
 .booking-step-body,
@@ -1240,10 +794,6 @@ html body #mainContent #patientAccountSection .tab-panel.active {
     display: block !important;
 }
 
-#dentistWalkInPage #existingPanel [data-search-wrapper] {
-    margin-bottom: .85rem;
-}
-
 html body #mainContent #patientAccountSection .patient-result {
     appearance: none !important;
     -webkit-appearance: none !important;
@@ -1275,14 +825,6 @@ html body #mainContent #patientAccountSection .patient-result.selected {
     border-color: #8B0000 !important;
     background: linear-gradient(180deg, #fff4f3 0%, #ffffff 100%) !important;
     box-shadow: 0 8px 20px rgba(139, 0, 0, 0.1) !important;
-}
-
-#dentistWalkInPage .patient-result.selected::after,
-#dentistBookAppointmentPage .patient-result.selected::after,
-#walkInAppointmentPage .patient-result.selected::after,
-#dentistWalkInAppointmentPage .patient-result.selected::after {
-    content: none !important;
-    display: none !important;
 }
 
 html body #mainContent #patientAccountSection .patient-result-main {
@@ -1435,11 +977,6 @@ html body #mainContent #patientAccountSection .selected-patient-box small {
     color: #333 !important;
 }
 
-.required-star {
-    color: #8B0000 !important;
-    font-weight: 800 !important;
-}
-
 .q-radio:checked {
     border-color: #8B0000 !important;
     background: #8B0000 !important;
@@ -1532,16 +1069,6 @@ html body #mainContent #patientAccountSection .selected-patient-box small {
     position: static !important;
 }
 
-#prevBtn,
-#nextBtn {
-    min-height: 48px !important;
-    border-radius: 16px !important;
-}
-
-[data-theme="dark"] .book-card,
-[data-theme="dark"] .walk-in-card,
-[data-theme="dark"] .booking-step-shell,
-[data-theme="dark"] .walk-in-step-shell,
 [data-theme="dark"] .section-card,
 [data-theme="dark"] .signature-draw-card {
     background: linear-gradient(145deg, #0d1117, #111827) !important;
@@ -1549,18 +1076,6 @@ html body #mainContent #patientAccountSection .selected-patient-box small {
     box-shadow: 0 18px 38px rgba(0, 0, 0, 0.38) !important;
 }
 
-[data-theme="dark"] .booking-step-title,
-[data-theme="dark"] .walk-in-step-title {
-    color: #fecaca !important;
-}
-
-[data-theme="dark"] .booking-step-eyebrow,
-[data-theme="dark"] .walk-in-step-eyebrow {
-    color: #fca5a5 !important;
-}
-
-[data-theme="dark"] .booking-step-subtitle,
-[data-theme="dark"] .walk-in-step-subtitle,
 [data-theme="dark"] .patient-result-meta {
     color: #9ca3af !important;
 }
@@ -1735,34 +1250,6 @@ html[data-theme="dark"] body #mainContent #patientAccountSection .selected-patie
 
 @media (max-width: 767px) {
 
-    .book-card,
-    .walk-in-card {
-        border-radius: 20px !important;
-    }
-
-    .book-card>div:last-child,
-    .walk-in-card>div:last-child {
-        padding: 1rem 1rem 4.25rem !important;
-    }
-
-    .booking-step-shell,
-    .walk-in-step-shell,
-    html body #mainContent #patientAccountSection {
-        border-radius: 22px !important;
-        padding: 1rem !important;
-    }
-
-    .booking-step-title,
-    .walk-in-step-title {
-        font-size: 1.6rem !important;
-    }
-
-    .booking-step-subtitle,
-    .walk-in-step-subtitle {
-        font-size: 0.88rem !important;
-        line-height: 1.55 !important;
-    }
-
     #calendarSkeletonContainer,
     #calendarSkeletonContainer .cal-shell {
         min-height: auto !important;
@@ -1777,18 +1264,6 @@ html[data-theme="dark"] body #mainContent #patientAccountSection .selected-patie
         gap: 0.65rem !important;
         margin: 1rem 0 0 !important;
         padding: 0 !important;
-    }
-
-    #prevBtn,
-    #nextBtn {
-        flex: 1 1 0 !important;
-        min-width: 0 !important;
-        justify-content: center !important;
-        min-height: 46px !important;
-        padding-left: 0.9rem !important;
-        padding-right: 0.9rem !important;
-        border-radius: 15px !important;
-        font-size: 0.82rem !important;
     }
 
     .signature-methods-grid.signature-drawing-only {
@@ -1818,211 +1293,5 @@ html[data-theme="dark"] body #mainContent #patientAccountSection .selected-patie
     html body #mainContent #patientAccountSection .patient-select-pill {
         grid-column: 1 / -1 !important;
         width: 100% !important;
-    }
-}
-
-@media (max-width: 480px) {
-
-    .booking-step-shell,
-    .walk-in-step-shell,
-    html body #mainContent #patientAccountSection {
-        padding: 0.85rem !important;
-        border-radius: 20px !important;
-    }
-
-    .booking-step-title,
-    .walk-in-step-title {
-        font-size: 1.45rem !important;
-    }
-
-    .booking-step-subtitle,
-    .walk-in-step-subtitle {
-        font-size: 0.82rem !important;
-    }
-
-    #navBtns {
-        gap: 0.55rem !important;
-    }
-
-    #prevBtn,
-    #nextBtn {
-        min-height: 44px !important;
-        font-size: 0.78rem !important;
-    }
-}
-
-@media (max-width: 980px) {
-    #dentistWalkInPage .patient-record-grid {
-        grid-template-columns:
-            repeat(2,
-                minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 640px) {
-    #dentistWalkInPage .patient-record-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-#dentistWalkInPage .patient-results.table-grid-view {
-    padding: 1rem 0;
-}
-
-#dentistWalkInPage .patient-record-grid {
-    grid-template-columns:
-        repeat(3,
-            minmax(0, 1fr));
-    align-items: stretch;
-}
-
-#dentistWalkInPage .patient-record-card {
-    min-height: 0;
-    height: auto;
-    padding: 1rem;
-    display: grid;
-    grid-template-columns:
-        54px minmax(0, 1fr);
-    align-items: flex-start;
-    gap: .9rem;
-    text-align: left;
-    cursor: pointer;
-    position: relative;
-}
-
-#dentistWalkInPage .patient-record-card.is-selected {
-    border-color: #15803d;
-    background: #f0fdf4;
-}
-
-#dentistWalkInPage .patient-card-content {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: .75rem;
-}
-
-#dentistWalkInPage .patient-card-header {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: start;
-    gap: .65rem;
-    padding-right: 1.9rem;
-}
-
-#dentistWalkInPage .patient-card-name {
-    min-width: 0;
-    color:
-        var(--table-text, #374151);
-    font-size: .9rem;
-    font-weight: 900;
-    line-height: 1.35;
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-    overflow-wrap: anywhere;
-}
-
-#dentistWalkInPage .patient-card-meta {
-    min-width: 0;
-    display: grid;
-    gap: .4rem;
-    color: var(--table-text-muted,
-            #6b7280);
-    font-size: .72rem;
-    font-weight: 650;
-}
-
-#dentistWalkInPage .patient-card-meta span {
-    min-width: 0;
-
-    display: flex;
-    align-items: center;
-    gap: .45rem;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-#dentistWalkInPage .patient-card-meta i {
-    width: 14px;
-    color: #9ca3af;
-}
-
-#dentistWalkInPage .patient-card-checkbox-wrap {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-
-    width: 20px;
-    height: 20px;
-    margin: 0;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    cursor: pointer;
-    z-index: 3;
-}
-
-#dentistWalkInPage .patient-card-checkbox {
-    width: 18px;
-    height: 18px;
-    margin: 0;
-    cursor: pointer;
-    accent-color: var(--crimson, #8B0000);
-}
-
-[data-theme="dark"] #dentistWalkInPage .patient-record-card.is-selected {
-    border-color:
-        rgba(134, 239, 172, .35);
-
-    background:
-        rgba(22, 163, 74, .14);
-}
-
-@media (max-width: 640px) {
-    #dentistWalkInPage .patient-record-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-#dentistWalkInPage .patient-picker-toolbar .global-page-size-control {
-    flex: 0 0 auto;
-}
-
-#dentistWalkInPage .patient-picker-search {
-    flex: 1 1 auto;
-    min-width: 0;
-}
-
-#dentistWalkInPage .patient-picker-status {
-    min-height: 38px;
-    margin-bottom: .25rem;
-
-    display: flex;
-    align-items: center;
-}
-
-#dentistWalkInPage .patient-results.table-grid-view {
-    min-height: 260px;
-    padding: 1rem 0;
-}
-
-@media (max-width: 767px) {
-    #dentistWalkInPage .patient-picker-toolbar {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    #dentistWalkInPage .patient-picker-search {
-        width: 100%;
-        flex-basis: auto;
-    }
-
-    #dentistWalkInPage .patient-page-size-control {
-        width: max-content;
     }
 }
