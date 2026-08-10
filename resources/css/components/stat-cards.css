@@ -115,73 +115,41 @@
     margin: 0;
 }
 
-.stat-card[data-filter="all"] .stat-icon,
-.stat-card[data-filter="all"] .stat-icon-wrapper {
-    background: #E0E7FF !important;
-    color: #2563EB !important;
+.stat-card[data-filter="all"] {
+    --stat-accent: var(--status-all-solid);
+    --stat-soft: var(--status-all-bg);
+    --stat-bg: var(--status-all-bg);
+    --stat-border: var(--status-all-border);
 }
 
-.stat-card[data-filter="pending"] .stat-icon,
-.stat-card[data-filter="pending"] .stat-icon-wrapper {
-    background: #FFF7ED !important;
-    color: #F97316 !important;
-    border: 1px solid #FED7AA !important;
+.stat-card[data-filter="pending"] {
+    --stat-accent: var(--status-pending-solid);
+    --stat-soft: var(--status-pending-bg);
+    --stat-bg: var(--status-pending-bg);
+    --stat-border: var(--status-pending-border);
 }
 
-.stat-card[data-filter="approved"] .stat-icon,
-.stat-card[data-filter="approved"] .stat-icon-wrapper {
-    background: #DCFCE7 !important;
-    color: #16A34A !important;
-    border: 1px solid #86EFAC !important;
+.stat-card[data-filter="approved"] {
+    --stat-accent: var(--status-approved-solid);
+    --stat-soft: var(--status-approved-bg);
+    --stat-bg: var(--status-approved-bg);
+    --stat-border: var(--status-approved-border);
 }
 
-.stat-card[data-filter="rejected"] .stat-icon,
-.stat-card[data-filter="rejected"] .stat-icon-wrapper {
-    background: #FEE2E2 !important;
-    color: #DC2626 !important;
-    border: 1px solid #FCA5A5 !important;
+.stat-card[data-filter="rejected"] {
+    --stat-accent: var(--status-rejected-solid);
+    --stat-soft: var(--status-rejected-bg);
+    --stat-bg: var(--status-rejected-bg);
+    --stat-border: var(--status-rejected-border);
 }
 
 [data-theme="dark"] .stat-card,
 .dark .stat-card {
-    background: #111827 !important;
-    border-color: #30363D !important;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28) !important;
-}
+    background: var(--card) !important;
+    border-color: var(--border) !important;
 
-[data-theme="dark"] .stat-card[data-filter="all"] .stat-icon,
-[data-theme="dark"] .stat-card[data-filter="all"] .stat-icon-wrapper,
-.dark .stat-card[data-filter="all"] .stat-icon,
-.dark .stat-card[data-filter="all"] .stat-icon-wrapper {
-    background: #E0E7FF !important;
-    color: #2563EB !important;
-}
-
-[data-theme="dark"] .stat-card[data-filter="pending"] .stat-icon,
-[data-theme="dark"] .stat-card[data-filter="pending"] .stat-icon-wrapper,
-.dark .stat-card[data-filter="pending"] .stat-icon,
-.dark .stat-card[data-filter="pending"] .stat-icon-wrapper {
-    background: #FFF7ED !important;
-    color: #F97316 !important;
-    border: 1px solid #FED7AA !important;
-}
-
-[data-theme="dark"] .stat-card[data-filter="approved"] .stat-icon,
-[data-theme="dark"] .stat-card[data-filter="approved"] .stat-icon-wrapper,
-.dark .stat-card[data-filter="approved"] .stat-icon,
-.dark .stat-card[data-filter="approved"] .stat-icon-wrapper {
-    background: #DCFCE7 !important;
-    color: #16A34A !important;
-    border: 1px solid #86EFAC !important;
-}
-
-[data-theme="dark"] .stat-card[data-filter="rejected"] .stat-icon,
-[data-theme="dark"] .stat-card[data-filter="rejected"] .stat-icon-wrapper,
-.dark .stat-card[data-filter="rejected"] .stat-icon,
-.dark .stat-card[data-filter="rejected"] .stat-icon-wrapper {
-    background: #FEE2E2 !important;
-    color: #DC2626 !important;
-    border: 1px solid #FCA5A5 !important;
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.24) !important;
 }
 
 .stat-grid {
@@ -248,7 +216,6 @@
 }
 
 .stat-card.s-green,
-.stat-card.active,
 .stat-card.patient {
     --stat-accent: #16A34A;
     --stat-soft: #F0FDF4;
@@ -270,6 +237,216 @@
     --stat-soft: #F5F3FF;
     --stat-bg: #F5F3FF;
     --stat-border: rgba(124, 58, 237, .18);
+}
+
+.stat-card.s-all {
+    --stat-accent: var(--status-all-solid);
+    --stat-soft: var(--status-all-soft);
+    --stat-bg: var(--status-all-bg);
+    --stat-text: var(--status-all-text);
+    --stat-border: var(--status-all-border);
+}
+
+.stat-card.s-today {
+    --stat-accent: var(--status-today-solid);
+    --stat-soft: var(--status-today-soft);
+    --stat-bg: var(--status-today-bg);
+    --stat-text: var(--status-today-text);
+    --stat-border: var(--status-today-border);
+}
+
+.stat-card.s-upcoming,
+.stat-card.s-scheduled {
+    --stat-accent: var(--status-upcoming-solid);
+    --stat-soft: var(--status-upcoming-soft);
+    --stat-bg: var(--status-upcoming-bg);
+    --stat-text: var(--status-upcoming-text);
+    --stat-border: var(--status-upcoming-border);
+}
+
+.stat-card.s-rescheduled {
+    --stat-accent: var(--status-rescheduled-solid);
+    --stat-soft: var(--status-rescheduled-soft);
+    --stat-bg: var(--status-rescheduled-bg);
+    --stat-text: var(--status-rescheduled-text);
+    --stat-border: var(--status-rescheduled-border);
+}
+
+.stat-card.s-completed,
+.stat-card.s-approved {
+    --stat-accent: var(--status-completed-solid);
+    --stat-soft: var(--status-completed-soft);
+    --stat-bg: var(--status-completed-bg);
+    --stat-text: var(--status-completed-text);
+    --stat-border: var(--status-completed-border);
+}
+
+.stat-card.s-cancelled,
+.stat-card.s-canceled,
+.stat-card.s-rejected {
+    --stat-accent: var(--status-cancelled-solid);
+    --stat-soft: var(--status-cancelled-soft);
+    --stat-bg: var(--status-cancelled-bg);
+    --stat-text: var(--status-cancelled-text);
+    --stat-border: var(--status-cancelled-border);
+}
+
+.stat-card.s-pending {
+    --stat-accent: var(--status-pending-solid);
+    --stat-soft: var(--status-pending-soft);
+    --stat-bg: var(--status-pending-bg);
+    --stat-text: var(--status-pending-text);
+    --stat-border: var(--status-pending-border);
+}
+
+.stat-card.s-active {
+    --stat-accent: var(--status-active-solid);
+    --stat-soft: var(--status-active-soft);
+    --stat-bg: var(--status-active-bg);
+    --stat-text: var(--status-active-text);
+    --stat-border: var(--status-active-border);
+}
+
+.stat-card.s-inactive {
+    --stat-accent: var(--status-inactive-solid);
+    --stat-soft: var(--status-inactive-soft);
+    --stat-bg: var(--status-inactive-bg);
+    --stat-text: var(--status-inactive-text);
+    --stat-border: var(--status-inactive-border);
+}
+
+.stat-card.s-archived {
+    --stat-accent: var(--status-archived-solid);
+    --stat-soft: var(--status-archived-soft);
+    --stat-bg: var(--status-archived-bg);
+    --stat-text: var(--status-archived-text);
+    --stat-border: var(--status-archived-border);
+}
+
+.stat-card.s-deleted {
+    --stat-accent: var(--status-deleted-solid);
+    --stat-soft: var(--status-deleted-soft);
+    --stat-bg: var(--status-deleted-bg);
+    --stat-text: var(--status-deleted-text);
+    --stat-border: var(--status-deleted-border);
+}
+
+.stat-card.s-ongoing,
+.stat-card.s-in-progress,
+.stat-card.s-in_progress {
+    --stat-accent: var(--status-ongoing-solid);
+    --stat-soft: var(--status-ongoing-soft);
+    --stat-bg: var(--status-ongoing-bg);
+    --stat-text: var(--status-ongoing-text);
+    --stat-border: var(--status-ongoing-border);
+}
+
+.stat-card.s-failed {
+    --stat-accent: var(--status-failed-solid);
+    --stat-soft: var(--status-failed-soft);
+    --stat-bg: var(--status-failed-bg);
+    --stat-text: var(--status-failed-text);
+    --stat-border: var(--status-failed-border);
+}
+
+.stat-card.s-ready {
+    --stat-accent: var(--status-ready-solid);
+    --stat-soft: var(--status-ready-soft);
+    --stat-bg: var(--status-ready-bg);
+    --stat-text: var(--status-ready-text);
+    --stat-border: var(--status-ready-border);
+}
+
+.stat-card.s-released {
+    --stat-accent: var(--status-released-solid);
+    --stat-soft: var(--status-released-soft);
+    --stat-bg: var(--status-released-bg);
+    --stat-text: var(--status-released-text);
+    --stat-border: var(--status-released-border);
+}
+
+.stat-card.s-ended {
+    --stat-accent: var(--status-ended-solid);
+    --stat-soft: var(--status-ended-soft);
+    --stat-bg: var(--status-ended-bg);
+    --stat-text: var(--status-ended-text);
+    --stat-border: var(--status-ended-border);
+}
+
+.stat-card.s-granted {
+    --stat-accent: var(--status-granted-solid);
+    --stat-soft: var(--status-granted-soft);
+    --stat-bg: var(--status-granted-bg);
+    --stat-text: var(--status-granted-text);
+    --stat-border: var(--status-granted-border);
+}
+
+.stat-card.s-denied {
+    --stat-accent: var(--status-denied-solid);
+    --stat-soft: var(--status-denied-soft);
+    --stat-bg: var(--status-denied-bg);
+    --stat-text: var(--status-denied-text);
+    --stat-border: var(--status-denied-border);
+}
+
+[data-theme="dark"] .stat-card.s-crimson,
+.dark .stat-card.s-crimson,
+[data-theme="dark"] .stat-card.total,
+.dark .stat-card.total {
+    --stat-accent: #FCA5A5;
+    --stat-soft: rgba(139, 0, 0, .22);
+    --stat-bg: rgba(139, 0, 0, .14);
+    --stat-border: rgba(252, 165, 165, .24);
+}
+
+[data-theme="dark"] .stat-card.s-red,
+.dark .stat-card.s-red,
+[data-theme="dark"] .stat-card.admin,
+.dark .stat-card.admin {
+    --stat-accent: #F87171;
+    --stat-soft: rgba(220, 38, 38, .18);
+    --stat-bg: rgba(220, 38, 38, .12);
+    --stat-border: rgba(248, 113, 113, .24);
+}
+
+[data-theme="dark"] .stat-card.s-blue,
+.dark .stat-card.s-blue,
+[data-theme="dark"] .stat-card.dentist,
+.dark .stat-card.dentist {
+    --stat-accent: #93C5FD;
+    --stat-soft: rgba(37, 99, 235, .18);
+    --stat-bg: rgba(37, 99, 235, .12);
+    --stat-border: rgba(147, 197, 253, .24);
+}
+
+[data-theme="dark"] .stat-card.s-green,
+.dark .stat-card.s-green,
+[data-theme="dark"] .stat-card.patient,
+.dark .stat-card.patient {
+    --stat-accent: #86EFAC;
+    --stat-soft: rgba(22, 163, 74, .18);
+    --stat-bg: rgba(22, 163, 74, .12);
+    --stat-border: rgba(134, 239, 172, .24);
+}
+
+[data-theme="dark"] .stat-card.s-amber,
+.dark .stat-card.s-amber,
+[data-theme="dark"] .stat-card.archived,
+.dark .stat-card.archived,
+[data-theme="dark"] .stat-card.low-stock,
+.dark .stat-card.low-stock {
+    --stat-accent: #FDE68A;
+    --stat-soft: rgba(202, 138, 4, .18);
+    --stat-bg: rgba(202, 138, 4, .12);
+    --stat-border: rgba(253, 230, 138, .24);
+}
+
+[data-theme="dark"] .stat-card.s-purple,
+.dark .stat-card.s-purple {
+    --stat-accent: #C4B5FD;
+    --stat-soft: rgba(124, 58, 237, .18);
+    --stat-bg: rgba(124, 58, 237, .12);
+    --stat-border: rgba(196, 181, 253, .24);
 }
 
 .stat-card-accent {
@@ -379,7 +556,12 @@
 
 [data-theme="dark"] .stat-label,
 .dark .stat-label {
-    color: #8B949E !important;
+    color: var(--text-3) !important;
+}
+
+[data-theme="dark"] .stat-footer,
+.dark .stat-footer {
+    color: var(--text-3) !important;
 }
 
 [data-theme="dark"] .stat-value,
@@ -388,13 +570,7 @@
 .dark .stat-value,
 .dark .stat-num,
 .dark .stat-count {
-    color: #F8FAFC !important;
-}
-
-[data-theme="dark"] .stat-icon,
-.dark .stat-icon {
-    background: #30363D !important;
-    color: inherit !important;
+    color: var(--text-1) !important;
 }
 
 @media (max-width:380px) {
@@ -467,12 +643,16 @@
 [data-theme="dark"] #mainContent #statCards.admin-dashboard-stat-grid .stat-card,
 .dark #mainContent #statCards.admin-dashboard-stat-grid .stat-card {
     background:
-        radial-gradient(circle at 100% 100%, var(--stat-bg) 0%, transparent 38%),
-        linear-gradient(145deg, rgba(17, 24, 39, .96), rgba(13, 17, 23, .94)) !important;
+        radial-gradient(circle at 100% 100%,
+            var(--stat-bg) 0%,
+            transparent 40%),
+        var(--card) !important;
+
     border-color: var(--stat-border) !important;
+
     box-shadow:
-        0 14px 30px rgba(0, 0, 0, .34),
-        inset 0 1px 0 rgba(255, 255, 255, .06) !important;
+        0 14px 30px rgba(0, 0, 0, .30),
+        inset 0 1px 0 rgba(255, 255, 255, .04) !important;
 }
 
 [data-theme="dark"] #mainContent #statCards.admin-dashboard-stat-grid .stat-value,

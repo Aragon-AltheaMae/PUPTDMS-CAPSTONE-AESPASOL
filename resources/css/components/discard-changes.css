@@ -6,7 +6,7 @@
     align-items: center;
     justify-content: center;
     padding: 1.25rem;
-    background: rgba(15, 23, 42, .48);
+    background: (63, 20, 20, 0.24);
     backdrop-filter: blur(8px) saturate(130%);
     -webkit-backdrop-filter: blur(8px) saturate(130%);
 }
@@ -21,7 +21,7 @@
     border-radius: 24px;
     background: #ffffff;
     border: 1px solid #eef2f7;
-    box-shadow: 0 28px 70px rgba(15, 23, 42, .24);
+    box-shadow: 0 28px 70px rgba(63, 20, 20, 0.24);
     transform: translateY(8px) scale(.98);
     opacity: 0;
     animation: discardModalIn .18s ease forwards;
@@ -187,12 +187,13 @@
 
 [data-theme="dark"] .discard-modal-shell,
 .dark .discard-modal-shell {
-    background: #0D1117;
-    border-color: #21262D;
-    color: #E5E7EB;
+    background: var(--card);
+    border-color: var(--border);
+    color: var(--text-1);
+
     box-shadow:
         0 28px 70px rgba(0, 0, 0, .62),
-        inset 0 1px 0 rgba(255, 255, 255, .05);
+        inset 0 1px 0 rgba(255, 255, 255, .04);
 }
 
 [data-theme="dark"] .discard-modal-header,
@@ -201,18 +202,18 @@
 .dark .discard-modal-header,
 .dark .discard-modal-body,
 .dark .discard-modal-footer {
-    background: #0D1117;
-    border-color: #21262D;
+    background: var(--card);
+    border-color: var(--border);
 }
 
 [data-theme="dark"] .discard-modal-title,
 .dark .discard-modal-title {
-    color: #F3F4F6;
+    color: var(--text-1);
 }
 
 [data-theme="dark"] .discard-modal-subtitle,
 .dark .discard-modal-subtitle {
-    color: #9CA3AF;
+    color: var(--text-3);
 }
 
 [data-theme="dark"] .discard-modal-x,
@@ -274,25 +275,26 @@
     left: 50%;
     bottom: -120px;
     z-index: 1200;
-
     width: max-content;
     max-width: calc(100vw - 2rem);
     min-height: 64px;
-
     padding: .7rem .75rem .7rem 1.25rem;
-
     display: flex;
     align-items: center;
     gap: 1.25rem;
-
-    border: 1px solid rgba(255, 255, 255, .12);
     border-radius: 999px;
+    background:
+        radial-gradient(circle at top left,
+            rgba(139, 0, 0, .18),
+            transparent 42%),
+        var(--card);
 
-    background: #111827;
-    color: #ffffff;
+    color: var(--text-1);
+
+    border: 1px solid var(--border);
 
     box-shadow:
-        0 20px 44px rgba(15, 23, 42, .26);
+        0 20px 44px rgba(0, 0, 0, .30);
 
     opacity: 0;
     visibility: hidden;
@@ -322,7 +324,7 @@
 }
 
 .fsb-title {
-    color: #ffffff;
+    color: var(--text-1);
     font-size: .84rem;
     font-weight: 850;
     line-height: 1.2;
@@ -330,7 +332,7 @@
 
 .fsb-sub {
     margin-top: 2px;
-    color: #9ca3af;
+    color: var(--text-3);
     font-size: .7rem;
     font-weight: 650;
 }

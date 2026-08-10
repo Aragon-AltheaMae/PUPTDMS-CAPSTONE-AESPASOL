@@ -474,30 +474,64 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         </div>
 
                         @if ($inventoryItems->count())
-                        <div class="inventory-kpi-grid">
-                            <div class="inventory-kpi-card kpi-used">
-                                <span class="inventory-kpi-label">Total used</span>
-                                <strong>{{ number_format($inventoryTotalUsed) }}</strong>
-                                <small>This month</small>
+                        <div class="stat-grid">
+
+                            <div class="stat-card s-blue">
+                                <div class="stat-card-info">
+                                    <div class="stat-label">Total Used</div>
+                                    <div class="stat-num">
+                                        {{ number_format($inventoryTotalUsed) }}
+                                    </div>
+                                    <div class="stat-footer">This month</div>
+                                </div>
+
+                                <div class="stat-icon-wrapper">
+                                    <i class="fa-solid fa-arrow-trend-down"></i>
+                                </div>
                             </div>
 
-                            <div class="inventory-kpi-card kpi-stock">
-                                <span class="inventory-kpi-label">Available stock</span>
-                                <strong>{{ number_format($inventoryTotalStock) }}</strong>
-                                <small>Units remaining</small>
+                            <div class="stat-card s-green">
+                                <div class="stat-card-info">
+                                    <div class="stat-label">Available Stock</div>
+                                    <div class="stat-num">
+                                        {{ number_format($inventoryTotalStock) }}
+                                    </div>
+                                    <div class="stat-footer">Units remaining</div>
+                                </div>
+
+                                <div class="stat-icon-wrapper">
+                                    <i class="fa-solid fa-boxes-stacked"></i>
+                                </div>
                             </div>
 
-                            <div class="inventory-kpi-card kpi-critical">
-                                <span class="inventory-kpi-label">Critical items</span>
-                                <strong>{{ number_format($inventoryCriticalCount) }}</strong>
-                                <small>Need urgent review</small>
+                            <div class="stat-card s-red">
+                                <div class="stat-card-info">
+                                    <div class="stat-label">Critical Items</div>
+                                    <div class="stat-num">
+                                        {{ number_format($inventoryCriticalCount) }}
+                                    </div>
+                                    <div class="stat-footer">Need urgent review</div>
+                                </div>
+
+                                <div class="stat-icon-wrapper">
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                </div>
                             </div>
 
-                            <div class="inventory-kpi-card kpi-reorder">
-                                <span class="inventory-kpi-label">Suggested reorder</span>
-                                <strong>{{ number_format($inventoryReorderUnits) }}</strong>
-                                <small>Total units</small>
+                            <div class="stat-card s-amber">
+                                <div class="stat-card-info">
+                                    <div class="stat-label">Suggested Reorder</div>
+                                    <div class="stat-num">
+                                        {{ number_format($inventoryReorderUnits) }}
+                                    </div>
+                                    <div class="stat-footer">Total units</div>
+                                </div>
+
+                                <div class="stat-icon-wrapper">
+                                    <i class="fa-solid fa-cart-plus"></i>
+                                </div>
                             </div>
+
                         </div>
 
                         <div class="forecast-note">
@@ -636,484 +670,517 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         Clinic Performance Overview
                     </div>
 
-                    <div class="kpi-grid-layout report-kpi-grid mb-8">
+                    <div class="stat-grid mb-8">
 
-                        <a href="{{ route('dentist.dentist.patients') }}" class="kpi-card kpi-card-patients group">
-                            <div class="kpi-icon kpi-icon-patients">
+                        <a href="{{ route('dentist.dentist.patients') }}" class="stat-card s-crimson">
+
+                            <div class="stat-card-info">
+                                <div class="stat-label">Patients This Month</div>
+
+                                <div class="stat-num">
+                                    {{ $patientsThisMonth }}
+                                </div>
+
+                                <div class="stat-footer">
+                                    @if (!is_null($patientsDelta))
+                                    <span class="{{ $patientsDelta >= 0 ? 'text-green-600' : 'text-red-600' }}">
+                                        <i class="fa-solid fa-arrow-{{ $patientsDelta >= 0 ? 'up' : 'down' }}"></i>
+                                        {{ abs($patientsDelta) }}%
+                                    </span>
+                                    @else
+                                    <span>No data last month</span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="stat-icon-wrapper">
                                 <i class="fa-solid fa-users"></i>
                             </div>
-
-                            <div class="flex-1 min-w-0">
-                                <div class="kpi-value">{{ $patientsThisMonth }}</div>
-                                <div class="kpi-label">Patients This Month</div>
-
-                                @if (!is_null($patientsDelta))
-                                <div class="kpi-delta {{ $patientsDelta >= 0 ? 'up' : 'down' }}">
-                                    <i class="fa-solid fa-arrow-{{ $patientsDelta >= 0 ? 'up' : 'down' }}"></i>
-                                    {{ abs($patientsDelta) }}%
-                                </div>
-                                @else
-                                <div class="kpi-delta neutral">No data last month</div>
-                                @endif
-                            </div>
-
-                            <i class="fa-solid fa-chevron-right kpi-arrow"></i>
                         </a>
 
-                        <a href="{{ route('dentist.dentist.appointments') }}"
-                            class="kpi-card kpi-card-appointments group">
-                            <div class="kpi-icon kpi-icon-appointments">
+                        <a href="{{ route('dentist.dentist.appointments') }}" class="stat-card s-amber">
+
+                            <div class="stat-card-info">
+                                <div class="stat-label">Appointments Today</div>
+
+                                <div class="stat-num">
+                                    {{ $appointmentsToday }}
+                                </div>
+
+                                <div class="stat-footer">
+                                    @if ($appointmentsDelta > 0)
+                                    <span class="text-green-600">
+                                        <i class="fa-solid fa-arrow-up"></i>
+                                        {{ $appointmentsDelta }} more
+                                    </span>
+                                    @elseif ($appointmentsDelta < 0) <span class="text-red-600">
+                                        <i class="fa-solid fa-arrow-down"></i>
+                                        {{ abs($appointmentsDelta) }} fewer
+                                        </span>
+                                        @else
+                                        <span>Same as yesterday</span>
+                                        @endif
+                                </div>
+                            </div>
+
+                            <div class="stat-icon-wrapper">
                                 <i class="fa-solid fa-calendar-check"></i>
                             </div>
+                        </a>
 
-                            <div class="flex-1 min-w-0">
-                                <div class="kpi-value">{{ $appointmentsToday }}</div>
-                                <div class="kpi-label">Appointments Today</div>
-
-                                @if ($appointmentsDelta > 0)
-                                <div class="kpi-delta up">
-                                    <i class="fa-solid fa-arrow-up"></i>
-                                    {{ $appointmentsDelta }} more
+                        <div class="stat-card s-red">
+                            <div class="stat-card-info">
+                                <div class="stat-label">
+                                    Cancellation Rate
                                 </div>
-                                @elseif ($appointmentsDelta < 0) <div class="kpi-delta down">
-                                    <i class="fa-solid fa-arrow-down"></i>
-                                    {{ abs($appointmentsDelta) }} fewer
+
+                                <div class="stat-num">
+                                    {{ $cancellationRate }}%
+                                </div>
+
+                                <div class="stat-footer">
+                                    Based on recorded appointments
+                                </div>
                             </div>
-                            @else
-                            <div class="kpi-delta neutral">Same as yesterday</div>
-                            @endif
+
+                            <div class="stat-icon-wrapper">
+                                <i class="fa-solid fa-calendar-xmark"></i>
+                            </div>
+                        </div>
+
+                        <a href="{{ route('dentist.dentist.inventory') }}" class="stat-card s-amber">
+                            <div class="stat-card-info">
+                                <div class="stat-label">
+                                    Low Stock Items
+                                </div>
+
+                                <div class="stat-num">
+                                    {{ $lowStockItems }}
+                                </div>
+
+                                <div class="stat-footer">
+                                    @if ($lowStockItems > 0)
+                                    <span class="text-red-600">
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+                                        Requires reorder
+                                    </span>
+                                    @else
+                                    <span class="text-green-600">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        All stocked up
+                                    </span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="stat-icon-wrapper">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                        </a>
                     </div>
 
-                    <i class="fa-solid fa-chevron-right kpi-arrow"></i>
-                    </a>
-
-                    <div class="kpi-card kpi-card-cancellation">
-                        <div class="kpi-icon kpi-icon-cancellation">
-                            <i class="fa-solid fa-calendar-xmark"></i>
-                        </div>
-
-                        <div class="flex-1 min-w-0">
-                            <div class="kpi-value">{{ $cancellationRate }}%</div>
-                            <div class="kpi-label">Cancellation Rate</div>
-                            <div class="kpi-delta neutral">Based on recorded appointments</div>
-                        </div>
-                    </div>
-
-                    <a href="{{ route('dentist.dentist.inventory') }}" class="kpi-card kpi-card-low-stock group">
-                        <div class="kpi-icon kpi-icon-low-stock">
-                            <i class="fa-solid fa-triangle-exclamation"></i>
-                        </div>
-
-                        <div class="flex-1 min-w-0">
-                            <div class="kpi-value kpi-value-low-stock">{{ $lowStockItems }}</div>
-                            <div class="kpi-label kpi-label-low-stock">Low Stock Items</div>
-
-                            @if ($lowStockItems > 0)
-                            <div class="kpi-delta down">
-                                <i class="fa-solid fa-circle-exclamation"></i>
-                                Requires reorder
-                            </div>
-                            @else
-                            <div class="kpi-delta up">
-                                <i class="fa-solid fa-circle-check"></i>
-                                All stocked up
-                            </div>
-                            @endif
-                        </div>
-                        <i class="fa-solid fa-chevron-right kpi-arrow"></i>
-                    </a>
-    </div>
-
-    <div class="analytics-section-label">
-        <i class="fa-solid fa-chart-column"></i>
-        Patient and Clinic Insights
-    </div>
-
-    <div class="card mb-6">
-        <div class="card-header">
-            <div class="card-header-left">
-                <span class="card-header-icon">
-                    <i class="fa-solid fa-chart-simple"></i>
-                </span>
-
-                <div>
-                    <h3 class="card-title">Monthly Clinic Overview</h3>
-                    <p class="card-subtitle">
-                        Comparison of patient and treatment activity
-                    </p>
-                </div>
-            </div>
-
-            <span class="metric-chip">Current month</span>
-        </div>
-
-        <div class="card-body">
-            <div class="relative h-[300px]">
-                <canvas id="clinicOverviewChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <div class="analytics-main-grid">
-        @php
-        $cleanPeriods = collect($periodOptions)
-        ->unique()
-        ->sortByDesc(function ($date) {
-        return \Carbon\Carbon::parse($date);
-        });
-        @endphp
-
-        <div class="card lg:col-span-1">
-            <div class="card-header">
-                <div class="card-header-left">
-                    <span class="card-header-icon">
+                    <div class="analytics-section-label">
                         <i class="fa-solid fa-chart-column"></i>
-                    </span>
-
-                    <div>
-                        <h3 class="card-title">GAD Report</h3>
-                        <p class="card-subtitle">
-                            Gender-disaggregated clinic records
-                        </p>
+                        Patient and Clinic Insights
                     </div>
-                </div>
 
-                <div class="card-header-right w-full sm:w-48">
-                    <select id="gadPeriodSelect" class="js-custom-select" data-placeholder="Select period">
+                    <div class="card mb-6">
+                        <div class="card-header">
+                            <div class="card-header-left">
+                                <span class="card-header-icon">
+                                    <i class="fa-solid fa-chart-simple"></i>
+                                </span>
 
-                        @foreach ($cleanPeriods as $opt)
-                        <option value="{{ $opt }}">
-                            {{ $opt }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="report-chart-legend"></div>
-                <div id="gadChartWrap" class="relative flex-1 min-h-[260px]">
-                    <canvas id="gadChart"></canvas>
-                    <div id="gadEmptyState" class="empty-state-host absolute inset-0"></div>
-                    <div id="gadLoadingState" class="chart-loading hidden absolute inset-0"><i
-                            class="fa-solid fa-spinner"></i></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card lg:col-span-1">
-            <div class="card-header">
-                <div class="card-header-left">
-                    <span class="card-header-icon">
-                        <i class="fa-solid fa-chart-line"></i>
-                    </span>
-
-                    <div>
-                        <h3 class="card-title">Weekly Cases</h3>
-                        <p class="card-subtitle">
-                            Weekly treatment and appointment activity
-                        </p>
-                    </div>
-                </div>
-
-                <div class="card-header-right w-48 max-w-full">
-                    <select id="weeklyPeriodSelect" class="js-custom-select" data-placeholder="Select period">
-
-                        @foreach ($cleanPeriods as $opt)
-                        <option value="{{ $opt }}">
-                            {{ $opt }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-            <div class="card-body">
-                <div id="weeklyChartWrap" class="relative flex-1 min-h-[260px]">
-                    <canvas id="weeklyDentalCasesChart"></canvas>
-                    <div id="weeklyEmptyState" class="empty-state-host absolute inset-0"></div>
-                    <div id="weeklyLoadingState" class="chart-loading hidden absolute inset-0"><i
-                            class="fa-solid fa-spinner"></i></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <span class="chart-title">
-                    <i class="fa-solid fa-user-group"></i>
-                    Returning vs New Patients
-                </span>
-            </div>
-
-            <div class="card-body">
-                <div class="relative h-[280px]">
-                    @if (($returningPatients ?? 0) > 0 || ($newPatients ?? 0) > 0)
-                    <canvas id="patientSegmentChart"></canvas>
-                    @else
-                    <div id="patientSegmentEmptyState" class="empty-state-host"></div>
-                    @endif
-                </div>
-            </div>
-        </div>
-
-    </div>
-    <div class="analytics-secondary-grid">
-        <div class="card">
-            <div class="card-header">
-                <div class="flex items-center gap-2 min-w-0">
-                    <span class="chart-title">
-                        <i class="fa-solid fa-star"></i>
-                        Top Dental Services
-                    </span>
-                </div>
-                <span class="metric-chip">Top this month</span>
-            </div>
-
-            <div class="card-body">
-                @if ($topServices->count() > 0)
-                <div class="service-list">
-                    @foreach ($topServices->take(5)->values() as $index => $service)
-                    <div class="service-row">
-                        <div class="service-meta">
-                            <div class="service-rank">{{ $index + 1 }}</div>
-                            <div class="service-name">
-                                {{ $service->name ?? ($service['name'] ?? 'Service') }}
+                                <div>
+                                    <h3 class="card-title">Monthly Clinic Overview</h3>
+                                    <p class="card-subtitle">
+                                        Comparison of patient and treatment activity
+                                    </p>
+                                </div>
                             </div>
+
+                            <span class="metric-chip">Current month</span>
                         </div>
-                        <div class="service-count">
-                            {{ $service->total ?? ($service['total'] ?? 0) }} cases
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-                @else
-                <div id="topServicesEmptyState" class="empty-state-host"></div>
-                @endif
-            </div>
-        </div>
 
-        <section class="card quick-actions-card">
-            <div class="card-header">
-                <div class="card-header-left">
-                    <span class="card-header-icon">
-                        <i class="fa-solid fa-bolt"></i>
-                    </span>
-
-                    <div>
-                        <h2 class="card-title">Quick Reports</h2>
-                        <p class="card-subtitle">
-                            Frequently used report shortcuts
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="quick-actions-list">
-                <a href="{{ route('dentist.dentist.report.dental-services') }}" class="quick-action quick-action-card">
-                    <span class="quick-action-icon">
-                        <i class="fa-solid fa-tooth"></i>
-                    </span>
-
-                    <span class="quick-action-copy">
-                        <span class="quick-action-title">Dental Services</span>
-                        <span class="quick-action-sub">View and export full service logs</span>
-                    </span>
-
-                    <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
-                    <i class="fa-solid fa-tooth quick-action-bg-icon"></i>
-                </a>
-
-                <a href="{{ route('dentist.dentist.report.daily-treatment') }}" class="quick-action quick-action-card">
-                    <span class="quick-action-icon">
-                        <i class="fa-solid fa-notes-medical"></i>
-                    </span>
-
-                    <span class="quick-action-copy">
-                        <span class="quick-action-title">Daily Treatment Record</span>
-                        <span class="quick-action-sub">Track daily patient treatments</span>
-                    </span>
-
-                    <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
-                    <i class="fa-solid fa-notes-medical quick-action-bg-icon"></i>
-                </a>
-            </div>
-        </section>
-    </div>
-
-    <section class="card printable-forms-card mb-8">
-        <div class="card-header">
-            <div class="card-header-left">
-                <span class="card-header-icon">
-                    <i class="fa-solid fa-file-signature"></i>
-                </span>
-
-                <div>
-                    <h2 class="card-title">Printable Forms</h2>
-                    <p class="card-subtitle">
-                        Clinic forms and certificates available for printing
-                    </p>
-                </div>
-            </div>
-
-            <span class="metric-chip">
-                {{ $documentTemplates->count() }}
-                active {{ Str::plural('template', $documentTemplates->count()) }}
-            </span>
-        </div>
-
-        <div class="card-body">
-            @if ($documentTemplates->count())
-            <div class="printable-template-grid">
-                @foreach ($documentTemplates as $template)
-                <article class="printable-template-item">
-                    <div class="printable-template-main">
-                        <span class="printable-template-icon">
-                            <i class="fa-solid fa-file-medical"></i>
-                        </span>
-
-                        <div class="printable-template-copy">
-                            <h3 class="printable-template-title">
-                                {{ $template->name }}
-                            </h3>
-
-                            <p class="printable-template-code">
-                                {{ $template->code ?: 'Template Code N/A' }}
-                            </p>
-
-                            <div class="printable-template-meta">
-                                <span class="status-pill s-active">
-                                    {{ Str::headline($template->document_type) }}
-                                </span>
-
-                                <span class="status-pill s-neutral">
-                                    {{ $template->category ?: 'General' }}
-                                </span>
-
-                                <span class="status-pill s-ongoing">
-                                    {{ $template->paper_size ?: 'A4' }}
-                                </span>
+                        <div class="card-body">
+                            <div class="relative h-[300px]">
+                                <canvas id="clinicOverviewChart"></canvas>
                             </div>
                         </div>
                     </div>
 
-                    <a href="{{ route('dentist.dentist.report.templates.print', $template->id) }}" target="_blank"
-                        rel="noopener" class="ui-btn ui-btn-primary ui-btn-sm">
-                        <i class="fa-solid fa-print"></i>
-                        Print
-                    </a>
-                </article>
-                @endforeach
-            </div>
-            @else
-            <div id="printableFormsEmptyState" class="empty-state-host"></div>
-            @endif
-        </div>
-    </section>
-
-    <div class="card report-inventory-shell mb-8">
-        <div class="card-header">
-            <span class="chart-title text-base"><i class="fa-solid fa-boxes-stacked"></i> Inventory
-                Analytics</span>
-            <a href="{{ route('dentist.dentist.inventory') }}" class="ui-btn ui-btn-secondary ui-btn-sm">
-                <i class="fa-solid fa-boxes-stacked"></i>
-                Manage Inventory
-            </a>
-        </div>
-
-        <div class="card-body">
-            <div class="report-inventory-grid grid grid-cols-1 md:grid-cols-3 gap-8">
-
-                <div class="col-span-1 inventory-chart-panel">
-                    <h3 class="text-center text-[11px] font-bold text-gray-500 mb-4 uppercase tracking-wider">
-                        Medicine
-                        Stock</h3>
-                    <div class="relative h-[220px] w-full">
-                        @if ($medicineItems->count() > 0)
-                        <canvas id="medicinePieChart"></canvas>
-                        @else
-                        <div id="medicineInventoryEmptyState" class="empty-state-host"></div>
-                        @endif
-                    </div>
-                </div>
-
-                <div class="col-span-1 report-inventory-panel">
-                    <h3 class="text-center text-[11px] font-bold text-gray-500 mb-4 uppercase tracking-wider">
-                        Medical
-                        Supplies</h3>
-                    <div class="relative h-[220px] w-full">
-                        @if ($suppliesItems->count() > 0)
-                        <canvas id="suppliesPieChart"></canvas>
-                        @else
-                        <div id="medicalSuppliesEmptyState" class="empty-state-host"></div>
-                        @endif
-                    </div>
-                </div>
-
-                <div class="col-span-1 bg-gray-50 rounded-xl p-5 low-stock-alert-card">
-                    <div class="low-stock-alert-header flex items-center gap-2 mb-4">
-                        <span class="low-stock-title-icon">
-                            <i class="fa-solid fa-triangle-exclamation"></i>
-                        </span>
-                        <span class="text-sm font-bold text-gray-800">Low Stock Alerts</span>
-                    </div>
-
-                    @if ($lowStockMedicine->count() > 0 || $lowStockSupplies->count() > 0)
-                    <div class="overflow-y-auto max-h-[190px] pr-2 scroll-smooth">
-
-                        @if ($lowStockMedicine->count() > 0)
-                        @foreach ($lowStockMedicine as $item)
+                    <div class="analytics-main-grid">
                         @php
-                        $remaining = $item->qty - $item->used;
-                        $pct = $item->qty > 0 ? round(($remaining / $item->qty) * 100) : 0;
-                        $barClass = $pct <= 15 ? 'bg-red-500' : 'bg-orange-400' ; @endphp <div class="stock-row">
-                            <div class="stock-name">
-                                <span class="truncate pr-2">{{ $item->name }}</span>
-                                <span class="text-red-600 font-bold text-[10px] whitespace-nowrap">{{ $remaining }}
-                                    left</span>
+                        $cleanPeriods = collect($periodOptions)
+                        ->unique()
+                        ->sortByDesc(function ($date) {
+                        return \Carbon\Carbon::parse($date);
+                        });
+                        @endphp
+
+                        <div class="card lg:col-span-1">
+                            <div class="card-header">
+                                <div class="card-header-left">
+                                    <span class="card-header-icon">
+                                        <i class="fa-solid fa-chart-column"></i>
+                                    </span>
+
+                                    <div>
+                                        <h3 class="card-title">GAD Report</h3>
+                                        <p class="card-subtitle">
+                                            Gender-disaggregated clinic records
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="card-header-right w-full sm:w-48">
+                                    <select id="gadPeriodSelect" class="js-custom-select"
+                                        data-placeholder="Select period">
+
+                                        @foreach ($cleanPeriods as $opt)
+                                        <option value="{{ $opt }}">
+                                            {{ $opt }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
-                            <div class="stock-bar-bg">
-                                <div class="stock-bar-fill {{ $barClass }}" style="width:{{ $pct }}%"></div>
+                            <div class="card-body">
+                                <div class="report-chart-legend"></div>
+                                <div id="gadChartWrap" class="relative flex-1 min-h-[260px]">
+                                    <canvas id="gadChart"></canvas>
+                                    <div id="gadEmptyState" class="empty-state-host absolute inset-0"></div>
+                                    <div id="gadLoadingState" class="chart-loading hidden absolute inset-0"><i
+                                            class="fa-solid fa-spinner"></i></div>
+                                </div>
                             </div>
+                        </div>
+
+                        <div class="card lg:col-span-1">
+                            <div class="card-header">
+                                <div class="card-header-left">
+                                    <span class="card-header-icon">
+                                        <i class="fa-solid fa-chart-line"></i>
+                                    </span>
+
+                                    <div>
+                                        <h3 class="card-title">Weekly Cases</h3>
+                                        <p class="card-subtitle">
+                                            Weekly treatment and appointment activity
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="card-header-right w-48 max-w-full">
+                                    <select id="weeklyPeriodSelect" class="js-custom-select"
+                                        data-placeholder="Select period">
+
+                                        @foreach ($cleanPeriods as $opt)
+                                        <option value="{{ $opt }}">
+                                            {{ $opt }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="weeklyChartWrap" class="relative flex-1 min-h-[260px]">
+                                    <canvas id="weeklyDentalCasesChart"></canvas>
+                                    <div id="weeklyEmptyState" class="empty-state-host absolute inset-0"></div>
+                                    <div id="weeklyLoadingState" class="chart-loading hidden absolute inset-0"><i
+                                            class="fa-solid fa-spinner"></i></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="chart-title">
+                                    <i class="fa-solid fa-user-group"></i>
+                                    Returning vs New Patients
+                                </span>
+                            </div>
+
+                            <div class="card-body">
+                                <div class="relative h-[280px]">
+                                    @if (($returningPatients ?? 0) > 0 || ($newPatients ?? 0) > 0)
+                                    <canvas id="patientSegmentChart"></canvas>
+                                    @else
+                                    <div id="patientSegmentEmptyState" class="empty-state-host"></div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
-                    @endforeach
-                    @endif
+                    <div class="analytics-secondary-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <span class="chart-title">
+                                        <i class="fa-solid fa-star"></i>
+                                        Top Dental Services
+                                    </span>
+                                </div>
+                                <span class="metric-chip">Top this month</span>
+                            </div>
 
-                    @if ($lowStockSupplies->count() > 0)
-                    @foreach ($lowStockSupplies as $item)
-                    @php
-                    $remaining = $item->qty - $item->used;
-                    $pct = $item->qty > 0 ? round(($remaining / $item->qty) * 100) : 0;
-                    $barClass = $pct <= 15 ? 'bg-red-500' : 'bg-orange-400' ; @endphp <div class="stock-row">
-                        <div class="stock-name">
-                            <span class="truncate pr-2">{{ $item->name }}</span>
-                            <span class="text-red-600 font-bold text-[10px] whitespace-nowrap">{{ $remaining }}
-                                left</span>
+                            <div class="card-body">
+                                @if ($topServices->count() > 0)
+                                <div class="service-list">
+                                    @foreach ($topServices->take(5)->values() as $index => $service)
+                                    <div class="service-row">
+                                        <div class="service-meta">
+                                            <div class="service-rank">{{ $index + 1 }}</div>
+                                            <div class="service-name">
+                                                {{ $service->name ?? ($service['name'] ?? 'Service') }}
+                                            </div>
+                                        </div>
+                                        <div class="service-count">
+                                            {{ $service->total ?? ($service['total'] ?? 0) }} cases
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                                @else
+                                <div id="topServicesEmptyState" class="empty-state-host"></div>
+                                @endif
+                            </div>
                         </div>
-                        <div class="stock-bar-bg">
-                            <div class="stock-bar-fill {{ $barClass }}" style="width:{{ $pct }}%"></div>
-                        </div>
-                </div>
-                @endforeach
-                @endif
-            </div>
-        </div>
-        @else
-        @php
-        $hasAnyInventoryData = $medicineItems->count() > 0 || $suppliesItems->count() > 0;
-        @endphp
 
-        @if ($hasAnyInventoryData)
-        <div class="flex flex-col items-center justify-center h-[160px] text-center">
-            <div class="stock-good-icon">
-                <i class="fa-solid fa-check"></i>
-            </div>
-            <p class="text-sm font-bold text-gray-700">Stock levels are good</p>
-            <p class="text-xs text-gray-500 mt-1">No items require immediate restocking.</p>
-        </div>
-        @else
-        <div id="inventoryRecordsEmptyState" class="empty-state-host"></div>
-        @endif
-        @endif
-    </div>
+                        <section class="card quick-actions-card">
+                            <div class="card-header">
+                                <div class="card-header-left">
+                                    <span class="card-header-icon">
+                                        <i class="fa-solid fa-bolt"></i>
+                                    </span>
+
+                                    <div>
+                                        <h2 class="card-title">Quick Reports</h2>
+                                        <p class="card-subtitle">
+                                            Frequently used report shortcuts
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="quick-actions-list">
+                                <a href="{{ route('dentist.dentist.report.dental-services') }}"
+                                    class="quick-action quick-action-card">
+                                    <span class="quick-action-icon">
+                                        <i class="fa-solid fa-tooth"></i>
+                                    </span>
+
+                                    <span class="quick-action-copy">
+                                        <span class="quick-action-title">Dental Services</span>
+                                        <span class="quick-action-sub">View and export full service logs</span>
+                                    </span>
+
+                                    <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
+                                    <i class="fa-solid fa-tooth quick-action-bg-icon"></i>
+                                </a>
+
+                                <a href="{{ route('dentist.dentist.report.daily-treatment') }}"
+                                    class="quick-action quick-action-card">
+                                    <span class="quick-action-icon">
+                                        <i class="fa-solid fa-notes-medical"></i>
+                                    </span>
+
+                                    <span class="quick-action-copy">
+                                        <span class="quick-action-title">Daily Treatment Record</span>
+                                        <span class="quick-action-sub">Track daily patient treatments</span>
+                                    </span>
+
+                                    <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
+                                    <i class="fa-solid fa-notes-medical quick-action-bg-icon"></i>
+                                </a>
+                            </div>
+                        </section>
+                    </div>
+
+                    <section class="card printable-forms-card mb-8">
+                        <div class="card-header">
+                            <div class="card-header-left">
+                                <span class="card-header-icon">
+                                    <i class="fa-solid fa-file-signature"></i>
+                                </span>
+
+                                <div>
+                                    <h2 class="card-title">Printable Forms</h2>
+                                    <p class="card-subtitle">
+                                        Clinic forms and certificates available for printing
+                                    </p>
+                                </div>
+                            </div>
+
+                            <span class="metric-chip">
+                                {{ $documentTemplates->count() }}
+                                active {{ Str::plural('template', $documentTemplates->count()) }}
+                            </span>
+                        </div>
+
+                        <div class="card-body">
+                            @if ($documentTemplates->count())
+                            <div class="printable-template-grid">
+                                @foreach ($documentTemplates as $template)
+                                <article class="printable-template-item">
+                                    <div class="printable-template-main">
+                                        <span class="printable-template-icon">
+                                            <i class="fa-solid fa-file-medical"></i>
+                                        </span>
+
+                                        <div class="printable-template-copy">
+                                            <h3 class="printable-template-title">
+                                                {{ $template->name }}
+                                            </h3>
+
+                                            <p class="printable-template-code">
+                                                {{ $template->code ?: 'Template Code N/A' }}
+                                            </p>
+
+                                            <div class="printable-template-meta">
+                                                <span class="status-pill s-active">
+                                                    {{ Str::headline($template->document_type) }}
+                                                </span>
+
+                                                <span class="status-pill s-neutral">
+                                                    {{ $template->category ?: 'General' }}
+                                                </span>
+
+                                                <span class="status-pill s-ongoing">
+                                                    {{ $template->paper_size ?: 'A4' }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <a href="{{ route('dentist.dentist.report.templates.print', $template->id) }}"
+                                        target="_blank" rel="noopener" class="ui-btn ui-btn-primary ui-btn-sm">
+                                        <i class="fa-solid fa-print"></i>
+                                        Print
+                                    </a>
+                                </article>
+                                @endforeach
+                            </div>
+                            @else
+                            <div id="printableFormsEmptyState" class="empty-state-host"></div>
+                            @endif
+                        </div>
+                    </section>
+
+                    <div class="card report-inventory-shell mb-8">
+                        <div class="card-header">
+                            <span class="chart-title text-base"><i class="fa-solid fa-boxes-stacked"></i> Inventory
+                                Analytics</span>
+                            <a href="{{ route('dentist.dentist.inventory') }}"
+                                class="ui-btn ui-btn-secondary ui-btn-sm">
+                                <i class="fa-solid fa-boxes-stacked"></i>
+                                Manage Inventory
+                            </a>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="report-inventory-grid grid grid-cols-1 md:grid-cols-3 gap-8">
+
+                                <div class="col-span-1 inventory-chart-panel">
+                                    <h3
+                                        class="text-center text-[11px] font-bold text-gray-500 mb-4 uppercase tracking-wider">
+                                        Medicine
+                                        Stock</h3>
+                                    <div class="relative h-[220px] w-full">
+                                        @if ($medicineItems->count() > 0)
+                                        <canvas id="medicinePieChart"></canvas>
+                                        @else
+                                        <div id="medicineInventoryEmptyState" class="empty-state-host"></div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="col-span-1 report-inventory-panel">
+                                    <h3
+                                        class="text-center text-[11px] font-bold text-gray-500 mb-4 uppercase tracking-wider">
+                                        Medical
+                                        Supplies</h3>
+                                    <div class="relative h-[220px] w-full">
+                                        @if ($suppliesItems->count() > 0)
+                                        <canvas id="suppliesPieChart"></canvas>
+                                        @else
+                                        <div id="medicalSuppliesEmptyState" class="empty-state-host"></div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="col-span-1 bg-gray-50 rounded-xl p-5 low-stock-alert-card">
+                                    <div class="low-stock-alert-header flex items-center gap-2 mb-4">
+                                        <span class="low-stock-title-icon">
+                                            <i class="fa-solid fa-triangle-exclamation"></i>
+                                        </span>
+                                        <span class="text-sm font-bold text-gray-800">Low Stock Alerts</span>
+                                    </div>
+
+                                    @if ($lowStockMedicine->count() > 0 || $lowStockSupplies->count() > 0)
+                                    <div class="overflow-y-auto max-h-[190px] pr-2 scroll-smooth">
+
+                                        @if ($lowStockMedicine->count() > 0)
+                                        @foreach ($lowStockMedicine as $item)
+                                        @php
+                                        $remaining = $item->qty - $item->used;
+                                        $pct = $item->qty > 0 ? round(($remaining / $item->qty) * 100) : 0;
+                                        $barClass = $pct <= 15 ? 'bg-red-500' : 'bg-orange-400' ; @endphp <div
+                                            class="stock-row">
+                                            <div class="stock-name">
+                                                <span class="truncate pr-2">{{ $item->name }}</span>
+                                                <span class="text-red-600 font-bold text-[10px] whitespace-nowrap">{{
+                                                    $remaining }}
+                                                    left</span>
+                                            </div>
+                                            <div class="stock-bar-bg">
+                                                <div class="stock-bar-fill {{ $barClass }}" style="width:{{ $pct }}%">
+                                                </div>
+                                            </div>
+                                    </div>
+                                    @endforeach
+                                    @endif
+
+                                    @if ($lowStockSupplies->count() > 0)
+                                    @foreach ($lowStockSupplies as $item)
+                                    @php
+                                    $remaining = $item->qty - $item->used;
+                                    $pct = $item->qty > 0 ? round(($remaining / $item->qty) * 100) : 0;
+                                    $barClass = $pct <= 15 ? 'bg-red-500' : 'bg-orange-400' ; @endphp <div
+                                        class="stock-row">
+                                        <div class="stock-name">
+                                            <span class="truncate pr-2">{{ $item->name }}</span>
+                                            <span class="text-red-600 font-bold text-[10px] whitespace-nowrap">{{
+                                                $remaining }}
+                                                left</span>
+                                        </div>
+                                        <div class="stock-bar-bg">
+                                            <div class="stock-bar-fill {{ $barClass }}" style="width:{{ $pct }}%"></div>
+                                        </div>
+                                </div>
+                                @endforeach
+                                @endif
+                            </div>
+                        </div>
+                        @else
+                        @php
+                        $hasAnyInventoryData = $medicineItems->count() > 0 || $suppliesItems->count() > 0;
+                        @endphp
+
+                        @if ($hasAnyInventoryData)
+                        <div class="flex flex-col items-center justify-center h-[160px] text-center">
+                            <div class="stock-good-icon">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <p class="text-sm font-bold text-gray-700">Stock levels are good</p>
+                            <p class="text-xs text-gray-500 mt-1">No items require immediate restocking.</p>
+                        </div>
+                        @else
+                        <div id="inventoryRecordsEmptyState" class="empty-state-host"></div>
+                        @endif
+                        @endif
+                    </div>
     </div>
 
     @endif

@@ -188,71 +188,6 @@ hr.section-divider {
     margin-top: 1rem;
 }
 
-.inventory-kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: .85rem;
-    padding: 1rem 1.25rem 0;
-}
-
-.inventory-kpi-card {
-    --kpi-accent: var(--brand-red, #8B0000);
-    --kpi-soft: rgba(139, 0, 0, .08);
-    min-width: 0;
-    padding: .95rem 1rem;
-    border-radius: 16px;
-    background:
-        radial-gradient(circle at top right, color-mix(in srgb, var(--kpi-accent) 12%, transparent), transparent 42%),
-        #FFFFFF;
-    border: 1px solid color-mix(in srgb, var(--kpi-accent) 18%, #E5E7EB);
-    box-shadow: 0 8px 20px rgba(15, 23, 42, .045);
-}
-
-.inventory-kpi-card.kpi-used {
-    --kpi-accent: #2563EB;
-}
-
-.inventory-kpi-card.kpi-stock {
-    --kpi-accent: #16A34A;
-}
-
-.inventory-kpi-card.kpi-critical {
-    --kpi-accent: #DC2626;
-}
-
-.inventory-kpi-card.kpi-reorder {
-    --kpi-accent: #D97706;
-}
-
-.inventory-kpi-label {
-    display: block;
-    margin-bottom: .5rem;
-    color: var(--um-muted, #6B7280);
-    font-size: .86rem !important;
-    font-weight: 900;
-    letter-spacing: .07em;
-    line-height: 1.15;
-    text-transform: uppercase;
-}
-
-.inventory-kpi-card strong {
-    display: block;
-    color: var(--kpi-accent);
-    font-size: 1.55rem;
-    font-weight: 950;
-    line-height: .95;
-    letter-spacing: -.04em;
-}
-
-.inventory-kpi-card small {
-    display: block;
-    margin-top: .42rem;
-    color: var(--um-muted, #6B7280);
-    font-size: .72rem;
-    font-weight: 650;
-    line-height: 1.25;
-}
-
 .forecast-note {
     display: flex;
     align-items: flex-start;
@@ -321,44 +256,6 @@ hr.section-divider {
     color: #B45309 !important;
 }
 
-[data-theme="dark"] .inventory-kpi-card,
-.dark .inventory-kpi-card {
-    background:
-        radial-gradient(circle at top right, color-mix(in srgb, var(--kpi-accent) 20%, transparent), transparent 44%),
-        rgba(13, 17, 23, .70) !important;
-    border-color: color-mix(in srgb, var(--kpi-accent) 34%, rgba(255, 255, 255, .10)) !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .06),
-        0 12px 28px rgba(0, 0, 0, .32) !important;
-}
-
-[data-theme="dark"] .inventory-kpi-label,
-[data-theme="dark"] .inventory-kpi-card small,
-.dark .inventory-kpi-label,
-.dark .inventory-kpi-card small {
-    color: var(--text-muted, #8B949E) !important;
-}
-
-[data-theme="dark"] .inventory-kpi-card.kpi-used strong,
-.dark .inventory-kpi-card.kpi-used strong {
-    color: #60A5FA !important;
-}
-
-[data-theme="dark"] .inventory-kpi-card.kpi-stock strong,
-.dark .inventory-kpi-card.kpi-stock strong {
-    color: #86EFAC !important;
-}
-
-[data-theme="dark"] .inventory-kpi-card.kpi-critical strong,
-.dark .inventory-kpi-card.kpi-critical strong {
-    color: #FCA5A5 !important;
-}
-
-[data-theme="dark"] .inventory-kpi-card.kpi-reorder strong,
-.dark .inventory-kpi-card.kpi-reorder strong {
-    color: #FCD34D !important;
-}
-
 [data-theme="dark"] .forecast-note,
 .dark .forecast-note {
     color: var(--text-muted, #8B949E) !important;
@@ -411,23 +308,7 @@ hr.section-divider {
     color: #FDBA74 !important;
 }
 
-@media (max-width: 1100px) {
-    .inventory-kpi-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
 @media (max-width: 767px) {
-    .inventory-kpi-grid {
-        grid-template-columns: 1fr;
-        gap: .7rem;
-        padding: .9rem 1rem 0;
-    }
-
-    .inventory-kpi-card {
-        padding: .85rem .9rem;
-        border-radius: 14px;
-    }
 
     .forecast-note {
         margin: .9rem 1rem;
@@ -612,29 +493,6 @@ hr.section-divider {
         font-size: .72rem !important;
     }
 
-    .inventory-kpi-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: .8rem !important;
-        padding: .95rem 1.05rem 0 !important;
-    }
-
-    .inventory-kpi-card {
-        padding: .9rem .95rem !important;
-        border-radius: 15px !important;
-    }
-
-    .inventory-kpi-label {
-        font-size: .72rem !important;
-    }
-
-    .inventory-kpi-card strong {
-        font-size: 1.4rem !important;
-    }
-
-    .inventory-kpi-card small {
-        font-size: .68rem !important;
-    }
-
     .forecast-note {
         margin: .95rem 1.05rem !important;
         padding: .75rem .85rem !important;
@@ -677,10 +535,6 @@ hr.section-divider {
 
     .chart-wrap[style] {
         height: 235px !important;
-    }
-
-    .inventory-kpi-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     }
 }
 
@@ -1112,146 +966,6 @@ hr.section-divider {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, .8);
 }
 
-#mainContent.dentist-report-page .report-kpi-grid {
-    display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 14px !important;
-    margin-bottom: 1.65rem !important;
-}
-
-#mainContent.dentist-report-page .kpi-card {
-    position: relative !important;
-    isolation: isolate !important;
-    overflow: hidden !important;
-
-    min-height: 92px !important;
-    height: auto !important;
-    padding: 14px 16px !important;
-    border-radius: 18px !important;
-
-    display: flex !important;
-    align-items: center !important;
-    gap: 13px !important;
-
-    text-decoration: none !important;
-    background: linear-gradient(145deg, #ffffff 0%, #fffafa 100%) !important;
-    border: 1px solid rgba(139, 0, 0, 0.12) !important;
-    box-shadow:
-        0 10px 26px rgba(15, 23, 42, 0.045),
-        inset 0 1px 0 rgba(255, 255, 255, 0.78) !important;
-
-    transition:
-        transform 0.18s ease,
-        box-shadow 0.18s ease,
-        border-color 0.18s ease,
-        background 0.18s ease !important;
-}
-
-#mainContent.dentist-report-page .kpi-card::before {
-    content: "" !important;
-    position: absolute !important;
-    inset: 0 auto 0 0 !important;
-    width: 4px !important;
-    border-radius: 999px !important;
-    opacity: 1 !important;
-    background: #8B0000 !important;
-}
-
-#mainContent.dentist-report-page .kpi-card:hover {
-    transform: translateY(-2px) !important;
-    box-shadow:
-        0 14px 30px rgba(139, 0, 0, 0.10),
-        inset 0 1px 0 rgba(255, 255, 255, 0.86) !important;
-}
-
-#mainContent.dentist-report-page .kpi-icon {
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
-    border-radius: 15px !important;
-
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    font-size: 1rem !important;
-    color: currentColor !important;
-    border: 1px solid transparent !important;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.72),
-        0 10px 22px rgba(15, 23, 42, 0.05) !important;
-}
-
-#mainContent.dentist-report-page .kpi-icon i {
-    color: currentColor !important;
-    font-size: 1rem !important;
-    line-height: 1 !important;
-    filter: none !important;
-}
-
-#mainContent.dentist-report-page .kpi-value {
-    font-size: 1.55rem !important;
-    font-weight: 950 !important;
-    line-height: 1 !important;
-    letter-spacing: -0.045em !important;
-    color: #111827 !important;
-    margin: 0 0 5px !important;
-}
-
-#mainContent.dentist-report-page .kpi-label {
-    font-size: 0.66rem !important;
-    font-weight: 900 !important;
-    line-height: 1.25 !important;
-    color: #6B7280 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.075em !important;
-}
-
-#mainContent.dentist-report-page .kpi-delta {
-    margin-top: 5px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 5px !important;
-    font-size: 0.70rem !important;
-    font-weight: 800 !important;
-    line-height: 1.15 !important;
-}
-
-#mainContent.dentist-report-page .kpi-delta.up {
-    color: #16A34A !important;
-}
-
-#mainContent.dentist-report-page .kpi-delta.down {
-    color: #DC2626 !important;
-}
-
-#mainContent.dentist-report-page .kpi-delta.neutral,
-#mainContent.dentist-report-page .kpi-delta.text-gray-400 {
-    color: #9CA3AF !important;
-    font-weight: 750 !important;
-}
-
-#mainContent.dentist-report-page .kpi-arrow {
-    margin-left: auto !important;
-    width: 30px !important;
-    height: 30px !important;
-    min-width: 30px !important;
-    border-radius: 999px !important;
-
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    background: rgba(139, 0, 0, 0.055) !important;
-    color: #CBD5E1 !important;
-    font-size: 0.78rem !important;
-    transition: all 0.18s ease !important;
-}
-
-#mainContent.dentist-report-page .kpi-card:hover .kpi-arrow {
-    transform: translateX(2px) !important;
-}
-
 .chart-title,
 .chart-title i {
     color: #8B0000;
@@ -1388,12 +1102,6 @@ hr.section-divider {
     white-space: nowrap;
 }
 
-.kpi-grid-layout {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 18px;
-}
-
 .report-date-range-section {
     display: flex;
     flex-direction: column;
@@ -1517,48 +1225,13 @@ hr.section-divider {
     gap: 10px;
 }
 
-[data-theme="dark"] #mainContent .kpi-card,
-.dark #mainContent .kpi-card {
-    background:
-        radial-gradient(circle at top left, rgba(139, 0, 0, 0.18), transparent 36%),
-        linear-gradient(145deg, rgba(13, 17, 23, 0.78), rgba(22, 27, 34, 0.66)) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-    box-shadow:
-        0 18px 38px rgba(0, 0, 0, 0.35),
-        inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
-    color: #F8FAFC !important;
-}
-
-[data-theme="dark"] #mainContent .kpi-card:hover,
-.dark #mainContent .kpi-card:hover {
-    background:
-        radial-gradient(circle at top left, rgba(139, 0, 0, 0.24), transparent 34%),
-        linear-gradient(145deg, rgba(13, 17, 23, 0.88), rgba(22, 27, 34, 0.78)) !important;
-    border-color: rgba(252, 165, 165, 0.22) !important;
-}
-
-[data-theme="dark"] #mainContent .kpi-value,
 [data-theme="dark"] #mainContent .chart-title,
 [data-theme="dark"] #mainContent .service-name,
 [data-theme="dark"] #mainContent .stock-name,
-[data-theme="dark"] #mainContent .text-gray-800,
-[data-theme="dark"] #mainContent .text-gray-700,
-.dark #mainContent .kpi-value,
 .dark #mainContent .chart-title,
 .dark #mainContent .service-name,
-.dark #mainContent .stock-name,
-.dark #mainContent .text-gray-800,
-.dark #mainContent .text-gray-700 {
+.dark #mainContent .stock-name {
     color: #F8FAFC !important;
-}
-
-[data-theme="dark"] #mainContent .kpi-label,
-[data-theme="dark"] #mainContent .text-gray-500,
-[data-theme="dark"] #mainContent .text-gray-400,
-.dark #mainContent .kpi-label,
-.dark #mainContent .text-gray-500,
-.dark #mainContent .text-gray-400 {
-    color: #C9D1D9 !important;
 }
 
 [data-theme="dark"] #mainContent .analytics-section-label,
@@ -1578,25 +1251,10 @@ hr.section-divider {
 
 [data-theme="dark"] #mainContent .service-row,
 [data-theme="dark"] #mainContent .stock-bar-bg,
-[data-theme="dark"] #mainContent .bg-gray-50,
 .dark #mainContent .service-row,
-.dark #mainContent .stock-bar-bg,
-.dark #mainContent .bg-gray-50 {
+.dark #mainContent .stock-bar-bg {
     background: rgba(13, 17, 23, 0.72) !important;
     border-color: rgba(255, 255, 255, 0.10) !important;
-}
-
-[data-theme="dark"] #mainContent .kpi-arrow,
-.dark #mainContent .kpi-arrow {
-    background: rgba(139, 0, 0, 0.18) !important;
-    color: #FCA5A5 !important;
-    border: 1px solid rgba(252, 165, 165, 0.18) !important;
-}
-
-[data-theme="dark"] #mainContent .kpi-card:hover .kpi-arrow,
-.dark #mainContent .kpi-card:hover .kpi-arrow {
-    background: #8B0000 !important;
-    color: #FFFFFF !important;
 }
 
 [data-theme="dark"] #mainContent .summary-tag,
@@ -1620,16 +1278,6 @@ hr.section-divider {
     margin-top: 12px !important;
 }
 
-#mainContent .kpi-card {
-    background:
-        radial-gradient(circle at top left, rgba(139, 0, 0, 0.06), transparent 35%),
-        linear-gradient(145deg, #FFFFFF, #FFFDFD) !important;
-    border-color: rgba(139, 0, 0, 0.12) !important;
-    box-shadow:
-        0 14px 34px rgba(15, 23, 42, 0.055),
-        inset 0 1px 0 rgba(255, 255, 255, 0.78) !important;
-}
-
 #mainContent .chart-loading {
     background: transparent !important;
     border-radius: 16px !important;
@@ -1640,27 +1288,11 @@ hr.section-divider {
     color: #111827 !important;
 }
 
-#mainContent .kpi-label {
-    color: #6B7280 !important;
-}
-
 #mainContent .service-row {
     background:
         radial-gradient(circle at top left, rgba(139, 0, 0, 0.04), transparent 42%),
         #FFFFFF !important;
     border-color: rgba(139, 0, 0, 0.10) !important;
-}
-
-[data-theme="dark"] #mainContent .kpi-card,
-.dark #mainContent .kpi-card {
-    background:
-        radial-gradient(circle at top left, rgba(139, 0, 0, 0.18), transparent 36%),
-        linear-gradient(145deg, rgba(13, 17, 23, 0.82), rgba(22, 27, 34, 0.70)) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-    box-shadow:
-        0 18px 38px rgba(0, 0, 0, 0.35),
-        inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
-    color: #F8FAFC !important;
 }
 
 [data-theme="dark"] #mainContent .chart-loading,
@@ -1859,50 +1491,6 @@ hr.section-divider {
         margin-bottom: 22px !important;
     }
 
-    #mainContent.dentist-page-shell .kpi-grid-layout {
-        display: grid !important;
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: 10px !important;
-        margin-bottom: 22px !important;
-    }
-
-    #mainContent.dentist-page-shell .kpi-card {
-        min-height: 112px !important;
-        padding: 12px !important;
-        border-radius: 16px !important;
-        gap: 9px !important;
-        align-items: flex-start !important;
-    }
-
-    #mainContent.dentist-page-shell .kpi-icon {
-        width: 38px !important;
-        height: 38px !important;
-        min-width: 38px !important;
-        border-radius: 12px !important;
-        font-size: 0.9rem !important;
-    }
-
-    #mainContent.dentist-page-shell .kpi-value {
-        font-size: 1.55rem !important;
-        margin-bottom: 4px !important;
-    }
-
-    #mainContent.dentist-page-shell .kpi-label {
-        font-size: 0.55rem !important;
-        line-height: 1.15 !important;
-        letter-spacing: .055em !important;
-    }
-
-    #mainContent.dentist-page-shell .kpi-delta {
-        font-size: 0.58rem !important;
-        line-height: 1.15 !important;
-        margin-top: 5px !important;
-    }
-
-    #mainContent.dentist-page-shell .kpi-arrow {
-        display: none !important;
-    }
-
     #mainContent.dentist-page-shell .chart-title {
         font-size: 0.86rem !important;
         line-height: 1.25 !important;
@@ -2090,11 +1678,6 @@ hr.section-divider {
         flex-shrink: 0 !important;
     }
 
-    #mainContent.dentist-page-shell .kpi-grid-layout {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: 16px !important;
-    }
-
     #mainContent.dentist-page-shell .analytics-main-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
         gap: 18px !important;
@@ -2138,11 +1721,6 @@ hr.section-divider {
         font-size: 2rem !important;
     }
 
-    #mainContent.dentist-page-shell .kpi-grid-layout {
-        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-        gap: 18px !important;
-    }
-
     #mainContent.dentist-page-shell .analytics-main-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
         gap: 18px !important;
@@ -2151,10 +1729,6 @@ hr.section-divider {
     #mainContent.dentist-page-shell .analytics-secondary-grid {
         grid-template-columns: 1.35fr .9fr !important;
         gap: 18px !important;
-    }
-
-    #mainContent.dentist-page-shell .kpi-card {
-        min-height: 118px !important;
     }
 }
 
@@ -2194,23 +1768,6 @@ hr.section-divider {
         width: 100% !important;
         min-width: 0 !important;
     }
-}
-
-#mainContent.dentist-page-shell .cancellation-rate-icon {
-    background: #FFF1F2 !important;
-    color: #E11D48 !important;
-    border: 1px solid #FFE4E6 !important;
-}
-
-#mainContent.dentist-page-shell .cancellation-rate-icon i {
-    color: currentColor !important;
-}
-
-[data-theme="dark"] #mainContent.dentist-page-shell .cancellation-rate-icon,
-.dark #mainContent.dentist-page-shell .cancellation-rate-icon {
-    background: rgba(225, 29, 72, 0.18) !important;
-    color: #FDA4AF !important;
-    border-color: rgba(253, 164, 175, 0.24) !important;
 }
 
 #mainContent.dentist-page-shell .printable-forms-card,
@@ -2336,164 +1893,6 @@ hr.section-divider {
     #mainContent.dentist-page-shell .low-stock-alert-card {
         grid-column: auto !important;
     }
-}
-
-#mainContent.dentist-report-page .kpi-card-patients::before {
-    background: linear-gradient(180deg, #8B0000, #DC2626) !important;
-}
-
-#mainContent.dentist-report-page .kpi-icon-patients {
-    background: #FEF2F2 !important;
-    color: #8B0000 !important;
-    border-color: #FECACA !important;
-}
-
-#mainContent.dentist-report-page .kpi-card-patients:hover .kpi-icon-patients {
-    background: #8B0000 !important;
-    color: #FFFFFF !important;
-}
-
-#mainContent.dentist-report-page .kpi-card-appointments::before {
-    background: linear-gradient(180deg, #F59E0B, #D97706) !important;
-}
-
-#mainContent.dentist-report-page .kpi-icon-appointments {
-    background: #FFFBEB !important;
-    color: #D97706 !important;
-    border-color: #FDE68A !important;
-}
-
-#mainContent.dentist-report-page .kpi-card-appointments:hover .kpi-icon-appointments {
-    background: #D97706 !important;
-    color: #FFFFFF !important;
-}
-
-#mainContent.dentist-report-page .kpi-card-cancellation::before {
-    background: linear-gradient(180deg, #E11D48, #BE123C) !important;
-}
-
-#mainContent.dentist-report-page .kpi-icon-cancellation,
-#mainContent.dentist-report-page .cancellation-rate-icon {
-    background: #FFF1F2 !important;
-    color: #E11D48 !important;
-    border-color: #FFE4E6 !important;
-}
-
-#mainContent.dentist-report-page .kpi-card-cancellation:hover .kpi-icon-cancellation,
-#mainContent.dentist-report-page .kpi-card-cancellation:hover .cancellation-rate-icon {
-    background: #E11D48 !important;
-    color: #FFFFFF !important;
-}
-
-#mainContent.dentist-report-page .kpi-card-low-stock::before {
-    background: linear-gradient(180deg, #EA580C, #DC2626) !important;
-}
-
-#mainContent.dentist-report-page .kpi-icon-low-stock {
-    background: #FFF7ED !important;
-    color: #C2410C !important;
-    border-color: #FED7AA !important;
-}
-
-#mainContent.dentist-report-page .kpi-card-low-stock:hover .kpi-icon-low-stock {
-    background: #C2410C !important;
-    color: #FFFFFF !important;
-}
-
-#mainContent.dentist-report-page .kpi-value-low-stock {
-    color: #991B1B !important;
-}
-
-#mainContent.dentist-report-page .kpi-label-low-stock {
-    color: #991B1B !important;
-}
-
-[data-theme="dark"] #mainContent.dentist-report-page .kpi-card,
-.dark #mainContent.dentist-report-page .kpi-card {
-    background:
-        radial-gradient(circle at top right, rgba(139, 0, 0, 0.12), transparent 40%),
-        linear-gradient(145deg, rgba(13, 17, 23, 0.90), rgba(22, 27, 34, 0.76)) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-    box-shadow:
-        0 14px 30px rgba(0, 0, 0, 0.34),
-        inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
-}
-
-[data-theme="dark"] #mainContent.dentist-report-page .kpi-card:hover,
-.dark #mainContent.dentist-report-page .kpi-card:hover {
-    border-color: rgba(252, 165, 165, 0.22) !important;
-    background:
-        radial-gradient(circle at top right, rgba(139, 0, 0, 0.20), transparent 42%),
-        linear-gradient(145deg, rgba(13, 17, 23, 0.96), rgba(22, 27, 34, 0.86)) !important;
-}
-
-[data-theme="dark"] #mainContent.dentist-report-page .kpi-value,
-.dark #mainContent.dentist-report-page .kpi-value {
-    color: #F8FAFC !important;
-}
-
-[data-theme="dark"] #mainContent.dentist-report-page .kpi-label,
-.dark #mainContent.dentist-report-page .kpi-label {
-    color: #CBD5E1 !important;
-}
-
-[data-theme="dark"] #mainContent.dentist-report-page .kpi-delta.neutral,
-[data-theme="dark"] #mainContent.dentist-report-page .kpi-delta.text-gray-400,
-.dark #mainContent.dentist-report-page .kpi-delta.neutral,
-.dark #mainContent.dentist-report-page .kpi-delta.text-gray-400 {
-    color: #94A3B8 !important;
-}
-
-[data-theme="dark"] #mainContent.dentist-report-page .kpi-icon-patients,
-.dark #mainContent.dentist-report-page .kpi-icon-patients {
-    background: rgba(139, 0, 0, 0.24) !important;
-    color: #FCA5A5 !important;
-    border-color: rgba(252, 165, 165, 0.24) !important;
-}
-
-[data-theme="dark"] #mainContent.dentist-report-page .kpi-icon-appointments,
-.dark #mainContent.dentist-report-page .kpi-icon-appointments {
-    background: rgba(245, 158, 11, 0.18) !important;
-    color: #FCD34D !important;
-    border-color: rgba(252, 211, 77, 0.24) !important;
-}
-
-[data-theme="dark"] #mainContent.dentist-report-page .kpi-icon-cancellation,
-[data-theme="dark"] #mainContent.dentist-report-page .cancellation-rate-icon,
-.dark #mainContent.dentist-report-page .kpi-icon-cancellation,
-.dark #mainContent.dentist-report-page .cancellation-rate-icon {
-    background: rgba(225, 29, 72, 0.18) !important;
-    color: #FDA4AF !important;
-    border-color: rgba(253, 164, 175, 0.24) !important;
-}
-
-[data-theme="dark"] #mainContent.dentist-report-page .kpi-icon-low-stock,
-.dark #mainContent.dentist-report-page .kpi-icon-low-stock {
-    background: rgba(249, 115, 22, 0.18) !important;
-    color: #FDBA74 !important;
-    border-color: rgba(253, 186, 116, 0.26) !important;
-}
-
-[data-theme="dark"] #mainContent.dentist-report-page .kpi-value-low-stock,
-.dark #mainContent.dentist-report-page .kpi-value-low-stock {
-    color: #FB923C !important;
-}
-
-[data-theme="dark"] #mainContent.dentist-report-page .kpi-label-low-stock,
-.dark #mainContent.dentist-report-page .kpi-label-low-stock {
-    color: #FED7AA !important;
-}
-
-[data-theme="dark"] #mainContent.dentist-report-page .kpi-card:hover .kpi-icon,
-.dark #mainContent.dentist-report-page .kpi-card:hover .kpi-icon {
-    color: #FFFFFF !important;
-}
-
-[data-theme="dark"] #mainContent.dentist-report-page .kpi-arrow,
-.dark #mainContent.dentist-report-page .kpi-arrow {
-    background: rgba(255, 255, 255, 0.06) !important;
-    color: #64748B !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 #createReportModal {

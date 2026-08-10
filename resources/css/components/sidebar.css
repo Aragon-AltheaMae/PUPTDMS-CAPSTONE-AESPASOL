@@ -872,11 +872,15 @@ body.sidebar-collapsed #sidebar.sidebar-admin .group-trigger:not(.active-group):
 
 [data-theme="dark"] .drawer-logout-btn,
 .dark .drawer-logout-btn {
-    background: linear-gradient(135deg,
+    background:
+        linear-gradient(135deg,
             rgba(127, 29, 29, .20),
-            rgba(15, 23, 42, .78));
+            color-mix(in srgb,
+                var(--card) 88%,
+                var(--crimson) 12%));
+
     border-color: rgba(248, 113, 113, .20);
-    color: #fca5a5;
+    color: #FCA5A5;
 }
 
 [data-theme="dark"] .drawer-logout-btn i,
@@ -903,8 +907,8 @@ body.sidebar-collapsed #sidebar.sidebar-admin .group-trigger:not(.active-group):
 
 [data-theme="dark"] #sidebar,
 .dark #sidebar {
-    background: var(--sidebar-bg, #0d0f12);
-    border-color: var(--sidebar-border, #21262d);
+    background: var(--sidebar-bg);
+    border-color: var(--sidebar-border);
     box-shadow: 4px 0 24px rgba(0, 0, 0, .22);
 }
 
@@ -960,21 +964,29 @@ body.sidebar-collapsed #sidebar.sidebar-admin .group-trigger:not(.active-group):
 
 [data-theme="dark"] #sidebar .nav-sep,
 .dark #sidebar .nav-sep {
-    background: #21262d !important;
+    background: var(--border) !important;
 }
 
 [data-theme="dark"] #sidebar .sidebar-bottom,
 .dark #sidebar .sidebar-bottom {
-    border-top-color: #21262d !important;
+    border-top-color: var(--border) !important;
 }
 
 [data-theme="dark"] #sidebar .logout-btn,
 .dark #sidebar .logout-btn {
-    background: linear-gradient(135deg,
+    background:
+        linear-gradient(
+            135deg,
             rgba(127, 29, 29, .20),
-            rgba(15, 23, 42, .72));
+            color-mix(
+                in srgb,
+                var(--card) 88%,
+                var(--crimson) 12%
+            )
+        );
+
     border-color: rgba(248, 113, 113, .20);
-    color: #fca5a5;
+    color: #FCA5A5;
 }
 
 [data-theme="dark"] #sidebar .logout-btn:hover,
@@ -1001,13 +1013,13 @@ body.sidebar-collapsed #sidebar.sidebar-admin .group-trigger:not(.active-group):
 
 [data-theme="dark"] #mobileDrawer,
 .dark #mobileDrawer {
-    background: #0d0f12;
+    background: var(--drawer-bg);
 }
 
 [data-theme="dark"] .drawer-user,
 .dark .drawer-user {
-    background: #161b22;
-    border-color: #21262d;
+    background: var(--surface);
+    border-color: var(--border);
 }
 
 [data-theme="dark"] .drawer-user-name,
@@ -1033,14 +1045,14 @@ body.sidebar-collapsed #sidebar.sidebar-admin .group-trigger:not(.active-group):
 
 [data-theme="dark"] .drawer-sep,
 .dark .drawer-sep {
-    background: #21262d !important;
+    background: var(--border) !important;
 }
 
 [data-theme="dark"] .drawer-footer,
 .dark .drawer-footer,
 [data-theme="dark"] .drawer-bottom,
 .dark .drawer-bottom {
-    border-top-color: #21262d !important;
+    border-top-color: var(--border) !important;
 }
 
 [data-theme="dark"] #sidebar.collapsed .nav-link:hover,
@@ -1190,24 +1202,24 @@ body.sidebar-collapsed #sidebar.sidebar-admin .group-trigger:not(.active-group):
 
 [data-theme="dark"] .theme-toggle-container,
 .dark .theme-toggle-container {
-    background: #111827;
-    border-color: #1f2937;
+    background: var(--surface);
+    border-color: var(--border);
 }
 
 [data-theme="dark"] .theme-option,
 .dark .theme-option {
-    color: #94a3b8;
+    color: var(--text-3);
 }
 
 [data-theme="dark"] .theme-option.active,
 .dark .theme-option.active {
-    color: #f8fafc;
+    color: var(--text-1);
 }
 
 [data-theme="dark"] .theme-indicator,
 .dark .theme-indicator {
-    background: #1f2937;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+    background: var(--card);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .30);
 }
 
 #sidebar.sidebar-admin .sidebar-inner {
@@ -1436,8 +1448,8 @@ body.sidebar-collapsed #sidebar.sidebar-admin .group-body .nav-link.active {
 .dark #sidebar.sidebar-admin.collapsed .group-body,
 [data-theme="dark"] body.sidebar-collapsed #sidebar.sidebar-admin .group-body,
 .dark body.sidebar-collapsed #sidebar.sidebar-admin .group-body {
-    background: #0d0f12 !important;
-    border-color: #21262D !important;
+    background: var(--card) !important;
+    border-color: var(--border) !important;
     box-shadow: 0 18px 44px rgba(0, 0, 0, .42);
 }
 
@@ -1583,8 +1595,8 @@ body.sidebar-collapsed #sidebar .sidebar-theme-collapsed {
 
 [data-theme="dark"] .sidebar-theme-popover,
 .dark .sidebar-theme-popover {
-    background: #0d0f12;
-    border-color: #21262D;
+    background: var(--card);
+    border-color: var(--border);
     box-shadow: 0 18px 44px rgba(0, 0, 0, .42);
 }
 

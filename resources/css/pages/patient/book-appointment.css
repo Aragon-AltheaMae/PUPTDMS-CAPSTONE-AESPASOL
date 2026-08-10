@@ -142,10 +142,11 @@ textarea {
 
 [data-theme="dark"] #mainContent #slotGrid .slot-chip:hover:not(:disabled):not(.disabled):not(.selected):not(.bg-\[\#8B0000\]),
 [data-theme="dark"] #mainContent #slotGrid .slot-chip.hover\:bg-\[\#fff5f5\]:hover {
-    background: linear-gradient(145deg, #1f2937, #111827) !important;
-    border-color: rgba(252, 165, 165, 0.35) !important;
-    color: #f9fafb !important;
-    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.35) !important;
+    background: var(--bg-panel) !important;
+    border-color: rgba(255, 247, 247, 0.492) !important;
+    color: var(--text-1) !important;
+    box-shadow:
+        0 14px 28px rgba(0, 0, 0, 0.28) !important;
 }
 
 [data-theme="dark"] #mainContent #slotGrid .slot-chip:hover i {
@@ -380,30 +381,23 @@ textarea {
     }
 }
 
-[data-theme="dark"] #mainContent {
-    background:
-        radial-gradient(circle at top, rgba(139, 0, 0, 0.18), transparent 34%),
-        #020b14 !important;
-    color: #e5e7eb !important;
-}
-
 [data-theme="dark"] #mainContent label,
 [data-theme="dark"] #mainContent .question-text {
     color: #d1d5db !important;
 }
 
-
 [data-theme="dark"] #mainContent .step-counter-pill {
-    background: #0d1117 !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-    color: #cbd5e1 !important;
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+    color: var(--text-2) !important;
 }
 
 [data-theme="dark"] #mainContent .bg-white,
 [data-theme="dark"] #mainContent .booking-step-shell {
-    background: linear-gradient(145deg, #0d1117, #111827) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-    box-shadow: 0 18px 38px rgba(0, 0, 0, 0.38) !important;
+    background: var(--card) !important;
+    border-color: var(--border) !important;
+    box-shadow:
+        0 18px 38px rgba(0, 0, 0, 0.32) !important;
 }
 
 [data-theme="dark"] #mainContent .booking-step-title,
@@ -423,13 +417,13 @@ textarea {
 }
 
 [data-theme="dark"] #slotGrid .slot-chip:not(.selected):not(:disabled) {
-    background: #161b22 !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-    color: #e5e7eb !important;
+    background: var(--card) !important;
+    border-color: var(--border) !important;
+    color: var(--text-1) !important;
 }
 
 [data-theme="dark"] #slotPlaceholder {
-    color: #9ca3af !important;
+    color: var(--text-3) !important;
 }
 
 [data-theme="dark"] #slotPlaceholder>div:first-child {
@@ -549,9 +543,9 @@ body.layout-no-sidebar #siteFooter {
 }
 
 [data-theme="dark"] #slotPlaceholder {
-    background: linear-gradient(145deg, #0d1117, #111827) !important;
+    background: var(--surface) !important;
     border-color: rgba(255, 255, 255, 0.10) !important;
-    color: #9ca3af !important;
+    color: var(--text-3) !important;
 }
 
 [data-theme="dark"] #slotPlaceholder p:first-child {
@@ -615,7 +609,7 @@ body.layout-no-sidebar #siteFooter {
 }
 
 [data-theme="dark"] #mainContent #slotPlaceholder {
-    background: linear-gradient(145deg, #0d1117, #111827) !important;
+    background: var(--surface) !important;
     border: 1px dashed rgba(255, 255, 255, .14) !important;
     color: #94a3b8 !important;
 }
@@ -700,14 +694,14 @@ body.layout-no-sidebar #siteFooter {
 [data-theme="dark"] #mainContent #slotGrid [class*="bg-gray"],
 [data-theme="dark"] #mainContent #slotGrid .animate-pulse,
 [data-theme="dark"] #mainContent #slotGrid .skeleton {
-    background: #161b22 !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-    color: #e5e7eb !important;
+    background: var(--card) !important;
+    border-color: var(--border) !important;
+    color: var(--text-1) !important;
 }
 
 [data-theme="dark"] #mainContent #slotGrid .animate-pulse *,
 [data-theme="dark"] #mainContent #slotGrid .skeleton * {
-    background: #0f1720 !important;
+    background: var(--surface) !important;
 }
 
 #mainContent #dateBanner:not(.hidden) {
@@ -723,80 +717,6 @@ body.layout-no-sidebar #siteFooter {
 [data-theme="dark"] #mainContent .border-\[\#f1e8e3\],
 [data-theme="dark"] #mainContent .border-\[\#e8e2dd\] {
     border-color: rgba(255, 255, 255, 0.10) !important;
-}
-
-[data-theme="dark"] #mainContent .flatpickr-calendar {
-    background: #0d1117 !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    box-shadow: 0 22px 50px rgba(0, 0, 0, 0.55) !important;
-    color: #e5e7eb !important;
-}
-
-[data-theme="dark"] #mainContent .flatpickr-weekdays,
-[data-theme="dark"] #mainContent .flatpickr-days {
-    background: #0d1117 !important;
-}
-
-[data-theme="dark"] #mainContent span.flatpickr-weekday {
-    color: #fca5a5 !important;
-}
-
-[data-theme="dark"] #mainContent .flatpickr-day {
-    color: #d1d5db !important;
-    background: transparent !important;
-}
-
-[data-theme="dark"] #mainContent .flatpickr-day:hover {
-    background: #1f2937 !important;
-    border-color: rgba(252, 165, 165, 0.25) !important;
-    color: #fca5a5 !important;
-}
-
-[data-theme="dark"] #mainContent .flatpickr-day.selected,
-[data-theme="dark"] #mainContent .flatpickr-day.startRange,
-[data-theme="dark"] #mainContent .flatpickr-day.endRange {
-    background: linear-gradient(135deg, #8B0000, #660000) !important;
-    border-color: #fca5a5 !important;
-    color: #ffffff !important;
-}
-
-[data-theme="dark"] #mainContent .flatpickr-day.today {
-    border-color: #c9a84c !important;
-    color: #fcd34d !important;
-}
-
-[data-theme="dark"] #mainContent .flatpickr-day.today:hover {
-    background: rgba(201, 168, 76, 0.14) !important;
-    color: #fde68a !important;
-}
-
-[data-theme="dark"] #mainContent .flatpickr-day.prevMonthDay,
-[data-theme="dark"] #mainContent .flatpickr-day.nextMonthDay {
-    color: #4b5563 !important;
-}
-
-[data-theme="dark"] #mainContent .flatpickr-day.flatpickr-disabled,
-[data-theme="dark"] #mainContent .flatpickr-day.prevMonthDay.flatpickr-disabled,
-[data-theme="dark"] #mainContent .flatpickr-day.nextMonthDay.flatpickr-disabled {
-    color: #374151 !important;
-    background: transparent !important;
-}
-
-[data-theme="dark"] #mainContent .flatpickr-day.flatpickr-future-disabled:hover {
-    background: #111827 !important;
-    border-color: rgba(252, 165, 165, 0.22) !important;
-    color: #fca5a5 !important;
-}
-
-[data-theme="dark"] #mainContent .custom-flatpickr-select {
-    background: rgba(255, 255, 255, 0.10) !important;
-    border-color: rgba(255, 255, 255, 0.16) !important;
-    color: #ffffff !important;
-}
-
-[data-theme="dark"] #mainContent .custom-flatpickr-select option {
-    background: #111827 !important;
-    color: #f9fafb !important;
 }
 
 [data-theme="dark"] #mainContent .medical-condition-grid label,
@@ -834,7 +754,7 @@ body.layout-no-sidebar #siteFooter {
 
 [data-theme="dark"] #mainContent #summaryBox>*,
 [data-theme="dark"] #mainContent .confirm-checkbox-wrap {
-    background: linear-gradient(145deg, #0d1117, #111827) !important;
+    background: var(--surface) !important;
     border-color: rgba(255, 255, 255, .10) !important;
     color: #e5e7eb !important;
 }
@@ -871,7 +791,7 @@ body.layout-no-sidebar #siteFooter {
 [data-theme="dark"] #summaryBox .bg-\[\#fffdfd\],
 [data-theme="dark"] #summaryBox .bg-\[\#fff7f6\],
 [data-theme="dark"] #summaryBox .bg-\[\#f9e8e8\] {
-    background: linear-gradient(145deg, #0d1117, #111827) !important;
+    background: var(--surface) !important;
     border-color: rgba(255, 255, 255, .10) !important;
     color: #e5e7eb !important;
 }
@@ -956,8 +876,8 @@ body.layout-no-sidebar #siteFooter {
 }
 
 [data-theme="dark"] #mainContent .signature-draw-card {
-    background: linear-gradient(145deg, #0d1117, #111827) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
+    background: var(--card) !important;
+    border-color: var(--border) !important;
 }
 
 [data-theme="dark"] #mainContent .signature-draw-title {
@@ -970,7 +890,7 @@ body.layout-no-sidebar #siteFooter {
 }
 
 [data-theme="dark"] #mainContent .signature-pad-help {
-    color: #9ca3af !important;
+    color: var(--text-3) !important;
 }
 
 .signature-methods-grid {
@@ -1090,7 +1010,7 @@ body.layout-no-sidebar #siteFooter {
     #mainContent .book-card>div:last-child {
         padding: 1rem !important;
     }
-    
+
     #mainContent .signature-methods-grid {
         grid-template-columns: 1fr !important;
         gap: 1rem !important;

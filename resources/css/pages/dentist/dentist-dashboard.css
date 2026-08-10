@@ -35,7 +35,6 @@
 
 .inventory-dashboard-table-scroll {
     max-height: 180px;
-    overflow-x: auto;
     overflow-y: auto;
     background: var(--table-surface-soft);
 }
@@ -55,11 +54,6 @@
     position: relative;
     z-index: 1;
     padding-top: .85rem;
-}
-
-.inventory-dashboard-table-scroll {
-    max-height: 180px;
-    overflow-y: auto;
 }
 
 .inventory-dashboard-table {
@@ -126,10 +120,6 @@
 .dashboard-kpi-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     margin-bottom: 1.25rem;
-}
-
-.dashboard-kpi-card {
-    min-height: 132px;
 }
 
 .dashboard-kpi-breakdown,
@@ -319,10 +309,6 @@
     transform: translateY(0);
 }
 
-#dentistCalendarContainer {
-    z-index: 10;
-}
-
 @media (max-width: 1023px) {
     .dashboard-kpi-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -347,15 +333,11 @@
     .dashboard-kpi-grid {
         grid-template-columns: 1fr;
     }
-
-    .dashboard-kpi-card {
-        min-height: 105px;
-    }
 }
 
 [data-theme="dark"] .day-hover-card,
 .dark .day-hover-card {
-    background: var(--bg-panel, #161b22);
+    background: var(--bg-panel);
     border-color: var(--border-dark, rgba(255, 255, 255, .1));
     box-shadow: 0 22px 46px rgba(0, 0, 0, .42);
 }
@@ -594,18 +576,6 @@
 
     .status-btn-wrap {
         flex-shrink: 0;
-    }
-
-    .kpi-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: 0.85rem !important;
-        margin-bottom: 1rem !important;
-    }
-
-    .kpi-card {
-        height: auto !important;
-        min-height: 118px !important;
-        padding: 0.9rem !important;
     }
 
     .row2-grid,
@@ -1288,29 +1258,29 @@
     color: #8B949E;
 }
 
-[data-theme="dark"] #mainContent .kpi-card,
 [data-theme="dark"] #mainContent .upcoming-card,
 [data-theme="dark"] #mainContent .dashboard-side-card,
-[data-theme="dark"] #mainContent .cal-shell,
-[data-theme="dark"] #mainContent .skeleton-shell,
-[data-theme="dark"] #mainContent .bg-white,
 [data-theme="dark"] #mainContent #gadAnalyticsContainer>div,
 [data-theme="dark"] #mainContent #scheduledTodayContainer .card,
-.dark #mainContent .kpi-card,
 .dark #mainContent .upcoming-card,
 .dark #mainContent .dashboard-side-card,
-.dark #mainContent .cal-shell,
-.dark #mainContent .skeleton-shell,
-.dark #mainContent .bg-white,
 .dark #mainContent #gadAnalyticsContainer>div,
 .dark #mainContent #scheduledTodayContainer .card {
     background:
-        radial-gradient(circle at top left, rgba(139, 0, 0, 0.18), transparent 36%),
-        linear-gradient(145deg, rgba(13, 17, 23, 0.78), rgba(22, 27, 34, 0.66)) !important;
-    border: 1px solid var(--border-dark, rgba(255, 255, 255, 0.10)) !important;
-    box-shadow: 0 18px 38px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
-    backdrop-filter: blur(18px) saturate(145%) !important;
-    -webkit-backdrop-filter: blur(18px) saturate(145%) !important;
+        radial-gradient(circle at top left,
+            rgba(139, 0, 0, 0.18),
+            transparent 36%),
+        linear-gradient(145deg,
+            rgba(13, 17, 23, 0.78),
+            rgba(22, 27, 34, 0.66)) !important;
+
+    border:
+        1px solid var(--border-dark,
+            rgba(255, 255, 255, 0.10)) !important;
+
+    box-shadow:
+        0 18px 38px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
 }
 
 [data-theme="dark"] #mainContent .dashboard-side-card-head,
@@ -1321,86 +1291,28 @@
     -webkit-backdrop-filter: blur(14px) !important;
 }
 
-[data-theme="dark"] #mainContent .bg-gradient-to-br,
-[data-theme="dark"] #mainContent .bg-gradient-to-b,
-[data-theme="dark"] #mainContent .bg-gradient-to-r,
-[data-theme="dark"] #mainContent .bg-gray-50,
-[data-theme="dark"] #mainContent .bg-gray-100,
-[data-theme="dark"] #mainContent .bg-red-50,
-[data-theme="dark"] #mainContent .bg-green-50,
-[data-theme="dark"] #mainContent .bg-emerald-50,
-[data-theme="dark"] #mainContent .bg-yellow-50,
-.dark #mainContent .bg-gradient-to-br,
-.dark #mainContent .bg-gradient-to-b,
-.dark #mainContent .bg-gradient-to-r,
-.dark #mainContent .bg-gray-50,
-.dark #mainContent .bg-gray-100,
-.dark #mainContent .bg-red-50,
-.dark #mainContent .bg-green-50,
-.dark #mainContent .bg-emerald-50,
-.dark #mainContent .bg-yellow-50 {
-    background: var(--bg-panel, rgba(22, 27, 34, 0.72)) !important;
-}
-
-[data-theme="dark"] #mainContent .text-gray-900,
-[data-theme="dark"] #mainContent .text-gray-800,
-[data-theme="dark"] #mainContent .text-gray-700,
-[data-theme="dark"] #mainContent h3,
-.dark #mainContent .text-gray-900,
-.dark #mainContent .text-gray-800,
-.dark #mainContent .text-gray-700,
-.dark #mainContent h3 {
-    color: var(--text-primary, #F8FAFC) !important;
-}
-
-[data-theme="dark"] #mainContent .text-gray-600,
-[data-theme="dark"] #mainContent .text-gray-500,
-[data-theme="dark"] #mainContent p,
-.dark #mainContent .text-gray-600,
-.dark #mainContent .text-gray-500,
-.dark #mainContent p {
-    color: var(--text-secondary, #C9D1D9) !important;
-}
-
-[data-theme="dark"] #mainContent .text-gray-400,
-[data-theme="dark"] #mainContent .text-gray-300,
-.dark #mainContent .text-gray-400,
-.dark #mainContent .text-gray-300 {
-    color: var(--text-muted, #8B949E) !important;
-}
-
-[data-theme="dark"] #mainContent .text-\[\#8B0000\],
 [data-theme="dark"] #mainContent .dashboard-side-card-title,
-[data-theme="dark"] #mainContent .cal-month-label,
 [data-theme="dark"] #mainContent .dashboard-quick-btn,
-.dark #mainContent .text-\[\#8B0000\],
 .dark #mainContent .dashboard-side-card-title,
-.dark #mainContent .cal-month-label,
 .dark #mainContent .dashboard-quick-btn {
     color: #FCA5A5 !important;
 }
 
 [data-theme="dark"] #mainContent .upcoming-date-btn,
 [data-theme="dark"] #mainContent .dashboard-quick-btn,
-[data-theme="dark"] #mainContent .cal-nav-btn,
-[data-theme="dark"] #mainContent .cal-cell,
-[data-theme="dark"] #mainContent .rounded-xl.border,
 .dark #mainContent .upcoming-date-btn,
-.dark #mainContent .dashboard-quick-btn,
-.dark #mainContent .cal-nav-btn,
-.dark #mainContent .cal-cell,
-.dark #mainContent .rounded-xl.border {
+.dark #mainContent .dashboard-quick-btn {
     background: rgba(22, 27, 34, 0.48) !important;
-    border-color: var(--border-dark, rgba(255, 255, 255, 0.10)) !important;
-    color: var(--text-secondary, #C9D1D9) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
+    border-color:
+        var(--border-dark,
+            rgba(255, 255, 255, 0.10)) !important;
+    color:
+        var(--text-secondary,
+            #C9D1D9) !important;
 }
 
 [data-theme="dark"] #mainContent .upcoming-date-btn.active,
-[data-theme="dark"] #mainContent .cal-cell.today,
-.dark #mainContent .upcoming-date-btn.active,
-.dark #mainContent .cal-cell.today {
+.dark #mainContent .upcoming-date-btn.active {
     background: linear-gradient(135deg, #8B0000, #B91C1C) !important;
     color: #FFFFFF !important;
     border-color: rgba(252, 165, 165, 0.46) !important;
@@ -1634,12 +1546,10 @@
     color: #FCA5A5 !important;
 }
 
-[data-theme="dark"] #mainContent .kpi-card i,
 [data-theme="dark"] #mainContent .dashboard-side-card-title i,
 [data-theme="dark"] #mainContent .gad-header-badge i,
 [data-theme="dark"] #mainContent .upcoming-empty-state i,
 [data-theme="dark"] #mainContent .status-icon-badge i,
-.dark #mainContent .kpi-card i,
 .dark #mainContent .dashboard-side-card-title i,
 .dark #mainContent .gad-header-badge i,
 .dark #mainContent .upcoming-empty-state i,
@@ -1652,10 +1562,8 @@
         filter 0.25s ease;
 }
 
-[data-theme="dark"] #mainContent .kpi-card:hover i,
 [data-theme="dark"] #mainContent .dashboard-side-card:hover i,
 [data-theme="dark"] #mainContent .gad-header-badge:hover i,
-.dark #mainContent .kpi-card:hover i,
 .dark #mainContent .dashboard-side-card:hover i,
 .dark #mainContent .gad-header-badge:hover i {
     transform: scale(1.08);
@@ -1682,32 +1590,6 @@
         0 0 8px rgba(255, 255, 255, 0.6),
         0 0 16px rgba(252, 165, 165, 0.6);
 }
-
-
-
-
-
-[data-theme="dark"] .kpi-card .status-change-btn,
-.dark .kpi-card .status-change-btn {
-    background: linear-gradient(135deg, #8B0000, #5F0000) !important;
-    color: #fff !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-
-    box-shadow:
-        0 8px 18px rgba(139, 0, 0, 0.30),
-        inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-[data-theme="dark"] .kpi-card .status-change-btn:hover,
-.dark .kpi-card .status-change-btn:hover {
-    background: linear-gradient(135deg, #B91C1C, #7F1D1D) !important;
-
-    box-shadow:
-        0 10px 24px rgba(185, 28, 28, 0.38),
-        0 0 18px rgba(252, 165, 165, 0.20);
-}
-
-
 
 .greeting-icon {
     animation: greetingGlow 2.5s ease-in-out infinite;
@@ -1756,17 +1638,6 @@
     box-shadow:
         0 10px 22px rgba(185, 28, 28, 0.40),
         0 0 16px rgba(252, 165, 165, 0.18);
-}
-
-[data-theme="dark"] .status-change-btn,
-.dark .status-change-btn {
-    background: linear-gradient(135deg, #8B0000, #5F0000) !important;
-    color: #ffffff !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-
-    box-shadow:
-        0 8px 18px rgba(139, 0, 0, 0.30),
-        inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 [data-theme="dark"] .status-change-btn:hover,
@@ -2350,43 +2221,6 @@
         white-space: nowrap !important;
     }
 
-    .kpi-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: 8px !important;
-    }
-
-    .kpi-card,
-    .kpi-grid>div {
-        min-height: 98px !important;
-        height: auto !important;
-        padding: 10px !important;
-        border-radius: 14px !important;
-    }
-
-    .kpi-grid>div .w-9.h-9,
-    .kpi-grid>div .w-10.h-10 {
-        width: 26px !important;
-        height: 26px !important;
-        border-radius: 8px !important;
-    }
-
-    .kpi-grid>div .w-9.h-9 i,
-    .kpi-grid>div .w-10.h-10 i {
-        font-size: 11px !important;
-    }
-
-    .kpi-grid>div p.text-3xl,
-    .kpi-grid>div .text-3xl {
-        font-size: 1.25rem !important;
-        line-height: 1 !important;
-    }
-
-    .kpi-grid>div p.text-2xl,
-    #statusKpiLabel {
-        font-size: 1.15rem !important;
-        line-height: 1 !important;
-    }
-
     #kpi-clock-hhmm {
         font-size: 1.05rem !important;
         line-height: 1 !important;
@@ -2394,28 +2228,6 @@
 
     #kpi-clock-ampm {
         font-size: 7px !important;
-    }
-
-    .kpi-grid>div p.text-\[10px\],
-    .kpi-grid>div .text-\[10px\] {
-        font-size: 7px !important;
-        line-height: 1.15 !important;
-        letter-spacing: 0.04em !important;
-    }
-
-    .kpi-grid>div .text-\[9px\] {
-        font-size: 7px !important;
-        line-height: 1.1 !important;
-    }
-
-    .kpi-grid>div .z-10.mt-4,
-    .kpi-grid>div .z-10.mt-3 {
-        margin-top: 0.55rem !important;
-    }
-
-    .kpi-grid>div .flex.flex-col.text-right {
-        gap: 1px !important;
-        max-width: 54px !important;
     }
 
     .status-change-btn {
@@ -2674,28 +2486,6 @@
         max-width: 150px !important;
         padding: 3px !important;
         grid-template-columns: 26px minmax(78px, 1fr) !important;
-    }
-
-
-    .kpi-grid {
-        gap: 7px !important;
-    }
-
-    .kpi-card,
-    .kpi-grid>div {
-        min-height: 94px !important;
-        padding: 9px !important;
-    }
-
-    .kpi-grid>div p.text-3xl,
-    .kpi-grid>div .text-3xl {
-        font-size: 1.12rem !important;
-    }
-
-    .kpi-grid>div p.text-\[10px\],
-    .kpi-grid>div .text-\[10px\] {
-        font-size: 6.5px !important;
-        letter-spacing: 0.02em !important;
     }
 
     .status-change-btn {
@@ -2999,7 +2789,6 @@ html {
 
     .dashboard-quick-btn:hover,
     .status-change-btn:hover,
-    .kpi-card .status-change-btn:hover,
     #medicalSuppliesContainer a:hover,
     #medicineSuppliesContainer a:hover {
         transform: none !important;

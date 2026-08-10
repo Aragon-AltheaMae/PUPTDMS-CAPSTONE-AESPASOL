@@ -95,8 +95,6 @@
     padding-bottom: 16px;
 }
 
-[data-theme="dark"] #mainContent .appt-table-head,
-.dark #mainContent .appt-table-head,
 [data-theme="dark"] #mainContent .appt-card,
 .dark #mainContent .appt-card,
 [data-theme="dark"] #mainContent .mobile-appt-card,
@@ -357,14 +355,6 @@
     border: 1px solid rgba(203, 213, 225, 0.14) !important;
 }
 
-[data-theme="dark"] #pastSection .appt-table-head,
-.dark #pastSection .appt-table-head {
-    background:
-        linear-gradient(145deg, rgba(13, 17, 23, 0.88), rgba(22, 27, 34, 0.78)) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-    color: #94A3B8 !important;
-}
-
 [data-theme="dark"] #mainContent .service-badge-default,
 .dark #mainContent .service-badge-default {
     background: rgba(139, 0, 0, 0.18) !important;
@@ -588,10 +578,12 @@
 }
 
 .mode-list .desktop-appointments-table .appt-table-head {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background: #fafafa;
+    background:
+        var(--table-header-surface);
+    color:
+        var(--table-heading-muted);
+    border-color:
+        var(--table-border);
 }
 
 .mode-list .desktop-appointments-table .appt-row-date .date-main {

@@ -177,7 +177,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
             @endif
         </div>
 
-        <div class="table-card rounded-2xl border border-gray-200 shadow-sm bg-white">
+        <div class="table-card docreq-table-card">
 
             <div class="px-4 md:px-6 py-3.5 border-b border-gray-100 bg-[#FAFAFA]/50">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -309,9 +309,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                 page-size-callback="selectDocreqPerPage" :page-size-value="$perPage" page-size-label="per page"
                 label="entries" class="docreq-pagebar docreq-pagebar-top" />
 
-            <div id="docreqTableHead"
-                class="hidden md:grid gap-3 text-[10px] font-bold uppercase tracking-wider text-gray-500 py-3.5 px-6 bg-[#FAFAFA] border-b border-gray-200"
-                style="grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1.5fr) minmax(0, 1.5fr) minmax(0, 1fr) 145px;">
+            <div id="docreqTableHead" class="table-list-header docreq-table-head hidden md:grid gap-3 py-3.5 px-6">
                 <div class="text-left">Patient</div>
                 <div class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-[10px]"></i>Date
                     Requested</div>
@@ -333,144 +331,140 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
     </div>
 </main>
 
-<div id="filterModal" class="filter-drawer-wrapper" aria-hidden="true">
-    <div class="filter-drawer-overlay" onclick="document.getElementById('filterCancelBtn')?.click()"></div>
+<x-filter-drawer id="filterModal" title="Filters" close-id="filterCancelBtn" clear-id="filterResetBtn"
+    clear-label="Clear Filters" cancel-id="filterCloseBtn" cancel-label="Cancel" apply-id="filterApplyBtn"
+    apply-label="Show results" results-id="filterResultsText" class="docreq-filter-sheet">
 
-    <div class="filter-drawer-panel docreq-filter-sheet">
+    <div id="activeFiltersSection" class="filter-active-section hidden">
+        <div class="filter-active-header">
+            <span class="filter-active-title">
+                Active Filters
+            </span>
 
-        <div class="filter-drawer-header">
-            <div class="filter-drawer-title">
-                <i class="fa-solid fa-sliders text-xl"></i>
-                <h2 class="text-xl font-extrabold">Filters</h2>
-            </div>
-
-            <button id="filterCancelBtn" type="button" class="filter-drawer-close" aria-label="Close filters">
-
-                <i class="fa-solid fa-xmark"></i>
+            <button id="clearAllChipsBtn" type="button" class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>Clear All</span>
             </button>
         </div>
 
-        <div class="filter-drawer-body">
-
-            <div id="activeFiltersSection" class="filter-active-section hidden">
-
-                <div class="filter-active-header">
-                    <span class="filter-active-title">
-                        Active Filters
-                    </span>
-
-                    <button id="clearAllChipsBtn" type="button"
-                        class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm">
-
-                        <i class="fa-solid fa-rotate-left"></i>
-                        <span>Clear All</span>
-                    </button>
-                </div>
-
-                <div id="activeChipsContainer" class="active-filters-container">
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Sort By</h3>
-                <div class="filter-chip-row" id="fSortGroup">
-                    <button type="button" class="ftag ftag-active" data-val="newest">Newest First</button>
-                    <button type="button" class="ftag" data-val="oldest">Oldest First</button>
-                    <button type="button" class="ftag" data-val="az">Patient Name A-Z</button>
-                    <button type="button" class="ftag" data-val="za">Patient Name Z-A</button>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Document Details</h3>
-                <input type="hidden" id="fDocType" value="">
-
-                <div id="docTypeSelect" class="docreq-custom-select docreq-filter-select">
-                    <button type="button" class="docreq-select-button" data-select-button aria-haspopup="listbox"
-                        aria-expanded="false" aria-controls="docTypeSelectMenu"
-                        onclick="toggleDocreqDropdown('docTypeSelect')">
-                        <span class="docreq-select-leading"><i class="fa-regular fa-file-lines"></i></span>
-                        <span class="docreq-select-text">
-                            <span>Document type</span>
-                            <strong id="docTypeSelectLabel">All document types</strong>
-                        </span>
-                        <i class="fa-solid fa-chevron-down docreq-select-chevron"></i>
-                    </button>
-
-                    <div id="docTypeSelectMenu" class="docreq-select-menu docreq-doc-type-menu" role="listbox">
-                        <button type="button" class="docreq-select-option doc-type-option active" data-value=""
-                            onclick="setDocTypeFilter('', 'All document types')">
-                            <span class="docreq-option-icon doc-type-all">
-                                <i class="fa-solid fa-layer-group"></i>
-                            </span>
-
-                            <span class="docreq-option-copy">
-                                <strong>All document types</strong>
-                                <small>No document type filter</small>
-                            </span>
-
-                            <i class="fa-solid fa-check docreq-option-check"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Filter by Date Range</h3>
-                <div class="filter-chip-row" id="datePresetGroup">
-                    <button type="button" class="quick-date-chip" data-range="7">Last 7 Days</button>
-                    <button type="button" class="quick-date-chip" data-range="30">Last 30 Days</button>
-                    <button type="button" class="quick-date-chip" data-range="90">Last 3 Months</button>
-                    <button type="button" class="quick-date-chip" data-range="180">Last 6 Months</button>
-                    <button type="button" class="quick-date-chip" data-range="365">Last 12 Months</button>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Custom Date Range</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div class="filter-date-input-wrap">
-                        <input type="text" id="fDateFrom" class="js-flatpickr-date-range-from" placeholder="Start date"
-                            readonly autocomplete="off" />
-                        <i class="fa-regular fa-calendar"></i>
-                    </div>
-
-                    <div class="filter-date-input-wrap">
-                        <input type="text" id="fDateTo" class="js-flatpickr-date-range-to" placeholder="End date"
-                            readonly autocomplete="off" />
-                        <i class="fa-regular fa-calendar"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="filter-drawer-footer">
-            <button id="filterResetBtn" type="button" class="filter-clear-btn ui-btn ui-btn-secondary ui-btn-sm">
-
-                <i class="fa-regular fa-trash-can"></i>
-                <span>Clear Filters</span>
-            </button>
-
-            <div class="filter-footer-actions">
-                <button id="filterCloseBtn" type="button" class="filter-cancel-btn ui-btn ui-btn-secondary">
-
-                    <i class="fa-solid fa-xmark"></i>
-                    <span>Cancel</span>
-                </button>
-
-                <button id="filterApplyBtn" type="button" class="filter-apply-btn ui-btn ui-btn-primary">
-
-                    <i class="fa-solid fa-check"></i>
-
-                    <span id="filterResultsText" class="filter-results-text">
-                        Show results
-                    </span>
-                </button>
-            </div>
-        </div>
-
+        <div id="activeChipsContainer" class="active-filters-container"></div>
     </div>
-</div>
+
+    <x-filter-group title="Sort By">
+        <div id="fSortGroup" class="filter-chip-row">
+            <button type="button" class="ftag ftag-active" data-val="newest">
+                Newest First
+            </button>
+
+            <button type="button" class="ftag" data-val="oldest">
+                Oldest First
+            </button>
+
+            <button type="button" class="ftag" data-val="az">
+                Patient Name A-Z
+            </button>
+
+            <button type="button" class="ftag" data-val="za">
+                Patient Name Z-A
+            </button>
+        </div>
+    </x-filter-group>
+
+    <x-filter-group title="Document Details">
+
+        <input type="hidden" id="fDocType" value="">
+
+        <div id="docTypeSelect" class="docreq-custom-select docreq-filter-select">
+            <button type="button" class="docreq-select-button" data-select-button aria-haspopup="listbox"
+                aria-expanded="false" aria-controls="docTypeSelectMenu" onclick="toggleDocreqDropdown('docTypeSelect')">
+                <span class="docreq-select-leading">
+                    <i class="fa-regular fa-file-lines"></i>
+                </span>
+
+                <span class="docreq-select-text">
+                    <span>Document type</span>
+
+                    <strong id="docTypeSelectLabel">
+                        All document types
+                    </strong>
+                </span>
+
+                <i class="fa-solid fa-chevron-down docreq-select-chevron"></i>
+            </button>
+
+            <div id="docTypeSelectMenu" class="docreq-select-menu docreq-doc-type-menu" role="listbox">
+                <button type="button" class="docreq-select-option doc-type-option active" data-value=""
+                    onclick="setDocTypeFilter('', 'All document types')">
+                    <span class="docreq-option-icon doc-type-all">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </span>
+
+                    <span class="docreq-option-copy">
+                        <strong>
+                            All document types
+                        </strong>
+
+                        <small>
+                            No document type filter
+                        </small>
+                    </span>
+
+                    <i class="fa-solid fa-check docreq-option-check"></i>
+                </button>
+            </div>
+        </div>
+
+    </x-filter-group>
+
+    <x-filter-group title="Filter by Date Range">
+
+        <div id="datePresetGroup" class="filter-chip-row">
+            <button type="button" class="quick-date-chip" data-range="7">
+                Last 7 Days
+            </button>
+
+            <button type="button" class="quick-date-chip" data-range="30">
+                Last 30 Days
+            </button>
+
+            <button type="button" class="quick-date-chip" data-range="90">
+                Last 3 Months
+            </button>
+
+            <button type="button" class="quick-date-chip" data-range="180">
+                Last 6 Months
+            </button>
+
+            <button type="button" class="quick-date-chip" data-range="365">
+                Last 12 Months
+            </button>
+        </div>
+
+    </x-filter-group>
+
+    <x-filter-group title="Custom Date Range" class="filter-group-last">
+
+        <div class="filter-date-grid">
+
+            <div class="filter-date-input-wrap">
+                <input type="text" id="fDateFrom" class="js-flatpickr-date-range-from" placeholder="Start date" readonly
+                    autocomplete="off">
+
+                <i class="fa-regular fa-calendar"></i>
+            </div>
+
+            <div class="filter-date-input-wrap">
+                <input type="text" id="fDateTo" class="js-flatpickr-date-range-to" placeholder="End date" readonly
+                    autocomplete="off">
+
+                <i class="fa-regular fa-calendar"></i>
+            </div>
+
+        </div>
+
+    </x-filter-group>
+
+</x-filter-drawer>
 
 <div id="approveModal" class="ui-modal modal-theme-success" aria-hidden="true">
 

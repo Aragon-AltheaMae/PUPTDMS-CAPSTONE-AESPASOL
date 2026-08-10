@@ -73,8 +73,8 @@ body {
 
 [data-theme="dark"] body,
 .dark body {
-    background-color: #101111 !important;
-    color: #E5E7EB !important;
+    background-color: var(--page-bg) !important;
+    color: var(--page-text) !important;
 }
 
 @media (max-width: 640px) {
@@ -113,14 +113,16 @@ body {
 
 [data-theme="dark"] #mainContent,
 .dark #mainContent {
-    background: #101111 !important;
-    color: #F8FAFC !important;
+    background: var(--page-bg) !important;
+    color: var(--text-1) !important;
 }
 
-[data-theme="dark"] #sidebar {
-    background-color: #101111 !important;
+[data-theme="dark"] #sidebar,
+.dark #sidebar {
+    background-color: var(--sidebar-bg) !important;
 }
 
-[data-theme="dark"] .bg-white {
-    background-color: #101111 !important;
+[data-theme="dark"] .bg-white,
+.dark .bg-white {
+    background-color: var(--card) !important;
 }

@@ -669,209 +669,252 @@ $notifCount = $notifications->count();
     </div>
 </main>
 
-<div id="filterModal" class="filter-drawer-wrapper" aria-hidden="true">
-    <div class="filter-drawer-overlay" onclick="document.getElementById('closeFilterModalBtn').click()"></div>
+<x-filter-drawer id="filterModal" title="Filters" close-id="closeFilterModalBtn" clear-id="clearFiltersModal"
+    clear-label="Clear Filters" cancel-id="cancelFilterBtn" cancel-label="Cancel" apply-id="applyFilters"
+    apply-label="Show 0 results" results-id="showResultsText">
 
-    <div class="filter-drawer-panel">
+    <div id="activeFiltersSection" class="filter-active-section hidden">
 
-        <div class="filter-drawer-header">
-            <div class="filter-drawer-title">
-                <i class="fa-solid fa-sliders"></i>
-                <h2>Filters</h2>
-            </div>
+        <div class="filter-active-header">
 
-            <button id="closeFilterModalBtn" type="button" class="filter-drawer-close" aria-label="Close filters">
+            <span class="filter-active-title">
+                Active Filters
+            </span>
 
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
+            <button id="clearAllChipsBtn" type="button" class="
+                    filter-clear-all
+                    ui-btn
+                    ui-btn-secondary
+                    ui-btn-sm
+                ">
+                <i class="fa-solid fa-rotate-left"></i>
 
-        <div class="filter-drawer-body">
-
-            <div id="activeFiltersSection" class="filter-active-section hidden">
-
-                <div class="filter-active-header">
-                    <span class="filter-active-title">
-                        Active Filters
-                    </span>
-
-                    <button id="clearAllChipsBtn" type="button"
-                        class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm">
-
-                        <i class="fa-solid fa-rotate-left"></i>
-                        <span>Clear All</span>
-                    </button>
-                </div>
-
-                <div id="activeChipsContainer" class="active-filters-container">
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Sort By</h3>
-                <div class="filter-chip-row" id="fSortGroup">
-                    <button type="button" class="ftag ftag-active" data-val="nearest">
-                        Nearest Appointment
-                    </button>
-
-                    <button type="button" class="ftag" data-val="farthest">
-                        Farthest Appointment
-                    </button>
-                    <button type="button" class="ftag" data-val="az">Patient Name A-Z</button>
-                    <button type="button" class="ftag" data-val="za">Patient Name Z-A</button>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Filter by Date Range</h3>
-                <div class="filter-chip-row" id="datePresetGroup">
-                    <button type="button" class="quick-date-chip" data-range="7">Last 7 Days</button>
-                    <button type="button" class="quick-date-chip" data-range="30">Last 30 Days</button>
-                    <button type="button" class="quick-date-chip" data-range="90">Last 3 Months</button>
-                    <button type="button" class="quick-date-chip" data-range="180">Last 6 Months</button>
-                    <button type="button" class="quick-date-chip" data-range="365">Last 12 Months</button>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Custom Date Range</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div class="filter-date-input-wrap">
-                        <input id="fromDate" type="text" class="js-flatpickr-date-range-from" placeholder="Start date"
-                            readonly autocomplete="off" />
-                        <i class="fa-regular fa-calendar"></i>
-                    </div>
-
-                    <div class="filter-date-input-wrap">
-                        <input id="toDate" type="text" class="js-flatpickr-date-range-to" placeholder="End date"
-                            readonly autocomplete="off" />
-                        <i class="fa-regular fa-calendar"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Course</h3>
-                <div class="filter-chip-grid">
-                    @foreach ([
-                    'BSIT',
-                    'BSECE',
-                    'BSBA - HRM',
-                    'BSED - ENG',
-                    'BSOA',
-                    'BSPSYCH',
-                    'DIT',
-                    'BSME',
-                    'BSBA -
-                    MM',
-                    'BSED - MATH',
-                    'DOMT',
-                    ] as $course)
-                    <label class="choice-chip">
-                        <input type="radio" name="course" value="{{ $course }}"
-                            class="filter-input radio-red chip-radio" />
-                        <span>{{ $course }}</span>
-                    </label>
-                    @endforeach
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <h3 class="filter-section-title">Year Level</h3>
-                    <div class="filter-chip-row">
-                        <label class="choice-chip">
-                            <input type="radio" name="year" value="1st Year"
-                                class="filter-input radio-red chip-radio" />
-                            <span>1st Year</span>
-                        </label>
-
-                        <label class="choice-chip">
-                            <input type="radio" name="year" value="2nd Year"
-                                class="filter-input radio-red chip-radio" />
-                            <span>2nd Year</span>
-                        </label>
-
-                        <label class="choice-chip">
-                            <input type="radio" name="year" value="3rd Year"
-                                class="filter-input radio-red chip-radio" />
-                            <span>3rd Year</span>
-                        </label>
-
-                        <label class="choice-chip">
-                            <input type="radio" name="year" value="4th Year"
-                                class="filter-input radio-red chip-radio" />
-                            <span>4th Year</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div>
-                    <h3 class="filter-section-title">Section</h3>
-                    <div class="filter-chip-row">
-                        <label class="choice-chip">
-                            <input type="radio" name="section" value="1" class="filter-input radio-red chip-radio" />
-                            <span>1</span>
-                        </label>
-
-                        <label class="choice-chip">
-                            <input type="radio" name="section" value="2" class="filter-input radio-red chip-radio" />
-                            <span>2</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pb-6">
-                <h3 class="filter-section-title">Department</h3>
-                <div class="filter-chip-row">
-                    <label class="choice-chip">
-                        <input type="radio" name="department" value="Administrative"
-                            class="filter-input radio-red chip-radio" />
-                        <span>Administrative</span>
-                    </label>
-
-                    <label class="choice-chip">
-                        <input type="radio" name="department" value="Faculty"
-                            class="filter-input radio-red chip-radio" />
-                        <span>Faculty</span>
-                    </label>
-
-                    <label class="choice-chip">
-                        <input type="radio" name="department" value="Dependent"
-                            class="filter-input radio-red chip-radio" />
-                        <span>Dependent</span>
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <div class="filter-drawer-footer">
-            <button id="clearFiltersModal" type="button" class="filter-clear-btn ui-btn ui-btn-secondary ui-btn-sm">
-
-                <i class="fa-regular fa-trash-can"></i>
-                <span>Clear Filters</span>
+                <span>
+                    Clear All
+                </span>
             </button>
 
-            <div class="filter-footer-actions">
-                <button id="cancelFilterBtn" type="button" class="filter-cancel-btn ui-btn ui-btn-secondary">
-
-                    <i class="fa-solid fa-xmark"></i>
-                    <span>Cancel</span>
-                </button>
-
-                <button id="applyFilters" type="button" class="filter-apply-btn ui-btn ui-btn-primary">
-
-                    <i class="fa-solid fa-check"></i>
-
-                    <span id="showResultsText" class="filter-results-text">
-                        Show 0 results
-                    </span>
-                </button>
-            </div>
         </div>
+
+        <div id="activeChipsContainer" class="active-filters-container"></div>
+
     </div>
-</div>
+
+
+    <x-filter-group title="Sort By">
+
+        <div id="fSortGroup" class="filter-chip-row">
+
+            <button type="button" class="ftag ftag-active" data-val="nearest">
+                Nearest Appointment
+            </button>
+
+            <button type="button" class="ftag" data-val="farthest">
+                Farthest Appointment
+            </button>
+
+            <button type="button" class="ftag" data-val="az">
+                Patient Name A-Z
+            </button>
+
+            <button type="button" class="ftag" data-val="za">
+                Patient Name Z-A
+            </button>
+
+        </div>
+
+    </x-filter-group>
+
+
+    <x-filter-group title="Filter by Date Range">
+
+        <div id="datePresetGroup" class="filter-chip-row">
+
+            <button type="button" class="quick-date-chip" data-range="7">
+                Last 7 Days
+            </button>
+
+            <button type="button" class="quick-date-chip" data-range="30">
+                Last 30 Days
+            </button>
+
+            <button type="button" class="quick-date-chip" data-range="90">
+                Last 3 Months
+            </button>
+
+            <button type="button" class="quick-date-chip" data-range="180">
+                Last 6 Months
+            </button>
+
+            <button type="button" class="quick-date-chip" data-range="365">
+                Last 12 Months
+            </button>
+
+        </div>
+
+    </x-filter-group>
+
+
+    <x-filter-group title="Custom Date Range">
+
+        <div class="filter-date-grid">
+
+            <div class="filter-date-input-wrap">
+
+                <input id="fromDate" type="text" class="js-flatpickr-date-range-from" placeholder="Start date" readonly
+                    autocomplete="off">
+
+                <i class="fa-regular fa-calendar"></i>
+
+            </div>
+
+            <div class="filter-date-input-wrap">
+
+                <input id="toDate" type="text" class="js-flatpickr-date-range-to" placeholder="End date" readonly
+                    autocomplete="off">
+
+                <i class="fa-regular fa-calendar"></i>
+
+            </div>
+
+        </div>
+
+    </x-filter-group>
+
+
+    <x-filter-group title="Course">
+
+        <div class="filter-chip-grid">
+
+            @foreach ([
+            'BSIT',
+            'BSECE',
+            'BSBA - HRM',
+            'BSED - ENG',
+            'BSOA',
+            'BSPSYCH',
+            'DIT',
+            'BSME',
+            'BSBA - MM',
+            'BSED - MATH',
+            'DOMT',
+            ] as $course)
+
+            <label class="choice-chip">
+
+                <input type="radio" name="course" value="{{ $course }}" class="
+                            filter-input
+                            radio-red
+                            chip-radio
+                        ">
+
+                <span>
+                    {{ $course }}
+                </span>
+
+            </label>
+
+            @endforeach
+
+        </div>
+
+    </x-filter-group>
+
+
+    <div class="filter-two-column-grid">
+
+        <x-filter-group title="Year Level">
+
+            <div class="filter-chip-row">
+
+                @foreach ([
+                '1st Year',
+                '2nd Year',
+                '3rd Year',
+                '4th Year',
+                ] as $year)
+
+                <label class="choice-chip">
+
+                    <input type="radio" name="year" value="{{ $year }}" class="
+                                filter-input
+                                radio-red
+                                chip-radio
+                            ">
+
+                    <span>
+                        {{ $year }}
+                    </span>
+
+                </label>
+
+                @endforeach
+
+            </div>
+
+        </x-filter-group>
+
+
+        <x-filter-group title="Section">
+
+            <div class="filter-chip-row">
+
+                @foreach (['1', '2'] as $section)
+
+                <label class="choice-chip">
+
+                    <input type="radio" name="section" value="{{ $section }}" class="
+                                filter-input
+                                radio-red
+                                chip-radio
+                            ">
+
+                    <span>
+                        {{ $section }}
+                    </span>
+
+                </label>
+
+                @endforeach
+
+            </div>
+
+        </x-filter-group>
+
+    </div>
+
+
+    <x-filter-group title="Department" class="filter-group-last">
+
+        <div class="filter-chip-row">
+
+            @foreach ([
+            'Administrative',
+            'Faculty',
+            'Dependent',
+            ] as $department)
+
+            <label class="choice-chip">
+
+                <input type="radio" name="department" value="{{ $department }}" class="
+                            filter-input
+                            radio-red
+                            chip-radio
+                        ">
+
+                <span>
+                    {{ $department }}
+                </span>
+
+            </label>
+
+            @endforeach
+
+        </div>
+
+    </x-filter-group>
+
+</x-filter-drawer>
 @endsection
 
 @section('scripts')

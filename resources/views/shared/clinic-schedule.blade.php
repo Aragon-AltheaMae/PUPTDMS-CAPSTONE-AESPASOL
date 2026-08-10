@@ -291,7 +291,7 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                         @if ($schedules->count())
                         <div id="scheduleRulesListView" class="schedule-rules-view">
                             <div class="overflow-x-auto px-2 pb-2 sm:px-0 sm:pb-0">
-                                <table class="sched-table">
+                                <table class="data-table sched-table">
                                     <thead>
                                         <tr>
                                             <th>Day(s)</th>

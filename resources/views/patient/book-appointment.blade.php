@@ -444,7 +444,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
     let formIsDirty = false;
     let formSubmitting = false;
-    let pendingNavigation = null;
 
     const appointmentCountsPerDay = @json($appointmentCountsPerDay ?? []);
     const MAX_SLOTS_PER_DAY = 5;
@@ -975,13 +974,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         updateUI();
     }
 
-    window.addEventListener("beforeunload", (e) => {
-        if (formIsDirty && !formSubmitting) {
-            e.preventDefault();
-            e.returnValue = "";
-        }
-    });
-
     function markFormDirty() {
         formIsDirty = true;
     }
@@ -1401,8 +1393,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         return out;
     }
 
-    const leaveModal = document.getElementById('leaveModal');
-
     document.querySelectorAll('input, textarea, select').forEach(input => {
         input.addEventListener('input', () => {
             formIsDirty = true;
@@ -1414,83 +1404,9 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         });
     });
 
-    function confirmReloadPage() {
-        openLeaveModal(() => {
-            window.location.reload();
-        });
-    }
-
-    function openLeaveModal(onConfirm) {
-        if (
-            window.__SESSION_EXPIRED__ ||
-            !leaveModal
-        ) {
-            return;
-        }
-
-        pendingNavigation = onConfirm;
-
-        window.openModal?.(
-            "leaveModal"
-        );
-    }
-
-    function closeLeaveModal() {
-        window.closeModal?.(
-            "leaveModal"
-        );
-
-        pendingNavigation = null;
-    }
-
-    function runPendingNavigation() {
-        if (
-            typeof pendingNavigation !==
-            "function"
-        ) {
-            pendingNavigation = null;
-            return;
-        }
-
-        const action =
-            pendingNavigation;
-
-        pendingNavigation = null;
-
-        action();
-    }
-
-    document.getElementById('cancelLeaveBtn')?.addEventListener('click', closeLeaveModal);
-
     document.getElementById('slotFullOkBtn')?.addEventListener('click', () => {
         const modal = document.getElementById('slotFullModal');
         if (modal) modal.close();
-    });
-
-    document.querySelectorAll('a[href]').forEach(link => {
-        link.addEventListener("click", e => {
-            const href = link.getAttribute("href") || "";
-
-            if (link.hasAttribute("data-legal-link")) {
-                return;
-            }
-
-            if (
-                href.startsWith("#") ||
-                href.startsWith("javascript:") ||
-                link.type === "submit"
-            ) {
-                return;
-            }
-
-            if (formIsDirty && !formSubmitting) {
-                e.preventDefault();
-
-                openLeaveModal(() => {
-                    window.location.href = link.href;
-                });
-            }
-        });
     });
 
     const clearSlotSelectionBtn = document.getElementById("clearSlotSelectionBtn");

@@ -21,7 +21,7 @@ $inactiveCount = $inactiveCount ?? 0;
                 </div>
 
                 <div class="flex items-center gap-3 flex-wrap w-full sm:w-auto">
-                    <button type="button" onclick="openModal('addModal', this)" class="um-hero-btn">
+                    <button type="button" onclick="openModal('addModal', this)" class="ui-btn ui-btn-primary">
                         <i class="fa-solid fa-user-plus"></i>
                         <span>Add New User</span>
                     </button>
@@ -111,29 +111,15 @@ $inactiveCount = $inactiveCount ?? 0;
 
                     <form method="GET" action="{{ route('admin.user_management') }}" id="umFilterForm"
                         class="um-users-filter-form">
-                        <div class="um-search-mobile um-search-row voice-search-row" data-voice-field>
-                            <div class="search-wrap global-search" data-search-wrapper>
-                                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <div class="um-search-row voice-search-row">
 
-                                <input id="umSearch" name="search" class="search-input no-voice"
-                                    placeholder="Search name or email…" value="{{ $search ?? '' }}" autocomplete="off"
-                                    data-search-input onkeydown="if(event.key==='Enter'){event.preventDefault();}" />
+                            <x-search-bar id="umSearch" name="search" placeholder="Search name or email…"
+                                :value="$search ?? ''" callback="handleUserManagementSearch" :debounce="350"
+                                clear-label="Clear user search" class="um-search-control" />
 
-                                <button type="button" class="search-clear" data-search-clear aria-label="Clear search">
-                                    <i class="fa-solid fa-xmark text-xs"></i>
-                                </button>
-                            </div>
+                            <x-voice-input target="#umSearch" status-id="umSearchVoiceStatus" label="Voice search users"
+                                title="Voice search" />
 
-                            <div class="voice-input-toggle">
-                                <button type="button" id="umSearchMicBtn" class="voice-search-mic external"
-                                    data-voice-trigger data-voice-target="#umSearch"
-                                    data-voice-status="#umSearchVoiceStatus" aria-label="Voice input for user search">
-                                    <i class="fa-solid fa-microphone"></i>
-                                </button>
-
-                                <span id="umSearchVoiceStatus" class="voice-status hidden" data-voice-status
-                                    aria-live="polite"></span>
-                            </div>
                         </div>
 
                         <x-view-toggle id="umViewToggle" class="um-view-toggle" storage-key="userManagementView"
@@ -141,73 +127,40 @@ $inactiveCount = $inactiveCount ?? 0;
                     </form>
                 </div>
 
-                <div class="global-pagebar global-pagebar-top">
-                    <div class="global-pagebar-left">
-                        <span class="global-pagebar-info">
-                            Showing
-                            <strong>{{ $users->firstItem() ?? 0 }}–{{ $users->lastItem() ?? 0 }}</strong>
-                            of <strong>{{ $users->total() }}</strong> users
-                        </span>
-
-                        <div class="global-page-size-control">
-                            <label for="umPerPageSelect">Show</label>
-
-                            <div class="global-page-size-select" data-global-page-size
-                                data-page-size-input="#umPerPageSelect">
-
-                                <select id="umPerPageSelect" class="global-page-size-native" tabindex="-1"
-                                    aria-hidden="true">
-
-                                    @foreach ([10, 20, 50, 100] as $size)
-                                    <option value="{{ $size }}" {{ (int) ($perPage ?? 10)===$size ? 'selected' : '' }}>
-                                        {{ $size }}
-                                    </option>
-                                    @endforeach
-                                </select>
-
-                                <button type="button" class="global-page-size-trigger" data-page-size-trigger
-                                    aria-haspopup="listbox" aria-expanded="false">
-
-                                    <span data-page-size-value>
-                                        {{ (int) ($perPage ?? 10) }}
-                                    </span>
-
-                                    <i class="fa-solid fa-chevron-down"></i>
-                                </button>
-
-                                <div class="global-page-size-menu" role="listbox">
-                                    @foreach ([10, 20, 50, 100] as $size)
-                                    <button type="button"
-                                        class="global-page-size-option {{ (int) ($perPage ?? 10) === $size ? 'is-selected' : '' }}"
-                                        data-page-size-option data-value="{{ $size }}" role="option"
-                                        aria-selected="{{ (int) ($perPage ?? 10) === $size ? 'true' : 'false' }}">
-
-                                        <span>{{ $size }}</span>
-                                        <i class="fa-solid fa-check"></i>
-                                    </button>
-                                    @endforeach
-                                </div>
-                            </div>
-
-                            <span>per page</span>
-                        </div>
-                    </div>
-
-                    <div class="global-pagination-wrap"></div>
-                </div>
+                <x-pagination-bar id="umPaginationTopBar" info-id="umPaginationInfoTop" pagination-id="umPaginationTop"
+                    position="top" :show-entries="true" page-size-id="umPerPageSelect"
+                    page-size-callback="handleUserManagementPerPageChange" :page-size-value="$perPage ?? 10"
+                    page-size-label="per page" label="users" />
 
                 <div class="um-users-content">
                     <div class="um-view um-list-view" id="umListView">
-                        <div class="um-table-scroll overflow-x-auto">
-                            <table class="w-full text-sm data-table um-table">
-                                <thead class="bg-gray-50 border-b border-gray-100">
-                                    <tr class="text-[10px] uppercase tracking-wide text-[#8B0000] font-bold">
-                                        <th class="py-3 px-3 sm:px-5 text-left w-12 hidden sm:table-cell">#</th>
-                                        <th class="py-3 px-4 text-left">User</th>
-                                        <th class="py-3 px-4 text-left">Role</th>
-                                        <th class="py-3 px-4 text-center">Status</th>
-                                        <th class="py-3 px-4 text-left hidden lg:table-cell">Registered</th>
-                                        <th class="py-3 px-4 text-center">Actions</th>
+                        <div class="table-scroll um-table-scroll">
+                            <table class="data-table um-table">
+                                <thead>
+                                    <tr>
+                                        <th class="hidden sm:table-cell">
+                                            #
+                                        </th>
+
+                                        <th>
+                                            User
+                                        </th>
+
+                                        <th>
+                                            Role
+                                        </th>
+
+                                        <th class="table-cell-center">
+                                            Status
+                                        </th>
+
+                                        <th class="hidden lg:table-cell">
+                                            Registered
+                                        </th>
+
+                                        <th class="table-cell-center">
+                                            Actions
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody id="umTableBody">
@@ -223,9 +176,10 @@ $inactiveCount = $inactiveCount ?? 0;
 
                                         <td class="py-3.5 px-2 sm:px-4">
                                             <div class="flex items-center gap-2 sm:gap-3">
-                                                <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm"
-                                                    style="background: linear-gradient(135deg, #8B0000, #b00000);">
-                                                    {{ strtoupper(substr($user->name, 0, 1)) }}
+                                                <div class="patient-avatar patient-avatar-md">
+                                                    <span>
+                                                        {{ strtoupper(substr($user->name, 0, 1)) }}
+                                                    </span>
                                                 </div>
                                                 <div>
                                                     <div class="font-semibold text-gray-800 text-sm leading-tight">
@@ -353,19 +307,9 @@ $inactiveCount = $inactiveCount ?? 0;
                                     </tr>
                                     @empty
                                     <tr id="dbEmptyRow">
-                                        <td colspan="6" style="padding:3.5rem 1rem;text-align:center;">
-                                            <div
-                                                style="display:inline-flex;align-items:center;justify-content:center;width:64px;height:64px;background:#f3f4f6;border-radius:18px;margin-bottom:1rem;">
-                                                <i class="fa-solid fa-magnifying-glass"
-                                                    style="font-size:1.6rem;color:#d1d5db;"></i>
+                                        <td colspan="6" class="p-0">
+                                            <div id="umTableEmptyState" class="empty-state-host">
                                             </div>
-                                            <p style="font-size:.9rem;font-weight:700;color:#374151;margin:0 0 .3rem;">
-                                                No
-                                                users
-                                                found</p>
-                                            <p style="font-size:.78rem;color:#9ca3af;margin:0;">Try adjusting your
-                                                filters.
-                                            </p>
                                         </td>
                                     </tr>
                                     @endforelse
@@ -395,9 +339,10 @@ $inactiveCount = $inactiveCount ?? 0;
                                     </div>
 
                                     <div class="flex items-center gap-3">
-                                        <div class="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm"
-                                            style="background: linear-gradient(135deg, #8B0000, #b00000);">
-                                            {{ strtoupper(substr($user->name, 0, 1)) }}
+                                        <div class="patient-avatar patient-avatar-sm">
+                                            <span>
+                                                {{ strtoupper(substr($user->name, 0, 1)) }}
+                                            </span>
                                         </div>
                                         <div class="min-w-0">
                                             <div class="font-semibold text-gray-800 text-sm leading-tight">
@@ -520,21 +465,15 @@ $inactiveCount = $inactiveCount ?? 0;
                                     </div>
                                 </div>
                                 @empty
+                                <div id="umGridEmptyState" class="empty-state-host"></div>
                                 @endforelse
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="global-pagebar global-pagebar-bottom">
-                    <span class="global-pagebar-info">
-                        Showing
-                        <strong>{{ $users->firstItem() ?? 0 }}–{{ $users->lastItem() ?? 0 }}</strong>
-                        of <strong>{{ $users->total() }}</strong> users
-                    </span>
-
-                    <div class="global-pagination-wrap"></div>
-                </div>
+                <x-pagination-bar id="umPaginationBottomBar" info-id="umPaginationInfoBottom"
+                    pagination-id="umPaginationBottom" position="bottom" :show-entries="false" label="users" />
             </div>
         </div>
     </div>
@@ -605,7 +544,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                 <span class="required-mark">*</span>
                             </label>
 
-                            <div class="modal-inline-control" data-voice-field>
+                            <div class="modal-inline-control">
                                 <div class="modal-inline-main">
                                     <input type="text" id="addNameInput" name="name" value="{{ old('name') }}"
                                         class="form-input-custom" placeholder="e.g. Juan dela Cruz" autocomplete="name"
@@ -613,18 +552,8 @@ $inactiveCount = $inactiveCount ?? 0;
                                         data-required-message="Please enter the user's full name." required>
                                 </div>
 
-                                <div class="modal-control-action voice-input-toggle">
-                                    <button type="button" id="addNameMicBtn" class="voice-search-mic external"
-                                        data-global-voice-trigger data-voice-target="#addNameInput"
-                                        data-voice-status="#addNameVoiceStatus" aria-label="Voice input for full name">
-
-                                        <i class="fa-solid fa-microphone"></i>
-                                    </button>
-
-                                    <span id="addNameVoiceStatus" class="voice-status hidden" data-voice-status
-                                        aria-live="polite">
-                                    </span>
-                                </div>
+                                <x-voice-input target="#addNameInput" status-id="addNameVoiceStatus"
+                                    label="Voice input for full name" title="Voice input" />
                             </div>
                         </div>
 
@@ -656,9 +585,8 @@ $inactiveCount = $inactiveCount ?? 0;
 
                                 @php
                                 $patientRole = $roles->first(
-                                fn ($role) =>
-                                strtolower($role->slug) === 'patient' ||
-                                strtolower($role->name) === 'patient'
+                                fn($role) => strtolower($role->slug) === 'patient' ||
+                                strtolower($role->name) === 'patient',
                                 );
                                 @endphp
 
@@ -670,10 +598,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                 @endif
 
                                 @foreach ($roles as $role)
-                                @continue(
-                                $patientRole &&
-                                (int) $role->id === (int) $patientRole->id
-                                )
+                                @continue($patientRole && (int) $role->id === (int) $patientRole->id)
 
                                 <option value="{{ $role->id }}" {{ old('role_id')==$role->id ? 'selected' : '' }}>
                                     {{ $role->display_name }}
@@ -939,26 +864,15 @@ $inactiveCount = $inactiveCount ?? 0;
                             <span class="required-mark">*</span>
                         </label>
 
-                        <div class="modal-inline-control" data-voice-field>
+                        <div class="modal-inline-control">
                             <div class="modal-inline-main">
                                 <input type="text" name="name" id="editName" class="form-input-custom"
                                     placeholder="Full name" autocomplete="name" data-field-label="Full Name"
                                     data-required-message="Please enter the user's full name." required>
                             </div>
 
-                            <div class="voice-input-toggle">
-                                <button type="button" id="editNameMicBtn" class="voice-search-mic external"
-                                    data-voice-trigger data-voice-target="#editName"
-                                    data-voice-status="#editNameVoiceStatus"
-                                    aria-label="Voice input for edit full name">
-
-                                    <i class="fa-solid fa-microphone"></i>
-                                </button>
-
-                                <span id="editNameVoiceStatus" class="voice-status hidden" data-voice-status
-                                    aria-live="polite">
-                                </span>
-                            </div>
+                            <x-voice-input target="#editName" status-id="editNameVoiceStatus"
+                                label="Voice input for edit full name" title="Voice input" />
                         </div>
                     </div>
 
@@ -994,10 +908,7 @@ $inactiveCount = $inactiveCount ?? 0;
                             @endif
 
                             @foreach ($roles as $role)
-                            @continue(
-                            $patientRole &&
-                            (int) $role->id === (int) $patientRole->id
-                            )
+                            @continue($patientRole && (int) $role->id === (int) $patientRole->id)
 
                             <option value="{{ $role->id }}">
                                 {{ $role->display_name }}
@@ -1491,7 +1402,6 @@ $inactiveCount = $inactiveCount ?? 0;
     page: @json((int) request('page', 1)),
         };
 
-    var umSearchTimer = null;
     var umController = null;
 
     window.closeAllModals = function () {
@@ -1806,9 +1716,9 @@ $inactiveCount = $inactiveCount ?? 0;
         }
 
         resetForm.action =
-            source === 'patients'
-                ? `/admin/user-management/patient/${id}/reset-password`
-                : `/admin/user-management/${id}/reset-password`;
+            source === 'patients' ?
+                `/admin/user-management/patient/${id}/reset-password` :
+                `/admin/user-management/${id}/reset-password`;
 
         if (resetSubtitle) {
             resetSubtitle.textContent =
@@ -1956,8 +1866,7 @@ $inactiveCount = $inactiveCount ?? 0;
 
     function openViewModal(payloadOrName, email, role, status, source, createdAt, details) {
         const payload = typeof payloadOrName === 'object' && payloadOrName !== null ?
-            payloadOrName :
-            {
+            payloadOrName : {
                 name: payloadOrName,
                 email,
                 role,
@@ -2173,24 +2082,24 @@ $inactiveCount = $inactiveCount ?? 0;
                 String(user.status || '').toLowerCase() === 'active';
 
             const toggleClass =
-                isActive
-                    ? 'ui-action-warning'
-                    : 'ui-action-success';
+                isActive ?
+                    'ui-action-warning' :
+                    'ui-action-success';
 
             const toggleIcon =
-                isActive
-                    ? 'fa-toggle-on'
-                    : 'fa-toggle-off';
+                isActive ?
+                    'fa-toggle-on' :
+                    'fa-toggle-off';
 
             const toggleTooltip =
-                isActive
-                    ? 'Deactivate account'
-                    : 'Activate account';
+                isActive ?
+                    'Deactivate account' :
+                    'Activate account';
 
             const toggleTone =
-                isActive
-                    ? 'reschedule'
-                    : 'start';
+                isActive ?
+                    'reschedule' :
+                    'start';
 
             return `
             <div class="ui-action-group um-action-group">
@@ -2269,74 +2178,78 @@ $inactiveCount = $inactiveCount ?? 0;
             return;
         }
 
-        if (!Array.isArray(users) || users.length === 0) {
+        if (
+            !Array.isArray(users) ||
+            users.length === 0
+        ) {
             const searchValue =
-                String(umState.search || '');
-
-            const hasSearch =
-                searchValue.trim() !== '';
-
-            const escapedSearch =
-                escapeHtml(searchValue);
-
-            const emptyTitle =
-                hasSearch
-                    ? `No results for “${escapedSearch}”`
-                    : 'No users found';
-
-            const emptySubtitle =
-                hasSearch
-                    ? 'Try a different name or email.'
-                    : 'Try adjusting your filters.';
-
-            const clearButton =
-                hasSearch
-                    ? `
-                    <button
-                        type="button"
-                        class="empty-state-btn"
-                        data-clear-search
-                        data-search-target="#umSearch">
-
-                        <i class="fa-solid fa-xmark"></i>
-                        Clear search
-                    </button>
-                `
-                    : '';
-
-            const emptyInner = `
-            <div class="empty-state">
-                <div class="empty-state-icon">
-                    <i class="fa-solid ${hasSearch
-                    ? 'fa-magnifying-glass'
-                    : 'fa-users'
-                }"></i>
-                </div>
-
-                <h3 class="empty-state-title">
-                    ${emptyTitle}
-                </h3>
-
-                <p class="empty-state-sub">
-                    ${emptySubtitle}
-                </p>
-
-                ${clearButton}
-            </div>
-        `;
+                String(
+                    umState.search || ''
+                ).trim();
 
             tbody.innerHTML = `
-            <tr>
-                <td colspan="6" class="p-0">
-                    ${emptyInner}
-                </td>
-            </tr>
-        `;
+        <tr>
+            <td
+                colspan="6"
+                class="p-0">
 
-            gridBody.innerHTML =
-                emptyInner;
+                <div
+                    id="umTableEmptyState"
+                    class="empty-state-host">
+                </div>
 
-            window.initSearchClearButtons?.();
+            </td>
+        </tr>
+    `;
+
+            gridBody.innerHTML = `
+        <div
+            id="umGridEmptyState"
+            class="empty-state-host">
+        </div>
+    `;
+
+            const renderEmptyState =
+                host => {
+
+                    if (!host) {
+                        return;
+                    }
+
+                    if (searchValue) {
+                        window.EmptyState
+                            ?.renderSearch({
+                                host,
+                                input: document.getElementById(
+                                    'umSearch'
+                                ),
+                                query: searchValue,
+                                message: 'Try a different name or email.',
+                            });
+
+                        return;
+                    }
+
+                    window.EmptyState
+                        ?.render({
+                            host,
+                            icon: 'fa-users',
+                            title: 'No users found',
+                            message: 'Users matching the selected filters will appear here.',
+                        });
+                };
+
+            renderEmptyState(
+                document.getElementById(
+                    'umTableEmptyState'
+                )
+            );
+
+            renderEmptyState(
+                document.getElementById(
+                    'umGridEmptyState'
+                )
+            );
 
             return;
         }
@@ -2370,15 +2283,15 @@ $inactiveCount = $inactiveCount ?? 0;
                 normalizedStatus === 'active';
 
             const statusClass =
-                isActive
-                    ? 'status-active'
-                    : 'status-inactive';
+                isActive ?
+                    'status-active' :
+                    'status-inactive';
 
             const statusLabel =
-                normalizedStatus
-                    ? normalizedStatus.charAt(0).toUpperCase() +
-                    normalizedStatus.slice(1)
-                    : 'Unknown';
+                normalizedStatus ?
+                    normalizedStatus.charAt(0).toUpperCase() +
+                    normalizedStatus.slice(1) :
+                    'Unknown';
 
             const initial =
                 String(user.name || 'U')
@@ -2392,9 +2305,9 @@ $inactiveCount = $inactiveCount ?? 0;
             const createdFull =
                 registeredDay +
                 (
-                    user.created_at_time
-                        ? ` ${user.created_at_time}`
-                        : ''
+                    user.created_at_time ?
+                        ` ${user.created_at_time}` :
+                        ''
                 );
 
             const safeName =
@@ -2446,11 +2359,10 @@ $inactiveCount = $inactiveCount ?? 0;
 
                 <td class="py-3.5 px-2 sm:px-4">
                     <div class="flex items-center gap-2 sm:gap-3">
-                        <div
-                            class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm"
-                            style="background: linear-gradient(135deg, #8B0000, #b00000);">
-
-                            ${initial}
+                        <div class="patient-avatar patient-avatar-md">
+                            <span>
+                                ${initial}
+                            </span>
                         </div>
 
                         <div class="min-w-0">
@@ -2504,11 +2416,10 @@ $inactiveCount = $inactiveCount ?? 0;
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <div
-                        class="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm"
-                        style="background: linear-gradient(135deg, #8B0000, #b00000);">
-
-                        ${initial}
+                    <div class="patient-avatar patient-avatar-sm">
+                        <span>
+                            ${initial}
+                        </span>
                     </div>
 
                     <div class="min-w-0">
@@ -2564,32 +2475,93 @@ $inactiveCount = $inactiveCount ?? 0;
             gridHtml;
     }
 
-    function umGoPage(page) {
-        umState.page = page;
-        umFetch();
-    }
-
     function umRenderPagebar(p) {
-        if (!p) return;
+        if (!p) {
+            return;
+        }
 
-        document.querySelectorAll(
-            '.user-management-page .global-pagebar-info'
-        ).forEach(function (el) {
-            el.innerHTML = 'Showing <strong>' + p.from + '–' + p.to + '</strong> of <strong>' + p.total +
-                '</strong> users';
+        const currentPage =
+            Number(p.current_page || 1);
+
+        const lastPage =
+            Math.max(
+                1,
+                Number(p.last_page || 1)
+            );
+
+        const total =
+            Number(p.total || 0);
+
+        const from =
+            Number(p.from || 0);
+
+        const to =
+            Number(p.to || 0);
+
+        const paginationContainers = [
+            document.getElementById(
+                'umPaginationTop'
+            ),
+            document.getElementById(
+                'umPaginationBottom'
+            ),
+        ].filter(Boolean);
+
+        const infoElements = [
+            document.getElementById(
+                'umPaginationInfoTop'
+            ),
+            document.getElementById(
+                'umPaginationInfoBottom'
+            ),
+        ].filter(Boolean);
+
+        const bars = [
+            document.getElementById(
+                'umPaginationTopBar'
+            ),
+            document.getElementById(
+                'umPaginationBottomBar'
+            ),
+        ].filter(Boolean);
+
+        window.renderGlobalPagination?.({
+            currentPage,
+            lastPage,
+            total,
+            from,
+            to,
+
+            containers: paginationContainers,
+
+            infoElements,
+
+            bars,
+
+            itemLabel: 'users',
+
+            onPageChange(page) {
+                umState.page = page;
+                umFetch();
+            },
         });
 
-        var html = umBuildPagination(p);
-        document.querySelectorAll(
-            '.user-management-page .global-pagination-wrap'
-        ).forEach(function (el) {
-            el.innerHTML = html;
-        });
+        const perPageSelect =
+            document.getElementById(
+                'umPerPageSelect'
+            );
 
-        var umPerPageSelect = document.getElementById('umPerPageSelect');
-        if (umPerPageSelect && p.per_page) {
-            umPerPageSelect.value = String(p.per_page);
-            window.syncGlobalPageSizeSelect?.(umPerPageSelect, p.per_page);
+        if (
+            perPageSelect &&
+            p.per_page
+        ) {
+            perPageSelect.value =
+                String(p.per_page);
+
+            window.syncGlobalPageSizeSelect?.(
+                perPageSelect,
+                p.per_page
+            );
         }
     }
 
@@ -2605,136 +2577,6 @@ $inactiveCount = $inactiveCount ?? 0;
         if (activeEl) activeEl.textContent = counts.active ?? 0;
         if (inactiveEl) inactiveEl.textContent = counts.inactive ?? 0;
         if (badgeEl) badgeEl.textContent = counts.all ?? 0;
-    }
-
-    function umBuildPagination(p) {
-        if (!p) {
-            return '';
-        }
-
-        const current = Number(p.current_page || 1);
-        const last = Math.max(
-            1,
-            Number(p.last_page || 1)
-        );
-        const windowSize = 5;
-        const half = Math.floor(windowSize / 2);
-
-        let start = Math.max(1, current - half);
-        let end = Math.min(last, start + windowSize - 1);
-
-        if (end - start + 1 < windowSize) {
-            start = Math.max(1, end - windowSize + 1);
-        }
-
-        let html = `
-        <nav class="global-pagination" aria-label="User pagination">
-    `;
-
-        html += current <= 1 ?
-            `
-            <button
-                type="button"
-                class="global-page-disabled"
-                aria-label="Previous page"
-                disabled>
-                <i class="fa-solid fa-chevron-left global-page-icon"></i>
-            </button>
-        ` :
-            `
-            <button
-                type="button"
-                class="global-page-btn"
-                onclick="umGoPage(${current - 1})"
-                aria-label="Previous page">
-                <i class="fa-solid fa-chevron-left global-page-icon"></i>
-            </button>
-        `;
-
-        if (start > 1) {
-            html += `
-            <button
-                type="button"
-                class="global-page-btn"
-                onclick="umGoPage(1)">
-                1
-            </button>
-        `;
-
-            if (start > 2) {
-                html += `
-                <span
-                    class="global-page-ellipsis"
-                    aria-hidden="true">
-                    &hellip;
-                </span>
-            `;
-            }
-        }
-
-        for (let page = start; page <= end; page++) {
-            html += page === current ?
-                `
-                <span
-                    class="global-page-current"
-                    aria-current="page">
-                    ${page}
-                </span>
-            ` :
-                `
-                <button
-                    type="button"
-                    class="global-page-btn"
-                    onclick="umGoPage(${page})">
-                    ${page}
-                </button>
-            `;
-        }
-
-        if (end < last) {
-            if (end < last - 1) {
-                html += `
-                <span
-                    class="global-page-ellipsis"
-                    aria-hidden="true">
-                    &hellip;
-                </span>
-            `;
-            }
-
-            html += `
-            <button
-                type="button"
-                class="global-page-btn"
-                onclick="umGoPage(${last})">
-                ${last}
-            </button>
-        `;
-        }
-
-        html += current >= last ?
-            `
-            <button
-                type="button"
-                class="global-page-disabled"
-                aria-label="Next page"
-                disabled>
-                <i class="fa-solid fa-chevron-right global-page-icon"></i>
-            </button>
-        ` :
-            `
-            <button
-                type="button"
-                class="global-page-btn"
-                onclick="umGoPage(${current + 1})"
-                aria-label="Next page">
-                <i class="fa-solid fa-chevron-right global-page-icon"></i>
-            </button>
-        `;
-
-        html += '</nav>';
-
-        return html;
     }
 
     const UM_TOAST_CACHE = new Map();
@@ -2776,7 +2618,86 @@ $inactiveCount = $inactiveCount ?? 0;
         showUserManagementToast('error', message);
     }
 
+    window.handleUserManagementPerPageChange =
+        function (value) {
+
+            const parsed =
+                Number(value);
+
+            umState.perPage = [10, 20, 50, 100].includes(parsed) ?
+                parsed :
+                10;
+
+            umState.page = 1;
+
+            umFetch();
+        };
+
+    window.handleUserManagementSearch = function (value) {
+        umState.search = String(value || '').trim();
+        umState.page = 1;
+
+        umFetch(true);
+    };
+
     document.addEventListener('DOMContentLoaded', function () {
+
+        const initialTableEmptyState =
+            document.getElementById(
+                'umTableEmptyState'
+            );
+
+        const initialGridEmptyState =
+            document.getElementById(
+                'umGridEmptyState'
+            );
+
+        const initialSearchValue =
+            String(
+                umState.search || ''
+            ).trim();
+
+        const renderInitialEmptyState =
+            host => {
+
+                if (!host) {
+                    return;
+                }
+
+                if (initialSearchValue) {
+                    window.EmptyState
+                        ?.renderSearch({
+                            host,
+                            input:
+                                document.getElementById(
+                                    'umSearch'
+                                ),
+                            query:
+                                initialSearchValue,
+                            message:
+                                'Try a different name or email.',
+                        });
+
+                    return;
+                }
+
+                window.EmptyState
+                    ?.render({
+                        host,
+                        icon: 'fa-users',
+                        title: 'No users found',
+                        message:
+                            'Users matching the selected filters will appear here.',
+                    });
+            };
+
+        renderInitialEmptyState(
+            initialTableEmptyState
+        );
+
+        renderInitialEmptyState(
+            initialGridEmptyState
+        );
 
         const editRoleSelect = document.getElementById('editRole');
 
@@ -2803,44 +2724,7 @@ $inactiveCount = $inactiveCount ?? 0;
         per_page: {{ $users-> perPage() }},
             });
 
-    var searchInput = document.getElementById('umSearch');
-
-    window.initSearchClearButtons?.();
     window.initGlobalPageSizeSelects?.();
-
-    var umPerPageSelect = document.getElementById('umPerPageSelect');
-    if (umPerPageSelect) {
-        umPerPageSelect.value = String(umState.perPage || 10);
-        window.syncGlobalPageSizeSelect?.(umPerPageSelect, umState.perPage || 10);
-
-        umPerPageSelect.addEventListener('change', function () {
-            umState.perPage = Number(this.value) || 10;
-            umState.page = 1;
-            umFetch();
-        });
-    }
-
-    if (searchInput) {
-        searchInput.addEventListener('input', function () {
-            clearTimeout(umSearchTimer);
-            var val = this.value;
-            umSearchTimer = setTimeout(function () {
-                umState.search = val;
-                umState.page = 1;
-                umFetch(true);
-            }, 350);
-        });
-    }
-
-    var statusFilter = document.getElementById('statusFilter');
-
-    if (statusFilter) {
-        statusFilter.addEventListener('change', function () {
-            umState.status = this.value;
-            umState.page = 1;
-            umFetch();
-        });
-    }
 
     var toggleForm = document.getElementById('toggleConfirmForm');
     if (toggleForm) {

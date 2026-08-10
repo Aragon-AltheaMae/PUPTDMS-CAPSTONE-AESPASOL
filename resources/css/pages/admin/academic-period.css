@@ -905,12 +905,6 @@
     box-shadow: 0 16px 34px rgba(0, 0, 0, .32) !important;
 }
 
-#addModal,
-#editModal,
-#deleteModal {
-    z-index: 99999 !important;
-}
-
 #addModal .ap-add-form,
 #editModal .ap-add-form {
     min-height: 0 !important;
@@ -960,50 +954,6 @@
         align-items: flex-end !important;
         padding: 0 !important;
     }
-}
-
-#addModal.ui-modal:not(.open):not(.closing),
-#editModal.ui-modal:not(.open):not(.closing) {
-    display: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-}
-
-#addModal.ui-modal.open,
-#editModal.ui-modal.open,
-#addModal.ui-modal.closing,
-#editModal.ui-modal.closing{
-    display: flex !important;
-    visibility: visible !important;
-}
-
-#addModal.ui-modal.open,
-#editModal.ui-modal.open {
-    opacity: 1 !important;
-    pointer-events: auto !important;
-}
-
-#addModal .modal-box,
-#editModal .modal-box,
-#deleteModal .modal-box {
-    pointer-events: auto !important;
-}
-
-#filterModal.filter-drawer-wrapper:not(.open):not(.closing) {
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-}
-
-#filterModal.filter-drawer-wrapper.open,
-#filterModal.filter-drawer-wrapper.closing {
-    visibility: visible !important;
-}
-
-#filterModal.filter-drawer-wrapper.open {
-    opacity: 1 !important;
-    pointer-events: auto !important;
 }
 
 [data-theme="dark"] #mainContent.academic-period-page .ap-periods-column>.bg-white,
@@ -1237,17 +1187,6 @@
 #addModal .ap-semester-card,
 #editModal .ap-semester-card {
     position: relative !important;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page .academic-quick-actions-panel,
-[data-theme="dark"] #mainContent.academic-period-page .academic-quick-actions-panel.table-card,
-.dark #mainContent.academic-period-page .academic-quick-actions-panel,
-.dark #mainContent.academic-period-page .academic-quick-actions-panel.table-card {
-    background: #0D1117 !important;
-    border-color: rgba(255, 255, 255, .10) !important;
-    box-shadow:
-        0 18px 38px rgba(0, 0, 0, .34),
-        inset 0 1px 0 rgba(255, 255, 255, .055) !important;
 }
 
 #addModal .ap-semester-card:hover,
@@ -1941,7 +1880,6 @@
         border-radius: 13px !important;
     }
 
-    #mainContent.academic-period-page .academic-quick-actions-panel,
     #mainContent.academic-period-page .cal-card,
     #mainContent.academic-period-page .bg-white.rounded-xl {
         border-radius: 18px !important;
@@ -2185,10 +2123,7 @@
         min-width: 0 !important;
     }
 
-    #mainContent.academic-period-page .ap-periods-column,
-    #mainContent.academic-period-page .lg\:col-span-2,
-    #mainContent.academic-period-page .cal-card,
-    #mainContent.academic-period-page .academic-quick-actions-panel {
+    #mainContent.academic-period-page .ap-periods-column {
         min-width: 0 !important;
         max-width: 100% !important;
     }

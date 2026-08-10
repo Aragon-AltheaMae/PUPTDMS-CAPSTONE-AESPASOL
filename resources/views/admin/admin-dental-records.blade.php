@@ -82,7 +82,7 @@ $recordItems->filter(fn($record) => strtolower($record->status ?? 'pending') ===
         </div>
 
         <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_380px] gap-5 items-start">
-            <section class="table-card rounded-2xl border border-gray-200 shadow-sm overflow-visible">
+            <section class="table-card dental-records-main-card">
                 <div class="patient-table-toolbar record-toolbar px-4 md:px-6 py-4 border-b border-gray-100">
                     <div class="record-toolbar-layout">
                         <span id="recordRowCount" class="sr-only">
@@ -186,48 +186,19 @@ $recordItems->filter(fn($record) => strtolower($record->status ?? 'pending') ===
 
                         <div class="record-toolbar-actions">
                             <div class="record-search-row voice-search-row">
-                                <div class="search-wrap global-search flex-1" data-search-wrapper>
-                                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
 
-                                    <input id="dentalRecordSearch" type="text" placeholder="Search patient name..."
-                                        autocomplete="off" data-search-input class="search-input" />
+                                <x-search-bar id="dentalRecordSearch" placeholder="Search patient name..." type="search"
+                                    clear-label="Clear dental record search" class="flex-1" />
 
-                                    <button type="button" class="search-clear" data-search-clear
-                                        aria-label="Clear search">
-                                        <i class="fa-solid fa-xmark text-xs"></i>
-                                    </button>
-                                </div>
+                                <x-voice-input target="#dentalRecordSearch" status-id="dentalRecordVoiceStatus"
+                                    label="Voice search dental records" title="Voice search" />
 
-                                <div class="voice-input-toggle">
-                                    <button type="button" id="dentalRecordMicToggleBtn"
-                                        class="voice-search-mic external" data-voice-trigger
-                                        data-voice-target="#dentalRecordSearch"
-                                        data-voice-status="#dentalRecordVoiceStatus"
-                                        aria-label="Voice search dental records">
-                                        <i class="fa-solid fa-microphone"></i>
-                                    </button>
-
-                                    <span id="dentalRecordVoiceStatus" class="voice-status hidden" data-voice-status
-                                        aria-live="polite"></span>
-                                </div>
                             </div>
 
-                            <div class="view-toggle-container record-view-toggle" id="dentalRecordViewToggle"
-                                data-global-view-toggle data-view-root="#mainContent"
-                                data-list-view="#dentalRecordListView" data-grid-view="#dentalRecordGridView"
-                                data-storage-key="admin_dental_records_view" aria-label="Record view options">
-                                <span class="view-slider" aria-hidden="true"></span>
-
-                                <button type="button" class="btn-view-mode active" title="List view"
-                                    aria-label="List view" aria-pressed="true" data-view-mode="list">
-                                    <i class="fa-solid fa-list"></i>
-                                </button>
-
-                                <button type="button" class="btn-view-mode" title="Grid view" aria-label="Grid view"
-                                    aria-pressed="false" data-view-mode="grid">
-                                    <i class="fa-solid fa-grip"></i>
-                                </button>
-                            </div>
+                            <x-view-toggle id="dentalRecordViewToggle" root="#mainContent"
+                                storage-key="admin_dental_records_view" list-view="#dentalRecordListView"
+                                grid-view="#dentalRecordGridView" list-label="List" grid-label="Grid"
+                                class="record-view-toggle" />
                         </div>
                     </div>
                 </div>
@@ -238,20 +209,15 @@ $recordItems->filter(fn($record) => strtolower($record->status ?? 'pending') ===
                 <div id="dentalRecordListView" class="dental-record-list-view overflow-x-auto">
                     <table class="w-full min-w-[880px] border-collapse">
                         <thead>
-                            <tr class="border-b border-gray-100 text-left">
-                                <th class="px-5 py-3 text-[11px] font-black uppercase tracking-wider text-gray-400">
-                                    Patient</th>
-                                <th class="px-5 py-3 text-[11px] font-black uppercase tracking-wider text-gray-400">
-                                    Procedure</th>
-                                <th class="px-5 py-3 text-[11px] font-black uppercase tracking-wider text-gray-400">
-                                    Dentist</th>
-                                <th class="px-5 py-3 text-[11px] font-black uppercase tracking-wider text-gray-400">
-                                    Date</th>
-                                <th class="px-5 py-3 text-[11px] font-black uppercase tracking-wider text-gray-400">
-                                    Status</th>
-                                <th
-                                    class="px-5 py-3 text-[11px] font-black uppercase tracking-wider text-gray-400 text-right">
-                                    Actions</th>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Procedure</th>
+                                <th>Dentist</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th class="table-cell-center">
+                                    Actions
+                                </th>
                             </tr>
                         </thead>
                         <tbody id="dentalRecordsTableBody" class="divide-y divide-gray-100">
@@ -286,54 +252,61 @@ $recordItems->filter(fn($record) => strtolower($record->status ?? 'pending') ===
                                 data-dentist="{{ strtolower($dentistName) }}" data-status="{{ $normalizedStatus }}"
                                 data-date="{{ $dateIso }}" @if (!empty($record->id)) onclick="openRecordPanel({{
                                 $record->id }})" @endif>
-                                <td class="px-5 py-4 align-middle">
-                                    <div class="flex items-center gap-3 min-w-0">
-                                        <div
-                                            class="w-9 h-9 rounded-full bg-gradient-to-br from-[#8B0000] to-[#6b0000] text-white flex items-center justify-center text-xs font-black flex-shrink-0">
-                                            {{ $initial }}
+                                <td class="table-cell-main">
+                                    <div class="table-primary">
+                                        <div class="patient-avatar patient-avatar-sm">
+                                            <span>
+                                                {{ $initial }}
+                                            </span>
                                         </div>
-                                        <div class="min-w-0">
-                                            <div class="font-black text-gray-800 text-sm truncate">
-                                                {{ $patientName }}</div>
-                                            <div class="text-[11px] font-bold text-gray-400">Dental record
-                                            </div>
+                                        <div class="dental-record-patient-copy">
+                                            <strong class="dental-record-patient-name">
+                                                {{ $patientName }}
+                                            </strong>
+
+                                            <span class="dental-record-patient-sub">
+                                                Dental record
+                                            </span>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-5 py-4 align-middle">
-                                    <span class="text-sm font-bold text-gray-700 break-words">{{ $procedure }}</span>
+                                <td class="table-cell-main">
+                                    {{ $procedure }}
                                 </td>
-                                <td class="px-5 py-4 align-middle">
-                                    <span class="text-sm font-bold text-gray-600">{{ $dentistName }}</span>
+                                <td>
+                                    {{ $dentistName }}
                                 </td>
-                                <td class="px-5 py-4 align-middle">
-                                    <div class="inline-flex items-center gap-2 text-sm font-bold text-gray-700">
-                                        <i class="fa-solid fa-calendar-day text-gray-400 text-xs"></i>
-                                        {{ $dateText }}
-                                    </div>
+                                <td>
+                                    <span class="table-primary">
+                                        <i class="fa-solid fa-calendar-day"></i>
+                                        <span>{{ $dateText }}</span>
+                                    </span>
                                 </td>
-                                <td class="px-5 py-4 align-middle">
+                                <td class="table-cell-main">
                                     <span class="status-pill {{ $statusClass }}">
                                         <span class="status-dot"></span>
                                         {{ ucfirst(str_replace('-', ' ', $normalizedStatus)) }}
                                     </span>
                                 </td>
-                                <td class="px-5 py-4 align-middle text-right">
-                                    @if (!empty($record->id))
-                                    <button type="button" class="ui-icon-btn edit"
-                                        onclick="event.stopPropagation(); openRecordPanel({{ $record->id }})"
-                                        title="View record">
-                                        <i class="fa-solid fa-eye"></i>
-                                    </button>
-                                    @endif
+                                <td class="table-action-cell">
+                                    <div class="ui-action-group">
+                                        @if (!empty($record->id))
+                                        <button type="button" class="ui-action-btn ui-action-view"
+                                            onclick="event.stopPropagation(); openRecordPanel({{ $record->id }})"
+                                            aria-label="View record" data-tooltip="View record"
+                                            data-tooltip-tone="view">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
-                <div id="dentalRecordGridView" class="dental-record-grid-view" hidden>
-                    <div class="dental-record-grid">
+                <div id="dentalRecordListView" class="dental-record-list-view table-list-view table-scroll">
+                    <table class="data-table dental-record-table">
                         @foreach ($recordsSource as $record)
                         @php
                         $rawStatus = strtolower(trim($record->status ?? 'pending'));
@@ -363,187 +336,224 @@ $recordItems->filter(fn($record) => strtolower($record->status ?? 'pending') ===
                         $initial = strtoupper(substr($patientName, 0, 1));
                         @endphp
 
-                        <article class="dental-record-grid-card dental-record-item"
+                        <article class="table-record-card dental-record-item"
                             data-patient="{{ strtolower($patientName) }}" data-procedure="{{ strtolower($procedure) }}"
                             data-dentist="{{ strtolower($dentistName) }}" data-status="{{ $normalizedStatus }}"
                             data-date="{{ $dateIso }}" @if (!empty($record->id)) onclick="openRecordPanel({{ $record->id
                             }})" @endif>
 
-                            <div class="dental-record-grid-top">
-                                <div class="dental-record-grid-avatar">
-                                    {{ $initial }}
+                            <div class="table-record-card-layout">
+
+                                <div class="table-record-content">
+
+                                    <div class="table-record-header">
+
+                                        <div class="table-primary">
+
+                                            <div class="patient-avatar patient-avatar-md">
+                                                <span>
+                                                    {{ $initial }}
+                                                </span>
+                                            </div>
+
+                                            <div class="dental-record-patient-copy">
+                                                <h3 class="table-record-title">
+                                                    {{ $patientName }}
+                                                </h3>
+
+                                                <span class="dental-record-patient-sub">
+                                                    Dental record
+                                                </span>
+                                            </div>
+
+                                        </div>
+
+                                        <span class="status-pill {{ $statusClass }}">
+                                            <span class="status-dot"></span>
+                                            {{ ucfirst(str_replace('-', ' ', $normalizedStatus)) }}
+                                        </span>
+
+                                    </div>
+
+                                    <div class="table-record-meta">
+
+                                        <div class="table-record-row">
+                                            <span class="table-record-label">
+                                                Procedure
+                                            </span>
+
+                                            <span class="table-record-value">
+                                                {{ $procedure }}
+                                            </span>
+                                        </div>
+
+                                        <div class="table-record-row">
+                                            <span class="table-record-label">
+                                                Dentist
+                                            </span>
+
+                                            <span class="table-record-value">
+                                                {{ $dentistName }}
+                                            </span>
+                                        </div>
+
+                                        <div class="table-record-row">
+                                            <span class="table-record-label">
+                                                Date
+                                            </span>
+
+                                            <span class="table-record-value">
+                                                <i class="fa-solid fa-calendar-day"></i>
+                                                &nbsp;
+                                                {{ $dateText }}
+                                            </span>
+                                        </div>
+
+                                    </div>
+
                                 </div>
 
-                                <div class="dental-record-grid-main">
-                                    <div class="dental-record-grid-name">{{ $patientName }}</div>
-                                    <div class="dental-record-grid-sub">Dental record</div>
-                                </div>
-
-                                <span class="status-pill {{ $statusClass }}">
-                                    <span class="status-dot"></span>
-                                    {{ ucfirst(str_replace('-', ' ', $normalizedStatus)) }}
-                                </span>
-                            </div>
-
-                            <div class="dental-record-grid-meta">
-                                <div class="dental-record-grid-meta-item">
-                                    <span class="dental-record-grid-label">Procedure</span>
-                                    <span class="dental-record-grid-value">{{ $procedure }}</span>
-                                </div>
-
-                                <div class="dental-record-grid-meta-item">
-                                    <span class="dental-record-grid-label">Dentist</span>
-                                    <span class="dental-record-grid-value">{{ $dentistName }}</span>
-                                </div>
-
-                                <div class="dental-record-grid-meta-item">
-                                    <span class="dental-record-grid-label">Date</span>
-                                    <span class="dental-record-grid-value">
-                                        <i class="fa-solid fa-calendar-day"></i>
-                                        {{ $dateText }}
-                                    </span>
-                                </div>
                             </div>
                         </article>
                         @endforeach
+                </div>
+        </div>
+        <div id="dentalRecordEmptyState" class="empty-state-host"></div>
+
+        @if ($recordsSource instanceof \Illuminate\Pagination\AbstractPaginator)
+
+        <x-pagination-bar id="dentalRecordsPagebar" info-id="dentalRecordsPageInfo"
+            pagination-id="dentalRecordsPagination" position="bottom" :show-entries="false" label="records" />
+
+        @endif
+        @endif
+        </section>
+
+        <aside class="space-y-5">
+            <section class="table-card dental-record-panel">
+                <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
+                    <div
+                        class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#8B0000] to-[#6b0000] text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <i class="fa-solid fa-notes-medical"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h2 id="panelRecordTitle" class="text-sm font-black text-gray-800 truncate">Select a
+                            record</h2>
+                        <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Dental Record</p>
                     </div>
                 </div>
-                <div id="dentalRecordEmptyState" class="empty-state-host"></div>
 
-                @if ($recordsSource instanceof \Illuminate\Pagination\AbstractPaginator)
-                <div class="px-4 md:px-6 py-4 border-t border-gray-100">
-                    {{ $recordsSource->links() }}
+                <div id="panelBody" class="p-5">
+                    <div class="text-center py-8">
+                        <div class="empty-state-icon !w-[64px] !h-[64px] !rounded-2xl !mb-4">
+                            <i class="fa-solid fa-notes-medical !text-[26px]"></i>
+                        </div>
+                        <h3 class="empty-state-title !text-[15px]">No record selected</h3>
+                        <p class="empty-state-sub !text-[13px] !mt-2">Click a row to view the record details.</p>
+                    </div>
                 </div>
-                @endif
-                @endif
+
+                <div id="panelFoot" class="hidden px-5 py-4 border-t border-gray-100 bg-gray-50 flex-wrap gap-2">
+                </div>
             </section>
 
-            <aside class="space-y-5">
-                <section
-                    class="table-card rounded-2xl border border-gray-200 shadow-sm overflow-hidden xl:sticky xl:top-6">
-                    <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
-                        <div
-                            class="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#8B0000] to-[#6b0000] text-white flex items-center justify-center flex-shrink-0 shadow-sm">
-                            <i class="fa-solid fa-notes-medical"></i>
-                        </div>
+            <section class="table-card rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
+                    <div
+                        class="dental-req-quick-actions-icon w-10 h-10 rounded-2xl bg-red-50 text-[#8B0000] border border-red-100 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-chart-pie"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-black text-gray-800">Record Insights</h2>
+                        <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Summary statistics
+                        </p>
+                    </div>
+                </div>
+
+                <div class="record-insights-list">
+                    <div class="record-insight-row px-5 py-4 flex items-center justify-between gap-3">
                         <div class="min-w-0">
-                            <h2 id="panelRecordTitle" class="text-sm font-black text-gray-800 truncate">Select a
-                                record</h2>
-                            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Dental Record</p>
+                            <div class="text-[11px] font-black uppercase tracking-wider text-gray-400">Most Common
+                                Procedure</div>
+                            <div class="text-sm font-black text-gray-800 truncate">
+                                {{ $topProcedure ?? 'No data yet' }}</div>
                         </div>
+                        <span class="status-pill status-default"><i class="fa-solid fa-tooth"></i></span>
                     </div>
 
-                    <div id="panelBody" class="p-5">
-                        <div class="text-center py-8">
-                            <div class="empty-state-icon !w-[64px] !h-[64px] !rounded-2xl !mb-4">
-                                <i class="fa-solid fa-notes-medical !text-[26px]"></i>
-                            </div>
-                            <h3 class="empty-state-title !text-[15px]">No record selected</h3>
-                            <p class="empty-state-sub !text-[13px] !mt-2">Click a row to view the record details.</p>
-                        </div>
-                    </div>
-
-                    <div id="panelFoot" class="hidden px-5 py-4 border-t border-gray-100 bg-gray-50 flex-wrap gap-2">
-                    </div>
-                </section>
-
-                <section class="table-card rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                    <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
-                        <div
-                            class="dental-req-quick-actions-icon w-10 h-10 rounded-2xl bg-red-50 text-[#8B0000] border border-red-100 flex items-center justify-center flex-shrink-0">
-                            <i class="fa-solid fa-chart-pie"></i>
-                        </div>
+                    <div class="record-insight-row px-5 py-4 flex items-center justify-between gap-3">
                         <div>
-                            <h2 class="text-sm font-black text-gray-800">Record Insights</h2>
-                            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Summary statistics
+                            <div class="text-[11px] font-black uppercase tracking-wider text-gray-400">Completed
+                                This Week</div>
+                            <div class="text-sm font-black text-gray-800">
+                                {{ number_format($completedThisWeek ?? 0) }}</div>
+                        </div>
+                        <span class="status-pill status-completed"><i class="fa-solid fa-circle-check"></i></span>
+                    </div>
+
+                    <div class="record-insight-row px-5 py-4 flex items-center justify-between gap-3">
+                        <div>
+                            <div class="text-[11px] font-black uppercase tracking-wider text-gray-400">Patients For
+                                Follow-Up</div>
+                            <div class="text-sm font-black text-gray-800">
+                                {{ number_format($patientsForFollowUp ?? 0) }}</div>
+                        </div>
+                        <span class="status-pill status-pending"><i class="fa-solid fa-user-clock"></i></span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card quick-actions-card">
+                <div class="card-header">
+                    <div class="card-header-left">
+                        <div class="card-header-icon">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+
+                        <div>
+                            <h2 class="card-title">
+                                Quick Actions
+                            </h2>
+
+                            <p class="card-subtitle">
+                                Common tasks
                             </p>
                         </div>
                     </div>
+                </div>
 
-                    <div class="record-insights-list">
-                        <div class="record-insight-row px-5 py-4 flex items-center justify-between gap-3">
-                            <div class="min-w-0">
-                                <div class="text-[11px] font-black uppercase tracking-wider text-gray-400">Most Common
-                                    Procedure</div>
-                                <div class="text-sm font-black text-gray-800 truncate">
-                                    {{ $topProcedure ?? 'No data yet' }}</div>
-                            </div>
-                            <span class="status-pill status-default"><i class="fa-solid fa-tooth"></i></span>
-                        </div>
+                <div class="quick-actions-list">
+                    <a href="{{ route('admin.reports.index') }}" class="quick-action quick-action-card">
+                        <span class="quick-action-icon">
+                            <i class="fa-solid fa-chart-column"></i>
+                        </span>
 
-                        <div class="record-insight-row px-5 py-4 flex items-center justify-between gap-3">
-                            <div>
-                                <div class="text-[11px] font-black uppercase tracking-wider text-gray-400">Completed
-                                    This Week</div>
-                                <div class="text-sm font-black text-gray-800">
-                                    {{ number_format($completedThisWeek ?? 0) }}</div>
-                            </div>
-                            <span class="status-pill status-completed"><i class="fa-solid fa-circle-check"></i></span>
-                        </div>
+                        <span class="quick-action-copy">
+                            <span class="quick-action-title">Reports</span>
+                            <span class="quick-action-sub">View analytics and summaries</span>
+                        </span>
 
-                        <div class="record-insight-row px-5 py-4 flex items-center justify-between gap-3">
-                            <div>
-                                <div class="text-[11px] font-black uppercase tracking-wider text-gray-400">Patients For
-                                    Follow-Up</div>
-                                <div class="text-sm font-black text-gray-800">
-                                    {{ number_format($patientsForFollowUp ?? 0) }}</div>
-                            </div>
-                            <span class="status-pill status-pending"><i class="fa-solid fa-user-clock"></i></span>
-                        </div>
-                    </div>
-                </section>
+                        <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
+                        <i class="fa-solid fa-chart-column quick-action-bg-icon"></i>
+                    </a>
 
-                <section class="card quick-actions-card">
-                    <div class="card-header">
-                        <div class="card-header-left">
-                            <div class="card-header-icon">
-                                <i class="fa-solid fa-bolt"></i>
-                            </div>
+                    <a href="{{ route('admin.appointments') }}" class="quick-action quick-action-card">
+                        <span class="quick-action-icon">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </span>
 
-                            <div>
-                                <h2 class="card-title">
-                                    Quick Actions
-                                </h2>
+                        <span class="quick-action-copy">
+                            <span class="quick-action-title">Appointments</span>
+                            <span class="quick-action-sub">Check scheduled clinic visits</span>
+                        </span>
 
-                                <p class="card-subtitle">
-                                    Common tasks
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="quick-actions-list">
-                        <a href="{{ route('admin.reports.index') }}" class="quick-action quick-action-card">
-                            <span class="quick-action-icon">
-                                <i class="fa-solid fa-chart-column"></i>
-                            </span>
-
-                            <span class="quick-action-copy">
-                                <span class="quick-action-title">Reports</span>
-                                <span class="quick-action-sub">View analytics and summaries</span>
-                            </span>
-
-                            <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
-                            <i class="fa-solid fa-chart-column quick-action-bg-icon"></i>
-                        </a>
-
-                        <a href="{{ route('admin.appointments') }}" class="quick-action quick-action-card">
-                            <span class="quick-action-icon">
-                                <i class="fa-solid fa-calendar-check"></i>
-                            </span>
-
-                            <span class="quick-action-copy">
-                                <span class="quick-action-title">Appointments</span>
-                                <span class="quick-action-sub">Check scheduled clinic visits</span>
-                            </span>
-
-                            <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
-                            <i class="fa-solid fa-calendar-check quick-action-bg-icon"></i>
-                        </a>
-                    </div>
-                </section>
-            </aside>
-        </div>
+                        <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
+                        <i class="fa-solid fa-calendar-check quick-action-bg-icon"></i>
+                    </a>
+                </div>
+            </section>
+        </aside>
+    </div>
     </div>
 </main>
 @endsection
@@ -625,8 +635,10 @@ $recordItems->filter(fn($record) => strtolower($record->status ?? 'pending') ===
 
             panelBody.innerHTML = `
                 <div class="rounded-2xl border border-red-100 bg-red-50/70 p-4 mb-4 flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#8B0000] to-[#6b0000] text-white flex items-center justify-center text-sm font-black flex-shrink-0">
-                        ${escapeHtml(initial)}
+                    <div class="patient-avatar patient-avatar-md">
+                        <span>
+                            ${escapeHtml(initial)}
+                        </span>
                     </div>
                     <div class="min-w-0 flex-1">
                         <div class="text-sm font-black text-gray-900 truncate">${escapeHtml(patientName)}</div>
@@ -713,21 +725,6 @@ $recordItems->filter(fn($record) => strtolower($record->status ?? 'pending') ===
         });
     }
 
-    function buildDentalRecordEmptyStateHtml({ icon, title, sub, actionHtml = '' }) {
-        return `
-        <div class="empty-state">
-            <div class="empty-state-icon">
-                <i class="fa-solid ${icon}"></i>
-            </div>
-
-            <p class="empty-state-title">${escapeHtml(title)}</p>
-            <p class="empty-state-sub">${escapeHtml(sub)}</p>
-
-            ${actionHtml}
-        </div>
-    `;
-    }
-
     function filterDentalRecords() {
         const input = document.getElementById('dentalRecordSearch');
         const statusFilter = document.getElementById('recordStatusFilter');
@@ -785,78 +782,104 @@ $recordItems->filter(fn($record) => strtolower($record->status ?? 'pending') ===
 
         if (emptyState) {
             if (shouldShowEmpty) {
-                if (listView) listView.hidden = true;
-                if (gridView) gridView.hidden = true;
+                if (listView) {
+                    listView.hidden = true;
+                }
 
-                let icon = 'fa-notes-medical';
-                let title = 'No dental records found';
-                let sub = 'New records will appear here once they are added.';
-                let actionHtml = '';
+                if (gridView) {
+                    gridView.hidden = true;
+                }
 
                 const statusEmptyCopy = {
                     today: {
                         icon: 'fa-clock',
                         title: 'No records added today',
-                        sub: 'Dental records created today will appear here.'
+                        message:
+                            'Dental records created today will appear here.',
                     },
+
                     pending: {
                         icon: 'fa-user-clock',
                         title: 'No pending dental records',
-                        sub: 'Pending dental records will appear here once available.'
+                        message:
+                            'Pending dental records will appear here once available.',
                     },
+
                     ongoing: {
                         icon: 'fa-spinner',
                         title: 'No ongoing dental records',
-                        sub: 'Ongoing dental procedures will appear here once started.'
+                        message:
+                            'Ongoing dental procedures will appear here once started.',
                     },
+
                     completed: {
                         icon: 'fa-check-double',
                         title: 'No completed dental records',
-                        sub: 'Completed dental records will appear here once finalized.'
+                        message:
+                            'Completed dental records will appear here once finalized.',
                     },
+
                     cancelled: {
                         icon: 'fa-calendar-xmark',
                         title: 'No cancelled dental records',
-                        sub: 'Cancelled dental records will appear here once available.'
-                    }
+                        message:
+                            'Cancelled dental records will appear here once available.',
+                    },
                 };
 
                 if (hasSearch) {
-                    icon = 'fa-magnifying-glass';
-                    title = `No results for "${q}"`;
-                    sub = 'Try a different patient name, procedure, dentist, or status.';
-                    actionHtml = `
-    <button type="button" data-clear-search data-search-target="#dentalRecordSearch" class="empty-state-btn">
-        <i class="fa-solid fa-xmark"></i>
-        Clear search
-    </button>
-`;
+                    window.EmptyState?.renderSearch({
+                        host: emptyState,
+                        input,
+                        query: q,
+                        message:
+                            'Try a different patient name, procedure, dentist, or status.',
+                    });
                 } else if (hasFilter) {
-                    const emptyCopy = statusEmptyCopy[selectedStatus] || {
-                        icon: 'fa-sliders',
-                        title: 'No matching dental records',
-                        sub: 'Try selecting another record status.'
-                    };
+                    const copy =
+                        statusEmptyCopy[selectedStatus] || {
+                            icon:
+                                'fa-sliders',
+                            title:
+                                'No matching dental records',
+                            message:
+                                'Try selecting another record status.',
+                        };
 
-                    icon = emptyCopy.icon;
-                    title = emptyCopy.title;
-                    sub = emptyCopy.sub;
+                    window.EmptyState?.render({
+                        host: emptyState,
+                        icon: copy.icon,
+                        title: copy.title,
+                        message: copy.message,
+                    });
+                } else {
+                    window.EmptyState?.render({
+                        host: emptyState,
+                        icon:
+                            'fa-notes-medical',
+                        title:
+                            'No dental records found',
+                        message:
+                            'New records will appear here once they are added.',
+                    });
                 }
-
-                emptyState.innerHTML = buildDentalRecordEmptyStateHtml({
-                    icon,
-                    title,
-                    sub,
-                    actionHtml
-                });
-
-                emptyState.classList.add('show', 'is-visible');
             } else {
-                emptyState.classList.remove('show', 'is-visible');
-                emptyState.innerHTML = '';
+                window.EmptyState?.hide(
+                    emptyState
+                );
 
-                const activeMode = window.getGlobalViewMode?.('dentalRecordViewToggle') || 'list';
-                window.setGlobalViewMode?.('dentalRecordViewToggle', activeMode, { persist: false });
+                const activeMode =
+                    window.getGlobalViewMode?.(
+                        'dentalRecordViewToggle'
+                    ) || 'list';
+
+                window.setGlobalViewMode?.(
+                    'dentalRecordViewToggle',
+                    activeMode,
+                    {
+                        persist: false,
+                    }
+                );
             }
         }
 
@@ -875,6 +898,95 @@ $recordItems->filter(fn($record) => strtolower($record->status ?? 'pending') ===
 
         setRecordStatusFilter('all');
         filterDentalRecords();
+    }
+
+    function renderDentalRecordsPagination() {
+        const pagebar =
+            document.getElementById(
+                'dentalRecordsPagebar'
+            );
+
+        const info =
+            document.getElementById(
+                'dentalRecordsPageInfo'
+            );
+
+        const pagination =
+            document.getElementById(
+                'dentalRecordsPagination'
+            );
+
+        if (
+            !pagebar ||
+            !info ||
+            !pagination
+        ) {
+            return;
+        }
+
+        const paginationMeta =
+            @json(
+                $recordsSource instanceof \Illuminate\Pagination\AbstractPaginator
+                ? [
+                    'current_page' => $recordsSource -> currentPage(),
+                        'last_page' => $recordsSource -> lastPage(),
+                            'total' => $recordsSource -> total(),
+                                'from' => $recordsSource -> firstItem(),
+                                    'to' => $recordsSource -> lastItem(),
+                ]
+                : null
+        );
+
+        if (!paginationMeta) {
+            return;
+        }
+
+        window.renderGlobalPagination?.({
+            currentPage:
+                paginationMeta.current_page,
+
+            lastPage:
+                paginationMeta.last_page,
+
+            total:
+                paginationMeta.total,
+
+            from:
+                paginationMeta.from,
+
+            to:
+                paginationMeta.to,
+
+            containers: [
+                pagination
+            ],
+
+            infoElements: [
+                info
+            ],
+
+            bars: [
+                pagebar
+            ],
+
+            itemLabel:
+                'records',
+
+            onPageChange(page) {
+                const url =
+                    new URL(
+                        window.location.href
+                    );
+
+                url.searchParams.set(
+                    'page',
+                    page
+                );
+
+                window.location.href =
+                    url.toString();
+            },
+        });
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -916,6 +1028,100 @@ $recordItems->filter(fn($record) => strtolower($record->status ?? 'pending') ===
 
         setRecordStatusFilter('all');
         filterDentalRecords();
+        document.addEventListener(
+            'DOMContentLoaded',
+            () => {
+                const input =
+                    document.getElementById(
+                        'dentalRecordSearch'
+                    );
+
+                const dropdownBtn =
+                    document.getElementById(
+                        'recordStatusDropdownBtn'
+                    );
+
+                input?.addEventListener(
+                    'input',
+                    filterDentalRecords
+                );
+
+                dropdownBtn?.addEventListener(
+                    'click',
+                    event => {
+                        event.stopPropagation();
+                        toggleRecordStatusDropdown();
+                    }
+                );
+
+                document
+                    .querySelectorAll(
+                        '.record-sort-option'
+                    )
+                    .forEach(option => {
+                        option.addEventListener(
+                            'click',
+                            event => {
+                                event.stopPropagation();
+
+                                const value =
+                                    option.dataset
+                                        .filter ||
+                                    'all';
+
+                                setRecordStatusFilter(
+                                    value
+                                );
+
+                                filterDentalRecords();
+
+                                closeRecordStatusDropdown();
+                            }
+                        );
+                    });
+
+                document.addEventListener(
+                    'click',
+                    event => {
+                        const field =
+                            document.getElementById(
+                                'recordStatusField'
+                            );
+
+                        if (
+                            field &&
+                            !field.contains(
+                                event.target
+                            )
+                        ) {
+                            closeRecordStatusDropdown();
+                        }
+                    }
+                );
+
+                document.addEventListener(
+                    'keydown',
+                    event => {
+                        if (
+                            event.key ===
+                            'Escape'
+                        ) {
+                            closeRecordStatusDropdown();
+                        }
+                    }
+                );
+
+                window.initSearchClearButtons?.();
+                window.initGlobalViewToggles?.();
+
+                setRecordStatusFilter(
+                    'all'
+                );
+
+                filterDentalRecords();
+                renderDentalRecordsPagination();
+            }
+        );
     });
 </script>
 @endsection

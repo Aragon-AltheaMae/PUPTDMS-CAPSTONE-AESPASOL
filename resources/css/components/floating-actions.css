@@ -1018,7 +1018,10 @@ body.filter-lock .chatbot-fab {
 }
 
 [data-theme="dark"] .chat-empty-orbit {
-    background: linear-gradient(135deg, rgba(127, 29, 29, .45), rgba(15, 23, 42, .95));
+    background:
+        linear-gradient(135deg,
+            rgba(127, 29, 29, .45),
+            var(--card));
     box-shadow: 0 14px 30px rgba(0, 0, 0, .35);
 }
 
