@@ -409,187 +409,196 @@ $status = $status ?? 'active';
 
         </div>
 </main>
-<div id="filterModal" class="filter-drawer-wrapper" aria-hidden="true">
-    <div class="filter-drawer-overlay" onclick="closeSlFilterPanel()">
+
+<x-filter-drawer id="filterModal" title="Filters" close-callback="closeSlFilterPanel()"
+    clear-callback="clearSlFilterPanelDraft()" clear-label="Clear Filters" cancel-id="filterCloseBtn"
+    cancel-callback="closeSlFilterPanel()" cancel-label="Cancel" apply-id="filterApplyBtn"
+    apply-callback="applySlFilters()" apply-label="Show 0 results" results-id="slShowResultsText">
+
+    <div id="slActiveFiltersSection" class="filter-active-section hidden">
+
+        <div class="filter-active-header">
+
+            <span class="filter-active-title">
+                Active Filters
+            </span>
+
+            <button id="slClearAllChipsBtn" type="button" class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm">
+                <i class="fa-solid fa-rotate-left"></i>
+
+                <span>
+                    Clear All
+                </span>
+            </button>
+
+        </div>
+
+        <div id="slActiveChipsContainer" class="active-filters-container"></div>
+
     </div>
 
-    <div class="filter-drawer-panel" aria-label="Filter system logs">
-        <div class="filter-drawer-header">
-            <div class="filter-drawer-title">
-                <i class="fa-solid fa-sliders text-xl"></i>
-                <h2 class="text-xl font-extrabold">Filters</h2>
-            </div>
+    <x-filter-group title="Sort By">
 
-            <button type="button" class="filter-drawer-close" onclick="closeSlFilterPanel()" aria-label="Close filters">
+        <input type="hidden" id="slSortOrder" value="desc">
 
-                <i class="fa-solid fa-xmark"></i>
+        <div id="slSortGroup" class="filter-chip-row">
+
+            <button type="button" class="ftag" data-sl-sort="desc">
+                <i class="fa-solid fa-arrow-down-wide-short"></i>
+                Newest First
             </button>
+
+            <button type="button" class="ftag" data-sl-sort="asc">
+                <i class="fa-solid fa-arrow-up-wide-short"></i>
+                Oldest First
+            </button>
+
         </div>
 
-        <div class="filter-drawer-body">
-            <div id="slActiveFiltersSection" class="filter-active-section hidden">
+    </x-filter-group>
 
-                <div class="filter-active-header">
-                    <span class="filter-active-title">
-                        Active Filters
+    <x-filter-group title="Filter by Date Range">
+
+        <input type="hidden" id="slDatePreset" value="">
+
+        <div id="slDatePresetGroup" class="filter-chip-row">
+
+            <button type="button" class="quick-date-chip" data-sl-date-preset="today" onclick="setSlQuickDate('today')">
+                Today
+            </button>
+
+            <button type="button" class="quick-date-chip" data-sl-date-preset="week" onclick="setSlQuickDate('week')">
+                Last 7 Days
+            </button>
+
+            <button type="button" class="quick-date-chip" data-sl-date-preset="month" onclick="setSlQuickDate('month')">
+                Last 30 Days
+            </button>
+
+        </div>
+
+    </x-filter-group>
+
+    <x-filter-group title="Custom Date Range">
+
+        <div class="filter-date-grid">
+
+            <div class="filter-date-input-wrap">
+
+                <input type="text" id="slDateFrom" class="js-flatpickr-date-max-today" placeholder="Start date" readonly
+                    autocomplete="off">
+
+                <i class="fa-regular fa-calendar"></i>
+
+            </div>
+
+            <div class="filter-date-input-wrap">
+
+                <input type="text" id="slDateTo" class="js-flatpickr-date-max-today" placeholder="End date" readonly
+                    autocomplete="off">
+
+                <i class="fa-regular fa-calendar"></i>
+
+            </div>
+
+        </div>
+
+    </x-filter-group>
+
+    <x-filter-group title="Action Type">
+
+        <input type="hidden" id="slActionType" value="">
+
+        <div id="slActionSelect" class="sl-action-select">
+
+            <button type="button" id="slActionSelectBtn" class="sl-action-select-btn" aria-expanded="false">
+                <span class="sl-action-select-current">
+
+                    <i id="slActionSelectIcon" class="fa-solid fa-layer-group"></i>
+
+                    <span id="slActionSelectLabel">
+                        All Actions
                     </span>
 
-                    <button id="slClearAllChipsBtn" type="button"
-                        class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm">
+                </span>
 
-                        <i class="fa-solid fa-rotate-left"></i>
-                        <span>Clear All</span>
-                    </button>
-                </div>
-
-                <div id="slActiveChipsContainer" class="active-filters-container">
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Sort By</h3>
-                <input type="hidden" id="slSortOrder" value="desc">
-
-                <div class="filter-chip-row" id="slSortGroup">
-                    <button type="button" class="ftag" data-sl-sort="desc">
-                        <i class="fa-solid fa-arrow-down-wide-short"></i>
-                        Newest First
-                    </button>
-
-                    <button type="button" class="ftag" data-sl-sort="asc">
-                        <i class="fa-solid fa-arrow-up-wide-short"></i>
-                        Oldest First
-                    </button>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Filter by Date Range</h3>
-                <input type="hidden" id="slDatePreset" value="">
-
-                <div class="filter-chip-row" id="slDatePresetGroup">
-                    <button type="button" class="quick-date-chip" data-sl-date-preset="today"
-                        onclick="setSlQuickDate('today')">Today</button>
-                    <button type="button" class="quick-date-chip" data-sl-date-preset="week"
-                        onclick="setSlQuickDate('week')">Last 7 Days</button>
-                    <button type="button" class="quick-date-chip" data-sl-date-preset="month"
-                        onclick="setSlQuickDate('month')">Last 30 Days</button>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Custom Date Range</h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div class="filter-date-input-wrap">
-                        <input type="text" id="slDateFrom" class="js-flatpickr-date-max-today" placeholder="Start date"
-                            readonly autocomplete="off">
-                        <i class="fa-regular fa-calendar"></i>
-                    </div>
-
-                    <div class="filter-date-input-wrap">
-                        <input type="text" id="slDateTo" class="js-flatpickr-date-max-today" placeholder="End date"
-                            readonly autocomplete="off">
-                        <i class="fa-regular fa-calendar"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Action Type</h3>
-                <input type="hidden" id="slActionType" value="">
-
-                <div class="sl-action-select" id="slActionSelect">
-                    <button type="button" class="sl-action-select-btn" id="slActionSelectBtn" aria-expanded="false">
-                        <span class="sl-action-select-current">
-                            <i id="slActionSelectIcon" class="fa-solid fa-layer-group"></i>
-                            <span id="slActionSelectLabel">All Actions</span>
-                        </span>
-                        <i class="fa-solid fa-chevron-down sl-action-select-chevron"></i>
-                    </button>
-
-                    <div class="sl-action-select-menu" id="slActionSelectMenu">
-                        <button type="button" class="sl-action-select-option active" data-value=""
-                            data-label="All Actions" data-icon="fa-layer-group">
-                            <span><i class="fa-solid fa-layer-group"></i> All Actions</span>
-                            <i class="fa-solid fa-check"></i>
-                        </button>
-
-                        <button type="button" class="sl-action-select-option" data-value="login" data-label="Login"
-                            data-icon="fa-right-to-bracket">
-                            <span><i class="fa-solid fa-right-to-bracket"></i> Login</span>
-                            <i class="fa-solid fa-check"></i>
-                        </button>
-
-                        <button type="button" class="sl-action-select-option" data-value="logout" data-label="Logout"
-                            data-icon="fa-right-from-bracket">
-                            <span><i class="fa-solid fa-right-from-bracket"></i> Logout</span>
-                            <i class="fa-solid fa-check"></i>
-                        </button>
-                        <button type="button" class="sl-action-select-option" data-value="error" data-label="Error"
-                            data-icon="fa-triangle-exclamation">
-                            <span><i class="fa-solid fa-triangle-exclamation"></i> Error</span>
-                            <i class="fa-solid fa-check"></i>
-                        </button>
-                        <button type="button" class="sl-action-select-option" data-value="create" data-label="Create"
-                            data-icon="fa-plus">
-                            <span><i class="fa-solid fa-plus"></i> Create</span>
-                            <i class="fa-solid fa-check"></i>
-                        </button>
-
-                        <button type="button" class="sl-action-select-option" data-value="update" data-label="Update"
-                            data-icon="fa-pen">
-                            <span><i class="fa-solid fa-pen"></i> Update</span>
-                            <i class="fa-solid fa-check"></i>
-                        </button>
-
-                        <button type="button" class="sl-action-select-option" data-value="delete" data-label="Delete"
-                            data-icon="fa-trash">
-                            <span><i class="fa-solid fa-trash"></i> Delete</span>
-                            <i class="fa-solid fa-check"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Module</h3>
-                <div class="filter-date-input-wrap">
-                    <input type="text" id="slModuleFilter" placeholder="e.g. appointments">
-                    <i class="fa-solid fa-cube"></i>
-                </div>
-            </div>
-        </div>
-
-        <div class="filter-drawer-footer">
-            <button type="button" onclick="clearSlFilterPanelDraft()"
-                class="filter-clear-btn ui-btn ui-btn-secondary ui-btn-sm">
-
-                <i class="fa-regular fa-trash-can"></i>
-                <span>Clear Filters</span>
+                <i class="fa-solid fa-chevron-down sl-action-select-chevron"></i>
             </button>
 
-            <div class="filter-footer-actions">
-                <button type="button" id="filterCloseBtn" onclick="closeSlFilterPanel()"
-                    class="filter-cancel-btn ui-btn ui-btn-secondary">
+            <div id="slActionSelectMenu" class="sl-action-select-menu">
 
-                    <i class="fa-solid fa-xmark"></i>
-                    <span>Cancel</span>
-                </button>
+                @foreach ([
+                [
+                'value' => '',
+                'label' => 'All Actions',
+                'icon' => 'fa-layer-group',
+                ],
+                [
+                'value' => 'login',
+                'label' => 'Login',
+                'icon' => 'fa-right-to-bracket',
+                ],
+                [
+                'value' => 'logout',
+                'label' => 'Logout',
+                'icon' => 'fa-right-from-bracket',
+                ],
+                [
+                'value' => 'error',
+                'label' => 'Error',
+                'icon' => 'fa-triangle-exclamation',
+                ],
+                [
+                'value' => 'create',
+                'label' => 'Create',
+                'icon' => 'fa-plus',
+                ],
+                [
+                'value' => 'update',
+                'label' => 'Update',
+                'icon' => 'fa-pen',
+                ],
+                [
+                'value' => 'delete',
+                'label' => 'Delete',
+                'icon' => 'fa-trash',
+                ],
+                ] as $action)
 
-                <button type="button" id="filterApplyBtn" onclick="applySlFilters()"
-                    class="filter-apply-btn ui-btn ui-btn-primary">
+                <button type="button" class="
+                            sl-action-select-option
+                            {{ $action['value'] === '' ? 'active' : '' }}
+                        " data-value="{{ $action['value'] }}" data-label="{{ $action['label'] }}"
+                    data-icon="{{ $action['icon'] }}">
+                    <span>
+                        <i class="fa-solid {{ $action['icon'] }}"></i>
+                        {{ $action['label'] }}
+                    </span>
 
                     <i class="fa-solid fa-check"></i>
-
-                    <span id="slShowResultsText" class="filter-results-text">
-                        Show 0 results
-                    </span>
                 </button>
+
+                @endforeach
+
             </div>
+
         </div>
-    </div>
-</div>
+
+    </x-filter-group>
+
+    <x-filter-group title="Module" class="filter-group-last">
+
+        <div class="filter-date-input-wrap">
+
+            <input type="text" id="slModuleFilter" placeholder="e.g. appointments">
+
+            <i class="fa-solid fa-cube"></i>
+
+        </div>
+
+    </x-filter-group>
+
+</x-filter-drawer>
 
 <div id="slArchiveModal" class="ui-modal modal-theme-warning" aria-hidden="true">
 

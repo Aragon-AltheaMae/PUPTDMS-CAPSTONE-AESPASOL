@@ -2,10 +2,6 @@
     display: none !important;
 }
 
-.inventory-table-wrap {
-    overflow-x: auto;
-}
-
 .stock-no {
     font-size: 12px;
     font-weight: 500;
@@ -15,43 +11,6 @@
     border-radius: 6px;
     color: #7A7370;
     display: inline-block;
-    white-space: nowrap;
-}
-
-.supply-name {
-    font-weight: 600;
-    color: #1A1614;
-}
-
-.supply-cat {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    padding: 2px 7px;
-    border-radius: 5px;
-    margin-top: 3px;
-}
-
-.supply-cat.medicine {
-    background: #E3F2FD;
-    color: #1565C0;
-}
-
-.supply-cat.supplies {
-    background: #E8F5E9;
-    color: #2E7D32;
-}
-
-.bal-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 4px 9px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 600;
     white-space: nowrap;
 }
 
@@ -69,8 +28,9 @@
     }
 }
 
-.bal-chip.alert-blink {
-    animation: stockAlertPulse 1.2s ease-in-out infinite;
+.inventory-card-top>.status-pill {
+    flex: 0 0 auto;
+    align-self: flex-start;
 }
 
 .out-icon {
@@ -80,30 +40,6 @@
     margin-left: 4px;
     font-size: 11px;
     line-height: 1;
-}
-
-.bal-chip::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: currentColor;
-    flex-shrink: 0;
-}
-
-.bal-chip.ok {
-    background: #D4EDDA;
-    color: #1A6B34;
-}
-
-.bal-chip.low {
-    background: #FFF3CD;
-    color: #92600A;
-}
-
-.bal-chip.critical {
-    background: #FFE5E5;
-    color: #C0392B;
 }
 
 .inventory-grid-wrap {
@@ -139,6 +75,31 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: .75rem;
+}
+
+.inventory-card-statuses {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: .45rem;
+    flex-wrap: wrap;
+}
+
+.inventory-card-statuses .status-pill {
+    flex: 0 0 auto;
+}
+
+@media (max-width: 640px) {
+    .inventory-card-top {
+        gap: .65rem;
+    }
+
+    .inventory-card-statuses {
+        max-width: 60%;
+    }
 }
 
 .inventory-card-name {
@@ -206,11 +167,6 @@
     font-weight: 700;
 }
 
-.inventory-balance-label {
-    font-size: 10px;
-    font-weight: 400;
-}
-
 .inventory-row-actions {
     display: flex;
     justify-content: center;
@@ -229,13 +185,12 @@
     font-size: 9px;
 }
 
-[data-theme="dark"] .inventory-card {
-    background: #161b22 !important;
-    border-color: #21262d !important;
+[data-theme="dark"] .inventory-card,
+.dark .inventory-card {
+    background: var(--card) !important;
+    border-color: var(--border) !important;
 }
 
-
-[data-theme="dark"] .supply-name,
 [data-theme="dark"] .inventory-card-name {
     color: #f3f4f6 !important;
 }
@@ -263,7 +218,7 @@
     }
 
     .inventory-data-table {
-        min-width: 760px;
+        min-width: 920px;
     }
 
     #mainContent.dentist-inventory-page .inventory-title-left {
@@ -703,7 +658,7 @@
 }
 
 #mainContent.inventory-page #tableWrapper .inventory-data-table {
-    min-width: 760px !important;
+    min-width: 920px !important;
 }
 
 @media only screen and (max-width: 767px) {
@@ -722,10 +677,6 @@
     #mainContent.inventory-page.mode-grid #inventoryGrid {
         display: grid !important;
         grid-template-columns: 1fr !important;
-    }
-
-    #mainContent.inventory-page.mode-list #tableWrapper {
-        border-top: 1px solid #F0ECE8 !important;
     }
 }
 
@@ -1018,11 +969,6 @@
 .inventory-card-top>.min-w-0 {
     flex: 1 1 auto;
     min-width: 0;
-}
-
-.inventory-card-top>.bal-chip {
-    flex: 0 0 auto;
-    align-self: flex-start;
 }
 
 #mainContent.inventory-page .inventory-card-actions {

@@ -342,8 +342,7 @@ $notifCount = $notifications->count();
                         class="absolute left-[8px] top-0 bottom-0 w-[2px] bg-gradient-to-b from-[#8b0000]/30 to-[#8b0000]/05 rounded-full">
                     </div>
 
-                    <div
-                        class="appt-table-head appointment-table-grid grid gap-4 text-[10px] font-bold uppercase tracking-[0.14em] text-gray-500 py-3 px-5 bg-[#FAFAFA] border border-gray-200 rounded-t-2xl mb-3">
+                    <div class="table-list-header appt-table-head appointment-table-grid grid gap-4 py-3 px-5 rounded-t-2xl mb-3">
                         <div class="flex items-center gap-1.5">
                             <i class="fa-regular fa-calendar text-[10px]"></i>Date
                         </div>
@@ -1042,8 +1041,7 @@ $notifCount = $notifications->count();
                 <div class="desktop-appointments-table relative pl-10">
                     <div class="absolute left-[8px] top-0 bottom-0 w-[2px] bg-gray-200 rounded-full"></div>
 
-                    <div
-                        class="appt-table-head appointment-table-grid grid gap-4 text-[10px] font-bold uppercase tracking-[0.14em] text-gray-400 py-3 px-5 bg-[#FAFAFA] border border-gray-200 rounded-t-2xl mb-3">
+                    <div class="table-list-header appt-table-head appointment-table-grid grid gap-4 py-3 px-5 rounded-t-2xl mb-3">
                         <div class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-[10px]"></i>Date
                         </div>
                         <div class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-[10px]"></i>Time
@@ -1559,8 +1557,7 @@ $notifCount = $notifications->count();
                                     data-tooltip="View details" onclick="openRecordModal(this)"
                                     data-appt-id="{{ $appt->id }}" data-service="{{ $serviceLabel }}"
                                     data-date="{{ $dateLabel }}" data-time="{{ $timeLabel }}"
-                                    data-status="{{ $pastStatusLabel }}"
-                                    data-duration-seconds="{{ $recordDuration }}"
+                                    data-status="{{ $pastStatusLabel }}" data-duration-seconds="{{ $recordDuration }}"
                                     data-remarks="{{ $recordRemarks }}" data-oral="{{ $recordOral }}"
                                     data-diagnosis="{{ $recordDiagnosis }}"
                                     data-prescription="{{ $recordPrescription }}"

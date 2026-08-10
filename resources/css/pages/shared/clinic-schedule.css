@@ -18,39 +18,14 @@
     background: #fff7f7;
 }
 
-.sched-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.sched-table thead tr {
-    background: linear-gradient(135deg, #6b0000, #8B0000);
-}
-
 .sched-table thead th {
-    color: #fff;
-    font-size: .72rem;
-    font-weight: 700;
     padding: 10px 14px;
-    text-align: left;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-}
-
-.sched-table tbody tr {
-    border-bottom: 1px solid #f8f4f4;
-    transition: background .12s;
-}
-
-.sched-table tbody tr:hover {
-    background: #fef5f5;
+    font-size: .72rem;
 }
 
 .sched-table tbody td {
     padding: 11px 14px;
     font-size: .8rem;
-    color: #374151;
-    vertical-align: middle;
 }
 
 .badge-open {
@@ -451,9 +426,10 @@
     user-select: none;
 }
 
-[data-theme="dark"] .modal-section {
-    background: #0d1117;
-    border-color: #2a2f36;
+[data-theme="dark"] .modal-section,
+.dark .modal-section {
+    background: var(--card);
+    border-color: var(--border);
 }
 
 [data-theme="dark"] .modal-section-title {
@@ -464,16 +440,13 @@
     color: #8b949e;
 }
 
-[data-theme="dark"] .day-toggle {
-    background: #0d1117;
-    border-color: #30363d;
-    color: #c9d1d9;
-}
-
-[data-theme="dark"] .break-chip {
-    background: #0d1117;
-    border-color: #30363d;
-    color: #c9d1d9;
+[data-theme="dark"] .day-toggle,
+.dark .day-toggle,
+[data-theme="dark"] .break-chip,
+.dark .break-chip {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text-2);
 }
 
 [data-theme="dark"] .bg-gray-50 {
@@ -493,19 +466,6 @@
 [data-theme="dark"] .text-gray-500,
 [data-theme="dark"] .text-gray-600 {
     color: #9ca3af !important;
-}
-
-[data-theme="dark"] .sched-table tbody tr {
-    background: transparent !important;
-    border-color: #21262d !important;
-}
-
-[data-theme="dark"] .sched-table tbody tr:hover {
-    background: rgba(255, 255, 255, .04) !important;
-}
-
-[data-theme="dark"] .sched-table tbody td {
-    color: #d1d5db !important;
 }
 
 [data-theme="dark"] .sched-table .badge-open {
@@ -554,15 +514,17 @@
     border-color: rgba(255, 255, 255, .08) !important;
 }
 
-[data-theme="dark"] .wk-hdr.empty {
-    background: linear-gradient(180deg, #161b22 0%, #111827 100%) !important;
-    border-right: 1px solid rgba(255, 255, 255, .08) !important;
+[data-theme="dark"] .wk-hdr.empty,
+.dark .wk-hdr.empty {
+    background: var(--surface) !important;
+    border-right-color: var(--border) !important;
 }
 
-[data-theme="dark"] .time-lbl {
-    background: #0d1117 !important;
-    color: #9ca3af !important;
-    border-color: #21262d !important;
+[data-theme="dark"] .time-lbl,
+.dark .time-lbl {
+    background: var(--surface) !important;
+    color: var(--text-3) !important;
+    border-color: var(--border) !important;
 }
 
 [data-theme="dark"] .cal-slot {
@@ -1266,31 +1228,10 @@
     background: rgba(13, 17, 23, .88) !important;
 }
 
-[data-theme="dark"] .clinic-schedule-page .sched-table thead th,
-.dark .clinic-schedule-page .sched-table thead th {
-    color: #FCA5A5 !important;
-    border-color: rgba(255, 255, 255, .10) !important;
-}
-
-[data-theme="dark"] .clinic-schedule-page .sched-table tbody tr,
-.dark .clinic-schedule-page .sched-table tbody tr {
-    border-color: rgba(255, 255, 255, .08) !important;
-}
-
-[data-theme="dark"] .clinic-schedule-page .sched-table tbody tr:hover,
-.dark .clinic-schedule-page .sched-table tbody tr:hover {
-    background: rgba(252, 165, 165, .06) !important;
-}
-
-[data-theme="dark"] .clinic-schedule-page .sched-table tbody td,
-.dark .clinic-schedule-page .sched-table tbody td {
-    color: #CBD5E1 !important;
-}
-
 [data-theme="dark"] .clinic-schedule-page .form-ctrl,
 [data-theme="dark"] .clinic-schedule-page .form-sel,
 .dark .clinic-schedule-page .form-ctrl,
-.dark .clinic-schedule-page .form-sel{
+.dark .clinic-schedule-page .form-sel {
     background: #0D1117 !important;
     border-color: #30363D !important;
     color: #E5E7EB !important;
@@ -1541,32 +1482,6 @@
     color: #FCA5A5 !important;
 }
 
-[data-theme="dark"] .clinic-schedule-page .sched-table thead tr,
-.dark .clinic-schedule-page .sched-table thead tr {
-    background: rgba(13, 17, 23, .9) !important;
-}
-
-[data-theme="dark"] .clinic-schedule-page .sched-table thead th,
-.dark .clinic-schedule-page .sched-table thead th {
-    color: #FCA5A5 !important;
-    border-color: rgba(255, 255, 255, .10) !important;
-}
-
-[data-theme="dark"] .clinic-schedule-page .sched-table tbody tr,
-.dark .clinic-schedule-page .sched-table tbody tr {
-    border-color: rgba(255, 255, 255, .08) !important;
-}
-
-[data-theme="dark"] .clinic-schedule-page .sched-table tbody tr:hover,
-.dark .clinic-schedule-page .sched-table tbody tr:hover {
-    background: rgba(252, 165, 165, .06) !important;
-}
-
-[data-theme="dark"] .clinic-schedule-page .sched-table tbody td,
-.dark .clinic-schedule-page .sched-table tbody td {
-    color: #CBD5E1 !important;
-}
-
 [data-theme="dark"] .clinic-schedule-page .badge-open,
 .dark .clinic-schedule-page .badge-open {
     background: rgba(34, 197, 94, .13) !important;
@@ -1648,7 +1563,7 @@
 }
 
 [data-theme="dark"] .clinic-schedule-page .cs-modal-card,
-.dark .clinic-schedule-page .cs-modal-card{
+.dark .clinic-schedule-page .cs-modal-card {
     background: #0D1117 !important;
     border-color: #21262D !important;
     color: #E5E7EB !important;
@@ -1780,50 +1695,6 @@
     }
 }
 
-.clinic-schedule-page #statCards.cs-stat-grid {
-    display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 16px !important;
-    margin-bottom: 1.5rem !important;
-}
-
-.clinic-schedule-page #statCards.cs-stat-grid .stat-card {
-    min-height: 104px !important;
-    padding: 20px 26px !important;
-    border-radius: 16px !important;
-    overflow: hidden !important;
-    background:
-        radial-gradient(circle at 100% 100%, var(--stat-soft) 0%, transparent 34%),
-        linear-gradient(135deg, var(--stat-bg) 0%, #ffffff 72%) !important;
-    border-color: var(--stat-border) !important;
-    box-shadow: 0 12px 30px rgba(15, 23, 42, .05) !important;
-}
-
-.clinic-schedule-page #statCards.cs-stat-grid .stat-card::before {
-    background: linear-gradient(90deg,
-            var(--stat-accent),
-            color-mix(in srgb, var(--stat-accent) 62%, #ffffff)) !important;
-}
-
-.clinic-schedule-page #statCards.cs-stat-grid .stat-num {
-    color: var(--stat-accent) !important;
-}
-
-.clinic-schedule-page #statCards.cs-stat-grid .stat-footer {
-    color: color-mix(in srgb, var(--stat-accent) 48%, #6B7280) !important;
-    font-weight: 750 !important;
-}
-
-.clinic-schedule-page #statCards.cs-stat-grid .stat-icon-wrapper {
-    background: var(--stat-soft) !important;
-    color: var(--stat-accent) !important;
-    border-color: var(--stat-border) !important;
-}
-
-.clinic-schedule-page #statCards.cs-stat-grid .stat-icon-wrapper i {
-    color: currentColor !important;
-}
-
 .clinic-schedule-page .cs-rule-modal .modal-section {
     border-radius: 20px !important;
     padding: 1rem !important;
@@ -1875,120 +1746,6 @@
 .dark .clinic-schedule-page .cs-rule-modal .form-sel option:checked {
     background: #8B0000 !important;
     color: #FFFFFF !important;
-}
-
-[data-theme="dark"] .clinic-schedule-page #statCards.cs-stat-grid .stat-card,
-.dark .clinic-schedule-page #statCards.cs-stat-grid .stat-card {
-    background:
-        radial-gradient(circle at 100% 100%, var(--stat-bg) 0%, transparent 38%),
-        linear-gradient(145deg, rgba(17, 24, 39, .96), rgba(13, 17, 23, .94)) !important;
-    border-color: var(--stat-border) !important;
-    box-shadow:
-        0 14px 30px rgba(0, 0, 0, .34),
-        inset 0 1px 0 rgba(255, 255, 255, .06) !important;
-}
-
-[data-theme="dark"] .clinic-schedule-page #statCards.cs-stat-grid .stat-card.s-crimson,
-.dark .clinic-schedule-page #statCards.cs-stat-grid .stat-card.s-crimson {
-    --stat-accent: #FCA5A5;
-    --stat-soft: rgba(139, 0, 0, .24);
-    --stat-bg: rgba(139, 0, 0, .16);
-    --stat-border: rgba(252, 165, 165, .28);
-}
-
-[data-theme="dark"] .clinic-schedule-page #statCards.cs-stat-grid .stat-card.s-blue,
-.dark .clinic-schedule-page #statCards.cs-stat-grid .stat-card.s-blue {
-    --stat-accent: #60A5FA;
-    --stat-soft: rgba(37, 99, 235, .22);
-    --stat-bg: rgba(37, 99, 235, .14);
-    --stat-border: rgba(147, 197, 253, .26);
-}
-
-[data-theme="dark"] .clinic-schedule-page #statCards.cs-stat-grid .stat-card.s-green,
-.dark .clinic-schedule-page #statCards.cs-stat-grid .stat-card.s-green {
-    --stat-accent: #86EFAC;
-    --stat-soft: rgba(22, 163, 74, .22);
-    --stat-bg: rgba(22, 163, 74, .14);
-    --stat-border: rgba(134, 239, 172, .26);
-}
-
-[data-theme="dark"] .clinic-schedule-page #statCards.cs-stat-grid .stat-card.s-amber,
-.dark .clinic-schedule-page #statCards.cs-stat-grid .stat-card.s-amber {
-    --stat-accent: #FCD34D;
-    --stat-soft: rgba(245, 158, 11, .22);
-    --stat-bg: rgba(245, 158, 11, .14);
-    --stat-border: rgba(251, 191, 36, .26);
-}
-
-[data-theme="dark"] .clinic-schedule-page #statCards.cs-stat-grid .stat-num,
-.dark .clinic-schedule-page #statCards.cs-stat-grid .stat-num {
-    color: var(--stat-accent) !important;
-}
-
-[data-theme="dark"] .clinic-schedule-page #statCards.cs-stat-grid .stat-icon-wrapper,
-.dark .clinic-schedule-page #statCards.cs-stat-grid .stat-icon-wrapper {
-    background: var(--stat-bg) !important;
-    color: var(--stat-accent) !important;
-    border-color: var(--stat-border) !important;
-}
-
-[data-theme="dark"] .clinic-schedule-page #statCards.cs-stat-grid .stat-footer,
-.dark .clinic-schedule-page #statCards.cs-stat-grid .stat-footer {
-    color: #94A3B8 !important;
-}
-
-@media (max-width: 1024px) {
-    .clinic-schedule-page #statCards.cs-stat-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    }
-}
-
-@media (max-width: 767px) {
-    .clinic-schedule-page #statCards.cs-stat-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: .75rem !important;
-        margin-bottom: 1rem !important;
-    }
-
-    .clinic-schedule-page #statCards.cs-stat-grid .stat-card {
-        min-height: 118px !important;
-        padding: .85rem !important;
-        border-radius: 16px !important;
-    }
-
-    .clinic-schedule-page #statCards.cs-stat-grid .stat-icon-wrapper {
-        width: 34px !important;
-        height: 34px !important;
-        min-width: 34px !important;
-        border-radius: 11px !important;
-        margin-bottom: .65rem !important;
-    }
-
-    .clinic-schedule-page #statCards.cs-stat-grid .stat-icon-wrapper i {
-        font-size: .78rem !important;
-    }
-
-    .clinic-schedule-page #statCards.cs-stat-grid .stat-label,
-    .clinic-schedule-page #statCards.cs-stat-grid p.text-gray-500 {
-        font-size: .58rem !important;
-        line-height: 1.15 !important;
-        letter-spacing: .04em !important;
-        text-align: right !important;
-    }
-
-    .clinic-schedule-page #statCards.cs-stat-grid .stat-num,
-    .clinic-schedule-page #statCards.cs-stat-grid p.text-gray-800 {
-        font-size: 1.45rem !important;
-        line-height: 1 !important;
-        text-align: right !important;
-    }
-
-    .clinic-schedule-page #statCards.cs-stat-grid .stat-footer,
-    .clinic-schedule-page #statCards.cs-stat-grid p.text-gray-400 {
-        font-size: .62rem !important;
-        line-height: 1.2 !important;
-        text-align: right !important;
-    }
 }
 
 .cs-modal .day-toggle {
@@ -2247,44 +2004,6 @@ html.dark .cs-modal .fp-date-icon,
         gap: .65rem !important;
         flex-wrap: wrap !important;
         margin-left: auto !important;
-    }
-
-    #mainContent.clinic-schedule-page #statCards.cs-stat-grid {
-        display: grid !important;
-        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-        gap: .85rem !important;
-        margin-bottom: 1.25rem !important;
-    }
-
-    #mainContent.clinic-schedule-page #statCards.cs-stat-grid .stat-card {
-        min-height: 94px !important;
-        padding: 1rem !important;
-        border-radius: 16px !important;
-    }
-
-    #mainContent.clinic-schedule-page #statCards.cs-stat-grid .stat-icon-wrapper {
-        width: 38px !important;
-        height: 38px !important;
-        min-width: 38px !important;
-        border-radius: 12px !important;
-    }
-
-    #mainContent.clinic-schedule-page #statCards.cs-stat-grid .stat-num,
-    #mainContent.clinic-schedule-page #statCards.cs-stat-grid p.text-gray-800 {
-        font-size: 1.55rem !important;
-        line-height: 1 !important;
-    }
-
-    #mainContent.clinic-schedule-page #statCards.cs-stat-grid .stat-label,
-    #mainContent.clinic-schedule-page #statCards.cs-stat-grid p.text-gray-500 {
-        font-size: .64rem !important;
-        line-height: 1.15 !important;
-    }
-
-    #mainContent.clinic-schedule-page #statCards.cs-stat-grid .stat-footer,
-    #mainContent.clinic-schedule-page #statCards.cs-stat-grid p.text-gray-400 {
-        font-size: .68rem !important;
-        line-height: 1.2 !important;
     }
 
     #mainContent.clinic-schedule-page .grid.grid-cols-1.lg\:grid-cols-3,
@@ -2567,16 +2286,6 @@ html.dark .cs-modal .fp-date-icon,
         width: 100% !important;
         justify-content: flex-start !important;
         margin-left: 0 !important;
-    }
-
-    #mainContent.clinic-schedule-page #statCards.cs-stat-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: .75rem !important;
-    }
-
-    #mainContent.clinic-schedule-page #statCards.cs-stat-grid .stat-card {
-        min-height: 104px !important;
-        padding: .9rem !important;
     }
 
     #mainContent.clinic-schedule-page #scheduleRulesGridView .schedule-rules-grid {

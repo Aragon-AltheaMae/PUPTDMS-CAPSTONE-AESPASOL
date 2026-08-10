@@ -184,31 +184,12 @@ $activePeriodPayload = $activePeriod
                                 <input type="hidden" name="status" id="statusFilter" value="{{ request('status') }}">
 
                                 <div class="voice-search-row table-toolbar-search">
-                                    <div class="search-wrap global-search" data-search-wrapper>
-                                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                                    <x-search-bar id="searchInput" name="search" placeholder="Search periods…"
+                                        :value="request('search')" clear-label="Clear academic period search"
+                                        class="flex-1" />
 
-                                        <input id="searchInput" name="search" type="text" placeholder="Search periods…"
-                                            value="{{ request('search') }}" autocomplete="off" class="search-input"
-                                            data-search-input>
-
-                                        <button type="button" id="clearSearch"
-                                            class="search-clear {{ request('search') ? 'show' : '' }}" data-search-clear
-                                            aria-label="Clear search">
-                                            <i class="fa-solid fa-xmark text-xs"></i>
-                                        </button>
-                                    </div>
-
-                                    <div class="voice-input-toggle">
-                                        <button type="button" id="apMicToggleBtn" class="voice-search-mic external"
-                                            data-global-voice-trigger data-voice-target="#searchInput"
-                                            data-voice-status="#apVoiceStatus" aria-label="Toggle voice search"
-                                            aria-pressed="false">
-                                            <i class="fa-solid fa-microphone"></i>
-                                        </button>
-
-                                        <span id="apVoiceStatus" class="voice-status hidden" aria-live="polite"
-                                            data-voice-status></span>
-                                    </div>
+                                    <x-voice-input target="#searchInput" status-id="apVoiceStatus"
+                                        label="Voice search academic periods" title="Voice search" />
                                 </div>
 
                                 <button id="filterBtn" type="button" class="global-filter-btn"
@@ -383,19 +364,15 @@ $activePeriodPayload = $activePeriod
                                     @empty
                                     <tr id="serverEmptyState">
                                         <td colspan="7" class="table-empty-state-cell">
-
-                                            <div class="empty-state">
-                                                <div class="empty-state-icon">
-                                                    <i class="fa-solid fa-school"></i>
-                                                </div>
-
-                                                <p class="empty-state-title">
-                                                    No academic periods found.
-                                                </p>
-                                            </div>
+                                            <div id="academicListEmptyState" class="empty-state-host"></div>
                                         </td>
                                     </tr>
                                     @endforelse
+                                    <tr id="academicDynamicListEmptyRow" hidden>
+                                        <td colspan="7" class="table-empty-state-cell">
+                                            <div id="academicDynamicListEmpty" class="empty-state-host"></div>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -559,38 +536,19 @@ $activePeriodPayload = $activePeriod
                                 </article>
                                 @empty
 
-                                <div id="serverEmptyStateGrid" class="empty-state table-grid-empty">
-
-                                    <i class="fa-solid fa-school"></i>
-
-                                    <p>
-                                        No academic periods found.
-                                    </p>
-                                </div>
+                                <div id="academicGridEmptyState" class="empty-state-host table-grid-empty"></div>
                                 @endforelse
+                                <div id="academicDynamicGridEmpty" class="empty-state-host table-grid-empty"></div>
                             </div>
                         </div>
 
-                        <div class="global-pagebar global-pagebar-bottom">
-
-                            <div class="global-pagebar-left">
-                                <p class="global-pagebar-info">
-                                    Showing
-                                    <strong>
-                                        {{ $academicPeriods->firstItem() ?? 0 }}–{{ $academicPeriods->lastItem() ?? 0 }}
-                                    </strong>
-                                    of
-                                    <strong>
-                                        {{ $academicPeriods->total() }}
-                                    </strong>
-                                    periods
-                                </p>
-                            </div>
-
-                            <div class="global-pagination-wrap">
-                                {{ $academicPeriods->onEachSide(2)->links('vendor.pagination.tailwind') }}
-                            </div>
-                        </div>
+                        <x-pagination-bar id="academicPeriodPagebar" info-id="academicPeriodPageInfo"
+                            pagination-id="academicPeriodPagination" position="bottom" :show-entries="false"
+                            label="periods" data-current-page="{{ $academicPeriods->currentPage() }}"
+                            data-last-page="{{ $academicPeriods->lastPage() }}"
+                            data-total="{{ $academicPeriods->total() }}"
+                            data-from="{{ $academicPeriods->firstItem() ?? 0 }}"
+                            data-to="{{ $academicPeriods->lastItem() ?? 0 }}" />
                     </div>
                 </div>
 
@@ -736,138 +694,133 @@ $activePeriodPayload = $activePeriod
     </div>
 </main>
 
-<div id="filterModal" class="filter-drawer-wrapper" aria-hidden="true">
-    <div class="filter-drawer-overlay" data-ap-close-filter></div>
+<x-filter-drawer id="filterModal" title="Filters" close-id="closeFilterModalBtn"
+    close-callback="closeAcademicFilterModal()" clear-id="clearFiltersModal" clear-label="Clear Filters"
+    cancel-id="cancelFilterBtn" cancel-callback="closeAcademicFilterModal()" cancel-label="Cancel"
+    apply-id="applyFilters" apply-label="Show {{ $academicPeriods->total() }} results" results-id="showResultsText">
 
-    <div class="filter-drawer-panel flex flex-col bg-white">
-        <div
-            class="filter-drawer-header px-6 py-5 flex items-center justify-between flex-shrink-0 bg-white border-b border-gray-100">
-            <div class="filter-drawer-title flex items-center gap-2">
-                <i class="fa-solid fa-sliders text-xl"></i>
-                <h2 class="text-xl font-extrabold">Filters</h2>
-            </div>
+    <div id="activeFiltersSection" class="filter-active-section hidden">
+        <div class="filter-active-header">
 
-            <button id="closeFilterModalBtn" type="button" class="filter-drawer-close"
-                onclick="closeAcademicFilterModal()" aria-label="Close filters">
+            <span class="filter-active-title">
+                Active Filters
+            </span>
 
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
+            <button id="clearAllChipsBtn" type="button" class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm">
+                <i class="fa-solid fa-rotate-left"></i>
 
-        <div class="filter-drawer-body px-6 py-5 flex flex-col gap-6 flex-1 overflow-y-auto bg-white">
-            <div id="activeFiltersSection" class="filter-active-section hidden">
-
-                <div class="filter-active-header">
-                    <span class="filter-active-title">
-                        Active Filters
-                    </span>
-
-                    <button id="clearAllChipsBtn" type="button"
-                        class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm">
-
-                        <i class="fa-solid fa-rotate-left"></i>
-                        <span>Clear All</span>
-                    </button>
-                </div>
-
-                <div id="activeChipsContainer" class="active-filters-container">
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Semester</h3>
-                <div class="filter-chip-row" id="semesterChipGroup">
-                    <label class="choice-chip">
-                        <input type="radio" name="filter_semester" value="" class="filter-input radio-red chip-radio">
-                        <span>All Semesters</span>
-                    </label>
-                    <label class="choice-chip">
-                        <input type="radio" name="filter_semester" value="First Semester"
-                            class="filter-input radio-red chip-radio">
-                        <span>First Semester</span>
-                    </label>
-                    <label class="choice-chip">
-                        <input type="radio" name="filter_semester" value="Second Semester"
-                            class="filter-input radio-red chip-radio">
-                        <span>2nd Semester</span>
-                    </label>
-                    <label class="choice-chip">
-                        <input type="radio" name="filter_semester" value="Summer"
-                            class="filter-input radio-red chip-radio">
-                        <span>Summer</span>
-                    </label>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Status</h3>
-                <div class="filter-chip-row" id="statusChipGroup">
-                    <label class="choice-chip">
-                        <input type="radio" name="filter_status" value="" class="filter-input radio-red chip-radio">
-                        <span>All Status</span>
-                    </label>
-                    <label class="choice-chip">
-                        <input type="radio" name="filter_status" value="Active"
-                            class="filter-input radio-red chip-radio">
-                        <span>Active</span>
-                    </label>
-                    <label class="choice-chip">
-                        <input type="radio" name="filter_status" value="Upcoming"
-                            class="filter-input radio-red chip-radio">
-                        <span>Upcoming</span>
-                    </label>
-                    <label class="choice-chip">
-                        <input type="radio" name="filter_status" value="Ended"
-                            class="filter-input radio-red chip-radio">
-                        <span>Ended</span>
-                    </label>
-                    <label class="choice-chip">
-                        <input type="radio" name="filter_status" value="Inactive"
-                            class="filter-input radio-red chip-radio">
-                        <span>Inactive</span>
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <div class="filter-drawer-footer">
-            <button id="clearFiltersModal" type="button" class="filter-clear-btn ui-btn ui-btn-secondary ui-btn-sm">
-
-                <i class="fa-regular fa-trash-can"></i>
-                <span>Clear Filters</span>
+                <span>
+                    Clear All
+                </span>
             </button>
 
-            <div class="filter-footer-actions">
-                <button id="cancelFilterBtn" type="button" class="filter-cancel-btn ui-btn ui-btn-secondary"
-                    onclick="closeAcademicFilterModal()">
-
-                    <i class="fa-solid fa-xmark"></i>
-                    <span>Cancel</span>
-                </button>
-
-                <button id="applyFilters" type="button" class="filter-apply-btn ui-btn ui-btn-primary">
-
-                    <i class="fa-solid fa-check"></i>
-
-                    <span id="showResultsText" class="filter-results-text">
-                        Show {{ $academicPeriods->total() }} results
-                    </span>
-                </button>
-            </div>
         </div>
+
+        <div id="activeChipsContainer" class="active-filters-container"></div>
     </div>
-</div>
+
+    <x-filter-group title="Semester">
+
+        <div id="semesterChipGroup" class="filter-chip-row">
+
+            <label class="choice-chip">
+                <input type="radio" name="filter_semester" value="" class="filter-input radio-red chip-radio">
+
+                <span>
+                    All Semesters
+                </span>
+            </label>
+
+            <label class="choice-chip">
+                <input type="radio" name="filter_semester" value="First Semester"
+                    class="filter-input radio-red chip-radio">
+
+                <span>
+                    First Semester
+                </span>
+            </label>
+
+            <label class="choice-chip">
+                <input type="radio" name="filter_semester" value="Second Semester"
+                    class="filter-input radio-red chip-radio">
+
+                <span>
+                    2nd Semester
+                </span>
+            </label>
+
+            <label class="choice-chip">
+                <input type="radio" name="filter_semester" value="Summer" class="filter-input radio-red chip-radio">
+
+                <span>
+                    Summer
+                </span>
+            </label>
+
+        </div>
+
+    </x-filter-group>
+
+    <x-filter-group title="Status" class="filter-group-last">
+
+        <div id="statusChipGroup" class="filter-chip-row">
+
+            <label class="choice-chip">
+                <input type="radio" name="filter_status" value="" class="filter-input radio-red chip-radio">
+
+                <span>
+                    All Status
+                </span>
+            </label>
+
+            <label class="choice-chip">
+                <input type="radio" name="filter_status" value="Active" class="filter-input radio-red chip-radio">
+
+                <span>
+                    Active
+                </span>
+            </label>
+
+            <label class="choice-chip">
+                <input type="radio" name="filter_status" value="Upcoming" class="filter-input radio-red chip-radio">
+
+                <span>
+                    Upcoming
+                </span>
+            </label>
+
+            <label class="choice-chip">
+                <input type="radio" name="filter_status" value="Ended" class="filter-input radio-red chip-radio">
+
+                <span>
+                    Ended
+                </span>
+            </label>
+
+            <label class="choice-chip">
+                <input type="radio" name="filter_status" value="Inactive" class="filter-input radio-red chip-radio">
+
+                <span>
+                    Inactive
+                </span>
+            </label>
+
+        </div>
+
+    </x-filter-group>
+
+</x-filter-drawer>
 
 <div id="addModal" class="ui-modal modal-theme-primary" aria-hidden="true">
 
     <form method="POST" action="{{ route('admin.academic_periods.store') }}"
-        class="ui-modal-card modal-lg modal-card-form ap-add-form" data-discard-form
-        data-discard-title="Discard new academic period?"
+        class="ui-modal-card modal-lg modal-card-form ap-add-form" data-global-validation
+        data-form-validation-rule="academicPeriod" data-discard-form data-discard-title="Discard new academic period?"
         data-discard-subtitle="You have unsaved academic period details."
-        data-discard-message="Closing this modal will remove the academic period draft you entered. Do you want to discard your changes?">
+        data-discard-message="Closing this modal will remove the academic period draft you entered. Do you want to discard your changes?"
+        novalidate>
 
         @csrf
-
         <div class="modal-hd">
             <div class="modal-heading">
                 <div class="modal-icon">
@@ -891,7 +844,7 @@ $activePeriodPayload = $activePeriod
         </div>
 
         <div class="modal-bd ap-add-body">
-            <div class="ap-panel ap-panel-soft">
+            <div class="ap-panel ap-panel-soft" data-global-field>
                 <div class="ap-label">
                     <span class="ap-label-text">Academic Year <span class="text-red-500">*</span></span>
                 </div>
@@ -902,18 +855,12 @@ $activePeriodPayload = $activePeriod
                             <i class="fa-solid fa-calendar"></i>
                         </span>
                         <input name="academic_year" id="addYear" type="text" placeholder="e.g. 2026-2027"
-                            class="ap-input field-input no-voice" required>
+                            class="ap-input field-input no-voice" data-field-label="Academic Year"
+                            data-required-message="Please enter the academic year." data-validation-rule="academicYear"
+                            required>
                     </div>
-                    <div class="ap-voice-toggle" style="margin-top: 0; position: relative;">
-                        <button type="button" class="voice-search-mic external" id="addYearMicBtn"
-                            data-global-voice-trigger data-voice-target="#addYear"
-                            data-voice-status="#addYearVoiceStatus" aria-label="Voice input for academic year"
-                            aria-pressed="false">
-                            <i class="fa-solid fa-microphone"></i>
-                        </button>
-                        <span id="addYearVoiceStatus" class="voice-status hidden" aria-live="polite"
-                            data-voice-status></span>
-                    </div>
+                    <x-voice-input target="#addYear" status-id="addYearVoiceStatus"
+                        label="Voice input for academic year" title="Voice input" />
                 </div>
 
                 <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
@@ -1022,18 +969,8 @@ $activePeriodPayload = $activePeriod
                         </button>
                     </div>
 
-                    <div class="voice-input-toggle">
-                        <button type="button" class="voice-search-mic external" id="addDescMicBtn"
-                            data-global-voice-trigger data-voice-target="#addDesc"
-                            data-voice-status="#addDescVoiceStatus" aria-label="Voice input for description"
-                            aria-pressed="false">
-
-                            <i class="fa-solid fa-microphone"></i>
-                        </button>
-
-                        <span id="addDescVoiceStatus" class="voice-status hidden" aria-live="polite"
-                            data-voice-status></span>
-                    </div>
+                    <x-voice-input target="#addDesc" status-id="addDescVoiceStatus" label="Voice input for description"
+                        title="Voice input" />
                 </div>
             </div>
 
@@ -1116,7 +1053,7 @@ $activePeriodPayload = $activePeriod
         </div>
 
         <div class="modal-bd ap-add-body">
-            <div class="ap-panel ap-panel-soft">
+            <div class="ap-panel ap-panel-soft" data-global-field>
                 <div class="ap-label">
                     <span class="ap-label-text">Academic Year <span class="text-red-500">*</span></span>
                 </div>
@@ -1129,16 +1066,8 @@ $activePeriodPayload = $activePeriod
                         <input type="text" name="academic_year" id="editYear" class="ap-input field-input no-voice"
                             placeholder="e.g. 2026-2027" required>
                     </div>
-                    <div class="ap-voice-toggle" style="margin-top: 0; position: relative;">
-                        <button type="button" class="voice-search-mic external" id="editYearMicBtn"
-                            data-global-voice-trigger data-voice-target="#editYear"
-                            data-voice-status="#editYearVoiceStatus" aria-label="Voice input for academic year"
-                            aria-pressed="false">
-                            <i class="fa-solid fa-microphone"></i>
-                        </button>
-                        <span id="editYearVoiceStatus" class="voice-status hidden" aria-live="polite"
-                            data-voice-status></span>
-                    </div>
+                    <x-voice-input target="#editYear" status-id="editYearVoiceStatus"
+                        label="Voice input for academic year" title="Voice input" />
                 </div>
 
                 <span class="field-error hidden text-xs font-semibold text-red-500 mt-1.5"></span>
@@ -1251,17 +1180,8 @@ $activePeriodPayload = $activePeriod
                         </button>
                     </div>
 
-                    <div class="voice-input-toggle">
-                        <button type="button" class="voice-search-mic external" id="editDescMicBtn" data-voice-trigger
-                            data-voice-target="#editDesc" data-voice-status="#editDescVoiceStatus"
-                            aria-label="Voice input for description" aria-pressed="false">
-
-                            <i class="fa-solid fa-microphone"></i>
-                        </button>
-
-                        <span id="editDescVoiceStatus" class="voice-status hidden" data-voice-status
-                            aria-live="polite"></span>
-                    </div>
+                    <x-voice-input target="#editYear" status-id="editYearVoiceStatus"
+                        label="Voice input for academic year" title="Voice input" />
                 </div>
             </div>
 
@@ -1475,74 +1395,6 @@ $activePeriodPayload = $activePeriod
             'Summer': ['Summer'],
         };
 
-        function getErr(field) {
-            if (field.id === 'addDesc' || field.id === 'editDesc') {
-                return field.closest('.ap-desc-panel')?.querySelector('.field-error') || null;
-            }
-
-            let current = field;
-            while (current) {
-                const panel = current.closest('.ap-panel, .ap-panel-soft, .ap-col-span-2');
-                if (panel) {
-                    return panel.querySelector('.field-error');
-                }
-                current = current.parentElement;
-            }
-
-            return null;
-        }
-
-        function setError(field, msg) {
-            field.classList.add('field-invalid');
-            field.classList.remove('field-valid');
-            const err = getErr(field);
-            if (err) {
-                err.textContent = '⚠ ' + msg;
-                err.classList.add('show');
-            }
-        }
-
-        function setValid(field) {
-            field.classList.remove('field-invalid');
-            field.classList.add('field-valid');
-            const err = getErr(field);
-            if (err) err.classList.remove('show');
-        }
-
-        function validateYear() {
-            const v = yearInput.value.trim();
-            const pattern = /^\d{4}-\d{4}$/;
-            if (!v) {
-                setError(yearInput, 'Academic year is required.');
-                return false;
-            }
-            if (!pattern.test(v)) {
-                setError(yearInput, 'Format must be YYYY-YYYY (e.g. 2025-2026).');
-                return false;
-            }
-            const [y1, y2] = v.split('-').map(Number);
-            if (y2 !== y1 + 1) {
-                setError(yearInput, 'Second year must be one after the first.');
-                return false;
-            }
-            setValid(yearInput);
-            return true;
-        }
-
-        function validateSemester() {
-            const checked = [...semRadios].some(r => r.checked);
-            const semErr = addForm.querySelector('.sem-error');
-            if (!checked) {
-                if (semErr) {
-                    semErr.textContent = '⚠ Please select a semester.';
-                    semErr.classList.add('show');
-                }
-                return false;
-            }
-            if (semErr) semErr.classList.remove('show');
-            return true;
-        }
-
         function findDuplicateAcademicPeriod(year, semester, ignoreId = null) {
             const aliases = semesterAliases[semester] || [semester];
 
@@ -1590,46 +1442,6 @@ $activePeriodPayload = $activePeriod
                 date.getDate() === day
             );
         }
-
-        function validateDates() {
-            let ok = true;
-            const s = startInput.value.trim();
-            const e = endInput.value.trim();
-
-            if (!s) {
-                setError(startInput, 'Start date is required.');
-                ok = false;
-            } else if (!isStrictIsoDate(s)) {
-                setError(startInput, 'Start date must be a valid date in YYYY-MM-DD format.');
-                ok = false;
-            } else {
-                setValid(startInput);
-            }
-
-            if (!e) {
-                setError(endInput, 'End date is required.');
-                ok = false;
-            } else if (!isStrictIsoDate(e)) {
-                setError(endInput, 'End date must be a valid date in YYYY-MM-DD format.');
-                ok = false;
-            } else if (s && isStrictIsoDate(s) && e <= s) {
-                setError(endInput, 'End date must be after start date.');
-                ok = false;
-            } else {
-                setValid(endInput);
-            }
-
-            return ok;
-        }
-
-        yearInput.addEventListener('input', validateYear);
-        yearInput.addEventListener('blur', validateYear);
-        startInput.addEventListener('change', () => {
-            validateDates();
-        });
-        endInput.addEventListener('change', () => {
-            validateDates();
-        });
 
         addForm.addEventListener('submit', e => {
             const y = validateYear();
@@ -2159,51 +1971,101 @@ $activePeriodPayload = $activePeriod
     }
 
     function clearAcademicSearch() {
-        const searchInput = document.getElementById('searchInput');
-        const clearBtn = document.getElementById('clearSearch');
-
-        if (searchInput) searchInput.value = '';
-        if (clearBtn) clearBtn.classList.remove('visible', 'show');
-
-        const items =
-            document.querySelectorAll(
-                '[data-record-row], ' +
-                '[data-record-card]'
+        const searchInput =
+            document.getElementById(
+                'searchInput'
             );
 
-        items.forEach(function (item) {
-            item.style.display = '';
+        const clearBtn =
+            searchInput
+                ?.closest(
+                    '[data-search-wrapper]'
+                )
+                ?.querySelector(
+                    '[data-search-clear]'
+                );
+
+        if (searchInput) {
+            searchInput.value = '';
+
+            searchInput.dispatchEvent(
+                new Event(
+                    'input',
+                    {
+                        bubbles: true,
+                    }
+                )
+            );
+        }
+
+        clearBtn?.classList.remove(
+            'visible',
+            'show'
+        );
+
+        document
+            .querySelectorAll(
+                '[data-record-row], ' +
+                '[data-record-card]'
+            )
+            .forEach(item => {
+                item.style.display = '';
+            });
+
+        const dynamicRow =
+            document.getElementById(
+                'academicDynamicListEmptyRow'
+            );
+
+        if (dynamicRow) {
+            dynamicRow.hidden = true;
+        }
+
+        window.EmptyState?.hide(
+            '#academicDynamicListEmpty'
+        );
+
+        window.EmptyState?.hide(
+            '#academicDynamicGridEmpty'
+        );
+
+        searchInput?.focus();
+    }
+
+    function renderAcademicBaseEmptyStates() {
+        const hasRecords =
+            document.querySelector(
+                '[data-record-row]'
+            );
+
+        if (hasRecords) {
+            return;
+        }
+
+        const options = {
+            icon:
+                'fa-school',
+
+            title:
+                'No academic periods found',
+
+            message:
+                'Academic periods will appear here once they are added.',
+        };
+
+        window.EmptyState?.render({
+            host:
+                '#academicListEmptyState',
+
+            ...options,
         });
 
-        const jsEmpty = document.getElementById('jsEmptyState');
-        if (jsEmpty) jsEmpty.style.display = 'none';
+        window.EmptyState?.render({
+            host:
+                '#academicGridEmptyState',
 
-        const jsEmptyGrid = document.getElementById('jsEmptyStateGrid');
-        if (jsEmptyGrid) jsEmptyGrid.style.display = 'none';
-
-        const jsFilterEmpty = document.getElementById('jsFilterEmptyState');
-        if (jsFilterEmpty) jsFilterEmpty.style.display = 'none';
-
-        const jsFilterEmptyGrid = document.getElementById('jsFilterEmptyStateGrid');
-        if (jsFilterEmptyGrid) jsFilterEmptyGrid.style.display = 'none';
-
-        const serverEmpty = document.getElementById('serverEmptyState');
-        if (serverEmpty) {
-            const hasRows = document.querySelectorAll(
-                '#academicTableBody [data-record-row]'
-            ).length > 0;
-            serverEmpty.style.display = hasRows ? 'none' : '';
-        }
-
-        const serverEmptyGrid = document.getElementById('serverEmptyStateGrid');
-        if (serverEmptyGrid) {
-            const hasCards = document.querySelectorAll(
-                '#academicGridView [data-record-card]'
-            ).length > 0;
-            serverEmptyGrid.style.display = hasCards ? 'none' : '';
-        }
-
-        if (searchInput) searchInput.focus();
+            ...options,
+        });
     }
 
     function resetAcademicFilters() {
@@ -2256,6 +2118,23 @@ $activePeriodPayload = $activePeriod
         const activeChipsContainer = document.getElementById('activeChipsContainer');
         const semesterRadios = Array.from(document.querySelectorAll('input[name="filter_semester"]'));
         const statusRadios = Array.from(document.querySelectorAll('input[name="filter_status"]'));
+
+        const academicPagebar =
+            document.getElementById(
+                'academicPeriodPagebar'
+            );
+
+        const academicPageInfo =
+            document.getElementById(
+                'academicPeriodPageInfo'
+            );
+
+        const academicPagination =
+            document.getElementById(
+                'academicPeriodPagination'
+            );
+
+        let academicPageLoading = false;
 
         const allTableRows = () =>
             tableBody ?
@@ -2383,8 +2262,6 @@ $activePeriodPayload = $activePeriod
             filterItems();
         }
 
-        document.querySelector('[data-ap-close-filter]')?.addEventListener('click', window
-            .closeAcademicFilterModal);
         document.getElementById('cancelFilterBtn')?.addEventListener('click', window.closeAcademicFilterModal);
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape' && filterModal?.classList.contains('open')) {
@@ -2420,202 +2297,383 @@ $activePeriodPayload = $activePeriod
             filterItems();
         });
 
+        function hideAcademicDynamicEmptyStates() {
+            const row =
+                document.getElementById(
+                    'academicDynamicListEmptyRow'
+                );
 
-        function showSearchEmptyState(query) {
-            const safeQuery = String(query || '').replace(/[&<>"']/g, function (match) {
-                return {
-                    '&': '&amp;',
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    '"': '&quot;',
-                    "'": '&#039;'
-                }[match];
-            });
-
-            let rowEmpty = document.getElementById('jsEmptyState');
-
-            if (!rowEmpty && tableBody) {
-                rowEmpty = document.createElement('tr');
-                rowEmpty.id = 'jsEmptyState';
-                rowEmpty.innerHTML = `
-            <td colspan="7" class="table-empty-state-cell">
-                <div class="empty-state">
-                    <div class="empty-state-icon">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </div>
-
-                    <p class="empty-state-title">No results for "${safeQuery}"</p>
-                    <p class="empty-state-sub">Try a different academic year or semester name.</p>
-
-                    <button type="button" class="empty-state-btn" onclick="clearAcademicSearch()">
-                        <i class="fa-solid fa-xmark"></i>
-                        Clear search
-                    </button>
-                </div>
-            </td>
-        `;
-
-                tableBody.appendChild(rowEmpty);
-            } else if (rowEmpty) {
-                rowEmpty.innerHTML = `
-            <td colspan="7" class="table-empty-state-cell">
-                <div class="empty-state">
-                    <div class="empty-state-icon">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </div>
-
-                    <p class="empty-state-title">No results for "${safeQuery}"</p>
-                    <p class="empty-state-sub">Try a different academic year or semester name.</p>
-
-                    <button type="button" class="empty-state-btn" onclick="clearAcademicSearch()">
-                        <i class="fa-solid fa-xmark"></i>
-                        Clear search
-                    </button>
-                </div>
-            </td>
-        `;
+            if (row) {
+                row.hidden = true;
             }
 
-            let gridEmpty = document.getElementById('jsEmptyStateGrid');
+            window.EmptyState?.hide(
+                '#academicDynamicListEmpty'
+            );
 
-            if (!gridEmpty && gridView) {
-                gridEmpty = document.createElement('div');
-                gridEmpty.id = 'jsEmptyStateGrid';
-                gridEmpty.className =
-                    'empty-state table-grid-empty';
-
-                const recordGrid =
-                    gridView.querySelector(
-                        '.table-record-grid'
-                    );
-
-                (recordGrid || gridView)
-                    .appendChild(gridEmpty);
-                gridEmpty.innerHTML = `
-            <div class="empty-state-icon">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </div>
-
-            <p class="empty-state-title">No results for "${safeQuery}"</p>
-            <p class="empty-state-sub">Try a different academic year or semester name.</p>
-
-            <button type="button" class="empty-state-btn" onclick="clearAcademicSearch()">
-                <i class="fa-solid fa-xmark"></i>
-                Clear search
-            </button>
-        `;
-
-                gridView.appendChild(gridEmpty);
-            } else if (gridEmpty) {
-                gridEmpty.className =
-                    'empty-state table-grid-empty';
-                gridEmpty.innerHTML = `
-            <div class="empty-state-icon">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </div>
-
-            <p class="empty-state-title">No results for "${safeQuery}"</p>
-            <p class="empty-state-sub">Try a different academic year or semester name.</p>
-
-            <button type="button" class="empty-state-btn" onclick="clearAcademicSearch()">
-                <i class="fa-solid fa-xmark"></i>
-                Clear search
-            </button>
-        `;
-            }
-
-            if (rowEmpty) rowEmpty.style.display = '';
-            if (gridEmpty) gridEmpty.style.display = '';
-
-            const serverEmpty = document.getElementById('serverEmptyState');
-            if (serverEmpty) serverEmpty.style.display = 'none';
-
-            const serverEmptyGrid = document.getElementById('serverEmptyStateGrid');
-            if (serverEmptyGrid) serverEmptyGrid.style.display = 'none';
+            window.EmptyState?.hide(
+                '#academicDynamicGridEmpty'
+            );
         }
 
-        function hideSearchEmptyState() {
-            const rowEmpty = document.getElementById('jsEmptyState');
-            const gridEmpty = document.getElementById('jsEmptyStateGrid');
-            if (rowEmpty) rowEmpty.style.display = 'none';
-            if (gridEmpty) gridEmpty.style.display = 'none';
+        function showSearchEmptyState(query) {
+            const row =
+                document.getElementById(
+                    'academicDynamicListEmptyRow'
+                );
+
+            if (row) {
+                row.hidden = false;
+            }
+
+            window.EmptyState?.renderSearch({
+                host: '#academicDynamicListEmpty',
+                input: '#searchInput',
+                query,
+                message:
+                    'Try a different academic year or semester name.',
+            });
+
+            window.EmptyState?.renderSearch({
+                host: '#academicDynamicGridEmpty',
+                input: '#searchInput',
+                query,
+                message:
+                    'Try a different academic year or semester name.',
+            });
         }
 
         function showFilterEmptyState() {
-            let rowEmpty = document.getElementById('jsFilterEmptyState');
+            const row =
+                document.getElementById(
+                    'academicDynamicListEmptyRow'
+                );
 
-            if (!rowEmpty && tableBody) {
-                rowEmpty = document.createElement('tr');
-                rowEmpty.id = 'jsFilterEmptyState';
-                rowEmpty.innerHTML = `
-            <td colspan="7" class="table-empty-state-cell">
-                <div class="empty-state">
-                    <div class="empty-state-icon">
-                        <i class="fa-solid fa-sliders"></i>
-                    </div>
-
-                    <p class="empty-state-title">No matches for your filters</p>
-                    <p class="empty-state-sub">Try removing or adjusting your filter criteria.</p>
-
-                    <button type="button" class="empty-state-btn" onclick="resetAcademicFilters()">
-                        <i class="fa-solid fa-xmark"></i>
-                        Clear filter
-                    </button>
-                </div>
-            </td>
-        `;
-
-                tableBody.appendChild(rowEmpty);
+            if (row) {
+                row.hidden = false;
             }
 
-            let gridEmpty = document.getElementById('jsFilterEmptyStateGrid');
+            const actionHtml = `
+        <button
+            type="button"
+            class="empty-state-btn"
+            onclick="resetAcademicFilters()"
+        >
+            <i class="fa-solid fa-xmark"></i>
+            Clear filter
+        </button>
+    `;
 
-            if (!gridEmpty && gridView) {
-                gridEmpty = document.createElement('div');
-                gridEmpty.id = 'jsFilterEmptyStateGrid';
-                gridEmpty.className =
-                    'empty-state table-grid-empty';
+            window.EmptyState?.render({
+                host: '#academicDynamicListEmpty',
+                icon: 'fa-sliders',
+                title: 'No matches for your filters',
+                message:
+                    'Try removing or adjusting your filter criteria.',
+                actionHtml,
+            });
 
-                const recordGrid =
-                    gridView.querySelector(
+            window.EmptyState?.render({
+                host: '#academicDynamicGridEmpty',
+                icon: 'fa-sliders',
+                title: 'No matches for your filters',
+                message:
+                    'Try removing or adjusting your filter criteria.',
+                actionHtml,
+            });
+        }
+
+        function getAcademicPaginationMeta(
+            pagebar = academicPagebar
+        ) {
+            return {
+                currentPage:
+                    Number(
+                        pagebar?.dataset.currentPage
+                    ) || 1,
+
+                lastPage:
+                    Number(
+                        pagebar?.dataset.lastPage
+                    ) || 1,
+
+                total:
+                    Number(
+                        pagebar?.dataset.total
+                    ) || 0,
+
+                from:
+                    Number(
+                        pagebar?.dataset.from
+                    ) || 0,
+
+                to:
+                    Number(
+                        pagebar?.dataset.to
+                    ) || 0,
+            };
+        }
+
+
+        function renderAcademicPagination() {
+            if (
+                !academicPagebar ||
+                !academicPageInfo ||
+                !academicPagination
+            ) {
+                return;
+            }
+
+            const meta =
+                getAcademicPaginationMeta();
+
+            window.renderGlobalPagination?.({
+                currentPage:
+                    meta.currentPage,
+
+                lastPage:
+                    meta.lastPage,
+
+                total:
+                    meta.total,
+
+                from:
+                    meta.from,
+
+                to:
+                    meta.to,
+
+                containers: [
+                    academicPagination
+                ],
+
+                infoElements: [
+                    academicPageInfo
+                ],
+
+                bars: [
+                    academicPagebar
+                ],
+
+                itemLabel:
+                    'periods',
+
+                onPageChange:
+                    loadAcademicPeriodPage,
+            });
+        }
+
+        async function loadAcademicPeriodPage(
+            page = 1
+        ) {
+            if (academicPageLoading) {
+                return;
+            }
+
+            academicPageLoading = true;
+
+            const url =
+                new URL(
+                    window.location.href
+                );
+
+            url.searchParams.set(
+                'page',
+                String(page)
+            );
+
+            const searchValue =
+                searchInput?.value
+                    ?.trim() || '';
+
+            const semesterValue =
+                semesterFilter?.value || '';
+
+            const statusValue =
+                statusFilter?.value || '';
+
+            if (searchValue) {
+                url.searchParams.set(
+                    'search',
+                    searchValue
+                );
+            } else {
+                url.searchParams.delete(
+                    'search'
+                );
+            }
+
+            if (semesterValue) {
+                url.searchParams.set(
+                    'semester',
+                    semesterValue
+                );
+            } else {
+                url.searchParams.delete(
+                    'semester'
+                );
+            }
+
+            if (statusValue) {
+                url.searchParams.set(
+                    'status',
+                    statusValue
+                );
+            } else {
+                url.searchParams.delete(
+                    'status'
+                );
+            }
+
+            try {
+                academicPagebar?.classList.add(
+                    'is-loading'
+                );
+
+                const response =
+                    await fetch(
+                        url.toString(),
+                        {
+                            headers: {
+                                Accept:
+                                    'text/html',
+
+                                'X-Requested-With':
+                                    'XMLHttpRequest',
+                            },
+
+                            credentials:
+                                'same-origin',
+                        }
+                    );
+
+                if (!response.ok) {
+                    throw new Error(
+                        'Unable to load academic periods.'
+                    );
+                }
+
+                const html =
+                    await response.text();
+
+                const parsed =
+                    new DOMParser()
+                        .parseFromString(
+                            html,
+                            'text/html'
+                        );
+
+                const newTableBody =
+                    parsed.getElementById(
+                        'academicTableBody'
+                    );
+
+                const newRecordGrid =
+                    parsed.querySelector(
+                        '#academicGridView ' +
                         '.table-record-grid'
                     );
 
-                (recordGrid || gridView)
-                    .appendChild(gridEmpty);
-                gridEmpty.innerHTML = `
-            <div class="empty-state-icon">
-                <i class="fa-solid fa-sliders"></i>
-            </div>
+                const newPagebar =
+                    parsed.getElementById(
+                        'academicPeriodPagebar'
+                    );
 
-            <p class="empty-state-title">No matches for your filters</p>
-            <p class="empty-state-sub">Try removing or adjusting your filter criteria.</p>
+                const newPeriodCount =
+                    parsed.getElementById(
+                        'periodCount'
+                    );
 
-            <button type="button" class="empty-state-btn" onclick="resetAcademicFilters()">
-                <i class="fa-solid fa-xmark"></i>
-                Clear filter
-            </button>
-        `;
+                if (
+                    !newTableBody ||
+                    !newRecordGrid ||
+                    !newPagebar
+                ) {
+                    throw new Error(
+                        'Invalid academic period response.'
+                    );
+                }
 
+                tableBody.innerHTML =
+                    newTableBody.innerHTML;
+
+                const currentRecordGrid =
+                    gridView?.querySelector(
+                        '.table-record-grid'
+                    );
+
+                if (currentRecordGrid) {
+                    currentRecordGrid.innerHTML =
+                        newRecordGrid.innerHTML;
+                }
+
+                [
+                    'currentPage',
+                    'lastPage',
+                    'total',
+                    'from',
+                    'to',
+                ].forEach(key => {
+                    academicPagebar.dataset[key] =
+                        newPagebar.dataset[key] ||
+                        '';
+                });
+
+                const periodCount =
+                    document.getElementById(
+                        'periodCount'
+                    );
+
+                if (
+                    periodCount &&
+                    newPeriodCount
+                ) {
+                    periodCount.textContent =
+                        newPeriodCount.textContent;
+                }
+
+                window.history.replaceState(
+                    {},
+                    '',
+                    url.toString()
+                );
+
+                renderAcademicPagination();
+                filterItems();
+                renderAcademicBaseEmptyStates();
+
+                const activeMode =
+                    window.getGlobalViewMode?.(
+                        'academicViewToggle'
+                    ) || 'list';
+
+                window.setGlobalViewMode?.(
+                    'academicViewToggle',
+                    activeMode,
+                    {
+                        persist: false,
+                    }
+                );
+            } catch (error) {
+                window.showToast?.({
+                    type: 'error',
+
+                    title:
+                        'Unable to load records',
+
+                    message:
+                        error.message ||
+                        'Please try again.',
+
+                    duration: 4500,
+                });
+            } finally {
+                academicPageLoading = false;
+
+                academicPagebar?.classList.remove(
+                    'is-loading'
+                );
             }
-
-            if (rowEmpty) rowEmpty.style.display = '';
-            if (gridEmpty) gridEmpty.style.display = '';
-
-            hideSearchEmptyState();
-
-            const serverEmpty = document.getElementById('serverEmptyState');
-            if (serverEmpty) serverEmpty.style.display = 'none';
-
-            const serverEmptyGrid = document.getElementById('serverEmptyStateGrid');
-            if (serverEmptyGrid) serverEmptyGrid.style.display = 'none';
-        }
-
-        function hideFilterEmptyState() {
-            const rowEmpty = document.getElementById('jsFilterEmptyState');
-            const gridEmpty = document.getElementById('jsFilterEmptyStateGrid');
-            if (rowEmpty) rowEmpty.style.display = 'none';
-            if (gridEmpty) gridEmpty.style.display = 'none';
         }
 
         function filterItems() {
@@ -2657,15 +2715,14 @@ $activePeriodPayload = $activePeriod
 
             if (visibleCount === 0) {
                 if (searchValue) {
-                    hideFilterEmptyState();
+                    hideAcademicDynamicEmptyStates();
                     showSearchEmptyState(searchInput.value.trim());
                 } else {
-                    hideSearchEmptyState();
+                    hideAcademicDynamicEmptyStates();
                     showFilterEmptyState();
                 }
             } else {
-                hideSearchEmptyState();
-                hideFilterEmptyState();
+                hideAcademicDynamicEmptyStates();
             }
 
             const serverEmpty = document.getElementById('serverEmptyState');
@@ -2904,10 +2961,6 @@ $activePeriodPayload = $activePeriod
 
         bindTextareaPlaceholder('addDesc', 'addDescWrap');
         bindTextareaPlaceholder('editDesc', 'editDescWrap');
-
-        if (typeof window.initializeVoiceInputs === 'function') {
-            window.initializeVoiceInputs(document);
-        }
     });
 </script>
 @endsection

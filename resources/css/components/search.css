@@ -1,19 +1,19 @@
 [data-theme="dark"] .search-input,
 .dark .search-input {
-    background: rgba(13, 17, 23, 0.70) !important;
-    border-color: rgba(255, 255, 255, 0.12) !important;
-    color: #CBD5E1 !important;
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+    color: var(--text-1) !important;
     box-shadow: none !important;
 }
 
 [data-theme="dark"] .search-input::placeholder,
 .dark .search-input::placeholder {
-    color: #64748B !important;
+    color: var(--text-3) !important;
 }
 
 [data-theme="dark"] .search-icon,
 .dark .search-icon {
-    color: #94A3B8 !important;
+    color: var(--text-3) !important;
 }
 
 .search-clear {
@@ -41,7 +41,7 @@
 
 [data-theme="dark"] #mainContent .search-clear,
 .dark #mainContent .search-clear {
-    color: #94A3B8 !important;
+    color: var(--text-3) !important;
 }
 
 [data-theme="dark"] #mainContent .search-clear:hover,
@@ -92,8 +92,8 @@
     padding: 0 42px 0 40px !important;
     border-radius: 999px !important;
     border: 1px solid rgba(139, 0, 0, 0.12) !important;
-    background: rgba(255, 255, 255, 0.96) !important;
-    color: #374151 !important;
+    background: var(--card) !important;
+    color: var(--text-1) !important;
     font-size: 14px !important;
     font-weight: 700 !important;
     line-height: 42px !important;
@@ -110,7 +110,7 @@
 .search-wrap .search-input::placeholder,
 .global-search .search-input::placeholder,
 [data-search-wrapper] [data-search-input]::placeholder {
-    color: #9CA3AF !important;
+    color: var(--text-3) !important;
     font-weight: 700 !important;
 }
 
@@ -118,7 +118,7 @@
 .global-search .search-input:focus,
 [data-search-wrapper] [data-search-input]:focus {
     border-color: rgba(139, 0, 0, 0.38) !important;
-    background: #FFFFFF !important;
+    background: var(--card) !important;
     box-shadow:
         0 0 0 4px rgba(139, 0, 0, 0.08),
         0 10px 24px rgba(139, 0, 0, 0.10) !important;
@@ -131,7 +131,7 @@
     left: 15px !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
-    color: #9CA3AF !important;
+    color: var(--text-3) !important;
     font-size: 14px !important;
     line-height: 1 !important;
     pointer-events: none !important;
@@ -163,7 +163,7 @@
     align-items: center !important;
     justify-content: center !important;
     border-radius: 999px !important;
-    color: #9CA3AF !important;
+    color: var(--text-3) !important;
     background: transparent !important;
     cursor: pointer !important;
     z-index: 3 !important;
@@ -200,10 +200,12 @@
 .dark .search-wrap .search-input,
 .dark .global-search .search-input,
 .dark [data-search-wrapper] [data-search-input] {
-    background: rgba(13, 17, 23, 0.78) !important;
-    border-color: rgba(255, 255, 255, 0.12) !important;
-    color: #E5E7EB !important;
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22) !important;
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+    color: var(--text-1) !important;
+
+    box-shadow:
+        0 10px 24px rgba(0, 0, 0, 0.20) !important;
 }
 
 [data-theme="dark"] .search-wrap .search-input:focus,
@@ -213,7 +215,7 @@
 .dark .global-search .search-input:focus,
 .dark [data-search-wrapper] [data-search-input]:focus {
     border-color: rgba(252, 165, 165, 0.38) !important;
-    background: rgba(13, 17, 23, 0.92) !important;
+    background: var(--card) !important;
     box-shadow:
         0 0 0 4px rgba(139, 0, 0, 0.20),
         0 12px 28px rgba(0, 0, 0, 0.32) !important;
@@ -225,7 +227,7 @@
 .dark .search-wrap .search-input::placeholder,
 .dark .global-search .search-input::placeholder,
 .dark [data-search-wrapper] [data-search-input]::placeholder {
-    color: #64748B !important;
+    color: var(--text-3) !important;
 }
 
 [data-theme="dark"] .search-wrap .search-icon,
@@ -233,17 +235,14 @@
 [data-theme="dark"] [data-search-wrapper] .search-icon,
 .dark .search-wrap .search-icon,
 .dark .global-search .search-icon,
-.dark [data-search-wrapper] .search-icon {
-    color: #94A3B8 !important;
-}
-
+.dark [data-search-wrapper] .search-icon,
 [data-theme="dark"] .search-wrap .search-clear,
 [data-theme="dark"] .global-search .search-clear,
 [data-theme="dark"] [data-search-wrapper] [data-search-clear],
 .dark .search-wrap .search-clear,
 .dark .global-search .search-clear,
 .dark [data-search-wrapper] [data-search-clear] {
-    color: #94A3B8 !important;
+    color: var(--text-3) !important;
 }
 
 [data-theme="dark"] .search-wrap .search-clear:hover,
@@ -256,15 +255,6 @@
     color: #FCA5A5 !important;
 }
 
-[data-theme="dark"] .search-wrap {
-    border-color: #2a3244;
-}
-
-[data-theme="dark"] .search-wrap input {
-    color: #e5e7eb;
-    background: transparent;
-}
-
 @media (max-width: 767px) {
 
     .search-wrap,
@@ -272,32 +262,6 @@
     [data-search-wrapper] {
         width: 100% !important;
         min-width: 0 !important;
-    }
-
-    #mainContent .patient-toolbar-actions .search-wrap,
-    #mainContent .patient-toolbar-actions .global-search {
-        width: 100% !important;
-        min-width: 0 !important;
-        flex: none !important;
-    }
-
-    #mainContent .patient-toolbar-actions .search-input {
-        width: 100% !important;
-        height: var(--pd-toolbar-h, 42px) !important;
-        min-height: var(--pd-toolbar-h, 42px) !important;
-        max-height: var(--pd-toolbar-h, 42px) !important;
-        border-radius: 999px !important;
-        padding-left: 44px !important;
-        padding-right: 44px !important;
-        font-size: 13px !important;
-    }
-
-    #mainContent .patient-toolbar-actions .search-icon {
-        left: 16px !important;
-    }
-
-    #mainContent .patient-toolbar-actions .search-clear {
-        right: 12px !important;
     }
 
     .search-combo {
@@ -331,7 +295,7 @@
     margin-top: .55rem !important;
     border-radius: 14px !important;
     overflow: hidden !important;
-    background: #ffffff !important;
+    background: var(--card) !important;
     border: 1px solid rgba(139, 0, 0, .12) !important;
     box-shadow: 0 18px 36px rgba(15, 23, 42, .14) !important;
     z-index: 50 !important;

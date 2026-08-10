@@ -34,7 +34,7 @@
 
     <div class="booking-progress-track">
 
-        <div id="headerProgressFill" class="progress-fill booking-progress-fill">
+        <div id="headerProgressFill" class="booking-progress-fill">
             <span id="headerProgressPercent" class="booking-progress-percent">
                 {{ intval(100 / max($totalSteps, 1)) }}%
             </span>

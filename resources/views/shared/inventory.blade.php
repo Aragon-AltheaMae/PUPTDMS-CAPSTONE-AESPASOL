@@ -178,13 +178,14 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                     page-size-id="inventoryPerPageSelect" page-size-callback="handleInventoryPerPageChange"
                     :page-size-value="10" page-size-label="per page" label="entries" />
 
-                <div id="tableWrapper" class="inventory-table-wrap">
+                <div id="tableWrapper" class="table-scroll inventory-table-wrap">
                     <table class="data-table inventory-data-table">
                         <thead>
                             <tr>
                                 <th>Date</th>
                                 <th>Stock No.</th>
-                                <th>Supply / Medicine</th>
+                                <th>Item Name</th>
+                                <th>Category</th>
                                 <th>Unit</th>
                                 <th>Qty</th>
                                 <th>Used</th>
@@ -206,121 +207,146 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
     </div>
 </main>
 
-<div id="filterModal" class="filter-drawer-wrapper" aria-hidden="true">
-    <div class="filter-drawer-overlay" onclick="closeFilterDrawer('filterModal')"></div>
-    <div class="filter-drawer-panel">
-        <div class="filter-drawer-header">
-            <div class="filter-drawer-title">
-                <i class="fa-solid fa-sliders"></i>
-                <h2>Filters</h2>
-            </div>
-            <button type="button" class="filter-drawer-close" onclick="closeFilterDrawer('filterModal')"
-                aria-label="Close filters">
-                <i class="fa-solid fa-xmark text-xl"></i>
-            </button>
-        </div>
+<x-filter-drawer id="filterModal" title="Filters" close-callback="closeFilterDrawer('filterModal')"
+    clear-id="clearFilterPanelBtn" clear-callback="clearFilterPanelModal()" clear-label="Clear Filters"
+    cancel-callback="closeFilterDrawer('filterModal')" cancel-label="Cancel" apply-id="saveFilterPanelBtn"
+    apply-callback="saveFilterPanel()" apply-label="Show 0 results" results-id="showResultsText">
 
-        <div class="filter-drawer-body">
-            <div id="activeFiltersSection" class="filter-active-section hidden">
+    <div id="activeFiltersSection" class="filter-active-section hidden">
 
-                <div class="filter-active-header">
-                    <span class="filter-active-title">
-                        Active Filters
-                    </span>
+        <div class="filter-active-header">
 
-                    <button id="clearAllChipsBtn" type="button"
-                        class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm">
+            <span class="filter-active-title">
+                Active Filters
+            </span>
 
-                        <i class="fa-solid fa-rotate-left"></i>
-                        <span>Clear All</span>
-                    </button>
-                </div>
-
-                <div id="activeChipsContainer" class="active-filters-container">
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Sort By</h3>
-                <div class="filter-chip-row" id="inventorySortGroup">
-                    <button type="button" class="ftag" data-group="sort" data-val="newest">Newest First</button>
-                    <button type="button" class="ftag" data-group="sort" data-val="oldest">Oldest First</button>
-                    <button type="button" class="ftag" data-group="sort" data-val="az">Name A-Z</button>
-                    <button type="button" class="ftag" data-group="sort" data-val="za">Name Z-A</button>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Filter by Date Range</h3>
-                <div class="filter-chip-row" id="inventoryDatePresetGroup">
-                    <button type="button" class="quick-date-chip" data-range="7">Last 7 Days</button>
-                    <button type="button" class="quick-date-chip" data-range="30">Last 30 Days</button>
-                    <button type="button" class="quick-date-chip" data-range="90">Last 3 Months</button>
-                    <button type="button" class="quick-date-chip" data-range="180">Last 6 Months</button>
-                    <button type="button" class="quick-date-chip" data-range="365">Last 12 Months</button>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Custom Date Range</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div class="filter-date-input-wrap">
-                        <input id="fp_dateFrom" type="text" class="js-flatpickr-date-range-from"
-                            placeholder="Start date" readonly autocomplete="off">
-                        <i class="fa-regular fa-calendar"></i>
-                    </div>
-                    <div class="filter-date-input-wrap">
-                        <input id="fp_dateTo" type="text" class="js-flatpickr-date-range-to" placeholder="End date"
-                            readonly autocomplete="off">
-                        <i class="fa-regular fa-calendar"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Stock Level</h3>
-                <div class="filter-chip-row" id="inventoryStockGroup">
-                    <button type="button" class="ftag" data-group="stock" data-val="in-stock">In Stock</button>
-                    <button type="button" class="ftag" data-group="stock" data-val="low-stock">Low Stock</button>
-                    <button type="button" class="ftag" data-group="stock" data-val="out-stock">Out of
-                        Stock</button>
-                    <button type="button" class="ftag" data-group="stock" data-val="low-high">Lowest
-                        Stock</button>
-                    <button type="button" class="ftag" data-group="stock" data-val="high-low">Highest
-                        Stock</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="filter-drawer-footer">
-            <button id="clearFilterPanelBtn" type="button" onclick="clearFilterPanelModal()"
-                class="filter-clear-btn ui-btn ui-btn-secondary ui-btn-sm">
-
-                <i class="fa-regular fa-trash-can"></i>
-                <span>Clear Filters</span>
+            <button id="clearAllChipsBtn" type="button" class="
+                    filter-clear-all
+                    ui-btn
+                    ui-btn-secondary
+                    ui-btn-sm
+                ">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>Clear All</span>
             </button>
 
-            <div class="filter-footer-actions">
-                <button type="button" onclick="closeFilterDrawer('filterModal')"
-                    class="filter-cancel-btn ui-btn ui-btn-secondary">
-
-                    <i class="fa-solid fa-xmark"></i>
-                    <span>Cancel</span>
-                </button>
-
-                <button id="saveFilterPanelBtn" type="button" onclick="saveFilterPanel()"
-                    class="filter-apply-btn ui-btn ui-btn-primary">
-
-                    <i class="fa-solid fa-check"></i>
-
-                    <span id="showResultsText" class="filter-results-text">
-                        Show 0 results
-                    </span>
-                </button>
-            </div>
         </div>
+
+        <div id="activeChipsContainer" class="active-filters-container"></div>
+
     </div>
-</div>
+
+
+    <x-filter-group title="Sort By">
+
+        <div id="inventorySortGroup" class="filter-chip-row">
+
+            <button type="button" class="ftag" data-group="sort" data-val="newest">
+                Newest First
+            </button>
+
+            <button type="button" class="ftag" data-group="sort" data-val="oldest">
+                Oldest First
+            </button>
+
+            <button type="button" class="ftag" data-group="sort" data-val="az">
+                Name A-Z
+            </button>
+
+            <button type="button" class="ftag" data-group="sort" data-val="za">
+                Name Z-A
+            </button>
+
+        </div>
+
+    </x-filter-group>
+
+
+    <x-filter-group title="Filter by Date Range">
+
+        <div id="inventoryDatePresetGroup" class="filter-chip-row">
+
+            <button type="button" class="quick-date-chip" data-range="7">
+                Last 7 Days
+            </button>
+
+            <button type="button" class="quick-date-chip" data-range="30">
+                Last 30 Days
+            </button>
+
+            <button type="button" class="quick-date-chip" data-range="90">
+                Last 3 Months
+            </button>
+
+            <button type="button" class="quick-date-chip" data-range="180">
+                Last 6 Months
+            </button>
+
+            <button type="button" class="quick-date-chip" data-range="365">
+                Last 12 Months
+            </button>
+
+        </div>
+
+    </x-filter-group>
+
+
+    <x-filter-group title="Custom Date Range">
+
+        <div class="filter-date-grid">
+
+            <div class="filter-date-input-wrap">
+
+                <input id="fp_dateFrom" type="text" class="js-flatpickr-date-range-from" placeholder="Start date"
+                    readonly autocomplete="off">
+
+                <i class="fa-regular fa-calendar"></i>
+
+            </div>
+
+            <div class="filter-date-input-wrap">
+
+                <input id="fp_dateTo" type="text" class="js-flatpickr-date-range-to" placeholder="End date" readonly
+                    autocomplete="off">
+
+                <i class="fa-regular fa-calendar"></i>
+
+            </div>
+
+        </div>
+
+    </x-filter-group>
+
+
+    <x-filter-group title="Stock Level" class="filter-group-last">
+
+        <div id="inventoryStockGroup" class="filter-chip-row">
+
+            <button type="button" class="ftag" data-group="stock" data-val="in-stock">
+                In Stock
+            </button>
+
+            <button type="button" class="ftag" data-group="stock" data-val="low-stock">
+                Low Stock
+            </button>
+
+            <button type="button" class="ftag" data-group="stock" data-val="out-stock">
+                Out of Stock
+            </button>
+
+            <button type="button" class="ftag" data-group="stock" data-val="low-high">
+                Lowest Stock
+            </button>
+
+            <button type="button" class="ftag" data-group="stock" data-val="high-low">
+                Highest Stock
+            </button>
+
+        </div>
+
+    </x-filter-group>
+
+</x-filter-drawer>
 
 <div id="addModal" class="ui-modal modal-theme-primary inventory-form-modal" aria-hidden="true">
 
@@ -2080,57 +2106,122 @@ aria-label="Delete inventory item"
         }
 
         paginatedData.forEach(function (item) {
-            var balance = n(item.qty) - n(item.used);
+            var balance =
+                n(item.qty) -
+                n(item.used);
 
-            var balClass = balance <= 0 ? 'critical' : balance <= 5 ? 'low' : 'ok';
-            var balLabel = balance <= 0 ? 'Out of stock' : balance <= 5 ? 'Low stock' : 'In stock';
-            var cardStockClass = balance <= 0 ? 'out-stock' : (balance <= 5 ? 'low-stock' : '');
+            var balLabel =
+                balance <= 0
+                    ? 'Out of stock'
+                    : balance <= 5
+                        ? 'Low stock'
+                        : 'In stock';
 
-            var catClass = item.category === 'Medicine' ? 'medicine' : 'supplies';
+            var balStatusClass =
+                balance <= 0
+                    ? 'status-out-of-stock'
+                    : balance <= 5
+                        ? 'status-low-stock'
+                        : 'status-in-stock';
+
+            var catStatusClass =
+                item.category === 'Medicine'
+                    ? 'status-medicine'
+                    : 'status-supplies';
+
+            var cardStockClass =
+                balance <= 0
+                    ? 'out-stock'
+                    : balance <= 5
+                        ? 'low-stock'
+                        : '';
 
             if (currentViewMode === 'grid') {
                 grid.innerHTML += `
-    <div class="inventory-card ${cardStockClass} ${catClass}">
-        <div class="inventory-card-top">
-            <div class="min-w-0">
-                <div class="inventory-card-name">${item.name || ''}</div>
+        <div class="inventory-card ${cardStockClass}">
 
-                <div class="inventory-card-tags">
-                    <span class="stock-no">${item.stock_no || ''}</span>
-                    <span class="supply-cat ${catClass}">${item.category || ''}</span>
-                </div>
-            </div>
+            <div class="inventory-card-top">
 
-            <span class="bal-chip ${balClass}">
-                ${balance}
-                <span>${balLabel}</span>
+    <div class="min-w-0">
+
+        <div class="inventory-card-name">
+            ${item.name || ''}
+        </div>
+
+        <div class="inventory-card-tags">
+            <span class="stock-no">
+                ${item.stock_no || ''}
             </span>
         </div>
 
-        <div class="inventory-card-meta">
-            <div>
-                <div class="inventory-card-label">Date</div>
-                <div class="inventory-card-value">${item.formatted_date || ''}</div>
-            </div>
-            <div>
-                <div class="inventory-card-label">Unit</div>
-                <div class="inventory-card-value">${item.unit || ''}</div>
-            </div>
-            <div>
-                <div class="inventory-card-label">Qty</div>
-                <div class="inventory-card-value">${item.qty || 0}</div>
-            </div>
-            <div>
-                <div class="inventory-card-label">Used</div>
-                <div class="inventory-card-value">${item.used || 0}</div>
-            </div>
-        </div>
-
-        <div class="ui-action-group inventory-card-actions">
-    ${inventoryActionButtons(item.id)}
-</div>
     </div>
-`;
+
+    <div class="inventory-card-statuses">
+
+        <span class="status-pill ${catStatusClass}">
+            <span class="status-dot"></span>
+            ${item.category || ''}
+        </span>
+
+        <span class="status-pill ${balStatusClass}">
+            <span class="status-dot"></span>
+            ${balance} · ${balLabel}
+        </span>
+
+    </div>
+
+</div>
+
+            <div class="inventory-card-meta">
+
+                <div>
+                    <div class="inventory-card-label">
+                        Date
+                    </div>
+
+                    <div class="inventory-card-value">
+                        ${item.formatted_date || ''}
+                    </div>
+                </div>
+
+                <div>
+                    <div class="inventory-card-label">
+                        Unit
+                    </div>
+
+                    <div class="inventory-card-value">
+                        ${item.unit || ''}
+                    </div>
+                </div>
+
+                <div>
+                    <div class="inventory-card-label">
+                        Qty
+                    </div>
+
+                    <div class="inventory-card-value">
+                        ${item.qty || 0}
+                    </div>
+                </div>
+
+                <div>
+                    <div class="inventory-card-label">
+                        Used
+                    </div>
+
+                    <div class="inventory-card-value">
+                        ${item.used || 0}
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="ui-action-group inventory-card-actions">
+                ${inventoryActionButtons(item.id)}
+            </div>
+
+        </div>
+    `;
             } else {
                 tbody.innerHTML += `
     <tr>
@@ -2144,19 +2235,22 @@ aria-label="Delete inventory item"
             </span>
         </td>
 
-        <td>
-            <div class="supply-name">
-                ${item.name || ''}
-            </div>
+        <td class="table-cell-main">
+    <div class="supply-name">
+        ${item.name || ''}
+    </div>
+</td>
 
-            <span class="supply-cat ${catClass}">
-                ${item.category || ''}
-            </span>
-        </td>
+<td>
+    <span class="status-pill ${catStatusClass}">
+        <span class="status-dot"></span>
+        ${item.category || ''}
+    </span>
+</td>
 
-        <td class="inventory-muted-cell">
-            ${item.unit || ''}
-        </td>
+<td class="inventory-muted-cell">
+    ${item.unit || ''}
+</td>
 
         <td class="inventory-strong-cell">
             ${item.qty || 0}
@@ -2167,11 +2261,10 @@ aria-label="Delete inventory item"
         </td>
 
         <td>
-            <span class="bal-chip ${balClass}">
-                ${balance}
-                <span class="inventory-balance-label">
-                    ${balLabel}
-                </span>
+            <span class="status-pill ${balStatusClass}">
+                <span class="status-dot"></span>
+
+                ${balance} · ${balLabel}
             </span>
         </td>
 

@@ -96,7 +96,7 @@
     overflow: visible;
 }
 
-.progress-fill {
+.booking-progress-fill {
     transition:
         width .5s cubic-bezier(.4, 0, .2, 1);
 }

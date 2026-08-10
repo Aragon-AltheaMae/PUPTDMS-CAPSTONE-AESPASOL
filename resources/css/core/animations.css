@@ -300,14 +300,6 @@
     animation: pageEnter .55s cubic-bezier(.22, 1, .36, 1) both;
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .page-enter {
-        animation: none !important;
-        transform: none !important;
-        filter: none !important;
-    }
-}
-
 @keyframes modalSlideUp {
     from {
         opacity: 0;
@@ -413,6 +405,42 @@
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+@keyframes globalFieldErrorIn {
+    from {
+        opacity: 0;
+        transform: translateY(-3px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes errorShake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-5px);
+    }
+
+    40% {
+        transform: translateX(5px);
+    }
+
+    60% {
+        transform: translateX(-3px);
+    }
+
+    80% {
+        transform: translateX(3px);
     }
 }
 
@@ -685,20 +713,6 @@
     }
 }
 
-@media (prefers-reduced-motion: reduce) {
-
-    .role-modal,
-    .role-modal::backdrop,
-    #vaOverlay,
-    #patientPickerOverlay,
-    #vaOverlay .va-panel,
-    #patientPickerOverlay .va-panel {
-        animation: none !important;
-        transition: none !important;
-        filter: none !important;
-    }
-}
-
 @keyframes globalRefreshNoticeIn {
     0% {
         opacity: 0;
@@ -759,19 +773,6 @@
         box-shadow:
             0 16px 38px rgba(15, 23, 42, 0.10),
             0 0 0 4px rgba(37, 99, 235, 0.06);
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-
-    .global-refresh-notice,
-    .global-refresh-icon,
-    .global-refresh-icon i,
-    .global-refresh-btn {
-        animation: none !important;
-        transition: none !important;
-        transform: none !important;
-        filter: none !important;
     }
 }
 
@@ -959,19 +960,6 @@
     }
 }
 
-@media (prefers-reduced-motion: reduce) {
-
-    .chat-action-btn,
-    .chat-action-btn::before {
-        animation: none !important;
-        transition: none !important;
-    }
-}
-
-/* =========================================================
-   AUTH LANDING PAGE ANIMATIONS
-   ========================================================= */
-
 @keyframes authFadeInUp {
     from {
         opacity: 0;
@@ -1085,19 +1073,6 @@
     transition-delay: 0.4s;
 }
 
-@media (prefers-reduced-motion: reduce) {
-
-    .auth-container .login-nav,
-    .auth-container .btn-sso,
-    .auth-container .hero-title,
-    .auth-container .reveal {
-        animation: none !important;
-        transition: none !important;
-        transform: none !important;
-        opacity: 1 !important;
-    }
-}
-
 @keyframes confirmBackdropFade {
     from {
         opacity: 0;
@@ -1169,5 +1144,111 @@
         box-shadow:
             0 18px 34px rgba(139, 0, 0, .14),
             inset 0 1px 0 rgba(255, 255, 255, .9);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .page-enter,
+    .card-reveal,
+    .stat-soft-rise,
+    .fade-up,
+    .fade-in,
+    .spin,
+    .dot-pulse {
+        animation: none !important;
+    }
+
+    .page-enter,
+    .fade-up,
+    .fade-in {
+        transform: none !important;
+        filter: none !important;
+        opacity: 1 !important;
+    }
+
+    .modal-overlay,
+    .modal-overlay .modal-box-inner,
+    .ui-modal,
+    .ui-modal-card,
+    .patient-doc-modal-box,
+    .doc-success-overlay,
+    .doc-success-card {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .modal-overlay .modal-box-inner,
+    .ui-modal-card,
+    .patient-doc-modal-box,
+    .doc-success-card {
+        filter: none !important;
+    }
+
+    .role-modal,
+    .role-modal::backdrop,
+    #vaOverlay,
+    #patientPickerOverlay,
+    #vaOverlay .va-panel,
+    #patientPickerOverlay .va-panel {
+        animation: none !important;
+        transition: none !important;
+        filter: none !important;
+    }
+
+    .global-refresh-notice,
+    .global-refresh-icon,
+    .global-refresh-icon i,
+    .global-refresh-btn {
+        animation: none !important;
+        transition: none !important;
+        transform: none !important;
+        filter: none !important;
+    }
+
+    .chat-action-btn,
+    .chat-action-btn::before {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .auth-container .login-nav,
+    .auth-container .hero-content>.hero-logos,
+    .auth-container .hero-content>.eyebrow,
+    .auth-container .hero-content>.hero-title,
+    .auth-container .hero-content>.hero-desc,
+    .auth-container .hero-content>.hero-features,
+    .auth-container .hero-content>#login,
+    .auth-container .btn-sso,
+    .auth-container .hero-title,
+    .auth-container .reveal {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .auth-container .hero-content>.hero-logos,
+    .auth-container .hero-content>.eyebrow,
+    .auth-container .hero-content>.hero-title,
+    .auth-container .hero-content>.hero-desc,
+    .auth-container .hero-content>.hero-features,
+    .auth-container .hero-content>#login,
+    .auth-container .reveal {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+
+    .book-appointment-btn::before,
+    .check-dates-btn i,
+    .check-dates-btn .btn-ripple,
+    .greeting-banner,
+    .upcoming-live-dot,
+    .request-doc-card .request-ripple,
+    .shimmer-btn,
+    .wave-hand,
+    .calendar-focus-pulse,
+    .appt-panel-fade,
+    .appt-section-reveal,
+    .appt-tab.appt-active::after {
+        animation: none !important;
     }
 }

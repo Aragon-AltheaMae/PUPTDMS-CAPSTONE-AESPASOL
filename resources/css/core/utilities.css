@@ -189,69 +189,14 @@
 
 .progress-fill {
     height: 100%;
-    border-radius: 2px;
-}
+    border-radius: inherit;
 
-.act {
-    width: 30px;
-    height: 30px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-size: 12px;
-    transition: all .15s;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    line-height: 1;
-    font-weight: 600;
-    flex-shrink: 0;
-}
+    background:
+        var(--progress-fill-color,
+            var(--crimson, #8B0000));
 
-.act i {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-}
-
-.act:hover {
-    transform: scale(1.06);
-}
-
-.act-edit {
-    background: #eff6ff;
-    color: #2563eb;
-}
-
-.act-edit:hover {
-    background: #dbeafe;
-}
-
-.act-star {
-    background: #d1fae5;
-    color: #065f46;
-}
-
-.act-star:hover {
-    background: #a7f3d0;
-}
-
-.act-del {
-    background: #fef2f2;
-    color: #dc2626;
-}
-
-.act-del:hover {
-    background: #fee2e2;
-}
-
-.act-pinned {
-    background: #d1fae5;
-    color: #065f46;
-    opacity: .55;
-    cursor: default;
+    transition:
+        width .3s ease;
 }
 
 .btn-collapse {
@@ -1016,7 +961,6 @@
     line-height: 1 !important;
     white-space: nowrap !important;
     letter-spacing: -0.01em !important;
-    text-transform: uppercase !important;
 
     background: var(--status-bg, var(--status-default-bg)) !important;
     color: var(--status-text, var(--status-default-text)) !important;
@@ -1252,6 +1196,105 @@
     --status-soft: var(--status-denied-soft);
 }
 
+.status-medicine,
+.pill-medicine,
+.badge-medicine {
+    --status-bg: #EFF6FF;
+    --status-text: #2563EB;
+    --status-border: #BFDBFE;
+    --status-solid: #2563EB;
+    --status-soft: rgba(37, 99, 235, .10);
+}
+
+[data-theme="dark"] .status-medicine,
+[data-theme="dark"] .pill-medicine,
+[data-theme="dark"] .badge-medicine,
+.dark .status-medicine,
+.dark .pill-medicine,
+.dark .badge-medicine {
+    --status-bg: rgba(37, 99, 235, .16);
+    --status-text: #93C5FD;
+    --status-border: rgba(96, 165, 250, .28);
+    --status-solid: #60A5FA;
+    --status-soft: rgba(37, 99, 235, .16);
+}
+
+.status-supplies,
+.pill-supplies,
+.badge-supplies {
+    --status-bg:
+        var(--status-approved-bg);
+
+    --status-text:
+        var(--status-approved-text);
+
+    --status-border:
+        var(--status-approved-border);
+
+    --status-solid:
+        var(--status-approved-solid);
+
+    --status-soft:
+        var(--status-approved-soft);
+}
+
+.status-in-stock,
+.pill-in-stock,
+.badge-in-stock {
+    --status-bg:
+        var(--status-approved-bg);
+
+    --status-text:
+        var(--status-approved-text);
+
+    --status-border:
+        var(--status-approved-border);
+
+    --status-solid:
+        var(--status-approved-solid);
+
+    --status-soft:
+        var(--status-approved-soft);
+}
+
+.status-low-stock,
+.pill-low-stock,
+.badge-low-stock {
+    --status-bg:
+        var(--status-pending-bg);
+
+    --status-text:
+        var(--status-pending-text);
+
+    --status-border:
+        var(--status-pending-border);
+
+    --status-solid:
+        var(--status-pending-solid);
+
+    --status-soft:
+        var(--status-pending-soft);
+}
+
+.status-out-of-stock,
+.pill-out-of-stock,
+.badge-out-of-stock {
+    --status-bg:
+        var(--status-cancelled-bg);
+
+    --status-text:
+        var(--status-cancelled-text);
+
+    --status-border:
+        var(--status-cancelled-border);
+
+    --status-solid:
+        var(--status-cancelled-solid);
+
+    --status-soft:
+        var(--status-cancelled-soft);
+}
+
 .status-default,
 .status-past,
 .pill-default,
@@ -1315,313 +1358,6 @@
     --status-border: var(--status-default-border);
     --status-solid: var(--status-default-solid);
     --status-soft: var(--status-default-soft);
-}
-
-.s-all {
-    --stat-accent: var(--status-all-solid);
-    --stat-soft: var(--status-all-soft);
-    --stat-bg: var(--status-all-bg);
-    --stat-text: var(--status-all-text);
-    --stat-border: var(--status-all-border);
-}
-
-.s-today {
-    --stat-accent: var(--status-today-solid);
-    --stat-soft: var(--status-today-soft);
-    --stat-bg: var(--status-today-bg);
-    --stat-text: var(--status-today-text);
-    --stat-border: var(--status-today-border);
-}
-
-.s-upcoming,
-.s-scheduled {
-    --stat-accent: var(--status-upcoming-solid);
-    --stat-soft: var(--status-upcoming-soft);
-    --stat-bg: var(--status-upcoming-bg);
-    --stat-text: var(--status-upcoming-text);
-    --stat-border: var(--status-upcoming-border);
-}
-
-.s-rescheduled {
-    --stat-accent: var(--status-rescheduled-solid);
-    --stat-soft: var(--status-rescheduled-soft);
-    --stat-bg: var(--status-rescheduled-bg);
-    --stat-text: var(--status-rescheduled-text);
-    --stat-border: var(--status-rescheduled-border);
-}
-
-.s-completed,
-.s-approved {
-    --stat-accent: var(--status-completed-solid);
-    --stat-soft: var(--status-completed-soft);
-    --stat-bg: var(--status-completed-bg);
-    --stat-text: var(--status-completed-text);
-    --stat-border: var(--status-completed-border);
-}
-
-.s-cancelled,
-.s-canceled,
-.s-rejected {
-    --stat-accent: var(--status-cancelled-solid);
-    --stat-soft: var(--status-cancelled-soft);
-    --stat-bg: var(--status-cancelled-bg);
-    --stat-text: var(--status-cancelled-text);
-    --stat-border: var(--status-cancelled-border);
-}
-
-.s-pending {
-    --stat-accent: var(--status-pending-solid);
-    --stat-soft: var(--status-pending-soft);
-    --stat-bg: var(--status-pending-bg);
-    --stat-text: var(--status-pending-text);
-    --stat-border: var(--status-pending-border);
-}
-
-.s-active {
-    --stat-accent: var(--status-active-solid);
-    --stat-soft: var(--status-active-soft);
-    --stat-bg: var(--status-active-bg);
-    --stat-text: var(--status-active-text);
-    --stat-border: var(--status-active-border);
-}
-
-.s-inactive {
-    --stat-accent: var(--status-inactive-solid);
-    --stat-soft: var(--status-inactive-soft);
-    --stat-bg: var(--status-inactive-bg);
-    --stat-text: var(--status-inactive-text);
-    --stat-border: var(--status-inactive-border);
-}
-
-.s-archived {
-    --stat-accent: var(--status-archived-solid);
-    --stat-soft: var(--status-archived-soft);
-    --stat-bg: var(--status-archived-bg);
-    --stat-text: var(--status-archived-text);
-    --stat-border: var(--status-archived-border);
-}
-
-.s-deleted {
-    --stat-accent: var(--status-deleted-solid);
-    --stat-soft: var(--status-deleted-soft);
-    --stat-bg: var(--status-deleted-bg);
-    --stat-text: var(--status-deleted-text);
-    --stat-border: var(--status-deleted-border);
-}
-
-.s-ongoing,
-.s-in-progress,
-.s-in_progress {
-    --stat-accent: var(--status-ongoing-solid);
-    --stat-soft: var(--status-ongoing-soft);
-    --stat-bg: var(--status-ongoing-bg);
-    --stat-text: var(--status-ongoing-text);
-    --stat-border: var(--status-ongoing-border);
-}
-
-.s-failed {
-    --stat-accent: var(--status-failed-solid);
-    --stat-soft: var(--status-failed-soft);
-    --stat-bg: var(--status-failed-bg);
-    --stat-text: var(--status-failed-text);
-    --stat-border: var(--status-failed-border);
-}
-
-.s-ready {
-    --stat-accent: var(--status-ready-solid);
-    --stat-soft: var(--status-ready-soft);
-    --stat-bg: var(--status-ready-bg);
-    --stat-text: var(--status-ready-text);
-    --stat-border: var(--status-ready-border);
-}
-
-.s-released {
-    --stat-accent: var(--status-released-solid);
-    --stat-soft: var(--status-released-soft);
-    --stat-bg: var(--status-released-bg);
-    --stat-text: var(--status-released-text);
-    --stat-border: var(--status-released-border);
-}
-
-.s-ended {
-    --stat-accent: var(--status-ended-solid);
-    --stat-soft: var(--status-ended-soft);
-    --stat-bg: var(--status-ended-bg);
-    --stat-text: var(--status-ended-text);
-    --stat-border: var(--status-ended-border);
-}
-
-.s-granted {
-    --stat-accent: var(--status-granted-solid);
-    --stat-soft: var(--status-granted-soft);
-    --stat-bg: var(--status-granted-bg);
-    --stat-text: var(--status-granted-text);
-    --stat-border: var(--status-granted-border);
-}
-
-.s-denied {
-    --stat-accent: var(--status-denied-solid);
-    --stat-soft: var(--status-denied-soft);
-    --stat-bg: var(--status-denied-bg);
-    --stat-text: var(--status-denied-text);
-    --stat-border: var(--status-denied-border);
-}
-
-.s-all::before,
-.s-today::before,
-.s-upcoming::before,
-.s-scheduled::before,
-.s-rescheduled::before,
-.s-completed::before,
-.s-approved::before,
-.s-cancelled::before,
-.s-canceled::before,
-.s-rejected::before,
-.s-pending::before,
-.s-active::before,
-.s-inactive::before,
-.s-archived::before,
-.s-deleted::before,
-.s-ongoing::before,
-.s-in-progress::before,
-.s-in_progress::before,
-.s-failed::before,
-.s-ready::before,
-.s-released::before,
-.s-ended::before,
-.s-granted::before,
-.s-denied::before {
-    background: linear-gradient(90deg,
-            var(--stat-accent, var(--status-default-solid)),
-            color-mix(in srgb, var(--stat-accent, var(--status-default-solid)) 72%, #ffffff)) !important;
-}
-
-.s-all .stat-value,
-.s-all .stat-num,
-.s-all .stat-count,
-.s-today .stat-value,
-.s-today .stat-num,
-.s-today .stat-count,
-.s-upcoming .stat-value,
-.s-upcoming .stat-num,
-.s-upcoming .stat-count,
-.s-scheduled .stat-value,
-.s-scheduled .stat-num,
-.s-scheduled .stat-count,
-.s-rescheduled .stat-value,
-.s-rescheduled .stat-num,
-.s-rescheduled .stat-count,
-.s-completed .stat-value,
-.s-completed .stat-num,
-.s-completed .stat-count,
-.s-approved .stat-value,
-.s-approved .stat-num,
-.s-approved .stat-count,
-.s-cancelled .stat-value,
-.s-cancelled .stat-num,
-.s-cancelled .stat-count,
-.s-canceled .stat-value,
-.s-canceled .stat-num,
-.s-canceled .stat-count,
-.s-rejected .stat-value,
-.s-rejected .stat-num,
-.s-rejected .stat-count,
-.s-pending .stat-value,
-.s-pending .stat-num,
-.s-pending .stat-count,
-.s-active .stat-value,
-.s-active .stat-num,
-.s-active .stat-count,
-.s-inactive .stat-value,
-.s-inactive .stat-num,
-.s-inactive .stat-count,
-.s-archived .stat-value,
-.s-archived .stat-num,
-.s-archived .stat-count,
-.s-deleted .stat-value,
-.s-deleted .stat-num,
-.s-deleted .stat-count,
-.s-ongoing .stat-value,
-.s-ongoing .stat-num,
-.s-ongoing .stat-count,
-.s-in-progress .stat-value,
-.s-in-progress .stat-num,
-.s-in-progress .stat-count,
-.s-in_progress .stat-value,
-.s-in_progress .stat-num,
-.s-in_progress .stat-count,
-.s-failed .stat-value,
-.s-failed .stat-num,
-.s-failed .stat-count,
-.s-ready .stat-value,
-.s-ready .stat-num,
-.s-ready .stat-count,
-.s-released .stat-value,
-.s-released .stat-num,
-.s-released .stat-count,
-.s-ended .stat-value,
-.s-ended .stat-num,
-.s-ended .stat-count,
-.s-granted .stat-value,
-.s-granted .stat-num,
-.s-granted .stat-count,
-.s-denied .stat-value,
-.s-denied .stat-num,
-.s-denied .stat-count {
-    color: var(--stat-accent, var(--status-default-solid)) !important;
-}
-
-.s-all .stat-icon,
-.s-all .stat-icon-wrapper,
-.s-today .stat-icon,
-.s-today .stat-icon-wrapper,
-.s-upcoming .stat-icon,
-.s-upcoming .stat-icon-wrapper,
-.s-scheduled .stat-icon,
-.s-scheduled .stat-icon-wrapper,
-.s-rescheduled .stat-icon,
-.s-rescheduled .stat-icon-wrapper,
-.s-completed .stat-icon,
-.s-completed .stat-icon-wrapper,
-.s-approved .stat-icon,
-.s-approved .stat-icon-wrapper,
-.s-cancelled .stat-icon,
-.s-cancelled .stat-icon-wrapper,
-.s-canceled .stat-icon,
-.s-canceled .stat-icon-wrapper,
-.s-rejected .stat-icon,
-.s-rejected .stat-icon-wrapper,
-.s-pending .stat-icon,
-.s-pending .stat-icon-wrapper,
-.s-active .stat-icon,
-.s-active .stat-icon-wrapper,
-.s-inactive .stat-icon,
-.s-inactive .stat-icon-wrapper,
-.s-archived .stat-icon,
-.s-archived .stat-icon-wrapper,
-.s-deleted .stat-icon,
-.s-deleted .stat-icon-wrapper,
-.s-ongoing .stat-icon,
-.s-ongoing .stat-icon-wrapper,
-.s-in-progress .stat-icon,
-.s-in-progress .stat-icon-wrapper,
-.s-in_progress .stat-icon,
-.s-in_progress .stat-icon-wrapper,
-.s-failed .stat-icon,
-.s-failed .stat-icon-wrapper,
-.s-ready .stat-icon,
-.s-ready .stat-icon-wrapper,
-.s-released .stat-icon,
-.s-released .stat-icon-wrapper,
-.s-ended .stat-icon,
-.s-ended .stat-icon-wrapper,
-.s-granted .stat-icon,
-.s-granted .stat-icon-wrapper,
-.s-denied .stat-icon,
-.s-denied .stat-icon-wrapper {
-    background: var(--stat-soft, var(--status-default-soft)) !important;
-    color: var(--stat-accent, var(--status-default-solid)) !important;
-    border-color: var(--stat-border, var(--status-default-border)) !important;
 }
 
 .toggle-slider {
@@ -1815,16 +1551,21 @@
     -webkit-backdrop-filter: blur(10px);
 }
 
-[data-theme="dark"] .tab-btn {
+[data-theme="dark"] .tab-btn,
+.dark .tab-btn {
     background:
-        radial-gradient(circle at bottom right, rgba(255, 255, 255, .07), transparent 42%),
-        linear-gradient(135deg, rgba(22, 27, 34, .68), rgba(17, 24, 39, .50)) !important;
-    border: 1px solid rgba(255, 255, 255, .10);
+        radial-gradient(circle at bottom right,
+            rgba(255, 255, 255, .05),
+            transparent 42%),
+        var(--surface) !important;
+
+    border: 1px solid var(--border);
+
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .10),
-        0 0 0 1px rgba(255, 255, 255, .025),
+        inset 0 1px 0 rgba(255, 255, 255, .05),
         0 8px 18px rgba(0, 0, 0, .16);
 }
 
@@ -1899,27 +1640,11 @@
     -webkit-backdrop-filter: blur(12px);
 }
 
-[data-theme="dark"] .act-edit {
-    background: rgba(37, 99, 235, .13) !important;
-    border: 1px solid rgba(96, 165, 250, .20) !important;
-}
-
-[data-theme="dark"] .act-star,
-[data-theme="dark"] .act-pinned {
-    background: rgba(16, 185, 129, .13) !important;
-    border: 1px solid rgba(52, 211, 153, .20) !important;
-}
-
-[data-theme="dark"] .act-del {
-    background: rgba(239, 68, 68, .12) !important;
-    border: 1px solid rgba(248, 113, 113, .20) !important;
-}
-
 [data-theme="dark"] .btn-collapse,
 .dark .btn-collapse {
-    background: #374151;
-    border-color: #4b5563;
-    color: #d1d5db;
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text-2);
 }
 
 [data-theme="dark"] .btn-reset,
@@ -1958,10 +1683,11 @@
     color: #FCA5A5 !important;
 }
 
-[data-theme="dark"] .chip-val {
-    background-color: #1f2937 !important;
-    color: #f3f4f6 !important;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+[data-theme="dark"] .chip-val,
+.dark .chip-val {
+    background: var(--surface) !important;
+    color: var(--text-1) !important;
+    border: 1px solid var(--border);
 }
 
 [data-theme="dark"] .ui-btn-secondary,
@@ -2069,16 +1795,20 @@
     color: #FFFFFF !important;
 }
 
-[data-theme="dark"] .tab-group {
-    background: #0d0f12;
-    border-color: #21262d;
+[data-theme="dark"] .tab-group,
+.dark .tab-group {
+    background: var(--surface);
+    border-color: var(--border);
 }
 
-[data-theme="dark"] .auth-theme-toggle {
-    background: rgba(13, 17, 23, 0.82);
-    border-color: rgba(255, 255, 255, 0.10);
-    color: #F3F4F6;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
+[data-theme="dark"] .auth-theme-toggle,
+.dark .auth-theme-toggle {
+    background: var(--card);
+    border-color: var(--border);
+    color: var(--text-1);
+
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, .28);
 }
 
 [data-theme="dark"] .auth-theme-toggle:hover {
@@ -2243,14 +1973,16 @@
 .dark .modal-themed-header {
     background:
         radial-gradient(circle at top left,
-            color-mix(in srgb, var(--modal-accent) 20%, transparent),
+            color-mix(in srgb,
+                var(--modal-accent) 20%,
+                transparent),
             transparent 42%),
-        linear-gradient(145deg,
-            rgba(13, 17, 23, .98),
-            rgba(22, 27, 34, .94)) !important;
+        var(--surface) !important;
 
     border-bottom-color:
-        color-mix(in srgb, var(--modal-accent) 32%, transparent) !important;
+        color-mix(in srgb,
+            var(--modal-accent) 32%,
+            var(--border)) !important;
 }
 
 [data-theme="dark"] .modal-themed-icon,
@@ -2519,8 +2251,8 @@
 .dark .global-info-item,
 [data-theme="dark"] .global-info-pill,
 .dark .global-info-pill {
-    background: rgba(13, 17, 23, .58);
-    border-color: rgba(255, 255, 255, .10);
+    background: var(--surface);
+    border-color: var(--border);
 }
 
 [data-theme="dark"] .global-info-profile,
@@ -2533,19 +2265,19 @@
 [data-theme="dark"] .global-info-profile-name,
 .dark .global-info-value,
 .dark .global-info-profile-name {
-    color: #F8FAFC;
+    color: var(--text-1);
 }
 
 [data-theme="dark"] .global-info-label,
 [data-theme="dark"] .global-info-subvalue,
 .dark .global-info-label,
 .dark .global-info-subvalue {
-    color: #94A3B8;
+    color: var(--text-3);
 }
 
 [data-theme="dark"] .global-info-pill,
 .dark .global-info-pill {
-    color: #CBD5E1;
+    color: var(--text-2);
 }
 
 [data-theme="dark"] .global-info-pill i,
@@ -2732,8 +2464,8 @@
 
 [data-theme="dark"] .global-record-card,
 .dark .global-record-card {
-    background: rgba(13, 17, 23, .82);
-    border-color: rgba(255, 255, 255, .10);
+    background: var(--surface);
+    border-color: var(--border);
     box-shadow: none;
 }
 
@@ -2745,7 +2477,7 @@
 
 [data-theme="dark"] .global-record-name,
 .dark .global-record-name {
-    color: #F8FAFC;
+    color: var(--text-1);
 }
 
 .ui-action-indicator {

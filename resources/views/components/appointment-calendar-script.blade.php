@@ -568,7 +568,7 @@
                     calendarConfig.disallowToday
                 ) {
                     cellClass +=
-                        "skeleton-block text-gray-500 cursor-not-allowed disabled";
+                        " same-day-unavailable disabled";
                 } else {
                     cellClass += " today";
                 }
@@ -585,7 +585,7 @@
                 state.isClosed
             ) {
                 cellClass +=
-                    "text-[#d1ccc8] cursor-not-allowed disabled";
+                    " clinic-closed disabled";
 
             } else if (
                 !ignoreAvailabilityRestrictions &&
@@ -593,7 +593,7 @@
                 state.isBookingMode
             ) {
                 cellClass +=
-                    "text-[#d1ccc8] cursor-not-allowed disabled";
+                    " past-date disabled";
 
             } else if (
                 !ignoreAvailabilityRestrictions &&
@@ -601,7 +601,7 @@
                 !state.hasCompletedAppointment
             ) {
                 cellClass +=
-                    "text-gray-400 cursor-default disabled";
+                    " past-date disabled";
             }
         } else {
             if (state.isSelected && !state.isDisabled) {

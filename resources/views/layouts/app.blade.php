@@ -186,9 +186,7 @@
 
     @include('partials.footer')
 
-    @if ($isAdmin || $isDentist)
-        @include('components.discard-changes')
-    @endif
+    @include('components.discard-changes')
 
     @include('partials.global-toast')
 
