@@ -475,7 +475,7 @@ $existingAppointmentMode
             </div>
 
             <button type="button" id="closeLegendDrawerBtn"
-                class="w-10 h-10 inline-flex items-center justify-center rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition shrink-0">
+                class="ui-icon-btn neutral shrink-0"  aria-label="Close treatment legend" title="Close treatment legend">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -3154,6 +3154,7 @@ $existingAppointmentMode
                 closeResetModal();
                 closeCancelProcedureModal();
                 closeFinishProcedureModal();
+                closeLegendDrawer();
 
                 if (currentView === '3d' && selectedTooth) {
                     clear3DSurfacePickerSelection(false);
