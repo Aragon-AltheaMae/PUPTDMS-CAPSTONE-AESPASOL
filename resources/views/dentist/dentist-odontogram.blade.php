@@ -4,6 +4,9 @@
 
 @section('title', 'Patient Odontogram')
 
+@section('hide-sidebar')
+@endsection
+
 @section('content')
 
 @php
@@ -32,7 +35,7 @@ $existingAppointmentMode
 : '2D / 3D Treatment &amp; Condition Mapping';
 @endphp
 
-<main id="mainContent" class="odontogram-page pt-[100px] px-3 md:px-6 pb-6">
+<main id="mainContent" class="odontogram-page pt-[100px] pb-6">
     <div class="w-full fade-in">
         <div class="odontogram-hero mb-6">
             <div class="odontogram-hero-main">
