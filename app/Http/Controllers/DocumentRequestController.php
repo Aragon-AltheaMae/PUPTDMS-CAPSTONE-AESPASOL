@@ -301,14 +301,10 @@ class DocumentRequestController extends Controller
         if ($activeRole !== 'dentist') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
-<<<<<<< Updated upstream
-        $docRequest = DocumentRequest::with('patient.user')->findOrFail($id);
-=======
 
         try {
             $docRequest = DB::transaction(function () use ($id) {
                 $documentRequest = DocumentRequest::with('patient.user')->findOrFail($id);
->>>>>>> Stashed changes
 
                 $documentRequest->update([
                     'status' => 'approved',
