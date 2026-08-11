@@ -32,6 +32,7 @@
 @import './pages/auth/login.css';
 @import './components/odontogram-preview.css';
 @import './components/booking-workflow.css';
+@import './components/filter-select.css';
 
 /* Shared page styles */
 @import './pages/dentist/dentist-shared.css';
@@ -65,8 +66,8 @@
 
 /* Admin pages */
 @import './pages/admin/admin-dashboard.css';
-@import './pages/admin/admin-dental-records.css';
-@import './pages/admin/admin-document-templates.css';
+@import './pages/admin/dental-records.css';
+@import './pages/admin/document-templates.css';
 @import './pages/admin/academic-period.css';
 @import './pages/admin/cms-access.css';
 @import './pages/admin/faculty-integration.css';

@@ -39,43 +39,214 @@ class DocumentTemplateController extends Controller
     public function index(Request $request)
     {
         if (!session('admin_logged_in')) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized',
+                ], 403);
+            }
+
             return redirect('/admin/login');
         }
 
-        $allowedStatuses = ['active', 'archived'];
+        $allowedStatuses = [
+            'active',
+            'archived',
+        ];
+
+        $allowedCategories = [
+            'clearance',
+            'record',
+            'report',
+            'inventory',
+        ];
+
+        $search = trim(
+            (string) $request->input(
+                'search',
+                ''
+            )
+        );
+
+        $status = trim(
+            (string) $request->input(
+                'status',
+                ''
+            )
+        );
+
+        $category = trim(
+            (string) $request->input(
+                'category',
+                ''
+            )
+        );
+
+        $perPageInput = (int) $request->input(
+            'per_page',
+            10
+        );
+
+        $perPage = in_array(
+            $perPageInput,
+            [10, 20, 50, 100],
+            true
+        )
+            ? $perPageInput
+            : 10;
+
 
         $query = DocumentTemplate::query()
-            ->whereIn('status', $allowedStatuses)
-            ->latest();
+            ->whereIn(
+                'status',
+                $allowedStatuses
+            );
 
-        if ($request->filled('document_type')) {
-            $query->where('document_type', $request->string('document_type'));
+
+        if ($search !== '') {
+            $searchLower = strtolower($search);
+
+            $query->where(
+                function ($q) use ($searchLower) {
+                    $q
+                        ->whereRaw(
+                            'LOWER(name) LIKE ?',
+                            ["%{$searchLower}%"]
+                        )
+                        ->orWhereRaw(
+                            'LOWER(code) LIKE ?',
+                            ["%{$searchLower}%"]
+                        )
+                        ->orWhereRaw(
+                            'LOWER(document_type) LIKE ?',
+                            ["%{$searchLower}%"]
+                        )
+                        ->orWhereRaw(
+                            'LOWER(category) LIKE ?',
+                            ["%{$searchLower}%"]
+                        )
+                        ->orWhereRaw(
+                            'LOWER(notes) LIKE ?',
+                            ["%{$searchLower}%"]
+                        );
+                }
+            );
         }
 
-        if ($request->filled('status')) {
-            $status = (string) $request->string('status');
 
-            if (in_array($status, $allowedStatuses, true)) {
-                $query->where('status', $status);
-            }
+        if (
+            $status !== '' &&
+            in_array(
+                $status,
+                $allowedStatuses,
+                true
+            )
+        ) {
+            $query->where(
+                'status',
+                $status
+            );
         }
 
-        if ($request->filled('search')) {
-            $search = strtolower(trim($request->search));
 
-            $query->where(function ($q) use ($search) {
-                $q->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"])
-                    ->orWhereRaw('LOWER(code) LIKE ?', ["%{$search}%"])
-                    ->orWhereRaw('LOWER(document_type) LIKE ?', ["%{$search}%"])
-                    ->orWhereRaw('LOWER(category) LIKE ?', ["%{$search}%"])
-                    ->orWhereRaw('LOWER(notes) LIKE ?', ["%{$search}%"]);
-            });
+        if (
+            $category !== '' &&
+            in_array(
+                $category,
+                $allowedCategories,
+                true
+            )
+        ) {
+            $query->where(
+                function ($q) use ($category) {
+                    $q
+                        ->where(
+                            'category',
+                            $category
+                        )
+                        ->orWhere(
+                            function ($fallback)
+                            use ($category) {
+                                $fallback
+                                    ->where(
+                                        function ($emptyCategory) {
+                                            $emptyCategory
+                                                ->whereNull('category')
+                                                ->orWhere(
+                                                    'category',
+                                                    ''
+                                                );
+                                        }
+                                    )
+                                    ->where(
+                                        'document_type',
+                                        'like',
+                                        "%{$category}%"
+                                    );
+                            }
+                        );
+                }
+            );
         }
 
-        $templates = $query->get();
+
+        $templates = $query
+            ->latest()
+            ->paginate(
+                $perPage
+            )
+            ->withQueryString();
+
+
         $stats = $this->templateStats();
 
-        return view('admin.document-template', compact('templates', 'stats'));
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+
+                'results_html' => view(
+                    'admin.document-template',
+                    compact(
+                        'templates',
+                        'stats'
+                    )
+                )->render(),
+
+                'pagination' => [
+                    'current_page' =>
+                    $templates->currentPage(),
+
+                    'last_page' =>
+                    $templates->lastPage(),
+
+                    'per_page' =>
+                    $templates->perPage(),
+
+                    'total' =>
+                    $templates->total(),
+
+                    'from' =>
+                    $templates->firstItem()
+                        ?? 0,
+
+                    'to' =>
+                    $templates->lastItem()
+                        ?? 0,
+                ],
+
+                'stats' => $stats,
+            ]);
+        }
+
+
+        return view(
+            'admin.document-template',
+            compact(
+                'templates',
+                'stats'
+            )
+        );
     }
 
     public function show($id)

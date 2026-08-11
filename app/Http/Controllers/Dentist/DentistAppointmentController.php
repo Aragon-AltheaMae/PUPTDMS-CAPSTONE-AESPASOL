@@ -304,7 +304,6 @@ class DentistAppointmentController extends Controller
 
         $appointment->update([
             'status' => 'cancelled',
-            'cancellation_reason' => $request->reason,
         ]);
 
         $patientUser = optional($appointment->patient)->user;

@@ -501,6 +501,10 @@
     transform: translateY(-1px);
 }
 
+.ui-btn-block {
+    width: 100%;
+}
+
 .ui-icon-btn {
     position: relative;
     width: 38px;

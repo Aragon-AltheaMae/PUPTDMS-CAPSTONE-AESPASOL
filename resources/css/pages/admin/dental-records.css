@@ -521,8 +521,8 @@
     border-top-color: #21262d !important;
 }
 
-[data-theme="dark"] .admin-dental-records-page .global-filter-select-field,
-.dark .admin-dental-records-page .global-filter-select-field {
+[data-theme="dark"] .admin-dental-records-page .global-native-filter-select-field,
+.dark .admin-dental-records-page .global-native-filter-select-field {
     background: rgba(255, 255, 255, .055) !important;
     border-color: rgba(255, 255, 255, .09) !important;
     color: #FCA5A5;
@@ -533,13 +533,13 @@
     -webkit-backdrop-filter: blur(16px);
 }
 
-[data-theme="dark"] .admin-dental-records-page .global-filter-select,
-.dark .admin-dental-records-page .global-filter-select {
+[data-theme="dark"] .admin-dental-records-page .global-native-filter-select,
+.dark .admin-dental-records-page .global-native-filter-select {
     color: #FEE2E2 !important;
 }
 
-[data-theme="dark"] .admin-dental-records-page .global-filter-select option,
-.dark .admin-dental-records-page .global-filter-select option {
+[data-theme="dark"] .admin-dental-records-page .global-native-filter-select option,
+.dark .admin-dental-records-page .global-native-filter-select option {
     color: #f3f4f6;
     background: #111827;
 }

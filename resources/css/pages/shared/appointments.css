@@ -2622,13 +2622,18 @@
         display: inline-flex !important;
     }
 
-    #mainContent.shared-appointments-page.admin-appointments-view .desktop-appointments-table,
     #mainContent.shared-appointments-page.admin-appointments-view.mode-list .desktop-appointments-table {
+        display: block !important;
+    }
+
+    #mainContent.shared-appointments-page.admin-appointments-view.mode-list .mobile-appointments-list {
         display: none !important;
     }
 
-    #mainContent.shared-appointments-page.admin-appointments-view .mobile-appointments-list,
-    #mainContent.shared-appointments-page.admin-appointments-view.mode-list .mobile-appointments-list,
+    #mainContent.shared-appointments-page.admin-appointments-view.mode-grid .desktop-appointments-table {
+        display: none !important;
+    }
+
     #mainContent.shared-appointments-page.admin-appointments-view.mode-grid .mobile-appointments-list {
         display: grid !important;
         grid-template-columns: 1fr !important;

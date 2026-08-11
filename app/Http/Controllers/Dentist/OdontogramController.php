@@ -97,7 +97,10 @@ class OdontogramController extends Controller
             ->map(fn($d) => Carbon::parse($d)->toDateString())
             ->toArray();
 
-        $philippineHolidays = PhilippineHolidays::range(0, 1);
+        $philippineHolidays = PhilippineHolidays::range(
+            yearsBefore: 15,
+            yearsAfter: 15
+        );
 
         return compact(
             'appointmentCountsPerDay',
@@ -137,7 +140,11 @@ class OdontogramController extends Controller
             ->map(fn($date) => Carbon::parse($date)->toDateString())
             ->toArray();
 
-        $philippineHolidays = PhilippineHolidays::range(15, 0);
+        $philippineHolidays =
+            PhilippineHolidays::range(
+                yearsBefore: 15,
+                yearsAfter: 15
+            );
 
         return compact(
             'appointmentCountsPerDay',
@@ -252,7 +259,7 @@ class OdontogramController extends Controller
     private function validateExistingAppointmentIntake(Request $request): array
     {
         return $request->validate([
-            'appointment_date' => 'required|date|before_or_equal:today',
+            'appointment_date' => 'required|date',
             'appointment_time' => 'required|date_format:H:i',
             'service_type' => 'required|string|max:255',
             'procedure_duration_hms' => ['required', 'regex:/^\d{2}:\d{2}:\d{2}$/'],
@@ -787,6 +794,34 @@ class OdontogramController extends Controller
             return redirect('/login');
         }
 
+        $rawAppointmentTime =
+            trim(
+                (string)
+                $request->input(
+                    'appointment_time',
+                    ''
+                )
+            );
+
+        if ($rawAppointmentTime !== '') {
+            try {
+                $normalizedAppointmentTime =
+                    $this->normalizeProcedureTime(
+                        $rawAppointmentTime
+                    );
+
+                $request->merge([
+                    'appointment_time' =>
+                    substr(
+                        $normalizedAppointmentTime,
+                        0,
+                        5
+                    ),
+                ]);
+            } catch (\Throwable $error) {
+            }
+        }
+
         $validated = $this->validateExistingAppointmentIntake($request);
 
         $serviceExists = ServiceType::where('name', $validated['service_type'])
@@ -829,6 +864,48 @@ class OdontogramController extends Controller
                 }
             )
             ->all();
+
+        $appointmentDate =
+            Carbon::parse(
+                $validated['appointment_date']
+            );
+
+        if (
+            $appointmentDate->isSaturday() ||
+            $appointmentDate->isSunday()
+        ) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors([
+                    'appointment_date' =>
+                    'The clinic is closed on Saturdays and Sundays.',
+                ]);
+        }
+
+        $holidayDates =
+            PhilippineHolidays::range(
+                yearsBefore: 15,
+                yearsAfter: 15
+            );
+
+        $appointmentDateIso =
+            $appointmentDate
+            ->toDateString();
+
+        if (
+            isset(
+                $holidayDates[$appointmentDateIso]
+            )
+        ) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors([
+                    'appointment_date' =>
+                    'The clinic is closed on Philippine holidays.',
+                ]);
+        }
 
         session([
             $this->existingAppointmentDraftSessionKey($patient) => $validated,

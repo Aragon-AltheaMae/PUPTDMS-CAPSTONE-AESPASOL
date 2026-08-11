@@ -17,7 +17,6 @@ class Appointment extends Model
         'appointment_date',
         'appointment_time',
         'status',
-        'cancellation_reason',
         'transferred_by',
         'transferred_at',
         'transfer_reason',

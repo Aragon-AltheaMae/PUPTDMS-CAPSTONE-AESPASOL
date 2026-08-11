@@ -201,6 +201,11 @@ function initGlobalSearchBars(
                     '[data-search-input]'
                 );
 
+            const clearButton =
+                wrapper.querySelector(
+                    '[data-search-clear]'
+                );
+
             if (!input) {
                 return;
             }
@@ -268,6 +273,24 @@ function initGlobalSearchBars(
                     run();
                 }
             );
+
+            clearButton?.addEventListener(
+                'click',
+                event => {
+                    event.preventDefault();
+
+                    window.clearTimeout(
+                        timer
+                    );
+
+                    input.value = '';
+
+                    run();
+
+                    input.focus();
+                }
+            );
+
         });
 }
 
@@ -285,6 +308,57 @@ document.addEventListener(
             event.detail?.modal ||
             document
         );
+    }
+);
+
+document.addEventListener(
+    'click',
+    event => {
+        const button =
+            event.target.closest(
+                '[data-clear-search]'
+            );
+
+        if (!button) {
+            return;
+        }
+
+        event.preventDefault();
+
+        const selector =
+            button.dataset
+                .searchTarget ||
+            '[data-search-input]';
+
+        const input =
+            document.querySelector(
+                selector
+            );
+
+        if (!input) {
+            return;
+        }
+
+        const wrapper =
+            input.closest(
+                '[data-global-search-bar]'
+            );
+
+        input.value = '';
+
+        const callback =
+            resolveSearchCallback(
+                wrapper?.dataset
+                    .searchCallback
+            );
+
+        callback?.(
+            '',
+            input,
+            wrapper
+        );
+
+        input.focus();
     }
 );
 

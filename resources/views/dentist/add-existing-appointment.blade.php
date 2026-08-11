@@ -18,27 +18,19 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 @section('content')
 <main id="mainContent" class="booking-page page-enter">
     <div class="booking-page-inner">
-        <x-booking.workflow-header :back-url="route(
-        'dentist.dentist.patient.profile',
-        ['patient' => $patient->id]
-    )" back-label="Back to Patient Profile" form-target="#existingAppointmentForm" icon="fa-solid fa-file-circle-plus"
-            title="Add Existing Appointment"
-            subtitle="Encode the completed appointment details before continuing to the odontogram." :steps="[
-        'Date & Time',
-        'Service',
-        'Dental History',
-        'Medical History',
-        'Review',
-    ]" />
+        <x-booking.workflow-header :back-url="route('dentist.dentist.patient.profile', ['patient' => $patient->id])"
+            back-label="Back to Patient Profile" form-target="#existingAppointmentForm"
+            icon="fa-solid fa-file-circle-plus" title="Add Existing Appointment"
+            subtitle="Encode the completed appointment details before continuing to the odontogram."
+            :steps="['Date & Time', 'Service', 'Dental History', 'Medical History', 'Review']" />
 
         <div class="w-full">
 
             <div class="booking-workflow-card">
                 <div>
-                    <form id="existingAppointmentForm" method="POST" action="{{ route(
-                            'dentist.odontogram.existing-appointment.intake.store',
-                            ['patient' => $patient->id]
-                        ) }}" data-global-selects data-global-validation data-discard-form
+                    <form id="existingAppointmentForm" method="POST"
+                        action="{{ route('dentist.odontogram.existing-appointment.intake.store', ['patient' => $patient->id]) }}"
+                        data-global-selects data-global-validation data-discard-form
                         data-discard-title="Discard existing appointment?"
                         data-discard-subtitle="You have unsaved appointment information."
                         data-discard-message="Leaving this page will remove the appointment details you entered. Do you want to discard your changes?">
@@ -125,12 +117,9 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                    global-control-icon"></i>
 
                                                         <input type="text" id="procedure_duration_hms"
-                                                            name="procedure_duration_hms" value="{{ old(
-                'procedure_duration_hms',
-                $defaults[
-                    'procedure_duration_hms'
-                ] ?? ''
-            ) }}" placeholder="HH:MM:SS" class="
+                                                            name="procedure_duration_hms"
+                                                            value="{{ old('procedure_duration_hms', $defaults['procedure_duration_hms'] ?? '') }}"
+                                                            placeholder="HH:MM:SS" class="
                 form-input-custom
                 global-control-with-icon
             " inputmode="numeric" maxlength="8" data-validation-rule="bookingDuration" data-required-message="
@@ -150,10 +139,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                             </div>
                         </div>
 
-                        <x-booking.service-step :services="$serviceTypes" :selected="old(
-        'service_type',
-        $defaults['service_type'] ?? ''
-    )" title="Choose Dental Service" subtitle="Select the dental service performed during this appointment." />
+                        <x-booking.service-step :services="$serviceTypes"
+                            :selected="old('service_type', $defaults['service_type'] ?? '')"
+                            title="Choose Dental Service"
+                            subtitle="Select the dental service performed during this appointment." />
 
                         <x-booking.dental-history :questions="$dentalQuestions" mode="nested" :answers="$dentalAnswers"
                             :defaults="$defaults"
@@ -184,31 +173,70 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
                         <div class="step-content hidden">
                             <div class="booking-step-shell">
-                                <div class="booking-step-header">
-                                    <p class="booking-step-eyebrow">Step 5 of 5</p>
-                                    <h2 class="booking-step-title">Review Before Odontogram</h2>
-                                    <p class="booking-step-subtitle">
-                                        Confirm the imported appointment details before continuing to the
-                                        odontogram.
-                                    </p>
-                                </div>
 
-                                <div class="booking-step-body">
-                                    <div class="booking-section-card">
-                                        <p class="booking-section-card-title">
-                                            <i class="fa-solid fa-circle-check text-xs"></i> Summary
-                                            <span class="booking-section-card-title-line"></span>
+                                <div id="summarySection">
+
+                                    <div class="booking-step-header">
+                                        <p class="booking-step-eyebrow">
+                                            Step 5 of 5
                                         </p>
+
+                                        <h2 class="booking-step-title">
+                                            Review Before Odontogram
+                                        </h2>
+
+                                        <p class="booking-step-subtitle">
+                                            Review the encoded appointment
+                                            details before final confirmation.
+                                        </p>
+                                    </div>
+
+                                    <div class="booking-step-body">
                                         <div id="existingAppointmentReviewGrid" class="space-y-4"></div>
                                     </div>
+
                                 </div>
+
+
+                                <div id="confirmationSection" class="hidden">
+
+                                    <div class="booking-step-header">
+
+                                        <p class="booking-step-eyebrow">
+                                            Step 5 of 5
+                                        </p>
+
+                                        <h2 class="booking-step-title">
+                                            Final Confirmation
+                                        </h2>
+
+                                        <p class="booking-step-subtitle">
+                                            Confirm that the encoded
+                                            appointment information is accurate
+                                            before continuing to the odontogram.
+                                        </p>
+
+                                    </div>
+
+
+                                    <div class="booking-step-body">
+
+                                        <x-booking.final-confirmation
+                                            message="Confirm that the encoded appointment details match the patient's actual visit record before continuing.">
+                                            I have reviewed the encoded appointment
+                                            information and confirm that it is accurate.
+                                        </x-booking.final-confirmation>
+
+                                    </div>
+
+                                </div>
+
                             </div>
                         </div>
                     </form>
                 </div>
 
-                <x-booking.navigation :show-submit="true" submit-label="Continue to Odontogram"
-                    submit-icon="fa-solid fa-arrow-right" />
+                <x-booking.navigation />
 
             </div>
         </div>
@@ -231,15 +259,16 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 'blockedDates' => $blockedDates ?? [],
 'appointmentCountsPerDay' => $appointmentCountsPerDay ?? [],
 'philippineHolidays' => $philippineHolidays ?? [],
-'useDynamicScheduleRules' => true,
 'disallowToday' => false,
 'allowPastDates' => true,
 'allowAllDates' => false,
 'allowAllDatesExceptHolidays' => true,
-'allowHolidaySelection' => true,
+'disableWeekends' => true,
+'allowHolidaySelection' => false,
+'useDynamicScheduleRules' => false,
 'allowToggleOffDate' => true,
 'historyMonths' => 180,
-'maxFutureMonths' => 0,
+'maxFutureMonths' => 180,
 'enableMonthYearShortcut' => true,
 ])
 @endsection
@@ -253,10 +282,76 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         const slotGridElement = document.getElementById('slotGrid');
         const timeInput = document.getElementById('appointment_time');
         const durationInput = document.getElementById('procedure_duration_hms');
-        const emergencyPersonInput = document.getElementById('emergency_person');
-        const emergencyNumberInput = document.getElementById('emergency_number');
 
         let bookingWorkflow = null;
+
+        let step5ConfirmationActive =
+            false;
+
+        const summarySection =
+            document.getElementById(
+                'summarySection'
+            );
+
+        const confirmationSection =
+            document.getElementById(
+                'confirmationSection'
+            );
+
+        const finalConfirm =
+            document.getElementById(
+                'finalConfirm'
+            );
+
+        const existingAppointmentForm =
+            document.getElementById(
+                'existingAppointmentForm'
+            );
+
+
+        function showStep5Review() {
+            step5ConfirmationActive =
+                false;
+
+            summarySection
+                ?.classList.remove(
+                    'hidden'
+                );
+
+            confirmationSection
+                ?.classList.add(
+                    'hidden'
+                );
+
+            bookingWorkflow
+                ?.setNextButton({
+                    label: 'Confirm Appointment',
+
+                    icon: 'fa-chevron-right',
+                });
+        }
+
+        function showStep5Confirmation() {
+            step5ConfirmationActive =
+                true;
+
+            summarySection
+                ?.classList.add(
+                    'hidden'
+                );
+
+            confirmationSection
+                ?.classList.remove(
+                    'hidden'
+                );
+
+            bookingWorkflow
+                ?.setNextButton({
+                    label: 'Continue to Odontogram',
+
+                    icon: 'fa-arrow-right',
+                });
+        }
 
         const isFemalePatient = @json($isFemalePatient);
 
@@ -361,8 +456,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                         if (field._flatpickr) {
                             field._flatpickr.clear();
                         } else if (
-                            field instanceof
-                            HTMLSelectElement
+                            field instanceof HTMLSelectElement
                         ) {
                             field.selectedIndex = 0;
                         } else {
@@ -406,162 +500,272 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             const get = (n) => data.get(n) || 'N/A';
             const getAll = (n) => data.getAll(n);
 
-            const diseases = Array.from(document.querySelectorAll('input[name="diseases[]"]:checked'))
-                .map(el => el.nextElementSibling.textContent.trim())
-                .join(', ') || 'None';
+            const diseaseLabels =
+                Array.from(
+                    document.querySelectorAll(
+                        'input[name="diseases[]"]:checked'
+                    )
+                ).map(
+                    input =>
+                        input
+                            .nextElementSibling
+                            ?.textContent
+                            ?.trim()
+                        || input.value
+                );
 
-            const row = (label, val) =>
-                `<p><b class="text-[#5c5550] font-semibold">${label}:</b> ${val && String(val).trim() !== "" ? val : '<span class="text-[#9e9690]">N/A</span>'}</p>`;
 
-            const optionalRow = (label, val) => {
-                if (!val || String(val).trim() === "" || val === "N/A") return "";
-                return `<p><b class="text-[#5c5550] font-semibold">${label}:</b> ${val}</p>`;
+            const diseaseTags =
+                diseaseLabels.length
+                    ? `
+            <div class="booking-summary-tag-list">
+
+                ${diseaseLabels
+                        .map(
+                            label => `
+                            <span class="booking-summary-tag">
+                                ${label}
+                            </span>
+                        `
+                        )
+                        .join('')}
+
+            </div>
+        `
+                    : `
+            <span class="booking-summary-muted">
+                None selected
+            </span>
+        `;
+
+            const row = (
+                label,
+                value
+            ) => {
+                const resolvedValue =
+                    value &&
+                        String(value).trim() !== ''
+                        ? value
+                        : `
+                <span class="booking-summary-muted">
+                    N/A
+                </span>
+            `;
+
+                return `
+        <p class="booking-summary-row">
+            <span class="booking-summary-row-label">
+                ${label}:
+            </span>
+
+            ${resolvedValue}
+        </p>
+    `;
             };
 
-            const summaryCard = (title, icon, body) => `
-            <div class="border border-[#e8e2dd] rounded-xl overflow-hidden bg-white">
-                <div class="bg-[#f9e8e8] px-4 py-2.5 text-xs font-bold text-[#8B0000] uppercase tracking-widest border-b border-[#e8e2dd]">
-                    <i class="fa-solid ${icon} mr-2"></i>${title}
-                </div>
-                <div class="p-4 text-sm leading-7 text-[#1a1410] space-y-4">${body}</div>
-            </div>
-        `;
+            const optionalRow = (
+                label,
+                value
+            ) => {
+                if (
+                    !value ||
+                    String(value).trim() === '' ||
+                    value === 'N/A'
+                ) {
+                    return '';
+                }
 
-            const subSection = (title, body) => `
-            <div class="rounded-xl border border-[#f1e8e3] bg-[#fffdfd] overflow-hidden">
-                <div class="px-4 py-2.5 bg-[#fff7f6] border-b border-[#f1e8e3] text-[0.72rem] font-extrabold uppercase tracking-[0.16em] text-[#8B0000]">
-                    ${title}
-                </div>
-                <div class="p-4">
-                    <div class="grid grid-cols-2 gap-x-8 gap-y-1 sm-grid-1col">
-                        ${body}
-                    </div>
-                </div>
-            </div>
-        `;
+                return `
+        <p class="booking-summary-row">
+            <span class="booking-summary-row-label">
+                ${label}:
+            </span>
 
-            const fullWidthSection = (title, body) => `
-            <div class="rounded-xl border border-[#f1e8e3] bg-[#fffdfd] overflow-hidden">
-                <div class="px-4 py-2.5 bg-[#fff7f6] border-b border-[#f1e8e3] text-[0.72rem] font-extrabold uppercase tracking-[0.16em] text-[#8B0000]">
-                    ${title}
-                </div>
-                <div class="p-4 text-sm leading-7 text-[#1a1410]">
-                    ${body}
-                </div>
+            ${value}
+        </p>
+    `;
+            };
+
+            const summaryCard = (
+                title,
+                icon,
+                body
+            ) => `
+    <section class="booking-summary-card">
+
+        <div class="booking-summary-card-header">
+            <i class="fa-solid ${icon}"></i>
+
+            <span>
+                ${title}
+            </span>
+        </div>
+
+        <div class="booking-summary-card-body">
+            ${body}
+        </div>
+
+    </section>
+`;
+
+            const subSection = (
+                title,
+                body
+            ) => `
+    <section class="booking-summary-section">
+
+        <div class="booking-summary-section-title">
+            ${title}
+        </div>
+
+        <div class="booking-summary-section-body">
+
+            <div
+                class="
+                    grid
+                    grid-cols-2
+                    gap-x-8
+                    gap-y-1
+                    sm-grid-1col
+                "
+            >
+                ${body}
             </div>
-        `;
+
+        </div>
+
+    </section>
+`;
+
+            const fullWidthSection = (
+                title,
+                body
+            ) => `
+    <section class="booking-summary-section">
+
+        <div class="booking-summary-section-title">
+            ${title}
+        </div>
+
+        <div class="booking-summary-section-body">
+            ${body}
+        </div>
+
+    </section>
+`;
 
             const dentalHistoryBody = `
             ${subSection("Basic Info", `
-                ${row("Last Dental Visit", get("last_dental_visit"))}
-                ${row("Previous Dentist", get("previous_dentist"))}
-            `)}
+                        ${row("Last Dental Visit", get("last_dental_visit"))}
+                        ${row("Previous Dentist", get("previous_dentist"))}
+                    `)}
 
             ${subSection("Dental Symptoms", `
-                ${row("Bleeding Gums", get("dental_answers[bleeding_gums]"))}
-                ${row("Sensitive (Hot/Cold)", get("dental_answers[sensitive_temp]"))}
-                ${row("Sensitive (Sweets/Sour)", get("dental_answers[sensitive_taste]"))}
-                ${row("Tooth Pain", get("dental_answers[tooth_pain]"))}
-                ${row("Sores/Lumps", get("dental_answers[sores]"))}
-                ${row("Jaw Injuries", get("dental_answers[injuries]"))}
-            `)}
+                        ${row("Bleeding Gums", get("dental_answers[bleeding_gums]"))}
+                        ${row("Sensitive (Hot/Cold)", get("dental_answers[sensitive_temp]"))}
+                        ${row("Sensitive (Sweets/Sour)", get("dental_answers[sensitive_taste]"))}
+                        ${row("Tooth Pain", get("dental_answers[tooth_pain]"))}
+                        ${row("Sores/Lumps", get("dental_answers[sores]"))}
+                        ${row("Jaw Injuries", get("dental_answers[injuries]"))}
+                    `)}
 
             ${subSection("Jaw & Bite Symptoms", `
-                ${row("Clicking", get("dental_answers[clicking]"))}
-                ${row("Joint Pain", get("dental_answers[joint_pain]"))}
-                ${row("Difficulty Moving", get("dental_answers[difficulty_moving]"))}
-                ${row("Difficulty Chewing", get("dental_answers[difficulty_chewing]"))}
-                ${row("Frequent Headaches", get("dental_answers[jaw_headaches]"))}
-                ${row("Grinding/Clenching", get("dental_answers[clench_grind]"))}
-                ${row("Lips/Cheek Biting", get("dental_answers[biting]"))}
-                ${row("Teeth Loosening", get("dental_answers[teeth_loosening]"))}
-                ${row("Food Caught Between Teeth", get("dental_answers[food_teeth]"))}
-                ${row("Medicine Reaction", get("dental_answers[med_reaction]"))}
-            `)}
+                        ${row("Clicking", get("dental_answers[clicking]"))}
+                        ${row("Joint Pain", get("dental_answers[joint_pain]"))}
+                        ${row("Difficulty Moving", get("dental_answers[difficulty_moving]"))}
+                        ${row("Difficulty Chewing", get("dental_answers[difficulty_chewing]"))}
+                        ${row("Frequent Headaches", get("dental_answers[jaw_headaches]"))}
+                        ${row("Grinding/Clenching", get("dental_answers[clench_grind]"))}
+                        ${row("Lips/Cheek Biting", get("dental_answers[biting]"))}
+                        ${row("Teeth Loosening", get("dental_answers[teeth_loosening]"))}
+                        ${row("Food Caught Between Teeth", get("dental_answers[food_teeth]"))}
+                        ${row("Medicine Reaction", get("dental_answers[med_reaction]"))}
+                    `)}
 
             ${subSection("Dental Procedures", `
-                ${row("Periodontal Treatment", get("dental_answers[periodontal]"))}
-                ${row("Difficult Extraction", get("dental_answers[difficult_extraction]"))}
-                ${get("dental_answers[difficult_extraction]") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
-                ${row("Prolonged Bleeding", get("dental_answers[prolonged_bleeding]"))}
-                ${row("Dentures", get("dental_answers[dentures]"))}
-                ${get("dental_answers[dentures]") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
-                ${row("Orthodontic Treatment", get("dental_answers[ortho_treatment]"))}
-                ${get("dental_answers[ortho_treatment]") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
-            `)}
+                        ${row("Periodontal Treatment", get("dental_answers[periodontal]"))}
+                        ${row("Difficult Extraction", get("dental_answers[difficult_extraction]"))}
+                        ${get("dental_answers[difficult_extraction]") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
+                        ${row("Prolonged Bleeding", get("dental_answers[prolonged_bleeding]"))}
+                        ${row("Dentures", get("dental_answers[dentures]"))}
+                        ${get("dental_answers[dentures]") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
+                        ${row("Orthodontic Treatment", get("dental_answers[ortho_treatment]"))}
+                        ${get("dental_answers[ortho_treatment]") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
+                    `)}
 
             ${fullWidthSection("Additional Concerns", `
-                ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
+                        ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
                     ? get("additional_concerns")
                     : '<span class="text-[#9e9690] italic">No additional concerns provided.</span>'}
-            `)}
+                    `)}
         `;
 
             const medicalHistoryBody = `
             ${subSection("General Health", `
-                ${row("Good Health", get("medical_answers[good_health]"))}
-                ${get("medical_answers[good_health]") === "NO" ? row("Health Details", get("medical_answers[good_health_details]")) : ""}
-                ${row("Had Medical Exam", get("medical_answers[had_medical_exam]"))}
-                ${get("medical_answers[had_medical_exam]") === "YES" ? row("Medical Exam Date", get("medical_answers[medical_exam_date]")) : ""}
-                ${row("Under Treatment", get("medical_answers[under_treatment]"))}
-                ${get("medical_answers[under_treatment]") === "YES" ? row("Treatment Details", get("medical_answers[treatment_details]")) : ""}
-                ${row("Hospitalized", get("medical_answers[hospitalized]"))}
-                ${get("medical_answers[hospitalized]") === "YES" ? row("Hospital Details", get("medical_answers[hospital_details]")) : ""}
-            `)}
+                        ${row("Good Health", get("medical_answers[good_health]"))}
+                        ${get("medical_answers[good_health]") === "NO" ? row("Health Details", get("medical_answers[good_health_details]")) : ""}
+                        ${row("Had Medical Exam", get("medical_answers[had_medical_exam]"))}
+                        ${get("medical_answers[had_medical_exam]") === "YES" ? row("Medical Exam Date", get("medical_answers[medical_exam_date]")) : ""}
+                        ${row("Under Treatment", get("medical_answers[under_treatment]"))}
+                        ${get("medical_answers[under_treatment]") === "YES" ? row("Treatment Details", get("medical_answers[treatment_details]")) : ""}
+                        ${row("Hospitalized", get("medical_answers[hospitalized]"))}
+                        ${get("medical_answers[hospitalized]") === "YES" ? row("Hospital Details", get("medical_answers[hospital_details]")) : ""}
+                    `)}
 
             ${subSection("Allergies", `
-                ${row("Allergy (Medicine)", get("medical_answers[allergy_medicine]"))}
-                ${row("Allergy (Food)", get("medical_answers[allergy_food]"))}
-                ${optionalRow("Allergy (Others)", get("medical_answers[allergy_others]"))}
-            `)}
+                        ${row("Allergy (Medicine)", get("medical_answers[allergy_medicine]"))}
+                        ${row("Allergy (Food)", get("medical_answers[allergy_food]"))}
+                        ${optionalRow("Allergy (Others)", get("medical_answers[allergy_others]"))}
+                    `)}
 
             ${subSection("Medications", `
-                ${row("Medication", get("medical_answers[medication]"))}
-                ${get("medical_answers[medication]") === "YES" ? row("Medication Details", get("medical_answers[medication_details]")) : ""}
-            `)}
+                        ${row("Medication", get("medical_answers[medication]"))}
+                        ${get("medical_answers[medication]") === "YES" ? row("Medication Details", get("medical_answers[medication_details]")) : ""}
+                    `)}
 
             ${isFemalePatient ? subSection("For Women Only", `
-                ${row("Pregnant", get("medical_answers[pregnant]"))}
-                ${row("Nursing", get("medical_answers[nursing]"))}
-                ${row("Birth Control Pills", get("medical_answers[birth_control]"))}
-            `) : ""}
+                        ${row("Pregnant", get("medical_answers[pregnant]"))}
+                        ${row("Nursing", get("medical_answers[nursing]"))}
+                        ${row("Birth Control Pills", get("medical_answers[birth_control]"))}
+                    `) : ""}
 
-            ${fullWidthSection("Medical Conditions", `
-                <b class="text-[#5c5550] font-semibold">Selected Conditions:</b> ${diseases}
-            `)}
+            ${fullWidthSection(
+                "Medical Conditions",
+                diseaseTags
+            )}
 
             ${subSection("Tobacco Use", `
-                ${row("Tobacco Use", get("medical_answers[tobacco_use]"))}
-                ${get("medical_answers[tobacco_use]") === "YES" ? row("Amount Per Day", get("medical_answers[tobacco_per_day]")) : ""}
-                ${get("medical_answers[tobacco_use]") === "YES" ? row("Amount Per Week", get("medical_answers[tobacco_per_week]")) : ""}
-            `)}
+                        ${row("Tobacco Use", get("medical_answers[tobacco_use]"))}
+                        ${get("medical_answers[tobacco_use]") === "YES" ? row("Amount Per Day", get("medical_answers[tobacco_per_day]")) : ""}
+                        ${get("medical_answers[tobacco_use]") === "YES" ? row("Amount Per Week", get("medical_answers[tobacco_per_week]")) : ""}
+                    `)}
 
             ${subSection("Do You Suffer From", `
-                ${row("Headaches", get("medical_answers[headaches]"))}
-                ${row("Earaches", get("medical_answers[earaches]"))}
-                ${row("Neck Aches", get("medical_answers[neck_aches]"))}
-            `)}
+                        ${row("Headaches", get("medical_answers[headaches]"))}
+                        ${row("Earaches", get("medical_answers[earaches]"))}
+                        ${row("Neck Aches", get("medical_answers[neck_aches]"))}
+                    `)}
         `;
 
             reviewGrid.innerHTML = `
             ${summaryCard("Appointment Details", "fa-calendar-check", `
-                <div class="grid grid-cols-1 gap-y-1">
-                    ${row("Service", get("service_type"))}
-                    ${row("Date", get("appointment_date"))}
-                    ${row("Time", toDisplayTime(get("appointment_time")) || 'N/A')}
-                    ${row("Duration", get("procedure_duration_hms"))}
-                </div>
-            `)}
+                        <div class="grid grid-cols-1 gap-y-1">
+                            ${row("Service", get("service_type"))}
+                            ${row("Date", get("appointment_date"))}
+                            ${row("Time", toDisplayTime(get("appointment_time")) || 'N/A')}
+                            ${row("Duration", get("procedure_duration_hms"))}
+                        </div>
+                    `)}
             ${summaryCard("Dental History", "fa-tooth", dentalHistoryBody)}
             ${summaryCard("Medical History", "fa-heart-pulse", medicalHistoryBody)}
             <div class="grid grid-cols-2 gap-4 sm-grid-1col">
                 ${summaryCard("Emergency Contact", "fa-phone", `
-                    <div class="grid grid-cols-1 gap-y-1">
-                        ${row("Name", get("emergency_person"))}
-                        ${row("Number", get("emergency_number"))}
-                        ${row("Relation", get("emergency_relation"))}
-                    </div>
-                `)}
+                            <div class="grid grid-cols-1 gap-y-1">
+                                ${row("Name", get("emergency_person"))}
+                                ${row("Number", get("emergency_number"))}
+                                ${row("Relation", get("emergency_relation"))}
+                            </div>
+                        `)}
             </div>
         `;
 
@@ -594,37 +798,81 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
             if (timeHint) {
                 if (!hasDate && !selectedValue) {
-                    timeHint.textContent = 'You can enter the original appointment time now, or select a date later to see suggested slots.';
+                    timeHint.textContent =
+                        'You can enter the original appointment time now, or select a date later to see suggested slots.';
                 } else if (!hasDate) {
-                    timeHint.textContent = 'Time saved. You can still select a date later to see suggested slots.';
+                    timeHint.textContent =
+                        'Time saved. You can still select a date later to see suggested slots.';
                 } else {
                     timeHint.textContent = 'Enter the original appointment time for this visit.';
                 }
             }
         }
 
-        timeField?.addEventListener('change', function () {
-            const selected = this.value;
-            if (!timeInput) return;
+        timeField?.addEventListener(
+            'change',
+            function () {
+                if (!timeInput) {
+                    return;
+                }
 
-            timeInput.value = selected;
+                const selected =
+                    toTimeInputValue(
+                        this.value
+                    );
 
-            const matchingChip = Array.from(slotGridElement?.querySelectorAll('.slot-chip[data-time]') || [])
-                .find((chip) => toTimeInputValue(chip.dataset.time || '') === selected);
-            if (matchingChip) {
-                matchingChip.click();
-                return;
+                timeInput.value =
+                    selected;
+
+                const matchingChip =
+                    Array.from(
+                        slotGridElement
+                            ?.querySelectorAll(
+                                '.slot-chip[data-time]'
+                            ) || []
+                    )
+                        .find(
+                            chip =>
+                                toTimeInputValue(
+                                    chip.dataset.time || ''
+                                ) === selected
+                        );
+
+                if (matchingChip) {
+                    matchingChip.click();
+                    return;
+                }
+
+                const selectedSlotDisplay =
+                    document.getElementById(
+                        'selectedSlotDisplay'
+                    );
+
+                const selectedSlotText =
+                    document.getElementById(
+                        'selectedSlotText'
+                    );
+
+                if (
+                    selected &&
+                    selectedSlotDisplay &&
+                    selectedSlotText
+                ) {
+                    selectedSlotText.textContent =
+                        toDisplayTime(
+                            selected
+                        );
+
+                    selectedSlotDisplay
+                        .classList.remove(
+                            'hidden'
+                        );
+
+                    selectedSlotDisplay.style.display =
+                        'block';
+                }
             }
-
-            const selectedSlotDisplay = document.getElementById('selectedSlotDisplay');
-            const selectedSlotText = document.getElementById('selectedSlotText');
-
-            if (selected && selectedSlotDisplay && selectedSlotText) {
-                selectedSlotText.textContent = toDisplayTime(selected);
-                selectedSlotDisplay.classList.remove('hidden');
-                selectedSlotDisplay.style.display = 'block';
-            }
-        });
+        );
 
         durationInput?.addEventListener('input', function () {
             const formatted = formatDurationInput(this.value);
@@ -850,36 +1098,73 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
         bookingWorkflow =
             window.BookingWorkflow?.create({
-                panels:
-                    '#existingAppointmentForm > .step-content',
+                panels: '#existingAppointmentForm > .step-content',
 
-                progressFill:
-                    '#headerProgressFill',
+                progressFill: '#headerProgressFill',
 
-                counter:
-                    '#stepCounterText',
+                counter: '#stepCounterText',
 
-                navContainer:
-                    '#navBtns',
+                navContainer: '#navBtns',
 
-                previousButton:
-                    '#prevBtn',
+                previousButton: '#prevBtn',
 
-                nextButton:
-                    '#nextBtn',
+                nextButton: '#nextBtn',
 
-                submitButton:
-                    '#submitBtn',
+                beforePrevious: currentStep => {
+                    if (
+                        currentStep === 4 &&
+                        step5ConfirmationActive
+                    ) {
+                        showStep5Review();
 
-                beforeNext:
-                    currentStep => {
-                        return validateCurrentStep(
-                            currentStep
-                        );
-                    },
+                        return false;
+                    }
+
+                    return true;
+                },
+
+                beforeNext: currentStep => {
+                    return validateCurrentStep(
+                        currentStep
+                    );
+                },
 
                 onLastStep: () => {
                     buildReview();
+                    showStep5Review();
+                },
+
+                onLastStepNext: () => {
+                    if (
+                        !step5ConfirmationActive
+                    ) {
+                        showStep5Confirmation();
+
+                        return true;
+                    }
+
+                    if (
+                        !finalConfirm?.checked
+                    ) {
+                        window
+                            .validateFormInputField?.(
+                                finalConfirm
+                            );
+
+                        finalConfirm?.focus();
+
+                        return false;
+                    }
+
+                    window.DiscardChanges
+                        ?.markSubmitting(
+                            existingAppointmentForm
+                        );
+
+                    existingAppointmentForm
+                        ?.requestSubmit();
+
+                    return true;
                 },
             });
 

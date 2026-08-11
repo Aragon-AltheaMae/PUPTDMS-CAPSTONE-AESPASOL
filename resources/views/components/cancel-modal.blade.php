@@ -32,9 +32,10 @@
 
         </div>
 
-        <form id="cancelAppointmentForm" data-discard-form data-discard-title="Discard cancellation?"
-            data-discard-subtitle="A cancellation reason has been selected."
-            data-discard-message="The selected cancellation reason will be cleared. Do you want to discard this change?">
+        <form id="cancelAppointmentForm" data-global-validation data-discard-form
+            data-discard-title="Discard cancellation?" data-discard-subtitle="A cancellation reason has been selected."
+            data-discard-message="The selected cancellation reason will be cleared. Do you want to discard this change?"
+            novalidate>
 
             <div class="modal-bd">
 
@@ -86,24 +87,20 @@
 
                 </div>
 
-                <div class="modal-form-section">
+                <div class="modal-form-section global-form-group" data-global-field>
 
                     <div class="global-label-row">
-
                         <label class="global-form-label">
                             Cancellation Reason
                         </label>
-
                     </div>
 
-                    <p class="modal-helper-text">
-                        Select the reason for cancelling this appointment.
-                    </p>
-
-                    <div id="cancelReasonChips" class="flex flex-wrap gap-2" onchange="clearReasonError()">
+                    <div id="cancelReasonChips" class="flex flex-wrap gap-2" role="radiogroup"
+                        aria-label="Cancellation Reason">
 
                         <div class="reason-chip">
-                            <input type="radio" name="cancelReason" id="r1" value="Patient no-show">
+                            <input type="radio" name="cancelReason" id="r1" value="Patient no-show" required
+                                data-required-message="Select the reason for cancelling this appointment.">
 
                             <label for="r1">
                                 <i class="fa-regular fa-circle-xmark"></i>
@@ -112,7 +109,8 @@
                         </div>
 
                         <div class="reason-chip">
-                            <input type="radio" name="cancelReason" id="r2" value="Doctor unavailable">
+                            <input type="radio" name="cancelReason" id="r2" value="Doctor unavailable"
+                                required>
 
                             <label for="r2">
                                 <i class="fa-solid fa-user-doctor"></i>
@@ -121,7 +119,7 @@
                         </div>
 
                         <div class="reason-chip">
-                            <input type="radio" name="cancelReason" id="r3" value="Patient request">
+                            <input type="radio" name="cancelReason" id="r3" value="Patient request" required>
 
                             <label for="r3">
                                 <i class="fa-regular fa-hand"></i>
@@ -130,7 +128,7 @@
                         </div>
 
                         <div class="reason-chip">
-                            <input type="radio" name="cancelReason" id="r4" value="Emergency">
+                            <input type="radio" name="cancelReason" id="r4" value="Emergency" required>
 
                             <label for="r4">
                                 <i class="fa-solid fa-bolt"></i>
@@ -139,7 +137,7 @@
                         </div>
 
                         <div class="reason-chip">
-                            <input type="radio" name="cancelReason" id="r5" value="Rescheduled">
+                            <input type="radio" name="cancelReason" id="r5" value="Rescheduled" required>
 
                             <label for="r5">
                                 <i class="fa-solid fa-rotate"></i>
@@ -149,14 +147,7 @@
 
                     </div>
 
-                    <div id="reasonError"
-                        class="
-                            hidden
-                            global-field-error
-                            mt-2
-                        ">
-                        <i class="fa-solid fa-circle-exclamation"></i>
-                        Please select a reason before cancelling.
+                    <div class="global-field-error" data-error-for="cancelReason" aria-hidden="true">
                     </div>
 
                 </div>
@@ -199,7 +190,6 @@
         document.getElementById('cancelPatientName').textContent = patientName;
         document.getElementById('cancelAppointmentDate').textContent = appointmentDate;
         document.querySelectorAll('input[name="cancelReason"]').forEach(r => r.checked = false);
-        clearReasonError();
         const confirmBtn = document.getElementById('confirmCancelBtn');
         confirmBtn.disabled = false;
         confirmBtn.innerHTML = `<i class="fa-solid fa-ban"></i><span>Yes, Cancel</span>`;
@@ -274,27 +264,27 @@
         }
     }
 
-    function clearReasonError() {
-        document.getElementById('cancelReasonChips').classList.remove('invalid', 'chips-error-shake');
-        document.getElementById('reasonError').classList.add('hidden');
-    }
-
-    document.querySelectorAll('input[name="cancelReason"]').forEach(r => {
-        r.addEventListener('change', clearReasonError);
-    });
-
     async function confirmCancelAppointment() {
-        const selectedReason = document.querySelector('input[name="cancelReason"]:checked')?.value || null;
+        const form = document.getElementById('cancelAppointmentForm');
 
-        if (!selectedReason) {
-            const chips = document.getElementById('cancelReasonChips');
-            document.getElementById('reasonError').classList.remove('hidden');
-            chips.classList.add('invalid');
-            chips.classList.remove('chips-error-shake');
-            void chips.offsetWidth;
-            chips.classList.add('chips-error-shake');
+        const validation =
+            window.validateGlobalForm?.(form);
+
+        if (
+            validation &&
+            !validation.valid
+        ) {
+            window.focusGlobalInvalidField?.(
+                validation.firstInvalid
+            );
+
             return;
         }
+
+        const selectedReason =
+            document.querySelector(
+                'input[name="cancelReason"]:checked'
+            )?.value || '';
 
         if (!selectedCancelUrl) {
             return;
@@ -322,16 +312,14 @@
             const data = await response.json();
 
             if (response.ok && data.success) {
-                if (selectedCancelAppointmentId) {
-                    sessionStorage.setItem(`appointmentCancelReason:${selectedCancelAppointmentId}`,
-                        selectedReason);
-                }
                 closeCancelAppointmentModal({
                     force: true
                 });
+
                 if (typeof closeDayAppointmentsModal === 'function') {
                     closeDayAppointmentsModal();
                 }
+
                 sessionStorage.setItem('dentistToast', JSON.stringify({
                     title: 'Appointment cancelled',
                     message: `${document.getElementById('cancelPatientName')?.textContent || 'Appointment'} was cancelled successfully.`,
@@ -342,11 +330,20 @@
                 window.location.reload();
             } else {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-ban text-xs mr-1.5"></i>Yes, Cancel';
+                btn.innerHTML = `
+        <i class="fa-solid fa-ban"></i>
+        <span>Yes, Cancel</span>
+    `;
             }
         } catch (error) {
+            console.error('Cancel appointment failed:', error);
+
             btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-ban text-xs mr-1.5"></i>Yes, Cancel';
+
+            btn.innerHTML = `
+        <i class="fa-solid fa-ban"></i>
+        <span>Yes, Cancel</span>
+    `;
         }
     }
 

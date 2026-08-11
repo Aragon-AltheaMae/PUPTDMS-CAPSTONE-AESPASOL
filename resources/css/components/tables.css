@@ -1,5 +1,5 @@
 :root {
-    --table-surface: #FFFFFF;
+    --table-surface: #ffffffc3;
     --table-surface-soft: #F8FAFC;
     --table-header-surface: #FAFAFA;
     --table-border: #E8EDF3;
@@ -315,13 +315,13 @@
 .dark .tbl-row.is-active {
     background:
         color-mix(in srgb,
-            var(--table-surface) 88%,
-            var(--crimson) 12%) !important;
+            var(--table-surface) 86%,
+            #22C55E 14%) !important;
 }
 
 .global-pagebar {
     position: relative;
-    z-index: 20;
+    z-index: 10;
 
     width: 100%;
     min-height: 62px;
@@ -637,9 +637,33 @@
 }
 
 .data-table tbody tr.is-active td {
-    background: color-mix(in srgb,
-            var(--table-row-hover) 70%,
-            #FEE2E2);
+    background:
+        color-mix(in srgb,
+            var(--table-surface) 88%,
+            #22C55E 12%);
+}
+
+.data-table tbody tr.is-active:hover td {
+    background:
+        color-mix(in srgb,
+            var(--table-surface) 84%,
+            #22C55E 16%);
+}
+
+[data-theme="dark"] .data-table tbody tr.is-active td,
+.dark .data-table tbody tr.is-active td {
+    background:
+        color-mix(in srgb,
+            var(--table-surface) 86%,
+            #22C55E 14%) !important;
+}
+
+[data-theme="dark"] .data-table tbody tr.is-active:hover td,
+.dark .data-table tbody tr.is-active:hover td {
+    background:
+        color-mix(in srgb,
+            var(--table-surface) 80%,
+            #22c55e9d 10%) !important;
 }
 
 .table-grid-view {
@@ -722,11 +746,115 @@
     white-space: nowrap;
 }
 
+.table-tag {
+    min-height: 26px;
+    width: fit-content;
+    padding: 0 .65rem;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .38rem;
+
+    border: 1px solid var(--table-border);
+    border-radius: 999px;
+
+    background: var(--table-surface-soft);
+    color: var(--table-text);
+
+    font-size: .69rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.table-tag i {
+    color: currentColor;
+    font-size: .66rem;
+    line-height: 1;
+}
+
+
+.table-tag-danger {
+    background: #FEF2F2;
+    border-color: #FECACA;
+    color: #B91C1C;
+}
+
+.table-tag-info {
+    background: #EFF6FF;
+    border-color: #BFDBFE;
+    color: #1D4ED8;
+}
+
+.table-tag-warning {
+    background: #FFFBEB;
+    border-color: #FDE68A;
+    color: #B45309;
+}
+
+.table-tag-neutral {
+    background: #F8FAFC;
+    border-color: #E2E8F0;
+    color: #64748B;
+}
+
+[data-theme="dark"] .table-tag-danger,
+.dark .table-tag-danger {
+    background: rgba(220, 38, 38, .14);
+    border-color: rgba(248, 113, 113, .25);
+    color: #FCA5A5;
+}
+
+[data-theme="dark"] .table-tag-info,
+.dark .table-tag-info {
+    background: rgba(37, 99, 235, .16);
+    border-color: rgba(96, 165, 250, .25);
+    color: #93C5FD;
+}
+
+[data-theme="dark"] .table-tag-warning,
+.dark .table-tag-warning {
+    background: rgba(217, 119, 6, .15);
+    border-color: rgba(251, 191, 36, .24);
+    color: #FCD34D;
+}
+
+[data-theme="dark"] .table-tag-neutral,
+.dark .table-tag-neutral {
+    background: rgba(255, 255, 255, .055);
+    border-color: var(--table-border);
+    color: var(--table-text-muted);
+}
+
+.table-date {
+    display: inline-flex;
+    align-items: center;
+    gap: .42rem;
+    color: var(--table-text-muted);
+    font-size: .72rem;
+    font-weight: 650;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.table-date i {
+    color: var(--table-heading-muted);
+    font-size: .68rem;
+}
+
+[data-theme="dark"] .table-date,
+.dark .table-date {
+    color: var(--table-text-muted);
+}
+
+[data-theme="dark"] .table-date i,
+.dark .table-date i {
+    color: var(--table-heading-muted);
+}
+
 .table-record-meta {
     display: grid;
     gap: .8rem;
-
-    /* Huwag nang itulak sa pinakababa. */
     margin-top: .25rem;
 }
 
