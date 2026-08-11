@@ -1135,9 +1135,7 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         ->middleware('permission:manage_reports')
         ->name('dentist.dentist.report.daily-treatment');
 
-    Route::get('/report/dental-services', function () {
-        return view('dentist.dental-services');
-    })
+    Route::get('/report/dental-services', [\App\Http\Controllers\Dentist\DentalServicesRecordController::class, 'index'])
         ->middleware('permission:manage_reports')
         ->name('dentist.dentist.report.dental-services');
 
@@ -1274,9 +1272,8 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         return view('dentist.daily-treatment');
     })->name('dentist.dentist.report.daily-treatment');
 
-    Route::get('/dental-services', function () {
-        return view('dentist.dental-services');
-    })->name('dentist.dentist.report.dental-services');
+    Route::get('/dental-services', [\App\Http\Controllers\Dentist\DentalServicesRecordController::class, 'index'])
+        ->name('dentist.dentist.report.dental-services');
 });*/
 
 Route::post('/chat/send', [ChatbotController::class, 'chat']);

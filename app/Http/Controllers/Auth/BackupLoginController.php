@@ -29,6 +29,8 @@ class BackupLoginController extends Controller
 
     public function store(Request $request): RedirectResponse|Response
     {
+        $this->concurrentSessionService->rememberBrowserHint($request);
+
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
@@ -124,6 +126,7 @@ class BackupLoginController extends Controller
         $request->session()->forget(['patient_id', 'dentist_id', 'dentist_email']);
         $request->session()->put('admin_id', $user->id);
         $request->session()->put('admin_email', $user->email);
+        $this->concurrentSessionService->syncCurrentSessionMetadata($request);
 
         $sessionResult = $this->concurrentSessionService->enforceLimitForCurrentSession(
             $user,

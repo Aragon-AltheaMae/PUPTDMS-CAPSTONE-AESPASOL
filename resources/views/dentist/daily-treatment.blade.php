@@ -104,12 +104,13 @@
           <table class="data-table service-table dtr-table">
             <thead>
               <tr>
-                <th>Date</th>
+                <th>Date/Time Requested</th>
                 <th>Patient Name</th>
                 <th>Email / Contact Number</th>
                 <th>Office / Program</th>
                 <th>Gender</th>
                 <th>Treatment Done</th>
+                <th>Date/Time Processed</th>
                 <th>Minutes Processed</th>
                 <th>Signature</th>
               </tr>
@@ -553,8 +554,14 @@
 
               <div class="report-custom-select report-template-select" data-report-select>
                 <select id="reportType" name="document_type" class="report-native-select" data-report-select-native>
-                  <option value="daily_treatment_record" data-document-type="daily_treatment_record" selected>Daily
-                    Treatment Record</option>
+                  @forelse (($dailyTreatmentTemplates ?? collect()) as $index => $template)
+                    <option value="{{ $template->id }}" data-document-type="{{ $template->document_type }}"
+                      {{ $index === 0 ? 'selected' : '' }}>
+                      {{ $template->name }}
+                    </option>
+                  @empty
+                    <option value="" data-document-type="" selected>Select a report type...</option>
+                  @endforelse
                 </select>
 
                 <button type="button" class="report-select-trigger" data-report-select-trigger
@@ -858,60 +865,63 @@
 
     if (listView) listView.hidden = false;
 
-    records.forEach(record => {
-      const contact = [record.patient_email, record.patient_phone].filter(Boolean).join(' / ') || '—';
-      const officeOrProgram = record.office_type || record.program_code || '—';
-      const signature = record.has_signature
-        ? '<span class="dtr-signature yes"><i class="fa-solid fa-check"></i> Signed</span>'
-        : '<span class="dtr-signature no">No signature</span>';
-      const timeRange = record.time_in || record.time_out
-        ? `<div class="text-[11px] text-gray-500 mt-1">${formatDtrClock(record.time_in)}${record.time_out ? ` - ${formatDtrClock(record.time_out)}` : ''}</div>`
-        : '';
+      records.forEach(record => {
+        const contact = [record.patient_email, record.patient_phone].filter(Boolean).join(' / ') || '—';
+        const officeOrProgram = record.office_display || record.office_type || record.program_code || '—';
+        const signature = record.has_signature
+          ? `
+            <a href="${escapeDtrHtml(record.signature_url || '#')}" class="dtr-signature-preview" target="_blank" rel="noopener noreferrer" aria-label="View patient signature">
+              <img src="${escapeDtrHtml(record.signature_url || '')}" alt="Patient signature" class="dtr-signature-image">
+            </a>
+          `
+          : '<span class="dtr-signature no">No signature</span>';
 
-      if (tbody) {
-        tbody.insertAdjacentHTML('beforeend', `
-          <tr>
-            <td class="whitespace-nowrap">
-              <div class="font-semibold text-gray-800">${formatDateToMMDDYY(record.treatment_date)}</div>
-              ${timeRange}
-            </td>
-            <td class="min-w-[220px]">
-              <div class="font-semibold text-gray-800">${escapeDtrHtml(record.patient_name || '—')}</div>
-              <div class="text-[11px] text-gray-500 mt-1">${escapeDtrHtml(record.gender || 'Gender not set')}</div>
-            </td>
+        if (tbody) {
+          tbody.insertAdjacentHTML('beforeend', `
+            <tr>
+              <td class="whitespace-nowrap min-w-[150px]">
+                <div class="text-gray-800">${escapeDtrHtml(record.requested_date_time || formatDateToMMDDYY(record.treatment_date) || '—')}</div>
+              </td>
+              <td class="min-w-[220px]">
+                <div class="text-gray-800">${escapeDtrHtml(record.patient_name || '—')}</div>
+              </td>
             <td class="min-w-[240px] text-[12px] leading-5">${escapeDtrHtml(contact)}</td>
             <td class="min-w-[140px]">
-              <div class="font-semibold text-gray-800">${escapeDtrHtml(officeOrProgram)}</div>
-            </td>
-            <td class="text-center">${escapeDtrHtml(record.gender || '—')}</td>
-            <td class="min-w-[220px] text-[12px] leading-5">${escapeDtrHtml(record.treatment_done || '—')}</td>
-            <td class="text-center whitespace-nowrap">
-              <span class="inline-flex min-w-[56px] items-center justify-center rounded-full bg-[#fff5f5] px-3 py-1 text-xs font-bold text-[#8B0000]">
-                ${escapeDtrHtml(record.minutes_processed ?? 0)} mins
-              </span>
-            </td>
-            <td class="text-center">${signature}</td>
-          </tr>
-        `);
+              <div class="text-gray-800">${escapeDtrHtml(officeOrProgram)}</div>
+              </td>
+              <td class="text-center">${escapeDtrHtml(record.gender || '—')}</td>
+              <td class="min-w-[220px] text-[12px] leading-5">${escapeDtrHtml(record.treatment_done || '—')}</td>
+              <td class="whitespace-nowrap min-w-[150px] text-[12px] leading-5">
+                <div class="text-gray-700">${escapeDtrHtml(record.processed_date_time || '—')}</div>
+              </td>
+              <td class="text-center whitespace-nowrap">
+                <span class="inline-flex min-w-[56px] items-center justify-center rounded-full bg-[#fff5f5] px-3 py-1 text-xs font-bold text-[#8B0000]">
+                  ${escapeDtrHtml(record.minutes_processed || '—')}${record.minutes_processed ? ' mins' : ''}
+                </span>
+              </td>
+              <td class="text-center">${signature}</td>
+            </tr>
+          `);
       }
 
       if (grid) {
         grid.insertAdjacentHTML('beforeend', `
           <article class="service-record-card">
-            <div class="service-record-card-head">
-              <div>
-                <h3>${escapeDtrHtml(record.patient_name || '—')}</h3>
-                <p>${formatDateToMMDDYY(record.treatment_date)}</p>
+              <div class="service-record-card-head">
+                <div>
+                  <h3>${escapeDtrHtml(record.patient_name || '—')}</h3>
+                  <p>${escapeDtrHtml(record.requested_date_time || formatDateToMMDDYY(record.treatment_date) || '—')}</p>
+                </div>
+                <span class="service-record-chip">${escapeDtrHtml(record.gender || 'N/A')}</span>
               </div>
-              <span class="service-record-chip">${escapeDtrHtml(record.gender || 'N/A')}</span>
-            </div>
 
-            <div class="service-record-meta">
-              <span><i class="fa-solid fa-envelope"></i>${escapeDtrHtml(record.patient_email || 'No email')}</span>
-              <span><i class="fa-solid fa-phone"></i>${escapeDtrHtml(record.patient_phone || 'No contact')}</span>
-              <span><i class="fa-solid fa-building"></i>${escapeDtrHtml(officeOrProgram)}</span>
-              <span><i class="fa-solid fa-clock"></i>${escapeDtrHtml(record.minutes_processed ?? 0)} mins</span>
-            </div>
+              <div class="service-record-meta">
+                <span><i class="fa-solid fa-envelope"></i>${escapeDtrHtml(record.patient_email || 'No email')}</span>
+                <span><i class="fa-solid fa-phone"></i>${escapeDtrHtml(record.patient_phone || 'No contact')}</span>
+                <span><i class="fa-solid fa-building"></i>${escapeDtrHtml(officeOrProgram)}</span>
+                <span><i class="fa-solid fa-clock"></i>${escapeDtrHtml(record.minutes_processed || '—')}${record.minutes_processed ? ' mins' : ''}</span>
+                <span><i class="fa-solid fa-calendar-check"></i>${escapeDtrHtml(record.processed_date_time || 'Not processed time-stamped')}</span>
+              </div>
 
             <p class="service-record-treatment">${escapeDtrHtml(record.treatment_done || '—')}</p>
           </article>
@@ -939,15 +949,15 @@
           Clear search
         </button>
       `;
-    } else if (dtrState.month) {
-      icon = 'fa-calendar-xmark';
-      title = `No record found for “${escapeDtrHtml(formatDtrMonthLabel(dtrState.month))}”`;
-      sub = dtrFilterCount() > 0
-        ? 'Try adjusting the filter panel or clearing filters.'
-        : 'No daily treatment entries were recorded for this month.';
-      actionHtml = dtrFilterCount() > 0
-        ? `<button type="button" class="empty-state-btn" onclick="clearDailyFilters()"><i class="fa-solid fa-filter-circle-xmark"></i>Clear filters</button>`
-        : '';
+      } else if (dtrState.month) {
+        icon = 'fa-calendar-xmark';
+        title = `No record found for “${escapeDtrHtml(formatDtrMonthLabel(dtrState.month))}”`;
+        sub = dtrFilterCount() > 0
+          ? 'Try adjusting the filter panel or clearing filters.'
+          : 'No daily treatment entries were recorded for this month.';
+        actionHtml = dtrFilterCount() > 0
+          ? `<button type="button" class="empty-state-btn" onclick="clearDailyFilters()"><i class="fa-solid fa-filter-circle-xmark"></i>Clear filters</button>`
+          : '';
     } else if (dtrFilterCount() > 0) {
       icon = 'fa-filter-circle-xmark';
       title = 'No records match the selected filters';

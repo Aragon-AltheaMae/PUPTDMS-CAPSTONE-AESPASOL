@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Dentist\DentistReportController;
 use Illuminate\Http\Request;
 use App\Models\DocumentRequest;
 use App\Models\Patient;
@@ -300,25 +301,39 @@ class DocumentRequestController extends Controller
         if ($activeRole !== 'dentist') {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
+<<<<<<< Updated upstream
         $docRequest = DocumentRequest::with('patient.user')->findOrFail($id);
+=======
 
-        $docRequest->update([
-            'status' => 'approved',
-            'approved_at' => now(),
-            'approved_by' => Auth::id(),
-            'rejection_reason' => null,
-        ]);
+        try {
+            $docRequest = DB::transaction(function () use ($id) {
+                $documentRequest = DocumentRequest::with('patient.user')->findOrFail($id);
+>>>>>>> Stashed changes
 
-        if ($docRequest->patient && $docRequest->patient->user) {
-            $docRequest->patient->user->notify(
-                new DocumentRequestApprovedNotification($docRequest)
-            );
+                $documentRequest->update([
+                    'status' => 'approved',
+                    'approved_at' => now(),
+                    'approved_by' => Auth::id(),
+                    'rejection_reason' => null,
+                ]);
+
+                return $documentRequest->fresh(['patient.user', 'approvedBy']);
+            });
+
+            if ($docRequest->patient && $docRequest->patient->user) {
+                $docRequest->patient->user->notify(
+                    new DocumentRequestApprovedNotification($docRequest)
+                );
+            }
+
+            return app(DentistReportController::class)
+                ->buildApprovedDocumentRequestPdfResponse($docRequest);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to approve document request: ' . $e->getMessage(),
+            ], 500);
         }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Document request approved.'
-        ]);
     }
 
     public function reject(Request $request, $id)

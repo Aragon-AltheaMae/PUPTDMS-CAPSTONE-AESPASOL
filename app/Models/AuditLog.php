@@ -19,7 +19,8 @@ class AuditLog extends Model
         'archived_at',
         'archived_by',
         'ip_address',
-        'user_agent'
+        'user_agent',
+        'browser_name',
     ];
 
     protected $casts = [

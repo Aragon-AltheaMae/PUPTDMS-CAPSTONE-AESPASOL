@@ -134,11 +134,11 @@ isset($upcomingAppointment) && $upcomingAppointment
 ? \Carbon\Carbon::parse($upcomingAppointment->appointment_date)->format('M d, Y')
 : 'No appointment yet';
 
-$resolvedBirthdate = optional($patient)->birthdate ?: optional(optional($patient)->user)->birthdate;
-$resolvedGender = optional($patient)->gender ?: optional(optional($patient)->user)->gender;
-$resolvedAge = $resolvedBirthdate ? \Carbon\Carbon::parse($resolvedBirthdate)->age : null;
-$resolvedBirthdateDisplay = $resolvedBirthdate
-? \Carbon\Carbon::parse($resolvedBirthdate)->format('M d, Y')
+$birthdate = optional($patient)->birthdate ?: optional(optional($patient)->user)->birthdate;
+$gender = optional($patient)->gender ?: optional(optional($patient)->user)->gender;
+$age = $birthdate ? \Carbon\Carbon::parse($birthdate)->age : null;
+$birthdateDisplay = $birthdate
+? \Carbon\Carbon::parse($birthdate)->format('M d, Y')
 : 'N/A';
 @endphp
 
@@ -570,9 +570,9 @@ $resolvedBirthdateDisplay = $resolvedBirthdate
         roleLabel: "{{ $patient->faculty_code ? 'Faculty' : ($patient->student_no ? 'Student' : 'Patient') }}",
         facultyCode: "{{ $patient->faculty_code ?? '' }}",
         studentNo: "{{ $patient->student_no ?? '' }}",
-        age: "{{ $resolvedAge ?? '' }}",
-        birthdate: "{{ $resolvedBirthdateDisplay }}",
-        gender: "{{ $resolvedGender ?? 'N/A' }}",
+        age: "{{ $age ?? '' }}",
+        birthdate: "{{ $birthdateDisplay }}",
+        gender: "{{ $gender ?? 'N/A' }}",
         contact: "{{ $patient->phone ?? 'N/A' }}",
         email: "{{ $patient->email ?? 'N/A' }}",
         emergencyName: "{{ optional($patient->medicalHistory)->emergency_person ?? 'Not specified' }}",

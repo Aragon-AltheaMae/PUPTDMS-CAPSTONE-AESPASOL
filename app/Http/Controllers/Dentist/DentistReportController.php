@@ -28,6 +28,23 @@ use setasign\Fpdi\Fpdi;
 
 class DentistReportController extends Controller
 {
+    public function buildApprovedDocumentRequestPdfResponse(DocumentRequest $documentRequest)
+    {
+        $payload = $this->generateApprovedDocumentRequestPdfPayload($documentRequest);
+
+        if ($payload === null) {
+            abort(422, 'This document request does not have a PDF template yet.');
+        }
+
+        return response($payload['content'], 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'attachment; filename="' . $payload['file_name'] . '"')
+            ->header('Content-Length', (string) strlen($payload['content']))
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('X-Approval-Message', 'Document request approved successfully.');
+    }
+
     public function index()
     {
         $activeRole = session('impersonated_role') ?: session('role');
@@ -2605,44 +2622,86 @@ class DentistReportController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $query = DB::table('daily_treatment_records');
+        $query = Appointment::query()
+            ->with([
+                'patient.medicalHistory',
+                'procedure',
+            ])
+            ->where('status', 'completed')
+            ->whereHas('patient');
 
         if ($request->filled('month') && preg_match('/^\d{4}-\d{2}$/', (string) $request->input('month'))) {
             [$year, $month] = explode('-', $request->input('month'));
 
-            $query->whereYear('treatment_date', $year)
-                ->whereMonth('treatment_date', $month);
+            $query->whereYear('appointment_date', $year)
+                ->whereMonth('appointment_date', $month);
         }
 
         if ($request->filled('search')) {
-            $search = $request->input('search');
+            $search = trim((string) $request->input('search'));
 
             $query->where(function ($q) use ($search) {
-                $q->where('patient_name', 'like', "%{$search}%")
-                    ->orWhere('patient_email', 'like', "%{$search}%")
-                    ->orWhere('patient_phone', 'like', "%{$search}%")
-                    ->orWhere('office_type', 'like', "%{$search}%")
-                    ->orWhere('program_code', 'like', "%{$search}%")
-                    ->orWhere('treatment_done', 'like', "%{$search}%");
+                $q->where('service_type', 'like', "%{$search}%")
+                    ->orWhereHas('patient', function ($patientQuery) use ($search) {
+                        $patientQuery->where('name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%")
+                            ->orWhere('phone', 'like', "%{$search}%")
+                            ->orWhere('course_code', 'like', "%{$search}%")
+                            ->orWhere('course_name', 'like', "%{$search}%")
+                            ->orWhere('faculty_code', 'like', "%{$search}%");
+                    });
             });
         }
 
         if ($request->filled('office_type')) {
-            $query->where('office_type', $request->input('office_type'));
+            $officeType = (string) $request->input('office_type');
+
+            $query->whereHas('patient', function ($patientQuery) use ($officeType) {
+                if ($officeType === 'Faculty') {
+                    $patientQuery->whereNotNull('faculty_code')
+                        ->where('faculty_code', '!=', '');
+
+                    return;
+                }
+
+                if (in_array($officeType, ['Administrative', 'Dependent'], true)) {
+                    $patientQuery->where(function ($innerQuery) {
+                        $innerQuery->whereNull('course_code')
+                            ->orWhere('course_code', '');
+                    })->where(function ($innerQuery) {
+                        $innerQuery->whereNull('faculty_code')
+                            ->orWhere('faculty_code', '');
+                    });
+                }
+            });
         }
 
         if ($request->filled('program_code')) {
-            $query->where('program_code', $request->input('program_code'));
+            $programCode = trim((string) $request->input('program_code'));
+
+            $query->whereHas('patient', function ($patientQuery) use ($programCode) {
+                $patientQuery->where('course_code', $programCode);
+            });
         }
 
         if ($request->input('sort_name') === 'az') {
-            $query->orderBy('patient_name', 'asc');
+            $query->join('patients as sort_patients', 'sort_patients.id', '=', 'appointments.patient_id')
+                ->select('appointments.*')
+                ->orderBy('sort_patients.name', 'asc')
+                ->orderBy('appointments.appointment_date', 'desc')
+                ->orderBy('appointments.appointment_time', 'desc');
         } elseif ($request->input('sort_name') === 'za') {
-            $query->orderBy('patient_name', 'desc');
+            $query->join('patients as sort_patients', 'sort_patients.id', '=', 'appointments.patient_id')
+                ->select('appointments.*')
+                ->orderBy('sort_patients.name', 'desc')
+                ->orderBy('appointments.appointment_date', 'desc')
+                ->orderBy('appointments.appointment_time', 'desc');
         } elseif ($request->input('sort_date') === 'asc') {
-            $query->orderBy('treatment_date', 'asc');
+            $query->orderBy('appointment_date', 'asc')
+                ->orderBy('appointment_time', 'asc');
         } else {
-            $query->orderBy('treatment_date', 'desc');
+            $query->orderBy('appointment_date', 'desc')
+                ->orderBy('appointment_time', 'desc');
         }
 
         $allowedPerPage = [10, 20, 50, 100];
@@ -2653,26 +2712,64 @@ class DentistReportController extends Controller
         }
 
         $records = $query
-            ->orderByDesc('id')
             ->paginate($perPage)
-            ->through(function ($record) {
-            return [
-                'id' => $record->id ?? null,
-                'treatment_date' => $record->treatment_date ?? null,
-                'patient_name' => $record->patient_name ?? '',
-                'patient_email' => $record->patient_email ?? '',
-                'patient_phone' => $record->patient_phone ?? '',
-                'office_type' => $record->office_type ?? '',
-                'program_code' => $record->program_code ?? '',
-                'gender' => $record->gender ?? '',
-                'treatment_done' => $record->treatment_done ?? '',
-                'minutes_processed' => $record->minutes_processed ?? 0,
-                'time_in' => !empty($record->time_in) ? Carbon::parse($record->time_in)->format('h:i A') : null,
-                'time_out' => !empty($record->time_out) ? Carbon::parse($record->time_out)->format('h:i A') : null,
-                'has_signature' => (bool) ($record->has_signature ?? false),
-                'signature_path' => $record->signature_path ?? null,
-            ];
-        });
+            ->through(function (Appointment $appointment) {
+                $patient = $appointment->patient;
+                $procedure = $appointment->procedure;
+                $demographics = $this->resolvePatientDemographics($patient);
+
+                $requestedDateTime = '';
+
+                if (!empty($appointment->appointment_date)) {
+                    $requestedDateTime = Carbon::parse($appointment->appointment_date)->format('m/d/y');
+                }
+
+                if (!empty($appointment->appointment_time)) {
+                    $timeText = $this->formatPdfTime($appointment->appointment_time);
+                    $requestedDateTime .= $requestedDateTime !== '' ? '  |  ' . $timeText : $timeText;
+                }
+
+                $processedDateTime = '';
+
+                if ($procedure?->procedure_completed_at) {
+                    $processedDateTime = Carbon::parse($procedure->procedure_completed_at)->format('m/d/y')
+                        . '  |  '
+                        . Carbon::parse($procedure->procedure_completed_at)->format('h:i A');
+                } elseif (!empty($appointment->updated_at)) {
+                    $processedDateTime = Carbon::parse($appointment->updated_at)->format('m/d/y')
+                        . '  |  '
+                        . Carbon::parse($appointment->updated_at)->format('h:i A');
+                }
+
+                return [
+                    'id' => $appointment->id,
+                    'treatment_date' => $appointment->appointment_date,
+                    'requested_date_time' => $requestedDateTime,
+                    'processed_date_time' => $processedDateTime,
+                    'patient_name' => trim((string) ($patient->name ?? 'Unknown Patient')),
+                    'patient_email' => trim((string) ($patient->email ?? '')),
+                    'patient_phone' => trim((string) ($patient->phone ?? '')),
+                    'office_type' => $this->dailyTreatmentOfficeType($patient),
+                    'office_display' => $this->dailyTreatmentOfficeDisplay($patient),
+                    'program_code' => trim((string) ($patient->course_code ?? '')),
+                    'gender' => trim((string) ($demographics['gender'] ?? '')),
+                    'treatment_done' => trim((string) ($appointment->service_type ?? 'Dental Service')),
+                    'minutes_processed' => $this->formatPdfDurationMinutes(
+                        (int) ($procedure?->procedure_duration_seconds ?? 0)
+                    ),
+                    'time_in' => !empty($appointment->appointment_time)
+                        ? $this->formatPdfTime($appointment->appointment_time)
+                        : null,
+                    'time_out' => $procedure?->procedure_completed_at
+                        ? Carbon::parse($procedure->procedure_completed_at)->format('h:i A')
+                        : null,
+                    'has_signature' => filled($patient?->medicalHistory?->patient_signature),
+                    'signature_path' => $patient?->medicalHistory?->patient_signature,
+                    'signature_url' => filled($patient?->medicalHistory?->patient_signature)
+                        ? asset('storage/' . ltrim((string) $patient->medicalHistory->patient_signature, '/'))
+                        : null,
+                ];
+            });
 
         return response()->json([
             'data' => $records->items(),
@@ -2685,6 +2782,44 @@ class DentistReportController extends Controller
                 'to' => $records->lastItem(),
             ],
         ]);
+    }
+
+    private function dailyTreatmentOfficeDisplay($patient): string
+    {
+        if (!$patient) {
+            return '—';
+        }
+
+        if (filled($patient->course_code)) {
+            return trim((string) $patient->course_code);
+        }
+
+        if (filled($patient->course_name)) {
+            return trim((string) $patient->course_name);
+        }
+
+        if (filled($patient->faculty_code)) {
+            return trim((string) $patient->faculty_code);
+        }
+
+        return '—';
+    }
+
+    private function dailyTreatmentOfficeType($patient): string
+    {
+        if (!$patient) {
+            return '';
+        }
+
+        if (filled($patient->course_code) || filled($patient->course_name)) {
+            return 'Student';
+        }
+
+        if (filled($patient->faculty_code)) {
+            return 'Faculty';
+        }
+
+        return '';
     }
 
     private function buildGadData(int $year, int $month): array
@@ -3048,6 +3183,164 @@ class DentistReportController extends Controller
             $pdf->SetFont('Helvetica', '', 10.5);
             $this->drawCenteredPdfText($pdf, 492, 440, $licenseNumber, 129, 12);
         }
+    }
+
+    private function generateApprovedDocumentRequestPdfPayload(DocumentRequest $documentRequest): ?array
+    {
+        $documentRequest->loadMissing(['patient', 'approvedBy']);
+
+        return match ($this->resolveApprovedDocumentRequestType($documentRequest->document_type)) {
+            'annual_dental_clearance' => $this->buildAnnualDentalClearancePdfPayload($documentRequest),
+            'dental_clearance' => $this->buildDentalClearancePdfPayload($documentRequest),
+            'dental_health_record' => $this->buildDentalHealthRecordPdfPayload($documentRequest),
+            default => null,
+        };
+    }
+
+    private function resolveApprovedDocumentRequestType(?string $documentType): ?string
+    {
+        $normalized = strtolower(trim((string) $documentType));
+        $normalized = str_replace(['-', '/'], ' ', $normalized);
+        $normalized = preg_replace('/\s+/', ' ', $normalized) ?? $normalized;
+
+        return match ($normalized) {
+            'annual dental clearance' => 'annual_dental_clearance',
+            'dental clearance' => 'dental_clearance',
+            'all dental records', 'medical records', 'diagnosis and treatment', 'dental health record' => 'dental_health_record',
+            default => null,
+        };
+    }
+
+    private function buildAnnualDentalClearancePdfPayload(DocumentRequest $documentRequest): array
+    {
+        $templatePath = storage_path('app/report-templates/annual-dental-clearance-template.pdf');
+
+        if (!file_exists($templatePath)) {
+            throw new \RuntimeException('Annual Dental Clearance PDF template was not found.');
+        }
+
+        $pdf = new Fpdi('P', 'pt');
+        $pdf->SetAutoPageBreak(false);
+        $pdf->SetMargins(0, 0, 0);
+        $pdf->setSourceFile($templatePath);
+
+        $template = $pdf->importPage(1);
+        $size = $pdf->getTemplateSize($template);
+
+        $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+        $pdf->useTemplate($template, 0, 0, $size['width'], $size['height'], true);
+        $this->drawAnnualDentalClearancePage($pdf, $documentRequest);
+
+        return [
+            'file_name' => $this->buildApprovedDocumentRequestFileName($documentRequest, 'annual-dental-clearance'),
+            'content' => $pdf->Output('S'),
+        ];
+    }
+
+    private function buildDentalClearancePdfPayload(DocumentRequest $documentRequest): array
+    {
+        $templatePath = storage_path('app/report-templates/dental-clearance-template.pdf');
+
+        if (!file_exists($templatePath)) {
+            throw new \RuntimeException('Dental Clearance PDF template was not found.');
+        }
+
+        $pdf = new Fpdi('P', 'pt');
+        $pdf->SetAutoPageBreak(false);
+        $pdf->SetMargins(0, 0, 0);
+        $pdf->setSourceFile($templatePath);
+
+        $template = $pdf->importPage(1);
+        $size = $pdf->getTemplateSize($template);
+
+        $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+        $pdf->useTemplate($template, 0, 0, $size['width'], $size['height'], true);
+        $this->drawDentalClearancePage($pdf, $documentRequest);
+
+        return [
+            'file_name' => $this->buildApprovedDocumentRequestFileName($documentRequest, 'dental-clearance'),
+            'content' => $pdf->Output('S'),
+        ];
+    }
+
+    private function buildDentalHealthRecordPdfPayload(DocumentRequest $documentRequest): array
+    {
+        $patient = $documentRequest->patient;
+
+        if (!$patient) {
+            throw new \RuntimeException('Unable to generate Dental Health Record because the patient record is missing.');
+        }
+
+        $templatePath = storage_path('app/report-templates/dental-health-record-template.pdf');
+
+        if (!file_exists($templatePath)) {
+            throw new \RuntimeException('Dental Health Record template was not found.');
+        }
+
+        $patientTreatments = Appointment::with(['patient', 'dentist'])
+            ->where('patient_id', $patient->id)
+            ->where('status', 'completed')
+            ->orderBy('appointment_date')
+            ->orderBy('appointment_time')
+            ->get();
+
+        $dentalHistory = DentalHistory::where('patient_id', $patient->id)->latest()->first();
+        $dentalConcern = DentalHistoryConcern::where('patient_id', $patient->id)->latest()->first();
+        $dentalDates = DentalHistoryConditionDate::where('patient_id', $patient->id)->latest()->first();
+        $medicalHistory = MedicalHistory::where('patient_id', $patient->id)->latest()->first();
+
+        $dentalAnswers = $this->getDentalHealthAnswerMap($patient->id);
+        $medicalAnswers = $medicalHistory
+            ? $this->getMedicalHealthAnswerMap($patient->id, $medicalHistory->id)
+            : [];
+        $diseaseAnswers = $medicalHistory
+            ? $this->getMedicalDiseaseAnswerMap($patient->id, $medicalHistory->id)
+            : [];
+
+        $procedureDiagnosisByAppointment = AppointmentProcedure::query()
+            ->whereIn('appointment_id', $patientTreatments->pluck('id')->filter()->all())
+            ->get()
+            ->groupBy('appointment_id')
+            ->map(function ($procedures) {
+                return trim((string) ($procedures->last()->diagnosis ?? ''));
+            });
+
+        $patientAppointmentIds = $patientTreatments->pluck('id')->filter()->values();
+
+        $appointmentProcedure = AppointmentProcedure::query()
+            ->where('patient_id', $patient->id)
+            ->when(
+                $patientAppointmentIds->isNotEmpty(),
+                fn($q) => $q->whereIn('appointment_id', $patientAppointmentIds->all())
+            )
+            ->latest('id')
+            ->first();
+
+        $pdf = new Fpdi('P', 'pt');
+        $pdf->SetAutoPageBreak(false);
+        $pdf->setSourceFile($templatePath);
+
+        $this->addDentalHealthTemplatePage($pdf, 1);
+        $this->drawDentalHealthRecordPageOne($pdf, $patient, $dentalHistory, $dentalAnswers, $appointmentProcedure);
+
+        $this->addDentalHealthTemplatePage($pdf, 2);
+        $this->drawDentalHealthRecordPageTwo($pdf, $dentalAnswers, $dentalConcern, $dentalDates, $medicalHistory, $medicalAnswers, $diseaseAnswers);
+
+        $this->addDentalHealthTemplatePage($pdf, 3);
+        $this->drawDentalHealthRecordPageThree($pdf, $medicalHistory, $patientTreatments, $procedureDiagnosisByAppointment);
+
+        return [
+            'file_name' => $this->buildApprovedDocumentRequestFileName($documentRequest, 'dental-health-record'),
+            'content' => $pdf->Output('S'),
+        ];
+    }
+
+    private function buildApprovedDocumentRequestFileName(DocumentRequest $documentRequest, string $prefix): string
+    {
+        $reference = trim((string) ($documentRequest->reference_number ?? ('document-request-' . $documentRequest->id)));
+        $reference = preg_replace('/[^A-Za-z0-9_\-]/', '_', $reference) ?: ('document-request-' . $documentRequest->id);
+
+        return strtolower($prefix . '-' . $reference . '.pdf');
     }
 
     private function drawDentalServicesRows(Fpdi $pdf, $records): void
@@ -3453,17 +3746,10 @@ class DentistReportController extends Controller
 
         $surname = array_pop($parts);
         $firstName = array_shift($parts) ?? '';
-        $middleInitial = '';
+        $remainingNames = trim(implode(' ', $parts));
+        $givenNames = trim($firstName . ' ' . $remainingNames);
 
-        if (!empty($parts)) {
-            $middleSource = trim((string) $parts[0]);
-
-            if ($middleSource !== '') {
-                $middleInitial = ' ' . strtoupper(mb_substr($middleSource, 0, 1)) . '.';
-            }
-        }
-
-        return trim($surname . ', ' . $firstName . $middleInitial);
+        return trim($surname . ', ' . $givenNames);
     }
 
     private function formatPdfDurationMinutes(int $seconds): string

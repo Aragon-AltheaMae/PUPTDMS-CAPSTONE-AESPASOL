@@ -16,7 +16,7 @@
     <li><a href="#services">Services</a></li>
     <li><a href="#faq">FAQ</a></li>
     <li><a href="#team">Team</a></li>
-    <li><a href="/auth/oidc/redirect" class="nav-cta">Login</a></li>
+    <li><a href="/auth/oidc/redirect" class="nav-cta" data-oidc-login-link>Login</a></li>
   </ul>
 
   <button class="auth-theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
@@ -38,7 +38,7 @@
   <a href="#faq" onclick="closeMobileMenu()">FAQ</a>
   <a href="#team" onclick="closeMobileMenu()">Team</a>
   <div class="mob-divider"></div>
-  <a href="/auth/oidc/redirect" class="nav-cta-mob">
+  <a href="/auth/oidc/redirect" class="nav-cta-mob" data-oidc-login-link>
     <i class="fa-solid fa-arrow-right-to-bracket" style="margin-right:6px;font-size:11px;"></i>Login with SSO
   </a>
   <a href="{{ route('backup.login') }}" class="nav-cta-mob" style="margin-top:10px;">
@@ -74,7 +74,7 @@
 
   <div id="login" class="reveal" style="animation-delay: 1.1s;">
     <div class="hero-login-actions">
-      <a href="/auth/oidc/redirect" class="btn-sso">
+      <a href="/auth/oidc/redirect" class="btn-sso" data-oidc-login-link>
         <div class="btn-sso-icon">
           <i class="fa-solid fa-arrow-right-to-bracket" style="font-size:12px;"></i>
         </div>
@@ -348,7 +348,7 @@
       <p class="closing-desc">Developed to manage appointments and records more effectively, supporting accessible and
         efficient dental care for the entire PUP Taguig community.</p>
       <div class="hero-login-actions" style="margin-top:1.2rem;">
-        <a href="/auth/oidc/redirect" class="btn-sso btn-sso-alt" style="margin:0;">
+        <a href="/auth/oidc/redirect" class="btn-sso btn-sso-alt" style="margin:0;" data-oidc-login-link>
           <div class="btn-sso-icon"><i class="fa-solid fa-arrow-right-to-bracket" style="font-size:11px;"></i></div>
           Login with SSO
         </a>
@@ -404,5 +404,47 @@
   }, { threshold: 0.08 });
 
   document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+  function detectBrowserName() {
+    const userAgent = navigator.userAgent || '';
+
+    if (navigator.brave) {
+      return 'Brave';
+    }
+
+    if (userAgent.includes('Edg/')) {
+      return 'Edge';
+    }
+
+    if (userAgent.includes('OPR/')) {
+      return 'Opera';
+    }
+
+    if (userAgent.includes('Firefox/')) {
+      return 'Firefox';
+    }
+
+    if (userAgent.includes('Chrome/')) {
+      return 'Chrome';
+    }
+
+    if (userAgent.includes('Safari/')) {
+      return 'Safari';
+    }
+
+    return 'Browser';
+  }
+
+  function applyBrowserHintToOidcLinks() {
+    const browserName = detectBrowserName();
+
+    document.querySelectorAll('[data-oidc-login-link]').forEach(link => {
+      const url = new URL(link.getAttribute('href'), window.location.origin);
+      url.searchParams.set('browser_name', browserName);
+      link.setAttribute('href', url.pathname + url.search);
+    });
+  }
+
+  applyBrowserHintToOidcLinks();
 </script>
 @endsection

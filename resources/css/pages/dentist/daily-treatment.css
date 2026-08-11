@@ -1,5 +1,5 @@
 .daily-treatment-page {
-    --service-table-min: 1080px;
+    --service-table-min: 1320px;
 }
 
 .daily-treatment-page .dtr-card {
@@ -75,6 +75,22 @@
 .daily-treatment-page .dtr-table th,
 .daily-treatment-page .dtr-table td {
     vertical-align: middle !important;
+    text-align: center !important;
+}
+
+.daily-treatment-page .dtr-table td > div,
+.daily-treatment-page .dtr-table td > span,
+.daily-treatment-page .dtr-table td > p {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    text-align: center !important;
+}
+
+.daily-treatment-page .dtr-table th:nth-child(4),
+.daily-treatment-page .dtr-table td:nth-child(4) {
+    min-width: 150px !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
 }
 
 .daily-treatment-page .dtr-signature {
@@ -101,6 +117,34 @@
     background: #F9FAFB !important;
     color: #9CA3AF !important;
     border: 1px solid #E5E7EB !important;
+}
+
+.daily-treatment-page .dtr-signature-preview {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 92px !important;
+    min-width: 92px !important;
+    height: 38px !important;
+    padding: 4px 8px !important;
+    border-radius: 12px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #DDE7E2 !important;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, .06) !important;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease !important;
+}
+
+.daily-treatment-page .dtr-signature-preview:hover {
+    transform: translateY(-1px) !important;
+    border-color: #86EFAC !important;
+    box-shadow: 0 10px 24px rgba(22, 163, 74, .12) !important;
+}
+
+.daily-treatment-page .dtr-signature-image {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
 }
 
 .daily-treatment-page~#filterModal .filter-drawer-panel {
