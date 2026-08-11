@@ -42,6 +42,8 @@ class OIDCController extends Controller
 
     public function redirect(Request $request)
     {
+        $this->concurrentSessionService->rememberBrowserHint($request);
+
         $loginUrl     = config('services.idp.login_url');
         $authorizeUrl = config('services.oidc.authorize_url');
         $clientId     = config('services.oidc.client_id');
@@ -419,6 +421,7 @@ class OIDCController extends Controller
         $request->session()->regenerate();
         $request->session()->put('oidc_id_token', $idToken);
         session()->save();
+        $this->concurrentSessionService->syncCurrentSessionMetadata($request);
 
         $sessionResult = $this->concurrentSessionService->enforceLimitForCurrentSession(
             $user,

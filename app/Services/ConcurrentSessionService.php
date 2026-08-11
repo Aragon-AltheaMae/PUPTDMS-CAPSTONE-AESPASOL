@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Helpers\AuditLogger;
 use App\Models\AuditLog;
 use App\Models\User;
+use App\Support\BrowserDetection;
+use Illuminate\Http\Request;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
@@ -14,6 +16,46 @@ use Illuminate\Support\Str;
 
 class ConcurrentSessionService
 {
+    public function rememberBrowserHint(Request $request): ?string
+    {
+        $browserName = BrowserDetection::detectFromRequest($request);
+
+        if ($browserName !== 'Browser') {
+            $request->session()->put('browser_name_hint', $browserName);
+        }
+
+        return $browserName !== 'Browser' ? $browserName : null;
+    }
+
+    public function syncCurrentSessionMetadata(Request $request): void
+    {
+        if (!$this->isEnabled()) {
+            return;
+        }
+
+        $sessionId = (string) $request->session()->getId();
+
+        if ($sessionId === '') {
+            return;
+        }
+
+        $request->session()->save();
+
+        $attributes = [
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'last_activity' => now()->getTimestamp(),
+        ];
+
+        if ($this->supportsSessionBrowserNameColumn()) {
+            $attributes['browser_name'] = BrowserDetection::detectFromRequest($request);
+        }
+
+        DB::table($this->sessionTable())
+            ->where('id', $sessionId)
+            ->update($attributes);
+    }
+
     public function isEnabled(): bool
     {
         if (!config('concurrent-sessions.enabled', true)) {
@@ -171,8 +213,8 @@ class ConcurrentSessionService
                     'is_current' => hash_equals((string) $session->id, $currentSessionId),
                     'ip_address' => $session->ip_address ?: 'Unknown',
                     'user_agent' => $session->user_agent ?: 'Unknown device',
-                    'device_label' => $this->formatDeviceLabel($session->user_agent),
-                    'browser_label' => $this->detectBrowser($session->user_agent),
+                    'device_label' => $this->deviceLabel($session->browser_name ?? null, $session->user_agent),
+                    'browser_label' => $this->browserLabel($session->browser_name ?? null, $session->user_agent),
                     'last_activity_at' => now()->setTimestamp((int) $session->last_activity),
                     'last_activity_label' => now()->setTimestamp((int) $session->last_activity)->diffForHumans(),
                 ];
@@ -233,8 +275,8 @@ class ConcurrentSessionService
                     'action' => $action,
                     'action_label' => $this->formatHistoryAction($action),
                     'action_tone' => $this->historyTone($action),
-                    'device_label' => $this->formatDeviceLabel($userAgent),
-                    'browser_label' => $this->detectBrowser($userAgent),
+                    'device_label' => $this->deviceLabel($entry->browser_name ?? null, $userAgent),
+                    'browser_label' => $this->browserLabel($entry->browser_name ?? null, $userAgent),
                     'ip_address' => $entry->ip_address ?: 'Unknown',
                     'user_agent' => $userAgent,
                     'description' => $entry->description ?: 'Session activity recorded.',
@@ -301,6 +343,10 @@ class ConcurrentSessionService
             ->whereNotNull('sessions.user_id')
             ->where('sessions.last_activity', '>=', $this->activeCutoffTimestamp());
 
+        if ($this->supportsSessionBrowserNameColumn()) {
+            $query->addSelect('sessions.browser_name');
+        }
+
         $role = trim((string) ($filters['role'] ?? ''));
         $search = trim((string) ($filters['search'] ?? ''));
 
@@ -336,8 +382,8 @@ class ConcurrentSessionService
                     'role_label' => $this->formatRoleLabel($role),
                     'ip_address' => $session->ip_address ?: 'Unknown',
                     'user_agent' => $session->user_agent ?: 'Unknown device',
-                    'device_label' => $this->formatDeviceLabel($session->user_agent),
-                    'browser_label' => $this->detectBrowser($session->user_agent),
+                    'device_label' => $this->deviceLabel($session->browser_name ?? null, $session->user_agent),
+                    'browser_label' => $this->browserLabel($session->browser_name ?? null, $session->user_agent),
                     'last_activity_at' => now()->setTimestamp((int) $session->last_activity),
                     'last_activity_label' => now()->setTimestamp((int) $session->last_activity)->diffForHumans(),
                     'is_current' => hash_equals((string) $session->id, $currentSessionId),
@@ -485,6 +531,11 @@ class ConcurrentSessionService
 
     protected function formatDeviceLabel(?string $userAgent): string
     {
+        return $this->deviceLabel(null, $userAgent);
+    }
+
+    protected function deviceLabel(?string $browserName, ?string $userAgent): string
+    {
         if (blank($userAgent)) {
             return 'Unknown device';
         }
@@ -498,25 +549,31 @@ class ConcurrentSessionService
             default => 'Device',
         };
 
-        $browser = $this->detectBrowser($userAgent);
+        $browser = $this->browserLabel($browserName, $userAgent);
 
         return trim($platform . ' - ' . $browser);
     }
 
     protected function detectBrowser(?string $userAgent): string
     {
-        if (blank($userAgent)) {
-            return 'Browser';
+        return BrowserDetection::detectFromUserAgent($userAgent);
+    }
+
+    protected function browserLabel(?string $browserName, ?string $userAgent): string
+    {
+        return BrowserDetection::normalizeBrowserName($browserName)
+            ?? $this->detectBrowser($userAgent);
+    }
+
+    protected function supportsSessionBrowserNameColumn(): bool
+    {
+        static $supportsColumn;
+
+        if ($supportsColumn === null) {
+            $supportsColumn = Schema::hasColumn($this->sessionTable(), 'browser_name');
         }
 
-        return match (true) {
-            Str::contains($userAgent, 'Edg/', true) => 'Edge',
-            Str::contains($userAgent, 'OPR/', true) => 'Opera',
-            Str::contains($userAgent, 'Firefox/', true) => 'Firefox',
-            Str::contains($userAgent, 'Chrome/', true) => 'Chrome',
-            Str::contains($userAgent, 'Safari/', true) => 'Safari',
-            default => 'Browser',
-        };
+        return $supportsColumn;
     }
 
     protected function formatRoleLabel(string $role): string

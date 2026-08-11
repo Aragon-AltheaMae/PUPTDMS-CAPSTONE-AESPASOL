@@ -2890,7 +2890,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                 const res = await fetch(approveUrl, {
                     method: DOCREQ_METHODS.approve || 'POST',
                     headers: {
-                        'Accept': 'application/json',
+                        'Accept': 'application/pdf, application/json',
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': CSRF,
                         'X-Requested-With': 'XMLHttpRequest'
@@ -2898,11 +2898,44 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                     body: JSON.stringify({})
                 });
 
-                const data = await res.json().catch(() => ({}));
+                const contentType = res.headers.get('content-type') || '';
 
                 if (!res.ok) {
-                    throw new Error(data.message || `Approval failed. Status: ${res.status}`);
+                    let message = `Approval failed. Status: ${res.status}`;
+
+                    if (contentType.includes('application/json')) {
+                        const data = await res.json().catch(() => ({}));
+                        message = data.message || message;
+                    }
+
+                    throw new Error(message);
                 }
+
+                if (!contentType.toLowerCase().includes('application/pdf')) {
+                    throw new Error('The server did not return a valid PDF file.');
+                }
+
+                const blob = await res.blob();
+                const downloadUrl = URL.createObjectURL(blob);
+
+                let fileName = `approved-document-request-${id}.pdf`;
+                const disposition = res.headers.get('Content-Disposition') || '';
+                const fileNameMatch = disposition.match(/filename="?([^"]+)"?/i);
+
+                if (fileNameMatch?.[1]) {
+                    fileName = fileNameMatch[1];
+                }
+
+                const link = document.createElement('a');
+                link.href = downloadUrl;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+
+                window.setTimeout(() => {
+                    URL.revokeObjectURL(downloadUrl);
+                }, 30000);
 
                 window.closeModal('approveModal');
                 syncLocalDocRequestStatus(id, 'approved');
@@ -2910,7 +2943,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                 docreqToast(
                     'success',
                     'Request approved',
-                    data.message ||
+                    res.headers.get('X-Approval-Message') ||
                     'The document request has been approved. The patient will be notified.'
                 );
             } catch (error) {

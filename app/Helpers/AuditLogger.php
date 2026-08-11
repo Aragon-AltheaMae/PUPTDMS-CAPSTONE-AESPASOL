@@ -5,6 +5,8 @@ namespace App\Helpers;
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use App\Support\BrowserDetection;
 
 class AuditLogger
 {
@@ -42,6 +44,20 @@ class AuditLogger
             'description' => $description,
             'ip_address' => Request::ip(),
             'user_agent' => Request::userAgent(),
+            'browser_name' => self::supportsBrowserNameColumn()
+                ? BrowserDetection::detectFromRequest(Request::instance())
+                : null,
         ]);
+    }
+
+    private static function supportsBrowserNameColumn(): bool
+    {
+        static $supportsColumn;
+
+        if ($supportsColumn === null) {
+            $supportsColumn = Schema::hasColumn('audit_logs', 'browser_name');
+        }
+
+        return $supportsColumn;
     }
 }

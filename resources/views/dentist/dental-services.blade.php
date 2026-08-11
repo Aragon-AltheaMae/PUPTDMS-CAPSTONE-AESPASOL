@@ -162,7 +162,7 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                             <th>Time Out</th>
                             <th>Duration</th>
                             <th>Emergency</th>
-                            <th>Non-Emerg.</th>
+                            <th>Non-Emergency</th>
                             <th>Sig.</th>
                         </tr>
                     </thead>
@@ -293,8 +293,8 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                 <h3 class="filter-section-title">Department</h3>
                 <div class="filter-chip-row">
                     <label class="choice-chip">
-                        <input type="radio" name="department" value="Administrative" class="chip-radio departmentRadio">
-                        <span>Administrative</span>
+                        <input type="radio" name="department" value="Student" class="chip-radio departmentRadio">
+                        <span>Student</span>
                     </label>
 
                     <label class="choice-chip">
@@ -303,8 +303,8 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                     </label>
 
                     <label class="choice-chip">
-                        <input type="radio" name="department" value="Dependent" class="chip-radio departmentRadio">
-                        <span>Dependent</span>
+                        <input type="radio" name="department" value="Administrative" class="chip-radio departmentRadio">
+                        <span>Administrative</span>
                     </label>
                 </div>
             </div>
@@ -409,8 +409,14 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                             <div class="report-custom-select report-template-select" data-report-select>
                                 <select id="reportType" name="document_type" class="report-native-select"
                                     data-report-select-native>
-                                    <option value="dental_services_report" data-document-type="dental_services_report"
-                                        selected>Dental Services Report</option>
+                                    @forelse (($dentalServiceTemplates ?? collect()) as $index => $template)
+                                        <option value="{{ $template->id }}" data-document-type="{{ $template->document_type }}"
+                                            {{ $index === 0 ? 'selected' : '' }}>
+                                            {{ $template->name }}
+                                        </option>
+                                    @empty
+                                        <option value="" data-document-type="" selected>Select a report type...</option>
+                                    @endforelse
                                 </select>
 
                                 <button type="button" class="report-select-trigger" data-report-select-trigger
@@ -419,18 +425,27 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                                         <span class="report-select-icon">
                                             <i class="fa-solid fa-file-lines"></i>
                                         </span>
-                                        <span data-report-select-label>Dental Services Report</span>
+                                        <span data-report-select-label>Select a report type...</span>
                                     </span>
                                     <i class="fa-solid fa-chevron-down report-select-chevron"></i>
                                 </button>
 
                                 <div class="report-select-menu" data-report-select-menu>
-                                    <button type="button" class="report-select-option is-active"
-                                        data-report-select-option data-value="dental_services_report"
-                                        data-document-type="dental_services_report">
-                                        <span>Dental Services Report</span>
-                                        <i class="fa-solid fa-check"></i>
-                                    </button>
+                                    @forelse (($dentalServiceTemplates ?? collect()) as $index => $template)
+                                        <button type="button" class="report-select-option {{ $index === 0 ? 'is-active' : '' }}"
+                                            data-report-select-option data-value="{{ $template->id }}"
+                                            data-document-type="{{ $template->document_type }}">
+                                            <span>{{ $template->name }}</span>
+                                            <i class="fa-solid fa-check"></i>
+                                        </button>
+                                    @empty
+                                        <button type="button" class="report-select-option is-active"
+                                            data-report-select-option data-value=""
+                                            data-document-type="">
+                                            <span>No available template</span>
+                                            <i class="fa-solid fa-check"></i>
+                                        </button>
+                                    @endforelse
                                 </div>
                             </div>
 
@@ -564,6 +579,8 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
 
 @section('scripts')
 <script>
+    const DENTAL_DOWNLOAD_URL = "{{ route('dentist.dentist.report.dental-services-download') }}";
+    const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || "{{ csrf_token() }}";
     const records = @json($frontendRecords);
     const initialSelectedMonth = @json($selectedMonth);
 
@@ -838,10 +855,10 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
         input.classList.toggle('border-gray-300', !show);
     }
 
-    function downloadDentalServicesReport() {
+    async function downloadDentalServicesReport() {
         const btn = document.getElementById('downloadReportBtn');
         const name = document.getElementById('reportName')?.value.trim() || '';
-        const type = document.getElementById('reportType')?.value || '';
+        const templateId = document.getElementById('reportType')?.value || '';
         const from = document.getElementById('dateFrom')?.value || '';
         const to = document.getElementById('dateTo')?.value || '';
         const qty = parseInt(document.getElementById('reportQty')?.value, 10);
@@ -866,8 +883,8 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
         setDentalModalError('reportName', 'reportNameErr', !name);
         if (!name) valid = false;
 
-        setDentalModalError('reportType', 'reportTypeErr', !type);
-        if (!type) valid = false;
+        setDentalModalError('reportType', 'reportTypeErr', !templateId);
+        if (!templateId) valid = false;
 
         ['dateFromErr', 'dateFutureErr', 'dateRangeErr'].forEach(id => {
             const el = document.getElementById(id);
@@ -914,16 +931,89 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
         }
 
         hideBanner();
-        closeCreateModal();
 
-        if (typeof window.openModal === 'function') {
-            window.openModal('downloadCompleteModal');
-        } else {
-            const completeModal = document.getElementById('downloadCompleteModal');
-            completeModal?.classList.add('open');
-            completeModal?.setAttribute('aria-hidden', 'false');
-            document.documentElement.classList.add('modal-lock');
-            document.body.classList.add('modal-lock');
+        const originalBtnHtml = btn?.innerHTML || '';
+
+        if (btn) {
+            btn.disabled = true;
+            btn.classList.add('opacity-70', 'cursor-not-allowed');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('_token', CSRF_TOKEN);
+            formData.append('report_name', name);
+            formData.append('document_template_id', templateId);
+            formData.append('date_from', from);
+            formData.append('quantity', String(qty));
+
+            if (to) formData.append('date_to', to);
+
+            const response = await fetch(DENTAL_DOWNLOAD_URL, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                    'X-XSRF-TOKEN': CSRF_TOKEN,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/pdf, application/json',
+                },
+                body: formData,
+                credentials: 'same-origin',
+            });
+
+            if (!response.ok) {
+                let message = `Unable to generate the report. Server returned ${response.status}.`;
+                const contentType = response.headers.get('content-type') || '';
+
+                if (contentType.includes('application/json')) {
+                    const errorData = await response.json();
+                    message = errorData.message || message;
+
+                    if (errorData.errors) {
+                        const firstError = Object.values(errorData.errors)[0];
+                        if (Array.isArray(firstError) && firstError.length > 0) message = firstError[0];
+                    }
+                }
+
+                throw new Error(message);
+            }
+
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            let fileName = `${name.replace(/[^A-Za-z0-9_-]/g, '_')}.pdf`;
+            const disposition = response.headers.get('Content-Disposition') || response.headers.get('content-disposition') || '';
+            const fileNameMatch = disposition.match(/filename="?([^"]+)"?/i);
+
+            if (fileNameMatch?.[1]) fileName = fileNameMatch[1];
+
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(downloadUrl);
+
+            closeCreateModal();
+
+            if (typeof window.openModal === 'function') {
+                window.openModal('downloadCompleteModal');
+            } else {
+                const completeModal = document.getElementById('downloadCompleteModal');
+                completeModal?.classList.add('open');
+                completeModal?.setAttribute('aria-hidden', 'false');
+                document.documentElement.classList.add('modal-lock');
+                document.body.classList.add('modal-lock');
+            }
+        } catch (err) {
+            showBanner(err.message || 'Unable to generate the report. Please try again.');
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.classList.remove('opacity-70', 'cursor-not-allowed');
+                btn.innerHTML = originalBtnHtml;
+            }
         }
     }
 
@@ -1234,6 +1324,7 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
             const safeType = escapeDentalText(r.type);
             const safeGender = escapeDentalText(r.gad?.gender);
             const safeDepartment = escapeDentalText(r.department);
+            const signatureUrl = typeof r.signature_url === 'string' ? r.signature_url.trim() : '';
 
             const emergencyMark = r.type === 'Emergency'
                 ? `<span class="check-mark check-gold"><i class="fa-solid fa-check"></i></span>`
@@ -1243,24 +1334,34 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                 ? `<span class="check-mark"><i class="fa-solid fa-check"></i></span>`
                 : '';
 
+            const signatureCell = signatureUrl
+                ? `
+                    <a href="${encodeURI(signatureUrl)}" target="_blank" rel="noopener noreferrer"
+                        class="service-signature-link" aria-label="View patient signature">
+                        <img src="${encodeURI(signatureUrl)}" alt="Patient signature"
+                            class="service-signature-image">
+                    </a>
+                `
+                : '<span class="service-signature-empty">No signature</span>';
+
             tbody.innerHTML += `
             <tr>
                 <td class="muted-cell whitespace-nowrap">${safeDate}</td>
                 <td class="whitespace-nowrap text-[11px]">${safeTimeIn}</td>
-                <td class="name-cell">${safeName}</td>
-                <td>${safeProgram}</td>
+                <td><div class="name-cell">${safeName}</div></td>
+                <td><div class="program-cell">${safeProgram}</div></td>
                 <td>${escapeDentalText(r.age)}</td>
                 <td>${r.gad?.gender === 'Male' ? '<span class="check-mark"><i class="fa-solid fa-check"></i></span>' : ''}</td>
                 <td>${r.gad?.gender === 'Female' ? '<span class="check-mark"><i class="fa-solid fa-check"></i></span>' : ''}</td>
                 <td>${(r.gad?.priority || []).includes('Senior') ? '<span class="check-mark check-gold"><i class="fa-solid fa-check"></i></span>' : ''}</td>
                 <td>${(r.gad?.priority || []).includes('PWD') ? '<span class="check-mark check-gold"><i class="fa-solid fa-check"></i></span>' : ''}</td>
-                <td class="muted-cell">${safeEmail}</td>
-                <td class="text-[11px]">${safeContact}</td>
+                <td class="muted-cell"><div class="email-cell">${safeEmail}</div></td>
+                <td class="text-[11px]"><div class="contact-cell">${safeContact}</div></td>
                 <td class="whitespace-nowrap text-[11px]">${safeTimeOut}</td>
                 <td class="text-[11px]">${safeDuration}</td>
                 <td>${emergencyMark}</td>
                 <td>${nonEmergencyMark}</td>
-                <td>${r.has_signature ? '<span class="check-mark"><i class="fa-solid fa-check"></i></span>' : ''}</td>
+                <td>${signatureCell}</td>
             </tr>
         `;
 

@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Support\BrowserDetection;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\ConcurrentSessionService;
+use Illuminate\Http\Request;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
@@ -94,6 +96,51 @@ class ConcurrentSessionFeatureTest extends TestCase
         $this->assertDatabaseMissing('sessions', ['id' => 'dentist-session-2']);
     }
 
+    public function test_session_display_prefers_stored_browser_name_when_available(): void
+    {
+        $patient = $this->makeUser('brave-user@example.com', 'patient');
+
+        $this->insertSession(
+            'brave-session',
+            $patient->id,
+            now()->subMinute()->timestamp,
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36',
+            'Brave'
+        );
+
+        $session = app(ConcurrentSessionService::class)
+            ->sessionsForDisplay($patient, 'brave-session')
+            ->first();
+
+        $this->assertSame('Brave', $session['browser_label']);
+    }
+
+    public function test_browser_detection_prefers_explicit_browser_hint(): void
+    {
+        $request = Request::create('/auth/oidc/redirect', 'GET', [
+            'browser_name' => 'Brave',
+        ], [], [], [
+            'HTTP_USER_AGENT' => 'Mozilla/5.0 Chrome/138.0.0.0 Safari/537.36',
+        ]);
+
+        $request->setLaravelSession(new class {
+            public function get($key, $default = null)
+            {
+                return $default;
+            }
+        });
+
+        $this->assertSame('Brave', BrowserDetection::detectFromRequest($request));
+    }
+
+    public function test_browser_detection_identifies_brave_from_client_hints(): void
+    {
+        $this->assertSame(
+            'Brave',
+            BrowserDetection::detectFromClientHints('"Brave";v="138", "Chromium";v="138", "Not=A?Brand";v="99"')
+        );
+    }
+
     private function makeUser(string $email, string $roleSlug): User
     {
         $role = Role::firstOrCreate(
@@ -110,13 +157,20 @@ class ConcurrentSessionFeatureTest extends TestCase
         ]);
     }
 
-    private function insertSession(string $id, int $userId, int $lastActivity): void
+    private function insertSession(
+        string $id,
+        int $userId,
+        int $lastActivity,
+        string $userAgent = 'PHPUnit',
+        ?string $browserName = null
+    ): void
     {
         DB::table('sessions')->insert([
             'id' => $id,
             'user_id' => $userId,
             'ip_address' => '127.0.0.1',
-            'user_agent' => 'PHPUnit',
+            'user_agent' => $userAgent,
+            'browser_name' => $browserName,
             'payload' => base64_encode('payload'),
             'last_activity' => $lastActivity,
         ]);

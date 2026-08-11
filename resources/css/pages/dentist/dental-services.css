@@ -1,9 +1,144 @@
 .dental-services-page {
-    --service-table-min: 1220px;
+    --service-table-min: 2240px;
 }
 
 .dental-services-page .service-dental-table {
-    min-width: var(--service-table-min);
+    min-width: var(--service-table-min) !important;
+    width: max-content !important;
+    table-layout: auto !important;
+}
+
+.dental-services-page .service-dental-table th,
+.dental-services-page .service-dental-table td {
+    text-align: center !important;
+    vertical-align: middle;
+}
+
+.dental-services-page .service-dental-table th {
+    white-space: nowrap !important;
+}
+
+.dental-services-page .service-dental-table td > div,
+.dental-services-page .service-dental-table td > span,
+.dental-services-page .service-dental-table td > p {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    text-align: center !important;
+}
+
+.dental-services-page .service-dental-table th:nth-child(1),
+.dental-services-page .service-dental-table td:nth-child(1) {
+    min-width: 88px;
+}
+
+.dental-services-page .service-dental-table th:nth-child(2),
+.dental-services-page .service-dental-table td:nth-child(2) {
+    min-width: 86px;
+}
+
+.dental-services-page .service-dental-table th:nth-child(3),
+.dental-services-page .service-dental-table td:nth-child(3) {
+    min-width: 260px;
+}
+
+.dental-services-page .service-dental-table .name-cell {
+    min-width: 0 !important;
+    max-width: 260px !important;
+    width: 260px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+}
+
+.dental-services-page .service-dental-table th:nth-child(4),
+.dental-services-page .service-dental-table td:nth-child(4) {
+    min-width: 150px;
+}
+
+.dental-services-page .service-dental-table .program-cell,
+.dental-services-page .service-dental-table .email-cell,
+.dental-services-page .service-dental-table .contact-cell {
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+}
+
+.dental-services-page .service-dental-table .program-cell {
+    max-width: 150px !important;
+    width: 150px !important;
+}
+
+.dental-services-page .service-dental-table th:nth-child(5),
+.dental-services-page .service-dental-table td:nth-child(5) {
+    min-width: 52px;
+    padding-left: 10px;
+    padding-right: 10px;
+    text-align: center;
+}
+
+.dental-services-page .service-dental-table th:nth-child(6),
+.dental-services-page .service-dental-table td:nth-child(6),
+.dental-services-page .service-dental-table th:nth-child(7),
+.dental-services-page .service-dental-table td:nth-child(7),
+.dental-services-page .service-dental-table th:nth-child(8),
+.dental-services-page .service-dental-table td:nth-child(8),
+.dental-services-page .service-dental-table th:nth-child(9),
+.dental-services-page .service-dental-table td:nth-child(9) {
+    min-width: 32px;
+    padding-left: 6px;
+    padding-right: 6px;
+    text-align: center;
+}
+
+.dental-services-page .service-dental-table th:nth-child(10),
+.dental-services-page .service-dental-table td:nth-child(10) {
+    min-width: 260px;
+}
+
+.dental-services-page .service-dental-table th:nth-child(11),
+.dental-services-page .service-dental-table td:nth-child(11) {
+    min-width: 124px;
+}
+
+.dental-services-page .service-dental-table .email-cell {
+    max-width: 260px !important;
+    width: 260px !important;
+}
+
+.dental-services-page .service-dental-table .contact-cell {
+    max-width: 124px !important;
+    width: 124px !important;
+}
+
+.dental-services-page .service-dental-table th:nth-child(12),
+.dental-services-page .service-dental-table td:nth-child(12) {
+    min-width: 98px;
+}
+
+.dental-services-page .service-dental-table th:nth-child(13),
+.dental-services-page .service-dental-table td:nth-child(13) {
+    min-width: 92px;
+}
+
+.dental-services-page .service-dental-table th:nth-child(14),
+.dental-services-page .service-dental-table td:nth-child(14) {
+    min-width: 92px;
+    text-align: center;
+}
+
+.dental-services-page .service-dental-table th:nth-child(15),
+.dental-services-page .service-dental-table td:nth-child(15) {
+    min-width: 138px;
+    text-align: center;
+}
+
+.dental-services-page .service-dental-table th:nth-child(16),
+.dental-services-page .service-dental-table td:nth-child(16) {
+    min-width: 84px;
+    text-align: center;
 }
 
 .dental-services-page .service-records-card {
@@ -44,6 +179,46 @@
     background: #ffffff;
 }
 
+.dental-services-page .service-signature-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 108px;
+    max-width: 100%;
+    min-height: 40px;
+    padding: 4px 6px;
+    border-radius: 12px;
+    border: 1px solid rgba(16, 185, 129, 0.26);
+    background: linear-gradient(135deg, rgba(236, 253, 245, 0.95), rgba(209, 250, 229, 0.78));
+    box-shadow: 0 8px 18px rgba(16, 185, 129, 0.12);
+}
+
+.dental-services-page .service-signature-image {
+    display: block;
+    width: 96px;
+    max-width: 100%;
+    height: 28px;
+    object-fit: contain;
+    mix-blend-mode: multiply;
+}
+
+.dental-services-page .service-signature-empty {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 98px;
+    min-height: 36px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(203, 213, 225, 0.95);
+    background: #F8FAFC;
+    color: #94A3B8;
+    font-size: 0.72rem;
+    font-weight: 900;
+    line-height: 1;
+    white-space: nowrap;
+}
+
 [data-theme="dark"] .dental-services-page .name-cell,
 .dark .dental-services-page .name-cell {
     color: #F8FAFC !important;
@@ -52,6 +227,26 @@
 [data-theme="dark"] .dental-services-page .muted-cell,
 .dark .dental-services-page .muted-cell {
     color: #C9D1D9 !important;
+}
+
+[data-theme="dark"] .dental-services-page .service-signature-link,
+.dark .dental-services-page .service-signature-link {
+    border-color: rgba(52, 211, 153, 0.28);
+    background: linear-gradient(135deg, rgba(6, 78, 59, 0.92), rgba(20, 83, 45, 0.84));
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+}
+
+[data-theme="dark"] .dental-services-page .service-signature-image,
+.dark .dental-services-page .service-signature-image {
+    filter: brightness(0) invert(1);
+    mix-blend-mode: screen;
+}
+
+[data-theme="dark"] .dental-services-page .service-signature-empty,
+.dark .dental-services-page .service-signature-empty {
+    background: #111827;
+    border-color: #334155;
+    color: #94A3B8;
 }
 
 .service-record-grid {

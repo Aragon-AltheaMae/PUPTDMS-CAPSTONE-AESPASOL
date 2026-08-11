@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Dentist;
 
 use App\Http\Controllers\Controller;
-use App\Models\DentalServiceRecord;
+use App\Models\Appointment;
+use App\Models\DocumentTemplate;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -13,19 +14,24 @@ class DentalServicesRecordController extends Controller
     {
         $selectedMonth = $this->resolveSelectedMonth($request->input('month'));
 
-        $records = DentalServiceRecord::query()
-            ->latest('time_in')
-            ->get()
-            ->map(fn(DentalServiceRecord $record) => $this->toFrontendRow($record))
+        $records = $this->recordsForMonth($selectedMonth)
+            ->map(fn(Appointment $appointment) => $this->toFrontendRow($appointment))
             ->values();
+
+        $dentalServiceTemplates = DocumentTemplate::query()
+            ->active()
+            ->where('document_type', 'dental_services')
+            ->orderBy('name')
+            ->get();
 
         $notifications = [];
 
-        return view('dentist.dental-services', compact(
-            'records',
-            'selectedMonth',
-            'notifications'
-        ));
+        return view('dentist.dental-services', [
+            'records' => $records,
+            'selectedMonth' => $selectedMonth,
+            'notifications' => $notifications,
+            'dentalServiceTemplates' => $dentalServiceTemplates,
+        ]);
     }
 
     public function data(Request $request)
@@ -33,7 +39,7 @@ class DentalServicesRecordController extends Controller
         $selectedMonth = $this->resolveSelectedMonth($request->input('month'));
 
         $records = $this->recordsForMonth($selectedMonth)
-            ->map(fn(DentalServiceRecord $record) => $this->toFrontendRow($record))
+            ->map(fn(Appointment $appointment) => $this->toFrontendRow($appointment))
             ->values();
 
         return response()->json([
@@ -56,59 +62,149 @@ class DentalServicesRecordController extends Controller
         $start = Carbon::createFromFormat('Y-m', $selectedMonth)->startOfMonth();
         $end = $start->copy()->endOfMonth();
 
-        return DentalServiceRecord::query()
-            ->whereBetween('time_in', [$start, $end])
-            ->latest('time_in')
+        return Appointment::query()
+            ->with([
+                'patient.medicalHistory',
+                'procedure',
+            ])
+            ->where('status', 'completed')
+            ->whereDate('appointment_date', '>=', $start->toDateString())
+            ->whereDate('appointment_date', '<=', $end->toDateString())
+            ->whereHas('patient')
+            ->orderBy('appointment_date')
+            ->orderBy('appointment_time')
             ->get();
     }
 
-    private function toFrontendRow(DentalServiceRecord $record): array
+    private function toFrontendRow(Appointment $appointment): array
     {
-        $middleInitial = $record->patient_middle_name
-            ? strtoupper(substr($record->patient_middle_name, 0, 1)) . '.'
-            : '';
+        $patient = $appointment->patient;
+        $procedure = $appointment->procedure;
+        $gender = strtolower(trim((string) ($patient->gender ?? $patient->user?->gender ?? '')));
+        $isMale = str_starts_with($gender, 'm');
+        $isFemale = str_starts_with($gender, 'f');
+        $visitType = strtolower(trim((string) ($appointment->visit_type ?? $appointment->concern ?? '')));
 
-        $name = trim("{$record->patient_last_name}, {$record->patient_first_name} {$middleInitial}");
+        $programDisplay = trim((string) ($patient->course_code ?? ''));
 
-        $programDisplay = $record->department === 'Student'
-            ? trim(
-                ($record->program_code ?? '') .
-                    ($record->year_level ? ' ' . $record->year_level : '') .
-                    ($record->section ? "-{$record->section}" : '')
-            )
-            : ($record->department ?? '');
-
-        $priority = array_values(array_filter([
-            $record->is_pwd ? 'PWD' : null,
-            $record->is_senior ? 'Senior' : null,
-        ]));
-
-        $duration = '';
-
-        if ($record->time_in && $record->time_out) {
-            $duration = $record->time_in->diffInMinutes($record->time_out) . ' mins';
+        if ($programDisplay === '') {
+            $programDisplay = trim((string) ($patient->course_name ?? ''));
         }
 
+        if ($programDisplay !== '' && !empty($patient->year_level)) {
+            $programDisplay .= ' - Y' . $patient->year_level;
+        }
+
+        if ($programDisplay !== '' && !empty($patient->section)) {
+            $programDisplay .= ' / ' . $patient->section;
+        }
+
+        if ($programDisplay === '') {
+            $programDisplay = trim((string) ($patient->faculty_code ?? ''));
+        }
+
+        $programDisplay = $programDisplay !== '' ? $programDisplay : '—';
+
+        $priority = array_values(array_filter([
+            ($patient->is_pwd ?? false) ? 'PWD' : null,
+            ($patient->is_senior ?? false) ? 'Senior' : null,
+        ]));
+
+        $timeIn = $appointment->appointment_time
+            ? Carbon::parse($appointment->appointment_time)->format('h:i A')
+            : '';
+
+        $timeOut = $procedure?->procedure_completed_at
+            ? Carbon::parse($procedure->procedure_completed_at)->format('h:i A')
+            : '';
+
+        $durationMinutes = (int) ($procedure?->procedure_duration_seconds ?? 0);
+        $duration = $durationMinutes > 0
+            ? (string) (int) ceil($durationMinutes / 60) . ' mins'
+            : '';
+
         return [
-            'id' => $record->id,
-            'date' => optional($record->time_in)->format('m/d/y') ?? '',
-            'dateKey' => optional($record->time_in)->format('Y-m-d') ?? '',
-            'monthKey' => optional($record->time_in)->format('Y-m') ?? '',
-            'timeIn' => optional($record->time_in)->format('h:i A') ?? '',
-            'name' => $name,
+            'id' => $appointment->id,
+            'date' => $appointment->appointment_date
+                ? Carbon::parse($appointment->appointment_date)->format('m/d/y')
+                : '',
+            'dateKey' => $appointment->appointment_date
+                ? Carbon::parse($appointment->appointment_date)->format('Y-m-d')
+                : '',
+            'monthKey' => $appointment->appointment_date
+                ? Carbon::parse($appointment->appointment_date)->format('Y-m')
+                : '',
+            'timeIn' => $timeIn,
+            'name' => $this->formatPatientNameSurnameFirst($patient?->name),
             'program' => $programDisplay,
-            'age' => $record->age,
+            'age' => $this->patientAge($patient?->birthdate ?? $patient?->user?->birthdate),
             'gad' => [
-                'gender' => $record->gender,
+                'gender' => $isMale ? 'Male' : ($isFemale ? 'Female' : trim((string) ($patient->gender ?? ''))),
                 'priority' => $priority,
             ],
-            'email' => $record->email,
-            'contact' => $record->contact,
-            'timeOut' => $record->time_out ? $record->time_out->format('h:i A') : '',
+            'email' => trim((string) ($patient->email ?? '')),
+            'contact' => trim((string) ($patient->phone ?? '')),
+            'timeOut' => $timeOut,
             'duration' => $duration,
-            'type' => $record->visit_type,
-            'department' => $record->department,
-            'has_signature' => (bool) $record->has_signature,
+            'type' => str_contains($visitType, 'emergency') ? 'Emergency' : 'Non-Emergency',
+            'department' => $this->departmentLabel($patient),
+            'has_signature' => filled($patient?->medicalHistory?->patient_signature),
+            'signature_url' => filled($patient?->medicalHistory?->patient_signature)
+                ? asset('storage/' . ltrim((string) $patient->medicalHistory->patient_signature, '/'))
+                : null,
         ];
+    }
+
+    private function formatPatientNameSurnameFirst(?string $fullName): string
+    {
+        $fullName = trim((string) $fullName);
+
+        if ($fullName === '') {
+            return 'Unknown Patient';
+        }
+
+        $parts = preg_split('/\s+/', $fullName) ?: [];
+        $parts = array_values(array_filter($parts, fn($part) => trim((string) $part) !== ''));
+
+        if (count($parts) === 1) {
+            return $parts[0];
+        }
+
+        $surname = array_pop($parts);
+        $firstName = array_shift($parts) ?? '';
+        $remainingNames = trim(implode(' ', $parts));
+        $givenNames = trim($firstName . ' ' . $remainingNames);
+
+        return trim($surname . ', ' . $givenNames);
+    }
+
+    private function patientAge($birthdate): string
+    {
+        if (empty($birthdate)) {
+            return '';
+        }
+
+        try {
+            return (string) Carbon::parse($birthdate)->age;
+        } catch (\Throwable $e) {
+            return '';
+        }
+    }
+
+    private function departmentLabel($patient): string
+    {
+        if (!$patient) {
+            return '';
+        }
+
+        if (filled($patient->course_code) || filled($patient->course_name)) {
+            return 'Student';
+        }
+
+        if (filled($patient->faculty_code)) {
+            return 'Faculty';
+        }
+
+        return 'Administrative';
     }
 }

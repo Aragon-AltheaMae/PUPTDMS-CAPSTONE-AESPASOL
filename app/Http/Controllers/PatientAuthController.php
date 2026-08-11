@@ -74,6 +74,8 @@ class PatientAuthController extends Controller
 
     public function login(Request $request)
     {
+        $this->concurrentSessionService->rememberBrowserHint($request);
+
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required|string',
@@ -122,6 +124,7 @@ class PatientAuthController extends Controller
             'patient_id' => $patient->id,
             'role' => 'patient',
         ]);
+        $this->concurrentSessionService->syncCurrentSessionMetadata($request);
 
         $sessionResult = $this->concurrentSessionService->enforceLimitForCurrentSession(
             $user,

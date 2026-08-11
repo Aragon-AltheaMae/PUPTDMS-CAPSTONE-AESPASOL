@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Dentist\DentistReportController;
 use App\Models\DocumentRequest;
 use App\Notifications\DocumentRequestApprovedNotification;
 use App\Notifications\DocumentRequestRejectedNotification;
@@ -163,14 +164,18 @@ class DocumentRequestController extends Controller
     public function approve($id)
     {
         try {
-            $documentRequest = DocumentRequest::with('patient.user')->findOrFail($id);
+            $documentRequest = DB::transaction(function () use ($id) {
+                $requestItem = DocumentRequest::with('patient.user')->findOrFail($id);
 
-            $documentRequest->update([
-                'status' => 'approved',
-            ]);
+                $requestItem->update([
+                    'status' => 'approved',
+                    'approved_at' => now(),
+                    'approved_by' => auth()->id(),
+                    'rejection_reason' => null,
+                ]);
 
-            $documentRequest->refresh();
-            $documentRequest->loadMissing('patient.user');
+                return $requestItem->fresh(['patient.user', 'approvedBy']);
+            });
 
             if ($documentRequest->patient?->user) {
                 $documentRequest->patient->user->notify(
@@ -183,13 +188,8 @@ class DocumentRequestController extends Controller
                 ]);
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Document request approved successfully.',
-                'status' => 'approved',
-                'request' => $this->formatRequestPayload($documentRequest),
-                'stats' => $this->getDocumentRequestStats(),
-            ]);
+            return app(DentistReportController::class)
+                ->buildApprovedDocumentRequestPdfResponse($documentRequest);
         } catch (\Throwable $e) {
             Log::error('Document request approval failed.', [
                 'document_request_id' => $id,
