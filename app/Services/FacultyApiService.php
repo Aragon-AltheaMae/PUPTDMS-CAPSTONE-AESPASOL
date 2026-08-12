@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Models\AcademicPeriod;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 class FacultyApiService
 {
@@ -300,6 +301,18 @@ class FacultyApiService
         );
 
         $status = $this->cleanValue(data_get($faculty, 'status'));
+        $birthday = $this->normalizeDateValue(
+            data_get($faculty, 'profile.birthday')
+                ?? data_get($faculty, 'profile.birthdate')
+                ?? data_get($faculty, 'profile.date_of_birth')
+                ?? data_get($faculty, 'profile.dateOfBirth')
+                ?? data_get($faculty, 'birthday')
+                ?? data_get($faculty, 'birthdate')
+                ?? data_get($faculty, 'date_of_birth')
+                ?? data_get($faculty, 'dateOfBirth')
+                ?? data_get($faculty, 'birth_date')
+        );
+        $age = $birthday !== null ? $this->calculateAgeFromBirthday($birthday) : null;
 
         if ($name === '' && $email === '' && $facultyCode === '' && $facultyId === null) {
             return null;
@@ -319,11 +332,15 @@ class FacultyApiService
             'email' => $email !== '' ? strtolower($email) : null,
             'contact_number' => $contactNumber !== '' ? $contactNumber : null,
             'status' => $status !== '' ? $status : null,
+            'birthday' => $birthday,
+            'birthdate' => $birthday,
+            'date_of_birth' => $birthday,
+            'age' => $age,
             'profile' => [
-                'birthday' => data_get($faculty, 'profile.birthday')
-                    ?? data_get($faculty, 'profile.birthdate')
-                    ?? data_get($faculty, 'birthday')
-                    ?? data_get($faculty, 'birthdate'),
+                'birthday' => $birthday,
+                'birthdate' => $birthday,
+                'date_of_birth' => $birthday,
+                'age' => $age,
                 'gender' => $this->cleanValue(
                     data_get($faculty, 'profile.gender')
                         ?? data_get($faculty, 'gender')
@@ -347,6 +364,49 @@ class FacultyApiService
         }
 
         return '';
+    }
+
+    private function normalizeDateValue(mixed $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if ($value instanceof Carbon) {
+            return $value->toDateString();
+        }
+
+        if (is_string($value) || is_numeric($value)) {
+            $trimmed = trim((string) $value);
+
+            if ($trimmed === '') {
+                return null;
+            }
+
+            try {
+                return Carbon::parse($trimmed)->toDateString();
+            } catch (\Throwable $e) {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    private function calculateAgeFromBirthday(string $birthday): ?int
+    {
+        try {
+            $birthDate = Carbon::parse($birthday)->startOfDay();
+            $today = Carbon::today();
+
+            if ($birthDate->greaterThan($today)) {
+                return null;
+            }
+
+            return $birthDate->diffInYears($today);
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     public function syncActiveAcademicYearSemester(): AcademicPeriod

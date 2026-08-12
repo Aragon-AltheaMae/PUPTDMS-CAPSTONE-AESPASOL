@@ -136,10 +136,19 @@ isset($upcomingAppointment) && $upcomingAppointment
 
 $birthdate = optional($patient)->birthdate ?: optional(optional($patient)->user)->birthdate;
 $gender = optional($patient)->gender ?: optional(optional($patient)->user)->gender;
-$age = $birthdate ? \Carbon\Carbon::parse($birthdate)->age : null;
-$birthdateDisplay = $birthdate
-? \Carbon\Carbon::parse($birthdate)->format('M d, Y')
-: 'N/A';
+$age = null;
+$birthdateDisplay = 'N/A';
+
+if ($birthdate) {
+    try {
+        $birthdateCarbon = \Carbon\Carbon::parse($birthdate);
+        $age = $birthdateCarbon->age;
+        $birthdateDisplay = $birthdateCarbon->format('M d, Y');
+    } catch (\Throwable $e) {
+        $age = null;
+        $birthdateDisplay = 'N/A';
+    }
+}
 @endphp
 
 <main id="mainContent" class="patient-page-shell patient-dashboard-page page-enter">
@@ -559,7 +568,13 @@ $birthdateDisplay = $birthdate
         ];
     }
 
-    $profileRows = [['Date of Birth', isset($patient -> birthdate) ?\Carbon\Carbon:: parse($patient -> birthdate) -> format('F d, Y') : '—'], ['Age', $patient -> age ?? '—'], ['Gender', $patient -> gender ?? '—'], ['Contact', $patient -> phone ?? '—'], ['Email', $patient -> email ?? '—']];
+    $profileRows = [
+        ['Date of Birth', $birthdateDisplay !== 'N/A' ? \Carbon\Carbon::parse($birthdate)->format('F d, Y') : '—'],
+        ['Age', $age !== null ? $age . ' yrs' : '—'],
+        ['Gender', $gender ?? '—'],
+        ['Contact', $patient->phone ?? '—'],
+        ['Email', $patient->email ?? '—'],
+    ];
     @endphp
 
     var UPCOMING_DATA = @json($upcomingJs);
