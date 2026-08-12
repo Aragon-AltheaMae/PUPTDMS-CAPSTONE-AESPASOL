@@ -8,6 +8,7 @@ import './empty-state';
 import './voice-logic';
 import './booking-workflow';
 import './booking-signature';
+import './filter-select';
 
 import '@fontsource/inter/300.css';
 import '@fontsource/inter/400.css';
@@ -4166,9 +4167,17 @@ function getFormInputValidationMessage(field) {
     }
 
     if (type === 'checkbox') {
-        return field.required && !field.checked
-            ? `Please check ${label.toLowerCase()}.`
-            : '';
+        if (
+            field.required &&
+            !field.checked
+        ) {
+            return (
+                field.dataset.requiredMessage ||
+                `Please check ${label.toLowerCase()}.`
+            );
+        }
+
+        return '';
     }
 
     if (field.required && !value) {
@@ -4816,6 +4825,36 @@ function focusGlobalInvalidField(
 window.focusGlobalInvalidField =
     focusGlobalInvalidField;
 
+function normalizeGlobalPhilippineMobile(
+    field
+) {
+    if (
+        !field ||
+        field.dataset.validationRule !==
+        'philippineMobile'
+    ) {
+        return;
+    }
+
+    const normalized =
+        String(
+            field.value || ''
+        )
+            .replace(/\D/g, '')
+            .slice(0, 11);
+
+    if (
+        field.value !==
+        normalized
+    ) {
+        field.value =
+            normalized;
+    }
+}
+
+window.normalizeGlobalPhilippineMobile =
+    normalizeGlobalPhilippineMobile;
+
 function bindFormInputValidation(root = document) {
     const scope =
         root && typeof root.querySelectorAll === 'function'
@@ -4836,15 +4875,33 @@ function bindFormInputValidation(root = document) {
             form.setAttribute('novalidate', '');
 
             const validateEventField = event => {
-                const field = event.target;
+                const field =
+                    event.target;
 
                 if (
-                    field instanceof HTMLInputElement ||
-                    field instanceof HTMLTextAreaElement ||
-                    field instanceof HTMLSelectElement
+                    !(
+                        field instanceof
+                        HTMLInputElement
+                    ) &&
+                    !(
+                        field instanceof
+                        HTMLTextAreaElement
+                    ) &&
+                    !(
+                        field instanceof
+                        HTMLSelectElement
+                    )
                 ) {
-                    validateFormInputField(field);
+                    return;
                 }
+
+                normalizeGlobalPhilippineMobile(
+                    field
+                );
+
+                validateFormInputField(
+                    field
+                );
             };
 
             form.addEventListener('input', validateEventField);
@@ -5680,21 +5737,63 @@ function initGlobalRefreshWatcher(config = {}) {
             }
         },
 
-        apply() {
-            if (!pendingPayload) return;
-
-            if (typeof config.onRefresh === 'function') {
-                config.onRefresh(pendingPayload);
+        async apply() {
+            if (!pendingPayload) {
+                return;
             }
 
-            this.sync(pendingPayload);
+            const payload =
+                pendingPayload;
 
-            if (config.toast !== false && typeof window.showToast === 'function') {
-                window.showToast({
-                    type: config.toast?.type || 'info',
-                    title: config.toast?.title || 'Updated',
-                    message: config.toast?.message || 'Latest records are now shown.',
-                    duration: config.toast?.duration || 3500
+            try {
+                if (
+                    typeof config.onRefresh ===
+                    'function'
+                ) {
+                    await config.onRefresh(
+                        payload
+                    );
+                }
+
+                this.sync(
+                    payload
+                );
+
+                if (
+                    config.toast !== false &&
+                    typeof window.showToast ===
+                    'function'
+                ) {
+                    window.showToast({
+                        type:
+                            config.toast?.type ||
+                            'info',
+
+                        title:
+                            config.toast?.title ||
+                            'Updated',
+
+                        message:
+                            config.toast?.message ||
+                            'Latest records are now shown.',
+
+                        duration:
+                            config.toast?.duration ||
+                            3500
+                    });
+                }
+
+            } catch (error) {
+                console.error(
+                    `${key} refresh failed:`,
+                    error
+                );
+
+                window.showToast?.({
+                    type: 'error',
+                    title: 'Refresh failed',
+                    message:
+                        'Unable to load the latest records.'
                 });
             }
         },

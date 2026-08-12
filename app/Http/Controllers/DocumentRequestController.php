@@ -206,15 +206,23 @@ class DocumentRequestController extends Controller
             ->get()
             : collect();
 
+        $refreshItems = DocumentRequest::query()
+            ->select('id')
+            ->orderByDesc('id')
+            ->get()
+            ->map(fn($item) => [
+                'id' => $item->id,
+            ])
+            ->values();
+
         return view(
             'shared.document-requests',
             [
                 'role' => 'dentist',
-
                 'requests' => $requests,
                 'stats' => $stats,
                 'notifications' => $notifications,
-
+                'refreshItems' => $refreshItems,
                 'search' => $search,
                 'status' => $status,
                 'type' => $type,

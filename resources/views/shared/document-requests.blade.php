@@ -97,6 +97,37 @@ $docRequestStats = [
 'rejected' => $statsSource['rejected'] ?? $countByStatus('rejected'),
 ];
 
+$docRequestStatusOptions = [
+[
+'value' => 'all',
+'label' => 'All Requests',
+'icon' => 'fa-layer-group',
+'tone' => 'status-all',
+'count' => $docRequestStats['all'] ?? 0,
+],
+[
+'value' => 'pending',
+'label' => 'Pending',
+'icon' => 'fa-clock-rotate-left',
+'tone' => 'status-pending',
+'count' => $docRequestStats['pending'] ?? 0,
+],
+[
+'value' => 'approved',
+'label' => 'Approved',
+'icon' => 'fa-file-circle-check',
+'tone' => 'status-approved',
+'count' => $docRequestStats['approved'] ?? 0,
+],
+[
+'value' => 'rejected',
+'label' => 'Rejected',
+'icon' => 'fa-file-circle-xmark',
+'tone' => 'status-rejected',
+'count' => $docRequestStats['rejected'] ?? 0,
+],
+];
+
 $requestableDocumentTypes = collect([
 'Dental Clearance',
 'Annual Dental Clearance',
@@ -179,7 +210,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
 
         <div class="table-card docreq-table-card">
 
-            <div class="px-4 md:px-6 py-3.5 border-b border-gray-100 bg-[#FAFAFA]/50">
+            <div class="docreq-toolbar-layer px-4 md:px-6 py-3.5 border-b border-gray-100 bg-[#FAFAFA]/50">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
 
                     <div class="order-2 md:order-1">
@@ -200,91 +231,9 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                                 label="Use voice search" title="Voice search" />
                         </div>
 
-                        <div id="docreqStatusSelect"
-                            class="docreq-custom-select docreq-status-dropdown docreq-sort-dropdown docreq-toolbar-sort"
-                            data-status-filter="all">
-
-                            <button type="button" class="docreq-sort-trigger" id="docreqStatusDropdownBtn"
-                                data-select-button aria-expanded="false" aria-haspopup="true"
-                                aria-controls="docreqStatusMenu" onclick="toggleDocreqDropdown('docreqStatusSelect')">
-
-                                <span class="docreq-sort-trigger-left">
-                                    <span class="docreq-sort-icon status-all" id="docreqStatusSelectedIcon">
-                                        <i class="fa-solid fa-file-medical"></i>
-                                    </span>
-
-                                    <span class="docreq-sort-copy">
-                                        <span class="docreq-sort-label">Sort By</span>
-                                        <strong class="docreq-sort-value" id="statusDropdownLabel">All Requests</strong>
-                                    </span>
-                                </span>
-
-                                <span class="docreq-sort-trigger-right">
-                                    <span id="statusDropdownCount" class="docreq-sort-count">
-                                        {{ $docRequestStats['all'] ?? 0 }}
-                                    </span>
-                                    <i class="fa-solid fa-chevron-down docreq-sort-chevron"></i>
-                                </span>
-                            </button>
-
-                            <input type="hidden" id="docreqStatusFilter" value="all">
-
-                            <div class="docreq-sort-panel" id="docreqStatusMenu" role="listbox">
-                                <div class="docreq-sort-grid">
-                                    <button type="button" class="docreq-sort-option is-active status-all"
-                                        data-value="all" data-label="All Requests" data-icon="fa-file-medical"
-                                        data-count="{{ $docRequestStats['all'] ?? 0 }}"
-                                        onclick="selectStatusFilter('all')">
-                                        <span class="docreq-option-icon status-all">
-                                            <i class="fa-solid fa-file-medical"></i>
-                                        </span>
-                                        <span class="docreq-option-label">All Requests</span>
-                                        <span class="docreq-sort-option-count docreq-option-count" id="statAll">
-                                            {{ $docRequestStats['all'] ?? 0 }}
-                                        </span>
-                                    </button>
-
-                                    <button type="button" class="docreq-sort-option status-pending" data-value="pending"
-                                        data-label="Pending" data-icon="fa-clock-rotate-left"
-                                        data-count="{{ $docRequestStats['pending'] ?? 0 }}"
-                                        onclick="selectStatusFilter('pending')">
-                                        <span class="docreq-option-icon status-pending">
-                                            <i class="fa-solid fa-clock-rotate-left"></i>
-                                        </span>
-                                        <span class="docreq-option-label">Pending</span>
-                                        <span class="docreq-sort-option-count docreq-option-count" id="statPending">
-                                            {{ $docRequestStats['pending'] ?? 0 }}
-                                        </span>
-                                    </button>
-
-                                    <button type="button" class="docreq-sort-option status-approved"
-                                        data-value="approved" data-label="Approved" data-icon="fa-file-circle-check"
-                                        data-count="{{ $docRequestStats['approved'] ?? 0 }}"
-                                        onclick="selectStatusFilter('approved')">
-                                        <span class="docreq-option-icon status-approved">
-                                            <i class="fa-solid fa-file-circle-check"></i>
-                                        </span>
-                                        <span class="docreq-option-label">Approved</span>
-                                        <span class="docreq-sort-option-count docreq-option-count" id="statApproved">
-                                            {{ $docRequestStats['approved'] ?? 0 }}
-                                        </span>
-                                    </button>
-
-                                    <button type="button" class="docreq-sort-option status-rejected"
-                                        data-value="rejected" data-label="Rejected" data-icon="fa-file-circle-xmark"
-                                        data-count="{{ $docRequestStats['rejected'] ?? 0 }}"
-                                        onclick="selectStatusFilter('rejected')">
-                                        <span class="docreq-option-icon status-rejected">
-                                            <i class="fa-solid fa-file-circle-xmark"></i>
-                                        </span>
-                                        <span class="docreq-option-label">Rejected</span>
-                                        <span class="docreq-sort-option-count docreq-option-count" id="statRejected">
-                                            {{ $docRequestStats['rejected'] ?? 0 }}
-                                        </span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        <x-filter-select id="docreqStatusFilter" name="document_request_status" label="Status"
+                            value="all" :options="$docRequestStatusOptions"
+                            callback="handleDocumentRequestStatusSelect" />
 
                         <button id="filterBtn" type="button" onclick="openFilterModal()" class="global-filter-btn">
                             <i class="fa-solid fa-sliders"></i>
@@ -674,8 +623,8 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                     </div>
 
                     <div class="global-textarea-tools">
-                        <x-voice-input target="#searchInput" status-id="patientSearchVoiceStatus"
-                            label="Use voice search" title="Voice search" />
+                        <x-voice-input target="#rejectNotes" status-id="rejectNotesVoiceStatus"
+                            label="Voice input for rejection reason" title="Voice input" />
                     </div>
 
                     <div class="global-field-error" data-error-for="rejectNotes" aria-hidden="true">
@@ -711,12 +660,6 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
     let allRequests = Array.isArray(ADMIN_DOC_REQUESTS) ? ADMIN_DOC_REQUESTS : [];
     let activeFilter = @json(request('status', 'all') ?: 'all');
 
-    const DOCREQ_DROPDOWN_STATUSES = ['all', 'pending', 'approved', 'rejected'];
-
-    if (!DOCREQ_DROPDOWN_STATUSES.includes(activeFilter)) {
-        activeFilter = 'all';
-    }
-
     const DOCREQ_DATA_URL = `${window.location.pathname.replace(/\/$/, '')}/data`;
 
     let docreqRefreshWatcher = null;
@@ -728,6 +671,12 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
     const DOCREQ_REFRESH_ITEMS = @json($refreshItems ?? []);
     const DOCREQ_INDEX_URL = DOCREQ_ROUTES.index || window.location.pathname;
     const DOCREQ_INITIAL_PAGINATION = @json($docRequestPagination);
+    const DOCREQ_REFRESH_KEY =
+        @json(
+            $isDentist
+                ? 'dentist-docreq'
+                : 'admin-docreq'
+        );
 
     let docreqPagination = DOCREQ_INITIAL_PAGINATION || {
         total: allRequests.length,
@@ -850,33 +799,68 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
     }
 
     function initDocreqRefreshWatcher() {
-        if (!window.initGlobalRefreshWatcher) return;
+        if (!window.initGlobalRefreshWatcher) {
+            return;
+        }
 
-        docreqRefreshWatcher = window.initGlobalRefreshWatcher({
-            key: 'docreq',
-            url: DOCREQ_DATA_URL,
-            initialItems: DOCREQ_REFRESH_ITEMS,
-            anchorSelector: '#mainContent.docreq-page .table-card',
-            itemLabel: 'document request',
-            getItems: (payload) => {
-                if (Array.isArray(payload)) {
-                    return payload.map(normalizeDocreqRequest);
+        docreqRefreshWatcher =
+            window.initGlobalRefreshWatcher({
+                key:
+                    DOCREQ_REFRESH_KEY,
+
+                url:
+                    DOCREQ_DATA_URL,
+
+                initialItems:
+                    DOCREQ_REFRESH_ITEMS,
+
+                anchorSelector:
+                    '#mainContent.docreq-page .table-card',
+
+                itemLabel:
+                    'document request',
+
+                getItems(payload) {
+                    if (Array.isArray(payload)) {
+                        return payload;
+                    }
+
+                    return Array.isArray(
+                        payload?.requests
+                    )
+                        ? payload.requests
+                        : [];
+                },
+
+                getItemId(request) {
+                    return request?.id;
+                },
+
+                title(count) {
+                    return `${count} new document request${count === 1 ? '' : 's'
+                        } available`;
+                },
+
+                subtitle(count) {
+                    return `Refresh to see the latest request${count === 1 ? '' : 's'
+                        }.`;
+                },
+
+                onRefresh() {
+                    currentPage = 1;
+
+                    fetchDocRequests();
+                },
+
+                toast: {
+                    type: 'info',
+                    title:
+                        'Document requests updated',
+
+                    message:
+                        'Latest document requests are now shown.'
                 }
-
-                return Array.isArray(payload?.requests) ?
-                    payload.requests.map(normalizeDocreqRequest) :
-                    [];
-            },
-            getItemId: (request) => request?.id,
-            title: (count) => `${count} new document request${count === 1 ? '' : 's'} available`,
-            subtitle: (count) => `Refresh to see the latest request${count === 1 ? '' : 's'}.`,
-            onRefresh: applyDocreqServerSnapshot,
-            toast: {
-                type: 'info',
-                title: 'Document requests updated',
-                message: 'Latest document requests are now shown.'
-            }
-        });
+            });
     }
 
     function loadData() {
@@ -1095,17 +1079,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                 const el = document.getElementById(id);
                 if (el) el.textContent = value;
             });
-
-            const option = document.querySelector(
-                `#docreqStatusSelect .docreq-sort-option[data-value="${CSS.escape(key)}"]`
-            );
-
-            if (option) {
-                option.dataset.count = value;
-            }
         });
-
-        updateStatusDropdownUI(activeFilter);
     }
 
     function getFiltered() {
@@ -1225,8 +1199,6 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
         filterSort = 'newest';
         currentPage = 1;
 
-        updateStatusDropdownUI('all');
-
         window.syncFilterTagGroup('fSortGroup', 'newest');
 
         const dateFrom = document.getElementById('fDateFrom');
@@ -1324,21 +1296,6 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
             allRequests = Array.isArray(data.requests) ?
                 data.requests.map(normalizeDocreqRequest) : [];
 
-            const isDefaultDataset = !searchQuery &&
-                activeFilter === 'all' &&
-                !filterDocType &&
-                !filterDateFrom &&
-                !filterDateTo &&
-                filterSort === 'newest' &&
-                currentPage === 1;
-
-            if (isDefaultDataset) {
-                window.syncGlobalRefreshWatcher?.(
-                    'docreq',
-                    allRequests
-                );
-            }
-
             if (Array.isArray(data.types)) {
                 documentTypeOptions = normalizeDocTypes(data.types);
                 renderDocTypeOptions(documentTypeOptions);
@@ -1400,12 +1357,37 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
         }
     }
 
+    function updateDocreqRowCount() {
+        const rowCount =
+            document.getElementById(
+                'rowCount'
+            );
+
+        if (!rowCount) {
+            return;
+        }
+
+        const total =
+            Number(
+                docreqPagination?.total ??
+                allRequests.length ??
+                0
+            );
+
+        rowCount.textContent =
+            `${total} ${total === 1
+                ? 'request'
+                : 'requests'
+            }`;
+    }
+
     function renderList() {
         const page = getFiltered();
         const tableHead = document.getElementById('docreqTableHead');
         const isMobile = window.innerWidth <= 767;
 
         renderDocreqPagebars(docreqPagination);
+        updateDocreqRowCount();
 
         const listContainer = document.getElementById('requestListContainer');
         const gridContainer = document.getElementById('requestGridContainer');
@@ -1910,6 +1892,9 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
         }
 
         if (!isDataEmpty) {
+            const hasAdvancedFilters =
+                countAdvancedFilters() > 0;
+
             window.EmptyState?.render({
                 host:
                     '#docreqEmptyState',
@@ -1918,11 +1903,40 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                     'fa-filter-circle-xmark',
 
                 title:
-                    'No matching requests found',
+                    hasAdvancedFilters
+                        ? 'No requests match your filters'
+                        : 'No matching requests found',
 
                 message:
-                    'No document requests match the selected filters.',
+                    hasAdvancedFilters
+                        ? 'Try removing or changing the selected filter criteria.'
+                        : 'No document requests match the selected status.',
+
+                actionHtml:
+                    hasAdvancedFilters
+                        ? `
+                    <button
+                        type="button"
+                        class="empty-state-btn"
+                        data-docreq-clear-filters
+                    >
+                        <i class="fa-solid fa-rotate-left"></i>
+                        Clear filters
+                    </button>
+                `
+                        : '',
             });
+
+            document
+                .querySelector(
+                    '#docreqEmptyState [data-docreq-clear-filters]'
+                )
+                ?.addEventListener(
+                    'click',
+                    function () {
+                        resetAdvancedFilters();
+                    }
+                );
 
             return;
         }
@@ -2122,6 +2136,46 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
     window.selectDocreqPerPage = selectDocreqPerPage;
 
     window.initGlobalPageSizeSelects?.();
+
+    window.handleDocumentRequestStatusSelect =
+        function (value) {
+            const nextStatus =
+                ['all', 'pending', 'approved', 'rejected']
+                    .includes(
+                        String(value || '')
+                            .trim()
+                            .toLowerCase()
+                    )
+                    ? String(value)
+                        .trim()
+                        .toLowerCase()
+                    : 'all';
+
+            activeFilter =
+                nextStatus;
+
+            filterStatus =
+                nextStatus;
+
+            searchQuery = '';
+
+            const searchInput =
+                document.getElementById(
+                    'searchInput'
+                );
+
+            if (searchInput) {
+                searchInput.value = '';
+
+                window.syncInputClearButton?.(
+                    searchInput
+                );
+            }
+
+            currentPage = 1;
+
+            fetchDocRequests();
+        };
 
     function renderDocreqPagebars(
         pagination
@@ -2395,101 +2449,6 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
         updateShowResultsButton();
     }
 
-    function getStatusMeta(status) {
-        const map = {
-            all: {
-                label: 'All Requests',
-                icon: 'fa-file-medical',
-                tone: 'status-all',
-                countId: 'statAll'
-            },
-            pending: {
-                label: 'Pending',
-                icon: 'fa-clock-rotate-left',
-                tone: 'status-pending',
-                countId: 'statPending'
-            },
-            approved: {
-                label: 'Approved',
-                icon: 'fa-file-circle-check',
-                tone: 'status-approved',
-                countId: 'statApproved'
-            },
-            rejected: {
-                label: 'Rejected',
-                icon: 'fa-file-circle-xmark',
-                tone: 'status-rejected',
-                countId: 'statRejected'
-            }
-        };
-
-        return map[status] || map.all;
-    }
-
-    function getStatusCount(status) {
-        const meta = getStatusMeta(status);
-        const option = document.querySelector(
-            `#docreqStatusSelect .docreq-sort-option[data-value="${CSS.escape(status)}"]`
-        );
-
-        return option?.dataset.count ||
-            document.getElementById(meta.countId)?.textContent?.trim() ||
-            '0';
-    }
-
-    function updateStatusDropdownUI(status) {
-        if (!DOCREQ_DROPDOWN_STATUSES.includes(status)) {
-            status = 'all';
-        }
-
-        const meta = getStatusMeta(status);
-        const wrap = document.getElementById('docreqStatusSelect');
-        const hiddenInput = document.getElementById('docreqStatusFilter');
-        const label = document.getElementById('statusDropdownLabel');
-        const count = document.getElementById('statusDropdownCount');
-        const leading = document.getElementById('docreqStatusSelectedIcon');
-
-        if (wrap) wrap.dataset.statusFilter = status;
-        if (hiddenInput) hiddenInput.value = status;
-        if (label) label.textContent = meta.label;
-        if (count) count.textContent = getStatusCount(status);
-
-        if (leading) {
-            leading.className = `docreq-sort-icon ${meta.tone}`;
-            leading.innerHTML = `<i class="fa-solid ${meta.icon}"></i>`;
-        }
-
-        document.querySelectorAll('#docreqStatusSelect .docreq-sort-option').forEach((option) => {
-            const active = option.getAttribute('data-value') === status;
-            option.classList.toggle('is-active', active);
-            option.classList.toggle('active', active);
-        });
-    }
-
-    function selectStatusFilter(status) {
-        if (!DOCREQ_DROPDOWN_STATUSES.includes(status)) {
-            status = 'all';
-        }
-
-        closeDocreqDropdowns();
-        setFilter(status);
-    }
-
-    function setFilter(f) {
-        if (!DOCREQ_DROPDOWN_STATUSES.includes(f)) {
-            f = 'all';
-        }
-
-        activeFilter = f;
-        filterStatus = f;
-        currentPage = 1;
-
-        updateStatusDropdownUI(f);
-        updateFilterBtn();
-        renderFilterChips();
-        fetchDocRequests();
-    }
-
     let docreqSearchTimer = null;
 
     window.handleDocumentRequestSearch =
@@ -2689,8 +2648,24 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
     }
 
     function updateShowResultsButton() {
-        const count = getDraftFilteredDocRequests().length;
-        window.updateShowResultsText(count);
+        const target =
+            document.getElementById(
+                'filterResultsText'
+            );
+
+        if (!target) {
+            return;
+        }
+
+        const count =
+            getDraftFilteredDocRequests()
+                .length;
+
+        target.textContent =
+            `Show ${count} ${count === 1
+                ? 'result'
+                : 'results'
+            }`;
     }
 
     function renderFilterChips() {
@@ -2816,9 +2791,16 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
             }
         );
 
-        window.addEventListener('resize', renderList);
+        window.setGlobalFilterSelectValue?.(
+            'docreqStatusFilter',
+            activeFilter,
+            {
+                callback: false,
+                focus: false
+            }
+        );
 
-        updateStatusDropdownUI(activeFilter);
+        window.addEventListener('resize', renderList);
         setCustomSelectValue('docTypeSelect', filterDocType);
 
         document.addEventListener('click', (event) => {

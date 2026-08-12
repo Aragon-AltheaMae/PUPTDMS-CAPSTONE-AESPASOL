@@ -175,50 +175,28 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                     </div>
 
 
-                                    <div class="booking-section-card mb-2">
-                                        <div class="flex items-start gap-2 mb-4">
-                                            <i class="fa-solid fa-shield-halved text-[#8B0000] mt-0.5"></i>
-                                            <p class="text-sm text-[#5c5550]">
-                                                By submitting, you confirm that all the information provided is
-                                                accurate
-                                                and
-                                                complete.
-                                            </p>
-                                        </div>
+                                    <div class="booking-step-body">
 
-                                        <label
-                                            class="confirm-checkbox-wrap flex items-start gap-3 p-4 rounded-xl border border-[#e8e2dd] bg-[#fafaf8] cursor-pointer">
-                                            <input id="finalConfirm" type="checkbox"
-                                                class="w-5 h-5 rounded border-2 border-[#e8e2dd] bg-white cursor-pointer flex-shrink-0 mt-0.5 accent-[#8B0000]"
-                                                required>
-                                            <span class="text-sm text-[#1a1410] leading-relaxed">
-                                                I have reviewed my dental and medical information and agree to the
-                                                <a href="https://www.pup.edu.ph/privacy/" target="_blank"
-                                                    rel="noopener noreferrer" data-legal-link
-                                                    class="booking-legal-link">
-                                                    Privacy Policy
-                                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                                </a>
-                                                and
-                                                <a href="https://www.pup.edu.ph/terms/" target="_blank"
-                                                    rel="noopener noreferrer" data-legal-link
-                                                    class="booking-legal-link">
-                                                    Terms and Conditions
-                                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                                </a>.
-                                            </span>
-                                        </label>
-                                    </div>
+                                        <x-booking.final-confirmation
+                                            message="By submitting, you confirm that all the information provided is accurate and complete.">
+                                            I have reviewed my dental and medical information
+                                            and agree to the
 
-                                    <div class="flex justify-center gap-3 mt-8 nav-btns-row">
-                                        <button type="button" id="confirmBackBtn" class="ui-btn ui-btn-secondary">
-                                            <i class="fa-solid fa-chevron-left"></i>
-                                            Back
-                                        </button>
-                                        <button type="button" id="finalSubmitBtn" class="ui-btn ui-btn-primary">
-                                            <i class="fa-solid fa-calendar-check"></i>
-                                            Confirm Appointment
-                                        </button>
+                                            <a href="https://www.pup.edu.ph/privacy/" target="_blank"
+                                                rel="noopener noreferrer" data-legal-link class="booking-legal-link">
+                                                Privacy Policy
+                                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                            </a>
+
+                                            and
+
+                                            <a href="https://www.pup.edu.ph/terms/" target="_blank"
+                                                rel="noopener noreferrer" data-legal-link class="booking-legal-link">
+                                                Terms and Conditions
+                                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                            </a>.
+                                        </x-booking.final-confirmation>
+
                                     </div>
                                 </div>
                             </div>
@@ -362,49 +340,23 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     </div>
 </div>
 
-<div id="confirmModal" class="ui-modal" aria-hidden="true">
-    <div class="ui-modal-card modal-md">
-        <div class="modal-hd appointment-modal-header">
-            <div class="flex items-center gap-3 min-w-0">
-                <div class="appointment-modal-header-icon">
-                    <i class="fa-solid fa-check"></i>
-                </div>
-                <div class="appointment-modal-header-copy">
-                    <span class="appointment-modal-eyebrow">
-                        Appointment Booking
-                    </span>
-                    <h2 class="appointment-modal-title">
-                        Appointment Confirmed
-                    </h2>
-                    <p class="appointment-modal-subtitle">
-                        Your appointment details are ready to be submitted.
-                    </p>
-                </div>
-            </div>
-        </div>
+<x-booking.confirmed-modal id="confirmModal" eyebrow="Appointment Booking" title="Appointment Confirmed"
+    subtitle="Your appointment has been successfully scheduled." header-icon="fa-check" section-icon="fa-calendar-check"
+    section-eyebrow="Booking Status" section-title="Booking successfully completed"
+    section-message="Your selected appointment schedule has been saved and confirmed." detail-label="Appointment Status"
+    result-title="Confirmed" message-title="Schedule details" message-id="confirmMessage">
+    Your dental appointment has been scheduled successfully.
 
-        <div class="modal-bd">
-            <div class="global-confirm-alert">
-                <i class="fa-solid fa-circle-check"></i>
-                <div>
-                    <strong>
-                        Appointment successfully scheduled
-                    </strong>
-                    <p id="confirmMessage">
-                        Your dental appointment has been scheduled successfully.
-                    </p>
-                </div>
-            </div>
-        </div>
+    <x-slot:footer>
 
-        <div class="modal-ft">
-            <button type="button" id="okBtn" class="ui-btn ui-btn-primary">
-                <i class="fa-solid fa-house"></i>
-                Back to Home
-            </button>
-        </div>
-    </div>
-</div>
+        <button type="button" id="okBtn" class="ui-btn ui-btn-primary">
+            <i class="fa-solid fa-house"></i>
+            Back to Home
+        </button>
+
+    </x-slot:footer>
+
+</x-booking.confirmed-modal>
 
 <div id="miniTab" class="mini-tab">
     <i class="fa-solid fa-circle-exclamation text-red-400" aria-hidden="true"></i>
@@ -598,9 +550,64 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
     let bookingWorkflow = null;
 
+    let step5ConfirmationActive =
+        false;
+
+    function showStep5Review() {
+        step5ConfirmationActive =
+            false;
+
+        summarySection
+            ?.classList.remove(
+                'hidden'
+            );
+
+        confirmationSection
+            ?.classList.add(
+                'hidden'
+            );
+
+        bookingWorkflow
+            ?.setNextButton({
+                label:
+                    'Confirm Appointment',
+
+                icon:
+                    'fa-chevron-right',
+            });
+    }
+
+
+    function showStep5Confirmation() {
+        step5ConfirmationActive =
+            true;
+
+        summarySection
+            ?.classList.add(
+                'hidden'
+            );
+
+        confirmationSection
+            ?.classList.remove(
+                'hidden'
+            );
+
+        bookingWorkflow
+            ?.setNextButton({
+                label:
+                    'Confirm Appointment',
+
+                icon:
+                    'fa-calendar-check',
+
+                iconPosition:
+                    'left',
+            });
+    }
+
+
     function resetStep5View() {
-        summarySection?.classList.remove("hidden");
-        confirmationSection?.classList.add("hidden");
+        showStep5Review();
     }
 
     function scrollToInvalidTarget(target) {
@@ -869,7 +876,21 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                     '#nextBtn',
 
                 hideNavigationOnLast:
-                    true,
+                    false,
+
+                beforePrevious:
+                    currentStep => {
+                        if (
+                            currentStep === 4 &&
+                            step5ConfirmationActive
+                        ) {
+                            showStep5Review();
+
+                            return false;
+                        }
+
+                        return true;
+                    },
 
                 beforeNext:
                     currentStep => {
@@ -880,7 +901,19 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
                 onLastStep: () => {
                     buildSummary();
-                    resetStep5View();
+                    showStep5Review();
+                },
+
+                onLastStepNext: () => {
+                    if (
+                        !step5ConfirmationActive
+                    ) {
+                        showStep5Confirmation();
+
+                        return true;
+                    }
+
+                    return confirmFinalAppointment();
                 },
 
                 onStepChange:
@@ -920,23 +953,6 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     } else {
         initBookingWorkflow();
     }
-
-    document.getElementById("goToConfirmationBtn")?.addEventListener("click", () => {
-        summarySection?.classList.add("hidden");
-        confirmationSection?.classList.remove("hidden");
-        confirmationSection?.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-        });
-    });
-    document.getElementById("confirmBackBtn")?.addEventListener("click", () => {
-        confirmationSection?.classList.add("hidden");
-        summarySection?.classList.remove("hidden");
-        summarySection?.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-        });
-    });
 
     function setupCharLimit(inputId, counterId, max = 150, warningId = null) {
         const input = document.getElementById(inputId);
@@ -1005,51 +1021,156 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     `;
         }
 
-        const row = (label, val) =>
-            `<p><b class="text-[#5c5550] font-semibold">${label}:</b> ${val && String(val).trim() !== "" ? val : '<span class="text-[#9e9690]">N/A</span>'}</p>`;
+        const row = (
+            label,
+            value
+        ) => {
+            const resolvedValue =
+                value &&
+                    String(value).trim() !== ''
+                    ? value
+                    : `
+                <span class="booking-summary-muted">
+                    N/A
+                </span>
+            `;
 
-        const optionalRow = (label, val) => {
-            if (!val || String(val).trim() === "" || val === "N/A") return "";
-            return `<p><b class="text-[#5c5550] font-semibold">${label}:</b> ${val}</p>`;
+            return `
+        <p class="booking-summary-row">
+            <span class="booking-summary-row-label">
+                ${label}:
+            </span>
+
+            ${resolvedValue}
+        </p>
+    `;
         };
 
-        const summaryCard = (title, icon, body) => `
-                <div class="border border-[#e8e2dd] rounded-xl overflow-hidden bg-white">
-                    <div class="bg-[#f9e8e8] px-4 py-2.5 text-xs font-bold text-[#8B0000] uppercase tracking-widest border-b border-[#e8e2dd]">
-                        <i class="fa-solid ${icon} mr-2"></i>${title}
-                    </div>
-                    <div class="p-4 text-sm leading-7 text-[#1a1410] space-y-4">${body}</div>
-                </div>
-            `;
+        const optionalRow = (
+            label,
+            value
+        ) => {
+            if (
+                !value ||
+                String(value).trim() === '' ||
+                value === 'N/A'
+            ) {
+                return '';
+            }
 
-        const subSection = (title, body) => `
-                <div class="rounded-xl border border-[#f1e8e3] bg-[#fffdfd] overflow-hidden">
-                    <div class="px-4 py-2.5 bg-[#fff7f6] border-b border-[#f1e8e3] text-[0.72rem] font-extrabold uppercase tracking-[0.16em] text-[#8B0000]">
-                        ${title}
-                    </div>
-                    <div class="p-4">
-                        <div class="grid grid-cols-2 gap-x-8 gap-y-1 sm-grid-1col">
-                            ${body}
-                        </div>
-                    </div>
-                </div>
-            `;
+            return `
+        <p class="booking-summary-row">
+            <span class="booking-summary-row-label">
+                ${label}:
+            </span>
 
-        const fullWidthSection = (title, body) => `
-                <div class="rounded-xl border border-[#f1e8e3] bg-[#fffdfd] overflow-hidden">
-                    <div class="px-4 py-2.5 bg-[#fff7f6] border-b border-[#f1e8e3] text-[0.72rem] font-extrabold uppercase tracking-[0.16em] text-[#8B0000]">
-                        ${title}
-                    </div>
-                    <div class="p-4 text-sm leading-7 text-[#1a1410]">
-                        ${body}
-                    </div>
-                </div>
-            `;
+            ${value}
+        </p>
+    `;
+        };
 
-        const diseases = getAll("diseases[]");
-        const diseaseText = diseases.length ?
-            diseases.map(code => diseaseLabelByCode?.[code] ?? code).join(", ") :
-            "None";
+        const summaryCard = (
+            title,
+            icon,
+            body
+        ) => `
+    <section class="booking-summary-card">
+
+        <div class="booking-summary-card-header">
+            <i class="fa-solid ${icon}"></i>
+
+            <span>
+                ${title}
+            </span>
+        </div>
+
+        <div class="booking-summary-card-body">
+            ${body}
+        </div>
+
+    </section>
+`;
+
+        const subSection = (
+            title,
+            body
+        ) => `
+    <section class="booking-summary-section">
+
+        <div class="booking-summary-section-title">
+            ${title}
+        </div>
+
+        <div class="booking-summary-section-body">
+
+            <div
+                class="
+                    grid
+                    grid-cols-2
+                    gap-x-8
+                    gap-y-1
+                    sm-grid-1col
+                "
+            >
+                ${body}
+            </div>
+
+        </div>
+
+    </section>
+`;
+
+        const fullWidthSection = (
+            title,
+            body
+        ) => `
+    <section class="booking-summary-section">
+
+        <div class="booking-summary-section-title">
+            ${title}
+        </div>
+
+        <div class="booking-summary-section-body">
+            ${body}
+        </div>
+
+    </section>
+`;
+
+        const diseases =
+            getAll(
+                'diseases[]'
+            );
+
+
+        const diseaseLabels =
+            diseases.map(
+                code =>
+                    diseaseLabelByCode?.[code]
+                    ?? code
+            );
+
+
+        const diseaseTags =
+            diseaseLabels.length
+                ? `
+            <div class="booking-summary-tag-list">
+                ${diseaseLabels
+                    .map(
+                        label => `
+                            <span class="booking-summary-tag">
+                                ${label}
+                            </span>
+                        `
+                    )
+                    .join('')}
+            </div>
+        `
+                : `
+            <span class="booking-summary-muted">
+                None selected
+            </span>
+        `;
 
         const patientName = @json($patient -> name ?? 'N/A');
         const patientGender = @json($patient -> gender ?? 'N/A');
@@ -1133,9 +1254,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                 ${row("Birth Control Pills", get("birth_control"))}
             `) : ""}
 
-    ${fullWidthSection("Medical Conditions", `
-                <b class="text-[#5c5550] dark:text-[#e5e5e5] font-semibold">Selected Conditions:</b> ${diseaseText}
-            `)}
+   ${fullWidthSection(
+            "Medical Conditions",
+            diseaseTags
+        )}
 
     ${subSection("Tobacco Use", `
                 ${row("Tobacco Use", get("tobacco_use"))}
@@ -1219,30 +1341,55 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         slotFullModal.showModal();
     }
 
-    const finalSubmitBtn = document.getElementById('finalSubmitBtn');
-    const finalConfirm = document.getElementById('finalConfirm');
+    const finalConfirm =
+        document.getElementById(
+            'finalConfirm'
+        );
 
-    if (finalSubmitBtn) {
-        finalSubmitBtn.addEventListener("click", () => {
-            if (!finalConfirm || !finalConfirm.checked) {
-                showMiniTab("Please confirm before submitting.");
-                return;
-            }
+    function confirmFinalAppointment() {
+        if (
+            !finalConfirm ||
+            !finalConfirm.checked
+        ) {
+            showMiniTab(
+                'Please confirm before submitting.'
+            );
 
-            const date = document.getElementById("appointment_date")?.value || "N/A";
-            const time = document.getElementById("appointment_time")?.value || "N/A";
+            finalConfirm?.focus();
 
-            if (confirmMessage) {
-                confirmMessage.innerHTML = `
-        Your dental appointment at PUP Taguig Dental Clinic has been successfully scheduled on 
+            return false;
+        }
+
+        const date =
+            document
+                .getElementById(
+                    'appointment_date'
+                )
+                ?.value ||
+            'N/A';
+
+        const time =
+            document
+                .getElementById(
+                    'appointment_time'
+                )
+                ?.value ||
+            'N/A';
+
+        if (confirmMessage) {
+            confirmMessage.innerHTML = `
+        Your dental appointment is scheduled for
         <b>${date}</b> at <b>${time}</b>.<br>
-        Please arrive on time and bring your school or office ID.
-        <br>
-        `;
-            }
+        Please arrive on time and bring your
+        school or office ID.
+    `;
+        }
 
-            openModal("confirmModal");
-        });
+        window.openModal?.(
+            'confirmModal'
+        );
+
+        return true;
     }
 
     if (okBtn) {

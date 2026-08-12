@@ -86,12 +86,20 @@ class DocumentRequestController extends Controller
             ]);
         }
 
+        $refreshItems = DocumentRequest::query()
+            ->select('id')
+            ->orderByDesc('id')
+            ->get()
+            ->map(fn($item) => [
+                'id' => $item->id,
+            ])
+            ->values();
+
         return view('shared.document-requests', [
             'role' => 'admin',
-
+            'refreshItems' => $refreshItems,
             'requests' => $requests,
             'stats' => $stats,
-
             'search' => $search,
             'status' => $status,
             'type' => $type,

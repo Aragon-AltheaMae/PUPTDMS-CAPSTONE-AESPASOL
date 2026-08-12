@@ -131,94 +131,56 @@ $notifCount = $notifications->count();
                                 </div>
                                 <div class="patient-sort-row">
 
-                                    <div class="patient-stats-dropdown" id="patientStatsDropdown">
-                                        <button type="button" class="patient-stats-trigger s-all"
-                                            id="patientStatsToggle" aria-expanded="false">
-                                            <span class="patient-stats-trigger-left">
-                                                <span class="patient-stats-trigger-icon s-all">
-                                                    <i class="fa-solid fa-users"></i>
-                                                </span>
+                                    @php
+                                    $patientStatusOptions = [
+                                    [
+                                    'value' => 'all',
+                                    'label' => 'All Patients',
+                                    'icon' => 'fa-users',
+                                    'tone' => 'status-all',
+                                    'count' => $allCount ?? 0,
+                                    ],
+                                    [
+                                    'value' => 'today',
+                                    'label' => 'Today',
+                                    'icon' => 'fa-clock',
+                                    'tone' => 'status-today',
+                                    'count' => $todayCount ?? 0,
+                                    ],
+                                    [
+                                    'value' => 'upcoming',
+                                    'label' => 'Upcoming',
+                                    'icon' => 'fa-calendar-check',
+                                    'tone' => 'status-upcoming',
+                                    'count' => $upcomingCount ?? 0,
+                                    ],
+                                    [
+                                    'value' => 'rescheduled',
+                                    'label' => 'Rescheduled',
+                                    'icon' => 'fa-calendar-plus',
+                                    'tone' => 'status-rescheduled',
+                                    'count' => $rescheduledCount ?? 0,
+                                    ],
+                                    [
+                                    'value' => 'completed',
+                                    'label' => 'Completed',
+                                    'icon' => 'fa-check-double',
+                                    'tone' => 'status-completed',
+                                    'count' => $completedCount ?? 0,
+                                    ],
+                                    [
+                                    'value' => 'cancelled',
+                                    'label' => 'Cancelled',
+                                    'icon' => 'fa-calendar-xmark',
+                                    'tone' => 'status-cancelled',
+                                    'count' => $cancelledCount ?? 0,
+                                    ],
+                                    ];
+                                    @endphp
 
-                                                <span class="patient-stats-trigger-text">
-                                                    <span class="patient-stats-trigger-label">Status</span>
-                                                    <strong id="patientStatsSelectedLabel">All Patients</strong>
-                                                </span>
-                                            </span>
-
-                                            <span class="patient-stats-trigger-right">
-                                                <span class="patient-stats-count-badge" id="patientStatsSelectedCount">
-                                                    {{ $allCount ?? 0 }}
-                                                </span>
-                                                <i class="fa-solid fa-chevron-down patient-stats-chevron"></i>
-                                            </span>
-                                        </button>
-
-                                        <div class="patient-stats-panel" id="patientStatsPanel">
-                                            <div id="tabsGrid" class="patient-stats-grid">
-                                                <button type="button" class="patient-stat-option filter-btn s-today"
-                                                    data-filter="today">
-                                                    <span class="patient-stat-option-icon">
-                                                        <i class="fa-solid fa-clock"></i>
-                                                    </span>
-                                                    <span class="patient-stat-option-label">Today</span>
-                                                    <span class="patient-stat-option-count" id="statToday">{{
-                                                        $todayCount ?? 0 }}</span>
-                                                </button>
-
-                                                <button type="button" class="patient-stat-option filter-btn s-upcoming"
-                                                    data-filter="upcoming">
-                                                    <span class="patient-stat-option-icon">
-                                                        <i class="fa-solid fa-calendar-check"></i>
-                                                    </span>
-                                                    <span class="patient-stat-option-label">Upcoming</span>
-                                                    <span class="patient-stat-option-count" id="statUpcoming">{{
-                                                        $upcomingCount ?? 0 }}</span>
-                                                </button>
-
-                                                <button type="button"
-                                                    class="patient-stat-option filter-btn s-rescheduled"
-                                                    data-filter="rescheduled">
-                                                    <span class="patient-stat-option-icon">
-                                                        <i class="fa-solid fa-calendar-plus"></i>
-                                                    </span>
-                                                    <span class="patient-stat-option-label">Rescheduled</span>
-                                                    <span class="patient-stat-option-count" id="statRescheduled">{{
-                                                        $rescheduledCount ?? 0 }}</span>
-                                                </button>
-
-                                                <button type="button" class="patient-stat-option filter-btn s-completed"
-                                                    data-filter="completed">
-                                                    <span class="patient-stat-option-icon">
-                                                        <i class="fa-solid fa-check-double"></i>
-                                                    </span>
-                                                    <span class="patient-stat-option-label">Completed</span>
-                                                    <span class="patient-stat-option-count" id="statCompleted">{{
-                                                        $completedCount ?? 0 }}</span>
-                                                </button>
-
-                                                <button type="button" class="patient-stat-option filter-btn s-cancelled"
-                                                    data-filter="cancelled">
-                                                    <span class="patient-stat-option-icon">
-                                                        <i class="fa-solid fa-calendar-xmark"></i>
-                                                    </span>
-                                                    <span class="patient-stat-option-label">Cancelled</span>
-                                                    <span class="patient-stat-option-count" id="statCancelled">{{
-                                                        $cancelledCount ?? 0 }}</span>
-                                                </button>
-
-                                                <button type="button"
-                                                    class="patient-stat-option filter-btn tab-active s-all"
-                                                    data-filter="all">
-                                                    <span class="patient-stat-option-icon">
-                                                        <i class="fa-solid fa-users"></i>
-                                                    </span>
-                                                    <span class="patient-stat-option-label">All Patients</span>
-                                                    <span class="patient-stat-option-count" id="statAll">{{ $allCount ??
-                                                        0 }}</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <x-filter-select id="patientStatusFilter" name="patient_status" label="Status"
+                                        value="all" :options="$patientStatusOptions"
+                                        callback="handlePatientStatusSelect" />
                                 </div>
 
                                 <div class="patient-filter-actions">
@@ -330,7 +292,7 @@ $notifCount = $notifications->count();
 
                     <div id="patientContainer" class="space-y-3 px-3 md:px-6 pb-6 pt-4">
 
-                        @foreach($appointments as $appt)
+                        @foreach ($appointments as $appt)
                         @php
                         $status = strtolower($appt->status ?? '');
                         $isCancelled = $status === 'cancelled';
@@ -786,20 +748,8 @@ $notifCount = $notifications->count();
 
         <div class="filter-chip-grid">
 
-            @foreach ([
-            'BSIT',
-            'BSECE',
-            'BSBA - HRM',
-            'BSED - ENG',
-            'BSOA',
-            'BSPSYCH',
-            'DIT',
-            'BSME',
-            'BSBA - MM',
-            'BSED - MATH',
-            'DOMT',
-            ] as $course)
-
+            @foreach (['BSIT', 'BSECE', 'BSBA - HRM', 'BSED - ENG', 'BSOA', 'BSPSYCH', 'DIT', 'BSME', 'BSBA - MM', 'BSED
+            - MATH', 'DOMT'] as $course)
             <label class="choice-chip">
 
                 <input type="radio" name="course" value="{{ $course }}" class="
@@ -813,7 +763,6 @@ $notifCount = $notifications->count();
                 </span>
 
             </label>
-
             @endforeach
 
         </div>
@@ -827,13 +776,7 @@ $notifCount = $notifications->count();
 
             <div class="filter-chip-row">
 
-                @foreach ([
-                '1st Year',
-                '2nd Year',
-                '3rd Year',
-                '4th Year',
-                ] as $year)
-
+                @foreach (['1st Year', '2nd Year', '3rd Year', '4th Year'] as $year)
                 <label class="choice-chip">
 
                     <input type="radio" name="year" value="{{ $year }}" class="
@@ -847,7 +790,6 @@ $notifCount = $notifications->count();
                     </span>
 
                 </label>
-
                 @endforeach
 
             </div>
@@ -860,7 +802,6 @@ $notifCount = $notifications->count();
             <div class="filter-chip-row">
 
                 @foreach (['1', '2'] as $section)
-
                 <label class="choice-chip">
 
                     <input type="radio" name="section" value="{{ $section }}" class="
@@ -874,7 +815,6 @@ $notifCount = $notifications->count();
                     </span>
 
                 </label>
-
                 @endforeach
 
             </div>
@@ -888,12 +828,7 @@ $notifCount = $notifications->count();
 
         <div class="filter-chip-row">
 
-            @foreach ([
-            'Administrative',
-            'Faculty',
-            'Dependent',
-            ] as $department)
-
+            @foreach (['Administrative', 'Faculty', 'Dependent'] as $department)
             <label class="choice-chip">
 
                 <input type="radio" name="department" value="{{ $department }}" class="
@@ -907,7 +842,6 @@ $notifCount = $notifications->count();
                 </span>
 
             </label>
-
             @endforeach
 
         </div>
@@ -919,140 +853,6 @@ $notifCount = $notifications->count();
 
 @section('scripts')
 <script>
-    function getPatientDropdownMeta(status) {
-        const map = {
-            today: {
-                label: 'Today',
-                icon: 'fa-clock',
-                tone: 's-today',
-                countId: 'statToday'
-            },
-            upcoming: {
-                label: 'Upcoming',
-                icon: 'fa-calendar-check',
-                tone: 's-upcoming',
-                countId: 'statUpcoming'
-            },
-            rescheduled: {
-                label: 'Rescheduled',
-                icon: 'fa-calendar-plus',
-                tone: 's-rescheduled',
-                countId: 'statRescheduled'
-            },
-            completed: {
-                label: 'Completed',
-                icon: 'fa-check-double',
-                tone: 's-completed',
-                countId: 'statCompleted'
-            },
-            cancelled: {
-                label: 'Cancelled',
-                icon: 'fa-calendar-xmark',
-                tone: 's-cancelled',
-                countId: 'statCancelled'
-            },
-            all: {
-                label: 'All Patients',
-                icon: 'fa-users',
-                tone: 's-all',
-                countId: 'statAll'
-            }
-        };
-
-        return map[status] || map.all;
-    }
-
-    function getPatientDropdownCount(status) {
-        const meta = getPatientDropdownMeta(status);
-        return document.getElementById(meta.countId)?.textContent?.trim() || '0';
-    }
-
-    function updatePatientStatsDropdownLabel() {
-        const activeBtn =
-            document.querySelector('#tabsGrid .filter-btn.tab-active') ||
-            document.querySelector('#tabsGrid .filter-btn[data-filter="all"]');
-
-        const labelEl = document.getElementById('patientStatsSelectedLabel');
-        const countEl = document.getElementById('patientStatsSelectedCount');
-        const leadingIcon = document.querySelector('#patientStatsToggle .patient-stats-trigger-icon');
-
-        if (!activeBtn || !labelEl || !countEl) return;
-
-        const status = activeBtn.getAttribute('data-filter') || 'all';
-        const meta = getPatientDropdownMeta(status);
-
-        labelEl.textContent = meta.label;
-        countEl.textContent = getPatientDropdownCount(status);
-
-        if (leadingIcon) {
-            leadingIcon.className = `patient-stats-trigger-icon ${meta.tone}`;
-            leadingIcon.innerHTML = `<i class="fa-solid ${meta.icon}"></i>`;
-        }
-        var trigger =
-            document.getElementById(
-                "patientStatsToggle"
-            );
-
-        if (trigger) {
-            trigger.classList.remove(
-                "s-today",
-                "s-upcoming",
-                "s-rescheduled",
-                "s-completed",
-                "s-cancelled",
-                "s-all"
-            );
-
-            trigger.classList.add(meta.tone);
-        }
-        document.querySelectorAll('#tabsGrid .filter-btn').forEach(function (btn) {
-            btn.classList.toggle('tab-active', btn.getAttribute('data-filter') === status);
-        });
-    }
-
-    window.updatePatientStatsDropdownLabel = updatePatientStatsDropdownLabel;
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const dropdown = document.getElementById('patientStatsDropdown');
-        const toggle = document.getElementById('patientStatsToggle');
-        const panel = document.getElementById('patientStatsPanel');
-
-        if (!dropdown || !toggle || !panel) return;
-
-        function closePatientStatsDropdown() {
-            dropdown.classList.remove('open');
-            toggle.setAttribute('aria-expanded', 'false');
-        }
-
-        toggle.addEventListener('click', function (e) {
-            e.stopPropagation();
-            const isOpen = dropdown.classList.toggle('open');
-            toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-        });
-
-        panel.addEventListener('click', function (e) {
-            e.stopPropagation();
-        });
-
-        document.addEventListener('click', closePatientStatsDropdown);
-
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') closePatientStatsDropdown();
-        });
-
-        updatePatientStatsDropdownLabel();
-    });
-
-    window.handlePatientDirectorySearch =
-        function (value) {
-            searchKeyword =
-                String(value || '')
-                    .trim()
-                    .toLowerCase();
-
-            applyFilters();
-        };
-
     document.addEventListener("DOMContentLoaded", function () {
         let patientFilterModal = null;
         let patientSearchInput = null;
@@ -1100,15 +900,26 @@ $notifCount = $notifications->count();
         }
 
         function resetAllFilters() {
-            resetPatientPanelFilters(false);
+            resetPatientPanelFilters(
+                false
+            );
 
-            searchKeyword = "";
+            searchKeyword = '';
 
             if (patientSearchInput) {
-                patientSearchInput.value = "";
+                patientSearchInput.value = '';
+
+                window.syncInputClearButton?.(
+                    patientSearchInput
+                );
             }
 
-            selectPatientStatus("all");
+            selectPatientStatus(
+                'all'
+            );
+
+            currentPage = 1;
+
             applyFilters();
         }
 
@@ -1159,20 +970,76 @@ $notifCount = $notifications->count();
             var activeTab = "all";
             var searchKeyword = "";
 
-            function selectPatientStatus(status) {
-                var nextStatus = status || "all";
+            window.handlePatientStatusSelect =
+                function (value) {
+                    activeTab =
+                        String(value || 'all')
+                            .trim()
+                            .toLowerCase();
+                    searchKeyword = '';
 
-                document.querySelectorAll(
-                    "#tabsGrid .filter-btn"
-                ).forEach(function (button) {
-                    button.classList.toggle(
-                        "tab-active",
-                        button.getAttribute("data-filter") === nextStatus
-                    );
-                });
+                    if (searchInput) {
+                        searchInput.value = '';
 
-                activeTab = nextStatus;
-                updatePatientStatsDropdownLabel();
+                        window.syncInputClearButton?.(
+                            searchInput
+                        );
+                    }
+
+                    currentPage = 1;
+
+                    applyFilters();
+                };
+
+
+            window.handlePatientDirectorySearch =
+                function (value) {
+                    searchKeyword =
+                        String(value || '')
+                            .trim()
+                            .toLowerCase();
+                    if (
+                        searchKeyword &&
+                        activeTab !== 'all'
+                    ) {
+                        activeTab = 'all';
+
+                        window.setGlobalFilterSelectValue?.(
+                            'patientStatusFilter',
+                            'all', {
+                            callback: false,
+                            focus: false
+                        }
+                        );
+                    }
+
+                    currentPage = 1;
+
+                    applyFilters();
+                };
+
+            function selectPatientStatus(
+                status,
+                options = {}
+            ) {
+                var nextStatus =
+                    String(
+                        status || 'all'
+                    )
+                        .trim()
+                        .toLowerCase();
+
+                activeTab =
+                    nextStatus;
+
+                window.setGlobalFilterSelectValue?.(
+                    'patientStatusFilter',
+                    nextStatus, {
+                    callback: options.callback === true,
+
+                    focus: false
+                }
+                );
             }
 
             var selectedProgram = null,
@@ -1812,37 +1679,6 @@ $notifCount = $notifications->count();
                 }
             });
 
-            var tabButtons = document.querySelectorAll(
-                "#tabsGrid .filter-btn"
-            );
-
-            tabButtons.forEach(function (btn) {
-                btn.addEventListener("click", function () {
-                    selectPatientStatus(
-                        btn.getAttribute("data-filter") || "all"
-                    );
-
-                    var dropdown =
-                        document.getElementById("patientStatsDropdown");
-
-                    var toggle =
-                        document.getElementById("patientStatsToggle");
-
-                    if (dropdown) {
-                        dropdown.classList.remove("open");
-                    }
-
-                    if (toggle) {
-                        toggle.setAttribute(
-                            "aria-expanded",
-                            "false"
-                        );
-                    }
-
-                    applyFilters();
-                });
-            });
-
             if (applyFiltersBtn) {
                 applyFiltersBtn.onclick = function () {
                     var draft = getDraftFilterState();
@@ -1894,16 +1730,38 @@ $notifCount = $notifications->count();
                 };
             }
 
-            var pageInfoTop = document.getElementById("patientPageInfoTop");
-            var pageInfoBottom = document.getElementById("patientPageInfoBottom");
+            var pageInfoTop =
+                document.getElementById(
+                    "patientPageInfoTop"
+                );
 
-            var paginationTop = document.getElementById("patientPaginationTop");
-            var paginationBottom = document.getElementById("patientPaginationBottom");
+            var pageInfoBottom =
+                document.getElementById(
+                    "patientPageInfoBottom"
+                );
 
-            var perPageInput = document.getElementById("patientPerPage");
+            var paginationTop =
+                document.getElementById(
+                    "patientPaginationTop"
+                );
 
-            var PER_PAGE = Number(perPageInput?.value || 10);
+            var paginationBottom =
+                document.getElementById(
+                    "patientPaginationBottom"
+                );
+
+            var perPageInput =
+                document.getElementById(
+                    "patientPerPage"
+                );
+
+            var PER_PAGE =
+                Number(
+                    perPageInput?.value || 10
+                );
+
             var currentPage = 1;
+
             var currentItems = [];
 
             function renderPatientPagebars() {
@@ -1985,8 +1843,7 @@ $notifCount = $notifications->count();
                     ],
 
                     itemLabel: totalItems === 1 ?
-                        'patient' :
-                        'patients',
+                        'patient' : 'patients',
 
                     onPageChange(page) {
                         currentPage = page;
@@ -2023,81 +1880,57 @@ $notifCount = $notifications->count();
             }
 
             function getCurrentPatientStatus() {
-                var activeButton = document.querySelector(
-                    "#tabsGrid .filter-btn.tab-active"
-                );
-
-                return activeButton ?
-                    activeButton.getAttribute("data-filter") || "all" :
-                    activeTab || "all";
+                return activeTab || 'all';
             }
 
             function getPatientStatusEmptyMeta(status) {
                 var map = {
                     today: {
-                        icon:
-                            "fa-clock",
+                        icon: "fa-clock",
 
-                        title:
-                            "No patients today",
+                        title: "No patients today",
 
-                        text:
-                            "There are currently no patient appointments scheduled for today."
+                        text: "There are currently no patient appointments scheduled for today."
                     },
 
                     upcoming: {
-                        icon:
-                            "fa-calendar-check",
+                        icon: "fa-calendar-check",
 
-                        title:
-                            "No upcoming patients",
+                        title: "No upcoming patients",
 
-                        text:
-                            "There are currently no upcoming patient appointments."
+                        text: "There are currently no upcoming patient appointments."
                     },
 
                     rescheduled: {
-                        icon:
-                            "fa-rotate-right",
+                        icon: "fa-rotate-right",
 
-                        title:
-                            "No rescheduled patients",
+                        title: "No rescheduled patients",
 
-                        text:
-                            "There are currently no rescheduled patient appointments."
+                        text: "There are currently no rescheduled patient appointments."
                     },
 
                     completed: {
-                        icon:
-                            "fa-circle-check",
+                        icon: "fa-circle-check",
 
-                        title:
-                            "No completed patients",
+                        title: "No completed patients",
 
-                        text:
-                            "Completed patient appointments will appear here."
+                        text: "Completed patient appointments will appear here."
                     },
 
                     cancelled: {
-                        icon:
-                            "fa-calendar-xmark",
+                        icon: "fa-calendar-xmark",
 
-                        title:
-                            "No cancelled patients",
+                        title: "No cancelled patients",
 
-                        text:
-                            "Cancelled patient appointments will appear here."
+                        text: "Cancelled patient appointments will appear here."
                     },
 
                     all: {
-                        icon:
-                            "fa-sliders",
+                        icon: "fa-sliders",
 
-                        title:
-                            "No patients match your filters",
+                        title: "No patients match your filters",
 
-                        text:
-                            "Try removing or changing the selected filter criteria."
+                        text: "Try removing or changing the selected filter criteria."
                     }
                 };
 
@@ -2147,17 +1980,13 @@ $notifCount = $notifications->count();
 
                 if (allPatients.length === 0) {
                     window.EmptyState?.render({
-                        host:
-                            patientBaseEmptyState,
+                        host: patientBaseEmptyState,
 
-                        icon:
-                            'fa-tooth',
+                        icon: 'fa-tooth',
 
-                        title:
-                            'No patients found',
+                        title: 'No patients found',
 
-                        message:
-                            'There are no patient appointments in the system yet.',
+                        message: 'There are no patient appointments in the system yet.',
                     });
 
                     return;
@@ -2165,17 +1994,13 @@ $notifCount = $notifications->count();
 
                 if (hasSearch) {
                     window.EmptyState?.renderSearch({
-                        host:
-                            patientSearchEmptyState,
+                        host: patientSearchEmptyState,
 
-                        input:
-                            searchInput,
+                        input: searchInput,
 
-                        query:
-                            searchKeyword,
+                        query: searchKeyword,
 
-                        message:
-                            'Try a different patient name, student number, program, or service.',
+                        message: 'Try a different patient name, student number, program, or service.',
                     });
 
                     return;
@@ -2190,27 +2015,22 @@ $notifCount = $notifications->count();
 
                 var meta =
                     getPatientStatusEmptyMeta(
-                        hasAdvancedFilters
-                            ? 'all'
-                            : currentStatus
+                        hasAdvancedFilters ?
+                            'all' :
+                            currentStatus
                     );
 
                 window.EmptyState?.render({
-                    host:
-                        patientStatusEmptyState,
+                    host: patientStatusEmptyState,
 
-                    icon:
-                        meta.icon,
+                    icon: meta.icon,
 
-                    title:
-                        meta.title,
+                    title: meta.title,
 
-                    message:
-                        meta.text,
+                    message: meta.text,
 
-                    actionHtml:
-                        hasAdvancedFilters
-                            ? `
+                    actionHtml: hasAdvancedFilters ?
+                        `
                     <button
                         type="button"
                         class="empty-state-btn"
@@ -2219,8 +2039,8 @@ $notifCount = $notifications->count();
                         <i class="fa-solid fa-rotate-left"></i>
                         Clear filters
                     </button>
-                `
-                            : '',
+                ` :
+                        '',
                 });
 
                 document
@@ -2409,22 +2229,19 @@ $notifCount = $notifications->count();
 
             syncMutualExclusion();
 
-            document.querySelectorAll('.filter-btn').forEach(function (b) {
-                b.classList.remove('tab-active');
-            });
+            activeTab = 'all';
 
-            var allPatientsBtn = document.querySelector(
-                '.filter-btn[data-filter="all"]'
+            window.setGlobalFilterSelectValue?.(
+                'patientStatusFilter',
+                'all', {
+                callback: false,
+                focus: false
+            }
             );
 
-            if (allPatientsBtn) {
-                allPatientsBtn.classList.add('tab-active');
-            }
-
-            activeTab = "all";
-
-            updatePatientStatsDropdownLabel();
-            window.initGlobalPageSizeSelects?.(document);
+            window.initGlobalPageSizeSelects?.(
+                document
+            );
 
             applyFilters();
 

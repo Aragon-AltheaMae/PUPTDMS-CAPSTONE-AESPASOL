@@ -1284,7 +1284,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 @endif
 
 @if ($isDentistView)
-<div id="createReportModal" class="ui-modal modal-theme-create" aria-hidden="true">
+<div id="createReportModal" class="ui-modal" aria-hidden="true">
 
     <div class="ui-modal-card modal-lg" role="dialog" aria-modal="true" aria-labelledby="createReportTitle"
         onclick="event.stopPropagation()">

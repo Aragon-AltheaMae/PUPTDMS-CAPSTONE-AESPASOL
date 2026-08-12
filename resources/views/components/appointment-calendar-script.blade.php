@@ -83,6 +83,7 @@
         allowPastDates: @json($allowPastDates ?? false),
         allowAllDates: @json($allowAllDates ?? false),
         allowAllDatesExceptHolidays: @json($allowAllDatesExceptHolidays ?? false),
+        disableWeekends: @json($disableWeekends ?? false),
         allowHolidaySelection: @json($allowHolidaySelection ?? false),
         allowToggleOffDate: @json($allowToggleOffDate ?? true),
         useDynamicScheduleRules: @json($useDynamicScheduleRules ?? false),
@@ -231,12 +232,16 @@
             calendarConfig
             .allowAllDatesExceptHolidays
         ) {
-            return [
-                'today',
-                'holiday'
-            ];
+            return calendarConfig
+                .disableWeekends ? [
+                    'today',
+                    'holiday',
+                    'clinicClosed'
+                ] : [
+                    'today',
+                    'holiday'
+                ];
         }
-
         if (mode === 'dentist') {
             return ['today', 'hasPatients', 'fullyBooked', 'holiday', 'clinicClosed'];
         }
@@ -421,8 +426,19 @@
         const cellDate = new Date(year, month, day);
         cellDate.setHours(0, 0, 0, 0);
 
-        const isToday = cellDate.getTime() === todayDate.getTime();
-        const isPast = cellDate < todayDate;
+        const isToday =
+            cellDate.getTime() ===
+            todayDate.getTime();
+
+        const isPast =
+            cellDate < todayDate;
+
+        const dayOfWeek =
+            cellDate.getDay();
+
+        const isWeekend =
+            dayOfWeek === 0 ||
+            dayOfWeek === 6;
         const isPastOrToday = calendarConfig.allowPastDates ?
             (calendarConfig.disallowToday ? isToday : false) :
             (calendarConfig.disallowToday ? cellDate <= todayDate : isPast);
@@ -452,10 +468,21 @@
             calendarConfig
             .allowAllDatesExceptHolidays
         ) {
-            isDisabled =
+            const holidayBlocked =
                 isHoliday &&
                 !calendarConfig
                 .allowHolidaySelection;
+
+            const weekendBlocked =
+                calendarConfig
+                .disableWeekends ===
+                true &&
+                isWeekend;
+
+            isDisabled =
+                holidayBlocked ||
+                weekendBlocked;
+
         } else if (
             calendarConfig.allowAllDates
         ) {
@@ -475,6 +502,7 @@
             cellDate,
             isToday,
             isPast,
+            isWeekend,
             isPastOrToday,
             holidayName,
             isHoliday,
@@ -525,6 +553,11 @@
             calendarConfig
             .allowAllDatesExceptHolidays === true;
 
+        const disableWeekends =
+            calendarConfig
+            .disableWeekends ===
+            true;
+
         const ignoreAvailabilityRestrictions =
             allowAllDates ||
             allowAllDatesExceptHolidays;
@@ -559,6 +592,14 @@
                     cellClass +=
                         " disabled";
                 }
+
+            } else if (
+                allowAllDatesExceptHolidays &&
+                disableWeekends &&
+                state.isWeekend
+            ) {
+                cellClass +=
+                    " clinic-closed disabled";
             } else if (
                 !ignoreAvailabilityRestrictions &&
                 state.isToday
@@ -711,6 +752,21 @@
         }
 
         if (
+            allowAllDatesExceptHolidays &&
+            disableWeekends &&
+            state.isWeekend
+        ) {
+            tooltip = `
+        <i class="fa-solid fa-circle-minus mr-1"></i>
+        Clinic closed on weekends
+    `;
+
+            tooltipBg =
+                "bg-gray-600";
+
+            tooltipArrow =
+                "after:border-t-gray-600";
+        } else if (
             state.isHoliday &&
             !allowAllDates
         ) {} else if (
@@ -890,12 +946,26 @@
                 1
             );
 
-        const maximum = new Date(
-            todayDate.getFullYear(),
-            todayDate.getMonth() +
-            Number(calendarConfig.maxFutureMonths || 6),
-            1
-        );
+        const maxFutureMonths =
+            Number.isFinite(
+                Number(
+                    calendarConfig
+                    .maxFutureMonths
+                )
+            ) ?
+            Number(
+                calendarConfig
+                .maxFutureMonths
+            ) :
+            6;
+
+        const maximum =
+            new Date(
+                todayDate.getFullYear(),
+                todayDate.getMonth() +
+                maxFutureMonths,
+                1
+            );
 
         return {
             minimum,
@@ -1309,40 +1379,58 @@
         ` : '';
 
         const monthControl = showMonthYearShortcut ? `
-            <div class="calendar-split-picker" aria-label="Choose month and year">
-                <label class="calendar-month-picker-wrap calendar-split-picker-item">
-                    <span class="sr-only">Choose month</span>
+    <div
+        class="calendar-split-picker"
+        aria-label="Choose month and year"
+    >
+        <div class="calendar-split-picker-item">
+            <span class="sr-only">
+                Choose month
+            </span>
 
-                    <select
-                        ${isDashboard ? 'data-calendar-month-picker' : 'data-calendar-month-select'}
-                        class="calendar-month-picker">
-                        ${isDashboard ? monthOptions : splitMonthOptions}
-                    </select>
+            <select
+                ${isDashboard
+                    ? 'data-calendar-month-picker'
+                    : 'data-calendar-month-select'
+                }
+                class="js-custom-select calendar-month-picker"
+                data-placeholder="Choose month"
+                aria-label="Choose month"
+            >
+                ${isDashboard
+                    ? monthOptions
+                    : splitMonthOptions
+                }
+            </select>
+        </div>
 
-                    <i
-                        class="fa-solid fa-chevron-down"
-                        aria-hidden="true"
-                    ></i>
-                </label>
+        ${isDashboard ? '' : `
+            <div
+                class="
+                    calendar-split-picker-item
+                    calendar-year-picker-wrap
+                "
+            >
+                <span class="sr-only">
+                    Choose year
+                </span>
 
-                ${isDashboard ? '' : `
-                    <label class="calendar-month-picker-wrap calendar-split-picker-item calendar-year-picker-wrap">
-                        <span class="sr-only">Choose year</span>
-
-                        <select
-                            data-calendar-year-select
-                            class="calendar-month-picker calendar-year-picker">
-                            ${splitYearOptions}
-                        </select>
-
-                        <i
-                            class="fa-solid fa-chevron-down"
-                            aria-hidden="true"
-                        ></i>
-                    </label>
-                `}
+                <select
+                    data-calendar-year-select
+                    class="
+                        js-custom-select
+                        calendar-month-picker
+                        calendar-year-picker
+                    "
+                    data-placeholder="Choose year"
+                    aria-label="Choose year"
+                >
+                    ${splitYearOptions}
+                </select>
             </div>
-        ` : `
+        `}
+    </div>
+` : `
             <div class="text-center">
                 <p class="cal-month-label text-base font-extrabold">
                     ${MONTHS[month]}
@@ -1463,15 +1551,39 @@
         hasCalendarRenderedOnce = true;
 
         setTimeout(() => {
+            const calendarContainer =
+                document.getElementById(
+                    calendarConfig.calendarContainerId
+                );
+
+            window.initCustomSelects?.(
+                calendarContainer
+            );
+
+            calendarContainer
+                ?.querySelectorAll(
+                    '.custom-select'
+                )
+                .forEach(wrapper => {
+                    window.syncCustomSelect?.(
+                        wrapper
+                    );
+                });
+
             bindCalendarClicks(
                 `#${calendarConfig.calendarContainerId} [data-date]`
             );
 
             bindCalendarToolbar();
-            applyCalendarFilter(activeCalendarFilter);
+
+            applyCalendarFilter(
+                activeCalendarFilter
+            );
 
             if (focusedDateIso) {
-                focusCalendarDate(focusedDateIso);
+                focusCalendarDate(
+                    focusedDateIso
+                );
             }
         }, isInitialAnimatedRender ? 180 : 0);
     }

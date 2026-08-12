@@ -356,10 +356,11 @@
             </label>
 
             <input type="tel" id="emergency_number" name="emergency_number"
-                value="{{ old('emergency_number', $defaults['emergency_number'] ?? '') }}" inputmode="numeric"
-                autocomplete="tel" maxlength="13" class="form-input-custom" placeholder="09xx xxx xxxx"
-                data-validation-rule="philippineMobile"
-                data-required-message="Please enter an emergency contact number." required>
+                value="{{ old('emergency_number', $defaults['emergency_number'] ?? '') }}"
+                inputmode="numeric" autocomplete="tel" maxlength="11" pattern="09[0-9]{9}"
+                class="form-input-custom" placeholder="09XXXXXXXXX" data-validation-rule="philippineMobile"
+                data-required-message="Please enter an emergency contact number."
+                data-pattern-message="Contact number must start with 09 and contain exactly 11 digits." required>
         </div>
 
 

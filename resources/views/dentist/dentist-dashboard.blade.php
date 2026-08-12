@@ -1667,7 +1667,7 @@ ${count}
                     cellClass += " full";
                 } else if (hasAppts) {
                     cellClass +=
-                        " bg-emerald-50 text-emerald-700 font-bold border-emerald-200 cursor-pointer hover:bg-emerald-100 transition-colors";
+                                 " has-patients font-bold cursor-pointer";
                 } else if (isUnavail) {
                     cellClass += " disabled text-gray-400";
                 } else {

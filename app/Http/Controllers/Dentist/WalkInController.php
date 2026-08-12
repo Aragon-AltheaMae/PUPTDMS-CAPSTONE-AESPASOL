@@ -9,6 +9,15 @@ use App\Models\BlockedDate;
 use App\Models\ClinicSchedule;
 use App\Models\Disease;
 use App\Models\MedicalHistory;
+use App\Models\DentalHistory;
+use App\Models\DentalHistoryCondition;
+use App\Models\DentalHistoryAnswer;
+use App\Models\DentalHistoryConditionDate;
+use App\Models\DentalHistoryConcern;
+
+use App\Models\MedicalHistoryQuestion;
+use App\Models\MedicalHistoryAnswer;
+use App\Models\MedicalHistoryDiseaseAnswer;
 use App\Models\Patient;
 use App\Models\ServiceType;
 use App\Models\User;
@@ -81,7 +90,8 @@ class WalkInController extends Controller
                 'philippineHolidays',
                 'dentalQuestions',
                 'medicalQuestions'
-            ));
+            )
+        );
     }
 
     public function searchPatient(
@@ -742,7 +752,27 @@ class WalkInController extends Controller
             'emergency_number' => ['required', 'string', 'max:15'],
             'emergency_relation' => ['required', 'string', 'max:50'],
 
-            'patient_signature' => ['required', 'file', 'mimes:png,jpg,jpeg', 'max:25600'],
+            'patient_signature' => [
+                'required',
+                'file',
+                'mimes:png,jpg,jpeg',
+                'max:25600',
+            ],
+
+            'signature_source' => [
+                'nullable',
+                'in:drawn,upload',
+            ],
+
+            'diseases' => [
+                'nullable',
+                'array',
+            ],
+
+            'diseases.*' => [
+                'string',
+                'exists:diseases,code',
+            ],
         ]);
 
         $patient = Patient::findOrFail($validated['patient_id']);
@@ -762,25 +792,579 @@ class WalkInController extends Controller
             $appointmentData['is_walk_in'] = true;
         }
 
-        if (Schema::hasColumn('appointments', 'concern')) {
-            $appointmentData['concern'] = $validated['concern'] ?? null;
+        if (
+            Schema::hasColumn(
+                'appointments',
+                'concern'
+            )
+        ) {
+            $appointmentData['concern'] =
+                $validated['concern'] ?? null;
         }
 
-        DB::transaction(function () use ($patient, $validated, $appointmentData, $signaturePath, &$appointment) {
-            $appointment = Appointment::create(
-            $appointmentData
-        );
+        $appointment = null;
 
-            MedicalHistory::updateOrCreate(
-                ['patient_id' => $patient->id],
+        try {
+            DB::transaction(
+                function () use (
+                    $request,
+                    $patient,
+                    $validated,
+                    $appointmentData,
+                    $signaturePath,
+                    &$appointment
+                ) {
+
+                    $appointment =
+                        Appointment::create(
+                            $appointmentData
+                        );
+
+                    DentalHistory::updateOrCreate(
+                        [
+                            'patient_id' =>
+                            $patient->id,
+                        ],
+                        [
+                            'last_dental_visit' =>
+                            $request->input(
+                                'last_dental_visit'
+                            ),
+
+                            'previous_dentist' =>
+                            $request->input(
+                                'previous_dentist'
+                            ),
+                        ]
+                    );
+
+                    DentalHistoryConditionDate::updateOrCreate(
+                        [
+                            'patient_id' =>
+                            $patient->id,
+                        ],
+                        [
+                            'extraction_date' =>
+                            $request->input(
+                                'extraction_date'
+                            ),
+
+                            'dentures_date' =>
+                            $request->input(
+                                'dentures_date'
+                            ),
+
+                            'ortho_date' =>
+                            $request->input(
+                                'ortho_date'
+                            ),
+                        ]
+                    );
+
+                    DentalHistoryConcern::updateOrCreate(
+                        [
+                            'patient_id' =>
+                            $patient->id,
+                        ],
+                        [
+                            'additional_concerns' =>
+                            $request->input(
+                                'additional_concerns'
+                            ),
+                        ]
+                    );
+
+                    $dentalAnswerMap = [
+                        'bleeding_gums' =>
+                        $request->input(
+                            'bleeding_gums'
+                        ),
+
+                        'sensitive_temp' =>
+                        $request->input(
+                            'sensitive_temp'
+                        ),
+
+                        'sensitive_taste' =>
+                        $request->input(
+                            'sensitive_taste'
+                        ),
+
+                        'tooth_pain' =>
+                        $request->input(
+                            'tooth_pain'
+                        ),
+
+                        'sores' =>
+                        $request->input(
+                            'sores'
+                        ),
+
+                        'injuries' =>
+                        $request->input(
+                            'injuries'
+                        ),
+
+                        'clicking' =>
+                        $request->input(
+                            'clicking'
+                        ),
+
+                        'joint_pain' =>
+                        $request->input(
+                            'joint_pain'
+                        ),
+
+                        'difficulty_moving' =>
+                        $request->input(
+                            'difficulty_moving'
+                        ),
+
+                        'difficulty_chewing' =>
+                        $request->input(
+                            'difficulty_chewing'
+                        ),
+
+                        'jaw_headaches' =>
+                        $request->input(
+                            'jaw_headaches'
+                        ),
+
+                        'clench_grind' =>
+                        $request->input(
+                            'clench_grind'
+                        ),
+
+                        'biting' =>
+                        $request->input(
+                            'biting'
+                        ),
+
+                        'teeth_loosening' =>
+                        $request->input(
+                            'teeth_loosening'
+                        ),
+
+                        'food_teeth' =>
+                        $request->input(
+                            'food_teeth'
+                        ),
+
+                        'med_reaction' =>
+                        $request->input(
+                            'med_reaction'
+                        ),
+
+                        'periodontal' =>
+                        $request->input(
+                            'periodontal'
+                        ),
+
+                        'difficult_extraction' =>
+                        $request->input(
+                            'difficult_extraction'
+                        ),
+
+                        'prolonged_bleeding' =>
+                        $request->input(
+                            'prolonged_bleeding'
+                        ),
+
+                        'dentures' =>
+                        $request->input(
+                            'dentures'
+                        ),
+
+                        'ortho_treatment' =>
+                        $request->input(
+                            'ortho_treatment'
+                        ),
+                    ];
+
+                    $conditionIdsByCode =
+                        DentalHistoryCondition::whereIn(
+                            'code',
+                            array_keys(
+                                $dentalAnswerMap
+                            )
+                        )
+                        ->pluck(
+                            'id',
+                            'code'
+                        );
+
+                    foreach (
+                        $dentalAnswerMap
+                        as $code => $rawValue
+                    ) {
+                        $conditionId =
+                            $conditionIdsByCode[$code] ?? null;
+
+                        if (!$conditionId) {
+                            continue;
+                        }
+
+                        DentalHistoryAnswer::updateOrCreate(
+                            [
+                                'patient_id' =>
+                                $patient->id,
+
+                                'condition_id' =>
+                                $conditionId,
+                            ],
+                            [
+                                'answer' =>
+                                $this->yesNoValue(
+                                    $rawValue
+                                ) === 'YES',
+                            ]
+                        );
+                    }
+
+                    $medicalHistory =
+                        MedicalHistory::updateOrCreate(
+                            [
+                                'patient_id' =>
+                                $patient->id,
+                            ],
+                            [
+                                'emergency_person' =>
+                                $validated['emergency_person'],
+
+                                'emergency_number' =>
+                                $validated['emergency_number'],
+
+                                'emergency_relation' =>
+                                $validated['emergency_relation'],
+
+                                'patient_signature' =>
+                                $signaturePath,
+                            ]
+                        );
+
+                    $medicalAnswerMap = [
+                        'good_health' =>
+                        $request->input(
+                            'good_health'
+                        ),
+
+                        'had_medical_exam' =>
+                        $request->input(
+                            'had_medical_exam'
+                        ),
+
+                        'under_treatment' =>
+                        $request->input(
+                            'under_treatment'
+                        ),
+
+                        'hospitalized' =>
+                        $request->input(
+                            'hospitalized'
+                        ),
+
+                        'allergy_medicine' =>
+                        $request->input(
+                            'allergy_medicine'
+                        ),
+
+                        'allergy_food' =>
+                        $request->input(
+                            'allergy_food'
+                        ),
+
+                        'medication' =>
+                        $request->input(
+                            'medication'
+                        ),
+
+                        'pregnant' =>
+                        $request->input(
+                            'pregnant'
+                        ),
+
+                        'nursing' =>
+                        $request->input(
+                            'nursing'
+                        ),
+
+                        'birth_control' =>
+                        $request->input(
+                            'birth_control'
+                        ),
+
+                        'tobacco_use' =>
+                        $request->input(
+                            'tobacco_use'
+                        ),
+
+                        'headaches' =>
+                        $request->input(
+                            'headaches'
+                        ),
+
+                        'earaches' =>
+                        $request->input(
+                            'earaches'
+                        ),
+
+                        'neck_aches' =>
+                        $request->input(
+                            'neck_aches'
+                        ),
+
+                        'good_health_details' =>
+                        $request->input(
+                            'good_health_details'
+                        ),
+
+                        'treatment_details' =>
+                        $request->input(
+                            'treatment_details'
+                        ),
+
+                        'hospital_details' =>
+                        $request->input(
+                            'hospital_details'
+                        ),
+
+                        'allergy_others' =>
+                        $request->input(
+                            'allergy_others'
+                        ),
+
+                        'medication_details' =>
+                        $request->input(
+                            'medication_details'
+                        ),
+
+                        'tobacco_per_day' =>
+                        $request->input(
+                            'tobacco_per_day'
+                        ),
+
+                        'tobacco_per_week' =>
+                        $request->input(
+                            'tobacco_per_week'
+                        ),
+
+                        'medical_exam_date' =>
+                        $request->input(
+                            'medical_exam_date'
+                        ),
+                    ];
+
+                    $questions =
+                        MedicalHistoryQuestion::whereIn(
+                            'code',
+                            array_keys(
+                                $medicalAnswerMap
+                            )
+                        )
+                        ->get()
+                        ->keyBy(
+                            'code'
+                        );
+
+                    foreach (
+                        $medicalAnswerMap
+                        as $code => $rawValue
+                    ) {
+                        $question =
+                            $questions->get(
+                                $code
+                            );
+
+                        if (!$question) {
+                            continue;
+                        }
+
+                        $criteria = [
+                            'patient_id' =>
+                            $patient->id,
+
+                            'medical_history_id' =>
+                            $medicalHistory->id,
+
+                            'question_id' =>
+                            $question->id,
+                        ];
+
+                        if (
+                            $question->type ===
+                            'bool'
+                        ) {
+                            MedicalHistoryAnswer::updateOrCreate(
+                                $criteria,
+                                [
+                                    'answer_bool' =>
+                                    $this->yesNoValue(
+                                        $rawValue
+                                    ) === 'YES',
+
+                                    'answer_text' =>
+                                    null,
+
+                                    'answer_date' =>
+                                    null,
+                                ]
+                            );
+
+                            continue;
+                        }
+
+                        if (
+                            $question->type ===
+                            'date'
+                        ) {
+                            $dateValue =
+                                trim(
+                                    (string) $rawValue
+                                );
+
+                            if (
+                                $dateValue === ''
+                            ) {
+                                MedicalHistoryAnswer::where(
+                                    $criteria
+                                )->delete();
+
+                                continue;
+                            }
+
+                            MedicalHistoryAnswer::updateOrCreate(
+                                $criteria,
+                                [
+                                    'answer_bool' =>
+                                    null,
+
+                                    'answer_text' =>
+                                    null,
+
+                                    'answer_date' =>
+                                    $dateValue,
+                                ]
+                            );
+
+                            continue;
+                        }
+
+                        $textValue =
+                            trim(
+                                (string) $rawValue
+                            );
+
+                        if (
+                            $textValue === ''
+                        ) {
+                            MedicalHistoryAnswer::where(
+                                $criteria
+                            )->delete();
+
+                            continue;
+                        }
+
+                        MedicalHistoryAnswer::updateOrCreate(
+                            $criteria,
+                            [
+                                'answer_bool' =>
+                                null,
+
+                                'answer_text' =>
+                                $textValue,
+
+                                'answer_date' =>
+                                null,
+                            ]
+                        );
+                    }
+
+                    $selectedDiseaseCodes =
+                        $request->input(
+                            'diseases',
+                            []
+                        );
+
+                    $selectedDiseaseIds =
+                        Disease::whereIn(
+                            'code',
+                            $selectedDiseaseCodes
+                        )
+                        ->pluck(
+                            'id'
+                        )
+                        ->all();
+
+                    MedicalHistoryDiseaseAnswer::where(
+                        'medical_history_id',
+                        $medicalHistory->id
+                    )->delete();
+
+                    foreach (
+                        $selectedDiseaseIds
+                        as $diseaseId
+                    ) {
+                        MedicalHistoryDiseaseAnswer::create([
+                            'patient_id' =>
+                            $patient->id,
+
+                            'medical_history_id' =>
+                            $medicalHistory->id,
+
+                            'disease_id' =>
+                            $diseaseId,
+
+                            'has_disease' =>
+                            true,
+                        ]);
+                    }
+                }
+            );
+        } catch (\Throwable $error) {
+            Log::error(
+                'Walk-in appointment creation failed',
                 [
-                    'emergency_person' => $validated['emergency_person'],
-                    'emergency_number' => $validated['emergency_number'],
-                    'emergency_relation' => $validated['emergency_relation'],
-                    'patient_signature' => $signaturePath,
+                    'message' =>
+                    $error->getMessage(),
+
+                    'file' =>
+                    $error->getFile(),
+
+                    'line' =>
+                    $error->getLine(),
+
+                    'patient_id' =>
+                    $patient->id,
                 ]
             );
-        });
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+
+                    'message' =>
+                    config('app.debug')
+                        ? $error->getMessage()
+                        : 'Unable to create the walk-in appointment.',
+                ], 500);
+            }
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with(
+                    'error',
+                    'Unable to create the walk-in appointment.'
+                );
+        }
+
+        if (!$appointment) {
+            return response()->json([
+                'success' => false,
+                'message' =>
+                'The walk-in appointment could not be created.',
+            ], 500);
+        }
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -1016,5 +1600,18 @@ class WalkInController extends Controller
         }
 
         return null;
+    }
+
+    private function yesNoValue($value): string {
+        $normalized =
+            strtoupper(
+                trim(
+                    (string) $value
+                )
+            );
+
+        return $normalized === 'YES'
+            ? 'YES'
+            : 'NO';
     }
 }

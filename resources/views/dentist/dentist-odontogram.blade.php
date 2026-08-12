@@ -2,6 +2,9 @@
 
 @section('layout-role', 'dentist')
 
+@section('hide-sidebar')
+@endsection
+
 @section('title', 'Patient Odontogram')
 
 @section('hide-sidebar')

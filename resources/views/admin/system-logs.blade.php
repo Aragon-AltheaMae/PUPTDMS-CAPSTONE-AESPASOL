@@ -122,17 +122,14 @@ $status = $status ?? 'active';
                 </div>
 
                 <div class="card-header-right sl-toolbar-actions">
-                    <div class="voice-search-row sl-search-row">
+                    <div class="global-voice-row sl-search-row">
+
                         <x-search-bar id="slSearch" name="search" placeholder="Search logs…" :value="$search ?? ''"
                             callback="handleSystemLogsSearch" :debounce="400" class="sl-search-wrap" />
 
-                        <div class="voice-input-toggle">
-                            <span class="voice-status hidden" data-voice-status></span>
-                            <button type="button" class="voice-search-mic external" data-global-voice-trigger
-                                data-voice-target="#slSearch" aria-label="Use voice search" title="Voice search">
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
-                        </div>
+                        <x-voice-input target="#slSearch" status-id="slSearchVoiceStatus"
+                            label="Voice search system logs" title="Voice search" />
+
                     </div>
 
                     <div class="sl-filter-actions-wrap">
@@ -171,241 +168,329 @@ $status = $status ?? 'active';
 
             @php $activeRole = $role ?? 'all'; @endphp
             <div class="sl-status-tabs">
-                <div class="sl-status-tabs">
-                    @foreach ([['key' => 'active', 'label' => 'Active', 'count' => $activeCount ?? 0, 'icon' =>
-                    'fa-wave-square'], ['key' => 'archived', 'label' => 'Archived', 'count' => $archivedCount ?? 0,
-                    'icon' => 'fa-box-archive'], ['key' => 'all', 'label' => 'All Logs', 'count' => ($activeCount ?? 0)
-                    + ($archivedCount ?? 0), 'icon' => 'fa-layer-group']] as $statusTab)
-                    <button type="button" class="sl-status-tab {{ $status === $statusTab['key'] ? 'active' : '' }}"
-                        onclick="slSetStatus(this, '{{ $statusTab['key'] }}')">
-                        <i class="fa-solid {{ $statusTab['icon'] }}"></i>
-                        <span>{{ $statusTab['label'] }}</span>
-                        <span class="sl-status-count">{{ $statusTab['count'] }}</span>
-                    </button>
-                    @endforeach
-                </div>
+                @foreach ([
+                [
+                'key' => 'active',
+                'label' => 'Active',
+                'count' => $activeCount ?? 0,
+                'icon' => 'fa-wave-square',
+                ],
+                [
+                'key' => 'archived',
+                'label' => 'Archived',
+                'count' => $archivedCount ?? 0,
+                'icon' => 'fa-box-archive',
+                ],
+                ] as $statusTab)
+                <button type="button" class="sl-status-tab {{ $status === $statusTab['key'] ? 'active' : '' }}"
+                    onclick="slSetStatus(this, '{{ $statusTab['key'] }}')">
+                    <i class="fa-solid {{ $statusTab['icon'] }}"></i>
+                    <span>{{ $statusTab['label'] }}</span>
+                    <span class="sl-status-count">{{ $statusTab['count'] }}</span>
+                </button>
+                @endforeach
+            </div>
 
-                <div class="sl-role-tabs">
-                    @foreach ([['key' => 'all', 'label' => 'All', 'icon' => 'fa-layer-group', 'count' => $totalCount],
-                    ['key' => 'admin', 'label' => 'Admin', 'icon' => 'fa-user-tie', 'count' => $adminCount], ['key' =>
-                    'dentist', 'label' => 'Dentist', 'icon' => 'fa-user-doctor', 'count' => $dentistCount], ['key' =>
-                    'patient', 'label' => 'Patient', 'icon' => 'fa-user', 'count' => $patientCount], ['key' => 'login',
-                    'label' => 'Logins', 'icon' => 'fa-right-to-bracket', 'count' => $loginCount], ['key' => 'error',
-                    'label' => 'Errors', 'icon' => 'fa-triangle-exclamation', 'count' => $errorCount ?? 0]] as $tab)
-                    <button class="tab-btn {{ $activeRole === $tab['key'] ? 'active' : '' }}"
-                        onclick="slSetTab(this, '{{ $tab['key'] }}')">
-                        <i class="fa-solid {{ $tab['icon'] }} mr-1 text-[0.7rem]"></i>{{ $tab['label'] }}
-                        <span
-                            class="tab-count {{ $activeRole === $tab['key'] ? 'bg-red-200 text-[#8B0000]' : 'bg-gray-200 text-gray-500' }} text-[0.62rem] font-bold px-1.5 py-0.5 rounded-full ml-1">
-                            {{ $tab['count'] }}
-                        </span>
-                    </button>
-                    @endforeach
-                </div>
+            <div class="sl-role-tabs">
+                @foreach ([['key' => 'all', 'label' => 'All', 'icon' => 'fa-layer-group', 'count' => $totalCount],
+                ['key' => 'admin', 'label' => 'Admin', 'icon' => 'fa-user-tie', 'count' => $adminCount], ['key' =>
+                'dentist', 'label' => 'Dentist', 'icon' => 'fa-user-doctor', 'count' => $dentistCount], ['key' =>
+                'patient', 'label' => 'Patient', 'icon' => 'fa-user', 'count' => $patientCount], ['key' => 'login',
+                'label' => 'Logins', 'icon' => 'fa-right-to-bracket', 'count' => $loginCount], ['key' => 'error',
+                'label' => 'Errors', 'icon' => 'fa-triangle-exclamation', 'count' => $errorCount ?? 0]] as $tab)
+                <button class="tab-btn {{ $activeRole === $tab['key'] ? 'active' : '' }}"
+                    onclick="slSetTab(this, '{{ $tab['key'] }}')">
+                    <i class="fa-solid {{ $tab['icon'] }} mr-1 text-[0.7rem]"></i>{{ $tab['label'] }}
+                    <span
+                        class="tab-count {{ $activeRole === $tab['key'] ? 'bg-red-200 text-[#8B0000]' : 'bg-gray-200 text-gray-500' }} text-[0.62rem] font-bold px-1.5 py-0.5 rounded-full ml-1">
+                        {{ $tab['count'] }}
+                    </span>
+                </button>
+                @endforeach
+            </div>
 
-                <x-pagination-bar id="systemLogsPaginationTopBar" info-id="systemLogsPageInfoTop"
-                    pagination-id="systemLogsPaginationTop" position="top" :show-entries="true"
-                    page-size-id="perPageSelect" page-size-callback="handleSystemLogsPerPageChange"
-                    :page-size-value="$perPage" page-size-label="per page" label="entries" />
+            <x-pagination-bar id="systemLogsPaginationTopBar" info-id="systemLogsPageInfoTop"
+                pagination-id="systemLogsPaginationTop" position="top" :show-entries="true" page-size-id="perPageSelect"
+                page-size-callback="handleSystemLogsPerPageChange" :page-size-value="$perPage"
+                page-size-label="per page" label="entries" />
 
-                <div class="sl-view" id="slListView">
-                    <div class="sl-table-wrap">
-                        <table class="data-table" id="slTable">
-                            <thead>
-                                <tr>
-                                    <th class="sl-col-id">ID</th>
-                                    <th class="sl-col-timestamp">Timestamp</th>
-                                    <th class="sl-col-role">Role</th>
-                                    <th class="sl-col-user">User</th>
-                                    <th class="sl-col-action">Action</th>
-                                    <th class="sl-col-module">Module</th>
-                                    <th>Description</th>
-                                </tr>
-                            </thead>
-                            <tbody id="slTableBody">
-                                @forelse($logs as $log)
-                                @php
-                                $role = strtolower($log->actor_role ?? 'other');
-                                $action = strtolower($log->action ?? '');
-                                $actionClass = match (true) {
-                                str_contains($action, 'error') ||
-                                str_contains($action, 'failed') ||
-                                str_contains($action, 'exception')
-                                => 'error',
-                                str_contains($action, 'login') => 'login',
-                                str_contains($action, 'logout') => 'logout',
-                                str_contains($action, 'create') => 'create',
-                                str_contains($action, 'update') => 'update',
-                                str_contains($action, 'delete') => 'delete',
-                                default => 'default',
-                                };
-                                $actionIcon = match ($actionClass) {
-                                'login' => 'fa-right-to-bracket',
-                                'logout' => 'fa-right-from-bracket',
-                                'create' => 'fa-plus',
-                                'update' => 'fa-pen',
-                                'delete' => 'fa-trash',
-                                'error' => 'fa-triangle-exclamation',
-                                default => 'fa-bolt',
-                                };
-                                $roleIcon = match ($role) {
-                                'admin' => 'fa-user-tie',
-                                'dentist' => 'fa-user-doctor',
-                                'patient' => 'fa-user',
-                                default => 'fa-circle-user',
-                                };
-                                $avatarLetter = strtoupper(substr($log->actor_name ?? $role, 0, 1));
-                                @endphp
-                                <tr data-role="{{ $role }}" data-action="{{ $actionClass }}">
-                                    <td><span class="sl-id">#{{ str_pad($log->id, 3, '0', STR_PAD_LEFT) }}</span>
-                                    </td>
-                                    <td>
-                                        <span class="sl-date-day">{{ $log->created_at->format('M j, Y') }}</span>
-                                        <span class="sl-date-time">{{ $log->created_at->format('h:i:s A') }}</span>
-                                    </td>
-                                    <td><span class="sl-role {{ $role }}"><i class="fa-solid {{ $roleIcon }}"></i>{{
-                                            ucfirst($role) }}</span>
-                                    </td>
-                                    <td>
-                                        <div class="sl-user">
-                                            <div class="sl-avatar {{ $role }}">{{ $avatarLetter }}</div>
-                                            <span class="sl-username">{{ $log->actor_name ?? 'Unknown User' }}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="sl-action {{ $actionClass }}">
-                                            <i
-                                                class="fa-solid {{ $actionIcon }} {{ $actionClass === 'error' ? 'sl-action-alert' : '' }}"></i>
-                                            {{ ucwords(str_replace('_', ' ', $log->action)) }}
+            <div class="sl-view" id="slListView">
+                <div class="sl-table-wrap">
+                    <table class="data-table" id="slTable">
+                        <thead>
+                            <tr>
+                                <th class="sl-col-id">ID</th>
+                                <th class="sl-col-timestamp">Timestamp</th>
+                                <th class="sl-col-role">Role</th>
+                                <th class="sl-col-user">User</th>
+                                <th class="sl-col-action">Action</th>
+                                <th class="sl-col-module">Module</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody id="slTableBody">
+                            @forelse($logs as $log)
+                            @php
+                            $role = strtolower($log->actor_role ?? 'other');
+                            $action = strtolower($log->action ?? '');
+                            $actionClass = match (true) {
+                            str_contains($action, 'error') ||
+                            str_contains($action, 'failed') ||
+                            str_contains($action, 'exception')
+                            => 'error',
+                            str_contains($action, 'login') => 'login',
+                            str_contains($action, 'logout') => 'logout',
+                            str_contains($action, 'create') => 'create',
+                            str_contains($action, 'update') => 'update',
+                            str_contains($action, 'delete') => 'delete',
+                            default => 'default',
+                            };
+                            $actionIcon = match ($actionClass) {
+                            'login' => 'fa-right-to-bracket',
+                            'logout' => 'fa-right-from-bracket',
+                            'create' => 'fa-plus',
+                            'update' => 'fa-pen',
+                            'delete' => 'fa-trash',
+                            'error' => 'fa-triangle-exclamation',
+                            default => 'fa-bolt',
+                            };
+                            $roleIcon = match ($role) {
+                            'admin' => 'fa-user-tie',
+                            'dentist' => 'fa-user-doctor',
+                            'patient' => 'fa-user',
+                            default => 'fa-circle-user',
+                            };
+                            $avatarLetter = strtoupper(substr($log->actor_name ?? $role, 0, 1));
+                            $roleBadgeClass = match ($role) {
+                            'admin' => 'role-admin',
+                            'dentist' => 'role-dentist',
+                            'patient' => 'role-patient',
+                            default => 'role-none',
+                            };
+                            $actionStatusClass = match ($actionClass) {
+                            'login' => 's-active',
+                            'logout' => 's-ended',
+                            'create' => 's-upcoming',
+                            'update' => 's-rescheduled',
+                            'delete' => 's-cancelled',
+                            'error' => 's-failed',
+                            default => 's-neutral',
+                            };
+                            @endphp
+                            <tr data-role="{{ $role }}" data-action="{{ $actionClass }}">
+                                <td><span class="sl-id">#{{ str_pad($log->id, 3, '0', STR_PAD_LEFT) }}</span>
+                                </td>
+                                <td>
+                                    <span class="sl-date-day">{{ $log->created_at->format('M j, Y') }}</span>
+                                    <span class="sl-date-time">{{ $log->created_at->format('h:i:s A') }}</span>
+                                </td>
+                                <td><span class="badge-role {{ $roleBadgeClass }}">
+                                        <i class="fa-solid {{ $roleIcon }}"></i>
+                                        {{ ucfirst($role) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="sl-user">
+
+                                        <span class="patient-avatar patient-avatar-sm" data-patient-avatar
+                                            data-patient-name="{{ $log->actor_name ?? 'Unknown User' }}"></span>
+
+                                        <span class="sl-username">
+                                            {{ $log->actor_name ?? 'Unknown User' }}
                                         </span>
-                                        @if ($log->is_archived)
-                                        <span class="sl-archive-badge"
-                                            title="Archived {{ optional($log->archived_at)->format('M j, Y h:i A') }}">
-                                            <i class="fa-solid fa-box-archive"></i> Archived
-                                        </span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <span class="sl-module">
-                                            <i class="fa-solid fa-cube"></i>{{ ucfirst(str_replace('_', ' ',
-                                            $log->module)) }}
-                                        </span>
-                                    </td>
-                                    <td><span class="sl-desc">{{ $log->description ?? 'No description provided.'
-                                            }}</span>
-                                    </td>
-                                </tr>
-                                @empty
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
+
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-pill {{ $actionStatusClass }}">
+                                        <span class="status-dot"></span>
+
+                                        <i class="fa-solid {{ $actionIcon }}
+        {{ $actionClass === 'error' ? 'sl-action-alert' : '' }}"></i>
+
+                                        {{ ucwords(str_replace('_', ' ', $log->action)) }}
+                                    </span>
+                                    @if ($log->is_archived)
+                                    <span class="status-pill s-archived"
+                                        title="Archived {{ optional($log->archived_at)->format('M j, Y h:i A') }}">
+                                        <span class="status-dot"></span>
+                                        <i class="fa-solid fa-box-archive"></i>
+                                        Archived
+                                    </span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <span class="table-tag table-tag-neutral">
+                                        <i class="fa-solid fa-cube"></i>
+
+                                        {{ ucfirst(str_replace('_', ' ', $log->module)) }}
+                                    </span>
+                                </td>
+                                <td><span class="sl-desc">{{ $log->description ?? 'No description provided.'
+                                        }}</span>
+                                </td>
+                            </tr>
+                            @empty
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
+            </div>
 
-                <div class="sl-view" id="slGridView" hidden>
-                    <div class="sl-grid" id="slGridBody">
-                        @forelse($logs as $log)
-                        @php
-                        $role = strtolower($log->actor_role ?? 'other');
-                        $action = strtolower($log->action ?? '');
-                        $actionClass = match (true) {
-                        str_contains($action, 'error') ||
-                        str_contains($action, 'failed') ||
-                        str_contains($action, 'exception')
-                        => 'error',
-                        str_contains($action, 'login') => 'login',
-                        str_contains($action, 'logout') => 'logout',
-                        str_contains($action, 'create') => 'create',
-                        str_contains($action, 'update') => 'update',
-                        str_contains($action, 'delete') => 'delete',
-                        default => 'default',
-                        };
-                        $actionIcon = match ($actionClass) {
-                        'login' => 'fa-right-to-bracket',
-                        'logout' => 'fa-right-from-bracket',
-                        'create' => 'fa-plus',
-                        'update' => 'fa-pen',
-                        'delete' => 'fa-trash',
-                        'error' => 'fa-triangle-exclamation',
-                        default => 'fa-bolt',
-                        };
-                        $roleIcon = match ($role) {
-                        'admin' => 'fa-user-tie',
-                        'dentist' => 'fa-user-doctor',
-                        'patient' => 'fa-user',
-                        default => 'fa-circle-user',
-                        };
-                        $avatarLetter = strtoupper(substr($log->actor_name ?? $role, 0, 1));
-                        @endphp
+            <div class="table-grid-view" id="slGridView" hidden>
+                <div class="table-record-grid" id="slGridBody">
+                    @forelse($logs as $log)
+                    @php
+                    $role = strtolower($log->actor_role ?? 'other');
+                    $action = strtolower($log->action ?? '');
+                    $actionClass = match (true) {
+                    str_contains($action, 'error') ||
+                    str_contains($action, 'failed') ||
+                    str_contains($action, 'exception')
+                    => 'error',
+                    str_contains($action, 'login') => 'login',
+                    str_contains($action, 'logout') => 'logout',
+                    str_contains($action, 'create') => 'create',
+                    str_contains($action, 'update') => 'update',
+                    str_contains($action, 'delete') => 'delete',
+                    default => 'default',
+                    };
+                    $actionIcon = match ($actionClass) {
+                    'login' => 'fa-right-to-bracket',
+                    'logout' => 'fa-right-from-bracket',
+                    'create' => 'fa-plus',
+                    'update' => 'fa-pen',
+                    'delete' => 'fa-trash',
+                    'error' => 'fa-triangle-exclamation',
+                    default => 'fa-bolt',
+                    };
+                    $roleIcon = match ($role) {
+                    'admin' => 'fa-user-tie',
+                    'dentist' => 'fa-user-doctor',
+                    'patient' => 'fa-user',
+                    default => 'fa-circle-user',
+                    };
+                    $avatarLetter = strtoupper(substr($log->actor_name ?? $role, 0, 1));
+                    $roleBadgeClass = match ($role) {
+                    'admin' => 'role-admin',
+                    'dentist' => 'role-dentist',
+                    'patient' => 'role-patient',
+                    default => 'role-none',
+                    };
+                    $actionStatusClass = match ($actionClass) {
+                    'login' => 's-active',
+                    'logout' => 's-ended',
+                    'create' => 's-upcoming',
+                    'update' => 's-rescheduled',
+                    'delete' => 's-cancelled',
+                    'error' => 's-failed',
+                    default => 's-neutral',
+                    };
+                    @endphp
+                    <article class="table-record-card" data-role="{{ $role }}" data-action="{{ $actionClass }}">
+                        <div class="table-record-content">
 
-                        <div class="sl-grid-card" data-role="{{ $role }}" data-action="{{ $actionClass }}">
-                            <div class="sl-grid-top">
-                                <div class="sl-grid-id">#{{ str_pad($log->id, 3, '0', STR_PAD_LEFT) }}</div>
-                                <span class="sl-action {{ $actionClass }}">
-                                    <i
-                                        class="fa-solid {{ $actionIcon }} {{ $actionClass === 'error' ? 'sl-action-alert' : '' }}"></i>
+                            <div class="table-record-header">
+                                <div class="table-primary">
+                                    <strong>
+                                        #{{ str_pad($log->id, 3, '0', STR_PAD_LEFT) }}
+                                    </strong>
+                                </div>
+
+                                <span class="status-pill {{ $actionStatusClass }}">
+                                    <span class="status-dot"></span>
+
+                                    <i class="fa-solid {{ $actionIcon }}
+                        {{ $actionClass === 'error' ? 'sl-action-alert' : '' }}">
+                                    </i>
+
                                     {{ ucwords(str_replace('_', ' ', $log->action)) }}
                                 </span>
-                                @if ($log->is_archived)
-                                <span class="sl-archive-badge"
-                                    title="Archived {{ optional($log->archived_at)->format('M j, Y h:i A') }}">
-                                    <i class="fa-solid fa-box-archive"></i> Archived
-                                </span>
-                                @endif
                             </div>
 
                             <div class="sl-user">
-                                <div class="sl-avatar {{ $role }}">{{ $avatarLetter }}</div>
-                                <span class="sl-username">{{ $log->actor_name ?? 'Unknown User' }}</span>
+                                <span class="patient-avatar patient-avatar-sm" data-patient-avatar
+                                    data-patient-name="{{ $log->actor_name ?? 'Unknown User' }}"></span>
+
+                                <span class="sl-username">
+                                    {{ $log->actor_name ?? 'Unknown User' }}
+                                </span>
                             </div>
 
-                            <div class="sl-grid-meta">
-                                <div class="sl-grid-field">
-                                    <div class="sl-grid-label">Timestamp</div>
-                                    <div class="sl-grid-value">
-                                        {{ $log->created_at->format('M j, Y') }}<br>
+                            <div class="table-record-meta">
+
+                                <div class="table-record-row">
+                                    <span class="table-record-label">
+                                        Timestamp
+                                    </span>
+
+                                    <span class="table-record-value">
+                                        {{ $log->created_at->format('M j, Y') }}
+                                        ·
                                         {{ $log->created_at->format('h:i:s A') }}
-                                    </div>
+                                    </span>
                                 </div>
 
-                                <div class="sl-grid-field">
-                                    <div class="sl-grid-label">Role</div>
-                                    <div class="sl-grid-value">
-                                        <span class="sl-role {{ $role }}">
-                                            <i class="fa-solid {{ $roleIcon }}"></i>{{ ucfirst($role) }}
+                                <div class="table-record-row">
+                                    <span class="table-record-label">
+                                        Role
+                                    </span>
+
+                                    <span class="table-record-value">
+                                        <span class="badge-role {{ $roleBadgeClass }}">
+                                            <i class="fa-solid {{ $roleIcon }}"></i>
+                                            {{ ucfirst($role) }}
                                         </span>
-                                    </div>
+                                    </span>
                                 </div>
 
-                                <div class="sl-grid-field">
-                                    <div class="sl-grid-label">Module</div>
-                                    <div class="sl-grid-value">
-                                        <span class="sl-module">
-                                            <i class="fa-solid fa-cube"></i>{{ ucfirst(str_replace('_', ' ',
-                                            $log->module)) }}
+                                <div class="table-record-row">
+                                    <span class="table-record-label">
+                                        Module
+                                    </span>
+
+                                    <span class="table-record-value">
+                                        <span class="table-tag table-tag-neutral">
+                                            <i class="fa-solid fa-cube"></i>
+
+                                            {{ ucfirst(str_replace('_', ' ', $log->module)) }}
                                         </span>
-                                    </div>
+                                    </span>
                                 </div>
 
-                                <div class="sl-grid-field">
-                                    <div class="sl-grid-label">Description</div>
-                                    <div class="sl-grid-value">
+                                <div class="table-record-row">
+                                    <span class="table-record-label">
+                                        Description
+                                    </span>
+
+                                    <span class="table-record-value">
                                         {{ $log->description ?? 'No description provided.' }}
-                                    </div>
+                                    </span>
                                 </div>
+
                             </div>
+
+                            @if ($log->is_archived)
+                            <span class="status-pill s-archived"
+                                title="Archived {{ optional($log->archived_at)->format('M j, Y h:i A') }}">
+                                <span class="status-dot"></span>
+                                <i class="fa-solid fa-box-archive"></i>
+                                Archived
+                            </span>
+                            @endif
+
                         </div>
-                        @empty
-                        @endforelse
-                    </div>
+                    </article>
+                    @empty
+                    @endforelse
                 </div>
-
-                <div id="emptyState" class="empty-state-host"></div>
-
-                <x-pagination-bar id="systemLogsPaginationBottomBar" info-id="systemLogsPageInfoBottom"
-                    pagination-id="systemLogsPaginationBottom" position="bottom" :page-size-value="$perPage"
-                    label="entries" />
             </div>
+
+            <div id="emptyState" class="empty-state-host"></div>
+
+            <x-pagination-bar id="systemLogsPaginationBottomBar" info-id="systemLogsPageInfoBottom"
+                pagination-id="systemLogsPaginationBottom" position="bottom" :page-size-value="$perPage"
+                label="entries" />
 
         </div>
 </main>
@@ -601,91 +686,109 @@ $status = $status ?? 'active';
 </x-filter-drawer>
 
 <div id="slArchiveModal" class="ui-modal modal-theme-warning" aria-hidden="true">
-
     <div class="ui-modal-card modal-md" role="dialog" aria-modal="true" aria-labelledby="slArchiveModalTitle">
 
-        <div class="modal-hd">
-            <div class="modal-heading">
-                <div class="modal-icon">
-                    <i class="fa-solid fa-box-archive"></i>
+        <form id="slArchiveForm" class="modal-card-form" data-discard-form
+            data-discard-title="Discard archive settings?" data-discard-subtitle="You have unsaved archive settings."
+            data-discard-message="Closing this modal will reset the archive age you selected. Do you want to discard these changes?">
+
+            <div class="modal-hd">
+                <div class="modal-heading">
+                    <div class="modal-icon">
+                        <i class="fa-solid fa-box-archive"></i>
+                    </div>
+
+                    <div class="modal-copy">
+                        <h3 id="slArchiveModalTitle" class="modal-title">
+                            Archive System Logs
+                        </h3>
+
+                        <p class="modal-subtitle">
+                            Move older log records out of the active view.
+                        </p>
+                    </div>
                 </div>
 
-                <div class="modal-copy">
-                    <h3 id="slArchiveModalTitle" class="modal-title">
-                        Archive System Logs
-                    </h3>
-
-                    <p class="modal-subtitle">
-                        Move older log records out of the active view.
-                    </p>
-                </div>
+                <button type="button" class="modal-x" data-discard-close="slArchiveModal"
+                    aria-label="Close archive modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
 
-            <button type="button" class="modal-x" onclick="closeSlArchiveModal()" aria-label="Close archive modal">
+            <div class="modal-bd">
+                <div class="modal-form-grid">
 
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
+                    <div class="global-confirm-alert">
+                        <i class="fa-solid fa-circle-info"></i>
 
-        <div class="modal-bd">
-            <div class="modal-form-grid">
+                        <p>
+                            Archive older active logs
 
-                <div class="global-confirm-alert">
-                    <i class="fa-solid fa-circle-info"></i>
+                            <span>
+                                Only active logs older than the selected
+                                number of days will be archived. Archived
+                                records remain accessible and are not deleted.
+                            </span>
+                        </p>
+                    </div>
 
-                    <p>
-                        Archive older active logs
+                    <div class="global-form-group" data-global-field>
+                        <label for="slArchiveDaysInput" class="global-form-label">
+                            Archive logs older than
+                        </label>
 
-                        <span>
-                            Only active logs older than the selected
-                            number of days will be archived. Archived
-                            records remain accessible and are not deleted.
-                        </span>
-                    </p>
-                </div>
+                        <div class="modal-inline-control">
 
-                <div>
-                    <label for="slArchiveDaysInput" class="form-label">
-                        Archive logs older than
-                    </label>
+                            <div class="modal-inline-main">
 
-                    <div class="modal-inline-control">
-                        <div class="modal-inline-main">
-                            <input type="number" id="slArchiveDaysInput" class="form-input" min="1" max="3650" step="1"
-                                value="90" placeholder="Enter number of days">
+                                <div class="global-number-stepper" data-global-number-stepper>
+                                    <button type="button" class="global-number-stepper-btn" data-number-step="-1"
+                                        aria-label="Decrease archive age">
+                                        <i class="fa-solid fa-minus"></i>
+                                    </button>
+
+                                    <input type="number" id="slArchiveDaysInput" name="older_than_days" value="90"
+                                        min="1" max="3650" step="1" inputmode="numeric"
+                                        class="global-number-stepper-input" data-number-stepper-input
+                                        data-field-label="Archive Age"
+                                        data-required-message="Please enter the number of days."
+                                        data-validation-rule="wholeNumber" required>
+
+                                    <button type="button" class="global-number-stepper-btn" data-number-step="1"
+                                        aria-label="Increase archive age">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                            <span class="modal-helper-text">
+                                days
+                            </span>
+
                         </div>
 
-                        <span class="modal-helper-text">
-                            days
-                        </span>
-                    </div>
-
-                    <div id="slArchiveError" class="modal-error-banner hidden mt-3">
-
-                        <i class="fa-solid fa-circle-exclamation"></i>
-
-                        <span>
-                            Please enter a valid number from 1 to 3650.
-                        </span>
+                        <div id="slArchiveError" class="global-field-error" data-error-for="slArchiveDaysInput"
+                            aria-live="polite" aria-hidden="true"></div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="modal-ft">
-            <button type="button" class="ui-btn ui-btn-secondary" onclick="closeSlArchiveModal()">
+            <div class="modal-ft">
+                <button type="button" class="ui-btn ui-btn-secondary" data-discard-close="slArchiveModal">
+                    <i class="fa-solid fa-xmark"></i>
+                    <span>Cancel</span>
+                </button>
 
-                <i class="fa-solid fa-xmark"></i>
-                <span>Cancel</span>
-            </button>
+                <button type="button" id="slArchiveConfirmBtn" class="ui-btn ui-btn-warning"
+                    onclick="submitSlArchiveModal()">
 
-            <button type="button" id="slArchiveConfirmBtn" class="ui-btn ui-btn-warning"
-                onclick="submitSlArchiveModal()">
-
-                <i class="fa-solid fa-box-archive"></i>
-                <span>Archive Logs</span>
-            </button>
-        </div>
+                    <i class="fa-solid fa-box-archive"></i>
+                    <span>Archive Logs</span>
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -693,23 +796,261 @@ $status = $status ?? 'active';
 
 @section('scripts')
 <script>
-    function exportSystemLogsPdf() {
-        var params = new URLSearchParams({
-            role: slState.role || "all",
-            search: slState.search || "",
-            status: slState.status || "active",
-            sort: slState.sort || "desc",
-            date_from: slState.dateFrom || "",
-            date_to: slState.dateTo || "",
-            action_type: slState.actionType || "",
-            module: slState.module || ""
-        });
+    async function exportSystemLogsPdf() {
+        const button =
+            document.getElementById(
+                'slExportBtn'
+            );
 
-        window.location.assign(
-            @json(route('admin.system_logs.export')) +
-            "?" +
-            params.toString()
-        );
+        if (!button || button.disabled) {
+            return;
+        }
+
+        const params =
+            new URLSearchParams({
+                role:
+                    slState.role ||
+                    'all',
+
+                search:
+                    slState.search ||
+                    '',
+
+                status:
+                    slState.status ||
+                    'active',
+
+                sort:
+                    slState.sort ||
+                    'desc',
+
+                date_from:
+                    slState.dateFrom ||
+                    '',
+
+                date_to:
+                    slState.dateTo ||
+                    '',
+
+                action_type:
+                    slState.actionType ||
+                    '',
+
+                module:
+                    slState.module ||
+                    ''
+            });
+
+        const endpoint =
+            @json(
+                route(
+                    'admin.system_logs.export'
+                )
+            );
+
+        const url =
+            endpoint +
+            '?' +
+            params.toString();
+
+        const originalHtml =
+            button.innerHTML;
+
+        button.disabled = true;
+
+        button.innerHTML = `
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        <span>Generating...</span>
+    `;
+
+        try {
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method: 'GET',
+
+                        credentials:
+                            'same-origin',
+
+                        cache:
+                            'no-store',
+
+                        headers: {
+                            'X-Requested-With':
+                                'XMLHttpRequest',
+
+                            'Accept':
+                                'application/pdf, application/json'
+                        }
+                    }
+                );
+
+            const contentType =
+                (
+                    response.headers.get(
+                        'content-type'
+                    ) || ''
+                ).toLowerCase();
+
+            if (!response.ok) {
+                let message =
+                    `Unable to export system logs. Server returned ${response.status}.`;
+
+                if (
+                    contentType.includes(
+                        'application/json'
+                    )
+                ) {
+                    const data =
+                        await response
+                            .json()
+                            .catch(
+                                () => ({})
+                            );
+
+                    message =
+                        data.message ||
+                        Object.values(
+                            data.errors || {}
+                        )
+                            .flat()
+                            .find(Boolean) ||
+                        message;
+                } else {
+                    const body =
+                        await response
+                            .text()
+                            .catch(
+                                () => ''
+                            );
+
+                    console.error(
+                        'System Logs export server response:',
+                        body
+                    );
+                }
+
+                throw new Error(
+                    message
+                );
+            }
+
+            if (
+                !contentType.includes(
+                    'application/pdf'
+                )
+            ) {
+                const body =
+                    await response
+                        .text()
+                        .catch(
+                            () => ''
+                        );
+
+                console.error(
+                    'Expected PDF but received:',
+                    {
+                        contentType,
+                        body
+                    }
+                );
+
+                throw new Error(
+                    'The export endpoint did not return a PDF file.'
+                );
+            }
+
+            const blob =
+                await response.blob();
+
+            if (!blob.size) {
+                throw new Error(
+                    'The generated PDF file is empty.'
+                );
+            }
+
+            const downloadUrl =
+                URL.createObjectURL(
+                    blob
+                );
+
+            let fileName =
+                `system-logs-${new Date()
+                    .toISOString()
+                    .slice(0, 10)}.pdf`;
+
+            const disposition =
+                response.headers.get(
+                    'content-disposition'
+                ) || '';
+
+            const filenameMatch =
+                disposition.match(
+                    /filename="?([^";]+)"?/i
+                );
+
+            if (filenameMatch?.[1]) {
+                fileName =
+                    filenameMatch[1]
+                        .trim();
+            }
+
+            const link =
+                document.createElement(
+                    'a'
+                );
+
+            link.href =
+                downloadUrl;
+
+            link.download =
+                fileName;
+
+            document.body.appendChild(
+                link
+            );
+
+            link.click();
+            link.remove();
+
+            window.setTimeout(
+                function () {
+                    URL.revokeObjectURL(
+                        downloadUrl
+                    );
+                },
+                30000
+            );
+
+            window.showToast?.({
+                type: 'success',
+                title: 'Export complete',
+                message:
+                    'System logs PDF downloaded successfully.'
+            });
+
+        } catch (error) {
+            console.error(
+                'System logs PDF export failed:',
+                error
+            );
+
+            window.showToast?.({
+                type: 'error',
+                title: 'Export failed',
+                message:
+                    error.message ||
+                    'Unable to export the system logs PDF.'
+            });
+
+        } finally {
+            button.disabled =
+                false;
+
+            button.innerHTML =
+                originalHtml;
+        }
     }
 
     function handleSystemLogsPerPageChange(value) {
@@ -743,17 +1084,6 @@ $status = $status ?? 'active';
 
     var slOverallTotal = {{ (int)($totalCount ?? 0) }};
 
-    window.handleSystemLogsSearch =
-        function (value) {
-            slState.search =
-                String(value || '')
-                    .trim();
-
-            slState.page = 1;
-
-            slFetch(true);
-        };
-
     var slController = null;
     var slDraftCountController = null;
     var slDraftCountTimer = null;
@@ -763,7 +1093,6 @@ $status = $status ?? 'active';
         syncSlFilterInputs();
         updateSlClearFilterButton();
 
-        window.initSearchClearButtons?.();
         window.initGlobalVoiceInputs?.();
 
         ['slDateFrom', 'slDateTo'].forEach(function (id) {
@@ -875,60 +1204,131 @@ $status = $status ?? 'active';
         });
     }
 
-    @php
-    $latestLogId = optional(($logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs -> getCollection() : $logs) -> first()) -> id ?? 0;
-    @endphp
+    systemLogsRefreshWatcher =
+        window.initGlobalRefreshWatcher?.({
+            key: 'system-logs',
 
-    systemLogsRefreshWatcher = window.initGlobalRefreshWatcher?.({
-        key: 'system-logs',
+            url:
+                @json(
+                    route(
+                        'admin.system_logs.check'
+                    )
+                ) +
+                '?status=active',
 
-        url: @json(route('admin.system_logs.check'). '?status=active'),
+            interval: 5000,
 
-        interval: 5000,
+            initialItems: [],
 
-        initialItems: @json($latestLogId ? [['id' => (int) $latestLogId]] : []),
+            autoStart: false,
 
-        anchorSelector: '#mainContent.system-logs-page .card',
+            anchorSelector:
+                '#mainContent.system-logs-page .card',
 
-        itemLabel: 'log entry',
+            itemLabel:
+                'log entry',
 
-        getItems: function (payload) {
-            if (Array.isArray(payload)) {
-                return payload;
+            getItems: function (payload) {
+                if (Array.isArray(payload)) {
+                    return payload;
+                }
+
+                const latestId =
+                    Number(
+                        payload?.latest_id || 0
+                    );
+
+                return latestId > 0
+                    ? [{
+                        id: latestId
+                    }]
+                    : [];
+            },
+
+            getItemId: function (item) {
+                return item?.id;
+            },
+
+            title: function (count) {
+                return count === 1
+                    ? 'New log entry detected'
+                    : `${count} new log entries detected`;
+            },
+
+            subtitle: function () {
+                return 'Refresh to see the latest system activity.';
+            },
+
+            onRefresh: function () {
+                slState.page = 1;
+
+                return slFetch();
+            },
+
+            toast: {
+                type: 'success',
+                title: 'System logs updated',
+                message:
+                    'Latest log entries are now shown.'
+            }
+        });
+
+    async function initializeSystemLogsRefreshWatcher() {
+        if (
+            !systemLogsRefreshWatcher ||
+            slState.status === 'archived'
+        ) {
+            systemLogsRefreshWatcher?.stop();
+            return;
+        }
+
+        try {
+            const response =
+                await fetch(
+                    @json(
+                        route(
+                            'admin.system_logs.check'
+                        )
+                    ) +
+                    '?status=active',
+                    {
+                        cache: 'no-store',
+
+                        credentials:
+                            'same-origin',
+
+                        headers: {
+                            'Accept':
+                                'application/json',
+
+                            'X-Requested-With':
+                                'XMLHttpRequest'
+                        }
+                    }
+                );
+
+            if (!response.ok) {
+                return;
             }
 
-            var latestId =
-                Number(payload?.latest_id || 0);
+            const payload =
+                await response.json();
 
-            return latestId > 0 ? [{
-                id: latestId
-            }] : [];
-        },
+            systemLogsRefreshWatcher.sync(
+                payload
+            );
 
-        getItemId: function (item) {
-            return item?.id;
-        },
+            systemLogsRefreshWatcher.start();
 
-        title: function () {
-            return 'New log entries detected';
-        },
-
-        subtitle: function () {
-            return 'Refresh to see the latest system activity.';
-        },
-
-        onRefresh: function () {
-            slState.page = 1;
-            slFetch();
-        },
-
-        toast: {
-            type: 'success',
-            title: 'System logs updated',
-            message: 'Latest log entries are now shown.'
+        } catch (error) {
+            console.warn(
+                'Unable to initialize system logs refresh watcher:',
+                error
+            );
         }
-    });
+    }
 
+    initializeSystemLogsRefreshWatcher();
     if (slState.status === 'archived') {
         systemLogsRefreshWatcher?.stop();
     }
@@ -942,27 +1342,84 @@ $status = $status ?? 'active';
             .replaceAll("'", '&#039;');
     }
 
+    function syncSlRoleTab(
+        role = 'all'
+    ) {
+        document
+            .querySelectorAll(
+                '.sl-role-tabs .tab-btn'
+            )
+            .forEach(button => {
+                const onclick =
+                    button.getAttribute(
+                        'onclick'
+                    ) || '';
+
+                const isActive =
+                    onclick.includes(
+                        `'${role}'`
+                    );
+
+                button.classList.toggle(
+                    'active',
+                    isActive
+                );
+
+                button
+                    .querySelector(
+                        '.tab-count'
+                    )
+                    ?.classList.toggle(
+                        'active',
+                        isActive
+                    );
+            });
+    }
+
+    window.handleSystemLogsSearch =
+        function (value) {
+            const query =
+                String(value || '')
+                    .trim();
+
+            slState.search =
+                query;
+
+            slState.page = 1;
+
+            if (query) {
+                slState.role =
+                    'all';
+
+                syncSlRoleTab(
+                    'all'
+                );
+            }
+
+            return slFetch();
+        };
+
     function slSetTab(el, role) {
-        slState.role = role;
+        slState.role =
+            role || 'all';
+
         slState.page = 1;
 
-        document.querySelectorAll('.sl-role-tabs .tab-btn').forEach(function (button) {
-            button.classList.remove('active');
-            button.querySelector('.tab-count')?.classList.remove('active');
-        });
+        syncSlRoleTab(
+            slState.role
+        );
 
-        el?.classList.add('active');
-        el?.querySelector('.tab-count')?.classList.add('active');
-
-        slFetch();
+        return slFetch();
     }
 
     function openSlArchiveModal() {
         if (slState.status === "archived") {
-            window.showToast?.(
-                "Switch to active or all logs before archiving.",
-                "warning"
-            );
+            window.showToast?.({
+                type: 'warning',
+                title: 'Archive unavailable',
+                message:
+                    'Switch to Active or All Logs before archiving.'
+            });
 
             return;
         }
@@ -987,7 +1444,15 @@ $status = $status ?? 'active';
         }
 
         if (typeof window.openModal === "function") {
-            window.openModal("slArchiveModal");
+            window.openModal(
+                'slArchiveModal'
+            );
+
+            window.initGlobalNumberSteppers?.(
+                document.getElementById(
+                    'slArchiveModal'
+                )
+            );
         } else {
             modal.classList.add("open");
             modal.setAttribute("aria-hidden", "false");
@@ -1004,37 +1469,101 @@ $status = $status ?? 'active';
     }
 
     function closeSlArchiveModal() {
-        var modal =
-            document.getElementById("slArchiveModal");
+        const modal =
+            document.getElementById(
+                'slArchiveModal'
+            );
+
+        const form =
+            document.getElementById(
+                'slArchiveForm'
+            );
+
+        if (!modal) {
+            return;
+        }
 
         clearSlArchiveError();
 
-        if (!modal) return;
-
-        if (typeof window.closeModal === "function") {
-            window.closeModal("slArchiveModal");
-        } else {
-            modal.classList.remove("open");
-            modal.setAttribute("aria-hidden", "true");
-            document.documentElement.classList.remove(
-                "modal-open"
+        window.DiscardChanges
+            ?.markSubmitting(
+                form
             );
-            document.body.classList.remove("modal-open");
-        }
+
+        window.closeModal?.(
+            'slArchiveModal'
+        );
+
+        window.setTimeout(
+            function () {
+                if (form) {
+                    form.reset();
+                }
+
+                if (slArchiveDaysInput) {
+                    slArchiveDaysInput.value =
+                        '90';
+
+                    slArchiveDaysInput.dispatchEvent(
+                        new Event(
+                            'input',
+                            {
+                                bubbles: true
+                            }
+                        )
+                    );
+                }
+
+                window.DiscardChanges
+                    ?.markNotSubmitting(
+                        form
+                    );
+
+                window.DiscardChanges
+                    ?.captureForm(
+                        form
+                    );
+            },
+            180
+        );
     }
 
     function clearSlArchiveError() {
-        slArchiveError?.classList.add('hidden');
+        if (!slArchiveDaysInput) {
+            return;
+        }
+
+        window.showFormInputValidationMessage?.(
+            slArchiveDaysInput,
+            ''
+        );
     }
 
     function submitSlArchiveModal() {
         var olderThanDays = Number(slArchiveDaysInput?.value || '');
 
-        if (!Number.isFinite(olderThanDays) || olderThanDays < 1 || olderThanDays > 3650) {
-            slArchiveError?.classList.remove('hidden');
-            slArchiveDaysInput?.focus();
+        if (
+            !Number.isFinite(olderThanDays) ||
+            !Number.isInteger(olderThanDays) ||
+            olderThanDays < 1 ||
+            olderThanDays > 3650
+        ) {
+            window.showFormInputValidationMessage?.(
+                slArchiveDaysInput,
+                'Please enter a whole number from 1 to 3650.'
+            );
+
+            window.focusGlobalInvalidField?.(
+                slArchiveDaysInput
+            );
+
             return;
         }
+
+        window.showFormInputValidationMessage?.(
+            slArchiveDaysInput,
+            ''
+        );
 
         var body = new URLSearchParams({
             older_than_days: String(Math.floor(olderThanDays)),
@@ -1052,6 +1581,16 @@ $status = $status ?? 'active';
             slArchiveConfirmBtn.innerHTML =
                 '<i class="fa-solid fa-spinner fa-spin"></i><span>Archiving...</span>';
         }
+
+        const archiveForm =
+            document.getElementById(
+                'slArchiveForm'
+            );
+
+        window.DiscardChanges
+            ?.markSubmitting(
+                archiveForm
+            );
 
         fetch('{{ route('admin.system_logs.archive') }}', {
             method: 'POST',
@@ -1077,12 +1616,29 @@ $status = $status ?? 'active';
                 }
 
                 closeSlArchiveModal();
-                window.showToast?.(result.data?.message || 'Logs archived successfully.', 'success');
+                window.showToast?.({
+                    type: 'success',
+                    title: 'Logs archived',
+                    message:
+                        result.data?.message ||
+                        'Logs archived successfully.'
+                });
                 slState.page = 1;
                 slFetch();
             })
             .catch(function (error) {
-                window.showToast?.(error.message || 'Unable to archive logs right now.', 'error');
+                window.DiscardChanges
+                    ?.markNotSubmitting(
+                        archiveForm
+                    );
+
+                window.showToast?.({
+                    type: 'error',
+                    title: 'Error',
+                    message:
+                        error.message ||
+                        'Unable to archive logs right now.'
+                });
             })
             .finally(function () {
                 if (slArchiveConfirmBtn) {
@@ -1095,21 +1651,26 @@ $status = $status ?? 'active';
 
     function slSetStatus(el, status) {
         slState.status = status || 'active';
+        slState.role = 'all';
         slState.page = 1;
 
-        document.querySelectorAll('.sl-status-tab').forEach(function (button) {
-            button.classList.remove('active');
-        });
+        document
+            .querySelectorAll('.sl-status-tab')
+            .forEach(function (button) {
+                button.classList.remove('active');
+            });
 
         el?.classList.add('active');
+
+        syncSlRoleTab('all');
 
         if (slState.status === 'archived') {
             systemLogsRefreshWatcher?.stop();
         } else {
-            systemLogsRefreshWatcher?.start();
+            initializeSystemLogsRefreshWatcher();
         }
 
-        slFetch();
+        return slFetch();
     }
 
     function hasActiveSlFilters() {
@@ -1582,6 +2143,76 @@ $status = $status ?? 'active';
         clearOnlySlFilters();
     }
 
+    let slRefreshBaselineController =
+        null;
+
+    async function syncSystemLogsRefreshBaseline() {
+        if (
+            !systemLogsRefreshWatcher ||
+            slState.status === 'archived'
+        ) {
+            return;
+        }
+
+        slRefreshBaselineController
+            ?.abort();
+
+        slRefreshBaselineController =
+            new AbortController();
+
+        try {
+            const response =
+                await fetch(
+                    @json(
+                        route(
+                            'admin.system_logs.check'
+                        )
+                    ) +
+                    '?status=active',
+                    {
+                        cache: 'no-store',
+
+                        credentials:
+                            'same-origin',
+
+                        headers: {
+                            'Accept':
+                                'application/json',
+
+                            'X-Requested-With':
+                                'XMLHttpRequest'
+                        },
+
+                        signal:
+                            slRefreshBaselineController
+                                .signal
+                    }
+                );
+
+            if (!response.ok) {
+                return;
+            }
+
+            const payload =
+                await response.json();
+
+            systemLogsRefreshWatcher.sync(
+                payload
+            );
+
+        } catch (error) {
+            if (
+                error.name !==
+                'AbortError'
+            ) {
+                console.warn(
+                    'System logs refresh baseline sync failed:',
+                    error
+                );
+            }
+        }
+    }
+
     function slFetch(silent) {
         if (slController) slController.abort();
 
@@ -1614,27 +2245,81 @@ $status = $status ?? 'active';
             '#emptyState'
         );
 
-        fetch('{{ route('admin.system_logs') }}?' + params.toString(), {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? ''
-            },
-            signal: slController.signal
-        })
+        console.log(
+            '[System Logs] request:',
+            params.toString()
+        );
+
+        return fetch(
+            '{{ route('admin.system_logs') }}?' +
+        params.toString(),
+            {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? ''
+                },
+                signal: slController.signal
+            })
             .then(function (res) {
                 if (!res.ok) throw new Error('Request failed');
                 return res.json();
             })
             .then(function (data) {
-                slRenderRows(data.logs || []);
-                slRenderPagebar(data.pagination);
-                slRenderCounts(data.counts);
+                console.log(
+                    '[System Logs] response:',
+                    {
+                        filters:
+                            data.filters,
+
+                        total:
+                            data.pagination?.total,
+
+                        logs:
+                            data.logs
+                    }
+                );
+
+                slRenderRows(
+                    data.logs || []
+                );
+
+                slRenderPagebar(
+                    data.pagination
+                );
+
+                slRenderCounts(
+                    data.counts
+                );
+
                 updateSlClearFilterButton();
-                updateSlShowResultsButton(Number(data.pagination?.total ?? 0));
+
+                updateSlShowResultsButton(
+                    Number(
+                        data.pagination?.total ?? 0
+                    )
+                );
+
+                if (
+                    slState.status !== 'archived'
+                ) {
+                    syncSystemLogsRefreshBaseline();
+                }
             })
-            .catch(function (e) {
-                if (e.name !== 'AbortError') console.error('Fetch error:', e);
+            .catch(function (error) {
+                if (
+                    error.name ===
+                    'AbortError'
+                ) {
+                    return;
+                }
+
+                console.error(
+                    'System Logs fetch error:',
+                    error
+                );
+
+                throw error;
             });
     }
 
@@ -1666,6 +2351,36 @@ $status = $status ?? 'active';
         return html;
     }
 
+    function restoreSlCurrentView() {
+        const listView =
+            document.getElementById(
+                'slListView'
+            );
+
+        const gridView =
+            document.getElementById(
+                'slGridView'
+            );
+
+        const savedView =
+            localStorage.getItem(
+                'systemLogsView'
+            );
+
+        const useGrid =
+            savedView === 'grid';
+
+        if (listView) {
+            listView.hidden =
+                useGrid;
+        }
+
+        if (gridView) {
+            gridView.hidden =
+                !useGrid;
+        }
+    }
+
     function slRenderRows(logs) {
         var tableBody = document.getElementById('slTableBody');
         var gridBody = document.getElementById('slGridBody');
@@ -1676,6 +2391,12 @@ $status = $status ?? 'active';
             showEmptyState(slState.search);
             return;
         }
+
+        restoreSlCurrentView();
+
+        window.EmptyState?.hide(
+            '#emptyState'
+        );
 
         var actionIcons = {
             login: 'fa-right-to-bracket',
@@ -1710,6 +2431,32 @@ $status = $status ?? 'active';
                                     'default';
 
             var actionIcon = actionIcons[actionClass] || 'fa-bolt';
+
+            var roleBadgeClasses = {
+                admin: 'role-admin',
+                dentist: 'role-dentist',
+                patient: 'role-patient',
+                other: 'role-none'
+            };
+
+            var roleBadgeClass =
+                roleBadgeClasses[role] ||
+                'role-none';
+
+            var actionStatusClasses = {
+                login: 's-active',
+                logout: 's-ended',
+                create: 's-upcoming',
+                update: 's-rescheduled',
+                delete: 's-cancelled',
+                error: 's-failed',
+                default: 's-neutral'
+            };
+
+            var actionStatusClass =
+                actionStatusClasses[actionClass] ||
+                's-neutral';
+
             var actionIconHtml = '<i class="fa-solid ' + actionIcon + (actionClass === 'error' ?
                 ' sl-action-alert' : '') + '"></i>';
             var roleIcon = roleIcons[role] || 'fa-circle-user';
@@ -1723,10 +2470,22 @@ $status = $status ?? 'active';
                 function (c) {
                     return c.toUpperCase();
                 }));
-            var archiveBadge = log.is_archived ?
-                '<span class="sl-archive-badge" title="' + escapeSlHtml(log.archived_at ||
-                    'Archived') + '"><i class="fa-solid fa-box-archive"></i> Archived</span>' :
-                '';
+            var archiveBadge =
+                log.is_archived
+                    ? `
+            <span
+                class="status-pill s-archived"
+                title="${escapeSlHtml(
+                        log.archived_at ||
+                        'Archived'
+                    )}"
+            >
+                <span class="status-dot"></span>
+                <i class="fa-solid fa-box-archive"></i>
+                Archived
+            </span>
+        `
+                    : '';
             var actorName = escapeSlHtml(log.actor_name ?? log.actor_identifier ?? 'Unknown User');
             var description = escapeSlHtml(log.description || 'No description provided.');
             var createdDay = escapeSlHtml(log.created_at_day || '');
@@ -1737,64 +2496,170 @@ $status = $status ?? 'active';
             tableHtml += '<td><span class="sl-id">' + idPadded + '</span></td>';
             tableHtml += '<td><span class="sl-date-day">' + createdDay +
                 '</span><span class="sl-date-time">' + createdTime + '</span></td>';
-            tableHtml += '<td><span class="sl-role ' + escapeSlHtml(role) +
-                '"><i class="fa-solid ' + roleIcon +
-                '"></i>' +
-                escapeSlHtml(role.charAt(0).toUpperCase() + role.slice(1)) + '</span></td>';
-            tableHtml += '<td><div class="sl-user"><div class="sl-avatar ' + escapeSlHtml(role) +
+            tableHtml +=
+                '<td>' +
+                '<span class="badge-role ' +
+                roleBadgeClass +
                 '">' +
-                letter +
-                '</div><span class="sl-username">' + actorName + '</span></div></td>';
-            tableHtml += '<td><span class="sl-action ' + escapeSlHtml(actionClass) + '">' +
+                '<i class="fa-solid ' +
+                roleIcon +
+                '"></i>' +
+                escapeSlHtml(
+                    role.charAt(0).toUpperCase() +
+                    role.slice(1)
+                ) +
+                '</span>' +
+                '</td>';
+            tableHtml +=
+                '<td>' +
+                '<div class="sl-user">' +
+
+                '<span ' +
+                'class="patient-avatar patient-avatar-sm" ' +
+                'data-patient-avatar ' +
+                'data-patient-name="' + actorName + '"' +
+                '></span>' +
+
+                '<span class="sl-username">' +
+                actorName +
+                '</span>' +
+
+                '</div>' +
+                '</td>';
+            tableHtml +=
+                '<td>' +
+                '<span class="status-pill ' +
+                actionStatusClass +
+                '">' +
+                '<span class="status-dot"></span>' +
                 actionIconHtml +
-                ' ' + actionLabel + '</span ></td > ';
-            tableHtml += '<td><span class="sl-module"><i class="fa-solid fa-cube"></i>' +
+                actionLabel +
+                '</span>' +
+                archiveBadge +
+                '</td>';
+            tableHtml +=
+                '<td>' +
+                '<span class="table-tag table-tag-neutral">' +
+                '<i class="fa-solid fa-cube"></i>' +
                 moduleLabel +
-                '</span></td>';
+                '</span>' +
+                '</td>';
             tableHtml += '<td><span class="sl-desc" title="' + description + '">' + description +
                 '</span></td>';
             tableHtml += '</tr>';
 
-            gridHtml += '<div class="sl-grid-card" data-role="' + escapeSlHtml(role) +
-                '" data-action="' +
-                escapeSlHtml(actionClass) + '">';
-            gridHtml += '<div class="sl-grid-top">';
-            gridHtml += '<div class="sl-grid-id">' + idPadded + '</div>';
-            gridHtml += '<span class="sl-action ' + escapeSlHtml(actionClass) + '"> ' +
-                actionIconHtml + ' ' + actionLabel + '</span > ';
-            gridHtml += '</div>';
+            gridHtml += `
+    <article
+        class="table-record-card"
+        data-role="${escapeSlHtml(role)}"
+        data-action="${escapeSlHtml(actionClass)}"
+    >
+        <div class="table-record-content">
 
-            gridHtml += '<div class="sl-user"><div class="sl-avatar ' + escapeSlHtml(role) + '">' +
-                letter +
-                '</div><span class="sl-username">' + actorName + '</span></div>';
+            <div class="table-record-header">
+                <div class="table-primary">
+                    <strong>
+                        ${idPadded}
+                    </strong>
+                </div>
 
-            gridHtml += '<div class="sl-grid-meta">';
-            gridHtml +=
-                '<div class="sl-grid-field"><div class="sl-grid-label">Timestamp</div><div class="sl-grid-value">' +
-                createdDay + '<br>' + createdTime + '</div></div>';
-            gridHtml +=
-                '<div class="sl-grid-field"><div class="sl-grid-label">Role</div><div class="sl-grid-value"><span class="sl-role ' +
-                escapeSlHtml(role) + '"><i class="fa-solid ' + roleIcon + '"></i>' + escapeSlHtml(
-                    role.charAt(0)
-                        .toUpperCase() + role
-                            .slice(1)) + '</span></div></div>';
-            gridHtml +=
-                '<div class="sl-grid-field"><div class="sl-grid-label">Module</div><div class="sl-grid-value"><span class="sl-module"><i class="fa-solid fa-cube"></i>' +
-                moduleLabel + '</span></div></div>';
-            gridHtml +=
-                '<div class="sl-grid-field"><div class="sl-grid-label">Description</div><div class="sl-grid-value">' +
-                description + '</div></div>';
-            gridHtml += '</div>';
-            gridHtml += '</div>';
+                <span class="status-pill ${actionStatusClass}">
+                    <span class="status-dot"></span>
+
+                    ${actionIconHtml}
+
+                    ${actionLabel}
+                </span>
+            </div>
+
+            <div class="sl-user">
+
+                <span
+                    class="patient-avatar patient-avatar-sm"
+                    data-patient-avatar
+                    data-patient-name="${actorName}"
+                ></span>
+
+                <span class="sl-username">
+                    ${actorName}
+                </span>
+
+            </div>
+
+            <div class="table-record-meta">
+
+                <div class="table-record-row">
+                    <span class="table-record-label">
+                        Timestamp
+                    </span>
+
+                    <span class="table-record-value">
+                        ${createdDay} · ${createdTime}
+                    </span>
+                </div>
+
+                <div class="table-record-row">
+                    <span class="table-record-label">
+                        Role
+                    </span>
+
+                    <span class="table-record-value">
+                        <span class="badge-role ${roleBadgeClass}">
+                            <i class="fa-solid ${roleIcon}"></i>
+                            ${escapeSlHtml(
+                role.charAt(0).toUpperCase() +
+                role.slice(1)
+            )
+                }
+                        </span>
+                    </span>
+                </div>
+
+                <div class="table-record-row">
+                    <span class="table-record-label">
+                        Module
+                    </span>
+
+                    <span class="table-record-value">
+                        <span class="table-tag table-tag-neutral">
+                            <i class="fa-solid fa-cube"></i>
+                            ${moduleLabel}
+                        </span>
+                    </span>
+                </div>
+
+                <div class="table-record-row">
+                    <span class="table-record-label">
+                        Description
+                    </span>
+
+                    <span class="table-record-value">
+                        ${description}
+                    </span>
+                </div>
+
+            </div>
+
+            ${archiveBadge}
+
+        </div>
+    </article>
+`;
         });
 
-        if (tableBody) tableBody.innerHTML = tableHtml;
-        if (gridBody) gridBody.innerHTML = gridHtml;
+        if (tableBody) {
+            tableBody.innerHTML = tableHtml;
 
-        var emptyState = document.getElementById('emptyState');
-        if (emptyState) {
-            window.EmptyState?.hide(
-                '#emptyState'
+            window.PatientUI?.initAvatars(
+                tableBody
+            );
+        }
+
+        if (gridBody) {
+            gridBody.innerHTML = gridHtml;
+
+            window.PatientUI?.initAvatars(
+                gridBody
             );
         }
     }
@@ -1916,7 +2781,6 @@ $status = $status ?? 'active';
         updateTabCount('error', counts.error);
         updateStatusCount('active', counts.active);
         updateStatusCount('archived', counts.archived);
-        updateStatusCount('all', Number(counts.active || 0) + Number(counts.archived || 0));
     }
 
     function updateTabCount(role, value) {
@@ -2072,12 +2936,45 @@ $status = $status ?? 'active';
                 ?.addEventListener(
                     'click',
                     function () {
-                        slSetTab(
+                        const allTab =
                             document.querySelector(
                                 '.sl-role-tabs .tab-btn'
-                            ),
-                            'all'
+                            );
+
+                        slState.role = 'all';
+                        slState.page = 1;
+
+                        document
+                            .querySelectorAll(
+                                '.sl-role-tabs .tab-btn'
+                            )
+                            .forEach(button => {
+                                button.classList.remove(
+                                    'active'
+                                );
+
+                                button
+                                    .querySelector(
+                                        '.tab-count'
+                                    )
+                                    ?.classList.remove(
+                                        'active'
+                                    );
+                            });
+
+                        allTab?.classList.add(
+                            'active'
                         );
+
+                        allTab
+                            ?.querySelector(
+                                '.tab-count'
+                            )
+                            ?.classList.add(
+                                'active'
+                            );
+
+                        slFetch();
                     }
                 );
 

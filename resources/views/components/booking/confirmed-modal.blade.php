@@ -1,0 +1,100 @@
+@props([
+    'id' => 'confirmModal',
+    'eyebrow' => 'Appointment',
+    'title' => 'Appointment Confirmed',
+    'subtitle' => 'The appointment was saved successfully.',
+    'headerIcon' => 'fa-check',
+    'sectionIcon' => 'fa-calendar-check',
+    'sectionEyebrow' => 'Confirmation Status',
+    'sectionTitle' => 'Appointment saved',
+    'sectionMessage' => 'The appointment information has been recorded successfully.',
+    'detailLabel' => 'Status',
+    'resultTitle' => 'Confirmed',
+
+    'messageTitle' => 'Confirmation details',
+    'messageId' => 'confirmMessage',
+    'size' => 'modal-md',
+])
+
+<div id="{{ $id }}" class="ui-modal" aria-hidden="true">
+    <div class="ui-modal-card {{ $size }}">
+        <div class="modal-hd appointment-modal-header">
+            <div class="modal-heading">
+                <div class="appointment-modal-header-icon">
+                    <i class="fa-solid {{ $headerIcon }}"></i>
+                </div>
+                <div class="appointment-modal-header-copy">
+
+                    <span class="appointment-modal-eyebrow">
+                        {{ $eyebrow }}
+                    </span>
+
+                    <h2 class="appointment-modal-title">
+                        {{ $title }}
+                    </h2>
+
+                    <p class="appointment-modal-subtitle">
+                        {{ $subtitle }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal-bd">
+            <div class="modal-profile-card modal-profile-card-single">
+                <div class="modal-profile-main">
+                    <div class="modal-profile-avatar">
+                        <i class="fa-solid {{ $sectionIcon }}"></i>
+                    </div>
+                    <div class="modal-profile-main-copy">
+                        <span class="modal-profile-eyebrow">
+                            {{ $sectionEyebrow }}
+                        </span>
+                        <strong class="modal-profile-name">
+                            {{ $sectionTitle }}
+                        </strong>
+                        <p class="modal-subtitle">
+                            {{ $sectionMessage }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="modal-profile-details modal-profile-details-single">
+                    <div class="modal-profile-detail">
+                        <div class="modal-profile-detail-icon">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div>
+                            <span class="modal-profile-label">
+                                {{ $detailLabel }}
+                            </span>
+
+                            <strong class="modal-profile-value">
+                                {{ $resultTitle }}
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="global-confirm-alert">
+                <i class="fa-solid fa-circle-check"></i>
+                <div>
+                    <strong>
+                        {{ $messageTitle }}
+                    </strong>
+
+                    <p id="{{ $messageId }}">
+                        {{ $slot }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-ft">
+            {{ $footer }}
+        </div>
+    </div>
+</div>

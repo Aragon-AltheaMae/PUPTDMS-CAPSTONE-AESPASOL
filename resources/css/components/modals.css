@@ -23,7 +23,7 @@
 }
 
 .modal-profile-card-single {
-    grid-template-columns: minmax(300px, 1.2fr) minmax(260px, .8fr);
+    grid-template-columns: minmax(0, 1.35fr) minmax(155px, .65fr);
 }
 
 .modal-profile-main {
@@ -733,27 +733,49 @@ body:has([id$="Modal"].opacity-100:not(.pointer-events-none)) {
 }
 
 .global-confirm-alert p {
-    margin: 0;
-    color: var(--modal-accent-dark);
-    font-size: 15px;
-    font-weight: 850;
-    line-height: 1.4;
+    margin: .3rem 0 0;
+    color: var(--text-2);
+    font-size: .98rem;
+    font-weight: 650;
+    line-height: 1.5;
+}
+
+[data-theme="dark"] .ui-modal .global-confirm-alert,
+.dark .ui-modal .global-confirm-alert {
+    color: var(--text-1) !important;
+}
+
+[data-theme="dark"] .ui-modal .global-confirm-alert p,
+.dark .ui-modal .global-confirm-alert p {
+    color:
+        var(--text-2) !important;
+}
+
+[data-theme="dark"] .ui-modal .global-confirm-alert span,
+.dark .ui-modal .global-confirm-alert span {
+    color: var(--text-2) !important;
+}
+
+[data-theme="dark"] .ui-modal .global-confirm-alert>i,
+.dark .ui-modal .global-confirm-alert>i {
+    color: var(--modal-accent) !important;
 }
 
 .global-confirm-alert strong {
-    display: inline-block;
-    padding: 1px 7px;
-    border-radius: 8px;
-    background: var(--card);
+    display: block;
+    margin: 0;
     color: var(--text-1);
+    font-size: .84rem;
+    font-weight: 700;
+    line-height: 1.35;
 }
 
 .global-confirm-alert span {
     display: block;
     margin-top: .35rem;
     color: var(--modal-accent-dark);
-    font-size: 12px;
-    font-weight: 650;
+    font-size: .84rem;
+    font-weight: 500;
 }
 
 .modal-ft--centered {
@@ -2199,7 +2221,7 @@ body.doc-modal-lock .floating-action {
 
 [data-theme="dark"] .doc-success-row span,
 .dark .doc-success-row span {
-    color: var(--text-3)!important;
+    color: var(--text-3) !important;
 }
 
 [data-theme="dark"] .doc-success-row strong,
@@ -2723,18 +2745,13 @@ body.doc-modal-lock .floating-action {
 .global-delete-target strong {
     min-width: 0;
     max-width: 68%;
-
     display: block;
     padding: 0;
-
-    background: transparent;
     color: #7F1D1D;
-
     font-size: .82rem;
-    font-weight: 900;
+    font-weight: 800;
     line-height: 1.3;
     text-align: right;
-
     overflow-wrap: anywhere;
     word-break: break-word;
 }

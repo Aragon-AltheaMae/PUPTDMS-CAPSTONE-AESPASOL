@@ -92,6 +92,9 @@
                 config.submitButton
             );
 
+        const defaultNextButtonHtml =
+            nextButton?.innerHTML || '';
+
         const completedSteps =
             new Set();
 
@@ -241,13 +244,18 @@
                 currentStep ===
                 totalSteps - 1;
 
+            const hasLastStepAction =
+                typeof config.onLastStepNext ===
+                'function';
+
             if (previousButton) {
                 previousButton.classList.toggle(
                     'hidden',
                     isFirst
                 );
 
-                previousButton.disabled = false;
+                previousButton.disabled =
+                    false;
 
                 previousButton.setAttribute(
                     'aria-disabled',
@@ -258,7 +266,8 @@
             if (nextButton) {
                 nextButton.classList.toggle(
                     'hidden',
-                    isLast
+                    isLast &&
+                    !hasLastStepAction
                 );
             }
 
@@ -275,9 +284,51 @@
             ) {
                 navContainer.classList.toggle(
                     'hidden',
-                    isLast
+                    isLast &&
+                    !hasLastStepAction
                 );
             }
+        }
+
+        function setNextButton({
+            label = 'Next',
+            icon = 'fa-chevron-right',
+            iconPosition = 'right',
+        } = {}) {
+            if (!nextButton) {
+                return api;
+            }
+
+            const iconHtml =
+                icon
+                    ? `<i class="fa-solid ${icon}"></i>`
+                    : '';
+
+            nextButton.innerHTML =
+                iconPosition === 'left'
+                    ? `
+                ${iconHtml}
+                <span>${label}</span>
+            `
+                    : `
+                <span>${label}</span>
+                ${iconHtml}
+            `;
+
+            return api;
+        }
+
+
+        function resetNextButton() {
+            if (
+                nextButton &&
+                defaultNextButtonHtml
+            ) {
+                nextButton.innerHTML =
+                    defaultNextButtonHtml;
+            }
+
+            return api;
         }
 
         function runPageCallbacks() {
@@ -366,6 +417,23 @@
         }
 
         function next() {
+            const isLast =
+                currentStep ===
+                totalSteps - 1;
+
+            if (
+                isLast &&
+                typeof config.onLastStepNext ===
+                'function'
+            ) {
+                const result =
+                    config.onLastStepNext(
+                        api
+                    );
+
+                return result !== false;
+            }
+
             const canContinue =
                 config.beforeNext
                     ? config.beforeNext(
@@ -393,6 +461,24 @@
         }
 
         function previous() {
+            if (
+                typeof config.beforePrevious ===
+                'function'
+            ) {
+                const canGoBack =
+                    config.beforePrevious(
+                        currentStep,
+                        api
+                    );
+
+                if (
+                    canGoBack ===
+                    false
+                ) {
+                    return false;
+                }
+            }
+
             if (currentStep <= 0) {
                 return false;
             }
@@ -419,11 +505,16 @@
             next,
             previous,
             goTo,
+            setNextButton,
+            resetNextButton,
             markComplete,
             markIncomplete,
             getCurrentStep,
             getCompletedSteps,
-            getPanels: () => panels,
+
+            getPanels: () =>
+                panels,
+
             getTotalSteps: () =>
                 totalSteps,
         };

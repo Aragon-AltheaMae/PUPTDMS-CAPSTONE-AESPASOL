@@ -74,27 +74,37 @@
         @else
             <div class="signature-methods-grid">
 
-                <div class="file-upload-zone">
+                <div class="file-upload-zone signature-upload-card">
 
-                    <i class="fa-regular fa-image"></i>
-
-                    <p>
-                        Select your file or drag and drop
+                    <p class="signature-method-title">
+                        Upload your signature
                     </p>
 
-                    <small>
-                        JPG, PNG, up to 25 MB
-                    </small>
+                    <div class="signature-upload-content">
 
-                    <label class="ui-btn ui-btn-primary ui-btn-sm cursor-pointer">
-                        <i class="fa-solid fa-upload"></i>
-                        Browse
+                        <span class="signature-upload-icon">
+                            <i class="fa-regular fa-image"></i>
+                        </span>
 
-                        <input type="file" name="patient_signature" id="patient_signature" class="hidden"
-                            accept=".jpg,.jpeg,.png" required>
+                        <p class="signature-upload-title">
+                            Select your file or drag and drop
+                        </p>
 
-                        <input type="hidden" name="signature_source" id="signature_source" value="">
-                    </label>
+                        <small class="signature-upload-help">
+                            JPG, PNG, up to 25 MB
+                        </small>
+
+                        <label class="ui-btn ui-btn-primary ui-btn-sm cursor-pointer">
+                            <i class="fa-solid fa-upload"></i>
+                            Browse
+
+                            <input type="file" name="patient_signature" id="patient_signature" class="hidden"
+                                accept=".jpg,.jpeg,.png" required>
+
+                            <input type="hidden" name="signature_source" id="signature_source" value="">
+                        </label>
+
+                    </div>
 
                 </div>
 
