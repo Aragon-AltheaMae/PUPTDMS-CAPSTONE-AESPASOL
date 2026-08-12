@@ -132,12 +132,6 @@
     background: rgba(252, 165, 165, .18);
 }
 
-@media (max-width: 640px) {
-    .record-modal-summary {
-        grid-template-columns: 1fr;
-    }
-}
-
 .records-hero {
     background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.16), transparent 28%),
         linear-gradient(135deg, #7A0000, #8B0000, #661010);
@@ -145,7 +139,7 @@
     padding: 2rem 2rem 3rem;
     position: relative;
     overflow: hidden;
-    margin-bottom: -2rem;
+    margin-bottom: 0;
     box-shadow: 0 16px 32px rgba(139, 0, 0, 0.15);
 }
 
@@ -448,140 +442,10 @@ body.role-patient #mainContent.patient-records-page .records-hero .hero-sub {
     background: rgba(252, 165, 165, 0.1) !important;
 }
 
-
-@media (max-width: 375px) {
-
-    .hero-title {
-        font-size: 1.35rem;
-    }
-
-    .hero-sub {
-        font-size: 0.75rem;
-    }
-
-    .records-body {
-        padding: 1.25rem 1rem;
-    }
-
-    .rec-card {
-        padding: 1rem;
-    }
-
-    .rec-service {
-        font-size: 0.9rem;
-    }
-
-    .rec-btn {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-
-@media (max-width: 640px) {
-
-    .records-hero {
-        padding: 1.5rem 1.25rem 2.5rem;
-    }
-
-    .hero-stats {
-        gap: 8px;
-    }
-
-    .hero-stat {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .rec-card {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .rec-btn {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-@media (max-width: 768px) {
-    .rec-card {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .rec-btn {
-        width: 100%;
-        justify-content: center;
-    }
-}
-
-
-@media (min-width: 641px) and (max-width: 768px) {
-
-    .records-hero {
-        padding: 1.75rem;
-    }
-
-    .hero-title {
-        font-size: 1.6rem;
-    }
-
-    .rec-card {
-        gap: 0.75rem;
-    }
-}
-
-
-@media (min-width: 769px) and (max-width: 1024px) {
-
-    *,
-    *::before,
-    *::after {
-        box-sizing: border-box;
-    }
-
-    html {
-        -webkit-text-size-adjust: 100%;
-        text-size-adjust: 100%;
-    }
-
-    body {
-        overflow-x: hidden;
-    }
-
-    img,
-    svg,
-    video,
-    canvas {
-        max-width: 100%;
-        height: auto;
-    }
-
-    button,
-    input,
-    textarea,
-    select {
-        font: inherit;
-    }
-
-    .records-body {
-        padding: 1.75rem;
-    }
-}
-
-
 @media (min-width: 1440px) {
-
     .records-body {
         max-width: 1400px;
         margin-inline: auto;
-    }
-
-    .records-hero {
-        max-width: 1400px;
-        margin-inline: auto;
-        margin-bottom: -2rem;
     }
 
     .hero-title {
@@ -591,12 +455,6 @@ body.role-patient #mainContent.patient-records-page .records-hero .hero-sub {
 
 
 @media (min-width: 1920px) {
-
-    .records-body,
-    .records-hero {
-        max-width: 1600px;
-    }
-
     .hero-title {
         font-size: 2.25rem;
     }
@@ -639,9 +497,8 @@ body.role-patient #mainContent.patient-records-page .records-hero .hero-sub {
     -webkit-backdrop-filter: blur(4px);
 }
 
-.records-body,
 .records-hero {
-    width: min(100%, 1400px);
+    width: 100%;
 }
 
 .record-modal-wide {
@@ -676,6 +533,22 @@ body.role-patient #mainContent.patient-records-page .records-hero .hero-sub {
     min-width: 0;
 }
 
+.records-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    position: relative;
+    z-index: 2;
+
+    margin-top: -2.3rem;
+}
+
+.records-hero {
+    position: relative;
+    z-index: 1;
+}
+
 .record-modal-odontogram {
     overflow: hidden;
     border: 1px solid var(--border);
@@ -685,4 +558,385 @@ body.role-patient #mainContent.patient-records-page .records-hero .hero-sub {
 .record-modal-odontogram>.odontogram-preview {
     border: 0;
     border-radius: 0;
+}
+
+.document-history-section {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+}
+
+.document-history-list {
+    display: grid;
+    gap: .75rem;
+    margin-inline: auto;
+    max-height: 540px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: .25rem;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+}
+
+.document-history-list > .global-record-card {
+    width: calc(100% - 4rem);
+    justify-self: center;
+}
+
+.document-history-list > .global-record-card .global-record-subline {
+    margin-top: 4px;
+}
+
+.document-history-list > .global-record-card .global-info-pill {
+    min-height: 20px;
+    padding: 2px 7px;
+    font-size: 9px;
+}
+
+.document-history-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.document-history-reference {
+    display: block;
+    margin-bottom: .25rem;
+
+    color: var(--text-3);
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+.document-history-result {
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+
+    margin-top: .7rem;
+
+    color: var(--text-3);
+    font-size: .72rem;
+    line-height: 1.4;
+}
+
+.document-history-result i {
+    color: var(--crimson);
+    flex-shrink: 0;
+}
+
+.document-request-item {
+    min-width: 0;
+}
+
+.document-request-row {
+    padding: .75rem 1rem .75rem 1.25rem;
+}
+
+.document-request-content {
+    min-width: 0;
+}
+
+.document-request-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    margin-bottom: .25rem;
+}
+
+.document-request-name {
+    margin: 0 0 .45rem;
+}
+
+.document-request-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .4rem .55rem;
+}
+
+.document-request-purpose {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+
+    min-width: 0;
+
+    color: var(--text-2);
+    font-size: .7rem;
+    line-height: 1.3;
+}
+
+.document-request-purpose i {
+    color: var(--crimson);
+    flex-shrink: 0;
+}
+
+.document-request-purpose-label {
+    color: var(--text-3);
+    font-weight: 700;
+}
+
+.document-request-purpose strong {
+    min-width: 0;
+    overflow-wrap: anywhere;
+
+    color: var(--text-2);
+    font-weight: 800;
+}
+
+.document-request-status-note {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+
+    margin-top: .45rem;
+
+    font-size: .67rem;
+    font-weight: 700;
+    color: var(--text-3);
+}
+
+.document-request-status-note.status-approved i {
+    color: var(--status-approved-solid);
+}
+
+.document-request-status-note.status-rejected i {
+    color: var(--status-rejected-solid);
+}
+
+.document-request-status-note.status-pending i {
+    color: var(--status-pending-solid);
+}
+
+
+@media (min-width: 769px) and (max-width: 1024px) {
+
+    .records-hero {
+        padding: 1.75rem 1.5rem 2.5rem;
+    }
+
+    .records-sections {
+        margin-top: -1.5rem;
+        gap: 1rem;
+    }
+
+    .record-modal-wide {
+        width: min(100%, calc(100vw - 32px));
+    }
+
+    .record-modal-summary-three {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .document-history-list > .global-record-card {
+        width: calc(100% - 2rem);
+    }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+
+    .records-hero {
+        padding: 1.5rem 1.25rem 2.25rem;
+    }
+
+    body.role-patient #mainContent.patient-records-page
+    .records-hero .hero-title {
+        font-size: 1.5rem;
+    }
+
+    .records-sections {
+        margin-top: -1.25rem;
+        gap: .9rem;
+    }
+
+    .record-modal-wide {
+        width: min(100%, calc(100vw - 24px));
+    }
+
+    .record-modal-summary-three,
+    .record-modal-grid-two {
+        grid-template-columns: 1fr;
+    }
+
+    .rec-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: .75rem;
+        padding: 1rem;
+    }
+
+    .rec-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .document-history-list {
+        max-height: 460px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .document-history-list > .global-record-card {
+        width: calc(100% - 1rem);
+    }
+
+    .document-request-row {
+        padding: .7rem .8rem;
+    }
+
+    .document-request-topline {
+        gap: .75rem;
+    }
+
+    .document-request-meta {
+        gap: .4rem .5rem;
+    }
+}
+
+@media (max-width: 640px) {
+
+    .records-hero {
+        padding: 1.25rem 1rem 1.8rem;
+        border-radius: 1rem;
+    }
+
+    body.role-patient #mainContent.patient-records-page
+    .records-hero .hero-title {
+        font-size: clamp(1.15rem, 6vw, 1.4rem);
+        line-height: 1.15;
+    }
+
+    body.role-patient #mainContent.patient-records-page
+    .records-hero .hero-sub {
+        font-size: .75rem;
+        line-height: 1.4;
+    }
+
+    .hero-stats {
+        margin-top: .8rem;
+        gap: .45rem;
+    }
+
+    .hero-stat {
+        width: auto;
+        max-width: 100%;
+        padding: 5px 9px;
+        font-size: .67rem;
+    }
+
+    .records-sections {
+        margin-top: -1rem;
+        gap: .8rem;
+    }
+
+    .records-section-title {
+        gap: 7px;
+        margin-bottom: .85rem;
+    }
+
+    .records-section-title span {
+        font-size: .62rem;
+        letter-spacing: .08em;
+    }
+
+    .record-modal-wide {
+        width: calc(100vw - 20px);
+    }
+
+    .record-modal-summary,
+    .record-modal-summary-three,
+    .record-modal-grid-two {
+        grid-template-columns: 1fr;
+    }
+
+    .record-summary-card,
+    .record-modal-content {
+        padding: 12px;
+    }
+
+    .rec-row {
+        min-width: 0;
+    }
+
+    .rec-tl {
+        width: 24px;
+    }
+
+    .rec-card {
+        min-width: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: .65rem;
+        padding: .8rem;
+    }
+
+    .rec-service {
+        font-size: .88rem;
+    }
+
+    .rec-meta {
+        gap: 5px;
+    }
+
+    .rec-meta-chip {
+        padding: 3px 7px;
+        font-size: .63rem;
+    }
+
+    .rec-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .document-history-list {
+        width: 100%;
+        max-height: 400px;
+
+        gap: .6rem;
+        padding-right: .15rem;
+
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        overscroll-behavior: contain;
+        scrollbar-gutter: stable;
+    }
+
+    .document-history-list > .global-record-card {
+        width: 100%;
+        justify-self: stretch;
+    }
+
+    .document-request-row {
+        padding: .65rem .7rem;
+    }
+
+    .document-request-topline {
+        align-items: flex-start;
+        gap: .5rem;
+    }
+
+    .document-request-topline .status-pill {
+        flex-shrink: 0;
+    }
+
+    .document-request-meta {
+        align-items: flex-start;
+        gap: .35rem .45rem;
+    }
+
+    .document-request-purpose {
+        width: 100%;
+        flex-basis: 100%;
+    }
+
+    .document-request-status-note {
+        width: 100%;
+    }
 }

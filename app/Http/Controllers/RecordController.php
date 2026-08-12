@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Appointment;
 use App\Models\Patient;
 use App\Helpers\AuditLogger;
+use App\Models\DocumentRequest;
 
 class RecordController extends Controller
 {
@@ -20,11 +21,23 @@ class RecordController extends Controller
 
         $patient = Patient::findOrFail($patientId);
 
+        $perPage = (int) request('per_page', 10);
+
+        if (!in_array($perPage, [10, 20, 50, 100], true)) {
+            $perPage = 10;
+        }
+
         $records = Appointment::with(['procedure', 'dentist'])
             ->where('patient_id', $patient->id)
             ->whereIn('status', ['completed', 'cancelled'])
             ->orderBy('appointment_date', 'desc')
             ->orderBy('appointment_time', 'desc')
+            ->paginate($perPage, ['*'], 'records_page')
+            ->withQueryString();
+
+        $documentRequests = DocumentRequest::query()
+            ->where('patient_id', $patient->id)
+            ->orderByDesc('created_at')
             ->get();
 
         $upcomingAppointment = Appointment::where('patient_id', $patient->id)
@@ -40,6 +53,11 @@ class RecordController extends Controller
             "Patient viewed dental records"
         );
 
-        return view('patient.record', compact('patient', 'records', 'upcomingAppointment'));
+        return view('patient.record', compact(
+            'patient',
+            'records',
+            'documentRequests',
+            'upcomingAppointment'
+        ));
     }
 }
