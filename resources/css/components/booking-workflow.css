@@ -469,13 +469,20 @@
         gap: 1rem !important;
     }
 
-    .service-step-grid {
-        grid-template-columns: 1fr;
-    }
-
     .service-option-card {
         min-height: 68px;
         padding: .65rem .7rem;
+        gap: .6rem;
+    }
+
+    .service-option-main {
+        gap: .55rem;
+    }
+
+    .service-option-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
     }
 
     .service-option-title {
@@ -486,6 +493,10 @@
         font-size: .68rem;
     }
 
+    .service-option-arrow {
+        width: 26px;
+        height: 26px;
+    }
 }
 
 .booking-intro-steps {
@@ -654,8 +665,10 @@
 .service-step-grid {
     display: grid;
     grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-    gap: .7rem;
+        repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    gap: .75rem;
+    width: 100%;
+    min-width: 0;
 }
 
 .service-option {
@@ -666,12 +679,14 @@
 }
 
 .service-option-card {
+    width: 100%;
+    min-width: 0;
     min-height: 74px;
-    padding: .7rem .8rem;
+    padding: .75rem .85rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: .7rem;
+    gap: .75rem;
     border: 1px solid var(--border);
     border-radius: 16px;
     background: var(--surface);
@@ -736,7 +751,8 @@
     font-size: .84rem;
     font-weight: 800;
     line-height: 1.2;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
+    word-break: normal;
 }
 
 .service-option-desc {
@@ -744,7 +760,8 @@
     color: var(--text-2);
     font-size: .72rem;
     line-height: 1.35;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
+    word-break: normal;
 }
 
 .service-option-badge {
@@ -889,13 +906,6 @@
     border-color: rgba(252, 165, 165, .4);
     background: var(--crimson);
     color: #ffffff;
-}
-
-@media (min-width: 1200px) {
-    .service-step-grid {
-        grid-template-columns:
-            repeat(3, minmax(0, 1fr));
-    }
 }
 
 .signature-result-box {
