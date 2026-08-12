@@ -11,6 +11,7 @@ class DentistTransitionItem extends Model
 
     public const TYPES = [
         'appointment',
+        'document_request',
     ];
 
     public const TRANSFER_STATUSES = [
@@ -67,10 +68,18 @@ class DentistTransitionItem extends Model
         return $this->belongsTo(User::class, 'transferred_by');
     }
 
+    public function documentRequest()
+    {
+        return $this->belongsTo(DocumentRequest::class, 'record_id');
+    }
+
     public function getReferenceLabelAttribute(): string
     {
         return match ($this->item_type) {
             'appointment' => 'APT-' . str_pad((string) $this->record_id, 6, '0', STR_PAD_LEFT),
+            'document_request' => $this->documentRequest?->reference_number
+                ? 'DOC-' . $this->documentRequest->reference_number
+                : 'DOC-' . str_pad((string) $this->record_id, 6, '0', STR_PAD_LEFT),
             default => strtoupper($this->item_type) . '-' . $this->record_id,
         };
     }

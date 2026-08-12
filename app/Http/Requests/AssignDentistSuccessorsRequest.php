@@ -18,6 +18,7 @@ class AssignDentistSuccessorsRequest extends FormRequest
         return [
             'default_successor_dentist_id' => ['nullable', 'integer', 'exists:users,id'],
             'items' => ['nullable', 'array'],
+            'items.*.selected_for_transfer' => ['nullable', 'boolean'],
             'items.*.successor_dentist_id' => ['nullable', 'integer', 'exists:users,id'],
             'items.*.transfer_status' => ['nullable', 'string'],
             'items.*.resolution_type' => ['nullable', 'string', 'max:40'],

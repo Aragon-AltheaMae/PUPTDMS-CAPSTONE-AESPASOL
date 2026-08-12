@@ -94,6 +94,10 @@ class SystemSetting extends Model
 
             'notif_dentist_emergency_out' => ['database', 'broadcast'],
 
+            'notif_dentist_transition_created' => ['database', 'broadcast'],
+            'notif_dentist_transition_updated' => ['database', 'broadcast'],
+            'notif_dentist_transition_finalized' => ['database', 'broadcast'],
+
             // New follow-up notification toggles
             'notif_follow_up_scheduled' => ['database', 'broadcast'],
             'notif_follow_up_reminder' => ['database', 'broadcast'],
