@@ -113,7 +113,7 @@ $notifCount = $notifications->count();
         @endif
 
         @php
-        $totalRecords = isset($records) ? $records->count() : 0;
+        $totalRecords = isset($records) ? $records->total() : 0;
         $latestDate = $totalRecords
         ? \Carbon\Carbon::parse($records->first()->appointment_date)->format('M d, Y')
         : null;
@@ -137,84 +137,392 @@ $notifCount = $notifications->count();
             </div>
         </div>
 
-        <div class="records-body">
-            @if ($totalRecords)
-            <div class="records-section-title">
-                <span><i class="fa-solid fa-clock-rotate-left mr-1"></i> Visit History</span>
-                <div></div>
-            </div>
+        <div class="records-sections">
 
-            <div class="space-y-0">
-                @foreach ($records as $i => $record)
-                @php
-                $apptDate = \Carbon\Carbon::parse($record->appointment_date);
-                $apptTime = \Carbon\Carbon::parse($record->appointment_time);
-                $fmtDate = $apptDate->format('F d, Y'); // Binago sa 'F' para sa Full Month (e.g., May)
-                $fmtTime = $apptTime->format('g:i A');
-                $fmtRange = $fmtTime . ' – ' . $apptTime->copy()->addHour()->format('g:i A');
-                $recordProcedure = $record->procedure;
-                $recordDuration = $recordProcedure?->procedure_duration_seconds
-                    ? \Carbon\CarbonInterval::seconds((int) $recordProcedure->procedure_duration_seconds)->cascade()->forHumans(['short' => true, 'minimumUnit' => 'second'])
-                    : ($record->duration
-                    ?? ($record->procedure_duration
-                    ?? ($record->treatment_duration ?? '60 mins')));
-                $recordTreatment = $recordProcedure?->completion_action
-                    ? \Illuminate\Support\Str::of($recordProcedure->completion_action)->replace('_', ' ')->title()
-                    : ($record->remarks ?? '');
-                @endphp
-                <div class="rec-row" style="animation-delay:{{ $i * 0.08 }}s;">
-                    <div class="rec-tl">
-                        <div class="rec-dot"></div>
-                        <div class="rec-line"></div>
-                    </div>
-                    <div class="rec-card">
-                        <div class="rec-card-left">
-                            <div class="rec-service">{{ $record->service_type }}</div>
-                            <div class="rec-meta">
-                                <span class="rec-meta-chip">
-                                    <i class="fa-regular fa-calendar-check text-[10px] mr-1.5"></i>{{ $fmtDate }}
-                                </span>
-                                <span class="rec-meta-chip">
-                                    <i class="fa-regular fa-clock text-[10px]"></i>{{ $fmtTime }}
-                                </span>
+           <section class="card records-visits-card">
+                <div class="card-body">
+                    <div class="records-section-title">
+                        <span>
+                            <i class="fa-solid fa-clock-rotate-left mr-1"></i>
+                            Visit History
+                        </span>
+
+                    <div></div>
+                </div>
+
+            @if ($totalRecords)
+                <x-pagination-bar
+                    id="recordsPagebarTop"
+                    info-id="recordsPageInfoTop"
+                    pagination-id="recordsPaginationTop"
+                    position="top"
+                    :show-entries="true"
+                    page-size-id="recordsPageSize"
+                    page-size-callback="changeRecordsPageSize"
+                    :page-size-value="$records->perPage()"
+                    page-size-label="per page"
+                    label="visits"
+                />
+
+                <div class="space-y-0">
+                    @foreach ($records as $i => $record)
+                        @php
+                            $apptDate = \Carbon\Carbon::parse($record->appointment_date);
+                            $apptTime = \Carbon\Carbon::parse($record->appointment_time);
+
+                            $fmtDate = $apptDate->format('F d, Y');
+                            $fmtTime = $apptTime->format('g:i A');
+
+                            $recordProcedure = $record->procedure;
+
+                            $recordDuration =
+                                $recordProcedure?->procedure_duration_seconds
+                                    ? \Carbon\CarbonInterval::seconds(
+                                        (int) $recordProcedure->procedure_duration_seconds
+                                    )
+                                        ->cascade()
+                                        ->forHumans([
+                                            'short' => true,
+                                            'minimumUnit' => 'second'
+                                        ])
+                                    : (
+                                        $record->duration
+                                        ?? $record->procedure_duration
+                                        ?? $record->treatment_duration
+                                        ?? '60 mins'
+                                    );
+
+                            $recordTreatment =
+                                $recordProcedure?->completion_action
+                                    ? \Illuminate\Support\Str::of(
+                                        $recordProcedure->completion_action
+                                    )
+                                        ->replace('_', ' ')
+                                        ->title()
+                                    : ($record->remarks ?? '');
+                        @endphp
+
+                        <div
+                            class="rec-row"
+                            style="animation-delay:{{ $i * 0.08 }}s;"
+                        >
+                            <div class="rec-tl">
+                                <div class="rec-dot"></div>
+                                <div class="rec-line"></div>
+                            </div>
+
+                            <div class="rec-card">
+                                <div class="rec-card-left">
+                                    <div class="rec-service">
+                                        {{ $record->service_type }}
+                                    </div>
+
+                                    <div class="rec-meta">
+                                        <span class="rec-meta-chip">
+                                            <i class="fa-regular fa-calendar-check text-[10px] mr-1.5"></i>
+                                            {{ $fmtDate }}
+                                        </span>
+
+                                        <span class="rec-meta-chip">
+                                            <i class="fa-regular fa-clock text-[10px]"></i>
+                                            {{ $fmtTime }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <button
+                                    class="rec-btn"
+                                    onclick="openRecordModal(this)"
+                                    data-service="{{ $record->service_type }}"
+                                    data-date="{{ $fmtDate }}"
+                                    data-time="{{ $record->appointment_time }}"
+                                    data-status="{{ $record->status }}"
+                                    data-duration="{{ $recordDuration }}"
+                                    data-remarks="{{ $recordTreatment }}"
+                                    data-oral="{{ $recordProcedure?->oral_examination ?? '' }}"
+                                    data-diagnosis="{{ $recordProcedure?->diagnosis ?? '' }}"
+                                    data-prescription="{{ $recordProcedure?->prescriptions ?? '' }}"
+                                >
+                                    View Details
+                                </button>
                             </div>
                         </div>
-                        <button class="rec-btn" onclick="openRecordModal(this)"
-                            data-service="{{ $record->service_type }}" data-date="{{ $fmtDate }}"
-                            data-time="{{ $record->appointment_time }}" data-status="{{ $record->status }}"
-                            data-duration="{{ $recordDuration }}" data-remarks="{{ $recordTreatment }}"
-                            data-oral="{{ $recordProcedure?->oral_examination ?? '' }}"
-                            data-diagnosis="{{ $recordProcedure?->diagnosis ?? '' }}"
-                            data-prescription="{{ $recordProcedure?->prescriptions ?? '' }}">
-                            View Details
-                        </button>
-                    </div>
+                    @endforeach
                 </div>
-                @endforeach
-            </div>
+
+                <x-pagination-bar
+                    id="recordsPagebarBottom"
+                    info-id="recordsPageInfoBottom"
+                    pagination-id="recordsPaginationBottom"
+                    position="bottom"
+                    :show-entries="false"
+                    label="visits"
+                />
+
             @else
-            <div class="empty-state fade-up">
-                <div class="empty-state-icon">
-                    <i class="fa-solid fa-folder-open"></i>
+                <div class="empty-state fade-up">
+                    <div class="empty-state-icon">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </div>
+
+                    <p class="empty-state-title">
+                        No records yet
+                    </p>
+
+                    <p class="empty-state-sub">
+                        Completed appointment records will appear here after your first dental visit.
+                    </p>
+
+                    <a
+                        href="{{ route('patient.book.appointment') }}"
+                        class="empty-state-btn"
+                    >
+                        <i class="fa-solid fa-calendar-plus"></i>
+                        Book First Appointment
+                    </a>
                 </div>
-                <p class="empty-state-title">No records yet</p>
-                <p class="empty-state-sub">Completed appointment records will appear here after your first dental visit.
-                </p>
-                <a href="{{ route('patient.book.appointment') }}" class="empty-state-btn">
-                    <i class="fa-solid fa-calendar-plus"></i> Book First Appointment
-                </a>
-            </div>
             @endif
+            </div>
+        </section>
+
+            <section class="card document-history-card">
+            <div class="card-body">
+
+            @php
+                $documentRequests = collect($documentRequests ?? []);
+            @endphp
+
+            <div class="document-history-section">
+                <div class="records-section-title">
+                    <span>
+                        <i class="fa-solid fa-file-lines mr-1"></i>
+                        Document Request History
+                    </span>
+
+                    <div></div>
+                </div>
+
+                @if ($documentRequests->isNotEmpty())
+                    <div class="document-history-list">
+                        @foreach ($documentRequests as $documentRequest)
+                            @php
+                                $rawStatus = strtolower(
+                                    str_replace(
+                                        '_',
+                                        '-',
+                                        $documentRequest->status ?? 'pending'
+                                    )
+                                );
+
+                                $displayStatus =
+                                    in_array(
+                                        $rawStatus,
+                                        [
+                                            'approved',
+                                            'ready',
+                                            'ready-for-pickup',
+                                            'ready-for-release',
+                                            'released',
+                                        ],
+                                        true
+                                    )
+                                        ? 'approved'
+                                        : (
+                                            $rawStatus === 'rejected'
+                                                ? 'rejected'
+                                                : 'pending'
+                                        );
+
+                                $requestDate =
+                                    $documentRequest->request_date
+                                        ? \Carbon\Carbon::parse(
+                                            $documentRequest->request_date
+                                        )->format('F d, Y')
+                                        : optional(
+                                            $documentRequest->created_at
+                                        )->format('F d, Y');
+
+                                $requestTime =
+                                    $documentRequest->request_time
+                                        ? \Carbon\Carbon::parse(
+                                            $documentRequest->request_time
+                                        )->format('g:i A')
+                                        : optional(
+                                            $documentRequest->created_at
+                                        )->format('g:i A');
+
+                                $processedDate =
+                                    $documentRequest->approved_at
+                                        ? \Carbon\Carbon::parse(
+                                            $documentRequest->approved_at
+                                        )->format('F d, Y')
+                                        : null;
+
+                                $statusLabel = match ($displayStatus) {
+                                    'approved' => 'Approved',
+                                    'rejected' => 'Rejected',
+                                    default => 'Pending',
+                                };
+                            @endphp
+
+                            <article
+                                class="global-record-card document-request-item"
+                                style="--record-accent:
+                                    {{ $displayStatus === 'approved'
+                                        ? 'var(--status-approved-solid)'
+                                        : ($displayStatus === 'rejected'
+                                            ? 'var(--status-rejected-solid)'
+                                            : 'var(--status-pending-solid)') }};
+                                "
+                            >
+                                <div class="document-request-row">
+
+                                    <div class="document-request-content">
+                                        <div class="document-request-topline">
+                                            <span class="document-history-reference">
+                                                {{ $documentRequest->reference_number ?? '—' }}
+                                            </span>
+
+                                            <span class="status-pill status-{{ $displayStatus }}">
+                                                <span class="status-dot"></span>
+                                                {{ $statusLabel }}
+                                            </span>
+                                        </div>
+
+                                        <h3 class="global-record-name document-request-name">
+                                            {{
+                                                \Illuminate\Support\Str::of(
+                                                    $documentRequest->document_type ?? 'Document'
+                                                )
+                                                    ->replace(['_', '-'], ' ')
+                                                    ->title()
+                                            }}
+                                        </h3>
+
+                                        <div class="document-request-meta">
+                                            <span class="global-info-pill">
+                                                <i class="fa-regular fa-calendar"></i>
+                                                {{ $requestDate ?: '—' }}
+                                            </span>
+
+                                            @if ($requestTime)
+                                                <span class="global-info-pill">
+                                                    <i class="fa-regular fa-clock"></i>
+                                                    {{ $requestTime }}
+                                                </span>
+                                            @endif
+
+                                            <span class="document-request-purpose">
+                                                <i class="fa-solid fa-bullseye"></i>
+                                                <span class="document-request-purpose-label">
+                                                    Purpose:
+                                                </span>
+
+                                                <strong>
+                                                    {{ $documentRequest->purpose ?: '—' }}
+                                                </strong>
+                                            </span>
+                                        </div>
+
+                                        @if ($displayStatus === 'approved' && $processedDate)
+                                            <div class="document-request-status-note status-approved">
+                                                <i class="fa-solid fa-circle-check"></i>
+                                                Processed on {{ $processedDate }}
+                                            </div>
+
+                                        @elseif ($displayStatus === 'rejected' && $documentRequest->rejection_reason)
+                                            <div class="document-request-status-note status-rejected">
+                                                <i class="fa-solid fa-circle-xmark"></i>
+                                                {{ $documentRequest->rejection_reason }}
+                                            </div>
+
+                                        @elseif ($displayStatus === 'pending')
+                                            <div class="document-request-status-note status-pending">
+                                                <i class="fa-regular fa-clock"></i>
+                                                Waiting for clinic review
+                                            </div>
+                                        @endif
+
+                                    </div>
+                                </div>
+                            </article>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fa-solid fa-file-circle-question"></i>
+                        </div>
+
+                        <p class="empty-state-title">
+                            No document requests yet
+                        </p>
+
+                        <p class="empty-state-sub">
+                            Your submitted document requests will appear here.
+                        </p>
+                    </div>
+                @endif
+            </div>
         </div>
+    </section>
 
     </div>
+        </div>
 </main>
 @endsection
 
 @section('scripts')
 <script>
+    function goToRecordsPage(page) {
+        const url = new URL(window.location.href);
+
+        url.searchParams.set('records_page', page);
+
+        window.location.href = url.toString();
+    }
+
+    function changeRecordsPageSize(size) {
+        const url = new URL(window.location.href);
+
+        url.searchParams.set('per_page', size);
+        url.searchParams.set('records_page', 1);
+
+        window.location.href = url.toString();
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         initRecordModal();
+
+        if (typeof window.renderGlobalPagination === 'function') {
+            window.renderGlobalPagination({
+                currentPage: {{ $records->currentPage() }},
+                lastPage: {{ $records->lastPage() }},
+                total: {{ $records->total() }},
+                from: {{ $records->firstItem() ?? 0 }},
+                to: {{ $records->lastItem() ?? 0 }},
+
+                containers: [
+                    document.getElementById('recordsPaginationTop'),
+                    document.getElementById('recordsPaginationBottom')
+                ],
+
+                infoElements: [
+                    document.getElementById('recordsPageInfoTop'),
+                    document.getElementById('recordsPageInfoBottom')
+                ],
+
+                bars: [
+                    document.getElementById('recordsPagebarTop'),
+                    document.getElementById('recordsPagebarBottom')
+                ],
+
+                itemLabel: 'visits',
+
+                onPageChange: goToRecordsPage
+            });
+        }
     });
+
 </script>
 @endsection
