@@ -263,7 +263,7 @@ class OIDCController extends Controller
             ->orWhere('external_admin_id', (string) $ssoUserId)
             ->first();
 
-        $facultyAccess = Faculty::with(['user.role'])
+        $facultyAccess = Faculty::with(['user.role', 'profile'])
             ->whereHas('user', function ($query) use ($email, $ssoUserId) {
                 $query->where('email', $email);
 
@@ -608,6 +608,19 @@ class OIDCController extends Controller
             }
         } elseif ($facultyAccess && $facultyAccess->user) {
             try {
+                $localFacultyBirthdate = $facultyAccess->profile?->birthday
+                    ?? $facultyAccess->user?->birthdate;
+
+                if ($localFacultyBirthdate) {
+                    $birthdate = $this->normalizeDate((string) $localFacultyBirthdate) ?? $birthdate;
+                }
+
+                $gender = $this->normalizeGenderLabel(
+                    $facultyAccess->profile?->gender
+                        ?? $facultyAccess->user?->gender
+                        ?? $gender
+                );
+
                 $faculties = $this->facultyApiService->getFaculties();
 
                 $matchedFaculty = collect($faculties)->first(function ($faculty) use ($email, $ssoUserId) {
@@ -624,13 +637,59 @@ class OIDCController extends Controller
                 });
 
                 if ($matchedFaculty) {
-                    $birthdate = $this->normalizeDate($matchedFaculty['profile']['birthday'] ?? $birthdate);
+                    $birthdate = $this->normalizeDate(
+                        $matchedFaculty['birthday']
+                            ?? $matchedFaculty['birthdate']
+                            ?? data_get($matchedFaculty, 'profile.birthday')
+                            ?? data_get($matchedFaculty, 'profile.birthdate')
+                            ?? data_get($matchedFaculty, 'profile.date_of_birth')
+                            ?? data_get($matchedFaculty, 'profile.dateOfBirth')
+                            ?? $birthdate
+                    );
                     $gender = $this->normalizeGenderLabel($matchedFaculty['profile']['gender'] ?? $gender);
                     $phone = $matchedFaculty['contact_number'] ?? $phone;
                     $facultyCode = $matchedFaculty['faculty_code'] ?? null;
                 }
             } catch (\Throwable $e) {
                 Log::error('Faculty API fetch failed', [
+                    'email' => $email,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        if ($birthdate === null || $facultyCode === null) {
+            try {
+                $faculties = $this->facultyApiService->getFaculties();
+
+                $matchedFaculty = collect($faculties)->first(function ($faculty) use ($email, $ssoUserId) {
+                    $facultyEmail = strtolower((string) ($faculty['email'] ?? ''));
+                    $userEmail = strtolower((string) $email);
+                    $facultyId = (string) ($faculty['faculty_id'] ?? '');
+                    $idpUserId = (string) ($faculty['idp_user_id'] ?? '');
+                    $currentSsoUserId = (string) ($ssoUserId ?? '');
+
+                    return ($facultyEmail !== '' && $facultyEmail === $userEmail)
+                        || ($idpUserId !== '' && $currentSsoUserId !== '' && $idpUserId === $currentSsoUserId)
+                        || ($facultyId !== '' && $currentSsoUserId !== '' && $facultyId === $currentSsoUserId);
+                });
+
+                if ($matchedFaculty) {
+                    $birthdate = $this->normalizeDate(
+                        $matchedFaculty['birthday']
+                            ?? $matchedFaculty['birthdate']
+                            ?? data_get($matchedFaculty, 'profile.birthday')
+                            ?? data_get($matchedFaculty, 'profile.birthdate')
+                            ?? data_get($matchedFaculty, 'profile.date_of_birth')
+                            ?? data_get($matchedFaculty, 'profile.dateOfBirth')
+                            ?? $birthdate
+                    );
+                    $facultyCode = $matchedFaculty['faculty_code'] ?? $facultyCode;
+                    $gender = $this->normalizeGenderLabel($matchedFaculty['profile']['gender'] ?? $gender);
+                    $phone = $matchedFaculty['contact_number'] ?? $phone;
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Faculty API fallback by email failed', [
                     'email' => $email,
                     'error' => $e->getMessage(),
                 ]);

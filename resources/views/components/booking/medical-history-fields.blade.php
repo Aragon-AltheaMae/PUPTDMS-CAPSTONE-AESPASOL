@@ -29,12 +29,16 @@
         return old($code, $defaults[$code] ?? $fallback);
     };
 
-    $allergyName = function (string $code) {
-        return "medical_answers[{$code}]";
+    $allergyName = function (string $code) use ($isNested) {
+        return $isNested ? "medical_answers[{$code}]" : $code;
     };
 
-    $allergyValue = function (string $code, string $fallback = '') use ($answers) {
-        return old("medical_answers.{$code}", $answers[$code] ?? $fallback);
+    $allergyValue = function (string $code, string $fallback = '') use ($isNested, $answers, $defaults) {
+        if ($isNested) {
+            return old("medical_answers.{$code}", $answers[$code] ?? $fallback);
+        }
+
+        return old($code, $defaults[$code] ?? $fallback);
     };
 @endphp
 
