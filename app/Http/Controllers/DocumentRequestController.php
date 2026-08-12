@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Dentist\DentistReportController;
 use Illuminate\Http\Request;
 use App\Models\DocumentRequest;
+use App\Models\Appointment;
 use App\Models\Patient;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -43,9 +44,16 @@ class DocumentRequestController extends Controller
         try {
             $documentRequest = DB::transaction(function () use ($request, $patient) {
                 $nextId = (DocumentRequest::max('id') ?? 0) + 1;
+                $assignedDentistId = Appointment::query()
+                    ->where('patient_id', $patient->id)
+                    ->whereNotNull('dentist_id')
+                    ->orderByDesc('appointment_date')
+                    ->orderByDesc('appointment_time')
+                    ->value('dentist_id');
 
                 return DocumentRequest::create([
                     'patient_id' => $patient->id,
+                    'assigned_dentist_id' => $assignedDentistId,
                     'reference_number' => 'DOC-' . now()->format('Y') . '-' . str_pad($nextId, 4, '0', STR_PAD_LEFT),
                     'document_type' => $request->document_type,
                     'purpose' => $request->purpose,
