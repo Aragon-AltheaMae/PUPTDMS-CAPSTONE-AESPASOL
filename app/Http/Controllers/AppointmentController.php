@@ -34,6 +34,12 @@ use App\Services\SignatureAiVerifier;
 use App\Helpers\BookingQuestions;
 use App\Models\AppointmentDraft;
 
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+
+use App\Mail\AppointmentConfirmationMail;
+use App\Mail\AppointmentRescheduleMail;
+
 class AppointmentController extends Controller
 {
 
@@ -1127,7 +1133,36 @@ class AppointmentController extends Controller
                 'appointments',
                 "Patient booked appointment for {$appointment->appointment_date} at {$appointment->appointment_time}"
             );
+
+            try {
+                $appointment->loadMissing('patient');
+
+                $patientEmail = $appointment->patient?->email;
+
+                if ($patientEmail) {
+                    Mail::to($patientEmail)
+                        ->send(new AppointmentConfirmationMail($appointment));
+
+                    Log::info('Appointment confirmation email sent.', [
+                        'appointment_id' => $appointment->id,
+                        'patient_id' => $appointment->patient_id,
+                        'email' => $patientEmail,
+                    ]);
+                } else {
+                    Log::warning('Appointment confirmation email not sent: patient has no email.', [
+                        'appointment_id' => $appointment->id,
+                        'patient_id' => $appointment->patient_id,
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Appointment confirmation email failed.', [
+                    'appointment_id' => $appointment->id,
+                    'patient_id' => $appointment->patient_id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
+
 
         $successMessage =
             $signatureReviewStatus ===
@@ -1537,6 +1572,9 @@ class AppointmentController extends Controller
                 ->with('error', 'Sorry, that time slot is already taken. Please choose another time.');
         }
 
+        $oldAppointmentDate = $appointment->appointment_date;
+        $oldAppointmentTime = $appointment->appointment_time;
+
         $appointment->update([
             'appointment_date' => $request->new_appointment_date,
             'appointment_time' => $mysqlTime,
@@ -1557,6 +1595,39 @@ class AppointmentController extends Controller
             foreach ($dentists as $dentist) {
                 $dentist->notify(new AppointmentRescheduledNotification($appointment, 'Patient'));
             }
+        }
+
+        try {
+            $appointment->loadMissing('patient');
+
+            $patientEmail = $appointment->patient?->email;
+
+            if ($patientEmail) {
+                Mail::to($patientEmail)
+                    ->send(new AppointmentRescheduleMail(
+                        $appointment,
+                        $oldAppointmentDate,
+                        $oldAppointmentTime,
+                        'the clinic'
+                    ));
+
+                Log::info('Appointment reschedule email sent.', [
+                    'appointment_id' => $appointment->id,
+                    'patient_id' => $appointment->patient_id,
+                    'email' => $patientEmail,
+                ]);
+            } else {
+                Log::warning('Appointment reschedule email not sent: patient has no email.', [
+                    'appointment_id' => $appointment->id,
+                    'patient_id' => $appointment->patient_id,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('Appointment reschedule email failed.', [
+                'appointment_id' => $appointment->id,
+                'patient_id' => $appointment->patient_id,
+                'error' => $e->getMessage(),
+            ]);
         }
 
         return response()->json(['success' => true]);

@@ -16,6 +16,12 @@ use App\Notifications\DocumentRequestSubmittedNotification;
 use App\Notifications\DocumentRequestApprovedNotification;
 use App\Notifications\DocumentRequestRejectedNotification;
 
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+
+use App\Mail\DocumentRequestApprovedMail;
+use App\Mail\DocumentRequestRejectedMail;
+
 class DocumentRequestController extends Controller
 {
     public function store(Request $request)
@@ -338,6 +344,34 @@ class DocumentRequestController extends Controller
                 );
             }
 
+            try {
+                $docRequest->loadMissing('patient');
+
+                $patientEmail = $docRequest->patient?->email;
+
+                if ($patientEmail) {
+                    Mail::to($patientEmail)
+                        ->send(new DocumentRequestApprovedMail($docRequest));
+
+                    Log::info('Document request approval email sent.', [
+                        'document_request_id' => $docRequest->id,
+                        'patient_id' => $docRequest->patient_id,
+                        'email' => $patientEmail,
+                    ]);
+                } else {
+                    Log::warning('Document request approval email not sent: patient has no email.', [
+                        'document_request_id' => $docRequest->id,
+                        'patient_id' => $docRequest->patient_id,
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Document request approval email failed.', [
+                    'document_request_id' => $docRequest->id,
+                    'patient_id' => $docRequest->patient_id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             return app(DentistReportController::class)
                 ->buildApprovedDocumentRequestPdfResponse($docRequest);
         } catch (\Throwable $e) {
@@ -373,6 +407,34 @@ class DocumentRequestController extends Controller
             $docRequest->patient->user->notify(
                 new DocumentRequestRejectedNotification($docRequest)
             );
+        }
+
+        try {
+            $docRequest->loadMissing('patient');
+
+            $patientEmail = $docRequest->patient?->email;
+
+            if ($patientEmail) {
+                Mail::to($patientEmail)
+                    ->send(new DocumentRequestRejectedMail($docRequest));
+
+                Log::info('Document request rejection email sent.', [
+                    'document_request_id' => $docRequest->id,
+                    'patient_id' => $docRequest->patient_id,
+                    'email' => $patientEmail,
+                ]);
+            } else {
+                Log::warning('Document request rejection email not sent: patient has no email.', [
+                    'document_request_id' => $docRequest->id,
+                    'patient_id' => $docRequest->patient_id,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('Document request rejection email failed.', [
+                'document_request_id' => $docRequest->id,
+                'patient_id' => $docRequest->patient_id,
+                'error' => $e->getMessage(),
+            ]);
         }
 
         return response()->json([
