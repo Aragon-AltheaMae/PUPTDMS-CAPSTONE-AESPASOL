@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Dentist;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AppointmentCancelledMail;
+use App\Mail\AppointmentRescheduleMail;
 use App\Models\Appointment;
 use App\Models\User;
 use Carbon\Carbon;
@@ -16,6 +18,7 @@ use App\Notifications\AppointmentRescheduledNotification;
 use App\Models\ServiceType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 
 
@@ -322,13 +325,15 @@ class DentistAppointmentController extends Controller
 
         $appointment = Appointment::with('patient.user')->findOrFail($id);
 
+        $cancelledBy = Auth::user()?->name ?? 'the dentist';
+
         $appointment->update([
             'status' => 'cancelled',
+            'cancellation_reason' => $request->reason,
         ]);
 
         $patientUser = optional($appointment->patient)->user;
 
-        // fallback kung walang relationship
         if (!$patientUser && !empty(optional($appointment->patient)->email)) {
             $patientUser = User::where('email', $appointment->patient->email)->first();
         }
@@ -337,11 +342,30 @@ class DentistAppointmentController extends Controller
             $patientUser->notify(
                 new AppointmentCancelledNotification(
                     $appointment,
-                    Auth::user()?->name ?? 'the dentist',
+                    $cancelledBy,
                     $request->reason
                 )
             );
         }
+
+        try {
+            $patientEmail = optional($appointment->patient)->email;
+
+            if ($patientEmail) {
+                Mail::to($patientEmail)
+                    ->send(new AppointmentCancelledMail(
+                        $appointment,
+                        $cancelledBy,
+                        $request->reason
+                    ));
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Appointment cancellation email failed.', [
+                'appointment_id' => $appointment->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
         return response()->json(['success' => true]);
     }
 
@@ -377,6 +401,9 @@ class DentistAppointmentController extends Controller
             ], 422);
         }
 
+        $oldAppointmentDate = $appointment->appointment_date;
+        $oldAppointmentTime = $appointment->appointment_time;
+
         $appointment->update([
             'appointment_date' => $request->new_appointment_date,
             'appointment_time' => $mysqlTime,
@@ -390,13 +417,34 @@ class DentistAppointmentController extends Controller
             $patientUser = User::where('email', $appointment->patient->email)->first();
         }
 
+        $rescheduledBy = Auth::user()?->name ?? 'the dentist';
+
         if ($patientUser) {
             $patientUser->notify(
                 new AppointmentRescheduledNotification(
                     $appointment,
-                    Auth::user()?->name ?? 'the dentist'
+                    $rescheduledBy
                 )
             );
+        }
+
+        try {
+            $patientEmail = optional($appointment->patient)->email;
+
+            if ($patientEmail) {
+                Mail::to($patientEmail)
+                    ->send(new AppointmentRescheduleMail(
+                        $appointment,
+                        $oldAppointmentDate,
+                        $oldAppointmentTime,
+                        $rescheduledBy
+                    ));
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Appointment reschedule email failed.', [
+                'appointment_id' => $appointment->id,
+                'error' => $e->getMessage(),
+            ]);
         }
 
         AuditLogger::log(

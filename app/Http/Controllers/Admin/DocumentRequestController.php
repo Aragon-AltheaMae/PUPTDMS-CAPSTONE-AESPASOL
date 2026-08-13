@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 
+use Illuminate\Support\Facades\Mail;
+
+use App\Mail\DocumentRequestApprovedMail;
+use App\Mail\DocumentRequestRejectedMail;
+
 class DocumentRequestController extends Controller
 {
     private const VALID_STATUSES = ['pending', 'approved', 'rejected'];
@@ -196,6 +201,34 @@ class DocumentRequestController extends Controller
                 ]);
             }
 
+            try {
+                $documentRequest->loadMissing('patient');
+
+                $patientEmail = $documentRequest->patient?->email;
+
+                if ($patientEmail) {
+                    Mail::to($patientEmail)
+                        ->send(new DocumentRequestApprovedMail($documentRequest));
+
+                    Log::info('Document request approval email sent.', [
+                        'document_request_id' => $documentRequest->id,
+                        'patient_id' => $documentRequest->patient_id,
+                        'email' => $patientEmail,
+                    ]);
+                } else {
+                    Log::warning('Document request approval email not sent: patient has no email.', [
+                        'document_request_id' => $documentRequest->id,
+                        'patient_id' => $documentRequest->patient_id,
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Document request approval email failed.', [
+                    'document_request_id' => $documentRequest->id,
+                    'patient_id' => $documentRequest->patient_id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
             return app(DentistReportController::class)
                 ->buildApprovedDocumentRequestPdfResponse($documentRequest);
         } catch (\Throwable $e) {
@@ -236,6 +269,34 @@ class DocumentRequestController extends Controller
                 Log::warning('Document request rejected but patient user was not found.', [
                     'document_request_id' => $documentRequest->id,
                     'patient_id' => $documentRequest->patient_id,
+                ]);
+            }
+
+            try {
+                $documentRequest->loadMissing('patient');
+
+                $patientEmail = $documentRequest->patient?->email;
+
+                if ($patientEmail) {
+                    Mail::to($patientEmail)
+                        ->send(new DocumentRequestRejectedMail($documentRequest));
+
+                    Log::info('Document request rejection email sent.', [
+                        'document_request_id' => $documentRequest->id,
+                        'patient_id' => $documentRequest->patient_id,
+                        'email' => $patientEmail,
+                    ]);
+                } else {
+                    Log::warning('Document request rejection email not sent: patient has no email.', [
+                        'document_request_id' => $documentRequest->id,
+                        'patient_id' => $documentRequest->patient_id,
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Document request rejection email failed.', [
+                    'document_request_id' => $documentRequest->id,
+                    'patient_id' => $documentRequest->patient_id,
+                    'error' => $e->getMessage(),
                 ]);
             }
 
