@@ -294,6 +294,9 @@ function updateMonthOnlyInput(instance, options = {}) {
 }
 
 function buildFlatpickrHeader(instance) {
+    const GLOBAL_CALENDAR_MIN_YEAR = 2000;
+    const GLOBAL_CALENDAR_FUTURE_YEARS = 10;
+
     if (!instance?.calendarContainer) return;
 
     const currentMonth = instance.calendarContainer.querySelector(
@@ -343,12 +346,12 @@ function buildFlatpickrHeader(instance) {
     const minimumYear =
         instance.config.minDate instanceof Date
             ? instance.config.minDate.getFullYear()
-            : instance.currentYear - 80;
+            : GLOBAL_CALENDAR_MIN_YEAR;
 
     const maximumYear =
         instance.config.maxDate instanceof Date
             ? instance.config.maxDate.getFullYear()
-            : instance.currentYear + 10;
+            : instance.currentYear + GLOBAL_CALENDAR_FUTURE_YEARS;
 
     for (let year = minimumYear; year <= maximumYear; year++) {
         const option = document.createElement('option');

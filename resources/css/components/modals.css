@@ -1444,15 +1444,6 @@ body:has([id$="Modal"].opacity-100:not(.pointer-events-none)) {
     animation: errorShake .35s ease;
 }
 
-@media (max-width: 640px) {
-
-    .reason-chip label {
-        min-height: 38px;
-        padding: 8px 12px;
-        font-size: 12px;
-    }
-}
-
 #termsModal {
     border: none;
     padding: 0;
@@ -2506,6 +2497,12 @@ body.doc-modal-lock .floating-action {
 }
 
 @media (max-width: 640px) {
+    .reason-chip label {
+        min-height: 38px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
     .patient-doc-modal {
         width: 100vw !important;
         max-width: 100vw !important;
@@ -2584,6 +2581,44 @@ body.doc-modal-lock .floating-action {
         height: 30px;
         min-width: 30px;
         border-radius: 10px;
+    }
+
+    #appointmentConfirmedModal .ui-modal-card {
+        max-height: calc(100dvh - 32px);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #appointmentConfirmedModal .modal-bd {
+        overflow-y: auto;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+
+    #appointmentConfirmedModal .confirmed-modal-section {
+        padding: 12px;
+    }
+
+    #appointmentConfirmedModal .confirmed-modal-schedule-grid {
+        gap: 8px;
+    }
+
+    #appointmentConfirmedModal .confirmed-modal-schedule-item {
+        padding: 10px;
+    }
+
+    #appointmentConfirmedModal .confirmed-modal-schedule-label {
+        font-size: 10px;
+    }
+
+    #appointmentConfirmedModal .confirmed-modal-schedule-value {
+        font-size: 13px;
+    }
+
+    #appointmentConfirmedModal .confirmed-modal-schedule-note {
+        padding: 10px;
+        font-size: 11px;
     }
 }
 
@@ -3853,4 +3888,111 @@ body.session-expired {
     border: 1px solid var(--border);
     border-radius: 16px;
     background: var(--card);
+}
+
+@media (max-width: 767px) {
+
+    body .ui-modal#appointmentConfirmedModal {
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 18px !important;
+    }
+
+    body .ui-modal#appointmentConfirmedModal .ui-modal-card {
+        margin: auto !important;
+        width: min(100%, 430px) !important;
+        max-width: 430px !important;
+        border-radius: 24px !important;
+    }
+
+}
+
+@media (max-width: 767px) {
+
+    body .ui-modal#appointmentConfirmedModal {
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 16px !important;
+    }
+
+    body .ui-modal#appointmentConfirmedModal .ui-modal-card {
+        width: 100% !important;
+        max-width: 430px !important;
+        max-height: calc(100dvh - 32px) !important;
+        border-radius: 24px !important;
+    }
+
+
+    body .ui-modal#appointmentConfirmedModal .appointment-modal-header {
+        min-height: 76px !important;
+        padding: .8rem 1rem !important;
+    }
+
+
+    body .ui-modal#appointmentConfirmedModal .appointment-modal-header-icon {
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+    }
+
+
+    body .ui-modal#appointmentConfirmedModal .appointment-modal-title {
+        font-size: 15px !important;
+    }
+
+
+    body .ui-modal#appointmentConfirmedModal .appointment-modal-subtitle {
+        font-size: 11px !important;
+    }
+
+
+    body .ui-modal#appointmentConfirmedModal .modal-bd {
+        padding: .7rem 1rem !important;
+    }
+
+
+    body .ui-modal#appointmentConfirmedModal .modal-profile-card {
+        padding: .65rem !important;
+        margin-bottom: .7rem !important;
+    }
+
+
+    body .ui-modal#appointmentConfirmedModal .confirmed-modal-details {
+        padding: .7rem !important;
+    }
+
+
+    body .ui-modal#appointmentConfirmedModal .confirmed-modal-schedule-item {
+        min-height: 50px !important;
+        padding: .5rem .6rem !important;
+    }
+
+
+    body .ui-modal#appointmentConfirmedModal .modal-ft {
+        padding: .6rem 1rem .8rem !important;
+    }
+
+
+    body .ui-modal#appointmentConfirmedModal .modal-ft button {
+        min-height: 38px !important;
+        font-size: .78rem !important;
+    }
+}
+
+body.appointment-confirmed-open .mobile-bottom-nav,
+body.appointment-confirmed-open .patient-mobile-nav,
+html.appointment-confirmed-open .mobile-bottom-nav,
+html.appointment-confirmed-open .patient-mobile-nav {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+body.appointment-confirmed-open .floating-actions,
+body.appointment-confirmed-open .floating-nav,
+html.appointment-confirmed-open .floating-actions,
+html.appointment-confirmed-open .floating-nav {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
 }

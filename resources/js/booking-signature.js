@@ -8,6 +8,9 @@ function escapeSignatureHtml(value = '') {
 }
 
 function createBookingSignature(root) {
+    let editingExistingSignature = false;
+
+
     if (
         !root ||
         root.dataset.bookingSignatureInitialized ===
@@ -1247,25 +1250,36 @@ function createBookingSignature(root) {
     }
 
     function isReady() {
-        if (
-            signatureAiChecking
-        ) {
-            return false;
-        }
 
         if (
+            root.dataset.hasExistingSignature === 'true'
+            &&
+            !editingExistingSignature
+            &&
             !sigInput?.files?.length
         ) {
+            return true;
+        }
+
+
+        if (signatureAiChecking) {
             return false;
         }
 
+
+        if (!sigInput?.files?.length) {
+            return false;
+        }
+
+
         if (
-            signatureSourceInput?.value ===
-            'drawn' &&
+            signatureSourceInput?.value === 'drawn'
+            &&
             !drawnSignatureWasUsed
         ) {
             return false;
         }
+
 
         return signatureAiValid;
     }
@@ -1371,6 +1385,60 @@ function createBookingSignature(root) {
             setMode(
                 'draw'
             )
+    );
+
+    const editExistingSignatureBtn =
+        root.querySelector(
+            '#editExistingSignatureBtn'
+        );
+
+    const signatureEditorWrapper =
+        root.querySelector(
+            '#signatureEditorWrapper'
+        );
+
+    const reuseExistingInput =
+        root.querySelector(
+            '#reuse_existing_signature'
+        );
+
+    editExistingSignatureBtn?.addEventListener(
+        'click',
+        () => {
+
+            editingExistingSignature = true;
+
+            root.dataset.hasExistingSignature = 'false';
+
+            if (reuseExistingInput) {
+                reuseExistingInput.value = '0';
+            }
+            
+            signatureEditorWrapper
+                ?.classList
+                .remove('hidden');
+
+
+            editExistingSignatureBtn
+                .closest('.signature-existing-card')
+                ?.classList
+                .add('hidden');
+
+
+            sigInput?.removeAttribute(
+                'disabled'
+            );
+
+
+            root.dispatchEvent(
+                new CustomEvent(
+                    'booking-signature:editing',
+                    {
+                        bubbles: true
+                    }
+                )
+            );
+        }
     );
 
     const controller = {

@@ -438,6 +438,20 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                     selected?.value ===
                     showOn;
 
+                if (
+                    shouldShow &&
+                    radioName === 'medical_answers[tobacco_use]'
+                ) {
+                    box.querySelectorAll('[data-number-stepper]')
+                        .forEach(input => {
+
+                            if (!input.value) {
+                                input.value = 1;
+                            }
+
+                        });
+                }
+
                 box.classList.toggle(
                     'hidden',
                     !shouldShow

@@ -291,8 +291,29 @@
                     {{ $medicalQuestionMap->get('tobacco_per_day')['label'] ?? 'How much per day:' }}
                 </label>
 
-                <input type="text" name="{{ $fieldName('tobacco_per_day') }}"
-                    value="{{ $fieldValue('tobacco_per_day') }}" class="form-input-custom" placeholder="Input here">
+                <div class="global-number-stepper" data-global-number-stepper>
+
+                    <button type="button" class="global-number-stepper-btn" data-number-step="-1"
+                        aria-label="Decrease">
+
+                        <i class="fa-solid fa-minus"></i>
+
+                    </button>
+
+
+                    <input type="number" name="{{ $fieldName('tobacco_per_day') }}"
+                        value="{{ $fieldValue('tobacco_per_day', '1') }}" min="1" max="100"
+                        step="1" class="global-number-stepper-input" data-number-stepper-input>
+
+
+                    <button type="button" class="global-number-stepper-btn" data-number-step="1"
+                        aria-label="Increase">
+
+                        <i class="fa-solid fa-plus"></i>
+
+                    </button>
+
+                </div>
             </div>
 
             <div class="global-form-group" data-global-field>
@@ -300,9 +321,23 @@
                     {{ $medicalQuestionMap->get('tobacco_per_week')['label'] ?? 'Per week:' }}
                 </label>
 
-                <input type="text" name="{{ $fieldName('tobacco_per_week') }}"
-                    value="{{ $fieldValue('tobacco_per_week') }}" class="form-input-custom"
-                    placeholder="Input here">
+                <div class="global-number-stepper" data-global-number-stepper>
+
+                    <button type="button" class="global-number-stepper-btn" data-number-step="-1"
+                        aria-label="Decrease">
+
+                        <i class="fa-solid fa-minus"></i>
+                    </button>
+
+                    <input type="number" name="{{ $fieldName('tobacco_per_week') }}"
+                        value="{{ $fieldValue('tobacco_per_week', '1') }}" min="1" max="7"
+                        step="1" class="global-number-stepper-input" data-number-stepper-input>
+
+                    <button type="button" class="global-number-stepper-btn" data-number-step="1"
+                        aria-label="Increase">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                </div>
             </div>
 
         </div>
@@ -360,9 +395,9 @@
             </label>
 
             <input type="tel" id="emergency_number" name="emergency_number"
-                value="{{ old('emergency_number', $defaults['emergency_number'] ?? '') }}"
-                inputmode="numeric" autocomplete="tel" maxlength="11" pattern="09[0-9]{9}"
-                class="form-input-custom" placeholder="09XXXXXXXXX" data-validation-rule="philippineMobile"
+                value="{{ old('emergency_number', $defaults['emergency_number'] ?? '') }}" inputmode="numeric"
+                autocomplete="tel" maxlength="11" pattern="09[0-9]{9}" class="form-input-custom"
+                placeholder="09XXXXXXXXX" data-validation-rule="philippineMobile"
                 data-required-message="Please enter an emergency contact number."
                 data-pattern-message="Contact number must start with 09 and contain exactly 11 digits." required>
         </div>
