@@ -22,6 +22,8 @@
         "pusher/pusher-php-server": "*",
         "setasign/fpdf": "^1.9",
         "setasign/fpdi": "^2.6",
+        "symfony/http-client": "^8.1",
+        "symfony/mailgun-mailer": "^8.1",
         "tymon/jwt-auth": "^2.3"
     },
     "require-dev": {

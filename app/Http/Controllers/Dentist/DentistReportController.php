@@ -707,7 +707,7 @@ class DentistReportController extends Controller
         $template = $pdf->importPage(1);
         $size = $pdf->getTemplateSize($template);
 
-        $rowsPerPage = 55;
+        $rowsPerPage = 16;
         $recordChunks = $records->chunk($rowsPerPage);
         $copies = (int) $validated['quantity'];
 
@@ -2414,10 +2414,12 @@ class DentistReportController extends Controller
     {
         $notes = [];
 
-        foreach ([
-            'earaches' => 'Earaches',
-            'neck_aches' => 'Neck aches',
-        ] as $key => $label) {
+        foreach (
+            [
+                'earaches' => 'Earaches',
+                'neck_aches' => 'Neck aches',
+            ] as $key => $label
+        ) {
             $value = $this->dhrMedicalTextByKeys($medicalAnswers, [$key]);
 
             if ($value !== '') {
@@ -3472,8 +3474,8 @@ class DentistReportController extends Controller
     {
         $pdf->SetTextColor(0, 0, 0);
 
-        $startY = 147.2;
-        $rowHeight = 7.32;
+        $startY = 208.0;
+        $rowHeight = 26.5;
 
         foreach ($records as $index => $appointment) {
             $y = $startY + ($index * $rowHeight);
@@ -3536,37 +3538,230 @@ class DentistReportController extends Controller
                 (int) ($procedure?->procedure_duration_seconds ?? 0)
             );
 
+            if ($processingTime !== '') {
+                $processingTime .= ((int) $processingTime === 1) ? ' min' : ' mins';
+            }
+
             $signaturePath = $this->resolveStoredSignaturePath($patient?->medicalHistory?->patient_signature);
 
-            $pdf->SetFont('Helvetica', '', 4.2);
+            $pdf->SetFont('Helvetica', '', 5.2);
 
-            $this->drawPdfCell($pdf, 84.0, $y, $date, 32, 5.5);
-            $this->drawPdfCell($pdf, 121.6, $y, $timeIn, 36, 5.5);
-            $this->drawPdfCell($pdf, 194.3, $y, $patientName, 100, 5.5, 'L');
-            $this->drawPdfCell($pdf, 270.8, $y, $programOrDept, 44, 5.5);
-            $this->drawPdfCell($pdf, 307.5, $y, $age, 20, 5.5);
+            // DATE
+            $this->drawPdfCell(
+                $pdf,
+                60.75,
+                $y,
+                $date,
+                38,
+                10,
+                'C'
+            );
 
-            $pdf->SetFont('Helvetica', 'B', 4.4);
+            // TIME IN
+            $this->drawPdfCell(
+                $pdf,
+                102.8,
+                $y,
+                $timeIn,
+                40,
+                10,
+                'C'
+            );
 
-            $this->drawPdfCell($pdf, 330.7, $y, $isMale ? 'X' : '', 16, 5.5);
-            $this->drawPdfCell($pdf, 352.3, $y, $isFemale ? 'X' : '', 18, 5.5);
-            $this->drawPdfCell($pdf, 380.5, $y, $isSenior ? 'X' : '', 31, 5.5);
-            $this->drawPdfCell($pdf, 407.7, $y, $isPwd ? 'X' : '', 17, 5.5);
+            // NAME OF PATIENT
+            $this->drawPdfCellAutoFont(
+                $pdf,
+                156.9,
+                $y,
+                $patientName,
+                58,
+                10,
+                'C',
+                'Helvetica',
+                '',
+                5.2,
+                3.5
+            );
 
-            $pdf->SetFont('Helvetica', '', 4.0);
+            // COURSE / YEAR / SECTION / DEPARTMENT
+            $this->drawPdfCellAutoFont(
+                $pdf,
+                212.4,
+                $y,
+                $programOrDept,
+                42,
+                10,
+                'C',
+                'Helvetica',
+                '',
+                5.0,
+                3.3
+            );
 
-            $this->drawPdfCellAutoFont($pdf, 447.2, $y, $email, 54, 5.5, 'L', 'Helvetica', '', 4.0, 2.1);
-            $this->drawPdfCell($pdf, 498.6, $y, $contact, 40, 5.5);
-            $this->drawPdfCell($pdf, 538.3, $y, $timeProcessed, 32, 5.5);
-            $this->drawPdfCell($pdf, 573.5, $y, $processingTime, 32, 5.5);
+            // AGE
+            $this->drawPdfCell(
+                $pdf,
+                255.8,
+                $y,
+                $age,
+                34,
+                10,
+                'C'
+            );
 
-            $pdf->SetFont('Helvetica', 'B', 4.4);
 
-            $this->drawPdfCell($pdf, 609.4, $y, $isEmergency ? 'X' : '', 32, 5.5);
-            $this->drawPdfCell($pdf, 649.5, $y, $isNonEmergency ? 'X' : '', 39, 5.5);
+            // ==========================
+            // GAD
+            // ==========================
+
+            $pdf->SetFont('Helvetica', 'B', 5.5);
+
+            // MALE
+            $this->drawPdfCell(
+                $pdf,
+                295.85,
+                $y,
+                $isMale ? 'X' : '',
+                34,
+                10,
+                'C'
+            );
+
+            // FEMALE
+            $this->drawPdfCell(
+                $pdf,
+                335.9,
+                $y,
+                $isFemale ? 'X' : '',
+                34,
+                10,
+                'C'
+            );
+
+            // SENIOR CITIZEN
+            $this->drawPdfCell(
+                $pdf,
+                375.95,
+                $y,
+                $isSenior ? 'X' : '',
+                34,
+                10,
+                'C'
+            );
+
+            // PWD
+            $this->drawPdfCell(
+                $pdf,
+                416.05,
+                $y,
+                $isPwd ? 'X' : '',
+                34,
+                10,
+                'C'
+            );
+
+
+            // ==========================
+            // CONTACT / PROCESSING
+            // ==========================
+
+            $pdf->SetFont('Helvetica', '', 4.8);
+
+            // EMAIL ADDRESS
+            $this->drawPdfCellAutoFont(
+                $pdf,
+                470.0,
+                $y,
+                $email,
+                62,
+                10,
+                'C',
+                'Helvetica',
+                '',
+                4.8,
+                2.8
+            );
+
+            // CONTACT NUMBER
+            $this->drawPdfCellAutoFont(
+                $pdf,
+                529.25,
+                $y,
+                $contact,
+                45,
+                10,
+                'C',
+                'Helvetica',
+                '',
+                4.8,
+                3.2
+            );
+
+            // TIME PROCESSED
+            $this->drawPdfCell(
+                $pdf,
+                574.65,
+                $y,
+                $timeProcessed,
+                36,
+                10,
+                'C'
+            );
+
+            // PROCESSING TIME
+            $this->drawPdfCell(
+                $pdf,
+                614.7,
+                $y,
+                $processingTime,
+                34,
+                10,
+                'C'
+            );
+
+
+            // ==========================
+            // CASE TYPE
+            // ==========================
+
+            $pdf->SetFont('Helvetica', 'B', 5.5);
+
+            // EMERGENCY
+            $this->drawPdfCell(
+                $pdf,
+                653.35,
+                $y,
+                $isEmergency ? 'X' : '',
+                30,
+                10,
+                'C'
+            );
+
+            // NON-EMERGENCY
+            $this->drawPdfCell(
+                $pdf,
+                689.25,
+                $y,
+                $isNonEmergency ? 'X' : '',
+                28,
+                10,
+                'C'
+            );
+
+
+            // ==========================
+            // SIGNATURE
+            // ==========================
 
             if ($signaturePath) {
-                $this->drawPdfImageInBox($pdf, $signaturePath, 706.4, $y, 65, 5.0);
+                $this->drawPdfImageInBox(
+                    $pdf,
+                    $signaturePath,
+                    737.6,
+                    $y,
+                    55,
+                    18
+                );
             }
         }
     }
@@ -4104,23 +4299,13 @@ class DentistReportController extends Controller
 
         $pdf->SetTextColor(0, 0, 0);
 
+
         $pdf->SetFillColor(255, 255, 255);
-        $pdf->Rect(662, 42, 88, 34, 'F');
+        $pdf->Rect(706.8, 67.0, 42, 6.5, 'F');
 
-        $pdf->SetDrawColor(0, 0, 0);
-        $pdf->SetLineWidth(0.5);
-        $pdf->Rect(668.5, 46.5, 72.5, 22.5, 'D');
-
-        $pdf->SetFont('Helvetica', '', 5.2);
-
-        $pdf->SetXY(671, 48.6);
-        $pdf->Cell(68, 5, 'PUP-TDRP-MEDS-', 0, 0, 'L');
-
-        $pdf->SetXY(671, 54.2);
-        $pdf->Cell(68, 5, 'Rev.1', 0, 0, 'L');
-
-        $pdf->SetXY(671, 59.8);
-        $pdf->Cell(68, 5, now()->format('F Y'), 0, 0, 'L');
+        $pdf->SetFont('Helvetica', '', 4.1);
+        $pdf->SetXY(707.9, 67.2);
+        $pdf->Cell(40, 5, now()->format('F Y'), 0, 0, 'L');
     }
 
     private function drawDentalHealthOdontogram(Fpdi $pdf, array $odontogramData): void
