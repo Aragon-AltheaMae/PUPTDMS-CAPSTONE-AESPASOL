@@ -6,7 +6,7 @@
     align-items: center;
     justify-content: center;
     padding: 1.25rem;
-    background: (63, 20, 20, 0.24);
+    background: rgba(63, 20, 20, 0.24);
     backdrop-filter: blur(8px) saturate(130%);
     -webkit-backdrop-filter: blur(8px) saturate(130%);
 }
@@ -167,6 +167,59 @@
     transform: translateY(-1px);
 }
 
+.discard-modal-btn-save {
+    background: #FFFFFF;
+    border-color: var(--crimson-mid, #FECACA);
+    color: var(--crimson, #8B0000);
+
+    box-shadow:
+        0 8px 18px rgba(139, 0, 0, .06);
+}
+
+.discard-modal-btn-save:hover:not(:disabled) {
+    background: var(--crimson-light, #FEF2F2);
+    border-color: var(--crimson, #8B0000);
+    color: var(--crimson-dark, #660000);
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 10px 22px rgba(139, 0, 0, .10);
+}
+
+.discard-modal-btn-save:disabled {
+    opacity: .65;
+    cursor: not-allowed;
+    transform: none;
+}
+
+[data-theme="dark"] .discard-modal-btn-save,
+.dark .discard-modal-btn-save {
+    background:
+        rgba(139, 0, 0, .16);
+
+    border-color:
+        rgba(252, 165, 165, .22);
+
+    color:
+        #FCA5A5;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .04);
+}
+
+[data-theme="dark"] .discard-modal-btn-save:hover:not(:disabled),
+.dark .discard-modal-btn-save:hover:not(:disabled) {
+    background:
+        rgba(139, 0, 0, .26);
+
+    border-color:
+        rgba(252, 165, 165, .34);
+
+    color:
+        #FECACA;
+}
+
 .discard-modal-btn-discard {
     background: linear-gradient(135deg, #8B0000, #B91C1C);
     color: #FFFFFF;
@@ -261,7 +314,7 @@
 
     .discard-modal-footer {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
     }
 
     .discard-modal-btn {

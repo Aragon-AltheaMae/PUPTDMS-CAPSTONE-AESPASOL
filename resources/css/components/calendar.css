@@ -1300,44 +1300,52 @@
     justify-content: center;
     border: 1px solid #ffffff;
     border-radius: 999px;
-    background: #4f46e5;
+    background: var(--status-completed-solid);
     color: #ffffff;
     font-size: 8px;
-    box-shadow: 0 3px 9px rgba(79, 70, 229, .28);
+    box-shadow: 0 3px 9px color-mix(in srgb,
+            var(--status-completed-solid) 28%,
+            transparent);
 }
 
 .cal-cell.completed-appointment {
     opacity: 1 !important;
     cursor: pointer !important;
-    background: #eef2ff !important;
-    color: #4338ca !important;
-    border: 2px solid #a5b4fc !important;
+    background: var(--status-completed-bg) !important;
+    color: var(--status-completed-text) !important;
+    border: 2px solid var(--status-completed-border) !important;
     font-weight: 850;
     box-shadow:
-        0 4px 12px rgba(79, 70, 229, .12),
+        0 4px 12px color-mix(in srgb,
+            var(--status-completed-solid) 12%,
+            transparent),
         inset 0 1px 0 rgba(255, 255, 255, .8);
 }
 
 .cal-cell.completed-appointment:hover {
-    background: #e0e7ff !important;
-    border-color: #6366f1 !important;
-    color: #3730a3 !important;
+    background: var(--status-completed-soft) !important;
+    border-color: var(--status-completed-solid) !important;
+    color: var(--status-completed-text) !important;
     transform: translateY(-1px);
 }
 
 .cal-cell.completed-appointment.selected-history {
-    background: #ffffff !important;
-    color: #3730a3 !important;
-    border: 3px solid #4f46e5 !important;
+    background: var(--card) !important;
+    color: var(--status-completed-text) !important;
+    border: 3px solid var(--status-completed-solid) !important;
     box-shadow:
-        0 0 0 3px rgba(79, 70, 229, .12),
-        0 8px 18px rgba(79, 70, 229, .16) !important;
+        0 0 0 3px color-mix(in srgb,
+            var(--status-completed-solid) 12%,
+            transparent),
+        0 8px 18px color-mix(in srgb,
+            var(--status-completed-solid) 16%,
+            transparent) !important;
 }
 
 .dashboard-calendar-status.completed {
-    background: #eef2ff;
-    color: #4338ca;
-    border: 1px solid #c7d2fe;
+    background: var(--status-completed-bg);
+    color: var(--status-completed-text);
+    border: 1px solid var(--status-completed-border);
 }
 
 .completed-visit-list {
@@ -1350,11 +1358,11 @@
 
 .completed-visit-card {
     padding: .85rem;
-    border: 1px solid #dfe4ff;
+    border: 1px solid var(--status-completed-border);
     border-radius: .85rem;
     background: linear-gradient(145deg,
-            #ffffff,
-            #f5f7ff);
+            var(--card),
+            var(--status-completed-bg));
 }
 
 .completed-visit-heading {
@@ -1371,8 +1379,8 @@
     justify-content: center;
     flex: 0 0 34px;
     border-radius: .7rem;
-    background: #e0e7ff;
-    color: #4338ca;
+    background: var(--status-completed-soft);
+    color: var(--status-completed-text);
     font-size: .75rem;
 }
 
@@ -1429,7 +1437,7 @@
     margin-top: .7rem;
     padding: .65rem;
     border-radius: .7rem;
-    background: rgba(79, 70, 229, .055);
+    background: var(--status-completed-bg);
 }
 
 .completed-visit-note p {
@@ -1447,16 +1455,17 @@
     justify-content: center;
     gap: .45rem;
     padding: 0 .9rem;
-    border: 1px solid #4f46e5;
+    border: 1px solid var(--status-completed-solid);
     border-radius: .72rem;
-    background: linear-gradient(135deg,
-            #4f46e5,
-            #3730a3);
+    background: var(--status-completed-solid);
     color: #ffffff;
     font-size: .72rem;
     font-weight: 800;
     text-decoration: none;
-    box-shadow: 0 8px 18px rgba(79, 70, 229, .18);
+    box-shadow:
+        0 8px 18px color-mix(in srgb,
+            var(--status-completed-solid) 18%,
+            transparent);
 }
 
 [data-theme="dark"] .cal-pill-blue {
@@ -1465,36 +1474,9 @@
     border-color: rgba(129, 140, 248, .28) !important;
 }
 
-[data-theme="dark"] .cal-cell.completed-appointment {
-    background: rgba(79, 70, 229, .16) !important;
-    color: #a5b4fc !important;
-    border-color: rgba(129, 140, 248, .42) !important;
-}
-
-[data-theme="dark"] .cal-cell.completed-appointment.selected-history {
-    background: rgba(79, 70, 229, .09) !important;
-    color: #c7d2fe !important;
-    border: 3px solid #818cf8 !important;
-}
-
-[data-theme="dark"] .dashboard-calendar-status.completed {
-    background: rgba(99, 102, 241, .16);
-    color: #c7d2fe;
-    border-color: rgba(129, 140, 248, .28);
-}
-
-[data-theme="dark"] .completed-visit-card {
-    background: rgba(99, 102, 241, .07);
-    border-color: rgba(129, 140, 248, .2);
-}
-
 [data-theme="dark"] .completed-visit-heading strong,
 [data-theme="dark"] .completed-visit-details strong {
     color: #f3f4f6;
-}
-
-[data-theme="dark"] .completed-visit-note {
-    background: rgba(99, 102, 241, .09);
 }
 
 [data-theme="dark"] .completed-visit-note p {

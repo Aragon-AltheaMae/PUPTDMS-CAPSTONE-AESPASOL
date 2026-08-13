@@ -801,6 +801,18 @@ Route::prefix('patient')->middleware(['role:patient'])->group(function () {
         ->middleware('permission:book_appointments')
         ->name('book.appointment.store');
 
+    Route::get('/book-appointment/draft', [AppointmentController::class, 'getDraft'])
+        ->middleware('permission:book_appointments')
+        ->name('book.appointment.draft.show');
+
+    Route::put('/book-appointment/draft', [AppointmentController::class, 'saveDraft'])
+        ->middleware('permission:book_appointments')
+        ->name('book.appointment.draft.save');
+
+    Route::delete('/book-appointment/draft', [AppointmentController::class, 'deleteDraft'])
+        ->middleware('permission:book_appointments')
+        ->name('book.appointment.draft.delete');
+
     Route::post('/book-appointment/validate-signature', [AppointmentController::class, 'validateSignature'])
         ->name('book.appointment.validate-signature');
 

@@ -39,11 +39,11 @@
 
     function makeMyAppointmentBadge() {
         return `
-            <span class="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-emerald-600 text-[9px] leading-none
-                flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-white">
-                <i class="fa-regular fa-calendar-check text-[8px]"></i>
-            </span>
-        `;
+        <span class="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-blue-600 text-[9px] leading-none
+            flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-white">
+            <i class="fa-regular fa-calendar-check text-[8px]"></i>
+        </span>
+    `;
     }
 
     const calendarConfig = {
@@ -298,28 +298,28 @@
             myAppointment: {
                 key: "myAppointment",
                 label: "My Appointment",
-                dotClass: "bg-emerald-600",
-                tooltipBg: "bg-[#008440]",
-                tooltipArrow: "after:border-t-[#008440]",
-                cellBg: "bg-emerald-50",
-                cellText: "text-emerald-700",
+                dotClass: "bg-blue-600",
+                tooltipBg: "bg-blue-600",
+                tooltipArrow: "after:border-t-blue-600",
+                cellBg: "bg-blue-50",
+                cellText: "text-blue-700",
                 legendIcon: `
-                    <span class="cal-pill cal-pill-green">
-                        <i class="fa-regular fa-calendar-check text-[10px]"></i>
-                        My Appointment
-                    </span>
-                `,
+        <span class="cal-pill cal-pill-blue">
+            <i class="fa-regular fa-calendar-check text-[10px]"></i>
+            My Appointment
+        </span>
+    `,
                 badge: () => makeMyAppointmentBadge(),
             },
             completedAppointment: {
                 key: "completedAppointment",
                 label: "Completed Visit",
 
-                tooltipBg: "bg-indigo-600",
-                tooltipArrow: "after:border-t-indigo-600",
+                tooltipBg: "bg-emerald-600",
+                tooltipArrow: "after:border-t-emerald-600",
 
                 legendIcon: `
-        <span class="cal-pill cal-pill-blue">
+        <span class="cal-pill cal-pill-green">
             <i class="fa-solid fa-circle-check text-[10px]"></i>
             Completed Visit
         </span>
@@ -660,7 +660,7 @@
 
         if (state.myAppointment && !state.isBookingMode) {
             badgeHtml += CALENDAR_THEME.statuses.myAppointment.badge();
-            tooltip = `<i class="fa-regular fa-calendar-check mr-1 text-[#6EE7A0]"></i>${state.myAppointment}`;
+            tooltip = `<i class="fa-regular fa-calendar-check mr-1 text-blue-200"></i>${state.myAppointment}`;
             tooltipBg = CALENDAR_THEME.statuses.myAppointment.tooltipBg;
             tooltipArrow = CALENDAR_THEME.statuses.myAppointment.tooltipArrow;
         }
@@ -1163,7 +1163,6 @@
                         currentYear = cursor.getFullYear();
                         currentMonth = cursor.getMonth();
                         selectedDate = state.iso;
-                        activeCalendarFilter = 'all';
                         renderCalendar();
                         await selectDate(state.iso);
                         focusCalendarDate(state.iso);
@@ -1256,6 +1255,7 @@
                 const filter = button.dataset.calendarFilter || 'all';
 
                 if (filter === 'earliest') {
+                    applyCalendarFilter('earliest');
                     await findEarliestAvailableDate();
                     return;
                 }
@@ -1368,7 +1368,7 @@
 
                     <button type="button" data-calendar-filter="earliest" aria-pressed="false">
                         <i class="fa-solid fa-bolt"></i>
-                        Earliest slot
+                        Earliest Date
                     </button>
 
                     <button type="button" data-calendar-filter="appointment" aria-pressed="false">

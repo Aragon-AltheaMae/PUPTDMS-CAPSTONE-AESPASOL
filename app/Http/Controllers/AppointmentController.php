@@ -32,6 +32,7 @@ use App\Notifications\AppointmentRescheduledNotification;
 use App\Notifications\SignatureReuploadRequiredNotification;
 use App\Services\SignatureAiVerifier;
 use App\Helpers\BookingQuestions;
+use App\Models\AppointmentDraft;
 
 class AppointmentController extends Controller
 {
@@ -421,6 +422,118 @@ class AppointmentController extends Controller
         ));
     }
 
+    public function getDraft()
+    {
+        $patientId =
+            session('impersonated_patient_id')
+            ?: session('patient_id');
+
+        if (! $patientId) {
+            return response()->json([
+                'has_draft' => false,
+                'draft' => null,
+            ], 401);
+        }
+
+        $draft =
+            AppointmentDraft::where(
+                'patient_id',
+                $patientId
+            )->first();
+
+        return response()->json([
+            'has_draft' => (bool) $draft,
+
+            'draft' => $draft
+                ? [
+                    'payload' =>
+                    $draft->payload,
+
+                    'current_step' =>
+                    $draft->current_step,
+
+                    'last_saved_at' =>
+                    optional(
+                        $draft->last_saved_at
+                    )->toISOString(),
+                ]
+                : null,
+        ]);
+    }
+
+    public function saveDraft(Request $request)
+    {
+        $patientId =
+            session('impersonated_patient_id')
+            ?: session('patient_id');
+
+        if (! $patientId) {
+            return response()->json([
+                'message' =>
+                'Unauthenticated.',
+            ], 401);
+        }
+
+        $validated =
+            $request->validate([
+                'payload' =>
+                'required|array',
+
+                'current_step' =>
+                'nullable|integer|min:0|max:4',
+            ]);
+
+        $draft =
+            AppointmentDraft::updateOrCreate(
+                [
+                    'patient_id' =>
+                    $patientId,
+                ],
+                [
+                    'payload' =>
+                    $validated['payload'],
+
+                    'current_step' =>
+                    $validated['current_step']
+                        ?? 0,
+
+                    'last_saved_at' =>
+                    now(),
+                ]
+            );
+
+        return response()->json([
+            'saved' => true,
+
+            'last_saved_at' =>
+            $draft
+                ->last_saved_at
+                ?->toISOString(),
+        ]);
+    }
+
+    public function deleteDraft()
+    {
+        $patientId =
+            session('impersonated_patient_id')
+            ?: session('patient_id');
+
+        if (! $patientId) {
+            return response()->json([
+                'message' => 'Unauthenticated.',
+            ], 401);
+        }
+
+        AppointmentDraft::where(
+            'patient_id',
+            $patientId
+        )->delete();
+
+        return response()->json([
+            'deleted' => true,
+        ]);
+    }
+
     /* =======================
        STORE APPOINTMENT
     ======================= */
@@ -509,10 +622,22 @@ class AppointmentController extends Controller
                 ->with('error', 'Invalid service type selected.');
         }
 
+        $patientId =
+            session('impersonated_patient_id')
+            ?: session('patient_id');
+
+        if (! $patientId) {
+            return redirect()
+                ->route('login')
+                ->with(
+                    'error',
+                    'Please login first!'
+                );
+        }
+
         $patient = Patient::findOrFail($patientId);
         $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
-        // Convert UI "1:00 PM" -> DB TIME "13:00:00"
         try {
             $mysqlTime = $this->toMysqlTime($request->appointment_time);
         } catch (\Throwable $e) {
@@ -608,8 +733,6 @@ class AppointmentController extends Controller
                 'birth_control' => 'NO',
             ]);
         }
-
-        // AI Signature Validation
 
         $signatureFile = $request->file('patient_signature');
 
@@ -994,17 +1117,61 @@ class AppointmentController extends Controller
         });
 
         if ($appointment) {
+            AppointmentDraft::where(
+                'patient_id',
+                $patientId
+            )->delete();
+
             AuditLogger::log(
                 'create',
                 'appointments',
                 "Patient booked appointment for {$appointment->appointment_date} at {$appointment->appointment_time}"
             );
         }
-        $successMessage = $signatureReviewStatus === 'pending_manual_review'
+
+        $successMessage =
+            $signatureReviewStatus ===
+            'pending_manual_review'
             ? 'Appointment booked successfully! The signature was accepted and flagged for manual review.'
             : 'Appointment booked successfully!';
 
-        return redirect()->route('homepage')->with('success', $successMessage);
+        return redirect()
+            ->route('homepage')
+            ->with(
+                'success',
+                $successMessage
+            )
+            ->with(
+                'appointment_draft_completed',
+                true
+            )
+            ->with(
+                'appointment_confirmation',
+                [
+                    'date' =>
+                    Carbon::parse(
+                        $appointment
+                            ->appointment_date
+                    )->format(
+                        'F d, Y'
+                    ),
+
+                    'time' =>
+                    Carbon::parse(
+                        $appointment
+                            ->appointment_time
+                    )->format(
+                        'g:i A'
+                    ),
+
+                    'service' =>
+                    $appointment
+                        ->service_type,
+
+                    'status' =>
+                    'Confirmed',
+                ]
+            );
     }
 
     public function slotsForDate(Request $request)

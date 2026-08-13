@@ -412,6 +412,38 @@
     transform: translateY(-1px);
 }
 
+.ui-btn-shimmer {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    border: 1px solid #d1d5db8d;
+    background:
+        linear-gradient(110deg,
+            #660000 25%,
+            #8B0000 45%,
+            #660000 65%);
+
+    background-size: 200% 100%;
+
+    animation:
+        shimmerBtn 4s linear infinite;
+}
+
+.ui-btn-shimmer:hover {
+    background:
+        linear-gradient(110deg,
+            #4D0000 25%,
+            #7A0000 45%,
+            #4D0000 65%);
+
+    background-size: 200% 100%;
+}
+
+.ui-btn-shimmer>* {
+    position: relative;
+    z-index: 1;
+}
+
 .ui-btn-secondary {
     background: #FFFFFF;
     color: #8B0000;
@@ -421,6 +453,20 @@
 
 .ui-btn-secondary:hover {
     background: #F3F4F6;
+}
+
+.ui-btn-ghost-light {
+    background: rgba(255, 255, 255, .10);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, .30);
+    box-shadow: none;
+}
+
+.ui-btn-ghost-light:hover {
+    background: rgba(255, 255, 255, .18);
+    color: #FFFFFF;
+    border-color: rgba(255, 255, 255, .40);
+    transform: translateY(-1px);
 }
 
 .ui-btn-danger {

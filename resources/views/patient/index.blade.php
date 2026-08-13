@@ -140,14 +140,14 @@ $age = null;
 $birthdateDisplay = 'N/A';
 
 if ($birthdate) {
-    try {
-        $birthdateCarbon = \Carbon\Carbon::parse($birthdate);
-        $age = $birthdateCarbon->age;
-        $birthdateDisplay = $birthdateCarbon->format('M d, Y');
-    } catch (\Throwable $e) {
-        $age = null;
-        $birthdateDisplay = 'N/A';
-    }
+try {
+$birthdateCarbon = \Carbon\Carbon::parse($birthdate);
+$age = $birthdateCarbon->age;
+$birthdateDisplay = $birthdateCarbon->format('M d, Y');
+} catch (\Throwable $e) {
+$age = null;
+$birthdateDisplay = 'N/A';
+}
 }
 @endphp
 
@@ -207,14 +207,12 @@ if ($birthdate) {
                     </div>
 
                     <div class="greeting-banner-actions">
-                        <a href="{{ route('patient.book.appointment') }}"
-                            class="book-appointment-btn inline-flex items-center justify-center gap-2 rounded-full text-white shadow transition">
+                        <a href="{{ route('patient.book.appointment') }}" class="ui-btn ui-btn-primary ui-btn-shimmer">
                             <i class="fa-solid fa-calendar-plus"></i>
                             <span>Book Appointment</span>
                         </a>
 
-                        <a href="{{ route('patient.record') }}"
-                            class="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-white/20">
+                        <a href="{{ route('patient.record') }}" class="ui-btn ui-btn-ghost-light">
                             <i class="fa-solid fa-folder-open"></i>
                             <span>View Records</span>
                         </a>
@@ -303,9 +301,9 @@ if ($birthdate) {
             </div>
         </div>
 
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-stretch dashboard-grid-tight mt-5">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start dashboard-grid-tight mt-5">
             <div class="xl:col-span-5">
-                <div id="requestDocsContainer" class="h-full">
+                <div id="requestDocsContainer">
                     <div
                         class="dashboard-glass rounded-[1rem] overflow-hidden h-full skeleton-shell skeleton-fade-swap">
                         <div class="p-4 sm:p-5">
@@ -386,29 +384,143 @@ if ($birthdate) {
                 </div>
             </div>
 
-            <dialog id="activeAppointmentModal" class="modal">
-                <div class="modal-box p-8 rounded-[1.5rem] bg-white text-center shadow-2xl w-[min(92vw,400px)]">
-                    <div
-                        class="mx-auto mb-5 w-20 h-20 rounded-full bg-red-50 flex items-center justify-center border-4 border-white shadow-sm">
-                        <i class="fa-solid fa-calendar-xmark text-[#8B0000] text-3xl"></i>
+            <div id="activeAppointmentModal" class="ui-modal modal-theme-warning" role="dialog" aria-modal="true"
+                aria-labelledby="activeAppointmentModalTitle" aria-describedby="activeAppointmentModalDescription">
+                <div class="ui-modal-card modal-sm" tabindex="-1">
+
+                    <div class="modal-hd">
+                        <div class="modal-heading">
+
+                            <div class="modal-icon">
+                                <i class="fa-solid fa-calendar-xmark"></i>
+                            </div>
+
+                            <div class="modal-copy">
+                                <h2 id="activeAppointmentModalTitle" class="modal-title">
+                                    Active Appointment
+                                </h2>
+
+                                <p id="activeAppointmentModalDescription" class="modal-subtitle">
+                                    You already have an active appointment scheduled.
+                                </p>
+                            </div>
+                        </div>
+
+                        <button type="button" class="modal-x" data-active-appointment-close
+                            aria-label="Close active appointment notice">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
                     </div>
-                    <h3 class="text-2xl font-extrabold text-gray-800 mb-3">Active Appointment</h3>
-                    <p class="text-sm text-gray-500 mb-8 leading-relaxed">You already have an active appointment
-                        scheduled.
-                        Please complete or cancel it before booking a new one.</p>
-                    <div class="flex flex-col gap-3">
-                        <a href="{{ route('patient.appointment.index') }}"
-                            class="w-full py-3.5 rounded-[0.85rem] bg-[#8B0000] text-white font-bold hover:bg-[#660000] transition-colors shadow-md">View
-                            My Appointments</a>
-                        <button id="closeActiveApptModalBtn" type="button"
-                            class="w-full py-3.5 rounded-[0.85rem] bg-gray-100 text-gray-700 font-bold hover:bg-gray-200 transition-colors">Close</button>
+
+                    <div class="modal-bd">
+                        <div class="global-confirm-alert">
+                            <i class="fa-solid fa-calendar-check"></i>
+
+                            <div>
+                                <p>
+                                    You currently have an active appointment.
+                                </p>
+
+                                <span>
+                                    Please complete or cancel it before booking
+                                    another dental appointment.
+                                </span>
+                            </div>
+                        </div>
                     </div>
+
+                    <div class="modal-ft">
+                        <button type="button" class="ui-btn ui-btn-secondary" data-active-appointment-close>
+                            Close
+                        </button>
+
+                        <a href="{{ route('patient.appointment.index') }}" class="ui-btn ui-btn-primary">
+                            <i class="fa-regular fa-calendar-check"></i>
+                            View My Appointments
+                        </a>
+                    </div>
+
                 </div>
-            </dialog>
-
-
+            </div>
         </div>
 </main>
+
+@if (session('appointment_confirmation'))
+@php
+$appointmentConfirmation =
+session(
+'appointment_confirmation'
+);
+@endphp
+
+<x-booking.confirmed-modal id="appointmentConfirmedModal" eyebrow="Appointment Booking" title="Appointment Confirmed"
+    subtitle="Your appointment has been successfully scheduled." header-icon="fa-check" section-icon="fa-calendar-check"
+    section-eyebrow="Booking Status" section-title="Booking successfully completed"
+    section-message="Your selected appointment schedule has been saved and confirmed." detail-label="Appointment Status"
+    :result-title="$appointmentConfirmation['status'] ?? 'Confirmed'" message-title="Schedule details"
+    message-id="appointmentConfirmedMessage">
+    <div class="confirmed-modal-schedule-grid">
+
+        <div class="confirmed-modal-schedule-item">
+            <span class="confirmed-modal-schedule-icon">
+                <i class="fa-regular fa-calendar"></i>
+            </span>
+
+            <div>
+                <span class="confirmed-modal-schedule-label">
+                    Date
+                </span>
+
+                <strong class="confirmed-modal-schedule-value">
+                    {{
+                    $appointmentConfirmation[
+                    'date'
+                    ] ?? 'N/A'
+                    }}
+                </strong>
+            </div>
+        </div>
+
+        <div class="confirmed-modal-schedule-item">
+            <span class="confirmed-modal-schedule-icon">
+                <i class="fa-regular fa-clock"></i>
+            </span>
+
+            <div>
+                <span class="confirmed-modal-schedule-label">
+                    Time
+                </span>
+
+                <strong class="confirmed-modal-schedule-value">
+                    {{
+                    $appointmentConfirmation[
+                    'time'
+                    ] ?? 'N/A'
+                    }}
+                </strong>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="confirmed-modal-schedule-note">
+        <i class="fa-solid fa-circle-info"></i>
+
+        <span>
+            Please arrive on time and bring your
+            school or office ID.
+        </span>
+    </div>
+
+    <x-slot:footer>
+        <button type="button" id="appointmentConfirmedDoneBtn" class="ui-btn ui-btn-primary">
+            <i class="fa-solid fa-check"></i>
+            Done
+        </button>
+    </x-slot:footer>
+
+</x-booking.confirmed-modal>
+@endif
 
 <div id="privateInformationModal" class="ui-modal modal-theme-warning" role="dialog" aria-modal="true"
     aria-labelledby="privateInformationModalTitle" aria-describedby="privateInformationModalDescription">
@@ -499,6 +611,36 @@ if ($birthdate) {
 
 @section('scripts')
 <script>
+    @if (session('appointment_draft_completed'))
+        localStorage.removeItem(
+            "appointmentDraft:v1"
+        );
+    @endif
+
+    @if (session('appointment_confirmation'))
+        document.addEventListener(
+            'DOMContentLoaded',
+            () => {
+                window.openModal?.(
+                    'appointmentConfirmedModal'
+                );
+
+                document
+                    .getElementById(
+                        'appointmentConfirmedDoneBtn'
+                    )
+                    ?.addEventListener(
+                        'click',
+                        () => {
+                            window.closeModal?.(
+                                'appointmentConfirmedModal'
+                            );
+                        }
+                    );
+            }
+        );
+    @endif
+
     function renderGreeting() {
         const nameEl = document.getElementById("patientName");
         const greetingEl = document.getElementById("greetingText");
@@ -568,13 +710,7 @@ if ($birthdate) {
         ];
     }
 
-    $profileRows = [
-        ['Date of Birth', $birthdateDisplay !== 'N/A' ? \Carbon\Carbon::parse($birthdate)->format('F d, Y') : '—'],
-        ['Age', $age !== null ? $age . ' yrs' : '—'],
-        ['Gender', $gender ?? '—'],
-        ['Contact', $patient->phone ?? '—'],
-        ['Email', $patient->email ?? '—'],
-    ];
+    $profileRows = [['Date of Birth', $birthdateDisplay !== 'N/A' ?\Carbon\Carbon:: parse($birthdate) -> format('F d, Y') : '—'], ['Age', $age !== null ? $age. ' yrs' : '—'], ['Gender', $gender ?? '—'], ['Contact', $patient -> phone ?? '—'], ['Email', $patient -> email ?? '—']];
     @endphp
 
     var UPCOMING_DATA = @json($upcomingJs);
@@ -604,22 +740,97 @@ if ($birthdate) {
     var ROUTE_RECORD = "{{ route('patient.record') }}";
 
     @if (session('activeAppointmentModal'))
-        document.addEventListener("DOMContentLoaded", function () {
-            var modal = document.getElementById("activeAppointmentModal");
-            var closeBtn = document.getElementById("closeActiveApptModalBtn");
-            if (!modal) return;
-            modal.showModal();
-            modal.addEventListener('click', function (e) {
-                var box = modal.querySelector('.modal-box');
-                if (box && !box.contains(e.target)) e.preventDefault();
-            });
-            modal.addEventListener('cancel', function (e) {
-                e.preventDefault();
-            });
-            if (closeBtn) closeBtn.addEventListener("click", function () {
-                modal.close();
-            });
-        });
+        document.addEventListener(
+            'DOMContentLoaded',
+            function () {
+                const modal =
+                    document.getElementById(
+                        'activeAppointmentModal'
+                    );
+
+                if (!modal) {
+                    return;
+                }
+
+                const openModal = () => {
+                    modal.classList.remove('closing');
+                    modal.classList.add('open');
+
+                    document.documentElement
+                        .classList.add('modal-lock');
+
+                    document.body
+                        .classList.add('modal-lock');
+
+                    requestAnimationFrame(() => {
+                        modal
+                            .querySelector('.ui-modal-card')
+                            ?.focus();
+                    });
+                };
+
+                const closeModal = () => {
+                    if (
+                        !modal.classList.contains('open')
+                    ) {
+                        return;
+                    }
+
+                    modal.classList.add('closing');
+
+                    window.setTimeout(() => {
+                        modal.classList.remove(
+                            'open',
+                            'closing'
+                        );
+
+                        document.documentElement
+                            .classList.remove(
+                                'modal-lock'
+                            );
+
+                        document.body
+                            .classList.remove(
+                                'modal-lock'
+                            );
+                    }, 170);
+                };
+
+                modal
+                    .querySelectorAll(
+                        '[data-active-appointment-close]'
+                    )
+                    .forEach(button => {
+                        button.addEventListener(
+                            'click',
+                            closeModal
+                        );
+                    });
+
+                modal.addEventListener(
+                    'click',
+                    event => {
+                        if (event.target === modal) {
+                            closeModal();
+                        }
+                    }
+                );
+
+                document.addEventListener(
+                    'keydown',
+                    event => {
+                        if (
+                            event.key === 'Escape' &&
+                            modal.classList.contains('open')
+                        ) {
+                            closeModal();
+                        }
+                    }
+                );
+
+                openModal();
+            }
+        );
     @endif
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -792,9 +1003,9 @@ if ($birthdate) {
             shouldMask
         );
 
-        const tooltip = shouldMask
-            ? 'Show private information'
-            : 'Hide private information';
+        const tooltip = shouldMask ?
+            'Show private information' :
+            'Hide private information';
 
         button.setAttribute(
             'data-masked',
@@ -809,9 +1020,9 @@ if ($birthdate) {
         button.setAttribute('aria-label', tooltip);
         button.setAttribute('data-tooltip', tooltip);
 
-        button.innerHTML = shouldMask
-            ? '<i class="fa-regular fa-eye"></i>'
-            : '<i class="fa-regular fa-eye-slash"></i>';
+        button.innerHTML = shouldMask ?
+            '<i class="fa-regular fa-eye"></i>' :
+            '<i class="fa-regular fa-eye-slash"></i>';
     }
 
     function handlePrivateInformationToggle(button) {
@@ -907,15 +1118,9 @@ if ($birthdate) {
         var d = UPCOMING_DATA;
 
         if (d.exists) {
-            var statusPillCls = d.isRescheduled ?
-                'bg-yellow-100 text-yellow-800 border-yellow-200' :
-                'bg-green-100 text-green-800 border-green-200';
-
-            var statusDotCls = d.isRescheduled ? 'bg-yellow-500' : 'bg-green-500';
-
-            var statusDarkPill = d.isRescheduled ?
-                'dark:bg-yellow-400/20 dark:text-yellow-100 dark:border-yellow-400/30' :
-                'dark:bg-emerald-500/20 dark:text-emerald-100 dark:border-emerald-500/30';
+            var statusClass = d.isRescheduled ?
+                'status-rescheduled' :
+                'status-upcoming';
 
             window.swapSkeletonContent('upcomingAppointmentWrapper',
                 '<div class="upcoming-card-polished bg-white dark:bg-[#161B22] rounded-[1rem] border border-gray-200 dark:border-white/10 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">' +
@@ -931,16 +1136,16 @@ if ($birthdate) {
                 '<i class="fa-solid fa-tooth text-[15px] relative z-[1] drop-shadow-[0_1px_2px_rgba(0,0,0,0.22)]"></i>' +
                 '</div>' +
                 '<span class="upcoming-live-dot absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full ' +
-                statusDotCls + ' border-2 border-white dark:border-[#161B22]"></span>' +
+                (d.isRescheduled ? 'bg-yellow-500' : 'bg-green-500') +
+                ' border-2 border-white dark:border-[#161B22]"></span>' +
                 '</div>' +
 
                 '<div class="min-w-0 flex-1">' +
                 '<div class="flex flex-wrap items-center gap-2">' +
                 '<h3 class="text-lg sm:text-[1.15rem] font-extrabold text-gray-900 dark:text-[#F3F4F6] leading-tight truncate">' +
                 window.escapeHtml(d.service) + '</h3>' +
-                '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border ' +
-                statusPillCls + ' ' + statusDarkPill + '">' +
-                '<span class="w-1.5 h-1.5 rounded-full ' + statusDotCls + '"></span>' +
+                '<span class="status-pill ' + statusClass + '">' +
+                '<span class="status-dot"></span>' +
                 window.escapeHtml(d.status) +
                 '</span>' +
                 '</div>' +
@@ -980,7 +1185,7 @@ if ($birthdate) {
                 '</div>' +
 
                 '<a href="' + window.escapeHtml(d.indexUrl) +
-                '" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[0.85rem] bg-[#8B0000] hover:bg-[#660000] text-white text-sm font-bold transition-all duration-300 shadow-sm hover:-translate-y-0.5">' +
+                '" class="ui-btn ui-btn-primary">' +
                 '<span>Manage Appointment</span>' +
                 '<i class="fa-solid fa-arrow-right text-[11px]"></i>' +
                 '</a>' +
@@ -1016,7 +1221,7 @@ if ($birthdate) {
             '</div>' +
 
             '<div class="flex flex-col sm:flex-row items-stretch gap-2.5 xl:min-w-[180px]">' +
-            '<button type="button" onclick="scrollToCalendar(event)" class="check-dates-btn inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[0.85rem] text-sm font-bold">' +
+            '<button type="button" onclick="scrollToCalendar(event)" class="ui-btn ui-btn-primary">' +
             '<i class="fa-solid fa-arrow-down"></i>' +
             '<span>Check Available Dates</span>' +
             '</button>' +
@@ -1040,25 +1245,29 @@ if ($birthdate) {
 
         if (pData.facultyCode && pData.facultyCode !== 'null') {
             roleBadge =
-                '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-[#8B0000] border border-red-100 text-xs font-bold">' +
-                '<i class="fa-solid fa-user-tie"></i> Faculty' +
+                '<span class="badge-role role-student">' +
+                '<i class="fa-solid fa-user-tie"></i>' +
+                '<span>Faculty</span>' +
                 '</span>';
             identityLabel = 'Faculty Code';
             identityRaw = pData.facultyCode;
             identityMasked = maskIdCode(pData.facultyCode);
         } else if (pData.studentNo && pData.studentNo !== 'null') {
             roleBadge =
-                '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-[#8B0000] border border-red-100 text-xs font-bold">' +
-                '<i class="fa-solid fa-user-graduate"></i> Student' +
+                '<span class="badge-role role-patient">' +
+                '<i class="fa-solid fa-user-graduate"></i>' +
+                '<span>Student</span>' +
                 '</span>';
             identityLabel = 'Student No';
             identityRaw = pData.studentNo;
             identityMasked = maskIdCode(pData.studentNo);
         } else {
             roleBadge =
-                '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-[#8B0000] border border-red-100 text-xs font-bold">' +
-                '<i class="fa-solid fa-user"></i> Patient' +
+                '<span class="badge-role role-patient">' +
+                '<i class="fa-solid fa-user"></i>' +
+                '<span>Patient</span>' +
                 '</span>';
+
             identityLabel = '';
             identityRaw = '';
             identityMasked = '';
@@ -1126,8 +1335,14 @@ if ($birthdate) {
 
             '<div class="px-4 pb-4 relative flex flex-col items-center mt-[-34px]">' +
             '<div class="relative mb-3">' +
-            '<img src="' + pData.avatar +
-            '" alt="Profile" class="w-[68px] h-[68px] rounded-full object-cover border-4 border-white shadow-md bg-white">' +
+            (
+                window.PatientUI?.buildAvatarHtml({
+                    name: pData.name,
+                    url: pData.avatar,
+                    size: 'lg',
+                    escapeHtml: window.escapeHtml
+                }) || ''
+            ) +
             '</div>' +
 
             '<div class="mt-1 flex items-center justify-center gap-2 max-w-full">' +
@@ -1139,8 +1354,9 @@ if ($birthdate) {
 
             '<div class="mt-3 flex flex-wrap items-center justify-center gap-2">' +
             roleBadge +
-            '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 text-xs font-bold">' +
-            '<i class="fa-solid fa-circle-check"></i> Profile Active' +
+            '<span class="status-pill status-active">' +
+            '<span class="status-dot"></span>' +
+            '<span>Profile Active</span>' +
             '</span>' +
             '</div>' +
             '</div>' +
@@ -1207,7 +1423,7 @@ if ($birthdate) {
         if (!container) return;
 
         window.swapSkeletonContent('requestDocsContainer',
-            '<div class="dashboard-card-polished dental-overview-card bg-gradient-to-br from-[#ffffff] via-[#fff3f3] to-[#ffeaea] border border-[#eadede] shadow-sm rounded-[1rem] overflow-hidden h-full flex flex-col">' +
+            '<div class="dashboard-card-polished dental-overview-card bg-gradient-to-br from-[#ffffff] via-[#fff3f3] to-[#ffeaea] border border-[#eadede] shadow-sm rounded-[1rem] overflow-hidden flex flex-col">' +
 
             '<div class="px-5 sm:px-6 py-4 border-b border-[#efe3e3] dark:border-white/10 bg-gradient-to-r from-[#fff6f6] via-[#fffdfd] to-[#fff1f1] dark:from-[#161B22] dark:via-[#161B22] dark:to-[#161B22]">' +
             '<div class="flex items-start justify-between gap-4">' +
@@ -1225,7 +1441,7 @@ if ($birthdate) {
 
             '</div>' +
 
-            '<div class="p-4 sm:p-5 flex-1 bg-gradient-to-b from-[#fffefe] via-[#fff8f8] to-[#fff3f3]">' +
+            '<div class="p-4 sm:p-5 bg-gradient-to-b from-[#fffefe] via-[#fff8f8] to-[#fff3f3]">' +
             '<div class="space-y-3">' +
 
             '<button type="button" data-doc-open="dentalHealthRecordModal" class="group request-doc-card relative w-full text-left rounded-[0.9rem] border border-red-100 bg-white p-4 shadow-sm transition-all duration-200">' +
@@ -1284,6 +1500,28 @@ if ($birthdate) {
             '</div>' +
             '</div>'
         );
+    }
+
+    function openDashboardRecordModal(encodedRecord) {
+        try {
+            const record = JSON.parse(
+                decodeURIComponent(encodedRecord)
+            );
+
+            if (typeof window.openRecordModal === 'function') {
+                window.openRecordModal(record);
+                return;
+            }
+
+            if (typeof openRecordModal === 'function') {
+                openRecordModal(record);
+            }
+        } catch (error) {
+            console.error(
+                'Unable to open dental record.',
+                error
+            );
+        }
     }
 
     function renderRecords() {
@@ -1345,7 +1583,7 @@ if ($birthdate) {
                 '<span class="inline-flex items-center rounded-full bg-white border border-gray-200 text-gray-600 px-3 py-1 text-xs font-semibold">Diagnosis summary</span>' +
                 '</div>' +
                 '<a href="' + ROUTE_BOOK +
-                '" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-[0.85rem] bg-[#8B0000] hover:bg-[#660000] text-white text-sm font-bold transition-all duration-300 hover:-translate-y-0.5">' +
+                '" class="ui-btn ui-btn-primary">' +
                 '<i class="fa-solid fa-calendar-plus"></i> Book First Appointment' +
                 '</a>' +
                 '</div>' +
@@ -1377,11 +1615,17 @@ if ($birthdate) {
                 '<div class="flex flex-wrap items-center gap-2">' +
                 '<p class="text-sm font-extrabold text-gray-900 truncate">' + window.escapeHtml(r.service) +
                 '</p>' +
-                '<span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold border ' +
+                '<span class="status-pill ' +
                 ((r.status || '').toLowerCase() === 'completed' ?
-                    'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100') +
+                    'status-completed' :
+                    'status-cancelled') +
                 '">' +
-                window.escapeHtml((r.status || '').toLowerCase() === 'completed' ? 'Completed' : 'Cancelled') +
+                '<span class="status-dot"></span>' +
+                window.escapeHtml(
+                    (r.status || '').toLowerCase() === 'completed' ?
+                        'Completed' :
+                        'Cancelled'
+                ) +
                 '</span>' +
                 '</div>' +
                 '<div class="mt-2 flex flex-wrap items-center gap-2">' +
@@ -1394,7 +1638,7 @@ if ($birthdate) {
                 '</div>' +
                 '</div>' +
                 '</div>' +
-                '<button type="button" class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-gray-50 hover:bg-[#8B0000] hover:text-white text-gray-700 text-[11px] font-bold border border-gray-200 hover:border-transparent transition-all duration-300 flex-shrink-0" onclick="openRecordModalFromData(\'' +
+                '<button type="button" class="ui-btn ui-btn-secondary ui-btn-sm flex-shrink-0" onclick="openDashboardRecordModal(\'' +
                 encoded + '\')">' +
                 '<i class="fa-solid fa-eye text-[10px]"></i>' +
                 '<span>View Details</span>' +
@@ -1406,7 +1650,7 @@ if ($birthdate) {
         html +=
             '<div class="pt-2">' +
             '<a href="' + ROUTE_RECORD +
-            '" class="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-[0.85rem] bg-[#8B0000] hover:bg-[#660000] text-white text-sm font-bold transition-all duration-300 hover:-translate-y-0.5">' +
+            '" class="ui-btn ui-btn-primary w-full">' +
             '<i class="fa-solid fa-folder-open"></i>' +
             '<span>View All Records</span>' +
             '<i class="fa-solid fa-arrow-right text-[11px]"></i>' +
@@ -1501,37 +1745,30 @@ if ($birthdate) {
     }
 
     function scrollToCalendar(event) {
-        if (event) {
-            event.preventDefault();
+        event?.preventDefault();
 
-            const btn = event.currentTarget;
+        const calendar =
+            document.getElementById(
+                'calendarSkeletonContainer'
+            );
 
-            const rect = btn.getBoundingClientRect();
-            const ripple = document.createElement("span");
-            const size = Math.max(rect.width, rect.height);
-
-            ripple.className = "btn-ripple";
-            ripple.style.width = size + "px";
-            ripple.style.height = size + "px";
-            ripple.style.left = (event.clientX - rect.left - size / 2) + "px";
-            ripple.style.top = (event.clientY - rect.top - size / 2) + "px";
-
-            btn.appendChild(ripple);
-            setTimeout(() => ripple.remove(), 500);
+        if (!calendar) {
+            return;
         }
-
-        const calendar = document.getElementById('calendarSkeletonContainer');
-        if (!calendar) return;
 
         calendar.scrollIntoView({
             behavior: 'smooth',
             block: 'center'
         });
 
-        calendar.classList.add('calendar-focus-pulse');
+        calendar.classList.add(
+            'calendar-focus-pulse'
+        );
 
-        setTimeout(() => {
-            calendar.classList.remove('calendar-focus-pulse');
+        window.setTimeout(() => {
+            calendar.classList.remove(
+                'calendar-focus-pulse'
+            );
         }, 1200);
     }
 

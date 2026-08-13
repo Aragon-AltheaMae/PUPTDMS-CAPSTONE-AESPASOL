@@ -319,13 +319,6 @@
 
         return parts.join(' ');
     }
-    
-    setText(
-        'm_duration',
-        formatRecordDurationSeconds(
-            data.durationSeconds
-        )
-    );
 
     function formatRecordTime(raw) {
         if (!raw) return '—';
@@ -533,9 +526,9 @@
         setText(
             'm_duration',
             data.durationSeconds !== null &&
-            data.durationSeconds !== undefined
-                ? formatRecordDurationSeconds(data.durationSeconds)
-                : formatRecordDuration(data.duration)
+            data.durationSeconds !== undefined ?
+            formatRecordDurationSeconds(data.durationSeconds) :
+            formatRecordDuration(data.duration)
         );
 
         var status = String(data.status || '').trim().toLowerCase();
@@ -575,12 +568,12 @@
         setText(
             'm_remarks',
             treatmentSummary !==
+            'No treatment record yet.' ?
+            treatmentSummary :
+            (
+                data.remarks ||
                 'No treatment record yet.'
-                ? treatmentSummary
-                : (
-                    data.remarks ||
-                    'No treatment record yet.'
-                )
+            )
         );
 
         setText(
@@ -696,6 +689,10 @@
             }
         });
     }
+
+    window.openRecordModal = openRecordModal;
+    window.closeRecordModal = closeRecordModal;
+    window.initRecordModal = initRecordModal;
 
     if (document.readyState === 'loading') {
         document.addEventListener(

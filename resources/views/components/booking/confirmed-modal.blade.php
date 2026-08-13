@@ -79,16 +79,25 @@
             </div>
 
 
-            <div class="global-confirm-alert">
-                <i class="fa-solid fa-circle-check"></i>
-                <div>
-                    <strong>
-                        {{ $messageTitle }}
-                    </strong>
+            <div class="confirmed-modal-details">
+                <div class="confirmed-modal-details-header">
+                    <div class="confirmed-modal-details-icon">
+                        <i class="fa-regular fa-calendar-check"></i>
+                    </div>
 
-                    <p id="{{ $messageId }}">
-                        {{ $slot }}
-                    </p>
+                    <div>
+                        <span class="confirmed-modal-details-eyebrow">
+                            Appointment Details
+                        </span>
+
+                        <strong class="confirmed-modal-details-title">
+                            {{ $messageTitle }}
+                        </strong>
+                    </div>
+                </div>
+
+                <div id="{{ $messageId }}" class="confirmed-modal-details-content">
+                    {{ $slot }}
                 </div>
             </div>
         </div>
