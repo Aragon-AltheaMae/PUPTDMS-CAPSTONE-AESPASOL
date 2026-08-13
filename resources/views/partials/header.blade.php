@@ -4,21 +4,45 @@
     $role = $role ?? (optional(optional($authUser)->role)->slug ?? (session('role') ?? 'patient'));
     $resolveNotificationUrl = function (array $payload, string $activeRole): string {
         $fallbackUrl = data_get($payload, 'url') ?? (data_get($payload, 'action_url') ?? '#');
+
         $event = data_get($payload, 'event') ?? data_get($payload, 'type');
 
         return match ($event) {
+
             'appointment.booked', 'appointment.rescheduled' => match ($activeRole) {
                 'admin', 'super_admin' => Route::has('admin.admin.appointments')
                     ? route('admin.admin.appointments')
                     : $fallbackUrl,
+
                 'dentist' => Route::has('dentist.dentist.appointments')
                     ? route('dentist.dentist.appointments')
                     : $fallbackUrl,
+
                 'patient' => Route::has('patient.appointment.index')
                     ? route('patient.appointment.index')
                     : $fallbackUrl,
+
                 default => $fallbackUrl,
             },
+
+            'appointment.cancelled' => match ($activeRole) {
+                'patient' => Route::has('patient.record')
+                    ? route('patient.record', [
+                        'appointment' => data_get($payload, 'appointment_id'),
+                    ])
+                    : $fallbackUrl,
+
+                'admin', 'super_admin' => Route::has('admin.admin.appointments')
+                    ? route('admin.admin.appointments')
+                    : $fallbackUrl,
+
+                'dentist' => Route::has('dentist.dentist.appointments')
+                    ? route('dentist.dentist.appointments')
+                    : $fallbackUrl,
+
+                default => $fallbackUrl,
+            },
+
             'document.request.submitted', 'document_request_submitted' => match ($activeRole) {
                 'admin', 'super_admin' => Route::has('admin.document-requests.index')
                     ? route('admin.document-requests.index')
@@ -31,8 +55,16 @@
                 default => $fallbackUrl,
             },
 
-            'document.request.approved', 'document_request_approved' => match ($activeRole) {
-                'patient' => Route::has('patient.record') ? route('patient.record') : $fallbackUrl,
+            'document.request.approved',
+            'document_request_approved',
+            'document.request.rejected',
+            'document_request_rejected'
+                => match ($activeRole) {
+                'patient' => Route::has('patient.record')
+                    ? route('patient.record', [
+                        'section' => 'document-requests',
+                    ])
+                    : $fallbackUrl,
 
                 default => $fallbackUrl,
             },

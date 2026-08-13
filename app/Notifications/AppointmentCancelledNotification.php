@@ -57,7 +57,9 @@ class AppointmentCancelledNotification extends Notification
             'title' => 'Appointment Cancelled',
             'message' => $message,
             'icon' => 'fa-calendar-xmark',
-            'url' => route('patient.appointment.cancelled.view'),
+            'url' => route('patient.record', [
+                'appointment' => $this->appointment->id,
+            ]),
             'appointment_id' => $this->appointment->id,
             'patient_id' => $this->appointment->patient_id,
             'status' => $this->appointment->status,

@@ -2,29 +2,43 @@
 
 namespace App\Http\Controllers\Dentist;
 
+use App\Helpers\PhilippineHolidays;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\BlockedDate;
 use App\Models\ClinicSchedule;
-use App\Helpers\PhilippineHolidays;
-use Carbon\Carbon;
 use App\Models\SystemSetting;
 use App\Models\User;
-use App\Notifications\DentistEmergencyOutNotification;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+
 
 class DentistDashboardController extends Controller
 {
     public function index()
     {
-        $startOfMonth = Carbon::now()->startOfMonth()->toDateString();
-        $endOfMonth = Carbon::now()->endOfMonth()->toDateString();
+        $now = Carbon::now();
+        $today = $now->toDateString();
+
+        $todayAppointments = Appointment::with('patient')
+            ->whereDate('appointment_date', $today)
+            ->whereIn('status', ['upcoming', 'rescheduled', 'pending', 'confirmed'])
+            ->orderBy('appointment_time', 'asc')
+            ->get();
+
+        $startOfMonth = $now->copy()->startOfMonth()->toDateString();
+        $endOfMonth = $now->copy()->endOfMonth()->toDateString();
 
         $calendarAppointments = Appointment::with('patient')
-            ->whereDate('appointment_date', '>=', Carbon::today())
-            ->whereIn('status', ['upcoming', 'rescheduled'])
+            ->whereBetween('appointment_date', [$startOfMonth, $endOfMonth])
+            ->whereIn('status', [
+                'pending',
+                'confirmed',
+                'upcoming',
+                'rescheduled',
+                'completed',
+            ])
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
             ->get();
@@ -61,6 +75,20 @@ class DentistDashboardController extends Controller
                         'service' => ucwords($service),
                         'status' => $appointment->status ?? 'pending',
                         'date' => Carbon::parse($appointment->appointment_date)->format('Y-m-d'),
+
+                        'patientProfileUrl' => $appointment->patient_id
+                            ? route('dentist.dentist.patient.profile', $appointment->patient_id)
+                            : '#',
+
+                        'rescheduleUrl' => route(
+                            'dentist.dentist.appointments.reschedule.update',
+                            $appointment->id
+                        ),
+
+                        'cancelUrl' => route(
+                            'dentist.dentist.appointments.cancel',
+                            $appointment->id
+                        ),
                     ];
                 })->values()->toArray();
             })
@@ -104,33 +132,191 @@ class DentistDashboardController extends Controller
                         'service' => ucwords($service),
                         'status' => $appointment->status ?? 'upcoming',
                         'date' => Carbon::parse($appointment->appointment_date)->format('Y-m-d'),
+
+                        'patientProfileUrl' => $appointment->patient_id
+                            ? route('dentist.dentist.patient.profile', $appointment->patient_id)
+                            : '#',
+
+                        'rescheduleUrl' => route(
+                            'dentist.dentist.appointments.reschedule.update',
+                            $appointment->id
+                        ),
+
+                        'cancelUrl' => route(
+                            'dentist.dentist.appointments.cancel',
+                            $appointment->id
+                        ),
                     ];
                 })->values()->toArray();
             })
             ->toArray();
 
+        $dentalCasesThisMonth = Appointment::whereYear('appointment_date', $now->year)
+            ->whereMonth('appointment_date', $now->month)
+            ->where('status', 'completed')
+            ->count();
+
+        $lastMonth = $now->copy()->subMonth();
+
+        $dentalCasesLastMonth = Appointment::whereYear(
+            'appointment_date',
+            $lastMonth->year
+        )
+            ->whereMonth('appointment_date', $lastMonth->month)
+            ->where('status', 'completed')
+            ->count();
+
+        $dentalCasesDelta = $dentalCasesLastMonth > 0
+            ? round(
+                (($dentalCasesThisMonth - $dentalCasesLastMonth)
+                    / $dentalCasesLastMonth) * 100
+            )
+            : null;
+
+        $totalApptsThisMonth = Appointment::whereYear(
+            'appointment_date',
+            $now->year
+        )
+            ->whereMonth('appointment_date', $now->month)
+            ->whereIn('status', [
+                'upcoming',
+                'rescheduled',
+                'completed',
+                'cancelled',
+                'pending',
+                'confirmed',
+            ])
+            ->count();
+
+        $totalApptsLastMonth = Appointment::whereYear(
+            'appointment_date',
+            $lastMonth->year
+        )
+            ->whereMonth('appointment_date', $lastMonth->month)
+            ->whereIn('status', [
+                'pending',
+                'confirmed',
+                'upcoming',
+                'rescheduled',
+                'completed',
+                'cancelled',
+            ])
+            ->count();
+
+        $totalApptsDelta = $totalApptsLastMonth > 0
+            ? round(
+                (($totalApptsThisMonth - $totalApptsLastMonth)
+                    / $totalApptsLastMonth) * 100
+            )
+            : null;
+
+        $medicalSupplies = DB::table('inventory_items')
+            ->where('category', 'Supplies')
+            ->orderByRaw('(qty - used) ASC')
+            ->limit(3)
+            ->get();
+
+        $medicineSupplies = DB::table('inventory_items')
+            ->where('category', 'Medicine')
+            ->orderByRaw('(qty - used) ASC')
+            ->limit(3)
+            ->get();
+
+        $gadRaw = DB::table('daily_treatment_records')
+            ->whereYear('treatment_date', $now->year)
+            ->whereMonth('treatment_date', $now->month)
+            ->select(
+                'office_type',
+                'gender',
+                DB::raw('COUNT(*) as total')
+            )
+            ->groupBy('office_type', 'gender')
+            ->get();
+
+        $gadLabels = [
+            'Student',
+            'Administrative',
+            'Faculty',
+            'Dependent',
+        ];
+
+        $gadFemale = [];
+        $gadMale = [];
+
+        foreach ($gadLabels as $label) {
+            $key = $label === 'Student'
+                ? null
+                : $label;
+
+            $gadFemale[] = (int) $gadRaw
+                ->where('office_type', $key)
+                ->where('gender', 'Female')
+                ->sum('total');
+
+            $gadMale[] = (int) $gadRaw
+                ->where('office_type', $key)
+                ->where('gender', 'Male')
+                ->sum('total');
+        }
+
         $blockedDates = BlockedDate::pluck('date')
-            ->map(fn($d) => Carbon::parse($d)->toDateString())
+            ->map(
+                fn($date) =>
+                Carbon::parse($date)->toDateString()
+            )
             ->toArray();
 
-        $philippineHolidays = PhilippineHolidays::range(0, 1);
+        $philippineHolidays = PhilippineHolidays::range(
+            yearsBefore: 1,
+            yearsAfter: 5
+        );
 
-        $schedules = ClinicSchedule::active()->orderBy('id')->get()
-            ->map(function ($s) {
-                $s->days = is_string($s->days) ? json_decode($s->days, true) : $s->days;
-                return $s;
-            })->toArray();
+        $schedules = ClinicSchedule::active()
+            ->orderBy('id')
+            ->get()
+            ->map(function ($schedule) {
+                $schedule->days = is_string($schedule->days)
+                    ? json_decode($schedule->days, true)
+                    : $schedule->days;
+
+                return $schedule;
+            })
+            ->toArray();
+
+        $clinicStatus = strtolower(
+            (string) SystemSetting::getSetting(
+                'clinic_status',
+                'in'
+            )
+        );
+
+        $notifications = collect([]);
 
         return view('dentist.dentist-dashboard', compact(
+            'todayAppointments',
             'appointmentCountsPerDay',
+            'calendarAppointmentDetails',
+            'dashboardAppointmentDetails',
             'blockedDates',
             'philippineHolidays',
             'schedules',
-            'calendarAppointmentDetails',
-            'dashboardAppointmentDetails'
+            'notifications',
+
+            'dentalCasesThisMonth',
+            'dentalCasesDelta',
+            'totalApptsThisMonth',
+            'totalApptsDelta',
+
+            'medicalSupplies',
+            'medicineSupplies',
+
+            'gadLabels',
+            'gadFemale',
+            'gadMale',
+
+            'clinicStatus'
         ));
     }
-
     public function updateClinicStatus(Request $request)
     {
         $request->validate([
@@ -140,10 +326,26 @@ class DentistDashboardController extends Controller
         $oldStatus = SystemSetting::getSetting('clinic_status', 'in');
         $newStatus = strtolower($request->status);
 
-        SystemSetting::setSetting('clinic_status', $newStatus, 'clinic');
+        SystemSetting::setSetting(
+            'clinic_status',
+            $newStatus,
+            'clinic'
+        );
 
         if ($oldStatus !== 'out' && $newStatus === 'out') {
-            $this->notifyPatientsWithAppointmentsToday();
+            SystemSetting::setSetting(
+                'clinic_status_out_at',
+                Carbon::now()->toDateTimeString(),
+                'clinic'
+            );
+        }
+
+        if ($oldStatus === 'out' && $newStatus === 'in') {
+            SystemSetting::setSetting(
+                'clinic_status_in_at',
+                Carbon::now()->toDateTimeString(),
+                'clinic'
+            );
         }
 
         return response()->json([
@@ -153,60 +355,6 @@ class DentistDashboardController extends Controller
                 ? 'Clinic marked as closed.'
                 : 'Clinic marked as open.',
         ]);
-    }
-
-    private function notifyPatientsWithAppointmentsToday(): void
-    {
-        $appointments = Appointment::query()
-            ->with('patient')
-            ->whereDate('appointment_date', Carbon::today())
-            ->whereIn('status', ['upcoming', 'rescheduled'])
-            ->get();
-
-        $notifiedUserIds = [];
-
-        foreach ($appointments as $appointment) {
-            $patient = $appointment->patient;
-
-            if (!$patient) {
-                Log::warning('Emergency OUT notification skipped because patient was not found.', [
-                    'appointment_id' => $appointment->id,
-                    'patient_id' => $appointment->patient_id,
-                ]);
-
-                continue;
-            }
-
-            $patientUser = $this->resolvePatientUser($patient);
-
-            if (!$patientUser) {
-                Log::warning('Emergency OUT notification skipped because patient user was not found.', [
-                    'appointment_id' => $appointment->id,
-                    'patient_id' => $patient->id,
-                ]);
-
-                continue;
-            }
-
-            if (in_array($patientUser->id, $notifiedUserIds, true)) {
-                continue;
-            }
-
-            $alreadyNotifiedToday = DB::table('notifications')
-                ->where('notifiable_type', User::class)
-                ->where('notifiable_id', $patientUser->id)
-                ->whereDate('created_at', Carbon::today())
-                ->where('data->type', 'dentist_emergency_out')
-                ->exists();
-
-            if ($alreadyNotifiedToday) {
-                continue;
-            }
-
-            $patientUser->notify(new DentistEmergencyOutNotification($appointment));
-
-            $notifiedUserIds[] = $patientUser->id;
-        }
     }
 
     private function resolvePatientUser($patient): ?User

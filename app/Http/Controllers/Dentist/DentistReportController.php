@@ -283,7 +283,7 @@ class DentistReportController extends Controller
 
         return response($pdf->Output('S'), 200)
             ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'inline; filename="'.$safeName.'.pdf"');
+            ->header('Content-Disposition', 'inline; filename="' . $safeName . '.pdf"');
     }
 
     private function getPrintableTemplatePdfPath(DocumentTemplate $template): ?string
@@ -324,7 +324,7 @@ class DentistReportController extends Controller
             return null;
         }
 
-        return storage_path('app/report-templates/'.$fileName);
+        return storage_path('app/report-templates/' . $fileName);
     }
 
     public function gadData(Request $request)
@@ -443,13 +443,13 @@ class DentistReportController extends Controller
         );
 
         $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $validated['report_name']);
-        $fileName = $safeName.'.pdf';
+        $fileName = $safeName . '.pdf';
 
         $pdfContent = $pdf->Output('S');
 
         return response($pdfContent, 200)
             ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'attachment; filename="'.$fileName.'"')
+            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"')
             ->header('Content-Length', (string) strlen($pdfContent))
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
             ->header('Pragma', 'no-cache');
@@ -536,17 +536,17 @@ class DentistReportController extends Controller
         AuditLogger::log(
             'download',
             'dentist_reports',
-            'Dentist downloaded Annual Dental Clearance PDF for '.$approvedRequests->count().' approved request(s).'
+            'Dentist downloaded Annual Dental Clearance PDF for ' . $approvedRequests->count() . ' approved request(s).'
         );
 
         $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $validated['report_name']);
-        $fileName = $safeName.'.pdf';
+        $fileName = $safeName . '.pdf';
 
         $pdfContent = $pdf->Output('S');
 
         return response($pdfContent, 200)
             ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'attachment; filename="'.$fileName.'"')
+            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"')
             ->header('Content-Length', (string) strlen($pdfContent))
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
             ->header('Pragma', 'no-cache');
@@ -634,15 +634,15 @@ class DentistReportController extends Controller
         AuditLogger::log(
             'download',
             'dentist_reports',
-            'Dentist downloaded Dental Clearance PDF for '.$approvedRequests->count().' approved request(s).'
+            'Dentist downloaded Dental Clearance PDF for ' . $approvedRequests->count() . ' approved request(s).'
         );
 
         $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $validated['report_name']);
-        $fileName = $safeName.'.pdf';
+        $fileName = $safeName . '.pdf';
 
         return response($pdf->Output('S'), 200)
             ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'attachment; filename="'.$fileName.'"');
+            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"');
     }
 
     public function downloadDentalServicesReport(Request $request)
@@ -724,15 +724,15 @@ class DentistReportController extends Controller
         AuditLogger::log(
             'download',
             'dentist_reports',
-            'Dentist downloaded Dental Services Record PDF for '.$records->count().' record(s).'
+            'Dentist downloaded Dental Services Record PDF for ' . $records->count() . ' record(s).'
         );
 
         $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $validated['report_name']);
-        $fileName = $safeName.'.pdf';
+        $fileName = $safeName . '.pdf';
 
         return response($pdf->Output('S'), 200)
             ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'attachment; filename="'.$fileName.'"');
+            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"');
     }
 
     public function downloadMedicineInventoryReport(Request $request)
@@ -811,15 +811,15 @@ class DentistReportController extends Controller
         AuditLogger::log(
             'download',
             'dentist_reports',
-            'Dentist downloaded Medicine Inventory PDF for '.$items->count().' item(s).'
+            'Dentist downloaded Medicine Inventory PDF for ' . $items->count() . ' item(s).'
         );
 
         $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $validated['report_name']);
-        $fileName = $safeName.'.pdf';
+        $fileName = $safeName . '.pdf';
 
         return response($pdf->Output('S'), 200)
             ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'attachment; filename="'.$fileName.'"');
+            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"');
     }
 
     public function downloadDentalSuppliesInventoryReport(Request $request)
@@ -898,15 +898,15 @@ class DentistReportController extends Controller
         AuditLogger::log(
             'download',
             'dentist_reports',
-            'Dentist downloaded Dental Supplies Inventory PDF for '.$items->count().' item(s).'
+            'Dentist downloaded Dental Supplies Inventory PDF for ' . $items->count() . ' item(s).'
         );
 
         $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $validated['report_name']);
-        $fileName = $safeName.'.pdf';
+        $fileName = $safeName . '.pdf';
 
         return response($pdf->Output('S'), 200)
             ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'attachment; filename="'.$fileName.'"');
+            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"');
     }
 
     public function downloadDailyTreatmentRecordReport(Request $request)
@@ -987,15 +987,15 @@ class DentistReportController extends Controller
         AuditLogger::log(
             'download',
             'dentist_reports',
-            'Dentist downloaded Daily Treatment Record PDF for '.$records->count().' record(s).'
+            'Dentist downloaded Daily Treatment Record PDF for ' . $records->count() . ' record(s).'
         );
 
         $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $validated['report_name']);
-        $fileName = $safeName.'.pdf';
+        $fileName = $safeName . '.pdf';
 
         return response($pdf->Output('S'), 200)
             ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'attachment; filename="'.$fileName.'"');
+            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"');
     }
 
     public function downloadDentalCasesReport(Request $request)
@@ -1042,7 +1042,7 @@ class DentistReportController extends Controller
             ->orderBy('appointment_date')
             ->orderBy('appointment_time')
             ->get()
-            ->filter(fn ($appointment) => $appointment->patient);
+            ->filter(fn($appointment) => $appointment->patient);
 
         if ($appointments->isEmpty()) {
             return response()->json([
@@ -1080,17 +1080,17 @@ class DentistReportController extends Controller
         AuditLogger::log(
             'download',
             'dentist_reports',
-            'Dentist downloaded Dental Cases PDF for '.$appointments->count().' completed appointment(s).'
+            'Dentist downloaded Dental Cases PDF for ' . $appointments->count() . ' completed appointment(s).'
         );
 
         $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $validated['report_name']);
-        $fileName = $safeName.'.pdf';
+        $fileName = $safeName . '.pdf';
 
         $pdfContent = $pdf->Output('S');
 
         return response($pdfContent, 200)
             ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'attachment; filename="'.$fileName.'"')
+            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"')
             ->header('Content-Length', (string) strlen($pdfContent))
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
             ->header('Pragma', 'no-cache');
@@ -1140,7 +1140,7 @@ class DentistReportController extends Controller
             ->orderBy('appointment_date')
             ->orderBy('appointment_time')
             ->get()
-            ->filter(fn ($appointment) => $appointment->patient);
+            ->filter(fn($appointment) => $appointment->patient);
 
         if ($appointments->isEmpty()) {
             return response()->json([
@@ -1170,15 +1170,15 @@ class DentistReportController extends Controller
         AuditLogger::log(
             'download',
             'dentist_reports',
-            'Dentist downloaded Monthly Report PDF for '.$appointments->count().' completed appointment(s).'
+            'Dentist downloaded Monthly Report PDF for ' . $appointments->count() . ' completed appointment(s).'
         );
 
         $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $validated['report_name']);
-        $fileName = $safeName.'.pdf';
+        $fileName = $safeName . '.pdf';
 
         return response($pdf->Output('S'), 200)
             ->header('Content-Type', 'application/pdf')
-            ->header('Content-Disposition', 'attachment; filename="'.$fileName.'"');
+            ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"');
     }
 
     public function downloadDentalHealthRecord(Request $request)
@@ -1324,7 +1324,7 @@ class DentistReportController extends Controller
                     ->where('patient_id', $patient->id)
                     ->when(
                         $patientAppointmentIds->isNotEmpty(),
-                        fn ($q) => $q->whereIn('appointment_id', $patientAppointmentIds->all())
+                        fn($q) => $q->whereIn('appointment_id', $patientAppointmentIds->all())
                     )
                     ->latest('id')
                     ->first();
@@ -1384,17 +1384,17 @@ class DentistReportController extends Controller
             AuditLogger::log(
                 'download',
                 'dentist_reports',
-                'Dentist downloaded Dental Health Record PDF for '.$patients->count().' patient(s).'
+                'Dentist downloaded Dental Health Record PDF for ' . $patients->count() . ' patient(s).'
             );
 
             $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', (string) ($validated['report_name'] ?? ''));
             $fileName = $safeName !== ''
-                ? $safeName.'.pdf'
-                : 'dental-health-record-'.$from->format('Ymd').'-to-'.$to->format('Ymd').'.pdf';
+                ? $safeName . '.pdf'
+                : 'dental-health-record-' . $from->format('Ymd') . '-to-' . $to->format('Ymd') . '.pdf';
 
             return response($pdf->Output('S'), 200, [
                 'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="'.$fileName.'"',
+                'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
             ]);
         } catch (\Throwable $e) {
             report($e);
@@ -1445,7 +1445,7 @@ class DentistReportController extends Controller
             arsort($cases);
 
             $groups[$groupKey] = collect($cases)
-                ->map(fn ($total, $diagnosis) => [
+                ->map(fn($total, $diagnosis) => [
                     'diagnosis' => $diagnosis,
                     'total' => $total,
                 ])
@@ -1799,10 +1799,10 @@ class DentistReportController extends Controller
         }
 
         if ($from->isSameYear($to)) {
-            return $from->format('F').' TO '.$to->format('F Y');
+            return $from->format('F') . ' TO ' . $to->format('F Y');
         }
 
-        return $from->format('F Y').' TO '.$to->format('F Y');
+        return $from->format('F Y') . ' TO ' . $to->format('F Y');
     }
 
     private function addDentalHealthTemplatePage(Fpdi $pdf, int $pageNumber): void
@@ -1829,11 +1829,11 @@ class DentistReportController extends Controller
         $yearSection = '';
 
         if (! empty($patient->year_level)) {
-            $yearSection .= 'Y'.$patient->year_level;
+            $yearSection .= 'Y' . $patient->year_level;
         }
 
         if (! empty($patient->section)) {
-            $yearSection .= $yearSection !== '' ? ' - '.$patient->section : $patient->section;
+            $yearSection .= $yearSection !== '' ? ' - ' . $patient->section : $patient->section;
         }
 
         $facultyCollege = trim((string) ($patient->course_code ?? ''));
@@ -2396,7 +2396,7 @@ class DentistReportController extends Controller
         $perWeek = $this->dhrMedicalTextByKeys($medicalAnswers, ['tobacco_per_week']);
 
         if ($perDay !== '' && $perWeek !== '') {
-            return $perDay.'/'.$perWeek;
+            return $perDay . '/' . $perWeek;
         }
 
         if ($perDay !== '') {
@@ -2423,7 +2423,7 @@ class DentistReportController extends Controller
             $value = $this->dhrMedicalTextByKeys($medicalAnswers, [$key]);
 
             if ($value !== '') {
-                $notes[] = $label.': '.$value;
+                $notes[] = $label . ': ' . $value;
             }
         }
 
@@ -2443,7 +2443,7 @@ class DentistReportController extends Controller
         }
 
         $parts = preg_split('/\s+/', trim($patientName)) ?: [];
-        $parts = array_values(array_filter($parts, fn ($part) => $part !== ''));
+        $parts = array_values(array_filter($parts, fn($part) => $part !== ''));
 
         if (count($parts) === 0) {
             return ['', '', ''];
@@ -2952,7 +2952,7 @@ class DentistReportController extends Controller
 
         $daysInMonth = Carbon::createFromDate($year, $month, 1)->daysInMonth;
         $weeksInMonth = (int) ceil($daysInMonth / 7);
-        $weekLabels = array_map(fn ($i) => "Week $i", range(1, $weeksInMonth));
+        $weekLabels = array_map(fn($i) => "Week $i", range(1, $weeksInMonth));
 
         $weeklyRaw = Appointment::whereYear('appointment_date', $year)
             ->whereMonth('appointment_date', $month)
@@ -3064,8 +3064,11 @@ class DentistReportController extends Controller
             'total' => [0, 0, 0, 0, 0],
         ];
 
-        $records = DentalServiceRecord::query()
-            ->whereBetween('time_in', [$from, $to])
+        $appointments = Appointment::with('patient')
+            ->where('status', 'completed')
+            ->whereDate('appointment_date', '>=', $from->toDateString())
+            ->whereDate('appointment_date', '<=', $to->toDateString())
+            ->whereHas('patient')
             ->get();
 
         $columnIndexes = [
@@ -3075,29 +3078,69 @@ class DentistReportController extends Controller
             'dependent' => 3,
         ];
 
-        foreach ($records as $record) {
-            $gender = $this->normalizeGadGender($record->gender ?? null);
+        foreach ($appointments as $appointment) {
+            $patient = $appointment->patient;
+
+            if (! $patient) {
+                continue;
+            }
+
+            $demographics = $this->resolvePatientDemographics($patient);
+
+            $gender = $this->normalizeGadGender(
+                $demographics['gender'] ?? null
+            );
 
             if (! $gender) {
                 continue;
             }
 
-            $officeType = $this->normalizeGadOfficeType($record->department ?? null);
-            $columnIndex = $columnIndexes[$officeType] ?? 0;
 
-            $isSenior = (bool) ($record->is_senior ?? false);
-            $isPwd = (bool) ($record->is_pwd ?? false);
-
-            if ($isSenior) {
-                $rowKey = 'senior_'.$gender;
-            } elseif ($isPwd) {
-                $rowKey = 'pwd_'.$gender;
+            if (
+                filled($patient->student_no) ||
+                filled($patient->course_code) ||
+                filled($patient->course_name)
+            ) {
+                $officeType = 'student';
+            } elseif (filled($patient->faculty_code)) {
+                $officeType = 'faculty';
             } else {
-                $rowKey = 'gad_'.$gender;
+                $patientType = strtolower(trim((string) (
+                    $patient->patient_type
+                    ?? $patient->type
+                    ?? ''
+                )));
+
+                if (
+                    str_contains($patientType, 'admin') ||
+                    str_contains($patientType, 'administrative')
+                ) {
+                    $officeType = 'administrative';
+                } else {
+                    $officeType = 'dependent';
+                }
             }
 
-            $counts[$rowKey][$columnIndex]++;
-            $counts[$rowKey][4]++;
+            $columnIndex = $columnIndexes[$officeType] ?? 0;
+
+            $genderRow = 'gad_' . $gender;
+
+            $counts[$genderRow][$columnIndex]++;
+            $counts[$genderRow][4]++;
+
+            if ((bool) ($patient->is_senior ?? false)) {
+                $seniorRow = 'senior_' . $gender;
+
+                $counts[$seniorRow][$columnIndex]++;
+                $counts[$seniorRow][4]++;
+            }
+
+            if ((bool) ($patient->is_pwd ?? false)) {
+                $pwdRow = 'pwd_' . $gender;
+
+                $counts[$pwdRow][$columnIndex]++;
+                $counts[$pwdRow][4]++;
+            }
 
             $counts['total'][$columnIndex]++;
             $counts['total'][4]++;
@@ -3498,11 +3541,11 @@ class DentistReportController extends Controller
             }
 
             if ($programOrDept !== '' && ! empty($patient->year_level)) {
-                $programOrDept .= ' - Y'.$patient->year_level;
+                $programOrDept .= ' - Y' . $patient->year_level;
             }
 
             if ($programOrDept !== '' && ! empty($patient->section)) {
-                $programOrDept .= ' / '.$patient->section;
+                $programOrDept .= ' / ' . $patient->section;
             }
 
             if ($programOrDept === '') {
@@ -3811,7 +3854,7 @@ class DentistReportController extends Controller
 
             if (! empty($appointment->appointment_time)) {
                 $timeText = $this->formatPdfTime($appointment->appointment_time);
-                $requestedDateTime .= $requestedDateTime !== '' ? '  |  '.$timeText : $timeText;
+                $requestedDateTime .= $requestedDateTime !== '' ? '  |  ' . $timeText : $timeText;
             }
 
             $patientName = trim((string) ($patient->name ?? 'Unknown Patient'));
@@ -3840,12 +3883,12 @@ class DentistReportController extends Controller
 
             if ($procedure?->procedure_completed_at) {
                 $processedDateTime = Carbon::parse($procedure->procedure_completed_at)->format('m/d/y')
-                    .'  |  '
-                    .Carbon::parse($procedure->procedure_completed_at)->format('h:i A');
+                    . '  |  '
+                    . Carbon::parse($procedure->procedure_completed_at)->format('h:i A');
             } elseif (! empty($appointment->updated_at)) {
                 $processedDateTime = Carbon::parse($appointment->updated_at)->format('m/d/y')
-                    .'  |  '
-                    .Carbon::parse($appointment->updated_at)->format('h:i A');
+                    . '  |  '
+                    . Carbon::parse($appointment->updated_at)->format('h:i A');
             }
 
             $minutesProcessed = $this->formatPdfDurationMinutes(
@@ -4008,7 +4051,7 @@ class DentistReportController extends Controller
             $current = '';
 
             foreach ($words as $word) {
-                $candidate = $current === '' ? $word : $current.' '.$word;
+                $candidate = $current === '' ? $word : $current . ' ' . $word;
 
                 if ($pdf->GetStringWidth($candidate) <= $maxWidth) {
                     $current = $candidate;
@@ -4045,7 +4088,7 @@ class DentistReportController extends Controller
         $parts = array_values(array_filter([
             trim($email),
             trim($contact),
-        ], fn ($value) => $value !== ''));
+        ], fn($value) => $value !== ''));
 
         return implode('  |  ', $parts);
     }
@@ -4059,7 +4102,7 @@ class DentistReportController extends Controller
         }
 
         $parts = preg_split('/\s+/', $fullName) ?: [];
-        $parts = array_values(array_filter($parts, fn ($part) => trim((string) $part) !== ''));
+        $parts = array_values(array_filter($parts, fn($part) => trim((string) $part) !== ''));
 
         if (count($parts) === 1) {
             return $parts[0];
@@ -4070,7 +4113,7 @@ class DentistReportController extends Controller
         $remainingNames = trim(implode(' ', $parts));
         $givenNames = trim($firstName . ' ' . $remainingNames);
 
-        return trim($surname.', '.$firstName.$middleInitial);
+        return trim($surname . ', ' . $givenNames);
     }
 
     private function formatPdfDurationMinutes(int $seconds): string
@@ -4090,7 +4133,7 @@ class DentistReportController extends Controller
             return null;
         }
 
-        $absolutePath = storage_path('app/public/'.str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $relativePath));
+        $absolutePath = storage_path('app/public/' . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $relativePath));
 
         return file_exists($absolutePath) ? $absolutePath : null;
     }
@@ -4139,11 +4182,11 @@ class DentistReportController extends Controller
             return $text;
         }
 
-        while ($text !== '' && $pdf->GetStringWidth($text.'...') > $maxWidth) {
+        while ($text !== '' && $pdf->GetStringWidth($text . '...') > $maxWidth) {
             $text = mb_substr($text, 0, -1);
         }
 
-        return trim($text).'...';
+        return trim($text) . '...';
     }
 
     private function formatPdfTime($value): string
@@ -4284,14 +4327,14 @@ class DentistReportController extends Controller
         $prefix = trim($prefix);
 
         if ($from->isSameMonth($to) && $from->isSameYear($to)) {
-            return $prefix.' '.strtoupper($from->format('F Y'));
+            return $prefix . ' ' . strtoupper($from->format('F Y'));
         }
 
         if ($from->isSameYear($to)) {
-            return $prefix.' '.strtoupper($from->format('F')).' TO '.strtoupper($to->format('F Y'));
+            return $prefix . ' ' . strtoupper($from->format('F')) . ' TO ' . strtoupper($to->format('F Y'));
         }
 
-        return $prefix.' '.strtoupper($from->format('F Y')).' TO '.strtoupper($to->format('F Y'));
+        return $prefix . ' ' . strtoupper($from->format('F Y')) . ' TO ' . strtoupper($to->format('F Y'));
     }
 
     private function drawDentalServicesTemplateDate(Fpdi $pdf): void
