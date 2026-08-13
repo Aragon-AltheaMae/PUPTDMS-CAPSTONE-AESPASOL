@@ -98,7 +98,7 @@ Route::middleware(['web'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', fn () => redirect('/login'));
+Route::get('/', fn() => redirect('/login'));
 
 // Patient Login
 Route::view('/login', 'auth.login')->name('login');
@@ -664,7 +664,7 @@ Route::post('/impersonate', function (Request $request) {
         AuditLogger::log(
             'impersonation_started',
             'authentication',
-            'Admin started impersonating Patient ID '.$patient->id
+            'Admin started impersonating Patient ID ' . $patient->id
         );
 
         return response()->json([
@@ -673,7 +673,7 @@ Route::post('/impersonate', function (Request $request) {
     }
 
     return response()->json([
-        'message' => 'Unsupported role: '.$targetRole,
+        'message' => 'Unsupported role: ' . $targetRole,
     ], 422);
 })->name('admin.impersonate');
 
@@ -750,7 +750,7 @@ Route::middleware(['role:patient'])->group(function () {
         ->middleware('permission:view_own_records')
         ->name('patient.record');
 
-    Route::get('/about-us', fn () => view('patient.about-us'))
+    Route::get('/about-us', fn() => view('patient.about-us'))
         ->name('patient.about.us');
 
     // Clinic Schedule
@@ -1139,9 +1139,13 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
     Route::get('/walk-in/search-patient', [WalkInController::class, 'searchPatient'])
         ->name('dentist.walk-in.search-patient');
 
+    Route::get(
+        '/walk-in/patients/{patient}/booking-information',
+        [WalkInController::class, 'patientBookingInformation']
+    )->name('dentist.walk-in.patient-booking-information');
+
     Route::post('/walk-in/guest', [WalkInController::class, 'storeGuest'])
         ->name('dentist.walk-in.guest.store');
-
     Route::post('/walk-in/start', [WalkInController::class, 'startWalkIn'])
         ->name('dentist.walk-in.start');
 

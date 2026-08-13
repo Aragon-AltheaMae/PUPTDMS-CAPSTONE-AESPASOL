@@ -41,6 +41,8 @@ class ConcurrentSessionService
 
         $request->session()->save();
 
+        $deviceDetails = BrowserDetection::deviceDetailsFromRequest($request);
+
         $attributes = [
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
@@ -48,7 +50,13 @@ class ConcurrentSessionService
         ];
 
         if ($this->supportsSessionBrowserNameColumn()) {
-            $attributes['browser_name'] = BrowserDetection::detectFromRequest($request);
+            $attributes['browser_name'] = $deviceDetails['browser_name'];
+        }
+
+        if ($this->supportsSessionDeviceColumns()) {
+            $attributes['device_type'] = $deviceDetails['device_type'];
+            $attributes['device_name'] = $deviceDetails['device_name'];
+            $attributes['os_name'] = $deviceDetails['os_name'];
         }
 
         DB::table($this->sessionTable())
@@ -118,7 +126,7 @@ class ConcurrentSessionService
             }
 
             $sessionsToRevoke = $activeSessions
-                ->filter(fn (object $session) => $session->id !== $currentSessionId)
+                ->filter(fn(object $session) => $session->id !== $currentSessionId)
                 ->take($excessCount)
                 ->pluck('id')
                 ->values();
@@ -213,13 +221,24 @@ class ConcurrentSessionService
                     'is_current' => hash_equals((string) $session->id, $currentSessionId),
                     'ip_address' => $session->ip_address ?: 'Unknown',
                     'user_agent' => $session->user_agent ?: 'Unknown device',
-                    'device_label' => $this->deviceLabel($session->browser_name ?? null, $session->user_agent),
-                    'browser_label' => $this->browserLabel($session->browser_name ?? null, $session->user_agent),
+                    'device_type' => $session->device_type
+                        ?? BrowserDetection::detectDeviceType($session->user_agent),
+
+                    'device_label' => $session->device_name
+                        ?? BrowserDetection::detectDeviceName($session->user_agent),
+
+                    'os_label' => $session->os_name
+                        ?? BrowserDetection::detectOperatingSystem($session->user_agent),
+
+                    'browser_label' => $this->browserLabel(
+                        $session->browser_name ?? null,
+                        $session->user_agent
+                    ),
                     'last_activity_at' => now()->setTimestamp((int) $session->last_activity),
                     'last_activity_label' => now()->setTimestamp((int) $session->last_activity)->diffForHumans(),
                 ];
             })
-            ->sortByDesc(fn (array $session) => $session['last_activity_at']->getTimestamp())
+            ->sortByDesc(fn(array $session) => $session['last_activity_at']->getTimestamp())
             ->values();
     }
 
@@ -347,6 +366,14 @@ class ConcurrentSessionService
             $query->addSelect('sessions.browser_name');
         }
 
+        if ($this->supportsSessionDeviceColumns()) {
+            $query->addSelect([
+                'sessions.device_type',
+                'sessions.device_name',
+                'sessions.os_name',
+            ]);
+        }
+
         $role = trim((string) ($filters['role'] ?? ''));
         $search = trim((string) ($filters['search'] ?? ''));
 
@@ -382,8 +409,19 @@ class ConcurrentSessionService
                     'role_label' => $this->formatRoleLabel($role),
                     'ip_address' => $session->ip_address ?: 'Unknown',
                     'user_agent' => $session->user_agent ?: 'Unknown device',
-                    'device_label' => $this->deviceLabel($session->browser_name ?? null, $session->user_agent),
-                    'browser_label' => $this->browserLabel($session->browser_name ?? null, $session->user_agent),
+                    'device_type' => $session->device_type
+                        ?? BrowserDetection::detectDeviceType($session->user_agent),
+
+                    'device_label' => $session->device_name
+                        ?? BrowserDetection::detectDeviceName($session->user_agent),
+
+                    'os_label' => $session->os_name
+                        ?? BrowserDetection::detectOperatingSystem($session->user_agent),
+
+                    'browser_label' => $this->browserLabel(
+                        $session->browser_name ?? null,
+                        $session->user_agent
+                    ),
                     'last_activity_at' => now()->setTimestamp((int) $session->last_activity),
                     'last_activity_label' => now()->setTimestamp((int) $session->last_activity)->diffForHumans(),
                     'is_current' => hash_equals((string) $session->id, $currentSessionId),
@@ -570,10 +608,28 @@ class ConcurrentSessionService
         static $supportsColumn;
 
         if ($supportsColumn === null) {
-            $supportsColumn = Schema::hasColumn($this->sessionTable(), 'browser_name');
+            $supportsColumn = Schema::hasColumn(
+                $this->sessionTable(),
+                'browser_name'
+            );
         }
 
         return $supportsColumn;
+    }
+
+    protected function supportsSessionDeviceColumns(): bool
+    {
+        static $supportsColumns;
+
+        if ($supportsColumns === null) {
+            $supportsColumns = Schema::hasColumns($this->sessionTable(), [
+                'device_type',
+                'device_name',
+                'os_name',
+            ]);
+        }
+
+        return $supportsColumns;
     }
 
     protected function formatRoleLabel(string $role): string

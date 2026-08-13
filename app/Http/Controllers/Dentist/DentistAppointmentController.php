@@ -25,6 +25,10 @@ class DentistAppointmentController extends Controller
     {
         $now = Carbon::now();
 
+        $gracePeriodMinutes = 60;
+
+        $cutoff = $now->copy()->subMinutes($gracePeriodMinutes);
+
         $updatePayload = [
             'status' => 'cancelled',
             'updated_at' => $now,
@@ -32,17 +36,33 @@ class DentistAppointmentController extends Controller
 
         if (Schema::hasColumn('appointments', 'cancellation_reason')) {
             $updatePayload['cancellation_reason'] = DB::raw(
-                "COALESCE(NULLIF(cancellation_reason, ''), 'Appointment was not started or processed on the scheduled time.')"
+                "COALESCE(
+                NULLIF(cancellation_reason, ''),
+                'Appointment was not started within the 1-hour grace period.'
+            )"
             );
         }
 
         Appointment::query()
             ->whereIn('status', ['upcoming', 'rescheduled'])
-            ->where(function ($query) use ($now) {
-                $query->whereDate('appointment_date', '<', $now->toDateString())
-                    ->orWhere(function ($sameDay) use ($now) {
-                        $sameDay->whereDate('appointment_date', $now->toDateString())
-                            ->whereTime('appointment_time', '<', $now->format('H:i:s'));
+            ->where(function ($query) use ($cutoff) {
+                $query
+                    ->whereDate(
+                        'appointment_date',
+                        '<',
+                        $cutoff->toDateString()
+                    )
+                    ->orWhere(function ($sameDay) use ($cutoff) {
+                        $sameDay
+                            ->whereDate(
+                                'appointment_date',
+                                $cutoff->toDateString()
+                            )
+                            ->whereTime(
+                                'appointment_time',
+                                '<',
+                                $cutoff->format('H:i:s')
+                            );
                     });
             })
             ->update($updatePayload);

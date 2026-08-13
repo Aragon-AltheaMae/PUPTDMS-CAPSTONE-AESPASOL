@@ -9,18 +9,16 @@
 
 @section('content')
 
-<main id="mainContent" class="booking-page page-enter">
-    <div class="booking-page-inner">
-        <x-booking.workflow-header :back-url="route('dentist.dentist.appointments')" back-label="Back to Appointments"
-            form-target="#appointmentForm" icon="fa-solid fa-person-walking-arrow-right" title="Walk-in Patient Intake"
-            subtitle="Register or select the patient, complete the clinical history, and prepare the patient for treatment."
-            :steps="['Patient', 'Service', 'Dental History', 'Medical History', 'Start Procedure']" />
+    <main id="mainContent" class="booking-page page-enter">
+        <div class="booking-page-inner">
+            <x-booking.workflow-header :back-url="route('dentist.dentist.appointments')" back-label="Back to Appointments" form-target="#appointmentForm"
+                icon="fa-solid fa-person-walking-arrow-right" title="Walk-in Patient Intake"
+                subtitle="Register or select the patient, complete the clinical history, and prepare the patient for treatment."
+                :steps="['Patient', 'Service', 'Dental History', 'Medical History', 'Start Procedure']" />
 
-        <div class="w-full">
+            <div class="w-full">
 
-            <div class="booking-workflow-card">
-
-                <div>
+                <div class="booking-workflow-card">
 
                     <form id="appointmentForm" action="{{ route('dentist.walk-in.start') }}" method="POST"
                         enctype="multipart/form-data" data-global-selects data-global-validation data-discard-form
@@ -82,27 +80,54 @@
                                             <x-pagination-bar id="patientPaginationTopBar" info-id="patientEntriesInfo"
                                                 pagination-id="patientPaginationTop" position="top" label="patients"
                                                 :show-entries="true" page-size-id="patientPageSize"
-                                                page-size-callback="handleWalkInPatientPerPageChange"
-                                                :page-size-value="10" hidden />
+                                                page-size-callback="handleWalkInPatientPerPageChange" :page-size-value="10"
+                                                hidden />
 
                                             <div id="patientResults" class="mt-5 mb-5" aria-live="polite"></div>
 
-                                            <x-pagination-bar id="patientPaginationBar"
-                                                info-id="patientEntriesInfoBottom" pagination-id="patientPagination"
-                                                position="bottom" label="patients" hidden />
+                                            <x-pagination-bar id="patientPaginationBar" info-id="patientEntriesInfoBottom"
+                                                pagination-id="patientPagination" position="bottom" label="patients"
+                                                hidden />
                                         </div>
                                         <div class="tab-panel" id="guestPanel">
+
                                             <div class="guest-fields-grid">
 
-                                                <div class="global-form-group" data-global-field>
-                                                    <label class="global-form-label" for="guestName">
-                                                        Guest Full Name
-                                                        <span class="required-mark">*</span>
-                                                    </label>
+                                                <div class="walkin-three-col">
 
-                                                    <input type="text" id="guestName" name="guest_name"
-                                                        class="form-input-custom" placeholder="Enter guest full name"
-                                                        autocomplete="off" disabled>
+                                                    <div class="global-form-group" data-global-field>
+                                                        <label class="global-form-label" for="guestFirstName">
+                                                            First Name
+                                                            <span class="required-mark">*</span>
+                                                        </label>
+
+                                                        <input type="text" id="guestFirstName" name="guest_first_name"
+                                                            class="form-input-custom" placeholder="Enter first name"
+                                                            autocomplete="given-name" disabled>
+                                                    </div>
+
+                                                    <div class="global-form-group" data-global-field>
+                                                        <label class="global-form-label" for="guestMiddleName">
+                                                            Middle Name
+                                                            <span class="field-optional">(Optional)</span>
+                                                        </label>
+
+                                                        <input type="text" id="guestMiddleName" name="guest_middle_name"
+                                                            class="form-input-custom" placeholder="Enter middle name"
+                                                            autocomplete="additional-name" disabled>
+                                                    </div>
+
+                                                    <div class="global-form-group" data-global-field>
+                                                        <label class="global-form-label" for="guestLastName">
+                                                            Last Name
+                                                            <span class="required-mark">*</span>
+                                                        </label>
+
+                                                        <input type="text" id="guestLastName" name="guest_last_name"
+                                                            class="form-input-custom" placeholder="Enter last name"
+                                                            autocomplete="family-name" disabled>
+                                                    </div>
+
                                                 </div>
 
                                                 <div class="walkin-two-col">
@@ -110,53 +135,162 @@
                                                     <div class="global-form-group" data-global-field>
                                                         <label class="global-form-label" for="guestEmail">
                                                             Email
-                                                            <span class="field-optional">(Optional)</span>
+                                                            <span class="required-mark">*</span>
                                                         </label>
 
                                                         <input type="email" id="guestEmail" name="guest_email"
-                                                            data-required-message="Please enter a valid email address."
                                                             class="form-input-custom" placeholder="Enter email address"
                                                             autocomplete="email" disabled>
                                                     </div>
 
                                                     <div class="global-form-group" data-global-field>
                                                         <label class="global-form-label" for="guestPhone">
-                                                            Phone
-                                                            <span class="field-optional">(Optional)</span>
+                                                            Contact Number
+                                                            <span class="required-mark">*</span>
                                                         </label>
 
                                                         <input type="text" id="guestPhone" name="guest_phone"
                                                             class="form-input-custom" placeholder="09xx xxx xxxx"
-                                                            autocomplete="tel" inputmode="numeric" disabled>
+                                                            autocomplete="tel" inputmode="numeric"
+                                                            data-validation-rule="philippineMobile" maxlength="11"
+                                                            disabled>
                                                     </div>
 
                                                 </div>
+
+                                                <div class="walkin-two-col">
+
+                                                    <div class="global-form-group" data-global-field>
+                                                        <label class="global-form-label" for="guestGender">
+                                                            Gender
+                                                            <span class="required-mark">*</span>
+                                                        </label>
+
+                                                        <select id="guestGender" name="guest_gender"
+                                                            class="form-select-custom js-custom-select" disabled>
+                                                            <option value="">Select gender</option>
+                                                            <option value="Male">Male</option>
+                                                            <option value="Female">Female</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="global-form-group" data-global-field>
+                                                        <label class="global-form-label" for="guestBirthdate">
+                                                            Birthday
+                                                            <span class="required-mark">*</span>
+                                                        </label>
+
+                                                        <input type="text" id="guestBirthdate" name="guest_birthdate"
+                                                            class="form-input-custom js-flatpickr-date"
+                                                            placeholder="Select birthday"
+                                                            max="{{ now()->subDay()->format('Y-m-d') }}"
+                                                            data-validation-rule="notFutureDate" autocomplete="off"
+                                                            disabled>
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="walkin-two-col">
+
+                                                    <div class="global-form-group" data-global-field>
+                                                        <label class="global-form-label" for="guestProgram">
+                                                            Program
+                                                            <span class="field-optional">(Optional)</span>
+                                                        </label>
+
+                                                        <input type="text" id="guestProgram" name="guest_program"
+                                                            class="form-input-custom" placeholder="Enter program"
+                                                            disabled>
+                                                    </div>
+
+                                                    <div class="global-form-group" data-global-field>
+                                                        <label class="global-form-label" for="guestFaculty">
+                                                            Faculty
+                                                            <span class="field-optional">(Optional)</span>
+                                                        </label>
+
+                                                        <input type="text" id="guestFaculty" name="guest_faculty"
+                                                            class="form-input-custom" placeholder="Enter faculty"
+                                                            disabled>
+                                                    </div>
+
+                                                </div>
+                                                <div class="walkin-two-col">
+
+                                                    <div class="global-form-group" data-global-field>
+                                                        <label class="global-form-label" for="guestYearLevel">
+                                                            Year Level
+                                                            <span class="field-optional">(Optional)</span>
+                                                        </label>
+
+                                                        <input type="text" id="guestYearLevel" name="guest_year_level"
+                                                            class="form-input-custom" placeholder="e.g. 4" disabled>
+                                                    </div>
+
+                                                    <div class="global-form-group" data-global-field>
+                                                        <label class="global-form-label" for="guestSection">
+                                                            Section
+                                                            <span class="field-optional">(Optional)</span>
+                                                        </label>
+
+                                                        <input type="text" id="guestSection" name="guest_section"
+                                                            class="form-input-custom" placeholder="e.g. BSIT 4-1"
+                                                            disabled>
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="global-form-group" data-global-field>
+                                                    <label class="global-form-label">
+                                                        Is the patient a Person with Disability (PWD)?
+                                                        <span class="required-mark">*</span>
+                                                    </label>
+
+                                                    <div class="flex gap-4">
+                                                        <label class="global-radio-option">
+                                                            <input type="radio" name="guest_is_pwd" value="1"
+                                                                class="global-radio-input" disabled>
+                                                            <span>Yes</span>
+                                                        </label>
+
+                                                        <label class="global-radio-option">
+                                                            <input type="radio" name="guest_is_pwd" value="0"
+                                                                class="global-radio-input" disabled>
+                                                            <span>No</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+
                                             </div>
 
                                             <button type="button" id="createGuestBtn" class="ui-btn ui-btn-primary">
-
                                                 <i class="fa-solid fa-user-plus"></i>
                                                 Create guest account
                                             </button>
+
                                         </div>
-                                        <div class="selected-patient-box" id="selectedPatientBox" hidden>
+                                    </div>
 
-                                            <span>
-                                                <i class="fa-solid fa-circle-check text-[11px] mr-1"></i>
-                                                Selected patient
-                                            </span>
 
-                                            <strong id="selectedPatientName"></strong>
+                                    <div class="selected-patient-box" id="selectedPatientBox" hidden>
 
-                                            <small id="selectedPatientMeta"></small>
+                                        <span>
+                                            <i class="fa-solid fa-circle-check text-[11px] mr-1"></i>
+                                            Selected patient
+                                        </span>
 
-                                            <button type="button" id="clearSelectedPatientBtn"
-                                                class="ui-btn ui-btn-secondary ui-btn-sm">
+                                        <strong id="selectedPatientName"></strong>
 
-                                                <i class="fa-solid fa-xmark"></i>
-                                                <span>Clear Selection</span>
-                                            </button>
-                                        </div>
+                                        <small id="selectedPatientMeta"></small>
+
+                                        <button type="button" id="clearSelectedPatientBtn"
+                                            class="ui-btn ui-btn-secondary ui-btn-sm">
+
+                                            <i class="fa-solid fa-xmark"></i>
+                                            <span>Clear Selection</span>
+
+                                        </button>
+
                                     </div>
                                 </div>
                             </div>
@@ -181,9 +315,8 @@
                                 </div>
 
                                 <div class="booking-step-body">
-                                    <x-booking.medical-history-fields :questions="$medicalQuestions"
-                                        :diseases="$diseases" mode="standard" :defaults="[]"
-                                        :selected-diseases="old('diseases', [])" :dynamic-female="true" />
+                                    <x-booking.medical-history-fields :questions="$medicalQuestions" :diseases="$diseases" mode="standard"
+                                        :defaults="[]" :selected-diseases="old('diseases', [])" :dynamic-female="true" />
 
                                     <x-booking.signature mode="draw-only" label="Patient's Signature"
                                         draw-title="Draw the patient's signature here"
@@ -239,668 +372,1369 @@
 
             </div>
         </div>
-</main>
+    </main>
 
-<div id="introBookingModal" class="ui-modal" aria-hidden="true">
-    <div class="ui-modal-card modal-md">
-        <div class="modal-hd">
-            <div class="modal-heading">
-                <div class="modal-icon">
-                    <i class="fa-solid fa-person-walking-arrow-right"></i>
-                </div>
+    <div id="introBookingModal" class="ui-modal" aria-hidden="true">
+        <div class="ui-modal-card modal-md">
+            <div class="modal-hd">
+                <div class="modal-heading">
+                    <div class="modal-icon">
+                        <i class="fa-solid fa-person-walking-arrow-right"></i>
+                    </div>
 
-                <div class="modal-copy">
-                    <h2 class="modal-title">
-                        Prepare the walk-in patient for treatment
-                    </h2>
+                    <div class="modal-copy">
+                        <h2 class="modal-title">
+                            Prepare the walk-in patient for treatment
+                        </h2>
 
-                    <p class="modal-subtitle">
-                        Complete the patient intake, service selection,
-                        clinical history, and signature before starting
-                        the procedure.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal-bd">
-            <div class="booking-intro-steps">
-                <div class="booking-intro-step">
-                    <strong>1</strong>
-                    <span>Patient</span>
-                </div>
-
-                <div class="booking-intro-step">
-                    <strong>2</strong>
-                    <span>Service</span>
-                </div>
-
-                <div class="booking-intro-step">
-                    <strong>3</strong>
-                    <span>Dental</span>
-                </div>
-
-                <div class="booking-intro-step">
-                    <strong>4</strong>
-                    <span>Medical</span>
-                </div>
-
-                <div class="booking-intro-step">
-                    <strong>5</strong>
-                    <span>Start</span>
+                        <p class="modal-subtitle">
+                            Complete the patient intake, service selection,
+                            clinical history, and signature before starting
+                            the procedure.
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            <div class="booking-intro-checklist">
-
-                <div class="booking-intro-item">
-                    <div class="global-icon-box global-icon-box-sm">
-                        <i class="fa-solid fa-check"></i>
+            <div class="modal-bd">
+                <div class="booking-intro-steps">
+                    <div class="booking-intro-step">
+                        <strong>1</strong>
+                        <span>Patient</span>
                     </div>
 
-                    <p>
-                        Select an existing patient or create a guest
-                        record for today's walk-in visit.
-                    </p>
+                    <div class="booking-intro-step">
+                        <strong>2</strong>
+                        <span>Service</span>
+                    </div>
+
+                    <div class="booking-intro-step">
+                        <strong>3</strong>
+                        <span>Dental</span>
+                    </div>
+
+                    <div class="booking-intro-step">
+                        <strong>4</strong>
+                        <span>Medical</span>
+                    </div>
+
+                    <div class="booking-intro-step">
+                        <strong>5</strong>
+                        <span>Start</span>
+                    </div>
                 </div>
 
-                <div class="booking-intro-item">
-                    <div class="global-icon-box global-icon-box-sm">
-                        <i class="fa-solid fa-tooth"></i>
+                <div class="booking-intro-checklist">
+
+                    <div class="booking-intro-item">
+                        <div class="global-icon-box global-icon-box-sm">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+
+                        <p>
+                            Select an existing patient or create a guest
+                            record for today's walk-in visit.
+                        </p>
                     </div>
 
-                    <p>
-                        Choose the requested dental service and complete
-                        the patient's dental and medical history.
-                    </p>
-                </div>
+                    <div class="booking-intro-item">
+                        <div class="global-icon-box global-icon-box-sm">
+                            <i class="fa-solid fa-tooth"></i>
+                        </div>
 
-                <div class="booking-intro-item">
-                    <div class="global-icon-box global-icon-box-sm">
-                        <i class="fa-solid fa-signature"></i>
+                        <p>
+                            Choose the requested dental service and complete
+                            the patient's dental and medical history.
+                        </p>
                     </div>
 
-                    <p>
-                        Ask the patient to review the information and
-                        provide a drawn signature.
-                    </p>
-                </div>
+                    <div class="booking-intro-item">
+                        <div class="global-icon-box global-icon-box-sm">
+                            <i class="fa-solid fa-signature"></i>
+                        </div>
 
-                <div class="booking-intro-item">
-                    <div class="global-icon-box global-icon-box-sm">
-                        <i class="fa-solid fa-list-check"></i>
+                        <p>
+                            Ask the patient to review the information and
+                            provide a drawn signature.
+                        </p>
                     </div>
 
-                    <p>
-                        Verify the intake summary before starting the
-                        dental procedure.
-                    </p>
+                    <div class="booking-intro-item">
+                        <div class="global-icon-box global-icon-box-sm">
+                            <i class="fa-solid fa-list-check"></i>
+                        </div>
+
+                        <p>
+                            Verify the intake summary before starting the
+                            dental procedure.
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="modal-ft">
-            <a href="{{ route('dentist.dentist.appointments') }}" class="ui-btn ui-btn-primary ui-btn-sm"
-                data-discard-navigation data-discard-form-target="#appointmentForm">
-                <i class="fa-solid fa-arrow-left"></i>
-                Back to Appointments
-            </a>
+            <div class="modal-ft">
+                <a href="{{ route('dentist.dentist.appointments') }}" class="ui-btn ui-btn-primary ui-btn-sm"
+                    data-discard-navigation data-discard-form-target="#appointmentForm">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back to Appointments
+                </a>
 
-            <button type="button" id="introContinueDraftBtn" class="hidden ui-btn ui-btn-secondary">
-                <i class="fa-solid fa-clock-rotate-left"></i>
-                Continue Draft
-            </button>
+                <button type="button" id="introContinueDraftBtn" class="hidden ui-btn ui-btn-secondary">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    Continue Draft
+                </button>
 
-            <button type="button" id="introStartBtn" class="ui-btn ui-btn-primary">
-                <i class="fa-solid fa-play"></i>
-                Begin Walk-in Intake
-            </button>
+                <button type="button" id="introStartBtn" class="ui-btn ui-btn-primary">
+                    <i class="fa-solid fa-play"></i>
+                    Begin Walk-in Intake
+                </button>
+            </div>
         </div>
     </div>
-</div>
 
-<x-booking.confirmed-modal id="confirmModal" eyebrow="Walk-in Appointment" title="Appointment Confirmed"
-    subtitle="The walk-in intake has been saved successfully." header-icon="fa-check" section-icon="fa-stethoscope"
-    section-eyebrow="Treatment Status" section-title="Ready to begin treatment"
-    section-message="The patient intake is complete and the dental procedure can now be started."
-    detail-label="Intake Status" result-title="Recorded" message-title="Procedure details" message-id="confirmMessage">
-    The walk-in appointment was recorded successfully.
+    <x-booking.confirmed-modal id="confirmModal" eyebrow="Walk-in Appointment" title="Appointment Confirmed"
+        subtitle="The walk-in intake has been saved successfully." header-icon="fa-check" section-icon="fa-stethoscope"
+        section-eyebrow="Treatment Status" section-title="Ready to begin treatment"
+        section-message="The patient intake is complete and the dental procedure can now be started."
+        detail-label="Intake Status" result-title="Recorded" message-title="Procedure details"
+        message-id="confirmMessage">
+        The walk-in appointment was recorded successfully.
 
-    <x-slot:footer>
+        <x-slot:footer>
 
-        <button type="button" id="okBtn" class="ui-btn ui-btn-primary">
-            <i class="fa-solid fa-play"></i>
-            Start Procedure
-        </button>
+            <button type="button" id="okBtn" class="ui-btn ui-btn-primary">
+                <i class="fa-solid fa-play"></i>
+                Start Procedure
+            </button>
 
-    </x-slot:footer>
+        </x-slot:footer>
 
-</x-booking.confirmed-modal>
+    </x-booking.confirmed-modal>
 @endsection
 
 @section('scripts')
 
-<script>
-    const diseaseLabelByCode = @json($diseases -> pluck('label', 'code'));
-    const DRAFT_KEY = "dentistWalkInDraft:v1";
+    <script>
+        const diseaseLabelByCode = @json($diseases->pluck('label', 'code'));
+        const DRAFT_KEY = "dentistWalkInDraft:v1";
 
-    let selectedWalkInPatient = null;
-    let formIsDirty = false;
-    let formSubmitting = false;
-    let pendingNavigation = null;
+        let selectedWalkInPatient = null;
+        let selectedPatientBookingInformation = null;
+        let patientHasExistingBookingInformation = false;
+        let patientHasReusableSignature = false;
+        let formIsDirty = false;
+        let formSubmitting = false;
+        let pendingNavigation = null;
 
-    const accountTabs = document.querySelectorAll(".account-tab");
-    const existingPanel = document.getElementById("existingPanel");
-    const guestPanel = document.getElementById("guestPanel");
+        const accountTabs = document.querySelectorAll(".account-tab");
+        const existingPanel = document.getElementById("existingPanel");
+        const guestPanel = document.getElementById("guestPanel");
 
-    const patientSearch = document.getElementById("patientSearch");
-    const patientResults = document.getElementById("patientResults");
+        const patientSearch = document.getElementById("patientSearch");
+        const patientResults = document.getElementById("patientResults");
 
-    const selectedPatientId = document.getElementById("selectedPatientId");
-    const patientModeInput = document.getElementById("patientMode");
-    const selectedPatientBox = document.getElementById("selectedPatientBox");
-    const selectedPatientName = document.getElementById("selectedPatientName");
-    const selectedPatientMeta = document.getElementById("selectedPatientMeta");
-    const clearSelectedPatientBtn = document.getElementById("clearSelectedPatientBtn");
+        const selectedPatientId = document.getElementById("selectedPatientId");
+        const patientModeInput = document.getElementById("patientMode");
+        const selectedPatientBox = document.getElementById("selectedPatientBox");
+        const selectedPatientName = document.getElementById("selectedPatientName");
+        const selectedPatientMeta = document.getElementById("selectedPatientMeta");
+        const clearSelectedPatientBtn = document.getElementById("clearSelectedPatientBtn");
+        const createGuestBtn = document.getElementById("createGuestBtn");
 
-    const createGuestBtn = document.getElementById("createGuestBtn");
-    const guestName = document.getElementById("guestName");
-    const guestEmail = document.getElementById("guestEmail");
-    const guestPhone = document.getElementById("guestPhone");
-    const walkInPatientGroup = document.querySelector('[data-walkin-patient-group]');
+        const guestFirstName =
+            document.getElementById("guestFirstName");
 
-    function setGuestFieldsEnabled(enabled) {
-        [guestName, guestEmail, guestPhone].forEach(input => {
+        const guestMiddleName =
+            document.getElementById("guestMiddleName");
+
+        const guestLastName =
+            document.getElementById("guestLastName");
+
+        const guestEmail =
+            document.getElementById("guestEmail");
+
+        const guestPhone =
+            document.getElementById("guestPhone");
+
+        const guestGender =
+            document.getElementById("guestGender");
+
+        const guestBirthdate =
+            document.getElementById("guestBirthdate");
+
+        const guestProgram =
+            document.getElementById("guestProgram");
+
+        const guestFaculty =
+            document.getElementById("guestFaculty");
+
+        const guestYearLevel =
+            document.getElementById("guestYearLevel");
+
+        const guestSection =
+            document.getElementById("guestSection");
+
+        const guestPwdRadios =
+            document.querySelectorAll(
+                'input[name="guest_is_pwd"]'
+            );
+        const walkInPatientGroup = document.querySelector('[data-walkin-patient-group]');
+
+        function setGuestFieldsEnabled(enabled) {
+            const guestFields = [
+                guestFirstName,
+                guestMiddleName,
+                guestLastName,
+                guestEmail,
+                guestPhone,
+                guestGender,
+                guestBirthdate,
+                guestProgram,
+                guestFaculty,
+                guestYearLevel,
+                guestSection,
+            ];
+
+            guestFields.forEach(input => {
+                if (!input) return;
+
+                input.disabled = !enabled;
+
+                if (!enabled) {
+                    input.required = false;
+                    input.value = "";
+
+                    window.clearFormInputValidation?.(
+                        input
+                    );
+                }
+            });
+
+            guestPwdRadios.forEach(radio => {
+                radio.disabled = !enabled;
+
+                if (!enabled) {
+                    radio.required = false;
+                    radio.checked = false;
+
+                    window.clearFormInputValidation?.(
+                        radio
+                    );
+                }
+            });
+
+            if (guestFirstName) {
+                guestFirstName.required = enabled;
+            }
+
+            if (guestMiddleName) {
+                guestMiddleName.required = false;
+            }
+
+            if (guestLastName) {
+                guestLastName.required = enabled;
+            }
+
+            if (guestEmail) {
+                guestEmail.required = enabled;
+            }
+
+            if (guestPhone) {
+                guestPhone.required = enabled;
+            }
+
+            if (guestGender) {
+                guestGender.required = enabled;
+            }
+
+            if (guestBirthdate) {
+                guestBirthdate.required = enabled;
+            }
+
+            guestPwdRadios.forEach((radio, index) => {
+                radio.required =
+                    enabled &&
+                    index === 0;
+            });
+
+            if (guestGender) {
+                window.initCustomSelects?.(
+                    guestPanel
+                );
+
+                const genderWrapper =
+                    guestGender.closest(
+                        ".custom-select"
+                    );
+
+                if (genderWrapper) {
+                    window.syncCustomSelect?.(
+                        genderWrapper
+                    );
+                }
+            }
+
+            if (
+                guestBirthdate?._flatpickr
+            ) {
+                guestBirthdate._flatpickr.redraw();
+            }
+        }
+
+        [
+            guestFirstName,
+            guestMiddleName,
+            guestLastName,
+            guestEmail,
+            guestPhone,
+            guestGender,
+            guestBirthdate,
+            guestProgram,
+            guestFaculty,
+            guestYearLevel,
+            guestSection,
+        ].forEach(input => {
             if (!input) return;
 
-            input.disabled = !enabled;
+            const eventName =
+                input.tagName === "SELECT" ||
+                input.type === "date" ?
+                "change" :
+                "input";
 
-            if (!enabled) {
-                input.required = false;
-                input.value = "";
-                window.clearFormInputValidation?.(
-                    input
-                );
-            }
+            input.addEventListener(eventName, () => {
+                if (
+                    patientModeInput?.value === "guest" &&
+                    selectedPatientId?.value
+                ) {
+                    clearSelectedPatientUI({
+                        clearSearch: false,
+                        reloadPatients: false,
+                    });
+                }
+            });
         });
 
-        if (guestName) {
-            guestName.required = enabled;
-        }
-    }
+        guestPwdRadios.forEach(radio => {
+            radio.addEventListener("change", () => {
+                if (
+                    patientModeInput?.value === "guest" &&
+                    selectedPatientId?.value
+                ) {
+                    clearSelectedPatientUI({
+                        clearSearch: false,
+                        reloadPatients: false,
+                    });
+                }
+            });
+        });
 
-    [guestName, guestEmail, guestPhone].forEach(input => {
-        input?.addEventListener("input", () => {
-            if (
-                patientModeInput?.value === "guest" &&
-                selectedPatientId?.value
-            ) {
+        const forWomenSection =
+            document.getElementById(
+                "forWomenSection"
+            );
+
+        const nonFemaleDefaults =
+            document.getElementById(
+                "nonFemaleDefaults"
+            );
+
+        const womenFieldNames = [
+            "pregnant",
+            "nursing",
+            "birth_control",
+        ];
+
+        function normalizePatientGender(
+            gender
+        ) {
+            return String(gender || "")
+                .trim()
+                .toLowerCase();
+        }
+
+        function isFemaleGender(
+            gender
+        ) {
+            const normalizedGender =
+                normalizePatientGender(
+                    gender
+                );
+
+            return [
+                "female",
+                "f",
+                "woman",
+            ].includes(
+                normalizedGender
+            );
+        }
+
+        function updateWomenSection(
+            gender
+        ) {
+            const showWomenSection =
+                isFemaleGender(
+                    gender
+                );
+
+            forWomenSection
+                ?.classList.toggle(
+                    "hidden",
+                    !showWomenSection
+                );
+
+            if (nonFemaleDefaults) {
+                nonFemaleDefaults.hidden =
+                    showWomenSection;
+
+                nonFemaleDefaults
+                    .querySelectorAll("input")
+                    .forEach(input => {
+                        input.disabled =
+                            showWomenSection;
+                    });
+            }
+
+            womenFieldNames.forEach(name => {
+                const radios =
+                    document.querySelectorAll(
+                        `input[type="radio"][name="${name}"]`
+                    );
+
+                radios.forEach((radio, index) => {
+                    radio.disabled = !showWomenSection;
+
+                    radio.required =
+                        showWomenSection &&
+                        index === 0;
+
+                    if (!showWomenSection) {
+                        radio.checked = false;
+
+                        window
+                            .clearFormInputValidation?.(
+                                radio
+                            );
+                    }
+                });
+            });
+        }
+
+        function clearSelectedPatientUI({
+            clearSearch = true,
+            reloadPatients = true,
+            markDirty = true,
+        } = {}) {
+
+            selectedWalkInPatient = null;
+
+            selectedPatientBookingInformation =
+                null;
+
+            patientHasExistingBookingInformation =
+                false;
+
+            patientHasReusableSignature =
+                false;
+
+            updateWomenSection(null);
+
+            if (selectedPatientId) {
+                selectedPatientId.value = "";
+            }
+
+            if (selectedPatientName) {
+                selectedPatientName.textContent = "";
+            }
+
+            if (selectedPatientMeta) {
+                selectedPatientMeta.textContent = "";
+            }
+
+            selectedPatientBox?.setAttribute(
+                "hidden",
+                "hidden"
+            );
+
+            document
+                .querySelectorAll(
+                    ".patient-record-card"
+                )
+                .forEach(card => {
+                    card.classList.remove(
+                        "is-selected"
+                    );
+
+                    const checkbox =
+                        card.querySelector(
+                            ".patient-card-checkbox"
+                        );
+
+                    if (checkbox) {
+                        checkbox.checked = false;
+                    }
+                });
+
+            if (clearSearch && patientSearch) {
+                patientSearch.value = "";
+
+                window.syncInputClearButton?.(
+                    patientSearch
+                );
+            }
+
+            window.clearGlobalGroupError?.(
+                document.querySelector(
+                    "[data-walkin-patient-group]"
+                ),
+                "walkin-patient"
+            );
+
+            if (reloadPatients) {
+                patientCurrentPage = 1;
+
+                loadPatients("", true);
+            }
+
+            if (markDirty) {
+                markFormDirty();
+            }
+        }
+
+        clearSelectedPatientBtn
+            ?.addEventListener(
+                "click",
+                () => {
+                    clearSelectedPatientUI({
+                        clearSearch: true,
+                        reloadPatients: true,
+                    });
+
+                    patientSearch?.focus();
+                }
+            );
+
+        function setPatientMode(mode, shouldClearSelected = false) {
+            const normalizedMode = mode === "guest" ? "guest" : "existing";
+            const isGuest = normalizedMode === "guest";
+
+            if (patientModeInput) {
+                patientModeInput.value = normalizedMode;
+            }
+
+            accountTabs.forEach(item => {
+                item.classList.toggle("active", item.dataset.tab === normalizedMode);
+            });
+
+            existingPanel?.classList.toggle("active", !isGuest);
+            guestPanel?.classList.toggle("active", isGuest);
+
+            setGuestFieldsEnabled(isGuest);
+
+            if (isGuest && shouldClearSelected) {
                 clearSelectedPatientUI({
                     clearSearch: false,
                     reloadPatients: false,
                 });
             }
-        });
-    });
 
-    const forWomenSection =
-        document.getElementById(
-            "forWomenSection"
-        );
-
-    const nonFemaleDefaults =
-        document.getElementById(
-            "nonFemaleDefaults"
-        );
-
-    const womenFieldNames = [
-        "pregnant",
-        "nursing",
-        "birth_control",
-    ];
-
-    function normalizePatientGender(
-        gender
-    ) {
-        return String(gender || "")
-            .trim()
-            .toLowerCase();
-    }
-
-    function isFemaleGender(
-        gender
-    ) {
-        const normalizedGender =
-            normalizePatientGender(
-                gender
-            );
-
-        return [
-            "female",
-            "f",
-            "woman",
-        ].includes(
-            normalizedGender
-        );
-    }
-
-    function updateWomenSection(
-        gender
-    ) {
-        const showWomenSection =
-            isFemaleGender(
-                gender
-            );
-
-        forWomenSection
-            ?.classList.toggle(
-                "hidden",
-                !showWomenSection
-            );
-
-        if (nonFemaleDefaults) {
-            nonFemaleDefaults.hidden =
-                showWomenSection;
-
-            nonFemaleDefaults
-                .querySelectorAll("input")
-                .forEach(input => {
-                    input.disabled =
-                        showWomenSection;
+            if (!isGuest) {
+                [
+                    guestFirstName,
+                    guestMiddleName,
+                    guestLastName,
+                    guestEmail,
+                    guestPhone,
+                    guestGender,
+                    guestBirthdate,
+                    guestProgram,
+                    guestFaculty,
+                    guestYearLevel,
+                    guestSection,
+                ].forEach(input => {
+                    if (input) {
+                        input.value = "";
+                    }
                 });
+
+                guestPwdRadios.forEach(radio => {
+                    radio.checked = false;
+                });
+            }
         }
 
-        womenFieldNames.forEach(name => {
-            const radios =
+        function setWalkInFormValue(name, value) {
+            const fields =
                 document.querySelectorAll(
-                    `input[type="radio"][name="${name}"]`
+                    `[name="${CSS.escape(name)}"]`
                 );
 
-            radios.forEach((radio, index) => {
-                radio.disabled = !showWomenSection;
+            fields.forEach(field => {
+                if (
+                    field.type === "radio"
+                ) {
+                    field.checked =
+                        String(field.value) ===
+                        String(value);
 
-                radio.required =
-                    showWomenSection &&
-                    index === 0;
+                    return;
+                }
 
-                if (!showWomenSection) {
-                    radio.checked = false;
+                if (
+                    field.type === "checkbox"
+                ) {
+                    field.checked =
+                        Boolean(value);
 
-                    window
-                        .clearFormInputValidation?.(
-                            radio
+                    return;
+                }
+
+                field.value =
+                    value ?? "";
+
+                if (
+                    field._flatpickr &&
+                    value
+                ) {
+                    field._flatpickr.setDate(
+                        value,
+                        false
+                    );
+                }
+
+                if (
+                    field.tagName === "SELECT"
+                ) {
+                    const wrapper =
+                        field.closest(
+                            ".custom-select"
                         );
+
+                    if (wrapper) {
+                        window.syncCustomSelect?.(
+                            wrapper
+                        );
+                    }
                 }
             });
-        });
-    }
-
-    function clearSelectedPatientUI({
-        clearSearch = true,
-        reloadPatients = true,
-        markDirty = true,
-    } = {}) {
-
-        selectedWalkInPatient = null;
-        updateWomenSection(null);
-
-        if (selectedPatientId) {
-            selectedPatientId.value = "";
         }
 
-        if (selectedPatientName) {
-            selectedPatientName.textContent = "";
-        }
+        function applyExistingPatientBookingInformation(data) {
+            if (!data) {
+                return;
+            }
 
-        if (selectedPatientMeta) {
-            selectedPatientMeta.textContent = "";
-        }
+            Object.entries(
+                data.dental || {}
+            ).forEach(
+                ([name, value]) => {
+                    setWalkInFormValue(
+                        name,
+                        value
+                    );
+                }
+            );
 
-        selectedPatientBox?.setAttribute(
-            "hidden",
-            "hidden"
-        );
+            Object.entries(
+                data.medical || {}
+            ).forEach(
+                ([name, value]) => {
+                    setWalkInFormValue(
+                        name,
+                        value
+                    );
+                }
+            );
 
-        document
-            .querySelectorAll(
-                ".patient-record-card"
-            )
-            .forEach(card => {
-                card.classList.remove(
-                    "is-selected"
+            const selectedDiseaseCodes =
+                new Set(
+                    data.diseases || []
                 );
 
-                const checkbox =
-                    card.querySelector(
-                        ".patient-card-checkbox"
+            document
+                .querySelectorAll(
+                    'input[name="diseases[]"]'
+                )
+                .forEach(input => {
+                    input.checked =
+                        selectedDiseaseCodes.has(
+                            input.value
+                        );
+                });
+
+            syncMedicalExamBox();
+
+            [{
+                    name: "good_health",
+                    boxId: "good_health_box",
+                    showOn: "NO",
+                },
+                {
+                    name: "under_treatment",
+                    boxId: "treatment_box",
+                    showOn: "YES",
+                },
+                {
+                    name: "hospitalized",
+                    boxId: "hospital_box",
+                    showOn: "YES",
+                },
+                {
+                    name: "medication",
+                    boxId: "medication_box",
+                    showOn: "YES",
+                },
+            ].forEach(({
+                name,
+                boxId,
+                showOn,
+            }) => {
+                const selected =
+                    document.querySelector(
+                        `input[name="${name}"]:checked`
                     );
 
-                if (checkbox) {
-                    checkbox.checked = false;
+                const box =
+                    document.getElementById(
+                        boxId
+                    );
+
+                if (!box) {
+                    return;
                 }
+
+                box.classList.toggle(
+                    "hidden",
+                    selected?.value !== showOn
+                );
             });
 
-        if (clearSearch && patientSearch) {
-            patientSearch.value = "";
+            const tobacco =
+                document.querySelector(
+                    'input[name="tobacco_use"]:checked'
+                );
 
-            window.syncInputClearButton?.(
-                patientSearch
+            document
+                .getElementById(
+                    "tobacco_details"
+                )
+                ?.classList.toggle(
+                    "hidden",
+                    tobacco?.value !== "YES"
+                );
+
+            updateWomenSection(
+                selectedWalkInPatient?.gender
             );
-        }
 
-        window.clearGlobalGroupError?.(
-            document.querySelector(
-                "[data-walkin-patient-group]"
-            ),
-            "walkin-patient"
-        );
+            if (
+                selectedWalkInPatient &&
+                data.contact
+            ) {
+                selectedWalkInPatient.email =
+                    data.contact.email ||
+                    selectedWalkInPatient.email ||
+                    "";
 
-        if (reloadPatients) {
-            patientCurrentPage = 1;
+                selectedWalkInPatient.phone =
+                    data.contact.phone ||
+                    selectedWalkInPatient.phone ||
+                    "";
 
-            loadPatients("", true);
-        }
-
-        if (markDirty) {
-            markFormDirty();
-        }
-    }
-
-    clearSelectedPatientBtn
-        ?.addEventListener(
-            "click",
-            () => {
-                clearSelectedPatientUI({
-                    clearSearch: true,
-                    reloadPatients: true,
-                });
-
-                patientSearch?.focus();
+                selectedWalkInPatient.address =
+                    data.contact.address || "";
             }
-        );
-
-    function setPatientMode(mode, shouldClearSelected = false) {
-        const normalizedMode = mode === "guest" ? "guest" : "existing";
-        const isGuest = normalizedMode === "guest";
-
-        if (patientModeInput) {
-            patientModeInput.value = normalizedMode;
         }
 
-        accountTabs.forEach(item => {
-            item.classList.toggle("active", item.dataset.tab === normalizedMode);
-        });
-
-        existingPanel?.classList.toggle("active", !isGuest);
-        guestPanel?.classList.toggle("active", isGuest);
-
-        setGuestFieldsEnabled(isGuest);
-
-        if (isGuest && shouldClearSelected) {
-            clearSelectedPatientUI({
-                clearSearch: false,
-                reloadPatients: false,
-            });
-        }
-
-        if (!isGuest) {
-            [guestName, guestEmail, guestPhone].forEach(input => {
-                if (input) input.value = "";
-            });
-        }
-    }
-
-    function selectWalkInPatient(patient) {
-        selectedWalkInPatient = {
-            ...patient,
-            mode: "existing",
-        };
-
-        updateWomenSection(
-            patient.gender
-        );
-
-        setPatientMode("existing", false);
-
-        if (selectedPatientId) {
-            selectedPatientId.value = patient.id;
-        }
-
-        if (selectedPatientName) {
-            selectedPatientName.textContent = patient.name || "Unnamed Patient";
-        }
-
-        if (selectedPatientMeta) {
-            selectedPatientMeta.textContent =
-                `${patient.type || "Patient"}${patient.email ? " - " + patient.email : ""}`;
-        }
-
-        selectedPatientBox?.removeAttribute("hidden");
-
-        [guestName, guestEmail, guestPhone].forEach(input => {
-            if (input) input.value = "";
-        });
-
-        markFormDirty();
-
-        window.clearGlobalGroupError?.(
-            document.querySelector(
-                "[data-walkin-patient-group]"
-            ),
-            "walkin-patient"
-        );
-
-        requestAnimationFrame(() => {
-            selectedPatientBox?.scrollIntoView({
-                behavior: "smooth",
-                block: "center",
-            });
-        });
-    }
-
-    function selectGuestPatient(shouldProceed = true) {
-        const name = guestName?.value?.trim() || "";
-        const email = guestEmail?.value?.trim() || "";
-        const phone = guestPhone?.value?.trim() || "";
-
-        if (!name) {
-            window.validateFormInputField?.(
-                guestName
-            );
-
-            window.focusGlobalInvalidField?.(
-                guestName
-            );
-            return false;
-        }
-
-        window.clearFormInputValidation?.(guestName);
-
-        selectedWalkInPatient = {
-            id: null,
-            mode: "guest",
-            name,
-            email,
-            phone,
-            type: "Guest Patient",
-        };
-
-        updateWomenSection(null);
-
-        if (selectedPatientId) {
-            selectedPatientId.value = "";
-        }
-
-        if (patientModeInput) {
-            patientModeInput.value = "guest";
-        }
-
-        if (selectedPatientName) {
-            selectedPatientName.textContent = name;
-        }
-
-        if (selectedPatientMeta) {
-            const metaParts = ["Guest Patient", email, phone].filter(Boolean);
-            selectedPatientMeta.textContent = metaParts.join(" - ");
-        }
-
-        selectedPatientBox?.removeAttribute("hidden");
-        markFormDirty();
-
-        if (shouldProceed) {
-            showMiniTab("Guest patient details saved.");
-        }
-
-        return true;
-    }
-
-    async function createGuestPatientOnServer() {
-        if (!selectGuestPatient(false)) {
-            return false;
-        }
-
-        const token = document.querySelector('input[name="_token"]')?.value || "";
-        const payload = new FormData();
-        payload.append("guest_name", guestName?.value?.trim() || "");
-        payload.append("guest_email", guestEmail?.value?.trim() || "");
-        payload.append("guest_phone", guestPhone?.value?.trim() || "");
-
-        if (createGuestBtn) {
-            createGuestBtn.disabled = true;
-            createGuestBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Creating guest account`;
-        }
-
-        try {
-            const response = await fetch(`{{ route('dentist.walk-in.guest.store') }}`, {
-                method: "POST",
-                headers: {
-                    "Accept": "application/json",
-                    "X-Requested-With": "XMLHttpRequest",
-                    "X-CSRF-TOKEN": token,
-                },
-                body: payload,
-            });
-
-            const data = await response.json().catch(() => ({}));
-
-            if (!response.ok || !data?.success || !data?.patient?.id) {
-                throw new Error(data?.message || "Unable to create guest patient.");
+        async function loadPatientBookingInformation(
+            patientId
+        ) {
+            if (!patientId) {
+                return null;
             }
 
+            try {
+                const url =
+                    `{{ url('/dentist/walk-in/patients') }}/${patientId}/booking-information`;
+
+                const response =
+                    await fetch(url, {
+                        headers: {
+                            Accept: "application/json",
+
+                            "X-Requested-With": "XMLHttpRequest",
+                        },
+                    });
+
+                const data =
+                    await response
+                    .json()
+                    .catch(
+                        () => ({})
+                    );
+
+                if (
+                    !response.ok ||
+                    !data?.success
+                ) {
+                    throw new Error(
+                        data?.message ||
+                        "Unable to load the patient's saved information."
+                    );
+                }
+
+                selectedPatientBookingInformation =
+                    data;
+
+                patientHasExistingBookingInformation =
+                    Boolean(
+                        data.has_existing_booking_information
+                    );
+
+                patientHasReusableSignature =
+                    Boolean(
+                        data.has_reusable_signature
+                    );
+
+                applyExistingPatientBookingInformation(
+                    data
+                );
+
+                return data;
+            } catch (error) {
+                console.error(
+                    "Walk-in history loading error:",
+                    error
+                );
+
+                selectedPatientBookingInformation =
+                    null;
+
+                patientHasExistingBookingInformation =
+                    false;
+
+                patientHasReusableSignature =
+                    false;
+
+                showMiniTab(
+                    error.message ||
+                    "Unable to load saved patient information."
+                );
+
+                return null;
+            }
+        }
+
+        async function selectWalkInPatient(patient) {
             selectedWalkInPatient = {
-                ...data.patient,
-                mode: "guest",
-                type: data.patient.type || "Guest",
+                ...patient,
+                mode: "existing",
             };
 
             updateWomenSection(
-                data.patient.gender
+                patient.gender
             );
 
+            setPatientMode("existing", false);
+
             if (selectedPatientId) {
-                selectedPatientId.value = data.patient.id;
+                selectedPatientId.value = patient.id;
             }
 
             if (selectedPatientName) {
-                selectedPatientName.textContent = data.patient.name || guestName?.value?.trim() || "Guest Patient";
+                selectedPatientName.textContent = patient.name || "Unnamed Patient";
+            }
+
+            if (selectedPatientMeta) {
+                selectedPatientMeta.textContent =
+                    `${patient.type || "Patient"}${patient.email ? " - " + patient.email : ""}`;
+            }
+
+            selectedPatientBox?.removeAttribute("hidden");
+            [
+                guestFirstName,
+                guestMiddleName,
+                guestLastName,
+                guestEmail,
+                guestPhone,
+                guestGender,
+                guestBirthdate,
+                guestProgram,
+                guestFaculty,
+                guestYearLevel,
+                guestSection,
+            ].forEach(input => {
+                if (input) {
+                    input.value = "";
+                }
+            });
+
+            guestPwdRadios.forEach(radio => {
+                radio.checked = false;
+            });
+
+            markFormDirty();
+
+            window.clearGlobalGroupError?.(
+                document.querySelector(
+                    "[data-walkin-patient-group]"
+                ),
+                "walkin-patient"
+            );
+
+            requestAnimationFrame(() => {
+                selectedPatientBox?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                });
+            });
+
+            await loadPatientBookingInformation(
+                patient.id
+            );
+
+            if (
+                patientHasExistingBookingInformation
+            ) {
+                showMiniTab(
+                    "Existing patient information loaded. The saved dental and medical history will be reused."
+                );
+            }
+
+        }
+
+        function selectGuestPatient(shouldProceed = true) {
+            const firstName =
+                guestFirstName?.value?.trim() || "";
+
+            const middleName =
+                guestMiddleName?.value?.trim() || "";
+
+            const lastName =
+                guestLastName?.value?.trim() || "";
+
+            const name = [
+                    firstName,
+                    middleName,
+                    lastName,
+                ]
+                .filter(Boolean)
+                .join(" ");
+
+            const email =
+                guestEmail?.value?.trim() || "";
+
+            const phone =
+                guestPhone?.value?.trim() || "";
+
+            const gender =
+                guestGender?.value || "";
+
+            const birthdate =
+                guestBirthdate?.value || "";
+
+            const program =
+                guestProgram?.value?.trim() || "";
+
+            const faculty =
+                guestFaculty?.value?.trim() || "";
+
+            const yearLevel =
+                guestYearLevel?.value?.trim() || "";
+
+            const section =
+                guestSection?.value?.trim() || "";
+
+            const pwdValue =
+                document.querySelector(
+                    'input[name="guest_is_pwd"]:checked'
+                )?.value;
+
+            if (!firstName) {
+                window.validateFormInputField?.(
+                    guestFirstName
+                );
+
+                window.focusGlobalInvalidField?.(
+                    guestFirstName
+                );
+
+                return false;
+            }
+
+            if (!lastName) {
+                window.validateFormInputField?.(
+                    guestLastName
+                );
+
+                window.focusGlobalInvalidField?.(
+                    guestLastName
+                );
+
+                return false;
+            }
+
+            if (!email) {
+                window.validateFormInputField?.(
+                    guestEmail
+                );
+
+                window.focusGlobalInvalidField?.(
+                    guestEmail
+                );
+
+                return false;
+            }
+
+            if (!phone) {
+                window.validateFormInputField?.(
+                    guestPhone
+                );
+
+                window.focusGlobalInvalidField?.(
+                    guestPhone
+                );
+
+                return false;
+            }
+
+            if (!gender) {
+                window.validateFormInputField?.(
+                    guestGender
+                );
+
+                window.focusGlobalInvalidField?.(
+                    guestGender
+                );
+
+                return false;
+            }
+
+            if (!birthdate) {
+                window.validateFormInputField?.(
+                    guestBirthdate
+                );
+
+                window.focusGlobalInvalidField?.(
+                    guestBirthdate
+                );
+
+                return false;
+            }
+
+            if (pwdValue === undefined) {
+                showMiniTab(
+                    "Please indicate whether the patient is PWD."
+                );
+
+                guestPwdRadios[0]?.focus();
+
+                return false;
+            }
+
+            window.clearFormInputValidation?.(
+                guestFirstName
+            );
+
+            window.clearFormInputValidation?.(
+                guestLastName
+            );
+
+            window.clearFormInputValidation?.(
+                guestEmail
+            );
+
+            window.clearFormInputValidation?.(
+                guestPhone
+            );
+
+            window.clearFormInputValidation?.(
+                guestGender
+            );
+
+            window.clearFormInputValidation?.(
+                guestBirthdate
+            );
+
+            selectedWalkInPatient = {
+                id: null,
+                mode: "guest",
+
+                name,
+                email,
+                phone,
+                gender,
+                birthdate,
+
+                program,
+                faculty_code: faculty,
+                year_level: yearLevel,
+                section,
+
+                is_pwd: pwdValue === "1",
+
+                type: "Guest Patient",
+            };
+
+            updateWomenSection(
+                gender
+            );
+
+            if (selectedPatientId) {
+                selectedPatientId.value = "";
+            }
+
+            if (patientModeInput) {
+                patientModeInput.value = "guest";
+            }
+
+            if (selectedPatientName) {
+                selectedPatientName.textContent =
+                    name;
             }
 
             if (selectedPatientMeta) {
                 const metaParts = [
-                    data.patient.type || "Guest",
-                    data.patient.email || guestEmail?.value?.trim(),
-                    guestPhone?.value?.trim(),
+                    "Guest Patient",
+                    gender,
+                    program,
+                    email,
+                    phone,
                 ].filter(Boolean);
-                selectedPatientMeta.textContent = metaParts.join(" - ");
+
+                selectedPatientMeta.textContent =
+                    metaParts.join(" - ");
             }
 
-            selectedPatientBox?.removeAttribute("hidden");
-            showMiniTab("Guest account created.");
+            selectedPatientBox
+                ?.removeAttribute(
+                    "hidden"
+                );
+
             markFormDirty();
+
+            if (shouldProceed) {
+                showMiniTab(
+                    "Guest patient details saved."
+                );
+            }
+
             return true;
-        } catch (error) {
-            showMiniTab(error.message || "Unable to create guest account. Please try again.");
-            return false;
-        } finally {
-            if (createGuestBtn) {
-                createGuestBtn.disabled = false;
-                createGuestBtn.innerHTML = `<i class="fa-solid fa-user-plus"></i> Create guest account`;
-            }
         }
-    }
 
-    setPatientMode("existing");
+        async function createGuestPatientOnServer() {
+            if (!selectGuestPatient(false)) {
+                return false;
+            }
 
-    accountTabs.forEach(tab => {
-        tab.addEventListener("click", function () {
-            setPatientMode(this.dataset.tab, true);
-            markFormDirty();
-        });
-    });
-
-    createGuestBtn?.addEventListener("click", () => {
-        setPatientMode("guest", false);
-        createGuestPatientOnServer();
-    });
-
-    let patientCurrentPage = 1;
-    let patientPageSize = 10;
-
-    let patientPaginationMeta = {
-        currentPage: 1,
-        lastPage: 1,
-        total: 0,
-        from: null,
-        to: null,
-    };
-
-    const patientEntriesInfo =
-        document.getElementById(
-            'patientEntriesInfo'
-        );
-
-    const patientEntriesInfoBottom =
-        document.getElementById(
-            'patientEntriesInfoBottom'
-        );
-
-    const patientPaginationTopBar =
-        document.getElementById(
-            'patientPaginationTopBar'
-        );
-
-    const patientPaginationTop =
-        document.getElementById(
-            'patientPaginationTop'
-        );
-
-    const patientPaginationBar =
-        document.getElementById(
-            'patientPaginationBar'
-        );
-
-    const patientPagination =
-        document.getElementById(
-            'patientPagination'
-        );
-
-    function buildWalkInPatientSkeletons(
-        count = patientPageSize
-    ) {
-        const skeletonCount =
-            Math.min(
-                Math.max(
-                    Number(count) || 10,
-                    4
-                ),
-                12
+            const token = document.querySelector('input[name="_token"]')?.value || "";
+            const payload = new FormData();
+            payload.append(
+                "guest_name",
+                [
+                    guestFirstName?.value?.trim(),
+                    guestMiddleName?.value?.trim(),
+                    guestLastName?.value?.trim(),
+                ]
+                .filter(Boolean)
+                .join(" ")
+            );
+            payload.append(
+                "guest_first_name",
+                guestFirstName?.value?.trim() || ""
             );
 
-        const cards =
-            Array
+            payload.append(
+                "guest_middle_name",
+                guestMiddleName?.value?.trim() || ""
+            );
+
+            payload.append(
+                "guest_last_name",
+                guestLastName?.value?.trim() || ""
+            );
+            payload.append("guest_email", guestEmail?.value?.trim() || "");
+            payload.append("guest_phone", guestPhone?.value?.trim() || "");
+            payload.append(
+                "guest_gender",
+                guestGender?.value || ""
+            );
+
+            payload.append(
+                "guest_birthdate",
+                guestBirthdate?.value || ""
+            );
+
+            payload.append(
+                "guest_program",
+                guestProgram?.value?.trim() || ""
+            );
+
+            payload.append(
+                "guest_faculty",
+                guestFaculty?.value?.trim() || ""
+            );
+
+            payload.append(
+                "guest_year_level",
+                guestYearLevel?.value?.trim() || ""
+            );
+
+            payload.append(
+                "guest_section",
+                guestSection?.value?.trim() || ""
+            );
+
+            payload.append(
+                "guest_is_pwd",
+                document.querySelector(
+                    'input[name="guest_is_pwd"]:checked'
+                )?.value ?? ""
+            );
+
+            if (createGuestBtn) {
+                createGuestBtn.disabled = true;
+                createGuestBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Creating guest account`;
+            }
+
+            try {
+                const response = await fetch(`{{ route('dentist.walk-in.guest.store') }}`, {
+                    method: "POST",
+                    headers: {
+                        "Accept": "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRF-TOKEN": token,
+                    },
+                    body: payload,
+                });
+
+                const data = await response.json().catch(() => ({}));
+
+                if (!response.ok || !data?.success || !data?.patient?.id) {
+                    throw new Error(data?.message || "Unable to create guest patient.");
+                }
+
+                selectedWalkInPatient = {
+                    ...data.patient,
+                    mode: "guest",
+                    type: data.patient.type || "Guest",
+                };
+
+                updateWomenSection(
+                    data.patient.gender
+                );
+
+                if (selectedPatientId) {
+                    selectedPatientId.value = data.patient.id;
+                }
+
+                if (selectedPatientName) {
+                    selectedPatientName.textContent =
+                        data.patient.name || [
+                            guestFirstName?.value?.trim(),
+                            guestMiddleName?.value?.trim(),
+                            guestLastName?.value?.trim(),
+                        ]
+                        .filter(Boolean)
+                        .join(" ") ||
+                        "Guest Patient";
+                }
+
+                if (selectedPatientMeta) {
+                    const metaParts = [
+                        data.patient.type || "Guest",
+                        data.patient.email || guestEmail?.value?.trim(),
+                        guestPhone?.value?.trim(),
+                    ].filter(Boolean);
+                    selectedPatientMeta.textContent = metaParts.join(" - ");
+                }
+
+                selectedPatientBox?.removeAttribute("hidden");
+                showMiniTab("Guest account created.");
+                markFormDirty();
+                return true;
+            } catch (error) {
+                showMiniTab(error.message || "Unable to create guest account. Please try again.");
+                return false;
+            } finally {
+                if (createGuestBtn) {
+                    createGuestBtn.disabled = false;
+                    createGuestBtn.innerHTML = `<i class="fa-solid fa-user-plus"></i> Create guest account`;
+                }
+            }
+        }
+
+        accountTabs.forEach(tab => {
+            tab.addEventListener("click", function() {
+                setPatientMode(this.dataset.tab, true);
+                markFormDirty();
+            });
+        });
+
+        createGuestBtn?.addEventListener("click", () => {
+            setPatientMode("guest", false);
+            createGuestPatientOnServer();
+        });
+
+        let patientCurrentPage = 1;
+        let patientPageSize = 10;
+
+        let patientPaginationMeta = {
+            currentPage: 1,
+            lastPage: 1,
+            total: 0,
+            from: null,
+            to: null,
+        };
+
+        const patientEntriesInfo =
+            document.getElementById(
+                'patientEntriesInfo'
+            );
+
+        const patientEntriesInfoBottom =
+            document.getElementById(
+                'patientEntriesInfoBottom'
+            );
+
+        const patientPaginationTopBar =
+            document.getElementById(
+                'patientPaginationTopBar'
+            );
+
+        const patientPaginationTop =
+            document.getElementById(
+                'patientPaginationTop'
+            );
+
+        const patientPaginationBar =
+            document.getElementById(
+                'patientPaginationBar'
+            );
+
+        const patientPagination =
+            document.getElementById(
+                'patientPagination'
+            );
+
+        function buildWalkInPatientSkeletons(
+            count = patientPageSize
+        ) {
+            const skeletonCount =
+                Math.min(
+                    Math.max(
+                        Number(count) || 10,
+                        4
+                    ),
+                    12
+                );
+
+            const cards =
+                Array
                 .from({
-                    length: skeletonCount
-                },
+                        length: skeletonCount
+                    },
                     () => `
                     <div
                         class="
@@ -973,7 +1807,7 @@
                 )
                 .join('');
 
-        return `
+            return `
     <div
         class="
             table-record-grid
@@ -984,158 +1818,158 @@
             ${cards}
         </div>
     `;
-    }
-
-    function renderWalkInPatientSkeletons() {
-        if (!patientResults) {
-            return;
         }
 
-        window.EmptyState?.hide(
-            patientResults
-        );
+        function renderWalkInPatientSkeletons() {
+            if (!patientResults) {
+                return;
+            }
 
-        patientResults.innerHTML =
-            buildWalkInPatientSkeletons();
-    }
+            window.EmptyState?.hide(
+                patientResults
+            );
 
-    function safePatientText(value) {
-        return String(value ?? "")
-            .replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll('"', "&quot;")
-            .replaceAll("'", "&#039;");
-    }
+            patientResults.innerHTML =
+                buildWalkInPatientSkeletons();
+        }
 
-    function renderPatientPagination() {
-        window.renderGlobalPagination?.({
-            ...patientPaginationMeta,
+        function safePatientText(value) {
+            return String(value ?? "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
 
-            containers: [
-                patientPaginationTop,
-                patientPagination,
-            ],
+        function renderPatientPagination() {
+            window.renderGlobalPagination?.({
+                ...patientPaginationMeta,
 
-            bars: [
-                patientPaginationTopBar,
-                patientPaginationBar,
-            ],
+                containers: [
+                    patientPaginationTop,
+                    patientPagination,
+                ],
 
-            infoElements: [
-                patientEntriesInfo,
-                patientEntriesInfoBottom,
-            ],
+                bars: [
+                    patientPaginationTopBar,
+                    patientPaginationBar,
+                ],
 
-            itemLabel: 'patients',
+                infoElements: [
+                    patientEntriesInfo,
+                    patientEntriesInfoBottom,
+                ],
 
-            onPageChange(page) {
-                patientCurrentPage =
-                    page;
+                itemLabel: 'patients',
 
-                const query =
-                    patientSearch
+                onPageChange(page) {
+                    patientCurrentPage =
+                        page;
+
+                    const query =
+                        patientSearch
                         ?.value
                         .trim() || '';
 
-                loadPatients(
-                    query,
-                    query === ''
+                    loadPatients(
+                        query,
+                        query === ''
+                    );
+
+                    patientResults
+                        ?.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                        });
+                },
+            });
+        }
+
+        function createPatientCard(patient) {
+            const card =
+                document.createElement(
+                    'div'
                 );
 
-                patientResults
-                    ?.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start',
-                    });
-            },
-        });
-    }
-
-    function createPatientCard(patient) {
-        const card =
-            document.createElement(
-                'div'
+            card.setAttribute(
+                'role',
+                'button'
             );
 
-        card.setAttribute(
-            'role',
-            'button'
-        );
+            card.setAttribute(
+                'tabindex',
+                '0'
+            );
 
-        card.setAttribute(
-            'tabindex',
-            '0'
-        );
+            card.setAttribute(
+                'aria-pressed',
+                'false'
+            );
 
-        card.setAttribute(
-            'aria-pressed',
-            'false'
-        );
+            card.className = [
+                'card',
+                'table-record-card',
+                'patient-record-card',
+            ].join(' ');
 
-        card.className = [
-            'card',
-            'table-record-card',
-            'patient-record-card',
-        ].join(' ');
+            card.dataset.patientId =
+                patient.id;
 
-        card.dataset.patientId =
-            patient.id;
+            const patientName =
+                patient.name ||
+                'Unnamed Patient';
 
-        const patientName =
-            patient.name ||
-            'Unnamed Patient';
+            const patientType =
+                patient.type ||
+                'Patient';
 
-        const patientType =
-            patient.type ||
-            'Patient';
-
-        const roleClass =
-            window.PatientUI
+            const roleClass =
+                window.PatientUI
                 ?.getRoleClass(
                     patientType
                 ) ||
-            'role-none';
+                'role-none';
 
-        const patientEmail =
-            patient.email || '';
+            const patientEmail =
+                patient.email || '';
 
-        const studentNumber =
-            patient.student_number || '';
+            const studentNumber =
+                patient.student_number || '';
 
-        const program =
-            patient.program || '';
+            const program =
+                patient.program || '';
 
-        const avatarUrl =
-            window.PatientUI
+            const avatarUrl =
+                window.PatientUI
                 ?.safeUrl(
                     patient.avatar_url
                 ) || '';
 
-        card.innerHTML = `
+            card.innerHTML = `
         <span class="patient-avatar patient-avatar-md">
     ${avatarUrl
                 ? `
-                                        <img
-                                            src="${safePatientText(
-                    avatarUrl
-                )}"
-                                            alt="${safePatientText(
-                    patientName
-                )}"
-                                            loading="lazy"
-                                        >
-                                    `
+                                                                                                                                                                                                                                                                                                <img
+                                                                                                                                                                                                                                                                                                    src="${safePatientText(
+                                                                                                                                                                                                                                                                            avatarUrl
+                                                                                                                                                                                                                                                                        )}"
+                                                                                                                                                                                                                                                                                                    alt="${safePatientText(
+                                                                                                                                                                                                                                                                            patientName
+                                                                                                                                                                                                                                                                        )}"
+                                                                                                                                                                                                                                                                                                    loading="lazy"
+                                                                                                                                                                                                                                                                                                >
+                                                                                                                                                                                                                                                                                            `
                 : `
-                                        <span>
-                                            ${safePatientText(
-                    window.PatientUI
-                        ?.getInitials(
-                            patientName
-                        ) || 'P'
-                )}
-                                        </span>
-                                    `
+                                                                                                                                                                                                                                                                                                <span>
+                                                                                                                                                                                                                                                                                                    ${safePatientText(
+                                                                                                                                                                                                                                                                            window.PatientUI
+                                                                                                                                                                                                                                                                                ?.getInitials(
+                                                                                                                                                                                                                                                                                    patientName
+                                                                                                                                                                                                                                                                                ) || 'P'
+                                                                                                                                                                                                                                                                        )}
+                                                                                                                                                                                                                                                                                                </span>
+                                                                                                                                                                                                                                                                                            `
             }
 </span>
 
@@ -1155,37 +1989,37 @@
             <span class="patient-card-meta">
                 ${studentNumber
                 ? `
-                                                        <span>
-                                                            <i class="fa-solid fa-id-card"></i>
-                                                            ${safePatientText(
-                    studentNumber
-                )}
-                                                        </span>
-                                                    `
+                                                                                                                                                                                                                                                                                                                <span>
+                                                                                                                                                                                                                                                                                                                    <i class="fa-solid fa-id-card"></i>
+                                                                                                                                                                                                                                                                                                                    ${safePatientText(
+                                                                                                                                                                                                                                                                            studentNumber
+                                                                                                                                                                                                                                                                        )}
+                                                                                                                                                                                                                                                                                                                </span>
+                                                                                                                                                                                                                                                                                                            `
                 : ''
             }
 
                 ${program
                 ? `
-                                                        <span>
-                                                            <i class="fa-solid fa-graduation-cap"></i>
-                                                            ${safePatientText(
-                    program
-                )}
-                                                        </span>
-                                                    `
+                                                                                                                                                                                                                                                                                                                <span>
+                                                                                                                                                                                                                                                                                                                    <i class="fa-solid fa-graduation-cap"></i>
+                                                                                                                                                                                                                                                                                                                    ${safePatientText(
+                                                                                                                                                                                                                                                                            program
+                                                                                                                                                                                                                                                                        )}
+                                                                                                                                                                                                                                                                                                                </span>
+                                                                                                                                                                                                                                                                                                            `
                 : ''
             }
 
                 ${patientEmail
                 ? `
-                                                        <span>
-                                                            <i class="fa-solid fa-envelope"></i>
-                                                            ${safePatientText(
-                    patientEmail
-                )}
-                                                        </span>
-                                                    `
+                                                                                                                                                                                                                                                                                                                <span>
+                                                                                                                                                                                                                                                                                                                    <i class="fa-solid fa-envelope"></i>
+                                                                                                                                                                                                                                                                                                                    ${safePatientText(
+                                                                                                                                                                                                                                                                            patientEmail
+                                                                                                                                                                                                                                                                        )}
+                                                                                                                                                                                                                                                                                                                </span>
+                                                                                                                                                                                                                                                                                                            `
                 : ''
             }
             </span>
@@ -1202,666 +2036,708 @@
 </label>
     `;
 
-        const patientCheckbox =
-            card.querySelector(
-                '.patient-card-checkbox'
-            );
+            const patientCheckbox =
+                card.querySelector(
+                    '.patient-card-checkbox'
+                );
 
-        if (
-            String(selectedPatientId?.value) ===
-            String(patient.id)
-        ) {
-            card.classList.add(
-                'is-selected'
-            );
-
-            if (patientCheckbox) {
-                patientCheckbox.checked = true;
-            }
-        }
-
-        function isThisPatientSelected() {
-            return (
-                String(
-                    selectedPatientId?.value || ''
-                ) ===
-                String(
-                    patient.id || ''
-                )
-            );
-        }
-
-        function syncCardSelectionState(
-            selected
-        ) {
-            card.classList.toggle(
-                'is-selected',
-                selected
-            );
-
-            card.setAttribute(
-                'aria-pressed',
-                selected ?
-                    'true' :
-                    'false'
-            );
-
-            if (patientCheckbox) {
-                patientCheckbox.checked =
-                    selected;
-            }
-        }
-
-        function clearOtherPatientCards() {
-            document
-                .querySelectorAll(
-                    '.patient-record-card'
-                )
-                .forEach(item => {
-                    if (item === card) {
-                        return;
-                    }
-
-                    item.classList.remove(
-                        'is-selected'
-                    );
-
-                    item.setAttribute(
-                        'aria-pressed',
-                        'false'
-                    );
-
-                    const checkbox =
-                        item.querySelector(
-                            '.patient-card-checkbox'
-                        );
-
-                    if (checkbox) {
-                        checkbox.checked = false;
-                    }
-                });
-        }
-
-        function selectThisPatient() {
-            clearOtherPatientCards();
-
-            selectWalkInPatient(
-                patient
-            );
-
-            syncCardSelectionState(
-                true
-            );
-        }
-
-        function unselectThisPatient() {
-            clearSelectedPatientUI({
-                clearSearch: false,
-                reloadPatients: false,
-            });
-
-            syncCardSelectionState(
-                false
-            );
-        }
-
-        function togglePatientSelection() {
             if (
-                isThisPatientSelected()
+                String(selectedPatientId?.value) ===
+                String(patient.id)
             ) {
-                unselectThisPatient();
-                return;
+                card.classList.add(
+                    'is-selected'
+                );
+
+                if (patientCheckbox) {
+                    patientCheckbox.checked = true;
+                }
             }
 
-            selectThisPatient();
-        }
-
-        syncCardSelectionState(
-            isThisPatientSelected()
-        );
-
-        card.addEventListener('click', event => {
-            if (event.target.closest('.patient-card-checkbox-wrap')) {
-                return;
-            }
-            togglePatientSelection();
-        });
-
-        card.addEventListener('keydown', event => {
-            if (event.key !== 'Enter' && event.key !== ' ') {
-                return;
-            }
-            event.preventDefault();
-            togglePatientSelection();
-        });
-
-        patientCheckbox?.addEventListener('click', event => {
-            event.stopPropagation();
-            event.preventDefault();
-            togglePatientSelection();
-        });
-        return card;
-    }
-
-    function renderPatients(responseData) {
-        const patients =
-            Array.isArray(responseData) ?
-                responseData :
-                Array.isArray(responseData?.data) ?
-                    responseData.data : [];
-
-        const isPaginatedResponse = !Array.isArray(responseData);
-
-        patientPaginationMeta = {
-            currentPage: isPaginatedResponse ?
-                Number(responseData?.current_page) || 1 : 1,
-
-            lastPage: isPaginatedResponse ?
-                Number(responseData?.last_page) || 1 : 1,
-
-            total: isPaginatedResponse ?
-                Number(responseData?.total) || patients.length : patients.length,
-
-            from: isPaginatedResponse ?
-                responseData?.from ?? null : patients.length ?
-                    1 : null,
-
-            to: isPaginatedResponse ?
-                responseData?.to ?? null : patients.length,
-        };
-
-        patientCurrentPage =
-            patientPaginationMeta.currentPage;
-
-        if (!patients.length) {
-            const query =
-                patientSearch
-                    ?.value
-                    .trim() || '';
-
-            patientResults.innerHTML = '';
-
-            if (query) {
-                window.EmptyState?.renderSearch({
-                    host: patientResults,
-
-                    input: patientSearch,
-
-                    query,
-
-                    title: 'No patient record found',
-
-                    message: 'Try another name, ID, or email address.',
-                });
-            } else {
-                window.EmptyState?.render({
-                    host: patientResults,
-
-                    icon: 'fa-user-slash',
-
-                    title: 'No patient records found',
-
-                    message: 'There are currently no patient records available.',
-                });
-            }
-
-            renderPatientPagination();
-
-            return;
-        }
-
-        window.EmptyState?.hide(patientResults);
-
-        const grid = document.createElement('div');
-        grid.className = 'table-record-grid patient-record-grid';
-
-        patients.forEach(patient => {
-            grid.appendChild(createPatientCard(patient));
-        });
-
-        patientResults.replaceChildren(grid);
-        renderPatientPagination();
-    }
-
-    window.handleWalkInPatientPerPageChange =
-        function (value) {
-            const allowed = [
-                10,
-                20,
-                50,
-                100,
-            ];
-
-            const requested =
-                Number(value);
-
-            patientPageSize =
-                allowed.includes(
-                    requested
-                ) ?
-                    requested :
-                    10;
-
-            patientCurrentPage = 1;
-
-            const query =
-                patientSearch
-                    ?.value
-                    .trim() || '';
-
-            loadPatients(
-                query,
-                query === ''
-            );
-        };
-
-    let patientSearchRequestId = 0;
-
-    async function loadPatients(query = "", showAll = false) {
-        if (!patientResults) return;
-
-        const requestId = ++patientSearchRequestId;
-        renderWalkInPatientSkeletons();
-
-        try {
-            const params = new URLSearchParams();
-
-            if (query) {
-                params.set("q", query);
-            }
-
-            if (showAll) {
-                params.set("show_all", "1");
-            }
-
-            params.set(
-                'page',
-                String(patientCurrentPage)
-            );
-
-            params.set(
-                'per_page',
-                String(patientPageSize)
-            );
-
-            const response = await fetch(`{{ route('dentist.walk-in.search-patient') }}?${params.toString()}`, {
-                headers: {
-                    "Accept": "application/json",
-                    "X-Requested-With": "XMLHttpRequest",
-                },
-            });
-
-            const responseData =
-                await response.json().catch(() => ({}));
-
-            if (!response.ok) {
-                throw new Error(
-                    responseData?.debug ||
-                    responseData?.message ||
-                    `Patient search failed. Status: ${response.status}`
+            function isThisPatientSelected() {
+                return (
+                    String(
+                        selectedPatientId?.value || ''
+                    ) ===
+                    String(
+                        patient.id || ''
+                    )
                 );
             }
 
-            if (
-                requestId !==
-                patientSearchRequestId
+            function syncCardSelectionState(
+                selected
             ) {
-                return;
+                card.classList.toggle(
+                    'is-selected',
+                    selected
+                );
+
+                card.setAttribute(
+                    'aria-pressed',
+                    selected ?
+                    'true' :
+                    'false'
+                );
+
+                if (patientCheckbox) {
+                    patientCheckbox.checked =
+                        selected;
+                }
             }
 
-            renderPatients(responseData);
+            function clearOtherPatientCards() {
+                document
+                    .querySelectorAll(
+                        '.patient-record-card'
+                    )
+                    .forEach(item => {
+                        if (item === card) {
+                            return;
+                        }
 
-        } catch (error) {
-            if (
-                requestId !==
-                patientSearchRequestId
-            ) {
-                return;
+                        item.classList.remove(
+                            'is-selected'
+                        );
+
+                        item.setAttribute(
+                            'aria-pressed',
+                            'false'
+                        );
+
+                        const checkbox =
+                            item.querySelector(
+                                '.patient-card-checkbox'
+                            );
+
+                        if (checkbox) {
+                            checkbox.checked = false;
+                        }
+                    });
             }
 
-            console.error(
-                'Walk-in patient loading error:',
-                error
-            );
+            function selectThisPatient() {
+                clearOtherPatientCards();
 
-            patientResults.innerHTML = '';
+                selectWalkInPatient(
+                    patient
+                );
 
-            window.EmptyState?.render({
-                host: patientResults,
+                syncCardSelectionState(
+                    true
+                );
+            }
 
-                icon: 'fa-triangle-exclamation',
-
-                title: 'Unable to load patient records',
-
-                message: error.message ||
-                    'Check your connection, then try again.',
-            });
-        }
-    }
-
-    function loadInitialPatientRecords() {
-        if (
-            !patientResults ||
-            patientResults.dataset
-                .initialPatientsLoaded === "true"
-        ) {
-            return;
-        }
-
-        patientResults.dataset
-            .initialPatientsLoaded = "true";
-
-        loadPatients("", true);
-    }
-
-    window.handleWalkInPatientSearch =
-        function (value) {
-            patientCurrentPage = 1;
-
-            const query =
-                String(value || '')
-                    .trim();
-
-            loadPatients(
-                query,
-                query === ''
-            );
-        };
-
-    function hasSavedDraft() {
-        const raw = localStorage.getItem(DRAFT_KEY);
-        if (!raw) return false;
-
-        try {
-            const parsed = JSON.parse(raw);
-            const values = Object.entries(parsed).filter(([key, value]) => {
-                if (key === "__meta") return false;
-                if (value === null || value === undefined) return false;
-                return String(value).trim() !== "";
-            });
-
-            return values.length >= 2;
-        } catch {
-            return false;
-        }
-    }
-
-    function saveDraftData() {
-        const form = document.getElementById("appointmentForm");
-        if (!form) return;
-        const data = new FormData(form),
-            obj = {};
-        for (const [key, value] of data.entries()) {
-            if (key === "patient_signature") continue;
-            if (obj[key] === undefined) obj[key] = value;
-            else if (Array.isArray(obj[key])) obj[key].push(value);
-            else obj[key] = [obj[key], value];
-        }
-
-        const draftFields = Object.keys(obj).filter(key => key !== "__meta");
-
-        if (!draftFields.length) {
-            clearDraft();
-            return;
-        }
-
-        obj.__meta = {
-            step: bookingWorkflow
-                ?.getCurrentStep?.() ?? 0,
-
-            savedAt: new Date().toISOString(),
-
-            fieldCount: draftFields.length
-        };
-
-        localStorage.setItem(DRAFT_KEY, JSON.stringify(obj));
-    }
-
-    function clearDraft() {
-        localStorage.removeItem(DRAFT_KEY);
-    }
-
-    document.querySelectorAll('input[name="service_type"]').forEach(radio => {
-        radio.addEventListener("change", markFormDirty);
-    });
-
-    async function restoreDraft() {
-        const raw = localStorage.getItem(DRAFT_KEY);
-        if (!raw) return;
-        let obj;
-        try {
-            obj = JSON.parse(raw);
-        } catch {
-            return;
-        }
-        const form = document.getElementById("appointmentForm");
-        if (!form) return;
-        Object.keys(obj).forEach((name) => {
-            if (name === "__meta") return;
-            const value = obj[name];
-            if (Array.isArray(value)) {
-                form.querySelectorAll(`[name="${CSS.escape(name)}"]`).forEach((el) => {
-                    if (el.type === "checkbox") el.checked = value.includes(el.value);
+            function unselectThisPatient() {
+                clearSelectedPatientUI({
+                    clearSearch: false,
+                    reloadPatients: false,
                 });
-                return;
+
+                syncCardSelectionState(
+                    false
+                );
             }
-            form.querySelectorAll(`[name="${CSS.escape(name)}"]`).forEach((el) => {
-                if (el.type === "radio") el.checked = (el.value === value);
-                else if (el.type === "checkbox") el.checked = (value === true || value === "on" ||
-                    value === el.value);
-                else el.value = value;
-            });
-        });
 
-        const relationSelect =
-            document.getElementById("emergency_relation");
-
-        const relationWrapper =
-            relationSelect?.closest(".custom-select");
-
-        if (relationWrapper) {
-            window.syncCustomSelect?.(relationWrapper);
-        }
-
-        const restoredMode = patientModeInput?.value || "existing";
-        setPatientMode(restoredMode, false);
-
-        if (restoredMode === "guest" && guestName?.value?.trim()) {
-            selectGuestPatient(false);
-        }
-
-        if (restoredMode !== "guest") {
-            updateWomenSection(
-                selectedWalkInPatient?.gender
-            );
-        }
-
-        formIsDirty = true;
-    }
-
-    const summarySection =
-        document.getElementById(
-            'summarySection'
-        );
-
-    const confirmationSection =
-        document.getElementById(
-            'confirmationSection'
-        );
-
-    let bookingWorkflow = null;
-
-    let step5ConfirmationActive =
-        false;
-
-    function showStep5Review() {
-        step5ConfirmationActive =
-            false;
-
-        summarySection
-            ?.classList.remove(
-                'hidden'
-            );
-
-        confirmationSection
-            ?.classList.add(
-                'hidden'
-            );
-
-        bookingWorkflow
-            ?.setNextButton({
-                label: 'Confirm Appointment',
-
-                icon: 'fa-chevron-right',
-            });
-    }
-
-
-    function showStep5Confirmation() {
-        step5ConfirmationActive =
-            true;
-
-        summarySection
-            ?.classList.add(
-                'hidden'
-            );
-
-        confirmationSection
-            ?.classList.remove(
-                'hidden'
-            );
-
-        bookingWorkflow
-            ?.setNextButton({
-                label: 'Start Procedure',
-
-                icon: 'fa-play',
-
-                iconPosition: 'left',
-            });
-
-        confirmationSection
-            ?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-            });
-    }
-
-
-    function resetStep5View() {
-        showStep5Review();
-    }
-
-    function scrollToInvalidTarget(target) {
-        if (!target) return;
-
-        const block =
-            target.closest('.grid') ||
-            target.closest('.ml-6') ||
-            target.closest('.booking-section-card') ||
-            target.closest('.voice-input-wrap') ||
-            target.closest('.date-input-wrap') ||
-            target;
-
-        block.scrollIntoView({
-            behavior: "smooth",
-            block: "center"
-        });
-
-        if (typeof target.focus === "function" && !target.hasAttribute("readonly")) {
-            setTimeout(() => target.focus(), 250);
-        }
-    }
-
-    function validateCurrentWalkInStep(stepElement) {
-        if (!stepElement) {
-            return {
-                valid: true,
-                firstInvalid: null,
-            };
-        }
-
-        const fields = Array.from(
-            stepElement.querySelectorAll(
-                [
-                    "input:not([type='hidden'])",
-                    "select",
-                    "textarea",
-                ].join(",")
-            )
-        ).filter(field => {
-            return (
-                !field.disabled &&
-                field.type !== "button" &&
-                field.type !== "submit"
-            );
-        });
-
-        const checkedGroups = new Set();
-        let firstInvalid = null;
-
-        fields.forEach(field => {
-            if (field.type === "radio") {
-                if (checkedGroups.has(field.name)) {
+            function togglePatientSelection() {
+                if (
+                    isThisPatientSelected()
+                ) {
+                    unselectThisPatient();
                     return;
                 }
 
-                checkedGroups.add(field.name);
+                selectThisPatient();
             }
 
-            const valid =
-                window.validateFormInputField?.(field) ??
-                field.checkValidity();
-
-            if (!valid && !firstInvalid) {
-                firstInvalid = field;
-            }
-        });
-
-        if (firstInvalid) {
-            window.focusGlobalInvalidField?.(
-                firstInvalid
+            syncCardSelectionState(
+                isThisPatientSelected()
             );
+
+            card.addEventListener('click', event => {
+                if (event.target.closest('.patient-card-checkbox-wrap')) {
+                    return;
+                }
+                togglePatientSelection();
+            });
+
+            card.addEventListener('keydown', event => {
+                if (event.key !== 'Enter' && event.key !== ' ') {
+                    return;
+                }
+                event.preventDefault();
+                togglePatientSelection();
+            });
+
+            patientCheckbox?.addEventListener('click', event => {
+                event.stopPropagation();
+                event.preventDefault();
+                togglePatientSelection();
+            });
+            return card;
         }
 
-        return {
-            valid: !firstInvalid,
-            firstInvalid,
-        };
-    }
+        function renderPatients(responseData) {
+            const patients =
+                Array.isArray(responseData) ?
+                responseData :
+                Array.isArray(responseData?.data) ?
+                responseData.data : [];
 
-    function isStepComplete(s) {
-        const stepEl =
-            bookingWorkflow
-                ?.getPanels()
-            ?.[s];
+            const isPaginatedResponse = !Array.isArray(responseData);
 
-        if (!stepEl) {
-            return true;
-        }
+            patientPaginationMeta = {
+                currentPage: isPaginatedResponse ?
+                    Number(responseData?.current_page) || 1 : 1,
 
-        if (s === 0) {
-            const mode = patientModeInput?.value || "existing";
-            const selectedPatientInput = document.getElementById("selectedPatientId");
+                lastPage: isPaginatedResponse ?
+                    Number(responseData?.last_page) || 1 : 1,
 
-            if (mode === "guest") {
-                if (!guestName?.value?.trim()) {
-                    window.validateFormInputField?.(
-                        guestName
-                    );
+                total: isPaginatedResponse ?
+                    Number(responseData?.total) || patients.length : patients.length,
 
-                    window.focusGlobalInvalidField?.(
-                        guestName
-                    );
+                from: isPaginatedResponse ?
+                    responseData?.from ?? null : patients.length ?
+                    1 : null,
 
-                    return false;
+                to: isPaginatedResponse ?
+                    responseData?.to ?? null : patients.length,
+            };
+
+            patientCurrentPage =
+                patientPaginationMeta.currentPage;
+
+            if (!patients.length) {
+                const query =
+                    patientSearch
+                    ?.value
+                    .trim() || '';
+
+                patientResults.innerHTML = '';
+
+                if (query) {
+                    window.EmptyState?.renderSearch({
+                        host: patientResults,
+
+                        input: patientSearch,
+
+                        query,
+
+                        title: 'No patient record found',
+
+                        message: 'Try another name, ID, or email address.',
+                    });
+                } else {
+                    window.EmptyState?.render({
+                        host: patientResults,
+
+                        icon: 'fa-user-slash',
+
+                        title: 'No patient records found',
+
+                        message: 'There are currently no patient records available.',
+                    });
                 }
 
-                if (!selectedPatientInput?.value) {
+                renderPatientPagination();
+
+                return;
+            }
+
+            window.EmptyState?.hide(patientResults);
+
+            const grid = document.createElement('div');
+            grid.className = 'table-record-grid patient-record-grid';
+
+            patients.forEach(patient => {
+                grid.appendChild(createPatientCard(patient));
+            });
+
+            patientResults.replaceChildren(grid);
+            renderPatientPagination();
+        }
+
+        window.handleWalkInPatientPerPageChange =
+            function(value) {
+                const allowed = [
+                    10,
+                    20,
+                    50,
+                    100,
+                ];
+
+                const requested =
+                    Number(value);
+
+                patientPageSize =
+                    allowed.includes(
+                        requested
+                    ) ?
+                    requested :
+                    10;
+
+                patientCurrentPage = 1;
+
+                const query =
+                    patientSearch
+                    ?.value
+                    .trim() || '';
+
+                loadPatients(
+                    query,
+                    query === ''
+                );
+            };
+
+        let patientSearchRequestId = 0;
+
+        async function loadPatients(query = "", showAll = false) {
+            if (!patientResults) return;
+
+            const requestId = ++patientSearchRequestId;
+            renderWalkInPatientSkeletons();
+
+            try {
+                const params = new URLSearchParams();
+
+                if (query) {
+                    params.set("q", query);
+                }
+
+                if (showAll) {
+                    params.set("show_all", "1");
+                }
+
+                params.set(
+                    'page',
+                    String(patientCurrentPage)
+                );
+
+                params.set(
+                    'per_page',
+                    String(patientPageSize)
+                );
+
+                const response = await fetch(`{{ route('dentist.walk-in.search-patient') }}?${params.toString()}`, {
+                    headers: {
+                        "Accept": "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                });
+
+                const responseData =
+                    await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    throw new Error(
+                        responseData?.debug ||
+                        responseData?.message ||
+                        `Patient search failed. Status: ${response.status}`
+                    );
+                }
+
+                if (
+                    requestId !==
+                    patientSearchRequestId
+                ) {
+                    return;
+                }
+
+                renderPatients(responseData);
+
+            } catch (error) {
+                if (
+                    requestId !==
+                    patientSearchRequestId
+                ) {
+                    return;
+                }
+
+                console.error(
+                    'Walk-in patient loading error:',
+                    error
+                );
+
+                patientResults.innerHTML = '';
+
+                window.EmptyState?.render({
+                    host: patientResults,
+
+                    icon: 'fa-triangle-exclamation',
+
+                    title: 'Unable to load patient records',
+
+                    message: error.message ||
+                        'Check your connection, then try again.',
+                });
+            }
+        }
+
+        function loadInitialPatientRecords() {
+            if (
+                !patientResults ||
+                patientResults.dataset
+                .initialPatientsLoaded === "true"
+            ) {
+                return;
+            }
+
+            patientResults.dataset
+                .initialPatientsLoaded = "true";
+
+            loadPatients("", true);
+        }
+
+        window.handleWalkInPatientSearch =
+            function(value) {
+                patientCurrentPage = 1;
+
+                const query =
+                    String(value || '')
+                    .trim();
+
+                loadPatients(
+                    query,
+                    query === ''
+                );
+            };
+
+        function hasSavedDraft() {
+            const raw = localStorage.getItem(DRAFT_KEY);
+            if (!raw) return false;
+
+            try {
+                const parsed = JSON.parse(raw);
+                const values = Object.entries(parsed).filter(([key, value]) => {
+                    if (key === "__meta") return false;
+                    if (value === null || value === undefined) return false;
+                    return String(value).trim() !== "";
+                });
+
+                return values.length >= 2;
+            } catch {
+                return false;
+            }
+        }
+
+        function saveDraftData() {
+            const form = document.getElementById("appointmentForm");
+            if (!form) return;
+            const data = new FormData(form),
+                obj = {};
+            for (const [key, value] of data.entries()) {
+                if (key === "patient_signature") continue;
+                if (obj[key] === undefined) obj[key] = value;
+                else if (Array.isArray(obj[key])) obj[key].push(value);
+                else obj[key] = [obj[key], value];
+            }
+
+            const draftFields = Object.keys(obj).filter(key => key !== "__meta");
+
+            if (!draftFields.length) {
+                clearDraft();
+                return;
+            }
+
+            obj.__meta = {
+                step: bookingWorkflow
+                    ?.getCurrentStep?.() ?? 0,
+
+                savedAt: new Date().toISOString(),
+
+                fieldCount: draftFields.length
+            };
+
+            localStorage.setItem(DRAFT_KEY, JSON.stringify(obj));
+        }
+
+        function clearDraft() {
+            localStorage.removeItem(DRAFT_KEY);
+        }
+
+        document.querySelectorAll('input[name="service_type"]').forEach(radio => {
+            radio.addEventListener("change", markFormDirty);
+        });
+
+        async function restoreDraft() {
+            const raw = localStorage.getItem(DRAFT_KEY);
+            if (!raw) return;
+            let obj;
+            try {
+                obj = JSON.parse(raw);
+            } catch {
+                return;
+            }
+            const form = document.getElementById("appointmentForm");
+            if (!form) return;
+            Object.keys(obj).forEach((name) => {
+                if (name === "__meta") return;
+                const value = obj[name];
+                if (Array.isArray(value)) {
+                    form.querySelectorAll(`[name="${CSS.escape(name)}"]`).forEach((el) => {
+                        if (el.type === "checkbox") el.checked = value.includes(el.value);
+                    });
+                    return;
+                }
+                form.querySelectorAll(`[name="${CSS.escape(name)}"]`).forEach((el) => {
+                    if (el.type === "radio") el.checked = (el.value === value);
+                    else if (el.type === "checkbox") el.checked = (value === true || value === "on" ||
+                        value === el.value);
+                    else el.value = value;
+                });
+            });
+
+            const relationSelect =
+                document.getElementById("emergency_relation");
+
+            const relationWrapper =
+                relationSelect?.closest(".custom-select");
+
+            if (relationWrapper) {
+                window.syncCustomSelect?.(relationWrapper);
+            }
+
+            const restoredMode = patientModeInput?.value || "existing";
+            setPatientMode(restoredMode, false);
+
+            if (
+                restoredMode === "guest" &&
+                guestFirstName?.value?.trim() &&
+                guestLastName?.value?.trim()
+            ) {
+                selectGuestPatient(false);
+            }
+
+            if (restoredMode !== "guest") {
+                updateWomenSection(
+                    selectedWalkInPatient?.gender
+                );
+            }
+
+            formIsDirty = true;
+        }
+
+        const summarySection =
+            document.getElementById(
+                'summarySection'
+            );
+
+        const confirmationSection =
+            document.getElementById(
+                'confirmationSection'
+            );
+
+        let bookingWorkflow = null;
+
+        let step5ConfirmationActive =
+            false;
+
+        let editingHistoryFromReview =
+            null;
+
+        function showStep5Review() {
+            step5ConfirmationActive =
+                false;
+
+            summarySection
+                ?.classList.remove(
+                    'hidden'
+                );
+
+            confirmationSection
+                ?.classList.add(
+                    'hidden'
+                );
+
+            bookingWorkflow
+                ?.setNextButton({
+                    label: 'Confirm Appointment',
+
+                    icon: 'fa-chevron-right',
+                });
+        }
+
+
+        function showStep5Confirmation() {
+            step5ConfirmationActive =
+                true;
+
+            summarySection
+                ?.classList.add(
+                    'hidden'
+                );
+
+            confirmationSection
+                ?.classList.remove(
+                    'hidden'
+                );
+
+            bookingWorkflow
+                ?.setNextButton({
+                    label: 'Start Procedure',
+
+                    icon: 'fa-play',
+
+                    iconPosition: 'left',
+                });
+
+            confirmationSection
+                ?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                });
+        }
+
+
+        function resetStep5View() {
+            showStep5Review();
+        }
+
+        function scrollToInvalidTarget(target) {
+            if (!target) return;
+
+            const block =
+                target.closest('.grid') ||
+                target.closest('.ml-6') ||
+                target.closest('.booking-section-card') ||
+                target.closest('.voice-input-wrap') ||
+                target.closest('.date-input-wrap') ||
+                target;
+
+            block.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+            if (typeof target.focus === "function" && !target.hasAttribute("readonly")) {
+                setTimeout(() => target.focus(), 250);
+            }
+        }
+
+        function validateCurrentWalkInStep(stepElement) {
+            if (!stepElement) {
+                return {
+                    valid: true,
+                    firstInvalid: null,
+                };
+            }
+
+            const fields = Array.from(
+                stepElement.querySelectorAll(
+                    [
+                        "input:not([type='hidden'])",
+                        "select",
+                        "textarea",
+                    ].join(",")
+                )
+            ).filter(field => {
+                return (
+                    !field.disabled &&
+                    field.type !== "button" &&
+                    field.type !== "submit"
+                );
+            });
+
+            const checkedGroups = new Set();
+            let firstInvalid = null;
+
+            fields.forEach(field => {
+                if (field.type === "radio") {
+                    if (checkedGroups.has(field.name)) {
+                        return;
+                    }
+
+                    checkedGroups.add(field.name);
+                }
+
+                const valid =
+                    window.validateFormInputField?.(field) ??
+                    field.checkValidity();
+
+                if (!valid && !firstInvalid) {
+                    firstInvalid = field;
+                }
+            });
+
+            if (firstInvalid) {
+                window.focusGlobalInvalidField?.(
+                    firstInvalid
+                );
+            }
+
+            return {
+                valid: !firstInvalid,
+                firstInvalid,
+            };
+        }
+
+        function isStepComplete(s) {
+            const stepEl =
+                bookingWorkflow
+                ?.getPanels()
+                ?.[s];
+
+            if (!stepEl) {
+                return true;
+            }
+
+            if (s === 0) {
+                const mode = patientModeInput?.value || "existing";
+                const selectedPatientInput = document.getElementById("selectedPatientId");
+
+                if (mode === "guest") {
+                    if (!guestFirstName?.value?.trim()) {
+                        window.validateFormInputField?.(
+                            guestFirstName
+                        );
+
+                        window.focusGlobalInvalidField?.(
+                            guestFirstName
+                        );
+
+                        return false;
+                    }
+
+                    if (!guestLastName?.value?.trim()) {
+                        window.validateFormInputField?.(
+                            guestLastName
+                        );
+
+                        window.focusGlobalInvalidField?.(
+                            guestLastName
+                        );
+
+                        return false;
+                    }
+
+                    if (!selectedPatientInput?.value) {
+                        window.showGlobalGroupError?.(
+                            walkInPatientGroup,
+                            'walkin-patient',
+                            'Please create the guest account before proceeding.'
+                        );
+
+                        walkInPatientGroup
+                            ?.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'center',
+                            });
+
+                        return false;
+                    }
+
+                    window.clearGlobalGroupError?.(
+                        walkInPatientGroup,
+                        'walkin-patient'
+                    );
+
+                } else if (
+                    !selectedPatientInput?.value
+                ) {
                     window.showGlobalGroupError?.(
                         walkInPatientGroup,
                         'walkin-patient',
-                        'Please create the guest account before proceeding.'
+                        'Please select an existing patient or use Guest Onboarding.'
                     );
 
                     walkInPatientGroup
@@ -1877,270 +2753,443 @@
                     walkInPatientGroup,
                     'walkin-patient'
                 );
+            }
 
-            } else if (
-                !selectedPatientInput?.value
-            ) {
-                window.showGlobalGroupError?.(
-                    walkInPatientGroup,
-                    'walkin-patient',
-                    'Please select an existing patient or use Guest Onboarding.'
-                );
+            if (s === 1) {
+                const serviceGroup =
+                    stepEl.querySelector(
+                        ".service-step-grid"
+                    );
 
-                walkInPatientGroup
-                    ?.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center',
+                const selectedService =
+                    serviceGroup?.querySelector(
+                        'input[name="service_type"]:checked'
+                    );
+
+                if (!selectedService) {
+                    window.showGlobalGroupError?.(
+                        serviceGroup,
+                        "service_type",
+                        "Please select a dental service."
+                    );
+
+                    serviceGroup?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center",
                     });
 
-                return false;
-            }
+                    return false;
+                }
 
-            window.clearGlobalGroupError?.(
-                walkInPatientGroup,
-                'walkin-patient'
-            );
-        }
-
-        if (s === 1) {
-            const serviceGroup =
-                stepEl.querySelector(
-                    ".service-step-grid"
-                );
-
-            const selectedService =
-                serviceGroup?.querySelector(
-                    'input[name="service_type"]:checked'
-                );
-
-            if (!selectedService) {
-                window.showGlobalGroupError?.(
+                window.clearGlobalGroupError?.(
                     serviceGroup,
-                    "service_type",
-                    "Please select a dental service."
+                    "service_type"
                 );
+            }
 
-                serviceGroup?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center",
-                });
+            const validation =
+                validateCurrentWalkInStep(stepEl);
 
+            if (!validation.valid) {
                 return false;
             }
 
-            window.clearGlobalGroupError?.(
-                serviceGroup,
-                "service_type"
-            );
-        }
-
-        const validation =
-            validateCurrentWalkInStep(stepEl);
-
-        if (!validation.valid) {
-            return false;
-        }
-
-        if (s === 3) {
-            const signature =
-                window.BookingSignature
+            if (
+                s === 3 &&
+                !patientHasReusableSignature
+            ) {
+                const signature =
+                    window.BookingSignature
                     ?.get(
                         stepEl
                     );
 
-            if (
-                signature &&
-                !signature.validate()
-            ) {
-                stepEl
-                    .querySelector(
-                        '[data-booking-signature]'
-                    )
-                    ?.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center',
-                    });
+                if (
+                    signature &&
+                    !signature.validate()
+                ) {
+                    stepEl
+                        .querySelector(
+                            '[data-booking-signature]'
+                        )
+                        ?.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center',
+                        });
 
-                return false;
+                    return false;
+                }
             }
+
+            return true;
         }
 
-        return true;
-    }
+        function initWalkInWorkflow() {
+            if (
+                bookingWorkflow ||
+                !window.BookingWorkflow
+            ) {
+                return;
+            }
 
-    function initWalkInWorkflow() {
-        if (
-            bookingWorkflow ||
-            !window.BookingWorkflow
-        ) {
-            return;
-        }
+            bookingWorkflow =
+                window.BookingWorkflow.create({
+                    panels: '#appointmentForm .step-content',
 
-        bookingWorkflow =
-            window.BookingWorkflow.create({
-                panels: '#appointmentForm > .step-content',
+                    progressFill: '#headerProgressFill',
 
-                progressFill: '#headerProgressFill',
+                    counter: '#stepCounterText',
 
-                counter: '#stepCounterText',
+                    navContainer: '#navBtns',
 
-                navContainer: '#navBtns',
+                    previousButton: '#prevBtn',
 
-                previousButton: '#prevBtn',
+                    nextButton: '#nextBtn',
 
-                nextButton: '#nextBtn',
+                    hideNavigationOnLast: false,
 
-                hideNavigationOnLast: false,
+                    beforePrevious: currentStep => {
+                        if (
+                            currentStep === 4 &&
+                            step5ConfirmationActive
+                        ) {
+                            showStep5Review();
 
-                beforeNext: currentStep => {
-                    return isStepComplete(
-                        currentStep
-                    );
-                },
+                            return false;
+                        }
 
-                beforePrevious: currentStep => {
-                    if (
-                        currentStep === 4 &&
-                        step5ConfirmationActive
-                    ) {
-                        showStep5Review();
+                        if (
+                            patientHasExistingBookingInformation &&
+                            currentStep === 4 &&
+                            !editingHistoryFromReview
+                        ) {
+                            bookingWorkflow.goTo(1);
 
-                        return false;
-                    }
+                            return false;
+                        }
 
-                    return true;
-                },
+                        if (
+                            editingHistoryFromReview ===
+                            'dental' &&
+                            currentStep === 2
+                        ) {
+                            editingHistoryFromReview =
+                                null;
 
-                onLastStep: () => {
-                    buildSummary();
-                    showStep5Review();
-                },
+                            bookingWorkflow.goTo(4);
 
-                onLastStepNext: () => {
-                    if (
-                        !step5ConfirmationActive
-                    ) {
-                        showStep5Confirmation();
+                            return false;
+                        }
+
+                        if (
+                            editingHistoryFromReview ===
+                            'medical' &&
+                            currentStep === 3
+                        ) {
+                            editingHistoryFromReview =
+                                null;
+
+                            bookingWorkflow.goTo(4);
+
+                            return false;
+                        }
 
                         return true;
-                    }
+                    },
 
-                    if (
-                        !finalConfirm ||
-                        !finalConfirm.checked
-                    ) {
-                        showMiniTab(
-                            'Please confirm before starting the procedure.'
+                    beforeNext: currentStep => {
+
+                        if (
+                            !isStepComplete(
+                                currentStep
+                            )
+                        ) {
+                            return false;
+                        }
+
+                        if (
+                            patientHasExistingBookingInformation &&
+                            currentStep === 1 &&
+                            !editingHistoryFromReview
+                        ) {
+                            bookingWorkflow.markComplete(1);
+                            bookingWorkflow.markComplete(2);
+                            bookingWorkflow.markComplete(3);
+
+                            bookingWorkflow.goTo(4);
+
+                            return false;
+                        }
+
+                        if (
+                            editingHistoryFromReview ===
+                            'dental' &&
+                            currentStep === 2
+                        ) {
+                            bookingWorkflow.markComplete(2);
+
+                            editingHistoryFromReview =
+                                null;
+
+                            bookingWorkflow.goTo(4);
+
+                            return false;
+                        }
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | AFTER EDITING MEDICAL
+                        | MEDICAL -> REVIEW
+                        |--------------------------------------------------------------------------
+                        */
+
+                        if (
+                            editingHistoryFromReview ===
+                            'medical' &&
+                            currentStep === 3
+                        ) {
+                            bookingWorkflow.markComplete(3);
+
+                            editingHistoryFromReview =
+                                null;
+
+                            bookingWorkflow.goTo(4);
+
+                            return false;
+                        }
+
+                        return true;
+                    },
+
+                    onLastStep: () => {
+                        buildSummary();
+                        showStep5Review();
+                    },
+
+                    onLastStepNext: () => {
+                        if (
+                            !step5ConfirmationActive
+                        ) {
+                            showStep5Confirmation();
+
+                            return true;
+                        }
+
+                        if (
+                            !finalConfirm ||
+                            !finalConfirm.checked
+                        ) {
+                            showMiniTab(
+                                'Please confirm before starting the procedure.'
+                            );
+
+                            finalConfirm?.focus();
+
+                            return false;
+                        }
+
+                        submitWalkInAppointment();
+
+                        return true;
+                    },
+
+                    onStepChange: currentStep => {
+                        if (
+                            currentStep !== 3
+                        ) {
+                            return;
+                        }
+
+                        setTimeout(
+                            () => {
+                                window
+                                    .BookingSignature
+                                    ?.get(
+                                        document
+                                    )
+                                    ?.resize();
+                            },
+                            120
                         );
-
-                        finalConfirm?.focus();
-
-                        return false;
-                    }
-
-                    submitWalkInAppointment();
-
-                    return true;
-                },
-
-                onStepChange: currentStep => {
-                    if (
-                        currentStep !== 3
-                    ) {
-                        return;
-                    }
-
-                    setTimeout(
-                        () => {
-                            window
-                                .BookingSignature
-                                ?.get(
-                                    document
-                                )
-                                ?.resize();
-                        },
-                        120
-                    );
-                },
-            });
-    }
-
-    if (
-        document.readyState ===
-        'loading'
-    ) {
-        document.addEventListener(
-            'DOMContentLoaded',
-            initWalkInWorkflow, {
-            once: true
+                    },
+                });
         }
-        );
-    } else {
-        initWalkInWorkflow();
-    }
 
-    function setupCharLimit(inputId, counterId, max = 150, warningId = null) {
-        const input = document.getElementById(inputId);
-        const counter = document.getElementById(counterId);
-        const warning = warningId ? document.getElementById(warningId) : null;
+        if (
+            document.readyState ===
+            'loading'
+        ) {
+            document.addEventListener(
+                'DOMContentLoaded',
+                initWalkInWorkflow, {
+                    once: true
+                }
+            );
+        } else {
+            initWalkInWorkflow();
+        }
 
-        if (!input || !counter) return;
+        function setupCharLimit(inputId, counterId, max = 150, warningId = null) {
+            const input = document.getElementById(inputId);
+            const counter = document.getElementById(counterId);
+            const warning = warningId ? document.getElementById(warningId) : null;
 
-        function updateUI() {
-            let length = input.value.length;
+            if (!input || !counter) return;
 
-            if (length > max) {
-                input.value = input.value.slice(0, max);
-                length = max;
+            function updateUI() {
+                let length = input.value.length;
+
+                if (length > max) {
+                    input.value = input.value.slice(0, max);
+                    length = max;
+                }
+
+                counter.textContent = `${length}/${max}`;
+
+                counter.classList.remove("text-red-600", "text-yellow-500");
+                input.classList.remove("border-red-500", "ring-1", "ring-red-400");
+
+                if (warning) warning.classList.add("hidden");
+
+                if (length >= max) {
+                    counter.classList.add("text-red-600");
+                    input.classList.add("border-red-500", "ring-1", "ring-red-400");
+                    if (warning) warning.classList.remove("hidden");
+                } else if (length >= max - 10) {
+                    counter.classList.add("text-yellow-500");
+                }
             }
 
-            counter.textContent = `${length}/${max}`;
+            input.addEventListener("input", updateUI);
 
-            counter.classList.remove("text-red-600", "text-yellow-500");
-            input.classList.remove("border-red-500", "ring-1", "ring-red-400");
+            updateUI();
+        }
 
-            if (warning) warning.classList.add("hidden");
-
-            if (length >= max) {
-                counter.classList.add("text-red-600");
-                input.classList.add("border-red-500", "ring-1", "ring-red-400");
-                if (warning) warning.classList.remove("hidden");
-            } else if (length >= max - 10) {
-                counter.classList.add("text-yellow-500");
+        window.addEventListener("beforeunload", (e) => {
+            if (formIsDirty && !formSubmitting) {
+                e.preventDefault();
+                e.returnValue = "";
             }
+        });
+
+        function markFormDirty() {
+            formIsDirty = true;
         }
 
-        input.addEventListener("input", updateUI);
+        function editDentalHistoryFromReview() {
+            if (!bookingWorkflow) {
+                return;
+            }
 
-        updateUI();
-    }
+            editingHistoryFromReview =
+                'dental';
 
-    window.addEventListener("beforeunload", (e) => {
-        if (formIsDirty && !formSubmitting) {
-            e.preventDefault();
-            e.returnValue = "";
+            resetStep5View();
+
+            bookingWorkflow.goTo(2);
         }
-    });
 
-    function markFormDirty() {
-        formIsDirty = true;
-    }
+        function editMedicalHistoryFromReview() {
+            if (!bookingWorkflow) {
+                return;
+            }
 
-    function buildSummary() {
-        const form = document.getElementById("appointmentForm");
-        if (!form) return;
+            editingHistoryFromReview =
+                'medical';
 
-        const data = new FormData(form);
-        const get = n => data.get(n) || "N/A";
-        const getAll = n => data.getAll(n);
+            resetStep5View();
 
-        const emergencyRelation = data.get("emergency_relation") || "N/A";
+            bookingWorkflow.goTo(3);
 
-        const sigFile = data.get("patient_signature");
-        let sigHTML = `<span class="text-[#9e9690] italic">Not uploaded</span>`;
-        if (sigFile && sigFile.size > 0) {
-            const url = URL.createObjectURL(sigFile);
-            sigHTML = `
+            setTimeout(() => {
+                window.BookingSignature
+                    ?.get(document)
+                    ?.resize();
+            }, 120);
+        }
+
+        function formatPatientDate(value) {
+            if (!value) {
+                return "N/A";
+            }
+
+            const rawValue =
+                String(value).trim();
+
+            let date;
+
+            if (/^\d{4}-\d{2}-\d{2}$/.test(rawValue)) {
+                const [
+                    year,
+                    month,
+                    day
+                ] = rawValue
+                    .split("-")
+                    .map(Number);
+
+                date = new Date(
+                    year,
+                    month - 1,
+                    day
+                );
+            } else {
+                date = new Date(rawValue);
+            }
+
+            if (
+                Number.isNaN(
+                    date.getTime()
+                )
+            ) {
+                return rawValue;
+            }
+
+            return new Intl.DateTimeFormat(
+                "en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                }
+            ).format(date);
+        }
+
+        function buildSummary() {
+            const form = document.getElementById("appointmentForm");
+            if (!form) return;
+
+            const data = new FormData(form);
+            const get = n => data.get(n) || "N/A";
+            const getAll = n => data.getAll(n);
+
+            const emergencyRelation = data.get("emergency_relation") || "N/A";
+
+            const sigFile =
+                data.get(
+                    "patient_signature"
+                );
+
+            let sigHTML =
+                patientHasReusableSignature ?
+                `
+            <div class="booking-summary-saved-info">
+                <p class="font-semibold">
+                    <i class="fa-solid fa-circle-check mr-1"></i>
+                    Existing signature on file
+                </p>
+
+                <p class="booking-summary-muted mt-1">
+                    The patient's previously saved signature will be reused.
+                </p>
+            </div>
+        ` :
+                `
+            <span class="booking-summary-muted">
+                Not provided
+            </span>
+        `;
+            if (sigFile && sigFile.size > 0) {
+                const url = URL.createObjectURL(sigFile);
+                sigHTML = `
     <div class="booking-signature-summary">
 
         <div class="booking-signature-summary-file">
@@ -2175,23 +3224,23 @@
 
     </div>
 `;
-        }
+            }
 
-        const row = (
-            label,
-            value
-        ) => {
-            const resolvedValue =
-                value &&
-                    String(value).trim() !== ''
-                    ? value
-                    : `
+            const row = (
+                label,
+                value
+            ) => {
+                const resolvedValue =
+                    value &&
+                    String(value).trim() !== '' ?
+                    value :
+                    `
                 <span class="booking-summary-muted">
                     N/A
                 </span>
             `;
 
-            return `
+                return `
         <p class="booking-summary-row">
             <span class="booking-summary-row-label">
                 ${label}:
@@ -2200,21 +3249,21 @@
             ${resolvedValue}
         </p>
     `;
-        };
+            };
 
-        const optionalRow = (
-            label,
-            value
-        ) => {
-            if (
-                !value ||
-                String(value).trim() === '' ||
-                value === 'N/A'
-            ) {
-                return '';
-            }
+            const optionalRow = (
+                label,
+                value
+            ) => {
+                if (
+                    !value ||
+                    String(value).trim() === '' ||
+                    value === 'N/A'
+                ) {
+                    return '';
+                }
 
-            return `
+                return `
         <p class="booking-summary-row">
             <span class="booking-summary-row-label">
                 ${label}:
@@ -2223,21 +3272,57 @@
             ${value}
         </p>
     `;
-        };
+            };
 
-        const summaryCard = (
-            title,
-            icon,
-            body
-        ) => `
+            const summaryCard = (
+                title,
+                icon,
+                body,
+                editAction = null
+            ) => `
     <section class="booking-summary-card">
 
-        <div class="booking-summary-card-header">
-            <i class="fa-solid ${icon}"></i>
+        <div
+            class="
+                booking-summary-card-header
+                flex
+                items-center
+                justify-between
+                gap-4
+                w-full
+            "
+        >
 
-            <span>
-                ${title}
-            </span>
+            <div class="flex items-center gap-2 min-w-0">
+
+                <i class="fa-solid ${icon}"></i>
+
+                <span>
+                    ${title}
+                </span>
+
+            </div>
+
+            ${
+                editAction
+                    ? `
+                            <button
+                                type="button"
+                                class="
+                                    ui-btn
+                                    ui-btn-secondary
+                                    ui-btn-sm
+                                    flex-shrink-0
+                                "
+                                onclick="${editAction}"
+                            >
+                                <i class="fa-solid fa-pen"></i>
+                                <span>Edit</span>
+                            </button>
+                        `
+                    : ''
+            }
+
         </div>
 
         <div class="booking-summary-card-body">
@@ -2246,11 +3331,10 @@
 
     </section>
 `;
-
-        const subSection = (
-            title,
-            body
-        ) => `
+            const subSection = (
+                title,
+                body
+            ) => `
     <section class="booking-summary-section">
 
         <div class="booking-summary-section-title">
@@ -2276,10 +3360,10 @@
     </section>
 `;
 
-        const fullWidthSection = (
-            title,
-            body
-        ) => `
+            const fullWidthSection = (
+                title,
+                body
+            ) => `
     <section class="booking-summary-section">
 
         <div class="booking-summary-section-title">
@@ -2292,128 +3376,192 @@
 
     </section>
 `;
-        const diseases =
-            getAll(
-                'diseases[]'
-            );
+            const diseases =
+                getAll(
+                    'diseases[]'
+                );
 
 
-        const diseaseLabels =
-            diseases.map(
-                code =>
-                    diseaseLabelByCode?.[code]
-                    ?? code
-            );
+            const diseaseLabels =
+                diseases.map(
+                    code =>
+                    diseaseLabelByCode?.[code] ??
+                    code
+                );
 
 
-        const diseaseTags =
-            diseaseLabels.length
-                ? `
+            const diseaseTags =
+                diseaseLabels.length ?
+                `
             <div class="booking-summary-tag-list">
                 ${diseaseLabels
                     .map(
                         label => `
-                            <span class="booking-summary-tag">
-                                ${label}
-                            </span>
-                        `
+                                                                                                                                                                                                                                                                                    <span class="booking-summary-tag">
+                                                                                                                                                                                                                                                                                        ${label}
+                                                                                                                                                                                                                                                                                    </span>
+                                                                                                                                                                                                                                                                                `
                     )
                     .join('')}
             </div>
-        `
-                : `
+        ` :
+                `
             <span class="booking-summary-muted">
                 None selected
             </span>
         `;
 
-        const patientName = selectedWalkInPatient?.name || document.getElementById("selectedPatientName")
-            ?.textContent || "N/A";
-        const patientGender =
-            selectedWalkInPatient?.gender
-                ? String(
+            const patientName =
+                selectedWalkInPatient?.name ||
+                document.getElementById(
+                    "selectedPatientName"
+                )?.textContent ||
+                "N/A";
+
+            const patientGender =
+                selectedWalkInPatient?.gender ?
+                String(
                     selectedWalkInPatient.gender
                 )
-                    .trim()
-                    .replace(
-                        /\b\w/g,
-                        char =>
-                            char.toUpperCase()
-                    )
-                : "N/A";
-        const dentalHistoryBody = `
+                .trim()
+                .replace(
+                    /\b\w/g,
+                    char =>
+                    char.toUpperCase()
+                ) :
+                "N/A";
+
+            const patientBirthday =
+                formatPatientDate(
+                    selectedWalkInPatient?.birthdate
+                );
+
+            const patientProgram =
+                selectedWalkInPatient?.program ||
+                "N/A";
+
+            const patientFaculty =
+                selectedWalkInPatient?.faculty_code ||
+                "N/A";
+
+            const patientYearLevel =
+                selectedWalkInPatient?.year_level ||
+                "N/A";
+
+            const patientSection =
+                selectedWalkInPatient?.section ||
+                "N/A";
+
+            const patientPwd =
+                selectedWalkInPatient?.is_pwd === true ||
+                selectedWalkInPatient?.is_pwd === 1 ||
+                selectedWalkInPatient?.is_pwd === "1" ?
+                "Yes" :
+                (
+                    selectedWalkInPatient?.is_pwd === false ||
+                    selectedWalkInPatient?.is_pwd === 0 ||
+                    selectedWalkInPatient?.is_pwd === "0" ?
+                    "No" :
+                    "N/A"
+                );
+
+            const patientEmail =
+                selectedWalkInPatient?.email ||
+                "N/A";
+
+            const patientType =
+                String(
+                    selectedWalkInPatient?.type || "Patient"
+                ).trim();
+
+            const normalizedPatientType =
+                patientType.toLowerCase();
+
+            const patientDepartment =
+                selectedWalkInPatient?.department ||
+                selectedWalkInPatient?.program ||
+                "N/A";
+
+            const patientFacultyType =
+                selectedWalkInPatient?.faculty_type ||
+                "N/A";
+
+            const patientPhone =
+                selectedWalkInPatient?.phone ||
+                "N/A";
+            const dentalHistoryBody = `
     ${subSection("Basic Info", `
-                                                                                                                                                                                                                        ${row("Last Dental Visit", get("last_dental_visit"))}
-                                                                                                                                                                                                                        ${row("Previous Dentist", get("previous_dentist"))}
-                                                                                                                                                                                                                    `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Last Dental Visit", get("last_dental_visit"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Previous Dentist", get("previous_dentist"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `)}
 
     ${subSection("Dental Symptoms", `
-                                                                                                                                                                                                                        ${row("Bleeding Gums", get("bleeding_gums"))}
-                                                                                                                                                                                                                        ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
-                                                                                                                                                                                                                        ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
-                                                                                                                                                                                                                        ${row("Tooth Pain", get("tooth_pain"))}
-                                                                                                                                                                                                                        ${row("Sores/Lumps", get("sores"))}
-                                                                                                                                                                                                                        ${row("Jaw Injuries", get("injuries"))}
-                                                                                                                                                                                                                    `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Bleeding Gums", get("bleeding_gums"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Tooth Pain", get("tooth_pain"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Sores/Lumps", get("sores"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Jaw Injuries", get("injuries"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `)}
 
     ${subSection("Jaw & Bite Symptoms", `
-                                                                                                                                                                                                                        ${row("Clicking", get("clicking"))}
-                                                                                                                                                                                                                        ${row("Joint Pain", get("joint_pain"))}
-                                                                                                                                                                                                                        ${row("Difficulty Moving", get("difficulty_moving"))}
-                                                                                                                                                                                                                        ${row("Difficulty Chewing", get("difficulty_chewing"))}
-                                                                                                                                                                                                                        ${row("Frequent Headaches", get("jaw_headaches"))}
-                                                                                                                                                                                                                        ${row("Grinding/Clenching", get("clench_grind"))}
-                                                                                                                                                                                                                        ${row("Lips/Cheek Biting", get("biting"))}
-                                                                                                                                                                                                                        ${row("Teeth Loosening", get("teeth_loosening"))}
-                                                                                                                                                                                                                        ${row("Food Caught Between Teeth", get("food_teeth"))}
-                                                                                                                                                                                                                        ${row("Medicine Reaction", get("med_reaction"))}
-                                                                                                                                                                                                                    `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Clicking", get("clicking"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Joint Pain", get("joint_pain"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Difficulty Moving", get("difficulty_moving"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Difficulty Chewing", get("difficulty_chewing"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Frequent Headaches", get("jaw_headaches"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Grinding/Clenching", get("clench_grind"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Lips/Cheek Biting", get("biting"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Teeth Loosening", get("teeth_loosening"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Food Caught Between Teeth", get("food_teeth"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Medicine Reaction", get("med_reaction"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `)}
 
     ${subSection("Dental Procedures", `
-                                                                                                                                                                                                                        ${row("Periodontal Treatment", get("periodontal"))}
-                                                                                                                                                                                                                        ${row("Difficult Extraction", get("difficult_extraction"))}
-                                                                                                                                                                                                                        ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Periodontal Treatment", get("periodontal"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Difficult Extraction", get("difficult_extraction"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
 
-                                                                                                                                                                                                                        ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
-                                                                                                                                                                                                                        ${row("Dentures", get("dentures"))}
-                                                                                                                                                                                                                        ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Dentures", get("dentures"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
 
-                                                                                                                                                                                                                        ${row("Orthodontic Treatment", get("ortho_treatment"))}
-                                                                                                                                                                                                                        ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
-                                                                                                                                                                                                                    `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Orthodontic Treatment", get("ortho_treatment"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `)}
 
     ${fullWidthSection("Additional Concerns", `
-                                                                                                                                                                                                                        ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
-                ? get("additional_concerns")
-                : '<span class="text-[#9e9690] italic">No additional concerns provided.</span>'}
-                                                                                                                                                                                                                    `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
+                                                                                                                                                                                                                                                                        ? get("additional_concerns")
+                                                                                                                                                                                                                                                                        : '<span class="text-[#9e9690] italic">No additional concerns provided.</span>'}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `)}
 `;
 
-        const medicalHistoryBody = `
+            const medicalHistoryBody = `
     ${subSection("General Health", `
-                                                                                                                                                                                                                    ${row("Good Health", get("good_health"))}
-                                                                                                                                                                                                                    ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Good Health", get("good_health"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
 
-                                                                                                                                                                                                                    ${row("Had Medical Exam", get("had_medical_exam"))}
-                                                                                                                                                                                                                    ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Had Medical Exam", get("had_medical_exam"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
 
-                                                                                                                                                                                                                    ${row("Under Treatment", get("under_treatment"))}
-                                                                                                                                                                                                                    ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Under Treatment", get("under_treatment"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
 
-                                                                                                                                                                                                                    ${row("Hospitalized", get("hospitalized"))}
-                                                                                                                                                                                                                    ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
-                                                                                                                                                                                                                `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Hospitalized", get("hospitalized"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        `)}
 
     ${subSection("Allergies", `
-                                                                                                                                                                                                                    ${row("Allergy (Medicine)", get("allergy_medicine"))}
-                                                                                                                                                                                                                    ${row("Allergy (Food)", get("allergy_food"))}
-                                                                                                                                                                                                                    ${optionalRow("Allergy (Others)", get("allergy_others"))}
-                                                                                                                                                                                                                `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Allergy (Medicine)", get("allergy_medicine"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Allergy (Food)", get("allergy_food"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${optionalRow("Allergy (Others)", get("allergy_others"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        `)}
 
     ${subSection("Medications", `
-                                                                                                                                                                                                                    ${row("Medication", get("medication"))}
-                                                                                                                                                                                                                    ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
-                                                                                                                                                                                                                `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Medication", get("medication"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        `)}
 
     ${isFemaleGender(
             selectedWalkInPatient?.gender
@@ -2421,21 +3569,21 @@
                 ? subSection(
                     "For Women Only",
                     `
-                                        ${row(
-                        "Pregnant",
-                        get("pregnant")
-                    )}
+                                                                                                                                                                                                                                                                                                ${row(
+                                                                                                                                                                                                                                                                                "Pregnant",
+                                                                                                                                                                                                                                                                                get("pregnant")
+                                                                                                                                                                                                                                                                            )}
 
-                                        ${row(
-                        "Nursing",
-                        get("nursing")
-                    )}
+                                                                                                                                                                                                                                                                                                ${row(
+                                                                                                                                                                                                                                                                                "Nursing",
+                                                                                                                                                                                                                                                                                get("nursing")
+                                                                                                                                                                                                                                                                            )}
 
-                                        ${row(
-                        "Birth Control Pills",
-                        get("birth_control")
-                    )}
-                                    `
+                                                                                                                                                                                                                                                                                                ${row(
+                                                                                                                                                                                                                                                                                "Birth Control Pills",
+                                                                                                                                                                                                                                                                                get("birth_control")
+                                                                                                                                                                                                                                                                            )}
+                                                                                                                                                                                                                                                                                            `
                 )
                 : ""}
 
@@ -2445,583 +3593,664 @@
                 )}
 
     ${subSection("Tobacco Use", `
-                                                                                                                                                                                                                    ${row("Tobacco Use", get("tobacco_use"))}
-                                                                                                                                                                                                                    ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
-                                                                                                                                                                                                                    ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
-                                                                                                                                                                                                                `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Tobacco Use", get("tobacco_use"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        `)}
 
     ${subSection("Do You Suffer From", `
-                                                                                                                                                                                                                    ${row("Headaches", get("headaches"))}
-                                                                                                                                                                                                                    ${row("Earaches", get("earaches"))}
-                                                                                                                                                                                                                    ${row("Neck Aches", get("neck_aches"))}
-                                                                                                                                                                                                                `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Headaches", get("headaches"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Earaches", get("earaches"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Neck Aches", get("neck_aches"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                        `)}
 `;
 
-        document.getElementById("summaryBox").innerHTML = `
-    ${summaryCard("Patient Information", "fa-user", `
-                                                                                                                                                                                                                    <div class="grid grid-cols-1 gap-y-1">
-                                                                                                                                                                                                                        ${row("Name", patientName)}
-                                                                                                                                                                                                                        ${row("Gender", patientGender)}
-                                                                                                                                                                                                                    </div>
-                                                                                                                                                                                                                `)}
 
-    <div class="grid grid-cols-2 gap-4 sm-grid-1col">
+            let patientInformationBody = "";
+
+            if (normalizedPatientType.includes("student")) {
+                patientInformationBody = `
+        <div class="grid grid-cols-2 gap-x-8 gap-y-1 sm-grid-1col">
+            ${row("Name", patientName)}
+            ${row("Gender", patientGender)}
+            ${row("Birthday", patientBirthday)}
+            ${row("PWD", patientPwd)}
+            ${row("Program", patientProgram)}
+            ${row("Year Level", patientYearLevel)}
+            ${row("Section", patientSection)}
+            ${row("Email", patientEmail)}
+            ${row("Phone", patientPhone)}
+        </div>
+    `;
+            } else if (normalizedPatientType.includes("faculty")) {
+                patientInformationBody = `
+        <div class="grid grid-cols-2 gap-x-8 gap-y-1 sm-grid-1col">
+            ${row("Name", patientName)}
+            ${row("Gender", patientGender)}
+            ${row("Birthday", patientBirthday)}
+            ${row("Faculty Code", patientFaculty)}
+            ${row("Department", patientDepartment)}
+            ${row("Faculty Type", patientFacultyType)}
+            ${row("Email", patientEmail)}
+            ${row("Phone", patientPhone)}
+        </div>
+    `;
+            } else if (normalizedPatientType.includes("guest")) {
+                patientInformationBody = `
+        <div class="grid grid-cols-2 gap-x-8 gap-y-1 sm-grid-1col">
+            ${row("Name", patientName)}
+            ${row("Gender", patientGender)}
+            ${row("Birthday", patientBirthday)}
+            ${row("PWD", patientPwd)}
+            ${row("Program", patientProgram)}
+            ${row("Faculty", patientFaculty)}
+            ${row("Year Level", patientYearLevel)}
+            ${row("Section", patientSection)}
+            ${row("Email", patientEmail)}
+            ${row("Phone", patientPhone)}
+        </div>
+    `;
+            } else if (
+                normalizedPatientType.includes("administrative") ||
+                normalizedPatientType.includes("admin")
+            ) {
+                patientInformationBody = `
+        <div class="grid grid-cols-2 gap-x-8 gap-y-1 sm-grid-1col">
+            ${row("Name", patientName)}
+            ${row("Gender", patientGender)}
+            ${row("Office", patientProgram)}
+            ${row("Email", patientEmail)}
+            ${row("Phone", patientPhone)}
+        </div>
+    `;
+            } else {
+                patientInformationBody = `
+        <div class="grid grid-cols-2 gap-x-8 gap-y-1 sm-grid-1col">
+            ${row("Name", patientName)}
+            ${row("Gender", patientGender)}
+            ${row("Birthday", patientBirthday)}
+            ${row("Email", patientEmail)}
+            ${row("Phone", patientPhone)}
+        </div>
+    `;
+            }
+
+            document.getElementById("summaryBox").innerHTML = `
+${summaryCard(
+    "Patient Information",
+    "fa-user",
+    patientInformationBody
+)}
      ${summaryCard("Walk-in Schedule", "fa-clock", `
-                                                        <div class="grid grid-cols-1 gap-y-1">
-                                                            <p class="booking-summary-row">
+                                                                                                                                                                                                                                                                                                                <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                                                                                                                                                                                                                    <p class="booking-summary-row">
 
-    <span class="booking-summary-row-label">
-        Date & Time:
-    </span>
+                                                                                                                                                                                                                                                            <span class="booking-summary-row-label">
+                                                                                                                                                                                                                                                                Date & Time:
+                                                                                                                                                                                                                                                            </span>
 
-    <span class="booking-summary-auto-note">
-        Recorded automatically when Start Procedure is clicked.
-    </span>
+                                                                                                                                                                                                                                                            <span class="booking-summary-auto-note">
+                                                                                                                                                                                                                                                                Recorded automatically when Start Procedure is clicked.
+                                                                                                                                                                                                                                                            </span>
 
-</p>
-                                                        </div>
-                                                    `)}
+                                                                                                                                                                                                                                                        </p>
+                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                            `)}
 
         ${summaryCard("Service", "fa-tooth", `
-                                                                                                                                                                                                                        <div class="grid grid-cols-1 gap-y-1">
-                                                                                                                                                                                                                            ${row("Type", get("service_type"))}
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                    `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${row("Type", get("service_type"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `)}
     </div>
 
-    ${summaryCard("Dental History", "fa-teeth", dentalHistoryBody)}
+    ${summaryCard(
+    "Dental History",
+    "fa-teeth",
+    dentalHistoryBody,
+    patientHasExistingBookingInformation
+        ? "editDentalHistoryFromReview()"
+        : null
+)}
 
-    ${summaryCard("Medical History", "fa-heart-pulse", medicalHistoryBody)}
+    ${summaryCard(
+    "Medical History",
+    "fa-heart-pulse",
+    medicalHistoryBody,
+    patientHasExistingBookingInformation
+        ? "editMedicalHistoryFromReview()"
+        : null
+)}
 
     <div class="grid grid-cols-2 gap-4 sm-grid-1col">
         ${summaryCard("Emergency Contact", "fa-phone", `
-                                                                                                                                                                                                                        <div class="grid grid-cols-1 gap-y-1">
-                                                                                                                                                                                                                            ${row("Name", get("emergency_person"))}
-                                                                                                                                                                                                                            ${row("Number", get("emergency_number"))}
-                                                                                                                                                                                                                            ${row("Relation", emergencyRelation)}
-                                                                                                                                                                                                                        </div>
-                                                                                                                                                                                                                    `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${row("Name", get("emergency_person"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${row("Number", get("emergency_number"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${row("Relation", emergencyRelation)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `)}
 
         ${summaryCard("Signature", "fa-signature", sigHTML)}
     </div>
 `;
 
-        document.querySelectorAll(".sm-grid-1col").forEach(el => {
-            if (window.innerWidth < 640) el.style.gridTemplateColumns = "1fr";
-        });
-    }
-
-    const confirmModal =
-        document.getElementById(
-            "confirmModal"
-        );
-
-    const confirmMessage =
-        document.getElementById(
-            "confirmMessage"
-        );
-
-    const okBtn =
-        document.getElementById(
-            "okBtn"
-        );
-
-    const finalConfirm =
-        document.getElementById(
-            "finalConfirm"
-        );
-
-    const appointmentForm =
-        document.getElementById(
-            "appointmentForm"
-        );
-
-    const appointmentsRedirectUrl =
-        @json(route('dentist.dentist.appointments'));
-
-    let appointmentSubmitRunning = false;
-
-    const workflowNextBtn =
-        document.getElementById(
-            'nextBtn'
-        );
-
-    function setFinalSubmitLoading(
-        loading
-    ) {
-        if (!workflowNextBtn) {
-            return;
+            document.querySelectorAll(".sm-grid-1col").forEach(el => {
+                if (window.innerWidth < 640) el.style.gridTemplateColumns = "1fr";
+            });
         }
 
-        workflowNextBtn.disabled =
-            loading;
+        const confirmModal =
+            document.getElementById(
+                "confirmModal"
+            );
 
-        if (loading) {
-            workflowNextBtn.innerHTML = `
+        const confirmMessage =
+            document.getElementById(
+                "confirmMessage"
+            );
+
+        const okBtn =
+            document.getElementById(
+                "okBtn"
+            );
+
+        const finalConfirm =
+            document.getElementById(
+                "finalConfirm"
+            );
+
+        const appointmentForm =
+            document.getElementById(
+                "appointmentForm"
+            );
+
+        const appointmentsRedirectUrl =
+            @json(route('dentist.dentist.appointments'));
+
+        let appointmentSubmitRunning = false;
+
+        const workflowNextBtn =
+            document.getElementById(
+                'nextBtn'
+            );
+
+        function setFinalSubmitLoading(
+            loading
+        ) {
+            if (!workflowNextBtn) {
+                return;
+            }
+
+            workflowNextBtn.disabled =
+                loading;
+
+            if (loading) {
+                workflowNextBtn.innerHTML = `
             <i class="fa-solid fa-spinner fa-spin"></i>
             <span>Starting Procedure...</span>
         `;
 
-            return;
-        }
-
-        bookingWorkflow
-            ?.setNextButton({
-                label: 'Start Procedure',
-
-                icon: 'fa-play',
-
-                iconPosition: 'left',
-            });
-    }
-
-    async function submitWalkInAppointment() {
-        if (
-            !appointmentForm ||
-            appointmentSubmitRunning
-        ) {
-            return;
-        }
-
-        if (
-            !finalConfirm ||
-            !finalConfirm.checked
-        ) {
-            showMiniTab(
-                "Please confirm before starting the procedure."
-            );
-
-            finalConfirm?.focus();
-            return;
-        }
-
-        appointmentSubmitRunning = true;
-        formSubmitting = true;
-
-        setFinalSubmitLoading(true);
-
-        try {
-            const response = await fetch(
-                appointmentForm.action, {
-                method: appointmentForm.method ||
-                    "POST",
-
-                headers: {
-                    Accept: "application/json",
-
-                    "X-Requested-With": "XMLHttpRequest",
-                },
-
-                body: new FormData(
-                    appointmentForm
-                ),
+                return;
             }
-            );
 
-            const contentType =
-                response.headers.get(
-                    'content-type'
-                ) || '';
+            bookingWorkflow
+                ?.setNextButton({
+                    label: 'Start Procedure',
 
-            let responseData = {};
+                    icon: 'fa-play',
+
+                    iconPosition: 'left',
+                });
+        }
+
+        async function submitWalkInAppointment() {
+            if (
+                !appointmentForm ||
+                appointmentSubmitRunning
+            ) {
+                return;
+            }
 
             if (
-                contentType.includes(
-                    'application/json'
-                )
+                !finalConfirm ||
+                !finalConfirm.checked
             ) {
-                responseData =
-                    await response.json();
-            } else {
-                const responseText =
-                    await response.text();
-
-                responseData = {
-                    message:
-                        responseText ||
-                        'Unexpected server response.',
-                };
-            }
-            if (
-                response.status === 401 &&
-                responseData?.expired
-            ) {
-                throw new Error(
-                    responseData.message ||
-                    'Your session has expired. Please sign in again.'
+                showMiniTab(
+                    "Please confirm before starting the procedure."
                 );
+
+                finalConfirm?.focus();
+                return;
             }
 
-            if (!response.ok) {
-                if (
-                    response.status === 422 &&
-                    responseData?.errors
-                ) {
-                    const firstMessage =
-                        Object.values(
-                            responseData.errors
-                        )
-                            .flat()
-                            .find(Boolean);
+            appointmentSubmitRunning = true;
+            formSubmitting = true;
 
+            setFinalSubmitLoading(true);
+
+            try {
+                const response = await fetch(
+                    appointmentForm.action, {
+                        method: appointmentForm.method ||
+                            "POST",
+
+                        headers: {
+                            Accept: "application/json",
+
+                            "X-Requested-With": "XMLHttpRequest",
+                        },
+
+                        body: new FormData(
+                            appointmentForm
+                        ),
+                    }
+                );
+
+                const contentType =
+                    response.headers.get(
+                        'content-type'
+                    ) || '';
+
+                let responseData = {};
+
+                if (
+                    contentType.includes(
+                        'application/json'
+                    )
+                ) {
+                    responseData =
+                        await response.json();
+                } else {
+                    const responseText =
+                        await response.text();
+
+                    responseData = {
+                        message: responseText ||
+                            'Unexpected server response.',
+                    };
+                }
+                if (
+                    response.status === 401 &&
+                    responseData?.expired
+                ) {
                     throw new Error(
-                        firstMessage ||
-                        "Please check the submitted information."
+                        responseData.message ||
+                        'Your session has expired. Please sign in again.'
                     );
                 }
 
-                throw new Error(
-                    responseData?.message ||
-                    "Unable to start the procedure."
-                );
-            }
+                if (!response.ok) {
+                    if (
+                        response.status === 422 &&
+                        responseData?.errors
+                    ) {
+                        const firstMessage =
+                            Object.values(
+                                responseData.errors
+                            )
+                            .flat()
+                            .find(Boolean);
 
-            clearDraft();
-            formIsDirty = false;
+                        throw new Error(
+                            firstMessage ||
+                            "Please check the submitted information."
+                        );
+                    }
 
-            const patientName =
-                selectedWalkInPatient?.name ||
-                selectedPatientName
+                    throw new Error(
+                        responseData?.message ||
+                        "Unable to start the procedure."
+                    );
+                }
+
+                clearDraft();
+                formIsDirty = false;
+
+                const patientName =
+                    selectedWalkInPatient?.name ||
+                    selectedPatientName
                     ?.textContent
                     ?.trim() ||
-                "the selected patient";
+                    "the selected patient";
 
-            if (confirmMessage) {
-                confirmMessage.textContent =
-                    responseData?.message ||
-                    `The walk-in appointment for ${patientName} has been recorded successfully.`;
-            }
+                if (confirmMessage) {
+                    confirmMessage.textContent =
+                        responseData?.message ||
+                        `The walk-in appointment for ${patientName} has been recorded successfully.`;
+                }
 
-            okBtn.dataset.startUrl =
-                responseData?.start_url || '';
+                okBtn.dataset.startUrl =
+                    responseData?.start_url || '';
 
-            window.openModal?.(
-                'confirmModal'
-            );
-
-            okBtn?.focus();
-
-        } catch (error) {
-            appointmentSubmitRunning = false;
-            formSubmitting = false;
-
-            setFinalSubmitLoading(false);
-
-            showMiniTab(
-                error.message ||
-                "Unable to start the procedure. Please try again."
-            );
-        }
-    }
-
-    appointmentForm?.addEventListener(
-        "submit",
-        function (event) {
-            event.preventDefault();
-
-            submitWalkInAppointment();
-        }
-    );
-
-    okBtn?.addEventListener(
-        'click',
-        () => {
-            const startUrl =
-                okBtn.dataset.startUrl;
-
-            if (!startUrl) {
-                return;
-            }
-
-            window.closeModal?.(
-                'confirmModal'
-            );
-
-            window.location.href =
-                startUrl;
-        }
-    );
-
-    function syncMedicalExamBox() {
-        const sel = document.querySelector('input[name="had_medical_exam"]:checked');
-        const box = document.getElementById("medical_exam_box");
-        const inp = document.getElementById("medicalExamDate");
-        if (!sel || !box || !inp) return;
-        if (sel.value === "YES") {
-            box.classList.remove("hidden");
-            inp.required = true;
-        } else {
-            box.classList.add("hidden");
-            inp.required = false;
-            inp.value = "";
-        }
-    }
-    document.querySelectorAll('input[name="had_medical_exam"]').forEach(r => r.addEventListener("change",
-        syncMedicalExamBox));
-    syncMedicalExamBox();
-
-    [{
-        name: "good_health",
-        boxId: "good_health_box",
-        showOn: "NO"
-    }, {
-        name: "under_treatment",
-        boxId: "treatment_box",
-        showOn: "YES"
-    }, {
-        name: "hospitalized",
-        boxId: "hospital_box",
-        showOn: "YES"
-    }, {
-        name: "medication",
-        boxId: "medication_box",
-        showOn: "YES"
-    }].forEach(({
-        name,
-        boxId,
-        showOn
-    }) => {
-        const radios = document.getElementsByName(name);
-        const box = document.getElementById(boxId);
-        if (!box || !radios.length) return;
-        radios.forEach(r => r.addEventListener("change", () => {
-            const sel = [...radios].find(x => x.checked);
-            const inputs = box.querySelectorAll("input");
-            if (sel?.value === showOn) {
-                box.classList.remove("hidden");
-                inputs.forEach(i => i.required = true);
-            } else {
-                box.classList.add("hidden");
-                inputs.forEach(i => {
-                    i.required = false;
-                    i.value = "";
-                });
-            }
-        }));
-    });
-    [...document.getElementsByName("tobacco_use")].forEach(r => r.addEventListener("change", () => {
-        if (r.checked && r.value === "YES") document.getElementById("tobacco_details")?.classList
-            .remove(
-                "hidden");
-        else document.getElementById("tobacco_details")?.classList.add("hidden");
-    }));
-
-    const emergencyNumber = document.getElementById("emergency_number");
-
-    function formatPhoneDisplay(rawDigits) {
-        const digits = rawDigits.slice(0, 11);
-        let out = "";
-
-        if (digits.length > 0) out += digits.slice(0, 4);
-        if (digits.length > 4) out += " " + digits.slice(4, 7);
-        if (digits.length > 7) out += " " + digits.slice(7, 11);
-
-        return out;
-    }
-
-    emergencyNumber?.addEventListener("input", (e) => {
-        const hadNonDigit = /[^\d\s]/.test(e.target.value);
-
-        let digits = e.target.value.replace(/\D/g, "");
-
-        if (digits.startsWith("9")) digits = "0" + digits;
-        if (digits.length > 11) digits = digits.slice(0, 11);
-
-        emergencyNumber.value = formatPhoneDisplay(digits);
-
-        window.validateFormInputField?.(
-            emergencyNumber
-        );
-
-        if (hadNonDigit) {
-            showMiniTab("Contact number must contain digits only.");
-        }
-
-        markFormDirty();
-    });
-
-    document.querySelectorAll('input, textarea, select').forEach(input => {
-        input.addEventListener('input', () => {
-            formIsDirty = true;
-        });
-    });
-    document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(input => {
-        input.addEventListener('change', () => {
-            formIsDirty = true;
-        });
-    });
-
-    function initIntroBookingModal() {
-        const modal =
-            document.getElementById(
-                "introBookingModal"
-            );
-
-        const startBtn =
-            document.getElementById(
-                "introStartBtn"
-            );
-
-        const continueDraftBtn =
-            document.getElementById(
-                "introContinueDraftBtn"
-            );
-
-        if (!modal) return;
-
-        const hasDraft =
-            hasSavedDraft();
-
-        continueDraftBtn?.classList.toggle(
-            "hidden",
-            !hasDraft
-        );
-
-        startBtn?.addEventListener(
-            "click",
-            () => {
-                window.closeModal?.(
-                    "introBookingModal"
-                );
-            }
-        );
-
-        continueDraftBtn?.addEventListener(
-            "click",
-            async () => {
-                window.closeModal?.(
-                    "introBookingModal"
+                window.openModal?.(
+                    'confirmModal'
                 );
 
-                await restoreDraft();
+                okBtn?.focus();
+
+            } catch (error) {
+                appointmentSubmitRunning = false;
+                formSubmitting = false;
+
+                setFinalSubmitLoading(false);
 
                 showMiniTab(
-                    "Saved draft loaded."
+                    error.message ||
+                    "Unable to start the procedure. Please try again."
                 );
+            }
+        }
+
+        appointmentForm?.addEventListener(
+            "submit",
+            function(event) {
+                event.preventDefault();
+
+                submitWalkInAppointment();
             }
         );
 
-        setTimeout(() => {
-            if (
-                window.__SESSION_EXPIRED__ ||
-                modal.classList.contains("open")
-            ) {
-                return;
-            }
+        okBtn?.addEventListener(
+            'click',
+            () => {
+                const startUrl =
+                    okBtn.dataset.startUrl;
 
-            window.openModal?.(
-                "introBookingModal"
-            );
-        }, 350);
-    }
-
-    initIntroBookingModal();
-
-    function refreshWalkInGlobalControls() {
-        const page =
-            document.getElementById(
-                'dentistWalkInPage'
-            ) || document;
-
-        window.initSearchClearButtons?.(page);
-        window.initGlobalSearchBars?.(page);
-        window.initCustomSelects?.(page);
-        window.initGlobalPageSizeSelects?.(page);
-        window.bindFormInputValidation?.(page);
-
-        const relationSelect =
-            document.getElementById(
-                'emergency_relation'
-            );
-
-        const relationWrapper =
-            relationSelect?.closest(
-                '.custom-select'
-            );
-
-        if (relationWrapper) {
-            window.syncCustomSelect?.(
-                relationWrapper
-            );
-        }
-    }
-
-    refreshWalkInGlobalControls();
-    loadInitialPatientRecords();
-
-    window.addEventListener("resize", () => {
-        document.querySelectorAll(".sm-grid-1col").forEach(el => {
-            el.style.gridTemplateColumns = window.innerWidth < 640 ? "1fr" : "1fr 1fr";
-        });
-    });
-
-    setupCharLimit("additional_concerns", "concernCount", 150, "concernWarning");
-    setupCharLimit(
-        "good_health_details", "goodHealthCount", 150);
-    setupCharLimit("treatment_details", "treatmentCount",
-        150);
-    setupCharLimit("hospital_details", "hospitalCount", 150);
-    setupCharLimit("medication_details",
-        "medicationCount", 150);
-
-    document.addEventListener("DOMContentLoaded", () => {
-        document.querySelectorAll(".global-question-text").forEach(q => {
-            const row = q.closest(".global-question-row");
-            const hasRequiredRadio = row?.querySelector("input[required]");
-
-            if (hasRequiredRadio && !q.querySelector(".required-mark")) {
-                const star = document.createElement("span");
-                star.className = "required-mark";
-                star.textContent = " *";
-                q.appendChild(star);
-            }
-        });
-
-        document.querySelectorAll(
-            "input[required], select[required], textarea[required]"
-        ).forEach(input => {
-            if (
-                input.tagName === "INPUT" &&
-                (
-                    input.type === "hidden" ||
-                    input.type === "radio" ||
-                    input.type === "checkbox"
-                )
-            ) {
-                return;
-            }
-
-            let label = null;
-
-            if (input.id) {
-                label = document.querySelector(`label[for="${input.id}"]`);
-            }
-
-            if (!label) {
-                label = input.closest("label");
-            }
-
-            if (!label) {
-                const fieldContainer = input.closest(
-                    ".space-y-4 > div, .grid > div, .ml-6, .mt-3, .mt-2, .date-input-wrap, .voice-input-wrap"
-                );
-                label = fieldContainer?.parentElement?.querySelector(":scope > label") || null;
-            }
-
-            if (!label) {
-                const previous = input.previousElementSibling;
-                if (previous && previous.tagName === "LABEL") {
-                    label = previous;
+                if (!startUrl) {
+                    return;
                 }
+
+                window.closeModal?.(
+                    'confirmModal'
+                );
+
+                window.location.href =
+                    startUrl;
+            }
+        );
+
+        function syncMedicalExamBox() {
+            const sel = document.querySelector('input[name="had_medical_exam"]:checked');
+            const box = document.getElementById("medical_exam_box");
+            const inp = document.getElementById("medicalExamDate");
+            if (!sel || !box || !inp) return;
+            if (sel.value === "YES") {
+                box.classList.remove("hidden");
+                inp.required = true;
+            } else {
+                box.classList.add("hidden");
+                inp.required = false;
+                inp.value = "";
+            }
+        }
+        document.querySelectorAll('input[name="had_medical_exam"]').forEach(r => r.addEventListener("change",
+            syncMedicalExamBox));
+        syncMedicalExamBox();
+
+        [{
+            name: "good_health",
+            boxId: "good_health_box",
+            showOn: "NO"
+        }, {
+            name: "under_treatment",
+            boxId: "treatment_box",
+            showOn: "YES"
+        }, {
+            name: "hospitalized",
+            boxId: "hospital_box",
+            showOn: "YES"
+        }, {
+            name: "medication",
+            boxId: "medication_box",
+            showOn: "YES"
+        }].forEach(({
+            name,
+            boxId,
+            showOn
+        }) => {
+            const radios = document.getElementsByName(name);
+            const box = document.getElementById(boxId);
+            if (!box || !radios.length) return;
+            radios.forEach(r => r.addEventListener("change", () => {
+                const sel = [...radios].find(x => x.checked);
+                const inputs = box.querySelectorAll("input");
+                if (sel?.value === showOn) {
+                    box.classList.remove("hidden");
+                    inputs.forEach(i => i.required = true);
+                } else {
+                    box.classList.add("hidden");
+                    inputs.forEach(i => {
+                        i.required = false;
+                        i.value = "";
+                    });
+                }
+            }));
+        });
+        [...document.getElementsByName("tobacco_use")].forEach(r => r.addEventListener("change", () => {
+            if (r.checked && r.value === "YES") document.getElementById("tobacco_details")?.classList
+                .remove(
+                    "hidden");
+            else document.getElementById("tobacco_details")?.classList.add("hidden");
+        }));
+
+        const emergencyNumber = document.getElementById("emergency_number");
+
+        function formatPhoneDisplay(rawDigits) {
+            const digits = rawDigits.slice(0, 11);
+            let out = "";
+
+            if (digits.length > 0) out += digits.slice(0, 4);
+            if (digits.length > 4) out += " " + digits.slice(4, 7);
+            if (digits.length > 7) out += " " + digits.slice(7, 11);
+
+            return out;
+        }
+
+        emergencyNumber?.addEventListener("input", (e) => {
+            const hadNonDigit = /[^\d\s]/.test(e.target.value);
+
+            let digits = e.target.value.replace(/\D/g, "");
+
+            if (digits.startsWith("9")) digits = "0" + digits;
+            if (digits.length > 11) digits = digits.slice(0, 11);
+
+            emergencyNumber.value = formatPhoneDisplay(digits);
+
+            window.validateFormInputField?.(
+                emergencyNumber
+            );
+
+            if (hadNonDigit) {
+                showMiniTab("Contact number must contain digits only.");
             }
 
-            if (label && !label.querySelector(".required-mark")) {
-                const star = document.createElement("span");
-                star.className = "required-mark";
-                star.textContent = " *";
-                label.appendChild(star);
-            }
+            markFormDirty();
         });
-    });
-</script>
+
+        document.querySelectorAll('input, textarea, select').forEach(input => {
+            input.addEventListener('input', () => {
+                formIsDirty = true;
+            });
+        });
+        document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(input => {
+            input.addEventListener('change', () => {
+                formIsDirty = true;
+            });
+        });
+
+        function initIntroBookingModal() {
+            const modal =
+                document.getElementById(
+                    "introBookingModal"
+                );
+
+            const startBtn =
+                document.getElementById(
+                    "introStartBtn"
+                );
+
+            const continueDraftBtn =
+                document.getElementById(
+                    "introContinueDraftBtn"
+                );
+
+            if (!modal) return;
+
+            const hasDraft =
+                hasSavedDraft();
+
+            continueDraftBtn?.classList.toggle(
+                "hidden",
+                !hasDraft
+            );
+
+            startBtn?.addEventListener(
+                "click",
+                () => {
+                    window.closeModal?.(
+                        "introBookingModal"
+                    );
+                }
+            );
+
+            continueDraftBtn?.addEventListener(
+                "click",
+                async () => {
+                    window.closeModal?.(
+                        "introBookingModal"
+                    );
+
+                    await restoreDraft();
+
+                    showMiniTab(
+                        "Saved draft loaded."
+                    );
+                }
+            );
+
+            setTimeout(() => {
+                if (
+                    window.__SESSION_EXPIRED__ ||
+                    modal.classList.contains("open")
+                ) {
+                    return;
+                }
+
+                window.openModal?.(
+                    "introBookingModal"
+                );
+            }, 350);
+        }
+
+        initIntroBookingModal();
+
+        function refreshWalkInGlobalControls() {
+            const page =
+                document.getElementById(
+                    'dentistWalkInPage'
+                ) || document;
+
+            window.initSearchClearButtons?.(page);
+            window.initGlobalSearchBars?.(page);
+            window.initCustomSelects?.(page);
+            window.initGlobalPageSizeSelects?.(page);
+            window.bindFormInputValidation?.(page);
+
+            const relationSelect =
+                document.getElementById(
+                    'emergency_relation'
+                );
+
+            const relationWrapper =
+                relationSelect?.closest(
+                    '.custom-select'
+                );
+
+            if (relationWrapper) {
+                window.syncCustomSelect?.(
+                    relationWrapper
+                );
+            }
+        }
+
+        refreshWalkInGlobalControls();
+        setPatientMode("existing", false);
+        loadInitialPatientRecords();
+
+        window.addEventListener("resize", () => {
+            document.querySelectorAll(".sm-grid-1col").forEach(el => {
+                el.style.gridTemplateColumns = window.innerWidth < 640 ? "1fr" : "1fr 1fr";
+            });
+        });
+
+        setupCharLimit("additional_concerns", "concernCount", 150, "concernWarning");
+        setupCharLimit(
+            "good_health_details", "goodHealthCount", 150);
+        setupCharLimit("treatment_details", "treatmentCount",
+            150);
+        setupCharLimit("hospital_details", "hospitalCount", 150);
+        setupCharLimit("medication_details",
+            "medicationCount", 150);
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll(".global-question-text").forEach(q => {
+                const row = q.closest(".global-question-row");
+                const hasRequiredRadio = row?.querySelector("input[required]");
+
+                if (hasRequiredRadio && !q.querySelector(".required-mark")) {
+                    const star = document.createElement("span");
+                    star.className = "required-mark";
+                    star.textContent = " *";
+                    q.appendChild(star);
+                }
+            });
+
+            document.querySelectorAll(
+                "input[required], select[required], textarea[required]"
+            ).forEach(input => {
+                if (
+                    input.tagName === "INPUT" &&
+                    (
+                        input.type === "hidden" ||
+                        input.type === "radio" ||
+                        input.type === "checkbox"
+                    )
+                ) {
+                    return;
+                }
+
+                let label = null;
+
+                if (input.id) {
+                    label = document.querySelector(`label[for="${input.id}"]`);
+                }
+
+                if (!label) {
+                    label = input.closest("label");
+                }
+
+                if (!label) {
+                    const fieldContainer = input.closest(
+                        ".space-y-4 > div, .grid > div, .ml-6, .mt-3, .mt-2, .date-input-wrap, .voice-input-wrap"
+                    );
+                    label = fieldContainer?.parentElement?.querySelector(":scope > label") || null;
+                }
+
+                if (!label) {
+                    const previous = input.previousElementSibling;
+                    if (previous && previous.tagName === "LABEL") {
+                        label = previous;
+                    }
+                }
+
+                if (label && !label.querySelector(".required-mark")) {
+                    const star = document.createElement("span");
+                    star.className = "required-mark";
+                    star.textContent = " *";
+                    label.appendChild(star);
+                }
+            });
+        });
+    </script>
 @endsection

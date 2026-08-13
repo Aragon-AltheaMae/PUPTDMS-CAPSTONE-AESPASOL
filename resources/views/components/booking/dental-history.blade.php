@@ -3,12 +3,12 @@
 @php
     $isNested = $mode === 'nested';
 
-    $answerValue = function (string $code, string $fallback = '') use ($isNested, $answers) {
+    $answerValue = function (string $code, string $fallback = '') use ($isNested, $answers, $defaults) {
         if ($isNested) {
             return old('dental_answers.' . $code, $answers[$code] ?? $fallback);
         }
 
-        return old($code, $fallback);
+        return old($code, $defaults[$code] ?? $fallback);
     };
 
     $questionName = function (string $code) use ($isNested) {

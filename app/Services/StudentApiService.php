@@ -37,7 +37,7 @@ class StudentApiService
             $attempts = [
                 [
                     'label' => 'json-camel',
-                    'request' => fn () => Http::acceptJson()
+                    'request' => fn() => Http::acceptJson()
                         ->asJson()
                         ->timeout(15)
                         ->post($this->tokenUrl, [
@@ -47,7 +47,7 @@ class StudentApiService
                 ],
                 [
                     'label' => 'json-snake',
-                    'request' => fn () => Http::acceptJson()
+                    'request' => fn() => Http::acceptJson()
                         ->asJson()
                         ->timeout(15)
                         ->post($this->tokenUrl, [
@@ -57,7 +57,7 @@ class StudentApiService
                 ],
                 [
                     'label' => 'form-snake',
-                    'request' => fn () => Http::acceptJson()
+                    'request' => fn() => Http::acceptJson()
                         ->asForm()
                         ->timeout(15)
                         ->post($this->tokenUrl, [
@@ -402,6 +402,56 @@ class StudentApiService
         $gender = data_get($student, 'gender')
             ?? data_get($student, 'sex');
 
+
+        $birthdate = data_get($student, 'birthdate')
+            ?? data_get($student, 'birth_date')
+            ?? data_get($student, 'birthday')
+            ?? data_get($student, 'date_of_birth')
+            ?? data_get($student, 'dateOfBirth')
+            ?? data_get($student, 'profile.birthdate')
+            ?? data_get($student, 'profile.birth_date')
+            ?? data_get($student, 'profile.birthday')
+            ?? data_get($student, 'profile.date_of_birth')
+            ?? data_get($student, 'profile.dateOfBirth');
+
+        $yearLevel = data_get($student, 'year_level')
+            ?? data_get($student, 'yearLevel')
+            ?? data_get($student, 'year')
+            ?? data_get($student, 'academic.year_level')
+            ?? data_get($student, 'academic.yearLevel');
+
+        $section = data_get($student, 'section')
+            ?? data_get($student, 'section_name')
+            ?? data_get($student, 'sectionName')
+            ?? data_get($student, 'academic.section')
+            ?? data_get($student, 'academic.section_name')
+            ?? data_get($student, 'academic.sectionName');
+
+        $isPwdRaw = data_get($student, 'is_pwd')
+            ?? data_get($student, 'isPwd')
+            ?? data_get($student, 'pwd')
+            ?? data_get($student, 'profile.is_pwd')
+            ?? data_get($student, 'profile.isPwd')
+            ?? data_get($student, 'profile.pwd');
+
+        $isPwd = match (true) {
+            is_bool($isPwdRaw) =>
+            $isPwdRaw,
+
+            is_numeric($isPwdRaw) =>
+            (int) $isPwdRaw === 1,
+
+            is_string($isPwdRaw) =>
+            in_array(
+                strtolower(trim($isPwdRaw)),
+                ['1', 'yes', 'true', 'y'],
+                true
+            ),
+
+            default =>
+            null,
+        };
+
         if (! $name) {
             return null;
         }
@@ -413,13 +463,38 @@ class StudentApiService
 
         return [
             'student_number' => $studentNumber,
+
             'name' => $name,
-            'email' => strtolower($email),
-            'phone' => $phone,
-            'programId' => $programId,
-            'program' => $program,
-            'gender' => $gender,
-            'raw' => $student,
+
+            'email' =>
+            strtolower($email),
+
+            'phone' =>
+            $phone,
+
+            'programId' =>
+            $programId,
+
+            'program' =>
+            $program,
+
+            'gender' =>
+            $gender,
+
+            'birthdate' =>
+            $birthdate,
+
+            'year_level' =>
+            $yearLevel,
+
+            'section' =>
+            $section,
+
+            'is_pwd' =>
+            $isPwd,
+
+            'raw' =>
+            $student,
         ];
     }
 
