@@ -75,7 +75,7 @@
                                                 <span
                                                     class="font-medium truncate">{{ $upcomingAppointment->dentist_name ??
                                                         'Dr.
-                                                                                                                                                    Nelson P. Angeles' }}</span>
+                                                                                                                                                                                                                                                            Nelson P. Angeles' }}</span>
                                             </span>
                                         </div>
 
@@ -256,7 +256,7 @@
                     </div>
                 </section>
 
-                <section class="card document-history-card">
+                <section id="documentRequestHistory" class="card document-history-card">
                     <div class="card-body">
 
                         @php
@@ -436,6 +436,20 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             initRecordModal();
+
+            const params =
+                new URLSearchParams(window.location.search);
+
+            if (params.get('section') === 'document-requests') {
+                setTimeout(() => {
+                    document
+                        .getElementById('documentRequestHistory')
+                        ?.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                }, 200);
+            }
 
             const params =
                 new URLSearchParams(
