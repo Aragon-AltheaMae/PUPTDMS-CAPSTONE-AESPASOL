@@ -43,41 +43,12 @@ body.role-patient #mainContent.patient-dashboard-page .upcoming-card-polished::b
     pointer-events: none;
 }
 
-body.role-patient #mainContent.patient-dashboard-page .check-dates-btn {
-    position: relative;
-    overflow: hidden;
-    isolation: isolate;
-    background:
-        linear-gradient(135deg, rgba(139, 0, 0, 0.95), rgba(179, 0, 0, 0.88)) !important;
-    color: #ffffff !important;
-    border: 1px solid rgba(255, 255, 255, .18);
-    box-shadow: 0 10px 24px rgba(139, 0, 0, .18);
-    transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
-}
-
-body.role-patient #mainContent.patient-dashboard-page .check-dates-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 16px 32px rgba(139, 0, 0, .28);
-    filter: brightness(1.05);
-}
-
-body.role-patient #mainContent.patient-dashboard-page .check-dates-btn:active {
-    transform: scale(.97);
-}
-
 [data-theme="dark"] body.role-patient #mainContent.patient-dashboard-page .upcoming-card-polished {
     background:
         radial-gradient(circle at top left, rgba(139, 0, 0, 0.22), transparent 34%),
         radial-gradient(circle at bottom right, rgba(245, 158, 11, 0.08), transparent 28%),
         linear-gradient(145deg, #0d0f12, #111827) !important;
     border-color: rgba(255, 255, 255, .10) !important;
-}
-
-[data-theme="dark"] body.role-patient #mainContent.patient-dashboard-page .check-dates-btn,
-.dark body.role-patient #mainContent.patient-dashboard-page .check-dates-btn {
-    background:
-        linear-gradient(135deg, #5A0000, #8B0000, #A31212) !important;
-    box-shadow: 0 14px 30px rgba(0, 0, 0, .38);
 }
 
 body.role-patient #mainContent.patient-dashboard-page .request-doc-card {
@@ -197,102 +168,12 @@ body.role-patient #mainContent.patient-dashboard-page .request-doc-card {
     display: inline-block;
 }
 
-.greeting-row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1.25rem;
-    flex-wrap: nowrap;
-}
-
-body.role-patient #mainContent.patient-dashboard-page .book-appointment-btn {
-    position: relative;
-    overflow: hidden;
-    padding: 10px 18px;
-    min-width: 182px;
-    font-size: 0.95rem;
-    font-weight: 700;
-    white-space: nowrap;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.449);
-    box-shadow: 0 10px 24px rgba(0, 0, 0, .18);
-    background: linear-gradient(110deg, #660000 25%, #8B0000 45%, #660000 65%);
-    background-size: 200% 100%;
-    animation: shimmerBtn 4s linear infinite;
-}
-
-body.role-patient #mainContent.patient-dashboard-page .book-appointment-btn i,
-body.role-patient #mainContent.patient-dashboard-page .book-appointment-btn span {
-    position: relative;
-    z-index: 1;
-}
-
-body.role-patient #mainContent.patient-dashboard-page .book-appointment-btn:hover {
-    background: linear-gradient(110deg, #4d0000 25%, #7a0000 45%, #4d0000 65%);
-    background-size: 200% 100%;
-    transform: translateY(-1px);
-}
-
-@media only screen and (max-width: 600px) {
-    body.role-patient #mainContent.patient-dashboard-page .greeting-row {
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 0.75rem !important;
-        margin-bottom: 1rem !important;
-    }
-
-    body.role-patient #mainContent.patient-dashboard-page .book-appointment-btn {
-        width: 100%;
-        min-width: 0;
-        padding: 10px 14px;
-        font-size: 0.84rem;
-    }
-
-    .upcoming-card-mobile {
-        border-radius: 18px !important;
-        margin-bottom: 1rem !important;
-    }
-
-    .upcoming-card-mobile .upcoming-card-header {
-        padding: 0.8rem 0.9rem !important;
-        gap: 0.5rem !important;
-    }
-
-    .upcoming-card-mobile .upcoming-card-header-icon {
-        width: 1.95rem !important;
-        height: 1.95rem !important;
-        font-size: 0.88rem !important;
-    }
-
-    .upcoming-card-mobile .upcoming-card-title {
-        font-size: 0.9rem !important;
-        line-height: 1.2 !important;
-    }
-
-    .upcoming-card-mobile .upcoming-status-pill {
-        font-size: 0.62rem !important;
-        padding: 0.28rem 0.48rem !important;
-        border-radius: 999px !important;
-    }
-
-    .upcoming-card-mobile .upcoming-card-body {
-        padding: 0.8rem 0.9rem 0.9rem !important;
-    }
-}
-
 @media only screen and (min-width: 600px) and (max-width: 767px) {
 
     body.role-patient #mainContent.patient-dashboard-page .greeting-row {
         flex-direction: column;
         align-items: stretch;
         gap: 0.9rem;
-    }
-
-    body.role-patient #mainContent.patient-dashboard-page .book-appointment-btn {
-        width: 100%;
-        min-width: 0;
     }
 }
 
@@ -304,25 +185,6 @@ body.role-patient #mainContent.patient-dashboard-page .book-appointment-btn:hove
         justify-content: space-between;
         gap: 1rem;
     }
-
-    body.role-patient #mainContent.patient-dashboard-page .book-appointment-btn {
-        width: auto;
-        min-width: 170px;
-    }
-}
-
-@media only screen and (max-width: 600px) {
-    #upcomingAppointmentWrapper .upcoming-card-mobile {
-        margin-bottom: 0.9rem !important;
-    }
-
-    #upcomingAppointmentWrapper {
-        gap: 0.55rem !important;
-    }
-
-    #upcomingAppointmentWrapper {
-        padding: 0.7rem 0.75rem !important;
-    }
 }
 
 @media only screen and (min-width: 1200px) {
@@ -332,12 +194,6 @@ body.role-patient #mainContent.patient-dashboard-page .book-appointment-btn:hove
 
     body.role-patient #mainContent.patient-dashboard-page .greeting-row {
         margin-bottom: 0.75rem !important;
-    }
-
-    body.role-patient #mainContent.patient-dashboard-page .book-appointment-btn {
-        min-width: 164px !important;
-        padding: 9px 16px !important;
-        font-size: 0.88rem !important;
     }
 
     body.role-patient #mainContent.patient-dashboard-page .dashboard-card-compact {
@@ -358,14 +214,6 @@ body.role-patient #mainContent.patient-dashboard-page .book-appointment-btn:hove
 
     body.role-patient #mainContent.patient-dashboard-page .dashboard-grid-tight {
         gap: 1.25rem !important;
-    }
-}
-
-@media only screen and (min-width: 1200px) {
-
-    #requestDocsContainer>div,
-    #dentalOverviewContainer>div {
-        min-height: 100%;
     }
 }
 
@@ -399,23 +247,6 @@ body.role-patient #mainContent .patient-privacy-toggle {
     min-width: 38px;
     border-radius: 999px;
     flex-shrink: 0;
-}
-
-.card-lift {
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-}
-
-.card-lift:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 16px 36px rgba(139, 0, 0, 0.08);
-}
-
-.stat-soft-rise:nth-child(2) {
-    animation-delay: 0.06s;
-}
-
-.stat-soft-rise:nth-child(3) {
-    animation-delay: 0.12s;
 }
 
 @media only screen and (min-width: 1200px) {
@@ -591,8 +422,7 @@ body.role-patient #mainContent .patient-privacy-toggle {
 [data-theme="dark"] #mainContent .bg-gray-50,
 [data-theme="dark"] #mainContent .bg-gray-100,
 [data-theme="dark"] #mainContent .bg-red-50,
-[data-theme="dark"] #mainContent .bg-amber-50,
-[data-theme="dark"] #mainContent .bg-emerald-50 {
+[data-theme="dark"] #mainContent .bg-amber-50 {
     background: var(--bg-panel) !important;
 }
 
@@ -600,7 +430,6 @@ body.role-patient #mainContent .patient-privacy-toggle {
 [data-theme="dark"] #mainContent .border-gray-100,
 [data-theme="dark"] #mainContent .border-red-100,
 [data-theme="dark"] #mainContent .border-amber-100,
-[data-theme="dark"] #mainContent .border-emerald-100,
 [data-theme="dark"] #mainContent .border-\[\#eadede\],
 [data-theme="dark"] #mainContent .border-\[\#efe3e3\] {
     border-color: var(--border-dark) !important;
@@ -631,10 +460,6 @@ body.role-patient #mainContent .patient-privacy-toggle {
     color: #FCD34D !important;
 }
 
-[data-theme="dark"] #mainContent .text-emerald-700 {
-    color: #86EFAC !important;
-}
-
 [data-theme="dark"] #mainContent .rounded-full.bg-white\/10 {
     background: rgba(255, 255, 255, 0.08) !important;
     border-color: rgba(255, 255, 255, 0.12) !important;
@@ -649,12 +474,6 @@ body.role-patient #mainContent .patient-privacy-toggle {
 [data-theme="dark"] #mainContent .upcoming-reminder-icon {
     background: var(--brand-red-soft) !important;
     color: #FCA5A5 !important;
-}
-
-[data-theme="dark"] #mainContent dialog .modal-box {
-    background: var(--bg-card) !important;
-    color: var(--text-primary) !important;
-    border: 1px solid var(--border-dark) !important;
 }
 
 [data-theme="dark"] #mainContent .profile-emergency-panel {
@@ -709,244 +528,17 @@ body.role-patient #mainContent.patient-dashboard-page .greeting-scroll-cue:hover
     transform: translateY(2px);
 }
 
-body.role-patient #mainContent.patient-dashboard-page .book-appointment-btn:hover {
-    box-shadow: 0 0 24px rgba(255, 255, 255, .16), 0 14px 30px rgba(139, 0, 0, .35);
-}
-
-.dashboard-greeting-row,
-.greeting-row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: var(--dashboard-greeting-row-mb, 1.25rem);
-    flex-wrap: nowrap;
-}
-
-.dashboard-greeting-copy {
-    min-width: 0;
-}
-
-.dashboard-greeting-heading {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    margin: 0;
-    color: #fff;
-}
-
-.dashboard-greeting-line {
-    display: block;
-}
-
-.dashboard-greeting-name-line {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    font-size: clamp(1.55rem, 3vw, 2.35rem);
-    font-weight: 800;
-    line-height: 1.15;
-}
-
-.dashboard-greeting-copy p {
-    color: rgba(255, 255, 255, .92);
-    font-size: 0.95rem;
-    margin-top: 0.45rem;
-    font-weight: 500;
-}
-
-.dashboard-greeting-actions {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-    gap: 12px;
-}
-
-@media only screen and (min-width: 768px) and (max-width: 1199px) {
-
-    .dashboard-greeting-inner {
-        flex-direction: column !important;
-        align-items: stretch !important;
-    }
-
-    .dashboard-greeting-actions {
-        width: 100%;
-    }
-
-    .dashboard-greeting-actions a {
-        flex: 1;
-    }
-}
-
-@media only screen and (min-width: 320px) and (max-width: 600px) {
-
-    .dashboard-greeting-name-line {
-        font-size: clamp(1.25rem, 8vw, 1.55rem) !important;
-    }
-
-    .dashboard-greeting-copy p {
-        font-size: 0.72rem !important;
-    }
-}
-
 body.role-patient #mainContent.patient-dashboard-page,
 body.role-patient #mainContent.patient-dashboard-page * {
     min-width: 0;
 }
 
-.dashboard-greeting-name-line,
-.dashboard-greeting-copy p,
 .request-doc-card h3,
 .request-doc-card p,
-.upcoming-card-title,
-.upcoming-status-pill,
 .upcoming-reminder-label,
 .upcoming-reminder-text {
     overflow-wrap: anywhere;
     word-break: break-word;
-}
-
-body.role-patient
-#mainContent.patient-dashboard-page
-.record-card-main {
-    flex: 1 1 auto;
-    min-width: 0;
-}
-
-body.role-patient
-#mainContent.patient-dashboard-page
-.record-card-schedule {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-    width: 100%;
-}
-
-body.role-patient
-#mainContent.patient-dashboard-page
-.record-schedule-pill {
-    display: inline-flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 0.375rem;
-
-    width: max-content;
-    max-width: 100%;
-    flex: 0 0 auto;
-
-    white-space: nowrap;
-    word-break: normal;
-    overflow-wrap: normal;
-}
-
-body.role-patient
-#mainContent.patient-dashboard-page
-.record-schedule-pill i {
-    flex: 0 0 auto;
-}
-
-body.role-patient
-#mainContent.patient-dashboard-page
-.record-view-button {
-    width: max-content;
-    min-width: max-content;
-    flex: 0 0 auto;
-
-    white-space: nowrap;
-    word-break: normal;
-    overflow-wrap: normal;
-}
-
-@media only screen and (max-width: 600px) {
-
-    body.role-patient
-    #mainContent.patient-dashboard-page
-    .record-view-button {
-        gap: 0.3rem;
-        padding: 0.4rem 0.55rem;
-        border-radius: 0.5rem;
-
-        font-size: 0.625rem;
-        line-height: 1;
-    }
-
-    body.role-patient
-    #mainContent.patient-dashboard-page
-    .record-view-button i {
-        font-size: 0.55rem;
-    }
-
-    body.role-patient
-    #mainContent.patient-dashboard-page
-    .record-schedule-pill {
-        gap: 0.35rem;
-        padding: 0.32rem 0.65rem;
-
-        font-size: 0.625rem;
-        line-height: 1;
-    }
-
-    body.role-patient
-    #mainContent.patient-dashboard-page
-    .record-schedule-pill i {
-        font-size: 0.6rem;
-    }
-}
-
-@media only screen and (max-width: 390px) {
-
-    body.role-patient
-    #mainContent.patient-dashboard-page
-    .record-view-button {
-        gap: 0.25rem;
-        padding: 0.35rem 0.45rem;
-
-        font-size: 0.575rem;
-    }
-
-    body.role-patient
-    #mainContent.patient-dashboard-page
-    .record-view-button i {
-        font-size: 0.5rem;
-    }
-
-    body.role-patient
-    #mainContent.patient-dashboard-page
-    .record-schedule-pill {
-        padding: 0.3rem 0.55rem;
-
-        font-size: 0.59rem;
-    }
-}
-
-@media only screen and (max-width: 340px) {
-
-    body.role-patient
-    #mainContent.patient-dashboard-page
-    .record-view-button {
-        gap: 0.2rem;
-        padding: 0.3rem 0.38rem;
-
-        font-size: 0.535rem;
-    }
-
-    body.role-patient
-    #mainContent.patient-dashboard-page
-    .record-view-button i {
-        font-size: 0.47rem;
-    }
-
-    body.role-patient
-    #mainContent.patient-dashboard-page
-    .record-schedule-pill {
-        gap: 0.28rem;
-        padding: 0.28rem 0.48rem;
-
-        font-size: 0.55rem;
-    }
 }
 
 @media only screen and (max-width: 375px) {
@@ -973,12 +565,6 @@ body.role-patient
         width: 2.65rem !important;
         height: 2.65rem !important;
     }
-
-    .upcoming-card-mobile .upcoming-status-pill {
-        width: 100%;
-        justify-content: center;
-    }
-
 }
 
 @media only screen and (min-width:376px) and (max-width:480px) {
@@ -1000,33 +586,13 @@ body.role-patient
 @media (hover:none) {
 
     .request-doc-card:hover,
-    .card-lift:hover,
-    .check-dates-btn:hover,
-    .book-appointment-btn:hover,
-    .profile-toggle-btn:hover,
     .greeting-insight-chip:hover,
     .greeting-scroll-cue:hover {
 
         transform: none !important;
         box-shadow: inherit;
         filter: none !important;
-
     }
-
-}
-
-@media (prefers-reduced-motion:reduce) {
-
-    *,
-    *::before,
-    *::after {
-
-        animation: none !important;
-        transition: none !important;
-        scroll-behavior: auto !important;
-
-    }
-
 }
 
 @supports not ((backdrop-filter:blur(18px)) or (-webkit-backdrop-filter:blur(18px))) {
