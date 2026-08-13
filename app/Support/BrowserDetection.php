@@ -7,6 +7,125 @@ use Illuminate\Support\Str;
 
 class BrowserDetection
 {
+
+    public static function deviceDetailsFromRequest(Request $request): array
+    {
+        $userAgent = (string) $request->userAgent();
+
+        return [
+            'browser_name' => self::detectFromRequest($request),
+            'device_type' => self::detectDeviceType($userAgent),
+            'device_name' => self::detectDeviceName($userAgent),
+            'os_name' => self::detectOperatingSystem($userAgent),
+        ];
+    }
+
+    public static function detectDeviceType(?string $userAgent): string
+    {
+        if (blank($userAgent)) {
+            return 'unknown';
+        }
+
+        return match (true) {
+            Str::contains($userAgent, ['iPad', 'Tablet'], true) => 'tablet',
+
+            Str::contains($userAgent, 'Android', true)
+                && !Str::contains($userAgent, 'Mobile', true) => 'tablet',
+
+            Str::contains($userAgent, ['iPhone', 'Android', 'Mobile'], true) => 'mobile',
+
+            Str::contains($userAgent, [
+                'Windows',
+                'Macintosh',
+                'Linux',
+                'X11',
+            ], true) => 'desktop',
+
+            default => 'unknown',
+        };
+    }
+
+    public static function detectOperatingSystem(?string $userAgent): string
+    {
+        if (blank($userAgent)) {
+            return 'Unknown OS';
+        }
+
+        return match (true) {
+            Str::contains($userAgent, 'Windows NT 10.0', true) => 'Windows',
+            Str::contains($userAgent, 'Windows', true) => 'Windows',
+
+            Str::contains($userAgent, 'iPhone', true) => 'iOS',
+            Str::contains($userAgent, 'iPad', true) => 'iPadOS',
+
+            Str::contains($userAgent, 'Android', true) => 'Android',
+
+            Str::contains($userAgent, 'Macintosh', true) => 'macOS',
+
+            Str::contains($userAgent, ['Linux', 'X11'], true) => 'Linux',
+
+            default => 'Unknown OS',
+        };
+    }
+
+    public static function detectDeviceName(?string $userAgent): string
+    {
+        if (blank($userAgent)) {
+            return 'Unknown Device';
+        }
+
+        if (Str::contains($userAgent, 'iPhone', true)) {
+            return 'iPhone';
+        }
+
+        if (Str::contains($userAgent, 'iPad', true)) {
+            return 'iPad';
+        }
+
+        if (Str::contains($userAgent, 'Macintosh', true)) {
+            return 'Mac';
+        }
+
+        if (Str::contains($userAgent, 'Android', true)) {
+            if (
+                preg_match(
+                    '/Android\s[^;)]*;\s*([^;)]+?)(?:\s+Build\/[^;)]+)?[;)]/i',
+                    $userAgent,
+                    $matches
+                )
+            ) {
+                $model = trim($matches[1]);
+
+                $model = preg_replace('/\s+Build\/.*$/i', '', $model);
+
+                if (
+                    $model !== ''
+                    && !in_array(strtolower($model), [
+                        'wv',
+                        'mobile',
+                        'tablet',
+                        'linux',
+                    ], true)
+                ) {
+                    return $model;
+                }
+            }
+
+            return Str::contains($userAgent, 'Mobile', true)
+                ? 'Android Phone'
+                : 'Android Tablet';
+        }
+
+        if (Str::contains($userAgent, 'Windows', true)) {
+            return 'Windows PC';
+        }
+
+        if (Str::contains($userAgent, ['Linux', 'X11'], true)) {
+            return 'Linux PC';
+        }
+
+        return 'Unknown Device';
+    }
     public static function detectFromRequest(Request $request): string
     {
         $provided = self::normalizeBrowserName(

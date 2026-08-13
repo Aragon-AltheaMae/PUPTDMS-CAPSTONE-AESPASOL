@@ -776,6 +776,12 @@ html body #mainContent #patientAccountSection .walkin-two-col {
     gap: 10px !important;
 }
 
+html body #mainContent #patientAccountSection .walkin-three-col {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+}
+
 html body #mainContent #patientAccountSection .walkin-field-label {
     display: block !important;
     margin-bottom: 5px !important;
@@ -1151,6 +1157,10 @@ html[data-theme="dark"] body #mainContent #patientAccountSection .selected-patie
 
 @media (max-width: 640px) {
     html body #mainContent #patientAccountSection .account-tabs {
+        grid-template-columns: 1fr !important;
+    }
+
+    html body #mainContent #patientAccountSection .walkin-three-col {
         grid-template-columns: 1fr !important;
     }
 

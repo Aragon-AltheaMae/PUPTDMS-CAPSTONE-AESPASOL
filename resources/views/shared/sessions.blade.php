@@ -6,88 +6,81 @@
 
 @section('content')
 
-<main id="mainContent" class="session-page page-enter">
-    <div class="session-shell">
+    <main id="mainContent" class="session-page page-enter">
+        <div class="session-shell">
 
-        <section class="page-banner">
-            <div class="page-banner-inner">
-                
-                <div>
-                    <h1 class="page-title page-banner-title">
-                        Account Sessions
-                    </h1>
+            <section class="page-banner">
+                <div class="page-banner-inner">
 
-                    <p class="page-subtitle">
-                        Review active devices and recent sign-in activity for your account.
-                    </p>
+                    <div>
+                        <h1 class="page-title page-banner-title">
+                            Account Sessions
+                        </h1>
+
+                        <p class="page-subtitle">
+                            Review active devices and recent sign-in activity for your account.
+                        </p>
+                    </div>
+
+                    <div class="page-banner-actions">
+                        <span class="page-badge">
+                            <span class="page-badge-dot"></span>
+                            Security Activity Visible
+                        </span>
+                    </div>
+
+                </div>
+            </section>
+
+            <div class="session-stats">
+                <div class="session-stat">
+                    <span class="session-stat-label global-info-label">Current Device</span>
+                    <span class="session-stat-value global-info-value">{{ $currentSessionCount }}</span>
+                    <span class="session-stat-note">The browser you are using right now</span>
                 </div>
 
-                <div class="page-banner-actions">
-                    <span class="page-badge">
-                        <span class="page-badge-dot"></span>
-                        Security Activity Visible
-                    </span>
+                <div class="session-stat">
+                    <span class="session-stat-label global-info-label">Other Active Sessions</span>
+                    <span class="session-stat-value global-info-value">{{ $otherSessionsCount }}</span>
+                    <span class="session-stat-note">Other browsers still signed in</span>
                 </div>
 
+                <div class="session-stat">
+                    <span class="session-stat-label global-info-label">Role Session Limit</span>
+                    <span class="session-stat-value global-info-value">{{ $sessionLimit }}</span>
+                    <span class="session-stat-note">Maximum active sessions for your role</span>
+                </div>
+
+                <div class="session-stat">
+                    <span class="session-stat-label global-info-label">Recent History</span>
+                    <span class="session-stat-value global-info-value">{{ $history->count() }}</span>
+                    <span class="session-stat-note">Recent sign-in and logout activity</span>
+                </div>
             </div>
-        </section>
-
-                <div class="session-stats">
-                    <div class="session-stat">
-                        <span class="session-stat-label global-info-label">Current Device</span>
-                        <span class="session-stat-value global-info-value">{{ $currentSessionCount }}</span>
-                        <span class="session-stat-note">The browser you are using right now</span>
-                    </div>
-
-                    <div class="session-stat">
-                        <span class="session-stat-label global-info-label">Other Active Sessions</span>
-                        <span class="session-stat-value global-info-value">{{ $otherSessionsCount }}</span>
-                        <span class="session-stat-note">Other browsers still signed in</span>
-                    </div>
-
-                    <div class="session-stat">
-                        <span class="session-stat-label global-info-label">Role Session Limit</span>
-                        <span class="session-stat-value global-info-value">{{ $sessionLimit }}</span>
-                        <span class="session-stat-note">Maximum active sessions for your role</span>
-                    </div>
-
-                    <div class="session-stat">
-                        <span class="session-stat-label global-info-label">Recent History</span>
-                        <span class="session-stat-value global-info-value">{{ $history->count() }}</span>
-                        <span class="session-stat-note">Recent sign-in and logout activity</span>
-                    </div>
-                </div>
 
             <div class="session-grid">
                 <section class="session-panel">
                     <div class="session-panel-head">
                         <div>
                             <h2>Signed-in Devices</h2>
-                            <p>These are your currently active sessions. Review your sessions and end any sessions you no longer recognize or need.</p>
+                            <p>These are your currently active sessions. Review your sessions and end any sessions you no
+                                longer recognize or need.</p>
                         </div>
 
                         <div class="session-panel-actions">
                             <div class="session-action-stack">
                                 @if ($otherSessionsCount > 0)
-                                    <form
-                                        id="logoutOtherDevicesForm"
-                                        method="POST"
-                                        action="{{ route('security.sessions.destroy-others') }}"
-                                    >
+                                    <form id="logoutOtherDevicesForm" method="POST"
+                                        action="{{ route('security.sessions.destroy-others') }}">
                                         @csrf
                                         @method('DELETE')
 
-                                        <button
-                                            type="button"
-                                            class="ui-btn ui-btn-secondary"
-                                            data-session-confirm
-                                            data-form-id="logoutOtherDevicesForm"
-                                            data-title="Log Out Other Devices?"
+                                        <button type="button" class="ui-btn ui-btn-secondary" data-session-confirm
+                                            data-form-id="logoutOtherDevicesForm" data-title="Log Out Other Devices?"
                                             data-subtitle="Confirm other device logout"
                                             data-message="Are you sure you want to log out all other devices?"
                                             data-helper="Your current browser session will remain active."
-                                            data-confirm-label="Log Out Other Devices"
-                                        >
+                                            data-confirm-label="Log Out Other Devices">
                                             <i class="fa-solid fa-right-from-bracket"></i>
                                             Log Out Other Devices
                                         </button>
@@ -95,25 +88,17 @@
                                 @endif
 
                                 @if ($sessions->isNotEmpty())
-                                    <form
-                                        id="logoutAllDevicesForm"
-                                        method="POST"
-                                        action="{{ route('security.sessions.destroy-all') }}"
-                                    >
+                                    <form id="logoutAllDevicesForm" method="POST"
+                                        action="{{ route('security.sessions.destroy-all') }}">
                                         @csrf
                                         @method('DELETE')
 
-                                        <button
-                                            type="button"
-                                            class="ui-btn ui-btn-danger"
-                                            data-session-confirm
-                                            data-form-id="logoutAllDevicesForm"
-                                            data-title="Log Out All Devices?"
+                                        <button type="button" class="ui-btn ui-btn-danger" data-session-confirm
+                                            data-form-id="logoutAllDevicesForm" data-title="Log Out All Devices?"
                                             data-subtitle="Confirm account-wide session logout"
                                             data-message="Are you sure you want to log out all signed-in devices?"
                                             data-helper="This will end all active sessions for your account, including the device you are currently using."
-                                            data-confirm-label="Log Out All Devices"
-                                        >
+                                            data-confirm-label="Log Out All Devices">
                                             <i class="fa-solid fa-arrow-right-from-bracket"></i>
                                             Log Out All Devices
                                         </button>
@@ -138,60 +123,50 @@
                                                 <h3>{{ $session['device_label'] }}</h3>
 
                                                 @if ($session['is_current'])
-                                                    <span class="session-badge status-pill session-badge-current">This Device</span>
+                                                    <span class="session-badge status-pill session-badge-current">This
+                                                        Device</span>
                                                 @else
                                                     <span class="session-badge status-pill">Other Active Session</span>
                                                 @endif
                                             </div>
 
-                                            <div class="session-agent">{{ $session['user_agent'] }}</div>
+                                            <div class="session-agent">
+                                                {{ $session['browser_label'] }}
+                                                <span aria-hidden="true">·</span>
+                                                {{ $session['os_label'] }}
+                                            </div>
                                         </div>
 
                                         <div class="session-card-actions">
                                             @unless ($session['is_current'])
-                                                <form
-                                                    id="logoutDeviceForm{{ $loop->index }}"
-                                                    method="POST"
-                                                    action="{{ route('security.sessions.destroy', $session['reference']) }}"
-                                                >
+                                                <form id="logoutDeviceForm{{ $loop->index }}" method="POST"
+                                                    action="{{ route('security.sessions.destroy', $session['reference']) }}">
                                                     @csrf
                                                     @method('DELETE')
 
-                                                    <button
-                                                        type="button"
-                                                        class="ui-btn ui-btn-danger"
-                                                        data-session-confirm
+                                                    <button type="button" class="ui-btn ui-btn-danger" data-session-confirm
                                                         data-form-id="logoutDeviceForm{{ $loop->index }}"
-                                                        data-title="Log Out This Device?"
-                                                        data-subtitle="Confirm device logout"
+                                                        data-title="Log Out This Device?" data-subtitle="Confirm device logout"
                                                         data-message="Are you sure you want to log out this device?"
                                                         data-helper="The selected browser session will be ended. Your current session will remain signed in."
-                                                        data-confirm-label="Log Out This Device"
-                                                    >
+                                                        data-confirm-label="Log Out This Device">
                                                         <i class="fa-solid fa-right-from-bracket"></i>
                                                         Log Out This Device
                                                     </button>
                                                 </form>
                                             @else
-                                                <form
-                                                    id="logoutCurrentSessionForm"
-                                                    method="POST"
-                                                    action="{{ route('security.sessions.destroy-current') }}"
-                                                >
+                                                <form id="logoutCurrentSessionForm" method="POST"
+                                                    action="{{ route('security.sessions.destroy-current') }}">
                                                     @csrf
                                                     @method('DELETE')
 
-                                                    <button
-                                                        type="button"
-                                                        class="ui-btn ui-btn-secondary"
-                                                        data-session-confirm
+                                                    <button type="button" class="ui-btn ui-btn-secondary" data-session-confirm
                                                         data-form-id="logoutCurrentSessionForm"
                                                         data-title="Log Out This Session?"
                                                         data-subtitle="Confirm current session logout"
                                                         data-message="Are you sure you want to log out this session?"
                                                         data-helper="You will be signed out from this browser and will need to sign in again to continue."
-                                                        data-confirm-label="Log Out This Session"
-                                                    >
+                                                        data-confirm-label="Log Out This Session">
                                                         Log Out This Session
                                                     </button>
                                                 </form>
@@ -202,17 +177,20 @@
                                     <div class="session-meta">
                                         <div class="session-meta-item">
                                             <span class="session-meta-label global-info-label">Browser</span>
-                                            <span class="session-meta-value global-info-value">{{ $session['browser_label'] }}</span>
+                                            <span
+                                                class="session-meta-value global-info-value">{{ $session['browser_label'] }}</span>
                                         </div>
 
                                         <div class="session-meta-item">
                                             <span class="session-meta-label global-info-label">IP Address</span>
-                                            <span class="session-meta-value global-info-value">{{ $session['ip_address'] }}</span>
+                                            <span
+                                                class="session-meta-value global-info-value">{{ $session['ip_address'] }}</span>
                                         </div>
 
                                         <div class="session-meta-item">
                                             <span class="session-meta-label global-info-label">Last Activity</span>
-                                            <span class="session-meta-value global-info-value">{{ $session['last_activity_label'] }}</span>
+                                            <span
+                                                class="session-meta-value global-info-value">{{ $session['last_activity_label'] }}</span>
                                         </div>
                                     </div>
                                 </article>
@@ -225,14 +203,16 @@
                     <div class="session-panel-head">
                         <div>
                             <h2>Recent Browser History</h2>
-                            <p>This section shows your recent sign-in and session-related activity, including browsers used in the past.</p>
+                            <p>This section shows your recent sign-in and session-related activity, including browsers used
+                                in the past.</p>
                         </div>
                     </div>
 
                     @if ($history->isEmpty())
                         <div class="session-empty">
                             <strong>No Recent History Yet</strong>
-                            Once your account records sign-ins or session events, your recent browser history will appear here.
+                            Once your account records sign-ins or session events, your recent browser history will appear
+                            here.
                         </div>
                     @else
                         <div class="session-history-wrap">
@@ -287,17 +267,9 @@
         </div>
     </main>
 
-    <div
-        id="sessionLogoutConfirmModal"
-        class="ui-modal logout-confirm-modal"
-        aria-hidden="true"
-    >
-        <div
-            class="ui-modal-card modal-box-inner logout-confirm-card"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="sessionLogoutConfirmTitle"
-        >
+    <div id="sessionLogoutConfirmModal" class="ui-modal logout-confirm-modal" aria-hidden="true">
+        <div class="ui-modal-card modal-box-inner logout-confirm-card" role="dialog" aria-modal="true"
+            aria-labelledby="sessionLogoutConfirmTitle">
             <div class="modal-hd">
                 <div class="modal-heading">
                     <div class="modal-icon logout-confirm-icon">
@@ -305,28 +277,18 @@
                     </div>
 
                     <div class="modal-copy">
-                        <h2
-                            id="sessionLogoutConfirmTitle"
-                            class="modal-title"
-                        >
+                        <h2 id="sessionLogoutConfirmTitle" class="modal-title">
                             Confirm Logout
                         </h2>
 
-                        <p
-                            id="sessionLogoutConfirmSubtitle"
-                            class="modal-subtitle"
-                        >
+                        <p id="sessionLogoutConfirmSubtitle" class="modal-subtitle">
                             Confirm session logout
                         </p>
                     </div>
                 </div>
 
-                <button
-                    type="button"
-                    class="modal-x"
-                    id="closeSessionLogoutModal"
-                    aria-label="Close confirmation modal"
-                >
+                <button type="button" class="modal-x" id="closeSessionLogoutModal"
+                    aria-label="Close confirmation modal">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -350,19 +312,11 @@
             </div>
 
             <div class="modal-ft logout-confirm-actions">
-                <button
-                    type="button"
-                    class="btn-close-modal"
-                    id="cancelSessionLogout"
-                >
+                <button type="button" class="btn-close-modal" id="cancelSessionLogout">
                     Cancel
                 </button>
 
-                <button
-                    type="button"
-                    class="modal-btn-confirm danger"
-                    id="confirmSessionLogout"
-                >
+                <button type="button" class="modal-btn-confirm danger" id="confirmSessionLogout">
                     <i class="fa-solid fa-right-from-bracket"></i>
                     <span>Log Out</span>
                 </button>
@@ -370,31 +324,31 @@
         </div>
     </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        @if (session('success'))
-            if (typeof window.showToast === 'function') {
-                window.showToast(
-                    'Success',
-                    @json(session('success')),
-                    'success'
-                );
-            }
-        @endif
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            @if (session('success'))
+                if (typeof window.showToast === 'function') {
+                    window.showToast(
+                        'Success',
+                        @json(session('success')),
+                        'success'
+                    );
+                }
+            @endif
 
-        @if (session('error'))
-            if (typeof window.showToast === 'function') {
-                window.showToast(
-                    'Error',
-                    @json(session('error')),
-                    'error'
-                );
-            }
-        @endif
+            @if (session('error'))
+                if (typeof window.showToast === 'function') {
+                    window.showToast(
+                        'Error',
+                        @json(session('error')),
+                        'error'
+                    );
+                }
+            @endif
 
-    const modal = document.getElementById('sessionLogoutConfirmModal');
+            const modal = document.getElementById('sessionLogoutConfirmModal');
 
-        if (!modal) return;
+            if (!modal) return;
 
             const title = document.getElementById('sessionLogoutConfirmTitle');
             const subtitle = document.getElementById('sessionLogoutConfirmSubtitle');
@@ -408,112 +362,112 @@
 
             let pendingForm = null;
 
-        function openSessionLogoutModal(trigger) {
-            const formId = trigger.dataset.formId;
-            pendingForm = document.getElementById(formId);
+            function openSessionLogoutModal(trigger) {
+                const formId = trigger.dataset.formId;
+                pendingForm = document.getElementById(formId);
 
-            if (!pendingForm) return;
+                if (!pendingForm) return;
 
-            title.textContent = trigger.dataset.title || 'Confirm Logout';
-            subtitle.textContent = trigger.dataset.subtitle || 'Confirm session logout';
-            message.textContent =  trigger.dataset.message || 'Are you sure you want to continue?';
-            helper.textContent = trigger.dataset.helper || 'Your active session will be ended.';
+                title.textContent = trigger.dataset.title || 'Confirm Logout';
+                subtitle.textContent = trigger.dataset.subtitle || 'Confirm session logout';
+                message.textContent = trigger.dataset.message || 'Are you sure you want to continue?';
+                helper.textContent = trigger.dataset.helper || 'Your active session will be ended.';
 
-            if (confirmButtonLabel) {
-                confirmButtonLabel.textContent = trigger.dataset.confirmLabel || 'Log Out';
-            }
+                if (confirmButtonLabel) {
+                    confirmButtonLabel.textContent = trigger.dataset.confirmLabel || 'Log Out';
+                }
 
-            confirmButton.disabled = false;
-            modal.classList.remove('closing');
-            modal.classList.add('open');
+                confirmButton.disabled = false;
+                modal.classList.remove('closing');
+                modal.classList.add('open');
 
-            modal.setAttribute('aria-hidden', 'false');
-            document.documentElement
-                .classList
-                .add('modal-lock');
-
-            document.body
-                .classList
-                .add('modal-lock');
-
-            closeButton?.focus();
-        }
-
-        function closeSessionLogoutModal() {
-            if (!modal.classList.contains('open')) {
-                return;
-            }
-
-            modal.classList.add('closing');
-
-            window.setTimeout(() => { 
-                    modal.classList.remove(
-                    'open',
-                    'closing'
-                );
-
-                modal.setAttribute('aria-hidden', 'true');
-
+                modal.setAttribute('aria-hidden', 'false');
                 document.documentElement
                     .classList
-                    .remove('modal-lock');
+                    .add('modal-lock');
 
                 document.body
                     .classList
-                    .remove('modal-lock');
+                    .add('modal-lock');
 
-                pendingForm = null;
+                closeButton?.focus();
+            }
 
-                confirmButton.disabled = false;
-            }, 160);
-        }
+            function closeSessionLogoutModal() {
+                if (!modal.classList.contains('open')) {
+                    return;
+                }
 
-        document
-            .querySelectorAll(
-                '[data-session-confirm]'
-            )
-            .forEach(button => {
-                button.addEventListener(
-                    'click',
-                    () => {
-                        openSessionLogoutModal(
-                            button
-                        );
+                modal.classList.add('closing');
+
+                window.setTimeout(() => {
+                    modal.classList.remove(
+                        'open',
+                        'closing'
+                    );
+
+                    modal.setAttribute('aria-hidden', 'true');
+
+                    document.documentElement
+                        .classList
+                        .remove('modal-lock');
+
+                    document.body
+                        .classList
+                        .remove('modal-lock');
+
+                    pendingForm = null;
+
+                    confirmButton.disabled = false;
+                }, 160);
+            }
+
+            document
+                .querySelectorAll(
+                    '[data-session-confirm]'
+                )
+                .forEach(button => {
+                    button.addEventListener(
+                        'click',
+                        () => {
+                            openSessionLogoutModal(
+                                button
+                            );
+                        }
+                    );
+                });
+
+            cancelButton?.addEventListener('click', closeSessionLogoutModal);
+            closeButton?.addEventListener('click', closeSessionLogoutModal);
+
+            modal.addEventListener(
+                'click',
+                event => {
+                    if (event.target === modal) {
+                        closeSessionLogoutModal();
                     }
-                );
-            });
-
-        cancelButton?.addEventListener('click', closeSessionLogoutModal);
-        closeButton?.addEventListener('click', closeSessionLogoutModal);
-
-        modal.addEventListener(
-            'click',
-            event => {
-                if (event.target === modal) {
-                    closeSessionLogoutModal();
                 }
-            }
-        );
+            );
 
-        document.addEventListener(
-            'keydown',
-            event => {
-                if (event.key === 'Escape' && modal.classList.contains('open')) {
-                    closeSessionLogoutModal();
+            document.addEventListener(
+                'keydown',
+                event => {
+                    if (event.key === 'Escape' && modal.classList.contains('open')) {
+                        closeSessionLogoutModal();
+                    }
                 }
-            }
-        );
+            );
 
-        confirmButton?.addEventListener(
-            'click',
-            () => {
-                if (!pendingForm) return;
+            confirmButton?.addEventListener(
+                'click',
+                () => {
+                    if (!pendingForm) return;
 
-                confirmButton.disabled = true;
+                    confirmButton.disabled = true;
 
-                pendingForm.submit();
-            }
-        );
-    });
+                    pendingForm.submit();
+                }
+            );
+        });
     </script>
 @endsection

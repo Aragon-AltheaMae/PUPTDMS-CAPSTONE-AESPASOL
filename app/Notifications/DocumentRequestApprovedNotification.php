@@ -11,9 +11,7 @@ class DocumentRequestApprovedNotification extends Notification
 {
     use Queueable;
 
-    public function __construct(public $documentRequest)
-    {
-    }
+    public function __construct(public $documentRequest) {}
 
     public function via(object $notifiable): array
     {
@@ -25,7 +23,7 @@ class DocumentRequestApprovedNotification extends Notification
         return [
             'title' => 'Document Request Approved',
             'message' => 'Your document request is approved and ready for pick up.',
-            'url' => route('patient.document.approved', $this->documentRequest->id),
+            'url' => route('patient.record'),
             'icon' => 'fa-file-circle-check',
             'document_request_id' => $this->documentRequest->id,
             'status' => $this->documentRequest->status,

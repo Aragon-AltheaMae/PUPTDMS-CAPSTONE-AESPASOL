@@ -82,17 +82,15 @@
                 <div class="session-admin-toolbar">
                     <div class="session-admin-toolbar-copy">
                         <h2>All Active User Sessions</h2>
-                        <p>Filter by role, search by user or browser, and take action 
+                        <p>Filter by role, search by user or browser, and take action
                             from a cleaner session queue without exposing raw session secrets.</p>
                     </div>
 
-                    <form method="GET" action="{{ route('admin.session_management.index') }}" class="session-admin-filters">
+                    <form method="GET" action="{{ route('admin.session_management.index') }}"
+                        class="session-admin-filters">
                         <div class="session-admin-search-wrap">
                             <i class="fa-solid fa-magnifying-glass"></i>
-                            <input
-                                type="text"
-                                name="search"
-                                value="{{ $filters['search'] ?? '' }}"
+                            <input type="text" name="search" value="{{ $filters['search'] ?? '' }}"
                                 class="session-admin-field session-admin-search"
                                 placeholder="Search user, email, IP, or browser">
                         </div>
@@ -100,7 +98,8 @@
                         <div class="session-admin-select-wrap">
                             <select name="role" class="session-admin-field session-admin-select">
                                 @foreach (['all' => 'All Roles', 'admin' => 'Admin', 'dentist' => 'Dentist', 'patient' => 'Patient'] as $value => $label)
-                                    <option value="{{ $value }}" {{ ($filters['role'] ?? 'all') === $value ? 'selected' : '' }}>
+                                    <option value="{{ $value }}"
+                                        {{ ($filters['role'] ?? 'all') === $value ? 'selected' : '' }}>
                                         {{ $label }}
                                     </option>
                                 @endforeach
@@ -117,8 +116,7 @@
                             </select>
                         </div>
 
-                        <button type="submit"
-                            class="session-admin-btn session-admin-btn-primary ui-btn">
+                        <button type="submit" class="session-admin-btn session-admin-btn-primary ui-btn">
                             Apply Filters
                         </button>
                     </form>
@@ -160,14 +158,16 @@
                                     default => 'session-admin-role-admin',
                                 };
 
-                                $statusClass = strtolower((string) $session->user_status) === 'active'
-                                    ? 'session-admin-status-active'
-                                    : 'session-admin-status-inactive';
+                                $statusClass =
+                                    strtolower((string) $session->user_status) === 'active'
+                                        ? 'session-admin-status-active'
+                                        : 'session-admin-status-inactive';
 
                                 $initial = strtoupper(substr((string) $session->user_name, 0, 1));
                             @endphp
 
-                            <article class="session-admin-item {{ $session->is_current ? 'session-admin-item-current' : '' }}">
+                            <article
+                                class="session-admin-item {{ $session->is_current ? 'session-admin-item-current' : '' }}">
                                 <div class="session-admin-item-shell">
                                     <div class="session-admin-userblock">
                                         <div class="session-admin-avatar global-record-avatar">
@@ -216,11 +216,19 @@
                                         </span>
 
                                         <span class="session-admin-device-title global-info-value">
+                                            @if ($session->device_type === 'mobile')
+                                                <i class="fa-solid fa-mobile-screen-button"></i>
+                                            @elseif ($session->device_type === 'tablet')
+                                                <i class="fa-solid fa-tablet-screen-button"></i>
+                                            @else
+                                                <i class="fa-solid fa-desktop"></i>
+                                            @endif
+
                                             {{ $session->device_label }}
                                         </span>
 
                                         <span class="session-admin-device-sub global-info-subvalue">
-                                            {{ $session->user_agent }}
+                                            {{ $session->browser_label }} · {{ $session->os_label }}
                                         </span>
                                     </div>
 
@@ -237,58 +245,64 @@
                                             {{ $session->last_activity_label }}
                                         </span>
 
-                                            <div class="session-admin-actions">
-                                                @if (!$session->is_current)
-                                                    <form method="POST" action="{{ route('admin.session_management.destroy_session', $session->reference) }}">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="session-admin-btn session-admin-btn-soft ui-btn">
-                                                            Log Out This Session
-                                                        </button>
-                                                    </form>
-                                                @else
-                                                    <button type="button" class="session-admin-btn session-admin-btn-current ui-btn" disabled>
-                                                        This Session Is Protected
-                                                    </button>
-                                                @endif
-
-                                                <form method="POST" action="{{ route('admin.session_management.destroy_user_sessions', $session->user_id) }}">
+                                        <div class="session-admin-actions">
+                                            @if (!$session->is_current)
+                                                <form method="POST"
+                                                    action="{{ route('admin.session_management.destroy_session', $session->reference) }}">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="session-admin-btn ui-btn 
-                                                        {{ $session->is_current ? 'session-admin-btn-soft' : 'session-admin-btn-danger' }}">
-                                                        {{ $session->is_current ? 'Log Out Other Sessions' : 'Log Out All User Sessions' }}
+                                                    <button type="submit"
+                                                        class="session-admin-btn session-admin-btn-soft ui-btn">
+                                                        Log Out This Session
                                                     </button>
                                                 </form>
-                                            </div>
+                                            @else
+                                                <button type="button"
+                                                    class="session-admin-btn session-admin-btn-current ui-btn" disabled>
+                                                    This Session Is Protected
+                                                </button>
+                                            @endif
+
+                                            <form method="POST"
+                                                action="{{ route('admin.session_management.destroy_user_sessions', $session->user_id) }}">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                    class="session-admin-btn ui-btn 
+                                                        {{ $session->is_current ? 'session-admin-btn-soft' : 'session-admin-btn-danger' }}">
+                                                    {{ $session->is_current ? 'Log Out Other Sessions' : 'Log Out All User Sessions' }}
+                                                </button>
+                                            </form>
                                         </div>
                                     </div>
-                                </article>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="session-admin-empty">
-                            <div class="session-admin-empty-icon global-info-icon">
-                                <i class="fa-solid fa-shield-halved"></i>
-                            </div>
-                            <h3>No Active Sessions Found</h3>
-                            <p>The current filters did not match any active sessions. Try changing the role filter or clearing the search query.</p>
-                        </div>
-                    @endif
-
-                    <div class="session-admin-pagination">
-                        <div class="session-admin-pagination-info">
-                            Page
-                            <strong>{{ $sessions->currentPage() }}</strong>
-                            of
-                            <strong>{{ $sessions->lastPage() }}</strong>
-                        </div>
-
-                        <div class="session-admin-links">
-                            {{ $sessions->links('vendor.pagination.bootstrap-5') }}
-                        </div>
+                                </div>
+                            </article>
+                        @endforeach
                     </div>
-                </section>
-            </div>
-        </main>
-    @endsection
+                @else
+                    <div class="session-admin-empty">
+                        <div class="session-admin-empty-icon global-info-icon">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <h3>No Active Sessions Found</h3>
+                        <p>The current filters did not match any active sessions. Try changing the role filter or clearing
+                            the search query.</p>
+                    </div>
+                @endif
+
+                <div class="session-admin-pagination">
+                    <div class="session-admin-pagination-info">
+                        Page
+                        <strong>{{ $sessions->currentPage() }}</strong>
+                        of
+                        <strong>{{ $sessions->lastPage() }}</strong>
+                    </div>
+
+                    <div class="session-admin-links">
+                        {{ $sessions->links('vendor.pagination.bootstrap-5') }}
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+@endsection
