@@ -1213,3 +1213,12 @@ body.filter-lock .back-to-top {
         transform: scale(.85) !important;
     }
 }
+
+body.appointment-confirmed-open #mobileBottomNav,
+body.appointment-confirmed-open .assistive-fab-group,
+body.appointment-confirmed-open .back-to-top {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateY(20px) scale(.95) !important;
+}

@@ -218,21 +218,29 @@
     pointer-events: none;
 }
 
-@media (max-width: 640px) {
+@media (max-width:640px) {
+
     .booking-workflow-card {
-        padding-bottom: 1rem;
+        padding-bottom: .5rem;
     }
 
     .booking-navigation {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        padding: 0 1rem;
+        position: relative;
+        display: flex;
+        gap: .5rem;
+        padding: .75rem .75rem 0;
+        margin-top: .75rem;
     }
 
     .booking-navigation .ui-btn {
-        width: 100%;
+        flex: 1;
+        min-height: 40px;
+        padding: .55rem .65rem;
+        font-size: .72rem;
         justify-content: center;
+        white-space: nowrap;
     }
+
 }
 
 .booking-conditional-field {
@@ -257,6 +265,11 @@
     .booking-conditional-field {
         margin-left: .65rem;
         padding-left: .65rem;
+    }
+
+    .booking-page {
+        padding-bottom:
+            calc(5rem + env(safe-area-inset-bottom));
     }
 }
 
@@ -426,19 +439,24 @@
 
 @media (max-width: 767px) {
     .step-label {
-        display: none !important;
+        display: block !important;
+        max-width: 60px;
+        margin-top: .35rem;
+        font-size: .48rem;
+        line-height: 1.15;
+        letter-spacing: .02em;
     }
 
     .step-circle {
-        width: 34px !important;
-        height: 34px !important;
-        font-size: .78rem !important;
+        width: 30px !important;
+        height: 30px !important;
+        font-size: .7rem !important;
     }
 
     .step-connector,
     .step-connector-size {
-        width: clamp(8px, 3vw, 24px) !important;
-        margin-top: 17px !important;
+        width: clamp(10px, 4vw, 18px) !important;
+        margin-top: 15px !important;
     }
 
     .book-card {
@@ -1332,9 +1350,11 @@
 }
 
 .signature-pad-actions {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: .55rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: .6rem;
+    flex-wrap: wrap;
 }
 
 .signature-pad-actions .ui-btn {
@@ -1593,6 +1613,33 @@
 }
 
 @media (max-width: 640px) {
+
+    .signature-pad-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        gap: .55rem;
+    }
+
+    .signature-pad-actions button {
+        width: 100%;
+        min-height: 38px;
+        padding: .45rem .55rem;
+        font-size: .72rem;
+        line-height: 1.15;
+    }
+
+    .signature-pad-actions #signatureUseDrawnBtn {
+        grid-column: 1 / -1;
+    }
+
+    .signature-pad-wrap {
+        padding: .7rem;
+    }
+
+    .signature-pad-canvas {
+        height: 170px;
+    }
 
     .booking-summary-card-header {
         padding: .65rem .8rem;

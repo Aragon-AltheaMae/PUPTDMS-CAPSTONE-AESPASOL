@@ -148,9 +148,12 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         :diseases="$diseases" mode="standard" :defaults="$medicalDefaults"
                                         :selected-diseases="$selectedDiseases" :is-female="$isFemalePatient" />
 
-                                    @if (!$hasReusableSignature)
-                                    <x-booking.signature mode="patient" label="Patient's Signature" />
-                                    @endif
+                                    <x-booking.signature :has-existing-signature="$hasReusableSignature"
+                                        :existing-signature-url="
+        $patient->medicalHistory?->patient_signature
+            ? asset('storage/' . $patient->medicalHistory->patient_signature)
+            : null
+    " />
                                 </div>
                             </div>
                         </div>
@@ -521,8 +524,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
             return {
                 payload: parsed,
-                savedAt:
-                    parsed.__meta?.savedAt ??
+                savedAt: parsed.__meta?.savedAt ??
                     null,
                 source: "local",
             };
@@ -536,20 +538,15 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         try {
             const response =
                 await fetch(
-                    DRAFT_SHOW_URL,
-                    {
-                        method: "GET",
-                        headers: {
-                            "Accept":
-                                "application/json",
-                            "X-Requested-With":
-                                "XMLHttpRequest",
-                        },
-                        credentials:
-                            "same-origin",
-                        cache:
-                            "no-store",
-                    }
+                    DRAFT_SHOW_URL, {
+                    method: "GET",
+                    headers: {
+                        "Accept": "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                    credentials: "same-origin",
+                    cache: "no-store",
+                }
                 );
 
             if (!response.ok) {
@@ -570,22 +567,18 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             }
 
             return {
-                payload:
-                    data.draft.payload,
+                payload: data.draft.payload,
 
-                savedAt:
-                    data.draft.last_saved_at ??
+                savedAt: data.draft.last_saved_at ??
                     data.draft.payload
                         ?.__meta
                         ?.savedAt ??
                     null,
 
-                currentStep:
-                    data.draft.current_step ??
+                currentStep: data.draft.current_step ??
                     0,
 
-                source:
-                    "server",
+                source: "server",
             };
         } catch (error) {
             console.warn(
@@ -607,9 +600,9 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                 draft.savedAt
             ).getTime();
 
-        return Number.isFinite(timestamp)
-            ? timestamp
-            : 0;
+        return Number.isFinite(timestamp) ?
+            timestamp :
+            0;
     }
 
     function chooseNewestDraft(
@@ -644,9 +637,9 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             getDraftTimestamp(
                 localDraft
             )
-        )
-            ? serverDraft
-            : localDraft;
+        ) ?
+            serverDraft :
+            localDraft;
     }
 
     async function resolveAvailableDraft() {
@@ -724,17 +717,14 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         }
 
         obj.__meta = {
-            step:
-                bookingWorkflow
-                    ?.getCurrentStep?.() ??
+            step: bookingWorkflow
+                ?.getCurrentStep?.() ??
                 0,
 
-            savedAt:
-                new Date()
-                    .toISOString(),
+            savedAt: new Date()
+                .toISOString(),
 
-            fieldCount:
-                Object.keys(obj).length,
+            fieldCount: Object.keys(obj).length,
         };
 
         localStorage.setItem(
@@ -761,37 +751,28 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         try {
             const response =
                 await fetch(
-                    DRAFT_SAVE_URL,
-                    {
-                        method: "PUT",
+                    DRAFT_SAVE_URL, {
+                    method: "PUT",
 
-                        headers: {
-                            "Content-Type":
-                                "application/json",
+                    headers: {
+                        "Content-Type": "application/json",
 
-                            "Accept":
-                                "application/json",
+                        "Accept": "application/json",
 
-                            "X-Requested-With":
-                                "XMLHttpRequest",
+                        "X-Requested-With": "XMLHttpRequest",
 
-                            "X-CSRF-TOKEN":
-                                getDraftCsrfToken(),
-                        },
+                        "X-CSRF-TOKEN": getDraftCsrfToken(),
+                    },
 
-                        credentials:
-                            "same-origin",
+                    credentials: "same-origin",
 
-                        body:
-                            JSON.stringify({
-                                payload:
-                                    draft,
+                    body: JSON.stringify({
+                        payload: draft,
 
-                                current_step:
-                                    draft.__meta?.step ??
-                                    0,
-                            }),
-                    }
+                        current_step: draft.__meta?.step ??
+                            0,
+                    }),
+                }
                 );
 
             if (!response.ok) {
@@ -829,25 +810,19 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                 try {
                     const response =
                         await fetch(
-                            DRAFT_DELETE_URL,
-                            {
-                                method:
-                                    "DELETE",
+                            DRAFT_DELETE_URL, {
+                            method: "DELETE",
 
-                                headers: {
-                                    "Accept":
-                                        "application/json",
+                            headers: {
+                                "Accept": "application/json",
 
-                                    "X-Requested-With":
-                                        "XMLHttpRequest",
+                                "X-Requested-With": "XMLHttpRequest",
 
-                                    "X-CSRF-TOKEN":
-                                        getDraftCsrfToken(),
-                                },
+                                "X-CSRF-TOKEN": getDraftCsrfToken(),
+                            },
 
-                                credentials:
-                                    "same-origin",
-                            }
+                            credentials: "same-origin",
+                        }
                         );
 
                     if (!response.ok) {
@@ -871,10 +846,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
                     window.showToast?.({
                         type: "error",
-                        title:
-                            "Draft not saved",
-                        message:
-                            "Unable to clear the previous saved draft. Please try again.",
+                        title: "Draft not saved",
+                        message: "Unable to clear the previous saved draft. Please try again.",
                         duration: 4000,
                     });
 
@@ -890,10 +863,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             if (!saved) {
                 window.showToast?.({
                     type: "error",
-                    title:
-                        "Draft not saved",
-                    message:
-                        "Unable to save your draft right now. Please try again.",
+                    title: "Draft not saved",
+                    message: "Unable to save your draft right now. Please try again.",
                     duration: 4000,
                 });
 
@@ -904,10 +875,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
             window.showToast?.({
                 type: "success",
-                title:
-                    "Draft saved",
-                message:
-                    "Your appointment draft has been saved.",
+                title: "Draft saved",
+                message: "Your appointment draft has been saved.",
                 duration: 3000,
             });
 
@@ -925,24 +894,19 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             try {
                 const response =
                     await fetch(
-                        DRAFT_DELETE_URL,
-                        {
-                            method: "DELETE",
+                        DRAFT_DELETE_URL, {
+                        method: "DELETE",
 
-                            headers: {
-                                "Accept":
-                                    "application/json",
+                        headers: {
+                            "Accept": "application/json",
 
-                                "X-Requested-With":
-                                    "XMLHttpRequest",
+                            "X-Requested-With": "XMLHttpRequest",
 
-                                "X-CSRF-TOKEN":
-                                    getDraftCsrfToken(),
-                            },
+                            "X-CSRF-TOKEN": getDraftCsrfToken(),
+                        },
 
-                            credentials:
-                                "same-origin",
-                        }
+                        credentials: "same-origin",
+                    }
                     );
 
                 if (!response.ok) {
@@ -965,10 +929,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
                 window.showToast?.({
                     type: "error",
-                    title:
-                        "Draft not discarded",
-                    message:
-                        "Unable to remove your saved draft. Please try again.",
+                    title: "Draft not discarded",
+                    message: "Unable to remove your saved draft. Please try again.",
                     duration: 4000,
                 });
 
@@ -1228,9 +1190,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
             if (bookingWorkflow) {
                 for (
-                    let index = 0;
-                    index < restoredStep;
-                    index++
+                    let index = 0; index < restoredStep; index++
                 ) {
                     bookingWorkflow
                         .markComplete(
@@ -1240,11 +1200,9 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
                 bookingWorkflow
                     .goTo(
-                        restoredStep,
-                        {
-                            scroll:
-                                false
-                        }
+                        restoredStep, {
+                        scroll: false
+                    }
                     );
             }
 
@@ -1325,14 +1283,11 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
         bookingWorkflow
             ?.setNextButton({
-                label:
-                    'Save Changes',
+                label: 'Save Changes',
 
-                icon:
-                    'fa-floppy-disk',
+                icon: 'fa-floppy-disk',
 
-                iconPosition:
-                    'left',
+                iconPosition: 'left',
             });
     }
 
@@ -2046,7 +2001,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         bookingWorkflow?.goTo(2);
     }
 
-    function editMedicalHistoryFromReview() {
+    function openMedicalHistoryEditorFromReview({
+        focusSignature = false
+    } = {}) {
+
         editingHistoryFromReview = 'medical';
 
         resetStep5View();
@@ -2054,10 +2012,42 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         bookingWorkflow?.goTo(3);
 
         setTimeout(() => {
-            window.BookingSignature
-                ?.get(document)
-                ?.resize();
-        }, 120);
+
+            const signature =
+                window.BookingSignature
+                    ?.get(document);
+
+            signature?.resize();
+
+
+            if (focusSignature) {
+
+                const signatureCard =
+                    document.querySelector(
+                        '[data-booking-signature]'
+                    );
+
+                signatureCard?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+
+        }, 200);
+    }
+
+    function editSignatureFromReview() {
+
+        openMedicalHistoryEditorFromReview({
+            focusSignature: true
+        });
+
+    }
+
+    function editMedicalHistoryFromReview() {
+
+        openMedicalHistoryEditorFromReview();
+
     }
 
     function buildSummary() {
@@ -2170,15 +2160,15 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     </div>
 
     ${editAction ? `
-            <button
-                type="button"
-                class="ui-btn ui-btn-secondary ui-btn-sm ml-auto"
-                onclick="${editAction}"
-            >
-                <i class="fa-solid fa-pen"></i>
-                Edit
-            </button>
-        ` : ''}
+                <button
+                    type="button"
+                    class="ui-btn ui-btn-secondary ui-btn-sm ml-auto"
+                    onclick="${editAction}"
+                >
+                    <i class="fa-solid fa-pen"></i>
+                    Edit
+                </button>
+            ` : ''}
 </div>
 
     <div class="booking-summary-card-body">
@@ -2255,10 +2245,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                 ${diseaseLabels
                     .map(
                         label => `
-                                                                                                            <span class="booking-summary-tag">
-                                                                                                                ${label}
-                                                                                                            </span>
-                                                                                                        `
+                                                                                                                <span class="booking-summary-tag">
+                                                                                                                    ${label}
+                                                                                                                </span>
+                                                                                                            `
                     )
                     .join('')}
             </div>
@@ -2281,83 +2271,83 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             document.getElementById('contact_address')?.value || 'N/A';
         const dentalHistoryBody = `
     ${subSection("Basic Info", `
-                                                                                                ${row("Last Dental Visit", get("last_dental_visit"))}
-                                                                                                ${row("Previous Dentist", get("previous_dentist"))}
-                                                                                            `)}
+                                                                                                    ${row("Last Dental Visit", get("last_dental_visit"))}
+                                                                                                    ${row("Previous Dentist", get("previous_dentist"))}
+                                                                                                `)}
 
     ${subSection("Dental Symptoms", `
-                                                                                                ${row("Bleeding Gums", get("bleeding_gums"))}
-                                                                                                ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
-                                                                                                ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
-                                                                                                ${row("Tooth Pain", get("tooth_pain"))}
-                                                                                                ${row("Sores/Lumps", get("sores"))}
-                                                                                                ${row("Jaw Injuries", get("injuries"))}
-                                                                                            `)}
+                                                                                                    ${row("Bleeding Gums", get("bleeding_gums"))}
+                                                                                                    ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
+                                                                                                    ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
+                                                                                                    ${row("Tooth Pain", get("tooth_pain"))}
+                                                                                                    ${row("Sores/Lumps", get("sores"))}
+                                                                                                    ${row("Jaw Injuries", get("injuries"))}
+                                                                                                `)}
 
     ${subSection("Jaw & Bite Symptoms", `
-                                                                                                ${row("Clicking", get("clicking"))}
-                                                                                                ${row("Joint Pain", get("joint_pain"))}
-                                                                                                ${row("Difficulty Moving", get("difficulty_moving"))}
-                                                                                                ${row("Difficulty Chewing", get("difficulty_chewing"))}
-                                                                                                ${row("Frequent Headaches", get("jaw_headaches"))}
-                                                                                                ${row("Grinding/Clenching", get("clench_grind"))}
-                                                                                                ${row("Lips/Cheek Biting", get("biting"))}
-                                                                                                ${row("Teeth Loosening", get("teeth_loosening"))}
-                                                                                                ${row("Food Caught Between Teeth", get("food_teeth"))}
-                                                                                                ${row("Medicine Reaction", get("med_reaction"))}
-                                                                                            `)}
+                                                                                                    ${row("Clicking", get("clicking"))}
+                                                                                                    ${row("Joint Pain", get("joint_pain"))}
+                                                                                                    ${row("Difficulty Moving", get("difficulty_moving"))}
+                                                                                                    ${row("Difficulty Chewing", get("difficulty_chewing"))}
+                                                                                                    ${row("Frequent Headaches", get("jaw_headaches"))}
+                                                                                                    ${row("Grinding/Clenching", get("clench_grind"))}
+                                                                                                    ${row("Lips/Cheek Biting", get("biting"))}
+                                                                                                    ${row("Teeth Loosening", get("teeth_loosening"))}
+                                                                                                    ${row("Food Caught Between Teeth", get("food_teeth"))}
+                                                                                                    ${row("Medicine Reaction", get("med_reaction"))}
+                                                                                                `)}
 
     ${subSection("Dental Procedures", `
-                                                                                                ${row("Periodontal Treatment", get("periodontal"))}
-                                                                                                ${row("Difficult Extraction", get("difficult_extraction"))}
-                                                                                                ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
+                                                                                                    ${row("Periodontal Treatment", get("periodontal"))}
+                                                                                                    ${row("Difficult Extraction", get("difficult_extraction"))}
+                                                                                                    ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
 
-                                                                                                ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
-                                                                                                ${row("Dentures", get("dentures"))}
-                                                                                                ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
+                                                                                                    ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
+                                                                                                    ${row("Dentures", get("dentures"))}
+                                                                                                    ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
 
-                                                                                                ${row("Orthodontic Treatment", get("ortho_treatment"))}
-                                                                                                ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
-                                                                                            `)}
+                                                                                                    ${row("Orthodontic Treatment", get("ortho_treatment"))}
+                                                                                                    ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
+                                                                                                `)}
 
     ${fullWidthSection("Additional Concerns", `
-                                                                                                ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
+                                                                                                    ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
                 ? get("additional_concerns")
                 : '<span class="text-[#9e9690] italic">No additional concerns provided.</span>'}
-                                                                                            `)}
+                                                                                                `)}
     `;
 
         const medicalHistoryBody = `
     ${subSection("General Health", `
-                                                                                                ${row("Good Health", get("good_health"))}
-                                                                                                ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
+                                                                                                    ${row("Good Health", get("good_health"))}
+                                                                                                    ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
 
-                                                                                                ${row("Had Medical Exam", get("had_medical_exam"))}
-                                                                                                ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
+                                                                                                    ${row("Had Medical Exam", get("had_medical_exam"))}
+                                                                                                    ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
 
-                                                                                                ${row("Under Treatment", get("under_treatment"))}
-                                                                                                ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
+                                                                                                    ${row("Under Treatment", get("under_treatment"))}
+                                                                                                    ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
 
-                                                                                                ${row("Hospitalized", get("hospitalized"))}
-                                                                                                ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
-                                                                                            `)}
+                                                                                                    ${row("Hospitalized", get("hospitalized"))}
+                                                                                                    ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
+                                                                                                `)}
 
     ${subSection("Allergies", `
-                                                                                                ${row("Allergy (Medicine)", get("allergy_medicine"))}
-                                                                                                ${row("Allergy (Food)", get("allergy_food"))}
-                                                                                                ${optionalRow("Allergy (Others)", get("allergy_others"))}
-                                                                                            `)}
+                                                                                                    ${row("Allergy (Medicine)", get("allergy_medicine"))}
+                                                                                                    ${row("Allergy (Food)", get("allergy_food"))}
+                                                                                                    ${optionalRow("Allergy (Others)", get("allergy_others"))}
+                                                                                                `)}
 
     ${subSection("Medications", `
-                                                                                                ${row("Medication", get("medication"))}
-                                                                                                ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
-                                                                                            `)}
+                                                                                                    ${row("Medication", get("medication"))}
+                                                                                                    ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
+                                                                                                `)}
 
     ${isFemalePatient ? subSection("For Women Only", `
-                                                                                                ${row("Pregnant", get("pregnant"))}
-                                                                                                ${row("Nursing", get("nursing"))}
-                                                                                                ${row("Birth Control Pills", get("birth_control"))}
-                                                                                            `) : ""}
+                                                                                                    ${row("Pregnant", get("pregnant"))}
+                                                                                                    ${row("Nursing", get("nursing"))}
+                                                                                                    ${row("Birth Control Pills", get("birth_control"))}
+                                                                                                `) : ""}
 
    ${fullWidthSection(
             "Medical Conditions",
@@ -2365,127 +2355,127 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         )}
 
     ${subSection("Tobacco Use", `
-                                                                                                ${row("Tobacco Use", get("tobacco_use"))}
-                                                                                                ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
-                                                                                                ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
-                                                                                            `)}
+                                                                                                    ${row("Tobacco Use", get("tobacco_use"))}
+                                                                                                    ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
+                                                                                                    ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
+                                                                                                `)}
 
     ${subSection("Do You Suffer From", `
-                                                                                                ${row("Headaches", get("headaches"))}
-                                                                                                ${row("Earaches", get("earaches"))}
-                                                                                                ${row("Neck Aches", get("neck_aches"))}
-                                                                                            `)}
+                                                                                                    ${row("Headaches", get("headaches"))}
+                                                                                                    ${row("Earaches", get("earaches"))}
+                                                                                                    ${row("Neck Aches", get("neck_aches"))}
+                                                                                                `)}
     `;
 
         document.getElementById("summaryBox").innerHTML = `
     ${summaryCard("Patient Information", "fa-user", `
-                                                                                                <div class="grid grid-cols-1 gap-y-1">
-                                                                                                    ${row("Name", patientName)}
-                                                                                                    ${row("Gender", patientGender)}
-                                                                                                </div>
-                                                                                            `)}
+                                                                                                    <div class="grid grid-cols-1 gap-y-1">
+                                                                                                        ${row("Name", patientName)}
+                                                                                                        ${row("Gender", patientGender)}
+                                                                                                    </div>
+                                                                                                `)}
                                                                     ${summaryCard(
             "Contact Information",
             "fa-address-card",
             `
-                                <div id="contactSummaryView">
-                                    <div class="grid grid-cols-1 gap-y-1">
-                                        ${row("Email", contactEmail)}
-                                        ${row("Phone", contactPhone)}
-                                        ${row("Address", contactAddress)}
-                                    </div>
-                                </div>
-
-                                <div
-                                    id="contactSummaryEditor"
-                                    class="hidden space-y-4"
-                                >
-                                    <div class="global-form-group">
-                                        <label
-                                            for="contactEditEmail"
-                                            class="global-form-label"
-                                        >
-                                            Email
-                                        </label>
-
-                                        <input
-                                            type="email"
-                                            id="contactEditEmail"
-                                            class="form-input-custom"
-                                            value="${contactEmail === 'N/A' ? '' : contactEmail}"
-                                        >
+                                    <div id="contactSummaryView">
+                                        <div class="grid grid-cols-1 gap-y-1">
+                                            ${row("Email", contactEmail)}
+                                            ${row("Phone", contactPhone)}
+                                            ${row("Address", contactAddress)}
+                                        </div>
                                     </div>
 
-                                    <div class="global-form-group">
-                                        <label
-                                            for="contactEditPhone"
-                                            class="global-form-label"
-                                        >
-                                            Phone
-                                        </label>
+                                    <div
+                                        id="contactSummaryEditor"
+                                        class="hidden space-y-4"
+                                    >
+                                        <div class="global-form-group">
+                                            <label
+                                                for="contactEditEmail"
+                                                class="global-form-label"
+                                            >
+                                                Email
+                                            </label>
 
-                                        <input
-                                            type="tel"
-                                            id="contactEditPhone"
-                                            class="form-input-custom"
-                                            maxlength="11"
-                                            inputmode="numeric"
-                                            placeholder="09XXXXXXXXX"
-                                            value="${contactPhone === 'N/A' ? '' : contactPhone}"
-                                        >
+                                            <input
+                                                type="email"
+                                                id="contactEditEmail"
+                                                class="form-input-custom"
+                                                value="${contactEmail === 'N/A' ? '' : contactEmail}"
+                                            >
+                                        </div>
+
+                                        <div class="global-form-group">
+                                            <label
+                                                for="contactEditPhone"
+                                                class="global-form-label"
+                                            >
+                                                Phone
+                                            </label>
+
+                                            <input
+                                                type="tel"
+                                                id="contactEditPhone"
+                                                class="form-input-custom"
+                                                maxlength="11"
+                                                inputmode="numeric"
+                                                placeholder="09XXXXXXXXX"
+                                                value="${contactPhone === 'N/A' ? '' : contactPhone}"
+                                            >
+                                        </div>
+
+                                        <div class="global-form-group">
+                                            <label
+                                                for="contactEditAddress"
+                                                class="global-form-label"
+                                            >
+                                                Address
+                                            </label>
+
+                                            <textarea
+                                                id="contactEditAddress"
+                                                class="form-input-custom global-form-textarea"
+                                                rows="3"
+                                            >${contactAddress === 'N/A' ? '' : contactAddress}</textarea>
+                                        </div>
+
+                                        <div class="flex flex-wrap gap-2">
+                                            <button
+                                                type="button"
+                                                class="ui-btn ui-btn-primary ui-btn-sm"
+                                                onclick="saveContactInformation()"
+                                            >
+                                                <i class="fa-solid fa-check"></i>
+                                                Save Changes
+                                            </button>
+
+                                            <button
+                                                type="button"
+                                                class="ui-btn ui-btn-secondary ui-btn-sm"
+                                                onclick="cancelContactInformationEdit()"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
                                     </div>
-
-                                    <div class="global-form-group">
-                                        <label
-                                            for="contactEditAddress"
-                                            class="global-form-label"
-                                        >
-                                            Address
-                                        </label>
-
-                                        <textarea
-                                            id="contactEditAddress"
-                                            class="form-input-custom global-form-textarea"
-                                            rows="3"
-                                        >${contactAddress === 'N/A' ? '' : contactAddress}</textarea>
-                                    </div>
-
-                                    <div class="flex flex-wrap gap-2">
-                                        <button
-                                            type="button"
-                                            class="ui-btn ui-btn-primary ui-btn-sm"
-                                            onclick="saveContactInformation()"
-                                        >
-                                            <i class="fa-solid fa-check"></i>
-                                            Save Changes
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            class="ui-btn ui-btn-secondary ui-btn-sm"
-                                            onclick="cancelContactInformationEdit()"
-                                        >
-                                            Cancel
-                                        </button>
-                                    </div>
-                                </div>
-                            `,
+                                `,
             "editContactInformationFromReview()"
         )}
 
     <div class="grid grid-cols-2 gap-4 sm-grid-1col">
         ${summaryCard("Appointment Details", "fa-calendar-check", `
-                                                                                                <div class="grid grid-cols-1 gap-y-1">
-                                                                                                    ${row("Date", get("appointment_date"))}
-                                                                                                    ${row("Time", get("appointment_time"))}
-                                                                                                </div>
-                                                                                            `)}
-
-        ${summaryCard("Service", "fa-tooth", `
                                                                                                     <div class="grid grid-cols-1 gap-y-1">
-                                                                                                        ${row("Type", get("service_type"))}
+                                                                                                        ${row("Date", get("appointment_date"))}
+                                                                                                        ${row("Time", get("appointment_time"))}
                                                                                                     </div>
                                                                                                 `)}
+
+        ${summaryCard("Service", "fa-tooth", `
+                                                                                                        <div class="grid grid-cols-1 gap-y-1">
+                                                                                                            ${row("Type", get("service_type"))}
+                                                                                                        </div>
+                                                                                                    `)}
     </div>
 
         ${summaryCard("Dental History", "fa-teeth",
@@ -2500,14 +2490,19 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
     <div class="grid grid-cols-2 gap-4 sm-grid-1col">
         ${summaryCard("Emergency Contact", "fa-phone", `
-                                                                                                    <div class="grid grid-cols-1 gap-y-1">
-                                                                                                        ${row("Name", get("emergency_person"))}
-                                                                                                        ${row("Number", get("emergency_number"))}
-                                                                                                        ${row("Relation", emergencyRelation)}
-                                                                                                    </div>
-                                                                                                `)}
+                                                                                                        <div class="grid grid-cols-1 gap-y-1">
+                                                                                                            ${row("Name", get("emergency_person"))}
+                                                                                                            ${row("Number", get("emergency_number"))}
+                                                                                                            ${row("Relation", emergencyRelation)}
+                                                                                                        </div>
+                                                                                                    `)}
 
-        ${summaryCard("Signature", "fa-signature", sigHTML)}
+        ${summaryCard(
+            "Signature",
+            "fa-signature",
+            sigHTML,
+            "editSignatureFromReview()"
+        )}
     </div>
 `;
 
@@ -2993,10 +2988,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
                         window.showToast?.({
                             type: "info",
-                            title:
-                                "No draft found",
-                            message:
-                                "There is no saved appointment draft to restore.",
+                            title: "No draft found",
+                            message: "There is no saved appointment draft to restore.",
                             duration: 3500,
                         });
 
@@ -3013,10 +3006,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                     if (restored) {
                         window.showToast?.({
                             type: "success",
-                            title:
-                                "Draft restored",
-                            message:
-                                "Your saved appointment information has been restored.",
+                            title: "Draft restored",
+                            message: "Your saved appointment information has been restored.",
                             duration: 4000,
                         });
                     }
