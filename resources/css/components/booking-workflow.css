@@ -1658,3 +1658,64 @@
         white-space: normal;
     }
 }
+
+.signature-existing-card {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    gap: .85rem;
+}
+
+.signature-existing-card.hidden {
+    display: none !important;
+}
+
+.signature-existing-header {
+    display: flex;
+    align-items: flex-start;
+    gap: .65rem;
+}
+
+.signature-existing-header>i {
+    margin-top: .15rem;
+    color: var(--success, #16a34a);
+    font-size: 1rem;
+}
+
+.signature-existing-title {
+    margin: 0;
+    color: var(--success, #16a34a);
+    font-size: .95rem;
+    font-weight: 800;
+}
+
+.signature-existing-help {
+    margin: .25rem 0 0;
+    color: var(--text-2);
+    font-size: .82rem;
+    line-height: 1.5;
+}
+
+.signature-existing-preview {
+    width: 100%;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    border-radius: 14px;
+    border: 1px dashed var(--border);
+    background: var(--card);
+    overflow: hidden;
+}
+
+.signature-existing-preview img {
+    width: auto;
+    height: 120px;
+    max-width: 320px;
+    object-fit: contain;
+}

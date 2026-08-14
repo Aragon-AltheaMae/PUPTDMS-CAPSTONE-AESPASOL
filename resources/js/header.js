@@ -369,11 +369,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
             document.body.style.overflow = '';
 
-            modal.classList.remove('closing');
-            modal.classList.add('open');
-            modal.setAttribute(
-                'aria-hidden',
-                'false'
+            window.closeModal?.(
+                modal.id
+            );
+            window.openModal?.(
+                modal.id
             );
 
             document.documentElement.classList.add(
@@ -390,19 +390,23 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
         const closeModal = () => {
-            if (!modal.classList.contains('open')) {
+
+            if (
+                !modal.classList.contains('open') &&
+                !modal.classList.contains('closing')
+            ) {
                 return;
             }
 
-            modal.classList.add('closing');
-            modal.classList.remove('open');
-            modal.setAttribute(
-                'aria-hidden',
-                'true'
+            window.closeModal?.(
+                modal.id
+            );
+
+            clearTimeout(
+                closingTimer
             );
 
             closingTimer = setTimeout(() => {
-                modal.classList.remove('closing');
 
                 document.documentElement.classList.remove(
                     'modal-lock'
@@ -415,7 +419,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 pendingLogoutForm = null;
 
                 lastFocusedElement?.focus?.();
-            }, 170);
+
+            }, 180);
         };
 
         document.addEventListener(

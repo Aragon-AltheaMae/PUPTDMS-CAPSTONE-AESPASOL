@@ -636,12 +636,19 @@ session(
                 );
 
                 document
-                    .getElementById(
-                        'appointmentConfirmedDoneBtn'
-                    )
-                    ?.addEventListener(
-                        'click',
-                        () => {
+                .getElementById(
+                    'appointmentConfirmedDoneBtn'
+                )
+                ?.addEventListener(
+                    'click',
+                    (event) => {
+
+                        const button = event.currentTarget;
+
+                        button.blur();
+
+                        requestAnimationFrame(() => {
+
                             window.closeModal?.(
                                 'appointmentConfirmedModal'
                             );
@@ -655,8 +662,11 @@ session(
                                 'appointment-confirmed-open',
                                 'modal-lock'
                             );
-                        }
-                    );
+
+                        });
+
+                    }
+                );
             }
         );
     @endif
