@@ -801,7 +801,7 @@ Route::prefix('patient')->middleware(['role:patient'])->group(function () {
         ->middleware('permission:book_appointments')
         ->name('book.appointment.store');
 
-            Route::get('/book-appointment/draft', [AppointmentController::class, 'getDraft'])
+    Route::get('/book-appointment/draft', [AppointmentController::class, 'getDraft'])
         ->middleware('permission:book_appointments')
         ->name('book.appointment.draft.show');
 
@@ -1002,7 +1002,10 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
             'gadMale',
             'clinicStatus'
         ));
-    })->middleware('permission:access_dentist_dashboard')->name('dentist.dentist.dashboard');
+    });
+    Route::get('/dashboard', [DentistDashboardController::class, 'index'])
+        ->middleware('permission:access_dentist_dashboard')
+        ->name('dentist.dentist.dashboard');
 
     // Appointments
     Route::get('/appointments', [DentistAppointmentController::class, 'index'])
@@ -1139,6 +1142,10 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
     Route::get('/report/dental-services', [\App\Http\Controllers\Dentist\DentalServicesRecordController::class, 'index'])
         ->middleware('permission:manage_reports')
         ->name('dentist.dentist.report.dental-services');
+        
+    Route::get('/report/dental-services/data', [\App\Http\Controllers\Dentist\DentalServicesRecordController::class, 'data'])
+        ->middleware('permission:manage_reports')
+        ->name('dentist.dentist.report.dental-services.data');
 
     Route::get('/report/daily-treatment-record/list', [\App\Http\Controllers\Dentist\DentistReportController::class, 'dailyTreatmentRecordList'])
         ->middleware('permission:manage_reports')

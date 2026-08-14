@@ -524,12 +524,16 @@ function initMonthOnlyFlatpickr(root = document) {
             ? `${rawDefault}-01`
             : rawDefault || new Date();
 
+        const limitToToday =
+            el.hasAttribute('data-month-max-today');
+
         flatpickr(el, {
             dateFormat: 'Y-m',
             altInput: true,
             altFormat: 'F Y',
             altInputClass: 'form-input-custom service-period-input service-period-alt',
             defaultDate,
+            maxDate: limitToToday ? 'today' : undefined,
             allowInput: false,
             clickOpens: true,
             disableMobile: true,

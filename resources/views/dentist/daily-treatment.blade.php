@@ -48,27 +48,18 @@
 
         <div class="card-header-right dtr-toolbar search-filter-row">
           <div class="dtr-month-picker fp-date-input-wrap">
-          <input type="text" id="monthPicker" class="form-input-custom fp-date-input"
-              data-month-only-picker placeholder="Select month" readonly>
+            <input type="text" id="monthPicker" class="form-input-custom fp-date-input" data-month-only-picker
+              data-month-max-today placeholder="Select month" readonly>
 
             <i class="fa-solid fa-calendar-days fp-date-icon"></i>
           </div>
 
-            <div class="voice-search-row">
-              <x-search-bar
-                  id="searchInput"
-                  placeholder="Search patient, program, treatment…"
-                  callback="handleDailyTreatmentSearch"
-                  :debounce="350"
-                  clear-label="Clear search"
-              />
+          <div class="voice-search-row">
+            <x-search-bar id="searchInput" placeholder="Search patient, program, treatment…"
+              callback="handleDailyTreatmentSearch" :debounce="350" clear-label="Clear search" />
 
-              <x-voice-input
-                  target="#searchInput"
-                  status-id="dailySearchVoiceStatus"
-                  label="Use voice search"
-                  title="Voice search"
-              />
+            <x-voice-input target="#searchInput" status-id="dailySearchVoiceStatus" label="Use voice search"
+              title="Voice search" />
           </div>
 
           <div class="dtr-filter-actions">
@@ -87,17 +78,9 @@
         </div>
       </div>
 
-      <x-pagination-bar
-        id="dailyPagebarTop"
-        info-id="dailyPageInfoTop"
-        pagination-id="dailyPaginationTop"
-        position="top"
-        :show-entries="true"
-        page-size-id="dtPerPageSelect"
-        page-size-callback="selectDailyPerPage"
-        :page-size-value="10"
-        label="entries"
-      />
+      <x-pagination-bar id="dailyPagebarTop" info-id="dailyPageInfoTop" pagination-id="dailyPaginationTop"
+        position="top" :show-entries="true" page-size-id="dtPerPageSelect" page-size-callback="selectDailyPerPage"
+        :page-size-value="10" label="entries" />
 
       <div class="card-body dtr-card-body">
         <div id="dailyListView" class="table-responsive-fix service-table-wrap dtr-table-wrap">
@@ -125,147 +108,111 @@
         <div id="dailyEmptyState" class="empty-state-host"></div>
       </div>
 
-      <x-pagination-bar
-        id="dailyPagebarBottom"
-        info-id="dailyPageInfoBottom"
-        pagination-id="dailyPaginationBottom"
-        position="bottom"
-        label="entries"
-      />
+      <x-pagination-bar id="dailyPagebarBottom" info-id="dailyPageInfoBottom" pagination-id="dailyPaginationBottom"
+        position="bottom" label="entries" />
     </section>
   </div>
 </main>
 
-<div id="filterModal" class="filter-drawer-wrapper" aria-hidden="true">
-  <div class="filter-drawer-overlay" onclick="closeDailyFilterPanel()"></div>
+<x-filter-drawer id="filterModal" title="Filter Records" close-id="dailyCloseFilterBtn"
+  close-callback="closeDailyFilterPanel()" clear-id="filterResetBtn" clear-callback="clearDailyFilterPanelDraft()"
+  clear-label="Clear Filters" cancel-id="filterCloseBtn" cancel-callback="closeDailyFilterPanel()" cancel-label="Cancel"
+  apply-id="filterApplyBtn" apply-callback="applyDailyFilters()" apply-label="Show Results"
+  results-id="dailyShowResultsText">
 
-  <div class="filter-drawer-panel">
+  <div id="dailyActiveFiltersSection" class="filter-active-section hidden">
+    <div class="filter-active-header">
+      <span class="filter-active-title">
+        Active Filters
+      </span>
 
-        <div class="filter-drawer-header">
-          <div class="filter-drawer-title">
-          <i class="fa-solid fa-sliders"></i>
-          <h2>Filters</h2>
-        </div>
-
-    <button type="button" class="filter-drawer-close"
-      onclick="closeDailyFilterPanel()" aria-label="Close Filters">
-
-      <i class="fa-solid fa-xmark"></i>
-    </button>
-  </div>
-
-    <div class="filter-drawer-body">
-      <div id="dailyActiveFiltersSection" class="filter-active-section hidden">
-
-        <div class="filter-active-header">
-            <span class="filter-active-title">Active Filters</span>
-
-            <button id="dailyClearAllChipsBtn" type="button" 
-            class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm" onclick="clearDailyFilterPanelDraft()">
-              
-            <i class="fa-solid fa-rotate-left"></i>
-            <span>Clear All</span>
-        </button>
-    </div>
-
-        <div id="dailyActiveChipsContainer" class="active-filters-container"></div>
-    </div>
-
-      <div>
-        <h3 class="filter-section-title">Sort by Name</h3>
-
-        <div class="filter-chip-row" id="dailyNameSortGroup">
-          <label class="choice-chip">
-            <input type="radio" name="daily_sort_name" value="az" class="chip-radio" data-daily-filter-key="sort_name">
-            <span>A to Z</span>
-          </label>
-
-          <label class="choice-chip">
-            <input type="radio" name="daily_sort_name" value="za" class="chip-radio" data-daily-filter-key="sort_name">
-            <span>Z to A</span>
-          </label>
-        </div>
-      </div>
-
-      <div>
-        <h3 class="filter-section-title">Date Order</h3>
-
-        <div class="filter-chip-row" id="dailyDateSortGroup">
-          <label class="choice-chip">
-            <input type="radio" name="daily_sort_date" value="desc" class="chip-radio"
-              data-daily-filter-key="sort_date">
-            <span>Newest First</span>
-          </label>
-
-          <label class="choice-chip">
-            <input type="radio" name="daily_sort_date" value="asc" class="chip-radio" data-daily-filter-key="sort_date">
-            <span>Oldest First</span>
-          </label>
-        </div>
-      </div>
-
-      <div>
-        <h3 class="filter-section-title">Office</h3>
-
-        <div class="filter-chip-row" id="dailyOfficeGroup">
-          @foreach (['Administrative', 'Faculty', 'Dependent'] as $office)
-          <label class="choice-chip">
-            <input type="radio" name="daily_office_type" value="{{ $office }}" class="chip-radio"
-              data-daily-filter-key="office_type">
-            <span>{{ $office }}</span>
-          </label>
-          @endforeach
-        </div>
-      </div>
-
-      <div>
-        <h3 class="filter-section-title">Course</h3>
-
-        <div class="filter-chip-grid" id="dailyProgramGroup">
-          @foreach (['BSIT', 'BSECE', 'BSBA - HRM', 'BSED - ENG', 'BSOA', 'BSPSYCH', 'DIT', 'BSME', 'BSBA - MM', 'BSED -
-          MATH', 'DOMT'] as $course)
-          <label class="choice-chip">
-            <input type="radio" name="daily_program_code" value="{{ $course }}" class="chip-radio"
-              data-daily-filter-key="program_code">
-            <span>{{ $course }}</span>
-          </label>
-          @endforeach
-        </div>
-      </div>
-    </div>
-
-    <div class="filter-drawer-footer">
-      <button id="filterResetBtn" type="button"
-        class="filter-clear-btn ui-btn ui-btn-secondary ui-btn-sm"
+      <button id="dailyClearAllChipsBtn" type="button" class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm"
         onclick="clearDailyFilterPanelDraft()">
-
-        <i class="fa-regular fa-trash-can text-lg"></i>
-        <span>Clear Filters</span>
+        <i class="fa-solid fa-rotate-left"></i>
+        <span>Clear All</span>
       </button>
-
-      <div class="filter-footer-actions">
-        <button id="filterCloseBtn" type="button"
-          class="filter-cancel-btn ui-btn ui-btn-secondary"
-          onclick="closeDailyFilterPanel()">
-
-          <i class="fa-solid fa-xmark"></i>
-          <span>Cancel</span>
-        </button>
-
-        <button id="filterApplyBtn" type="button"
-          class="filter-apply-btn ui-btn ui-btn-primary"
-          onclick="applyDailyFilters()">
-
-          <i class="fa-solid fa-check"></i>
-          <span id="dailyShowResultsText" class="filter-results-text">
-            Show 0 results
-          </span>
-        </button>
-
-      </div>
     </div>
+
+    <div id="dailyActiveChipsContainer" class="active-filters-container"></div>
   </div>
-</div>
+
+
+  <x-filter-group title="Sort by Name">
+    <div class="filter-chip-row" id="dailyNameSortGroup">
+      <label class="choice-chip">
+        <input type="radio" name="daily_sort_name" value="az" class="chip-radio" data-daily-filter-key="sort_name">
+        <span>A to Z</span>
+      </label>
+
+      <label class="choice-chip">
+        <input type="radio" name="daily_sort_name" value="za" class="chip-radio" data-daily-filter-key="sort_name">
+        <span>Z to A</span>
+      </label>
+    </div>
+  </x-filter-group>
+
+
+  <x-filter-group title="Date Order">
+    <div class="filter-chip-row" id="dailyDateSortGroup">
+      <label class="choice-chip">
+        <input type="radio" name="daily_sort_date" value="desc" class="chip-radio" data-daily-filter-key="sort_date">
+        <span>Newest First</span>
+      </label>
+
+      <label class="choice-chip">
+        <input type="radio" name="daily_sort_date" value="asc" class="chip-radio" data-daily-filter-key="sort_date">
+        <span>Oldest First</span>
+      </label>
+    </div>
+  </x-filter-group>
+
+
+  <x-filter-group title="Office">
+    <div class="filter-chip-row" id="dailyOfficeGroup">
+      @foreach (
+      [
+      'Administrative',
+      'Faculty',
+      'Dependent'
+      ] as $office
+      )
+      <label class="choice-chip">
+        <input type="radio" name="daily_office_type" value="{{ $office }}" class="chip-radio"
+          data-daily-filter-key="office_type">
+        <span>{{ $office }}</span>
+      </label>
+      @endforeach
+    </div>
+  </x-filter-group>
+
+
+  <x-filter-group title="Course" class="filter-group-last">
+    <div class="filter-chip-grid" id="dailyProgramGroup">
+      @foreach (
+      [
+      'BSIT',
+      'BSECE',
+      'BSBA - HRM',
+      'BSED - ENG',
+      'BSOA',
+      'BSPSYCH',
+      'DIT',
+      'BSME',
+      'BSBA - MM',
+      'BSED - MATH',
+      'DOMT'
+      ] as $course
+      )
+      <label class="choice-chip">
+        <input type="radio" name="daily_program_code" value="{{ $course }}" class="chip-radio"
+          data-daily-filter-key="program_code">
+        <span>{{ $course }}</span>
+      </label>
+      @endforeach
+    </div>
+  </x-filter-group>
+
+</x-filter-drawer>
 
 <div id="dailyRecordModal" class="ui-modal modal-overlay" aria-hidden="true"
   onclick="closeModalOnBackdrop(event, 'dailyRecordModal')">
@@ -280,7 +227,8 @@
 
         <div class="min-w-0">
           <h3 class="font-extrabold text-gray-800 text-lg leading-tight">Add Daily Treatment Record</h3>
-          <p class="text-xs text-gray-500 mt-0.5">Cleaner entry form with live procedure timer and signature upload.</p>
+          <p class="text-xs text-gray-500 mt-0.5">Cleaner entry form with live procedure timer and signature
+            upload.</p>
         </div>
       </div>
 
@@ -296,17 +244,22 @@
             <section class="rounded-2xl border border-[#ead9d9] bg-[#fffafa] p-4 sm:p-5">
               <div class="flex items-start justify-between gap-3 mb-4">
                 <div>
-                  <h4 class="text-base font-extrabold text-gray-800 leading-tight">Patient and Treatment Details</h4>
-                  <p class="text-xs text-gray-500 mt-1">Fields are spaced out para mas madaling basahin at encode-an.</p>
+                  <h4 class="text-base font-extrabold text-gray-800 leading-tight">Patient and
+                    Treatment Details</h4>
+                  <p class="text-xs text-gray-500 mt-1">Fields are spaced out para mas madaling
+                    basahin at encode-an.
+                  </p>
                 </div>
-                <span class="inline-flex items-center rounded-full bg-white px-3 py-1 text-[11px] font-bold text-[#8B0000] border border-[#f1d7d7]">
+                <span
+                  class="inline-flex items-center rounded-full bg-white px-3 py-1 text-[11px] font-bold text-[#8B0000] border border-[#f1d7d7]">
                   Record Entry
                 </span>
               </div>
 
               <div class="grid gap-4 md:grid-cols-2">
                 <div>
-                  <label for="recordTreatmentDate" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                  <label for="recordTreatmentDate"
+                    class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                     Treatment Date <span class="text-red-500">*</span>
                   </label>
                   <input id="recordTreatmentDate" name="treatment_date" type="date"
@@ -314,10 +267,12 @@
                 </div>
 
                 <div>
-                  <label for="recordGender" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                  <label for="recordGender"
+                    class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                     Gender
                   </label>
-                  <select id="recordGender" name="gender" class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white">
+                  <select id="recordGender" name="gender"
+                    class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white">
                     <option value="">Select gender</option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
@@ -326,7 +281,8 @@
                 </div>
 
                 <div class="md:col-span-2">
-                  <label for="recordPatientName" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                  <label for="recordPatientName"
+                    class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                     Patient Name <span class="text-red-500">*</span>
                   </label>
                   <input id="recordPatientName" name="patient_name" type="text" maxlength="150"
@@ -335,7 +291,8 @@
                 </div>
 
                 <div>
-                  <label for="recordPatientEmail" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                  <label for="recordPatientEmail"
+                    class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                     Email Address
                   </label>
                   <input id="recordPatientEmail" name="patient_email" type="email" maxlength="190"
@@ -344,7 +301,8 @@
                 </div>
 
                 <div>
-                  <label for="recordPatientPhone" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                  <label for="recordPatientPhone"
+                    class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                     Contact Number
                   </label>
                   <input id="recordPatientPhone" name="patient_phone" type="text" maxlength="30"
@@ -353,10 +311,12 @@
                 </div>
 
                 <div>
-                  <label for="recordOfficeType" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                  <label for="recordOfficeType"
+                    class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                     Office
                   </label>
-                  <select id="recordOfficeType" name="office_type" class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white">
+                  <select id="recordOfficeType" name="office_type"
+                    class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white">
                     <option value="">Select office</option>
                     <option value="Administrative">Administrative</option>
                     <option value="Faculty">Faculty</option>
@@ -365,16 +325,17 @@
                 </div>
 
                 <div>
-                  <label for="recordProgramCode" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                  <label for="recordProgramCode"
+                    class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                     Program / Course
                   </label>
-                  <input id="recordProgramCode" name="program_code" type="text" maxlength="50"
-                    placeholder="e.g. BSIT"
+                  <input id="recordProgramCode" name="program_code" type="text" maxlength="50" placeholder="e.g. BSIT"
                     class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white">
                 </div>
 
                 <div class="md:col-span-2">
-                  <label for="recordTreatmentDone" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                  <label for="recordTreatmentDone"
+                    class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                     Treatment Done <span class="text-red-500">*</span>
                   </label>
                   <textarea id="recordTreatmentDone" name="treatment_done" rows="4" maxlength="150"
@@ -387,16 +348,21 @@
             <section class="rounded-2xl border border-[#ead9d9] bg-white p-4 sm:p-5">
               <div class="flex items-start justify-between gap-3 mb-4">
                 <div>
-                  <h4 class="text-base font-extrabold text-gray-800 leading-tight">Procedure Timer and Signature</h4>
-                  <p class="text-xs text-gray-500 mt-1">Mag-start ito once pinindot ang procedure start.</p>
+                  <h4 class="text-base font-extrabold text-gray-800 leading-tight">Procedure Timer
+                    and Signature</h4>
+                  <p class="text-xs text-gray-500 mt-1">Mag-start ito once pinindot ang procedure
+                    start.</p>
                 </div>
                 <i class="fa-solid fa-clock text-[#8B0000] text-lg"></i>
               </div>
 
-              <div class="rounded-2xl bg-gradient-to-br from-[#8B0000] via-[#a10000] to-[#6B0000] text-white p-5 shadow-lg">
-                <p class="text-[11px] uppercase tracking-[0.22em] text-white/70 font-bold mb-2">Live Procedure Time</p>
+              <div
+                class="rounded-2xl bg-gradient-to-br from-[#8B0000] via-[#a10000] to-[#6B0000] text-white p-5 shadow-lg">
+                <p class="text-[11px] uppercase tracking-[0.22em] text-white/70 font-bold mb-2">Live
+                  Procedure Time</p>
                 <div id="dailyTimerDisplay" class="text-3xl sm:text-[2rem] font-black tracking-[0.18em]">00:00:00</div>
-                <p id="dailyTimerStatus" class="text-xs text-white/80 mt-3">Timer has not started yet.</p>
+                <p id="dailyTimerStatus" class="text-xs text-white/80 mt-3">Timer has not started yet.
+                </p>
               </div>
 
               <div class="grid gap-3 sm:grid-cols-2 mt-4">
@@ -415,7 +381,8 @@
 
               <div class="grid gap-4 sm:grid-cols-2 mt-4">
                 <div>
-                  <label for="recordTimeInDisplay" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                  <label for="recordTimeInDisplay"
+                    class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                     Started At
                   </label>
                   <input id="recordTimeInDisplay" type="text" readonly
@@ -423,7 +390,8 @@
                 </div>
 
                 <div>
-                  <label for="recordTimeOutDisplay" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                  <label for="recordTimeOutDisplay"
+                    class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                     Stopped At
                   </label>
                   <input id="recordTimeOutDisplay" type="text" readonly
@@ -431,7 +399,8 @@
                 </div>
 
                 <div class="sm:col-span-2">
-                  <label for="recordMinutesProcessed" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                  <label for="recordMinutesProcessed"
+                    class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                     Number of Minutes Processed
                   </label>
                   <input id="recordMinutesProcessed" name="minutes_processed" type="number" min="0" max="1440" readonly
@@ -443,12 +412,15 @@
               <input id="recordTimeOut" name="time_out" type="hidden">
 
               <div class="mt-4">
-                <label for="recordPatientSignature" class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
+                <label for="recordPatientSignature"
+                  class="block text-[11px] font-bold text-gray-600 uppercase tracking-wide mb-1.5">
                   Patient Signature
                 </label>
-                <input id="recordPatientSignature" name="patient_signature" type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg"
+                <input id="recordPatientSignature" name="patient_signature" type="file"
+                  accept=".png,.jpg,.jpeg,image/png,image/jpeg"
                   class="field-input w-full border border-gray-200 px-3.5 py-3 text-sm bg-white file:mr-3 file:rounded-lg file:border-0 file:bg-[#fff0f0] file:px-3 file:py-2 file:text-xs file:font-bold file:text-[#8B0000]">
-                <p class="text-[11px] text-gray-400 mt-2">Optional. Accepted formats: PNG, JPG, JPEG up to 5 MB.</p>
+                <p class="text-[11px] text-gray-400 mt-2">Optional. Accepted formats: PNG, JPG, JPEG up
+                  to 5 MB.</p>
               </div>
 
               <div id="dailyRecordErrorBanner" class="report-modal-error hidden mt-4">
@@ -476,20 +448,17 @@
   </div>
 </div>
 
-<div id="createReportModal" class="ui-modal" aria-hidden="true"
-  onclick="closeModalOnBackdrop(event, 'createReportModal')">
+<div id="createReportModal" class="ui-modal" aria-hidden="true">
+  <div class="ui-modal-card modal-lg" role="dialog" aria-modal="true" aria-labelledby="dailyCreateReportTitle">
 
-  <div class="ui-modal-card modal-md"
-      onclick="event.stopPropagation()">
-  
-  <div class="modal-hd">
-    <div class="modal-heading">
-      <div class="modal-icon">
-        <i class="fa-solid fa-file-circle-plus"></i>
-      </div>
+    <div class="modal-hd">
+      <div class="modal-heading">
+        <div class="modal-icon">
+          <i class="fa-solid fa-file-circle-plus"></i>
+        </div>
 
         <div class="modal-copy">
-          <h3 class="modal-title">
+          <h3 id="dailyCreateReportTitle" class="modal-title">
             Create Daily Treatment Report
           </h3>
 
@@ -499,12 +468,17 @@
         </div>
       </div>
 
-      <button type="button" class="modal-x" onclick="closeDailyCreateReportModal()" aria-label="Close create report modal">
+      <button type="button" class="modal-x" data-discard-close="createReportModal"
+        aria-label="Close create report modal">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
 
-    <form id="reportForm" class="flex-1 flex flex-col min-h-0" novalidate>
+    <form id="reportForm" class="modal-card-form" data-global-validation
+      data-form-validation-rule="dailyTreatmentReport" data-discard-form data-discard-title="Discard report changes?"
+      data-discard-subtitle="You have unsaved changes in this report."
+      data-discard-message="Closing this modal will remove the report details you entered. Do you want to discard your changes?"
+      novalidate>
       <div class="modal-bd">
         <div class="modal-form-section">
           <div class="modal-section-heading">
@@ -519,116 +493,100 @@
           </div>
 
           <div class="modal-form-grid">
-            <div>
-              <div class="modal-inline-control">
-                <label for="reportName" class="form-label">
-                  Report Name <span class="text-red-500">*</span>
+            <div class="modal-field" data-global-field>
+              <div class="global-label-row">
+                <label for="reportName" class="global-form-label">
+                  Report Name
+                  <span class="required-mark">*</span>
                 </label>
 
-                <span id="reportNameCounter" class="modal-helper-text">0 / 100</span>
+                <span id="reportNameCounter" class="char-counter">
+                  0 / 100
+                </span>
               </div>
 
-              <div class="modal-inline-control" data-voice-field>
-                <input id="reportName" name="report_name" type="text" maxlength="100"
-                  placeholder="e.g. Daily Treatment Report — Dec 2026"
-                  class="form-input modal-inline-main">
-
-                <x-voice-input
-                  target="#reportName"
-                  status-id="reportNameVoiceStatus"
-                  label="Voice input for report name"
-                  title="Voice input"
-                />
-              </div>
-
-              <p id="reportNameErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                Report name is required.
-              </p>
-            </div>
-
-            <div>
-              <label for="reportType" class="form-label">
-                Report Type <span class="text-red-500">*</span>
-              </label>
-
-              <div class="report-custom-select report-template-select" data-report-select>
-                <select id="reportType" name="document_type" class="report-native-select" data-report-select-native>
-                  @forelse (($dailyTreatmentTemplates ?? collect()) as $index => $template)
-                    <option value="{{ $template->id }}" data-document-type="{{ $template->document_type }}"
-                      {{ $index === 0 ? 'selected' : '' }}>
-                      {{ $template->name }}
-                    </option>
-                  @empty
-                    <option value="" data-document-type="" selected>Select a report type...</option>
-                  @endforelse
-                </select>
-
-                <button type="button" class="report-select-trigger" data-report-select-trigger
-                  data-placeholder="Select a report type..." aria-expanded="false">
-                  <span class="report-select-main">
-                    <span class="report-select-icon">
-                      <i class="fa-solid fa-file-lines"></i>
-                    </span>
-                    <span data-report-select-label>Select a report type...</span>
-                  </span>
-                  <i class="fa-solid fa-chevron-down report-select-chevron"></i>
-                </button>
-
-                <div class="report-select-menu" data-report-select-menu>
-                  @forelse (($dailyTreatmentTemplates ?? collect()) as $index => $template)
-                  <button type="button" class="report-select-option {{ $index === 0 ? 'is-active' : '' }}" data-report-select-option
-                    data-value="{{ $template->id }}" data-document-type="{{ $template->document_type }}">
-                    <span>{{ $template->name }}</span>
-                    <i class="fa-solid fa-check"></i>
-                  </button>
-                  @empty
-                  <button type="button" class="report-select-option" disabled>
-                    <span>No active daily treatment templates available</span>
-                    <i class="fa-solid fa-check"></i>
-                  </button>
-                  @endforelse
+              <div class="global-voice-row" data-voice-field>
+                <div class="global-voice-control">
+                  <input id="reportName" name="report_name" type="text" minlength="3" maxlength="100"
+                    class="form-input-custom" placeholder="e.g. Daily Treatment Report — Dec 2026"
+                    data-field-label="Report Name" data-required-message="Please enter a report name."
+                    data-char-limit="100" data-char-counter="#reportNameCounter" required>
                 </div>
+
+                <x-voice-input target="#reportName" status-id="reportNameVoiceStatus"
+                  label="Voice input for report name" title="Voice input" />
               </div>
 
-              <p id="reportTypeErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                Please select a report type.
-              </p>
+              <div id="reportNameErr" class="global-field-error" data-error-for="reportName" aria-live="polite"
+                aria-hidden="true"></div>
             </div>
-            
-          <div class="modal-form-grid modal-form-grid-2">
-            <div>
-              <label class="form-label">
-              From <span class="text-red-500">*</span>
+
+            <div class="modal-field" data-global-field>
+              <label for="reportType" class="global-form-label">
+                Report Type
+                <span class="required-mark">*</span>
               </label>
 
-              <div class="fp-date-input-wrap">
-                <input id="dateFrom" name="date_from" type="text"
-                  class="form-input js-flatpickr-date-max-today"
-                  placeholder="Select start date" readonly>
-                <i class="fa-regular fa-calendar fp-date-icon"></i>
-              </div>
+              <select id="reportType" name="document_template_id" class="js-custom-select"
+                data-placeholder="Select a report type" data-field-label="Report Type"
+                data-required-message="Please select a report type." required>
+                <option value="">
+                  Select a report type...
+                </option>
 
-              <p id="dateFromErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                Start date is required.
-              </p>
+                @foreach ($dailyTreatmentTemplates ?? collect() as $template)
+                <option value="{{ $template->id }}" data-document-type="{{ $template->document_type }}">
+                  {{ $template->name }}
+                </option>
+                @endforeach
+              </select>
+
+              <div id="reportTypeErr" class="global-field-error" data-error-for="reportType" aria-live="polite"
+                aria-hidden="true"></div>
             </div>
 
-            <div>
-              <label class="form-label">
-                To <span class="text-gray-400 normal-case font-normal">(optional)</span>
-              </label>
+            <div class="modal-form-grid-2">
 
-              <div class="fp-date-input-wrap">
-                <input id="dateTo" name="date_to" type="text"
-                  class="form-input js-flatpickr-date-max-today"
-                  placeholder="Select end date" readonly>
-                <i class="fa-regular fa-calendar fp-date-icon"></i>
+              <div class="modal-field" data-global-field>
+                <label for="dateFrom" class="global-form-label">
+                  From
+                  <span class="required-mark">*</span>
+                </label>
+
+                <div class="fp-date-input-wrap">
+                  <input id="dateFrom" name="date_from" type="text"
+                    class="form-input-custom js-flatpickr-date-max-today" placeholder="Select start date"
+                    data-field-label="From Date" data-required-message="Please select a start date."
+                    data-validation-rule="notFutureDate" readonly required>
+
+                  <i class="fa-regular fa-calendar fp-date-icon" aria-hidden="true"></i>
+                </div>
+
+                <div id="dateFromErr" class="global-field-error" data-error-for="dateFrom" aria-live="polite"
+                  aria-hidden="true"></div>
               </div>
+
+              <div class="modal-field" data-global-field>
+                <label for="dateTo" class="global-form-label">
+                  To
+                  <span class="modal-helper-text">
+                    (optional)
+                  </span>
+                </label>
+
+                <div class="fp-date-input-wrap">
+                  <input id="dateTo" name="date_to" type="text" class="form-input-custom js-flatpickr-date-max-today"
+                    placeholder="Select end date" data-field-label="To Date" data-validation-rule="notFutureDate"
+                    readonly>
+
+                  <i class="fa-regular fa-calendar fp-date-icon" aria-hidden="true"></i>
+                </div>
+
+                <div id="dateToErr" class="global-field-error" data-error-for="dateTo" aria-live="polite"
+                  aria-hidden="true"></div>
+              </div>
+
             </div>
-          </div>
 
             <div>
               <p class="modal-helper-text">
@@ -636,43 +594,42 @@
                 Leave "To" empty to report on a single date.
               </p>
 
-              <p id="dateFutureErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                Dates cannot be in the future.
-              </p>
-
-              <p id="dateRangeErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                End date must be on or after start date.
-              </p>
             </div>
 
-            <div>
-              <label for="reportQty" class="form-label">
-              Quantity <span class="text-red-500">*</span>
+            <div class="modal-field modal-field-full" data-global-field>
+              <label class="global-form-label" for="reportQty">
+                Quantity
+                <span class="required-mark">*</span>
               </label>
 
-              <div class="report-qty-row">
-                <div class="report-qty-control">
-                  <button type="button" class="report-qty-btn" data-qty-minus aria-label="Decrease quantity">
-                    <i class="fa-solid fa-minus"></i>
-                  </button>
+              <div class="modal-inline-control">
+                <div class="modal-inline-main">
 
-                  <input id="reportQty" name="quantity" type="number" min="1" max="100" step="1" placeholder="1 – 100"
-                    class="form-input modal-number-input report-qty-input">
+                  <div class="global-number-stepper" data-global-number-stepper>
+                    <button type="button" class="global-number-stepper-btn" data-number-step="-1"
+                      aria-label="Decrease quantity">
+                      <i class="fa-solid fa-minus"></i>
+                    </button>
 
-                  <button type="button" class="report-qty-btn" data-qty-plus aria-label="Increase quantity">
-                    <i class="fa-solid fa-plus"></i>
-                  </button>
+                    <input id="reportQty" name="quantity" type="number" value="1" min="1" max="100" step="1"
+                      class="global-number-stepper-input" data-number-stepper-input data-field-label="Quantity"
+                      data-required-message="Please enter a quantity." data-validation-rule="wholeNumber" required>
+
+                    <button type="button" class="global-number-stepper-btn" data-number-step="1"
+                      aria-label="Increase quantity">
+                      <i class="fa-solid fa-plus"></i>
+                    </button>
+                  </div>
+
                 </div>
 
-                <span class="report-qty-helper">Whole numbers only</span>
+                <span class="modal-helper-text">
+                  Whole numbers only
+                </span>
               </div>
 
-              <p id="reportQtyErr" class="text-red-500 text-xs mt-1 hidden items-center gap-1">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                <span id="reportQtyErrMsg">Quantity must be between 1 and 100.</span>
-              </p>
+              <div id="reportQtyErr" class="global-field-error" data-error-for="reportQty" aria-live="polite"
+                aria-hidden="true"></div>
             </div>
 
             <div>
@@ -686,19 +643,18 @@
       </div>
 
       <div class="modal-ft">
-        <button type="button" class="btn-close-modal" onclick="closeDailyCreateReportModal()" >
+        <button type="button" class="ui-btn ui-btn-secondary" data-discard-close="createReportModal">
           Cancel
         </button>
 
-        <button type="button" id="downloadReportBtn" class="modal-btn-primary">
-          
-            <i class="fa-solid fa-download"></i>
-            <span>Download</span>
-          </button>
-        </div>
-      </form>
-    </div>
+        <button type="button" id="downloadReportBtn" class="ui-btn ui-btn-primary">
+          <i class="fa-solid fa-download"></i>
+          <span>Download</span>
+        </button>
+      </div>
+    </form>
   </div>
+</div>
 
 <div id="downloadCompleteModal" class="ui-modal" onclick="closeModalOnBackdrop(event, 'downloadCompleteModal')">
   <div class="ui-modal-card modal-box p-0 rounded-2xl overflow-hidden bg-white shadow-2xl max-w-sm">
@@ -709,7 +665,8 @@
         <i class="fa-solid fa-check text-green-500 text-2xl"></i>
       </div>
       <h3 class="text-xl font-bold text-[#8B0000] mb-2">Download Complete!</h3>
-      <p class="text-gray-500 text-sm leading-relaxed mb-7">Your report has been successfully generated and downloaded.
+      <p class="text-gray-500 text-sm leading-relaxed mb-7">Your report has been successfully generated and
+        downloaded.
       </p>
       <button type="button" onclick="closeDownloadModal()"
         class="px-8 py-2.5 rounded-xl bg-[#8B0000] hover:bg-[#6b0000] text-white font-bold text-sm shadow-sm transition-all w-full">Done</button>
@@ -723,7 +680,8 @@
   const DTR_LIST_URL = "{{ route('dentist.dentist.reports.daily-treatment-record.list') }}";
   const DTR_STORE_URL = "{{ route('dentist.dentist.reports.daily-treatment-record.store') }}";
   const DTR_DOWNLOAD_URL = "{{ route('dentist.dentist.report.daily-treatment-record-download') }}";
-  const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || "{{ csrf_token() }}";
+  const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+    "{{ csrf_token() }}";
 
   const dtrState = {
     search: '',
@@ -737,7 +695,9 @@
     total: 0,
   };
 
-  let dtrDraft = { ...dtrState };
+  let dtrDraft = {
+    ...dtrState
+  };
   let dtrListController = null;
   let dtrDraftCountController = null;
   let dtrDraftCountTimer = null;
@@ -855,7 +815,7 @@
     if (!hasData) {
       if (listView) listView.hidden = true;
       if (grid) grid.hidden = true;
-      showDailyEmptyState();
+      renderDailyTreatmentEmptyState();
       return;
     }
 
@@ -865,19 +825,19 @@
 
     if (listView) listView.hidden = false;
 
-      records.forEach(record => {
-        const contact = [record.patient_email, record.patient_phone].filter(Boolean).join(' / ') || '—';
-        const officeOrProgram = record.office_display || record.office_type || record.program_code || '—';
-        const signature = record.has_signature
-          ? `
+    records.forEach(record => {
+      const contact = [record.patient_email, record.patient_phone].filter(Boolean).join(' / ') || '—';
+      const officeOrProgram = record.office_display || record.office_type || record.program_code || '—';
+      const signature = record.has_signature ?
+        `
             <a href="${escapeDtrHtml(record.signature_url || '#')}" class="dtr-signature-preview" target="_blank" rel="noopener noreferrer" aria-label="View patient signature">
               <img src="${escapeDtrHtml(record.signature_url || '')}" alt="Patient signature" class="dtr-signature-image">
             </a>
-          `
-          : '<span class="dtr-signature no">No signature</span>';
+          ` :
+        '<span class="dtr-signature no">No signature</span>';
 
-        if (tbody) {
-          tbody.insertAdjacentHTML('beforeend', `
+      if (tbody) {
+        tbody.insertAdjacentHTML('beforeend', `
             <tr>
               <td class="whitespace-nowrap min-w-[150px]">
                 <div class="text-gray-800">${escapeDtrHtml(record.requested_date_time || formatDateToMMDDYY(record.treatment_date) || '—')}</div>
@@ -903,85 +863,79 @@
             </tr>
           `);
       }
-
-      if (grid) {
-        grid.insertAdjacentHTML('beforeend', `
-          <article class="service-record-card">
-              <div class="service-record-card-head">
-                <div>
-                  <h3>${escapeDtrHtml(record.patient_name || '—')}</h3>
-                  <p>${escapeDtrHtml(record.requested_date_time || formatDateToMMDDYY(record.treatment_date) || '—')}</p>
-                </div>
-                <span class="service-record-chip">${escapeDtrHtml(record.gender || 'N/A')}</span>
-              </div>
-
-              <div class="service-record-meta">
-                <span><i class="fa-solid fa-envelope"></i>${escapeDtrHtml(record.patient_email || 'No email')}</span>
-                <span><i class="fa-solid fa-phone"></i>${escapeDtrHtml(record.patient_phone || 'No contact')}</span>
-                <span><i class="fa-solid fa-building"></i>${escapeDtrHtml(officeOrProgram)}</span>
-                <span><i class="fa-solid fa-clock"></i>${escapeDtrHtml(record.minutes_processed || '—')}${record.minutes_processed ? ' mins' : ''}</span>
-                <span><i class="fa-solid fa-calendar-check"></i>${escapeDtrHtml(record.processed_date_time || 'Not processed time-stamped')}</span>
-              </div>
-
-            <p class="service-record-treatment">${escapeDtrHtml(record.treatment_done || '—')}</p>
-          </article>
-        `);
-      }
     });
   }
 
-  function showDailyEmptyState() {
-    const emptyState = document.getElementById('dailyEmptyState');
-    if (!emptyState) return;
+  function renderDailyTreatmentEmptyState() {
+    const host =
+      document.getElementById(
+        'dailyEmptyState'
+      );
 
-    let icon = 'fa-clipboard-list';
-    let title = 'No daily treatment records yet';
-    let sub = 'Treatment records will appear here once added to the system.';
-    let actionHtml = '';
-
-    if (dtrState.search) {
-      icon = 'fa-magnifying-glass';
-      title = `No results for “${escapeDtrHtml(dtrState.search)}”`;
-      sub = 'Try searching another patient, program, contact, or treatment.';
-      actionHtml = `
-        <button type="button" class="empty-state-btn" onclick="clearDailySearch()">
-          <i class="fa-solid fa-xmark"></i>
-          Clear search
-        </button>
-      `;
-      } else if (dtrState.month) {
-        icon = 'fa-calendar-xmark';
-        title = `No record found for “${escapeDtrHtml(formatDtrMonthLabel(dtrState.month))}”`;
-        sub = dtrFilterCount() > 0
-          ? 'Try adjusting the filter panel or clearing filters.'
-          : 'No daily treatment entries were recorded for this month.';
-        actionHtml = dtrFilterCount() > 0
-          ? `<button type="button" class="empty-state-btn" onclick="clearDailyFilters()"><i class="fa-solid fa-filter-circle-xmark"></i>Clear filters</button>`
-          : '';
-    } else if (dtrFilterCount() > 0) {
-      icon = 'fa-filter-circle-xmark';
-      title = 'No records match the selected filters';
-      sub = 'Try adjusting the filter panel or clearing all filters.';
-      actionHtml = `
-        <button type="button" class="empty-state-btn" onclick="clearDailyFilters()">
-          <i class="fa-solid fa-filter-circle-xmark"></i>
-          Clear filters
-        </button>
-      `;
+    if (!host) {
+      return;
     }
 
-    emptyState.hidden = false;
-    emptyState.className = 'empty-state-host dtr-empty-host show';
-    emptyState.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-state-icon">
-          <i class="fa-solid ${icon}"></i>
-        </div>
-        <h3 class="empty-state-title">${title}</h3>
-        <p class="empty-state-sub">${sub}</p>
-        ${actionHtml ? `<div class="empty-state-actions">${actionHtml}</div>` : ''}
-      </div>
-    `;
+    const hasSearch =
+      Boolean(
+        String(
+          dtrState.search || ''
+        ).trim()
+      );
+
+    const hasFilters =
+      Boolean(
+        dtrState.sort_name ||
+        dtrState.sort_date ||
+        dtrState.office_type ||
+        dtrState.program_code
+      );
+
+    if (hasSearch) {
+      window.EmptyState?.renderSearch({
+        host,
+        input: '#searchInput',
+        query: dtrState.search,
+        title:
+          `No results for “${dtrState.search}”`,
+        message:
+          'Try another patient name, program, treatment, email, or contact number.',
+      });
+
+      return;
+    }
+
+    if (hasFilters) {
+      window.EmptyState?.render({
+        host,
+        icon: 'fa-sliders',
+        title:
+          'No matches for your filters',
+        message:
+          'Try removing or adjusting your filter criteria.',
+        actionHtml: `
+                <button
+                    type="button"
+                    class="empty-state-btn"
+                    onclick="clearDailyFilters()"
+                >
+                    <i class="fa-solid fa-rotate-left"></i>
+                    Clear filters
+                </button>
+            `,
+      });
+
+      return;
+    }
+
+    window.EmptyState?.render({
+      host,
+      icon: 'fa-folder-open',
+      title:
+        'No daily treatment records found',
+      message:
+        'There are no treatment records for the selected month.',
+    });
   }
 
   async function fetchDailyRecords(options = {}) {
@@ -1021,117 +975,95 @@
       console.error(err);
       dtrState.total = 0;
       renderDailyRecords([]);
-      renderDtrPagebar({ total: 0, from: 0, to: 0, current_page: 1, last_page: 1, per_page: dtrState.perPage });
+      renderDtrPagebar({
+        total: 0,
+        from: 0,
+        to: 0,
+        current_page: 1,
+        last_page: 1,
+        per_page: dtrState.perPage
+      });
       updateFilterButtonState();
     }
   }
 
   function renderDtrPagebar(meta = {}) {
-    const total = Number(meta.total || 0);
-    const from = Number(meta.from || 0);
-    const to = Number(meta.to || 0);
+    const currentPage =
+      Number(
+        meta.current_page || 1
+      );
 
-    const infoHtml = total > 0
-        ? `Showing <strong>${from}–${to}</strong> of <strong>${total}</strong> entries`
-        : 'Showing <strong>0</strong> entries';
+    const lastPage =
+      Number(
+        meta.last_page || 1
+      );
 
-    const topInfo =
-        document.getElementById('dailyPageInfoTop');
+    const total =
+      Number(
+        meta.total || 0
+      );
 
-    const bottomInfo =
-        document.getElementById('dailyPageInfoBottom');
+    const from =
+      total
+        ? Number(meta.from || 0)
+        : 0;
 
-    if (topInfo) {
-        topInfo.innerHTML = infoHtml;
-    }
+    const to =
+      total
+        ? Number(meta.to || 0)
+        : 0;
 
-    if (bottomInfo) {
-        bottomInfo.innerHTML = infoHtml;
-    }
+    window.renderGlobalPagination?.({
+      currentPage,
+      lastPage,
+      total,
+      from,
+      to,
 
-    const paginationHtml =
-        buildDtrPagination(meta);
+      containers: [
+        document.getElementById(
+          'dailyPaginationTop'
+        ),
+        document.getElementById(
+          'dailyPaginationBottom'
+        ),
+      ],
 
-    const topPagination =
-        document.getElementById('dailyPaginationTop');
+      bars: [
+        document.getElementById(
+          'dailyPagebarTop'
+        ),
+        document.getElementById(
+          'dailyPagebarBottom'
+        ),
+      ],
 
-    const bottomPagination =
-        document.getElementById('dailyPaginationBottom');
+      infoElements: [
+        document.getElementById(
+          'dailyPageInfoTop'
+        ),
+        document.getElementById(
+          'dailyPageInfoBottom'
+        ),
+      ],
 
-    if (topPagination) {
-        topPagination.innerHTML = paginationHtml;
-    }
+      itemLabel:
+        'entries',
 
-    if (bottomPagination) {
-        bottomPagination.innerHTML = paginationHtml;
-    }
+      onPageChange(page) {
+        dtrState.page =
+          Number(page) || 1;
+
+        fetchDailyRecords();
+      },
+    });
 
     setDailyPageSizeUI(
-        meta.per_page ||
-        dtrState.perPage ||
-        10
+      meta.per_page ||
+      dtrState.perPage ||
+      10
     );
-}
-
-  function buildDtrPagination(meta = {}) {
-    if (Number(meta.last_page || 1) <= 1) return '';
-
-    const current = Number(meta.current_page || 1);
-    const last = Number(meta.last_page || 1);
-    const winSize = 5;
-    const half = Math.floor(winSize / 2);
-    let start = Math.max(1, current - half);
-    let end = Math.min(last, start + winSize - 1);
-
-    if (end - start + 1 < winSize) start = Math.max(1, end - winSize + 1);
-
-    let html = '<nav class="global-pagination" aria-label="Daily treatment pagination">';
-
-    html += current <= 1
-      ? '<button type="button" disabled class="global-page-disabled" aria-label="Previous page"><i class="fa-solid fa-chevron-left global-page-icon"></i></button>'
-      : `<button type="button" onclick="goDailyPage(${current - 1})" class="global-page-btn" aria-label="Previous page"><i class="fa-solid fa-chevron-left global-page-icon"></i></button>`;
-
-    if (start > 1) {
-      html += '<button type="button" onclick="goDailyPage(1)" class="global-page-btn">1</button>';
-      if (start > 2) html += '<span class="global-page-ellipsis" aria-hidden="true">&hellip;</span>';
-    }
-
-    for (let i = start; i <= end; i++) {
-      html += i === current
-        ? `<span class="global-page-current" aria-current="page">${i}</span>`
-        : `<button type="button" onclick="goDailyPage(${i})" class="global-page-btn">${i}</button>`;
-    }
-
-    if (end < last) {
-      if (end < last - 1) html += '<span class="global-page-ellipsis" aria-hidden="true">&hellip;</span>';
-      html += `<button type="button" onclick="goDailyPage(${last})" class="global-page-btn">${last}</button>`;
-    }
-
-    html += current >= last
-      ? '<button type="button" disabled class="global-page-disabled" aria-label="Next page"><i class="fa-solid fa-chevron-right global-page-icon"></i></button>'
-      : `<button type="button" onclick="goDailyPage(${current + 1})" class="global-page-btn" aria-label="Next page"><i class="fa-solid fa-chevron-right global-page-icon"></i></button>`;
-
-    html += '</nav>';
-    return html;
   }
-
-  function goDailyPage(page) {
-    dtrState.page = Number(page) || 1;
-    fetchDailyRecords();
-  }
-
-  window.goDailyPage = goDailyPage;
-
-  function clearDailySearch() {
-    const input = document.getElementById('searchInput');
-    if (input) input.value = '';
-
-    dtrState.search = '';
-    dtrState.page = 1;
-    fetchDailyRecords();
-  }
-
-  window.clearDailySearch = clearDailySearch;
 
   function handleDailyTreatmentSearch(value) {
     dtrState.search = String(value || '').trim();
@@ -1143,30 +1075,29 @@
   window.handleDailyTreatmentSearch = handleDailyTreatmentSearch;
 
   function openDailyFilterPanel() {
-    dtrDraft = { ...dtrState };
+    dtrDraft = {
+      ...dtrState
+    };
+
     renderDailyFilterDraft();
-
-    if (typeof window.openFilterDrawer === 'function') {
-      window.openFilterDrawer('filterModal');
-    } else {
-      document.getElementById('filterModal')?.classList.add('open');
-      document.getElementById('filterModal')?.setAttribute('aria-hidden', 'false');
-    }
-
     updateDailyDraftCount();
+
+    window.openFilterDrawer?.(
+      'filterModal'
+    );
   }
 
   function closeDailyFilterPanel() {
-    if (typeof window.closeFilterDrawer === 'function') {
-      window.closeFilterDrawer('filterModal');
-    } else {
-      document.getElementById('filterModal')?.classList.remove('open');
-      document.getElementById('filterModal')?.setAttribute('aria-hidden', 'true');
-    }
+    window.closeFilterDrawer?.(
+      'filterModal'
+    );
   }
 
-  window.openDailyFilterPanel = openDailyFilterPanel;
-  window.closeDailyFilterPanel = closeDailyFilterPanel;
+  window.openDailyFilterPanel =
+    openDailyFilterPanel;
+
+  window.closeDailyFilterPanel =
+    closeDailyFilterPanel;
 
   function setDailyDraftFilter(key, value) {
     if (key === 'office_type') {
@@ -1238,10 +1169,22 @@
 
     const chips = [];
 
-    if (dtrDraft.sort_name) chips.push({ label: `Name: ${dtrDraft.sort_name === 'za' ? 'Z to A' : 'A to Z'}`, key: 'sort_name' });
-    if (dtrDraft.sort_date) chips.push({ label: `Date: ${dtrDraft.sort_date === 'asc' ? 'Oldest First' : 'Newest First'}`, key: 'sort_date' });
-    if (dtrDraft.office_type) chips.push({ label: `Office: ${dtrDraft.office_type}`, key: 'office_type' });
-    if (dtrDraft.program_code) chips.push({ label: `Course: ${dtrDraft.program_code}`, key: 'program_code' });
+    if (dtrDraft.sort_name) chips.push({
+      label: `Name: ${dtrDraft.sort_name === 'za' ? 'Z to A' : 'A to Z'}`,
+      key: 'sort_name'
+    });
+    if (dtrDraft.sort_date) chips.push({
+      label: `Date: ${dtrDraft.sort_date === 'asc' ? 'Oldest First' : 'Newest First'}`,
+      key: 'sort_date'
+    });
+    if (dtrDraft.office_type) chips.push({
+      label: `Office: ${dtrDraft.office_type}`,
+      key: 'office_type'
+    });
+    if (dtrDraft.program_code) chips.push({
+      label: `Course: ${dtrDraft.program_code}`,
+      key: 'program_code'
+    });
 
     section.classList.toggle('hidden', chips.length === 0);
 
@@ -1256,7 +1199,7 @@
           </button>
         </span>
       `).join('');
-    }
+  }
 
   function removeDailyDraftChip(key) {
     dtrDraft[key] = '';
@@ -1285,7 +1228,9 @@
     dtrState.sort_date = '';
     dtrState.page = 1;
 
-    dtrDraft = { ...dtrState };
+    dtrDraft = {
+      ...dtrState
+    };
     renderDailyFilterDraft();
     fetchDailyRecords();
   }
@@ -1320,7 +1265,14 @@
       if (dtrDraftCountController) dtrDraftCountController.abort();
       dtrDraftCountController = new AbortController();
 
-      const params = buildDtrParams({ ...dtrDraft, page: 1, perPage: 1 }, { page: 1, perPage: 1 });
+      const params = buildDtrParams({
+        ...dtrDraft,
+        page: 1,
+        perPage: 1
+      }, {
+        page: 1,
+        perPage: 1
+      });
 
       try {
         const res = await fetch(`${DTR_LIST_URL}?${params.toString()}`, {
@@ -1353,269 +1305,94 @@
 
   function selectDailyPerPage(value) {
     const selectedValue =
-        Number(value) || 10;
+      Number(value) || 10;
 
     dtrState.perPage =
-        selectedValue;
+      selectedValue;
 
     dtrState.page = 1;
 
     setDailyPageSizeUI(
-        selectedValue
+      selectedValue
     );
 
     fetchDailyRecords();
-}
+  }
 
   window.selectDailyPerPage =
     selectDailyPerPage;
 
-  function forceCloseDailyModal(id) {
-    const modal = document.getElementById(id);
-    if (!modal) return;
-
-    modal.classList.remove('open', 'closing');
-    modal.setAttribute('aria-hidden', 'true');
-
-    if (!document.querySelector('.ui-modal.open, .modal-overlay.open, dialog[open]')) {
-      document.documentElement.classList.remove('modal-lock');
-      document.body.classList.remove('modal-lock');
-    }
-  }
-
-  function resetDailyReportForm() {
-    const form = document.getElementById('reportForm');
-    if (form) form.reset();
-
-    syncDailyReportCustomSelects(document.getElementById('createReportModal'));
-
-    const counter = document.getElementById('reportNameCounter');
-    if (counter) {
-      counter.textContent = '0 / 100';
-      counter.classList.remove('text-red-500');
-      counter.classList.add('text-gray-400');
-    }
-
-    ['reportNameErr', 'reportTypeErr', 'dateFromErr', 'dateFutureErr', 'dateRangeErr', 'reportQtyErr', 'formErrorBanner'].forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
-
-      el.classList.add('hidden');
-      el.classList.remove('flex');
-    });
-
-    ['reportName', 'reportType', 'dateFrom', 'dateTo', 'reportQty'].forEach(id => {
-      const el = document.getElementById(id);
-      if (!el) return;
-
-      el.classList.remove('border-red-400');
-      el.classList.add('border-gray-300');
-    });
-  }
-
-  function ensureDailyReportFlatpickrs() {
-    if (!window.flatpickr) return;
-
-    const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
-
-    ['dateFrom', 'dateTo'].forEach(id => {
-      const input = document.getElementById(id);
-      if (!input) return;
-
-      input.setAttribute('max', todayStr);
-
-      if (input._flatpickr) {
-        input._flatpickr.set('maxDate', 'today');
-        return;
-      }
-
-      window.flatpickr(input, {
-        dateFormat: 'Y-m-d',
-        maxDate: 'today',
-        allowInput: false,
-        clickOpens: true,
-        disableMobile: true,
-        appendTo: document.body,
-        positionElement: input,
-        onOpen: (_dates, _str, instance) => {
-          instance.calendarContainer.style.zIndex = '1000000';
-        },
-      });
-    });
-  }
-
   function openDailyCreateReportModal() {
-    const modal = document.getElementById('createReportModal');
-    if (!modal) return;
+    const modal =
+      document.getElementById(
+        'createReportModal'
+      );
 
-    modal.classList.remove('closing');
-    modal.classList.add('open');
-    modal.setAttribute('aria-hidden', 'false');
-
-    document.documentElement.classList.add('modal-lock');
-    document.body.classList.add('modal-lock');
-
-    initDailyReportCustomSelects(modal);
-    syncDailyReportCustomSelects(modal);
-    ensureDailyReportFlatpickrs();
-    initDailyReportQtyButtons();
-
-    document.dispatchEvent(new CustomEvent('voice:refresh', { detail: { root: modal } }));
-  }
-
-  function closeDailyCreateReportModal() {
-    if (typeof window.closeModal === 'function') {
-      window.closeModal('createReportModal');
-    } else {
-      forceCloseDailyModal('createReportModal');
+    if (!modal) {
+      return;
     }
 
     resetDailyReportForm();
+
+    window.initCustomSelects?.(
+      modal
+    );
+
+    modal
+      .querySelectorAll(
+        '.custom-select'
+      )
+      .forEach(wrapper => {
+        window.syncCustomSelect?.(
+          wrapper
+        );
+      });
+
+    window.openModal?.(
+      'createReportModal'
+    );
+
+    window.initGlobalVoiceInputs?.(
+      modal
+    );
+
+    window.initGlobalNumberSteppers?.(
+      modal
+    );
+
+    window.DiscardChanges
+      ?.captureForm(
+        document.getElementById(
+          'reportForm'
+        )
+      );
+  }
+
+  function closeDailyCreateReportModal() {
+    window.closeModal?.(
+      'createReportModal'
+    );
+
+    window.setTimeout(
+      resetDailyReportForm,
+      180
+    );
   }
 
   function closeDownloadModal() {
-    if (typeof window.closeModal === 'function') {
-      window.closeModal('downloadCompleteModal');
-    } else {
-      forceCloseDailyModal('downloadCompleteModal');
-    }
+    window.closeModal?.(
+      'downloadCompleteModal'
+    );
   }
 
-  window.openDailyCreateReportModal = openDailyCreateReportModal;
-  window.closeDailyCreateReportModal = closeDailyCreateReportModal;
-  window.closeDownloadModal = closeDownloadModal;
+  window.openDailyCreateReportModal =
+    openDailyCreateReportModal;
 
-  function closeDailyReportSelects(except = null) {
-    document.querySelectorAll('.report-custom-select.open').forEach(select => {
-      if (select === except) return;
+  window.closeDailyCreateReportModal =
+    closeDailyCreateReportModal;
 
-      select.classList.remove('open');
-      select.querySelector('[data-report-select-trigger]')?.setAttribute('aria-expanded', 'false');
-    });
-  }
-
-  function syncDailyReportSelectUI(nativeSelect) {
-    if (!nativeSelect) return;
-
-    const wrap = nativeSelect.closest('[data-report-select]');
-    if (!wrap) return;
-
-    const label = wrap.querySelector('[data-report-select-label]');
-    const trigger = wrap.querySelector('[data-report-select-trigger]');
-    const selectedOption = nativeSelect.selectedOptions?.[0];
-    const placeholder = trigger?.dataset.placeholder || 'Select option';
-    const selectedText = nativeSelect.value ? selectedOption?.textContent?.trim() : placeholder;
-
-    if (label) label.textContent = selectedText || placeholder;
-
-    wrap.querySelectorAll('[data-report-select-option]').forEach(option => {
-      const isActive = option.dataset.value === nativeSelect.value;
-      option.classList.toggle('is-active', isActive);
-      option.setAttribute('aria-selected', isActive ? 'true' : 'false');
-    });
-  }
-
-  function syncDailyReportCustomSelects(root = document) {
-    const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
-    scope.querySelectorAll('[data-report-select-native]').forEach(syncDailyReportSelectUI);
-  }
-
-  function initDailyReportCustomSelects(root = document) {
-    const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
-
-    scope.querySelectorAll('[data-report-select]').forEach(wrap => {
-      if (wrap.dataset.reportSelectInitialized === 'true') {
-        syncDailyReportSelectUI(wrap.querySelector('[data-report-select-native]'));
-        return;
-      }
-
-      wrap.dataset.reportSelectInitialized = 'true';
-
-      const nativeSelect = wrap.querySelector('[data-report-select-native]');
-      const trigger = wrap.querySelector('[data-report-select-trigger]');
-
-      trigger?.addEventListener('click', event => {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const willOpen = !wrap.classList.contains('open');
-        closeDailyReportSelects(wrap);
-        wrap.classList.toggle('open', willOpen);
-        trigger.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
-      });
-
-      wrap.querySelectorAll('[data-report-select-option]').forEach(option => {
-        option.addEventListener('click', event => {
-          event.preventDefault();
-          event.stopPropagation();
-
-          if (!nativeSelect) return;
-
-          nativeSelect.value = option.dataset.value || '';
-          syncDailyReportSelectUI(nativeSelect);
-          nativeSelect.dispatchEvent(new Event('change', { bubbles: true }));
-          wrap.classList.remove('open');
-          trigger?.setAttribute('aria-expanded', 'false');
-        });
-      });
-
-      nativeSelect?.addEventListener('change', () => syncDailyReportSelectUI(nativeSelect));
-      syncDailyReportSelectUI(nativeSelect);
-    });
-  }
-
-  function initDailyReportQtyButtons() {
-    const input = document.getElementById('reportQty');
-    const minus = document.querySelector('[data-qty-minus]');
-    const plus = document.querySelector('[data-qty-plus]');
-    if (!input || input.dataset.qtyReady === 'true') return;
-
-    input.dataset.qtyReady = 'true';
-
-    function normalize(value) {
-      const parsed = parseInt(value, 10);
-      if (Number.isNaN(parsed)) return '';
-      return Math.min(100, Math.max(1, parsed));
-    }
-
-    function updateButtons() {
-      const value = parseInt(input.value, 10);
-      minus?.classList.toggle('is-disabled', Number.isNaN(value) || value <= 1);
-      plus?.classList.toggle('is-disabled', !Number.isNaN(value) && value >= 100);
-    }
-
-    minus?.addEventListener('click', () => {
-      const value = normalize(input.value || 1) || 1;
-      input.value = Math.max(1, value - 1);
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-      updateButtons();
-    });
-
-    plus?.addEventListener('click', () => {
-      const value = normalize(input.value || 0) || 0;
-      input.value = Math.min(100, value + 1);
-      input.dispatchEvent(new Event('input', { bubbles: true }));
-      updateButtons();
-    });
-
-    input.addEventListener('input', updateButtons);
-    updateButtons();
-  }
-
-  function setDailyModalError(inputId, errId, show) {
-    const input = document.getElementById(inputId);
-    const err = document.getElementById(errId);
-    if (!input || !err) return;
-
-    const selectWrap = input.closest('[data-report-select]');
-    if (selectWrap) selectWrap.classList.toggle('is-invalid', show);
-
-    err.classList.toggle('hidden', !show);
-    err.classList.toggle('flex', show);
-    input.classList.toggle('border-red-400', show);
-    input.classList.toggle('border-gray-300', !show);
-  }
+  window.closeDownloadModal =
+    closeDownloadModal;
 
   function formatDailyElapsedTime(totalSeconds) {
     const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
@@ -1639,7 +1416,10 @@
   }
 
   function syncDailyTimerButtons(isRunning) {
-    const { startBtn, stopBtn } = getDailyTimerElements();
+    const {
+      startBtn,
+      stopBtn
+    } = getDailyTimerElements();
     startBtn?.classList.toggle('opacity-60', isRunning);
     startBtn?.classList.toggle('cursor-not-allowed', isRunning);
     stopBtn?.classList.toggle('opacity-60', !isRunning && !dailyTimerStartedAt);
@@ -1665,9 +1445,9 @@
     const elapsedSeconds = Math.max(0, Math.floor((endDate.getTime() - dailyTimerStartedAt.getTime()) / 1000));
     elements.display.textContent = formatDailyElapsedTime(elapsedSeconds);
     elements.minutes.value = Math.floor(elapsedSeconds / 60);
-    elements.status.textContent = dailyTimerStoppedAt
-      ? 'Procedure timer stopped and ready to save.'
-      : 'Procedure is running live.';
+    elements.status.textContent = dailyTimerStoppedAt ?
+      'Procedure timer stopped and ready to save.' :
+      'Procedure is running live.';
     syncDailyTimerButtons(!dailyTimerStoppedAt);
   }
 
@@ -1708,37 +1488,213 @@
   }
 
   function resetDailyRecordForm() {
-    const form = document.getElementById('dailyRecordForm');
-    const today = new Date();
-    if (form) form.reset();
+    const form =
+      document.getElementById(
+        'dailyRecordForm'
+      );
 
-    dailyTimerStartedAt = null;
-    dailyTimerStoppedAt = null;
+    const today =
+      new Date();
+
+    form?.reset();
+
+    dailyTimerStartedAt =
+      null;
+
+    dailyTimerStoppedAt =
+      null;
 
     if (dailyTimerInterval) {
-      clearInterval(dailyTimerInterval);
-      dailyTimerInterval = null;
+      clearInterval(
+        dailyTimerInterval
+      );
+
+      dailyTimerInterval =
+        null;
     }
 
-    const elements = getDailyTimerElements();
-    if (elements.timeIn) elements.timeIn.value = '';
-    if (elements.timeOut) elements.timeOut.value = '';
-    if (elements.timeInDisplay) elements.timeInDisplay.value = '';
-    if (elements.timeOutDisplay) elements.timeOutDisplay.value = '';
+    const elements =
+      getDailyTimerElements();
 
-    const dateInput = document.getElementById('recordTreatmentDate');
-    if (dateInput) dateInput.value = today.toISOString().split('T')[0];
+    if (elements.timeIn) {
+      elements.timeIn.value = '';
+    }
 
-    document.getElementById('dailyRecordErrorBanner')?.classList.add('hidden');
-    document.getElementById('dailyRecordErrorBanner')?.classList.remove('flex');
+    if (elements.timeOut) {
+      elements.timeOut.value = '';
+    }
 
-    ['recordTreatmentDate', 'recordPatientName', 'recordTreatmentDone'].forEach(id => {
-      const input = document.getElementById(id);
-      input?.classList.remove('border-red-400');
-      input?.classList.add('border-gray-300');
+    if (elements.timeInDisplay) {
+      elements.timeInDisplay.value = '';
+    }
+
+    if (elements.timeOutDisplay) {
+      elements.timeOutDisplay.value = '';
+    }
+
+    const dateInput =
+      document.getElementById(
+        'recordTreatmentDate'
+      );
+
+    if (dateInput) {
+      dateInput.value =
+        today
+          .toISOString()
+          .split('T')[0];
+    }
+
+    const banner =
+      document.getElementById(
+        'dailyRecordErrorBanner'
+      );
+
+    banner?.classList.add(
+      'hidden'
+    );
+
+    banner?.classList.remove(
+      'flex'
+    );
+
+    [
+      'recordTreatmentDate',
+      'recordPatientName',
+      'recordTreatmentDone',
+    ].forEach(id => {
+      const input =
+        document.getElementById(id);
+
+      input?.classList.remove(
+        'border-red-400'
+      );
+
+      input?.classList.add(
+        'border-gray-300'
+      );
     });
 
     updateDailyTimerDisplay();
+  }
+
+  function resetDailyReportForm() {
+    const form =
+      document.getElementById(
+        'reportForm'
+      );
+
+    if (!form) {
+      return;
+    }
+
+    form.reset();
+
+    window.initCustomSelects?.(
+      form
+    );
+
+    const quantityInput =
+      document.getElementById(
+        'reportQty'
+      );
+
+    if (quantityInput) {
+      quantityInput.value = '1';
+
+      quantityInput.dispatchEvent(
+        new Event(
+          'input', {
+          bubbles: true
+        }
+        )
+      );
+    }
+
+    ['dateFrom', 'dateTo']
+      .forEach(id => {
+        document
+          .getElementById(id)
+          ?._flatpickr
+          ?.clear(false);
+      });
+
+    form
+      .querySelectorAll(
+        'input, textarea, select'
+      )
+      .forEach(field => {
+        field.classList.remove(
+          'is-invalid',
+          'is-valid'
+        );
+
+        field.removeAttribute(
+          'aria-invalid'
+        );
+
+        field.removeAttribute(
+          'aria-describedby'
+        );
+
+        field.setCustomValidity('');
+      });
+
+    form
+      .querySelectorAll(
+        '.custom-select'
+      )
+      .forEach(wrapper => {
+        wrapper.classList.remove(
+          'is-invalid',
+          'is-valid'
+        );
+
+        window.syncCustomSelect?.(
+          wrapper
+        );
+      });
+
+    form
+      .querySelectorAll(
+        '.global-field-error'
+      )
+      .forEach(error => {
+        error.classList.remove(
+          'show',
+          'is-success'
+        );
+
+        error.innerHTML = '';
+
+        error.setAttribute(
+          'aria-hidden',
+          'true'
+        );
+      });
+
+    document
+      .getElementById(
+        'formErrorBanner'
+      )
+      ?.classList
+      .add('hidden');
+
+    const counter =
+      document.getElementById(
+        'reportNameCounter'
+      );
+
+    if (counter) {
+      counter.textContent =
+        '0 / 100';
+
+      counter.className =
+        'char-counter';
+    }
+
+    window.initGlobalNumberSteppers?.(
+      form
+    );
   }
 
   function openDailyRecordModal() {
@@ -1789,7 +1745,8 @@
     });
 
     if (!valid) {
-      banner.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i><span>Please complete the treatment date, patient name, and treatment details.</span>';
+      banner.innerHTML =
+        '<i class="fa-solid fa-triangle-exclamation"></i><span>Please complete the treatment date, patient name, and treatment details.</span>';
       banner.classList.remove('hidden');
       banner.classList.add('flex');
       return;
@@ -1806,7 +1763,8 @@
     if (saveBtn) {
       saveBtn.disabled = true;
       saveBtn.classList.add('opacity-70', 'cursor-not-allowed');
-      saveBtn.innerHTML = '<span class="btn-confirm-icon"><i class="fa-solid fa-spinner fa-spin"></i></span><span>Saving...</span>';
+      saveBtn.innerHTML =
+        '<span class="btn-confirm-icon"><i class="fa-solid fa-spinner fa-spin"></i></span><span>Saving...</span>';
     }
 
     try {
@@ -1838,7 +1796,8 @@
       dtrState.page = 1;
       await fetchDailyRecords();
     } catch (error) {
-      banner.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i><span>${escapeDtrHtml(error.message || 'Unable to save the daily treatment record.')}</span>`;
+      banner.innerHTML =
+        `<i class="fa-solid fa-triangle-exclamation"></i><span>${escapeDtrHtml(error.message || 'Unable to save the daily treatment record.')}</span>`;
       banner.classList.remove('hidden');
       banner.classList.add('flex');
     } finally {
@@ -1850,171 +1809,410 @@
     }
   }
 
+  function registerDailyTreatmentReportValidation() {
+    if (
+      typeof window
+        .registerGlobalFormValidationRule !==
+      'function'
+    ) {
+      return;
+    }
+
+    window.registerGlobalFormValidationRule(
+      'dailyTreatmentReport',
+      form => {
+        const fromField =
+          form.querySelector(
+            '#dateFrom'
+          );
+
+        const toField =
+          form.querySelector(
+            '#dateTo'
+          );
+
+        const quantityField =
+          form.querySelector(
+            '#reportQty'
+          );
+
+        let valid = true;
+        let firstInvalid = null;
+
+        if (
+          fromField?.value &&
+          toField?.value &&
+          toField.value < fromField.value
+        ) {
+          window
+            .showFormInputValidationMessage?.(
+              toField,
+              'End date must be the same as or later than the start date.'
+            );
+
+          valid = false;
+          firstInvalid = toField;
+        }
+
+        if (
+          quantityField?.value !== ''
+        ) {
+          const quantity =
+            Number(
+              quantityField.value
+            );
+
+          if (
+            !Number.isInteger(quantity) ||
+            quantity < 1 ||
+            quantity > 100
+          ) {
+            window
+              .showFormInputValidationMessage?.(
+                quantityField,
+                'Quantity must be a whole number between 1 and 100.'
+              );
+
+            valid = false;
+
+            firstInvalid ||=
+              quantityField;
+          }
+        }
+
+        return {
+          valid,
+          firstInvalid,
+        };
+      }
+    );
+  }
+
+  window.addEventListener(
+    'global-validation-ready',
+    registerDailyTreatmentReportValidation
+  );
+
+  document.addEventListener(
+    'DOMContentLoaded',
+    registerDailyTreatmentReportValidation
+  );
+
   async function downloadDailyReport() {
-    const btn = document.getElementById('downloadReportBtn');
-    const name = document.getElementById('reportName')?.value.trim() || '';
-    const templateId = document.getElementById('reportType')?.value || '';
-    const from = document.getElementById('dateFrom')?.value || '';
-    const to = document.getElementById('dateTo')?.value || '';
-    const qty = parseInt(document.getElementById('reportQty')?.value, 10);
-    const banner = document.getElementById('formErrorBanner');
-    const todayStr = new Date().toISOString().split('T')[0];
+    const form =
+      document.getElementById(
+        'reportForm'
+      );
 
-    let valid = true;
+    const btn =
+      document.getElementById(
+        'downloadReportBtn'
+      );
 
-    function showBanner(message = 'Please complete all required fields before downloading.') {
-      if (!banner) return;
+    const banner =
+      document.getElementById(
+        'formErrorBanner'
+      );
 
-      banner.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-red-500 flex-shrink-0"></i><span>${escapeDtrHtml(message)}</span>`;
-      banner.classList.remove('hidden');
-      banner.classList.add('flex');
+    if (!form || !btn) {
+      return;
+    }
+
+    function showBanner(
+      message =
+        'Please complete all required fields before downloading.'
+    ) {
+      if (!banner) {
+        return;
+      }
+
+      banner.innerHTML = `
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span>
+        ${escapeDtrHtml(message)}
+      </span>
+    `;
+
+      banner.classList.remove(
+        'hidden'
+      );
     }
 
     function hideBanner() {
-      banner?.classList.add('hidden');
-      banner?.classList.remove('flex');
-    }
-
-    setDailyModalError('reportName', 'reportNameErr', !name);
-    if (!name) valid = false;
-
-    setDailyModalError('reportType', 'reportTypeErr', !templateId);
-    if (!templateId) valid = false;
-
-    ['dateFromErr', 'dateFutureErr', 'dateRangeErr'].forEach(id => {
-      const el = document.getElementById(id);
-      el?.classList.add('hidden');
-      el?.classList.remove('flex');
-    });
-
-    ['dateFrom', 'dateTo'].forEach(id => {
-      const el = document.getElementById(id);
-      el?.classList.remove('border-red-400');
-      el?.classList.add('border-gray-300');
-    });
-
-    if (!from) {
-      document.getElementById('dateFromErr')?.classList.remove('hidden');
-      document.getElementById('dateFromErr')?.classList.add('flex');
-      document.getElementById('dateFrom')?.classList.add('border-red-400');
-      document.getElementById('dateFrom')?.classList.remove('border-gray-300');
-      valid = false;
-    } else if (from > todayStr || (to && to > todayStr)) {
-      document.getElementById('dateFutureErr')?.classList.remove('hidden');
-      document.getElementById('dateFutureErr')?.classList.add('flex');
-      valid = false;
-    } else if (to && new Date(to) < new Date(from)) {
-      document.getElementById('dateRangeErr')?.classList.remove('hidden');
-      document.getElementById('dateRangeErr')?.classList.add('flex');
-      document.getElementById('dateTo')?.classList.add('border-red-400');
-      document.getElementById('dateTo')?.classList.remove('border-gray-300');
-      valid = false;
-    }
-
-    const qtyInvalid = Number.isNaN(qty) || qty < 1 || qty > 100;
-    document.getElementById('reportQtyErrMsg').textContent = Number.isNaN(qty) || qty < 1
-      ? 'Quantity must be between 1 and 100.'
-      : 'Quantity cannot exceed 100.';
-    setDailyModalError('reportQty', 'reportQtyErr', qtyInvalid);
-    if (qtyInvalid) valid = false;
-
-    if (!valid) {
-      showBanner();
-      btn?.classList.add('animate-bounce');
-      setTimeout(() => btn?.classList.remove('animate-bounce'), 600);
-      return;
+      banner?.classList.add(
+        'hidden'
+      );
     }
 
     hideBanner();
 
-    const originalBtnHtml = btn?.innerHTML || '';
+    const validationResult =
+      window.validateGlobalForm?.(
+        form
+      );
 
-    if (btn) {
-      btn.disabled = true;
-      btn.classList.add('opacity-70', 'cursor-not-allowed');
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
+    if (
+      validationResult === false ||
+      validationResult?.valid === false
+    ) {
+      showBanner();
+
+      return;
     }
 
+    const name =
+      document.getElementById(
+        'reportName'
+      )?.value
+        ?.trim() || '';
+
+    const templateId =
+      document.getElementById(
+        'reportType'
+      )?.value || '';
+
+    const from =
+      document.getElementById(
+        'dateFrom'
+      )?.value || '';
+
+    const to =
+      document.getElementById(
+        'dateTo'
+      )?.value || '';
+
+    const qty =
+      Number(
+        document.getElementById(
+          'reportQty'
+        )?.value || 0
+      );
+
+    if (
+      !name ||
+      !templateId ||
+      !from ||
+      !Number.isInteger(qty) ||
+      qty < 1 ||
+      qty > 100
+    ) {
+      showBanner();
+      return;
+    }
+
+    window.DiscardChanges
+      ?.markSubmitting(form);
+
+    const originalBtnHtml =
+      btn.innerHTML;
+
+    btn.disabled = true;
+
+    btn.setAttribute(
+      'aria-busy',
+      'true'
+    );
+
+    btn.innerHTML = `
+    <i class="fa-solid fa-spinner fa-spin"></i>
+    <span>Generating...</span>
+  `;
+
     try {
-      const formData = new FormData();
-      formData.append('_token', CSRF_TOKEN);
-      formData.append('report_name', name);
-      formData.append('document_template_id', templateId);
-      formData.append('date_from', from);
-      formData.append('quantity', String(qty));
+      const formData =
+        new FormData();
 
-      if (to) formData.append('date_to', to);
+      formData.append(
+        '_token',
+        CSRF_TOKEN
+      );
 
-      const response = await fetch(DTR_DOWNLOAD_URL, {
-        method: 'POST',
-        headers: {
-          'X-CSRF-TOKEN': CSRF_TOKEN,
-          'X-XSRF-TOKEN': CSRF_TOKEN,
-          'X-Requested-With': 'XMLHttpRequest',
-          'Accept': 'application/pdf, application/json',
-        },
-        body: formData,
-        credentials: 'same-origin',
-      });
+      formData.append(
+        'report_name',
+        name
+      );
+
+      formData.append(
+        'document_template_id',
+        templateId
+      );
+
+      formData.append(
+        'date_from',
+        from
+      );
+
+      formData.append(
+        'quantity',
+        String(qty)
+      );
+
+      if (to) {
+        formData.append(
+          'date_to',
+          to
+        );
+      }
+
+      const response =
+        await fetch(
+          DTR_DOWNLOAD_URL,
+          {
+            method: 'POST',
+
+            headers: {
+              'X-CSRF-TOKEN':
+                CSRF_TOKEN,
+
+              'X-Requested-With':
+                'XMLHttpRequest',
+
+              'Accept':
+                'application/pdf, application/json',
+            },
+
+            body:
+              formData,
+
+            credentials:
+              'same-origin',
+          }
+        );
 
       if (!response.ok) {
-        let message = `Unable to generate the report. Server returned ${response.status}.`;
-        const contentType = response.headers.get('content-type') || '';
+        let message =
+          `Unable to generate the report. Server returned ${response.status}.`;
 
-        if (contentType.includes('application/json')) {
-          const errorData = await response.json();
-          message = errorData.message || message;
+        const contentType =
+          response.headers.get(
+            'content-type'
+          ) || '';
 
-          if (errorData.errors) {
-            const firstError = Object.values(errorData.errors)[0];
-            if (Array.isArray(firstError) && firstError.length > 0) message = firstError[0];
+        if (
+          contentType.includes(
+            'application/json'
+          )
+        ) {
+          const errorData =
+            await response.json();
+
+          message =
+            errorData.message ||
+            message;
+
+          if (
+            errorData.errors
+          ) {
+            const firstError =
+              Object.values(
+                errorData.errors
+              )[0];
+
+            if (
+              Array.isArray(
+                firstError
+              ) &&
+              firstError.length > 0
+            ) {
+              message =
+                firstError[0];
+            }
           }
         }
 
-        throw new Error(message);
+        throw new Error(
+          message
+        );
       }
 
-      const blob = await response.blob();
-      const downloadUrl = window.URL.createObjectURL(blob);
-      let fileName = `${name.replace(/[^A-Za-z0-9_-]/g, '_')}.pdf`;
-      const disposition = response.headers.get('Content-Disposition') || response.headers.get('content-disposition') || '';
-      const fileNameMatch = disposition.match(/filename="?([^"]+)"?/i);
+      const blob =
+        await response.blob();
 
-      if (fileNameMatch?.[1]) fileName = fileNameMatch[1];
+      const downloadUrl =
+        window.URL
+          .createObjectURL(blob);
 
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = fileName;
-      document.body.appendChild(link);
+      let fileName =
+        `${name.replace(
+          /[^A-Za-z0-9_-]/g,
+          '_'
+        )}.pdf`;
+
+      const disposition =
+        response.headers.get(
+          'Content-Disposition'
+        ) ||
+        response.headers.get(
+          'content-disposition'
+        ) ||
+        '';
+
+      const fileNameMatch =
+        disposition.match(
+          /filename="?([^"]+)"?/i
+        );
+
+      if (
+        fileNameMatch?.[1]
+      ) {
+        fileName =
+          fileNameMatch[1];
+      }
+
+      const link =
+        document.createElement(
+          'a'
+        );
+
+      link.href =
+        downloadUrl;
+
+      link.download =
+        fileName;
+
+      document.body.appendChild(
+        link
+      );
+
       link.click();
       link.remove();
-      window.URL.revokeObjectURL(downloadUrl);
+
+      window.URL
+        .revokeObjectURL(
+          downloadUrl
+        );
+
+      window.DiscardChanges
+        ?.captureForm(form);
 
       closeDailyCreateReportModal();
 
-      if (typeof window.openModal === 'function') {
-        window.openModal('downloadCompleteModal');
-      } else {
-        document.getElementById('downloadCompleteModal')?.classList.add('open');
-      }
-    } catch (err) {
-      showBanner(err.message || 'Unable to generate the report. Please try again.');
+      window.openModal?.(
+        'downloadCompleteModal'
+      );
+
+    } catch (error) {
+      window.DiscardChanges
+        ?.markNotSubmitting(form);
+
+      showBanner(
+        error.message ||
+        'Unable to generate the report. Please try again.'
+      );
+
     } finally {
-      if (btn) {
-        btn.disabled = false;
-        btn.classList.remove('opacity-70', 'cursor-not-allowed');
-        btn.innerHTML = originalBtnHtml;
-      }
+      btn.disabled = false;
+
+      btn.removeAttribute(
+        'aria-busy'
+      );
+
+      btn.innerHTML =
+        originalBtnHtml;
     }
   }
 
-  document.addEventListener('click', event => {
-    if (!event.target.closest('[data-report-select]')) closeDailyReportSelects();
-  });
-
   document.addEventListener('DOMContentLoaded', () => {
-    initDailyReportCustomSelects(document);
-    initDailyReportQtyButtons();
     resetDailyRecordForm();
 
     const monthPicker = document.getElementById('monthPicker');
@@ -2035,16 +2233,6 @@
       dtrState.month = event.target.value || '';
       dtrState.page = 1;
       fetchDailyRecords();
-    });
-
-    document.getElementById('reportName')?.addEventListener('input', event => {
-      const counter = document.getElementById('reportNameCounter');
-      if (!counter) return;
-
-      const length = event.target.value.length;
-      counter.textContent = `${length} / 100`;
-      counter.classList.toggle('text-red-500', length >= 100);
-      counter.classList.toggle('text-gray-400', length < 100);
     });
 
     document.getElementById('recordTreatmentDate')?.setAttribute('max', now.toISOString().split('T')[0]);

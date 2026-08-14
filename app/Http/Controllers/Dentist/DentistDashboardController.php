@@ -133,6 +133,13 @@ class DentistDashboardController extends Controller
                         'status' => $appointment->status ?? 'upcoming',
                         'date' => Carbon::parse($appointment->appointment_date)->format('Y-m-d'),
 
+                        'patientPhotoUrl' =>
+                        optional($appointment->patient)->profile_photo_url
+                            ?? optional($appointment->patient)->profile_picture_url
+                            ?? optional($appointment->patient)->avatar_url
+                            ?? optional($appointment->patient)->photo_url
+                            ?? '',
+
                         'patientProfileUrl' => $appointment->patient_id
                             ? route('dentist.dentist.patient.profile', $appointment->patient_id)
                             : '#',

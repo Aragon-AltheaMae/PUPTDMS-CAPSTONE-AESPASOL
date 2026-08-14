@@ -40,27 +40,18 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
 
         <section id="statCards" class="stat-grid" aria-label="Dental service summary">
             <article class="stat-card s-all">
-                <div class="stat-icon-wrapper">
-                    <i class="fa-solid fa-file-lines"></i>
+                <div class="stat-card-info">
+                    <div class="stat-num" id="statTotal">0</div>
+                    <div class="stat-label">Total Records</div>
                 </div>
 
-                <div class="stat-card-info">
-                    <div class="stat-num" id="statTotal">
-                        0
-                    </div>
-
-                    <div class="stat-label">
-                        Total Records
-                    </div>
+                <div class="stat-icon-wrapper">
+                    <i class="fa-solid fa-file-lines"></i>
                 </div>
             </article>
 
 
             <article class="stat-card s-amber">
-                <div class="stat-icon-wrapper">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                </div>
-
                 <div class="stat-card-info">
                     <div class="stat-num" id="statEmergency">
                         0
@@ -70,14 +61,14 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                         Emergency
                     </div>
                 </div>
+
+                <div class="stat-icon-wrapper">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
             </article>
 
 
             <article class="stat-card s-green">
-                <div class="stat-icon-wrapper">
-                    <i class="fa-solid fa-circle-check"></i>
-                </div>
-
                 <div class="stat-card-info">
                     <div class="stat-num" id="statNonEmergency">
                         0
@@ -87,14 +78,15 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                         Non-Emergency
                     </div>
                 </div>
+
+                <div class="stat-icon-wrapper">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+
             </article>
 
 
             <article class="stat-card s-blue">
-                <div class="stat-icon-wrapper">
-                    <i class="fa-solid fa-venus"></i>
-                </div>
-
                 <div class="stat-card-info">
                     <div class="stat-num" id="statFemale">
                         0
@@ -103,6 +95,10 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                     <div class="stat-label">
                         Female Patients
                     </div>
+                </div>
+
+                <div class="stat-icon-wrapper">
+                    <i class="fa-solid fa-venus"></i>
                 </div>
             </article>
         </section>
@@ -123,7 +119,7 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                 <div class="card-header-right service-toolbar search-filter-row">
                     <div class="service-month-picker service-toolbar-month-picker">
                         <input type="text" id="monthPicker" class="form-input-custom service-period-input"
-                            data-month-only-picker placeholder="Select month" readonly>
+                            data-month-only-picker data-month-max-today placeholder="Select month" readonly>
 
                         <i class="fa-solid fa-calendar-days service-month-icon"></i>
                     </div>
@@ -194,7 +190,8 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
 <x-filter-drawer id="filterModal" title="Filter Records" close-id="closeFilterModalBtn"
     close-callback="closeDentalFilterModal()" clear-id="clearFilterBtn" clear-label="Clear Filters"
     cancel-id="cancelFilterBtn" cancel-callback="closeDentalFilterModal()" cancel-label="Cancel"
-    apply-id="applyFiltersBtn" apply-callback="applyDentalFiltersFromDrawer()" apply-label="Show Results">
+    apply-id="applyFiltersBtn" apply-callback="applyDentalFiltersFromDrawer()" apply-label="Show Results"
+    results-id="showResultsText">
 
     <div id="activeFiltersSection" class="filter-active-section hidden">
         <div class="filter-active-header">
@@ -615,7 +612,12 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
 <script>
     const DENTAL_DOWNLOAD_URL = "{{ route('dentist.dentist.report.dental-services-download') }}";
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || "{{ csrf_token() }}";
-    const records = @json($frontendRecords);
+    let records = @json($frontendRecords);
+
+    const DENTAL_SERVICES_DATA_URL =
+        "{{ route('dentist.dentist.report.dental-services.data') }}";
+
+    let dentalServicesRequestController = null;
     const initialSelectedMonth = @json($selectedMonth);
 
     let searchKeyword = '';
@@ -1426,17 +1428,6 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
         });
     }
 
-    function getRecordMonthKey(record) {
-        if (record.monthKey) return record.monthKey;
-        if (record.dateKey) return String(record.dateKey).slice(0, 7);
-
-        const [month, , year] = String(record.date || '').split('/');
-
-        if (!month || !year) return '';
-
-        return `20${year}-${String(month).padStart(2, '0')}`;
-    }
-
     function getDentalPagination(data) {
         const total = data.length;
         const lastPage = Math.max(1, Math.ceil(total / servicePerPage));
@@ -1560,10 +1551,9 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
         tbody.innerHTML = '';
         if (grid) grid.innerHTML = '';
 
-        document.getElementById('statTotal').textContent = data.length;
-        document.getElementById('statEmergency').textContent = data.filter(r => r.type === 'Emergency').length;
-        document.getElementById('statNonEmergency').textContent = data.filter(r => r.type === 'Non-Emergency').length;
-        document.getElementById('statFemale').textContent = data.filter(r => r.gad?.gender === 'Female').length;
+        function updateDentalServiceStats() {
+            updateDentalServiceStats();
+        }
 
         const pagination = getDentalPagination(data);
         renderDentalPagebar(pagination);
@@ -1681,6 +1671,111 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
         return new Date(`20${year}-${month}-${day}`);
     }
 
+    async function fetchDentalServicesMonth(month) {
+        if (!month) {
+            records = [];
+            applyFilters(true);
+            return;
+        }
+
+        if (dentalServicesRequestController) {
+            dentalServicesRequestController.abort();
+        }
+
+        dentalServicesRequestController =
+            new AbortController();
+
+        const monthPicker =
+            document.getElementById('monthPicker');
+
+        try {
+            monthPicker?.setAttribute(
+                'aria-busy',
+                'true'
+            );
+
+            const url =
+                new URL(
+                    DENTAL_SERVICES_DATA_URL,
+                    window.location.origin
+                );
+
+            url.searchParams.set(
+                'month',
+                month
+            );
+
+            const response =
+                await fetch(
+                    url.toString(),
+                    {
+                        headers: {
+                            'Accept':
+                                'application/json',
+
+                            'X-Requested-With':
+                                'XMLHttpRequest',
+                        },
+
+                        credentials:
+                            'same-origin',
+
+                        signal:
+                            dentalServicesRequestController.signal,
+                    }
+                );
+
+            if (!response.ok) {
+                throw new Error(
+                    'Unable to load dental service records.'
+                );
+            }
+
+            const payload =
+                await response.json();
+
+            records =
+                Array.isArray(payload.records)
+                    ? payload.records
+                    : [];
+
+            selectedMonth =
+                payload.selectedMonth ||
+                month;
+
+            serviceCurrentPage = 1;
+
+            applyFilters(true);
+            updateShowResultsButton();
+            updateFilterButtonState();
+            renderDentalFilterChips();
+
+        } catch (error) {
+            if (
+                error.name ===
+                'AbortError'
+            ) {
+                return;
+            }
+
+            console.error(
+                'Dental services month load failed:',
+                error
+            );
+
+            window.showToast?.({
+                type: 'error',
+                title: 'Unable to load records',
+                message:
+                    'Dental service records for the selected month could not be loaded.',
+            });
+        } finally {
+            monthPicker?.removeAttribute(
+                'aria-busy'
+            );
+        }
+    }
+
     function applyFilters(resetPage = false) {
         if (resetPage) {
             serviceCurrentPage = 1;
@@ -1727,10 +1822,6 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
             data = data.filter(r => r.department === selectedDepartment);
         }
 
-        if (selectedMonth) {
-            data = data.filter(r => getRecordMonthKey(r) === selectedMonth);
-        }
-
         if (dateSort === 'asc') {
             data.sort((a, b) => parseRecordDate(a.date) - parseRecordDate(b.date));
         }
@@ -1763,13 +1854,13 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
     window.handleDentalServicesSearch = handleDentalServicesSearch;
 
     function updateShowResultsButton() {
-        const count = getFilteredDentalRecords().length;
-        window.updateShowResultsText?.(count, 'showResultsText');
+        const count =
+            getFilteredDentalRecords().length;
 
-        const fallback = document.getElementById('showResultsText');
-        if (fallback && typeof window.updateShowResultsText !== 'function') {
-            fallback.textContent = `Show ${count} ${count === 1 ? 'result' : 'results'}`;
-        }
+        window.updateShowResultsText?.(
+            count,
+            'showResultsText'
+        );
     }
 
     function renderDentalFilterChips() {
@@ -1871,6 +1962,8 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
             closeDentalFilterModal();
         }
     }
+
+    window.resetDentalFilters = resetDentalFilters;
 
     function openDentalFilterModal() {
         renderDentalFilterChips();
@@ -2017,23 +2110,43 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
             });
         });
 
-        monthPicker?.addEventListener('change', (e) => {
-            selectedMonth = e.target.value || '';
+        monthPicker?.addEventListener(
+            'change',
+            async event => {
+                const nextMonth =
+                    event.target.value || '';
 
-            const url = new URL(window.location.href);
+                if (
+                    !nextMonth ||
+                    nextMonth === selectedMonth
+                ) {
+                    return;
+                }
 
-            if (selectedMonth) {
-                url.searchParams.set('month', selectedMonth);
-            } else {
-                url.searchParams.delete('month');
+                selectedMonth =
+                    nextMonth;
+
+                const url =
+                    new URL(
+                        window.location.href
+                    );
+
+                url.searchParams.set(
+                    'month',
+                    selectedMonth
+                );
+
+                history.replaceState(
+                    null,
+                    '',
+                    url.toString()
+                );
+
+                await fetchDentalServicesMonth(
+                    selectedMonth
+                );
             }
-
-            history.replaceState(null, '', url.toString());
-
-            applyFilters(true);
-            updateShowResultsButton();
-            renderDentalFilterChips();
-        });
+        );
 
         downloadReportBtn?.addEventListener('click', downloadDentalServicesReport);
 
