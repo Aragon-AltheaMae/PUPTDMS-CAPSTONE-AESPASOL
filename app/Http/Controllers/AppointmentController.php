@@ -31,7 +31,14 @@ use App\Notifications\AppointmentBookedNotification;
 use App\Notifications\AppointmentRescheduledNotification;
 use App\Notifications\SignatureReuploadRequiredNotification;
 use App\Services\SignatureAiVerifier;
+use App\Helpers\BookingQuestions;
+use App\Models\AppointmentDraft;
 
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+
+use App\Mail\AppointmentConfirmationMail;
+use App\Mail\AppointmentRescheduleMail;
 
 class AppointmentController extends Controller
 {
@@ -188,6 +195,7 @@ class AppointmentController extends Controller
         ));
     }
 
+
     public function create()
     {
         $patientId = session('impersonated_patient_id') ?: session('patient_id');
@@ -198,18 +206,130 @@ class AppointmentController extends Controller
 
         $patient = Patient::findOrFail($patientId);
 
-        // DO NOT REMOVE
-        // $hasActiveAppointment = Appointment::where('patient_id', $patientId)
-        //     ->whereIn('status', ['upcoming', 'rescheduled'])
-        //     ->exists();
+        $patient->load([
+            'dentalHistory',
+            'dentalHistoryDates',
+            'dentalHistoryConcerns',
+            'dentalHistoryAnswers.condition',
+            'medicalHistory.answers.question',
+            'medicalHistory.diseaseAnswers.disease',
+        ]);
 
-        // if ($hasActiveAppointment) {
-        //     return redirect()->back()->with([
-        //         'activeAppointmentModal' => true,
-        //         'activeAppointmentMsg' =>
-        //         "You already have an active appointment. Please wait until it is completed before booking another one."
-        //     ]);
-        // }
+        $dentalDefaults = [
+            'last_dental_visit' => $patient->dentalHistory?->last_dental_visit
+                ? $patient->dentalHistory->last_dental_visit->format('Y-m-d')
+                : '',
+
+            'previous_dentist' => $patient->dentalHistory?->previous_dentist ?? '',
+
+            'additional_concerns' =>
+            $patient->dentalHistoryConcerns?->additional_concerns ?? '',
+
+            'extraction_date' => $patient->dentalHistoryDates?->extraction_date
+                ? $patient->dentalHistoryDates->extraction_date->format('Y-m-d')
+                : '',
+
+            'dentures_date' => $patient->dentalHistoryDates?->dentures_date
+                ? $patient->dentalHistoryDates->dentures_date->format('Y-m-d')
+                : '',
+
+            'ortho_date' => $patient->dentalHistoryDates?->ortho_date
+                ? $patient->dentalHistoryDates->ortho_date->format('Y-m-d')
+                : '',
+        ];
+
+        foreach ($patient->dentalHistoryAnswers as $answer) {
+            $code = $answer->condition?->code;
+
+            if (!$code) {
+                continue;
+            }
+
+            $dentalDefaults[$code] = $answer->answer ? 'YES' : 'NO';
+        }
+
+        $medicalDefaults = [];
+
+        if ($patient->medicalHistory) {
+            $medicalDefaults = [
+                'emergency_person' =>
+                $patient->medicalHistory->emergency_person ?? '',
+
+                'emergency_number' =>
+                $patient->medicalHistory->emergency_number ?? '',
+
+                'emergency_relation' =>
+                $patient->medicalHistory->emergency_relation ?? '',
+            ];
+
+            foreach ($patient->medicalHistory->answers as $answer) {
+                $code = $answer->question?->code;
+
+                if (!$code) {
+                    continue;
+                }
+
+                if ($answer->answer_bool !== null) {
+                    $medicalDefaults[$code] =
+                        $answer->answer_bool ? 'YES' : 'NO';
+
+                    continue;
+                }
+
+                if ($answer->answer_text !== null) {
+                    $medicalDefaults[$code] =
+                        $answer->answer_text;
+
+                    continue;
+                }
+
+                if ($answer->answer_date !== null) {
+                    $medicalDefaults[$code] =
+                        $answer->answer_date->format('Y-m-d');
+                }
+            }
+        }
+
+        $selectedDiseases = $patient->medicalHistory
+            ? $patient->medicalHistory
+            ->diseaseAnswers
+            ->filter(fn($answer) => $answer->has_disease)
+            ->map(fn($answer) => $answer->disease?->code)
+            ->filter()
+            ->values()
+            ->all()
+            : [];
+
+        $hasExistingDentalHistory =
+            $patient->dentalHistory !== null &&
+            $patient->dentalHistoryAnswers->isNotEmpty();
+
+        $hasExistingMedicalHistory =
+            $patient->medicalHistory !== null &&
+            $patient->medicalHistory->answers->isNotEmpty();
+
+        $hasExistingBookingInformation =
+            $hasExistingDentalHistory &&
+            $hasExistingMedicalHistory;
+
+        $hasReusableSignature =
+            !empty($patient->medicalHistory?->patient_signature) &&
+            $patient->medicalHistory?->signature_review_status !==
+            'invalid_reupload_required';
+
+
+        // DO NOT REMOVE
+        $hasActiveAppointment = Appointment::where('patient_id', $patientId)
+            ->whereIn('status', ['upcoming', 'rescheduled'])
+            ->exists();
+
+        if ($hasActiveAppointment) {
+            return redirect()->back()->with([
+                'activeAppointmentModal' => true,
+                'activeAppointmentMsg' =>
+                "You already have an active appointment. Please wait until it is completed before booking another one."
+            ]);
+        }
 
         $appointmentCountsPerDay = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
             ->selectRaw('appointment_date, COUNT(*) as count')
@@ -276,6 +396,9 @@ class AppointmentController extends Controller
             })
             ->values();
 
+        $dentalQuestions = BookingQuestions::dental();
+        $medicalQuestions = BookingQuestions::medical();
+
         AuditLogger::log(
             'view',
             'appointments',
@@ -291,20 +414,173 @@ class AppointmentController extends Controller
             'philippineHolidays',
             'diseases',
             'serviceTypes',
-            'odontogramTeeth'
+            'odontogramTeeth',
+            'dentalQuestions',
+            'medicalQuestions',
+            'dentalDefaults',
+            'medicalDefaults',
+            'selectedDiseases',
+            'hasExistingDentalHistory',
+            'hasExistingMedicalHistory',
+            'hasExistingBookingInformation',
+            'hasReusableSignature'
         ));
+    }
+
+    public function getDraft()
+    {
+        $patientId =
+            session('impersonated_patient_id')
+            ?: session('patient_id');
+
+        if (! $patientId) {
+            return response()->json([
+                'has_draft' => false,
+                'draft' => null,
+            ], 401);
+        }
+
+        $draft =
+            AppointmentDraft::where(
+                'patient_id',
+                $patientId
+            )->first();
+
+        return response()->json([
+            'has_draft' => (bool) $draft,
+
+            'draft' => $draft
+                ? [
+                    'payload' =>
+                    $draft->payload,
+
+                    'current_step' =>
+                    $draft->current_step,
+
+                    'last_saved_at' =>
+                    optional(
+                        $draft->last_saved_at
+                    )->toISOString(),
+                ]
+                : null,
+        ]);
+    }
+
+    public function saveDraft(Request $request)
+    {
+        $patientId =
+            session('impersonated_patient_id')
+            ?: session('patient_id');
+
+        if (! $patientId) {
+            return response()->json([
+                'message' =>
+                'Unauthenticated.',
+            ], 401);
+        }
+
+        $validated =
+            $request->validate([
+                'payload' =>
+                'required|array',
+
+                'current_step' =>
+                'nullable|integer|min:0|max:4',
+            ]);
+
+        $draft =
+            AppointmentDraft::updateOrCreate(
+                [
+                    'patient_id' =>
+                    $patientId,
+                ],
+                [
+                    'payload' =>
+                    $validated['payload'],
+
+                    'current_step' =>
+                    $validated['current_step']
+                        ?? 0,
+
+                    'last_saved_at' =>
+                    now(),
+                ]
+            );
+
+        return response()->json([
+            'saved' => true,
+
+            'last_saved_at' =>
+            $draft
+                ->last_saved_at
+                ?->toISOString(),
+        ]);
+    }
+
+    public function deleteDraft()
+    {
+        $patientId =
+            session('impersonated_patient_id')
+            ?: session('patient_id');
+
+        if (! $patientId) {
+            return response()->json([
+                'message' => 'Unauthenticated.',
+            ], 401);
+        }
+
+        AppointmentDraft::where(
+            'patient_id',
+            $patientId
+        )->delete();
+
+        return response()->json([
+            'deleted' => true,
+        ]);
     }
 
     /* =======================
        STORE APPOINTMENT
     ======================= */
     public function store(Request $request, SignatureAiVerifier $signatureVerifier)
-
     {
+        $patientId = session('impersonated_patient_id') ?: session('patient_id');
+
+        if (!$patientId) {
+            return redirect()->route('login')
+                ->with('error', 'Please login first!');
+        }
+
+        $existingMedicalHistory = MedicalHistory::where(
+            'patient_id',
+            $patientId
+        )->first();
+
+        $hasReusableSignature =
+            !empty($existingMedicalHistory?->patient_signature) &&
+            $existingMedicalHistory?->signature_review_status !== 'invalid_reupload_required';
+
         $request->validate([
             'appointment_date'     => 'required|date|after:today',
             'appointment_time'     => 'required|string', // "1:00 PM"
             'service_type' => 'required|string|max:255',
+
+            'contact_email' => [
+                'required',
+                'email',
+                'max:255',
+            ],
+
+            'contact_phone' => [
+                'required',
+                'regex:/^09\d{9}$/',
+            ],
+
+            'contact_address' => [
+                'required',
+                'string',
+                'max:500',
+            ],
 
             'emergency_person' => [
                 'required',
@@ -331,7 +607,7 @@ class AppointmentController extends Controller
             ],
 
             'patient_signature' => [
-                'required',
+                $hasReusableSignature ? 'nullable' : 'required',
                 'file',
                 'mimes:jpg,jpeg,png',
                 'max:25600', // 25 MB
@@ -351,15 +627,22 @@ class AppointmentController extends Controller
                 ->with('error', 'Invalid service type selected.');
         }
 
-        $patientId = session('patient_id');
-        if (!$patientId) {
-            return redirect()->route('login')->with('error', 'Please login first!');
+        $patientId =
+            session('impersonated_patient_id')
+            ?: session('patient_id');
+
+        if (! $patientId) {
+            return redirect()
+                ->route('login')
+                ->with(
+                    'error',
+                    'Please login first!'
+                );
         }
 
         $patient = Patient::findOrFail($patientId);
         $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
-        // Convert UI "1:00 PM" -> DB TIME "13:00:00"
         try {
             $mysqlTime = $this->toMysqlTime($request->appointment_time);
         } catch (\Throwable $e) {
@@ -456,62 +739,120 @@ class AppointmentController extends Controller
             ]);
         }
 
-        /*
-|--------------------------------------------------------------------------
-| AI Signature Validation
-|--------------------------------------------------------------------------
-| Check muna kung mukhang signature talaga yung uploaded image.
-| Kapag hindi pasado, huwag i-save yung appointment.
-*/
         $signatureFile = $request->file('patient_signature');
-        $isDrawnSignature = $this->isDrawnSignatureSubmission($request);
 
-        if (! $isDrawnSignature) {
-            $aiResult = $signatureVerifier->verify($signatureFile);
+        if (!$signatureFile && $hasReusableSignature) {
 
-            \Log::info('Store Appointment Signature Result', $aiResult);
 
-            if (!($aiResult['accepted'] ?? false)) {
-                $reason = $aiResult['reason'] ?? 'The uploaded image did not pass signature validation.';
-                $detectedType = $aiResult['detected_type'] ?? 'unknown';
-                $confidence = $aiResult['confidence'] ?? 0;
+            $signaturePath = $existingMedicalHistory->patient_signature;
 
-                return redirect()->back()
-                    ->withInput()
-                    ->withErrors([
-                        'patient_signature' =>
-                        'Signature could not be processed. Please try again. ' .
-                            'Reason: ' . $reason .
-                            ' Detected: ' . $detectedType .
-                            ' Confidence: ' . $confidence,
-                    ]);
-            }
-        } else {
+            $signatureReviewStatus =
+                $existingMedicalHistory->signature_review_status ?? 'verified';
+
+            $signatureReviewNotes =
+                $existingMedicalHistory->signature_review_notes;
+
             $aiResult = [
                 'accepted' => true,
-                'source' => 'drawn',
-                'reason' => 'Drawn signature skipped AI validation.',
-                'confidence' => 1,
-                'review_required' => false,
-                'review_status' => 'verified',
-                'detected_type' => 'drawn_signature',
+                'source' => 'existing',
+                'reason' => 'Existing patient signature reused.',
+                'confidence' => $existingMedicalHistory->signature_ai_confidence,
+                'review_required' =>
+                $signatureReviewStatus === 'pending_manual_review',
+                'review_status' => $signatureReviewStatus,
+                'detected_type' => 'existing_signature',
             ];
+        } else {
 
-            \Log::info('Store Appointment Signature Result', [
-                'accepted' => $aiResult['accepted'],
-                'source' => $aiResult['source'],
-                'reason' => $aiResult['reason'],
-            ]);
+            $isDrawnSignature =
+                $this->isDrawnSignatureSubmission($request);
+
+            if (! $isDrawnSignature) {
+
+                $aiResult =
+                    $signatureVerifier->verify(
+                        $signatureFile
+                    );
+
+                \Log::info(
+                    'Store Appointment Signature Result',
+                    $aiResult
+                );
+
+                if (!($aiResult['accepted'] ?? false)) {
+
+                    $reason =
+                        $aiResult['reason']
+                        ?? 'The uploaded image did not pass signature validation.';
+
+                    $detectedType =
+                        $aiResult['detected_type']
+                        ?? 'unknown';
+
+                    $confidence =
+                        $aiResult['confidence']
+                        ?? 0;
+
+                    return redirect()
+                        ->back()
+                        ->withInput()
+                        ->withErrors([
+                            'patient_signature' =>
+                            'Signature could not be processed. Please try again. ' .
+                                'Reason: ' . $reason .
+                                ' Detected: ' . $detectedType .
+                                ' Confidence: ' . $confidence,
+                        ]);
+                }
+            } else {
+
+                $aiResult = [
+                    'accepted' => true,
+                    'source' => 'drawn',
+                    'reason' =>
+                    'Drawn signature skipped AI validation.',
+                    'confidence' => 1,
+                    'review_required' => false,
+                    'review_status' => 'verified',
+                    'detected_type' => 'drawn_signature',
+                ];
+
+                \Log::info(
+                    'Store Appointment Signature Result',
+                    [
+                        'accepted' =>
+                        $aiResult['accepted'],
+
+                        'source' =>
+                        $aiResult['source'],
+
+                        'reason' =>
+                        $aiResult['reason'],
+                    ]
+                );
+            }
+
+            $signatureReviewStatus =
+                ($aiResult['review_status'] ?? null)
+                === 'pending_manual_review'
+                ? 'pending_manual_review'
+                : 'verified';
+
+            $signatureReviewNotes =
+                $aiResult['review_required'] ?? false
+                ? (
+                    $aiResult['reason']
+                    ?? 'Accepted for manual review.'
+                )
+                : null;
+
+            $signaturePath =
+                $signatureFile->store(
+                    'signatures',
+                    'public'
+                );
         }
 
-        $signatureReviewStatus = ($aiResult['review_status'] ?? null) === 'pending_manual_review'
-            ? 'pending_manual_review'
-            : 'verified';
-        $signatureReviewNotes = $aiResult['review_required'] ?? false
-            ? ($aiResult['reason'] ?? 'Accepted for manual review.')
-            : null;
-
-        $signaturePath = $signatureFile->store('signatures', 'public');
         $appointment = null;
 
         DB::transaction(function () use ($request, $signaturePath, $mysqlTime, $patientId, $signatureReviewStatus, $signatureReviewNotes, $aiResult, &$appointment) {
@@ -523,6 +864,12 @@ class AppointmentController extends Controller
                 'appointment_date' => $request->appointment_date,
                 'appointment_time' => $mysqlTime,
                 'status'           => 'upcoming',
+            ]);
+
+            Patient::where('id', $patientId)->update([
+                'email' => $request->contact_email,
+                'phone' => $request->contact_phone,
+                'address' => $request->contact_address,
             ]);
 
             //  Notify dentists
@@ -775,17 +1122,90 @@ class AppointmentController extends Controller
         });
 
         if ($appointment) {
+            AppointmentDraft::where(
+                'patient_id',
+                $patientId
+            )->delete();
+
             AuditLogger::log(
                 'create',
                 'appointments',
                 "Patient booked appointment for {$appointment->appointment_date} at {$appointment->appointment_time}"
             );
+
+            try {
+                $appointment->loadMissing('patient');
+
+                $patientEmail = $appointment->patient?->email;
+
+                if ($patientEmail) {
+                    Mail::to($patientEmail)
+                        ->send(new AppointmentConfirmationMail($appointment));
+
+                    Log::info('Appointment confirmation email sent.', [
+                        'appointment_id' => $appointment->id,
+                        'patient_id' => $appointment->patient_id,
+                        'email' => $patientEmail,
+                    ]);
+                } else {
+                    Log::warning('Appointment confirmation email not sent: patient has no email.', [
+                        'appointment_id' => $appointment->id,
+                        'patient_id' => $appointment->patient_id,
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Appointment confirmation email failed.', [
+                    'appointment_id' => $appointment->id,
+                    'patient_id' => $appointment->patient_id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
-        $successMessage = $signatureReviewStatus === 'pending_manual_review'
+
+
+        $successMessage =
+            $signatureReviewStatus ===
+            'pending_manual_review'
             ? 'Appointment booked successfully! The signature was accepted and flagged for manual review.'
             : 'Appointment booked successfully!';
 
-        return redirect()->route('homepage')->with('success', $successMessage);
+        return redirect()
+            ->route('homepage')
+            ->with(
+                'success',
+                $successMessage
+            )
+            ->with(
+                'appointment_draft_completed',
+                true
+            )
+            ->with(
+                'appointment_confirmation',
+                [
+                    'date' =>
+                    Carbon::parse(
+                        $appointment
+                            ->appointment_date
+                    )->format(
+                        'F d, Y'
+                    ),
+
+                    'time' =>
+                    Carbon::parse(
+                        $appointment
+                            ->appointment_time
+                    )->format(
+                        'g:i A'
+                    ),
+
+                    'service' =>
+                    $appointment
+                        ->service_type,
+
+                    'status' =>
+                    'Confirmed',
+                ]
+            );
     }
 
     public function slotsForDate(Request $request)
@@ -872,7 +1292,7 @@ class AppointmentController extends Controller
                 'required',
                 'file',
                 'mimes:jpg,jpeg,png',
-                'max:25600', // 25 MB
+                'max:25600',
             ],
         ]);
 
@@ -1151,6 +1571,9 @@ class AppointmentController extends Controller
                 ->with('error', 'Sorry, that time slot is already taken. Please choose another time.');
         }
 
+        $oldAppointmentDate = $appointment->appointment_date;
+        $oldAppointmentTime = $appointment->appointment_time;
+
         $appointment->update([
             'appointment_date' => $request->new_appointment_date,
             'appointment_time' => $mysqlTime,
@@ -1171,6 +1594,39 @@ class AppointmentController extends Controller
             foreach ($dentists as $dentist) {
                 $dentist->notify(new AppointmentRescheduledNotification($appointment, 'Patient'));
             }
+        }
+
+        try {
+            $appointment->loadMissing('patient');
+
+            $patientEmail = $appointment->patient?->email;
+
+            if ($patientEmail) {
+                Mail::to($patientEmail)
+                    ->send(new AppointmentRescheduleMail(
+                        $appointment,
+                        $oldAppointmentDate,
+                        $oldAppointmentTime,
+                        'the clinic'
+                    ));
+
+                Log::info('Appointment reschedule email sent.', [
+                    'appointment_id' => $appointment->id,
+                    'patient_id' => $appointment->patient_id,
+                    'email' => $patientEmail,
+                ]);
+            } else {
+                Log::warning('Appointment reschedule email not sent: patient has no email.', [
+                    'appointment_id' => $appointment->id,
+                    'patient_id' => $appointment->patient_id,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('Appointment reschedule email failed.', [
+                'appointment_id' => $appointment->id,
+                'patient_id' => $appointment->patient_id,
+                'error' => $e->getMessage(),
+            ]);
         }
 
         return response()->json(['success' => true]);

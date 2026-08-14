@@ -6,6 +6,7 @@ use App\Helpers\AuditLogger;
 use App\Http\Controllers\Controller;
 use App\Models\ExternalAdminAccess;
 use App\Models\Faculty;
+use App\Models\MedicalHistory;
 use App\Models\Patient;
 use App\Models\Role;
 use App\Models\User;
@@ -19,7 +20,10 @@ use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class OIDCController extends Controller
@@ -38,6 +42,8 @@ class OIDCController extends Controller
 
     public function redirect(Request $request)
     {
+        $this->concurrentSessionService->rememberBrowserHint($request);
+
         $loginUrl     = config('services.idp.login_url');
         $authorizeUrl = config('services.oidc.authorize_url');
         $clientId     = config('services.oidc.client_id');
@@ -226,24 +232,7 @@ class OIDCController extends Controller
                 ->with('error', 'Email not returned by identity provider.');
         }
 
-        $studentData = [];
-
-        try {
-            $studentProfile = $this->studentApiService->getStudentByEmail($email);
-            $studentData = is_array($studentProfile['data'] ?? null)
-                ? $studentProfile['data']
-                : [];
-
-            Log::info('Student API profile fetched', [
-                'email' => $email,
-                'student_profile' => $studentProfile,
-            ]);
-        } catch (\Throwable $e) {
-            Log::warning('Student API fetch failed', [
-                'email' => $email,
-                'message' => $e->getMessage(),
-            ]);
-        }
+        $studentData = $this->resolveStudentDataForSync($email);
 
         $incomingRoles = $profile['roles'] ?? [];
 
@@ -274,7 +263,7 @@ class OIDCController extends Controller
             ->orWhere('external_admin_id', (string) $ssoUserId)
             ->first();
 
-        $facultyAccess = Faculty::with(['user.role'])
+        $facultyAccess = Faculty::with(['user.role', 'profile'])
             ->whereHas('user', function ($query) use ($email, $ssoUserId) {
                 $query->where('email', $email);
 
@@ -286,8 +275,7 @@ class OIDCController extends Controller
 
         if ($assignedAccess) {
             if (($assignedAccess->cms_status ?? 'inactive') !== 'active') {
-                return redirect()->route('login')
-                    ->with('error', 'Your CMS access is inactive. Contact administrator.');
+                return $this->renderInactiveAccessPage();
             }
 
             if (!empty($assignedAccess->cms_role)) {
@@ -295,17 +283,16 @@ class OIDCController extends Controller
             }
         } elseif ($facultyAccess && $facultyAccess->user) {
             if (($facultyAccess->user->status ?? 'inactive') !== 'active') {
-                return redirect()->route('login')
-                    ->with('error', 'Your CMS access is inactive. Contact administrator.');
+                return $this->renderInactiveAccessPage();
             }
 
             if (!empty($facultyAccess->user->role?->slug)) {
                 $roleSlug = $facultyAccess->user->role->slug;
-                $roleId = Role::where('slug', $roleSlug)->value('id');
+                $roleId = $this->resolveLocalRoleId($roleSlug);
             }
         }
 
-        $roleId = Role::where('slug', $roleSlug)->value('id');
+        $roleId = $this->resolveLocalRoleId($roleSlug);
 
         Log::info('ROLE MAPPING DEBUG', [
             'incoming_roles'      => $incomingRoles,
@@ -330,6 +317,10 @@ class OIDCController extends Controller
                 $query->orWhere('sso_user_id', $ssoUserId);
             })
             ->first();
+
+        if ($user && ($user->status ?? 'inactive') !== 'active') {
+            return $this->renderInactiveAccessPage();
+        }
 
         if (!$user) {
             $user = User::create([
@@ -378,7 +369,6 @@ class OIDCController extends Controller
         $user->access_token  = $accessToken;
         $user->refresh_token = $refreshToken;
         $user->last_login_at = now();
-        $user->status        = 'active';
         $user->save();
         // I-reload para makuha yung actual role na naka-set sa DB
         $user->refresh();
@@ -431,6 +421,7 @@ class OIDCController extends Controller
         $request->session()->regenerate();
         $request->session()->put('oidc_id_token', $idToken);
         session()->save();
+        $this->concurrentSessionService->syncCurrentSessionMetadata($request);
 
         $sessionResult = $this->concurrentSessionService->enforceLimitForCurrentSession(
             $user,
@@ -532,25 +523,22 @@ class OIDCController extends Controller
         ?ExternalAdminAccess $assignedAccess,
         ?Faculty $facultyAccess
     ): Patient {
-        $phone = $studentData['mobileNumber'] ?? '';
+        $phone = $this->extractStudentPhone($studentData);
         $facultyCode = null;
-        $studentNo = $studentData['studentNumber'] ?? null;
-        $programCode = $studentData['program']['code']
-            ?? $studentData['programCode']
-            ?? $studentData['course']['code']
-            ?? $studentData['courseCode']
-            ?? null;
-        $programName = $studentData['program']['name']
-            ?? $studentData['program']
-            ?? $studentData['course']['name']
-            ?? $studentData['course']
-            ?? null;
-        $yearLevel = $studentData['yearLevel'] ?? null;
-        $section = $studentData['section'] ?? null;
+        $studentNo = $this->extractStudentNumber($studentData) ?: $patient?->student_no;
+        $programCode = $this->extractStudentProgramCode($studentData) ?: $patient?->course_code;
+        $programName = $this->extractStudentProgramName($studentData) ?: $patient?->course_name;
+        $yearLevel = $studentData['yearLevel'] ?? $studentData['year_level'] ?? $patient?->year_level;
+        $section = $studentData['section'] ?? $patient?->section;
 
         $personalInfo = [];
+        $studentAddresses = [];
         $birthdate = null;
         $gender = null;
+        $placeOfBirth = null;
+        $heightM = null;
+        $weightKg = null;
+        $address = $patient?->address;
 
         try {
             if (!empty($studentNo)) {
@@ -558,16 +546,36 @@ class OIDCController extends Controller
                 $personalInfo = is_array($personalResponse['data'] ?? null)
                     ? $personalResponse['data']
                     : [];
+
+                $addressResponse = $this->studentApiService->getAddressesByStudentNumber($studentNo);
+                $studentAddresses = is_array($addressResponse['data'] ?? null)
+                    ? $addressResponse['data']
+                    : [];
             }
         } catch (\Throwable $e) {
-            Log::warning('Student personal info fetch failed', [
+            Log::warning('Student personal info or address fetch failed', [
                 'student_no' => $studentNo,
                 'message' => $e->getMessage(),
             ]);
         }
 
-        $birthdate = $this->normalizeDate($personalInfo['dateOfBirth'] ?? null);
-        $gender = $personalInfo['gender']['name'] ?? null;
+        $birthdate = $this->normalizeDate(
+            $personalInfo['dateOfBirth']
+                ?? $personalInfo['birthdate']
+                ?? $studentData['birthdate']
+                ?? $studentData['dateOfBirth']
+                ?? null
+        );
+        $gender = $this->normalizeGenderLabel(
+            $personalInfo['gender']['name']
+                ?? $personalInfo['gender']
+                ?? $studentData['gender']
+                ?? null
+        );
+        $placeOfBirth = $this->cleanStringValue($personalInfo['placeOfBirth'] ?? $personalInfo['place_of_birth'] ?? null);
+        $heightM = $this->normalizeNullableFloat($personalInfo['heightM'] ?? $personalInfo['height_m'] ?? null);
+        $weightKg = $this->normalizeNullableFloat($personalInfo['weightKg'] ?? $personalInfo['weight_kg'] ?? null);
+        $address = $this->formatStudentAddress($studentAddresses) ?: $address;
 
         if ($assignedAccess) {
             try {
@@ -586,10 +594,10 @@ class OIDCController extends Controller
                     $admin = is_array($payload['data'] ?? null) ? $payload['data'] : [];
 
                     $birthdate = $this->normalizeDate($admin['birthday'] ?? $birthdate);
-                    $gender = $admin['gender'] ?? $gender;
+                    $gender = $this->normalizeGenderLabel($admin['gender'] ?? $gender);
                     $phone = $admin['emergency_contact_no'] ?? $phone;
                 } else {
-                    $gender = $assignedAccess->gender ?? $gender;
+                    $gender = $this->normalizeGenderLabel($assignedAccess->gender ?? $gender);
                     $phone = $assignedAccess->contact_number ?? $phone;
                 }
             } catch (\Throwable $e) {
@@ -600,6 +608,19 @@ class OIDCController extends Controller
             }
         } elseif ($facultyAccess && $facultyAccess->user) {
             try {
+                $localFacultyBirthdate = $facultyAccess->profile?->birthday
+                    ?? $facultyAccess->user?->birthdate;
+
+                if ($localFacultyBirthdate) {
+                    $birthdate = $this->normalizeDate((string) $localFacultyBirthdate) ?? $birthdate;
+                }
+
+                $gender = $this->normalizeGenderLabel(
+                    $facultyAccess->profile?->gender
+                        ?? $facultyAccess->user?->gender
+                        ?? $gender
+                );
+
                 $faculties = $this->facultyApiService->getFaculties();
 
                 $matchedFaculty = collect($faculties)->first(function ($faculty) use ($email, $ssoUserId) {
@@ -616,13 +637,59 @@ class OIDCController extends Controller
                 });
 
                 if ($matchedFaculty) {
-                    $birthdate = $this->normalizeDate($matchedFaculty['profile']['birthday'] ?? $birthdate);
-                    $gender = $matchedFaculty['profile']['gender'] ?? $gender;
+                    $birthdate = $this->normalizeDate(
+                        $matchedFaculty['birthday']
+                            ?? $matchedFaculty['birthdate']
+                            ?? data_get($matchedFaculty, 'profile.birthday')
+                            ?? data_get($matchedFaculty, 'profile.birthdate')
+                            ?? data_get($matchedFaculty, 'profile.date_of_birth')
+                            ?? data_get($matchedFaculty, 'profile.dateOfBirth')
+                            ?? $birthdate
+                    );
+                    $gender = $this->normalizeGenderLabel($matchedFaculty['profile']['gender'] ?? $gender);
                     $phone = $matchedFaculty['contact_number'] ?? $phone;
                     $facultyCode = $matchedFaculty['faculty_code'] ?? null;
                 }
             } catch (\Throwable $e) {
                 Log::error('Faculty API fetch failed', [
+                    'email' => $email,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        if ($birthdate === null || $facultyCode === null) {
+            try {
+                $faculties = $this->facultyApiService->getFaculties();
+
+                $matchedFaculty = collect($faculties)->first(function ($faculty) use ($email, $ssoUserId) {
+                    $facultyEmail = strtolower((string) ($faculty['email'] ?? ''));
+                    $userEmail = strtolower((string) $email);
+                    $facultyId = (string) ($faculty['faculty_id'] ?? '');
+                    $idpUserId = (string) ($faculty['idp_user_id'] ?? '');
+                    $currentSsoUserId = (string) ($ssoUserId ?? '');
+
+                    return ($facultyEmail !== '' && $facultyEmail === $userEmail)
+                        || ($idpUserId !== '' && $currentSsoUserId !== '' && $idpUserId === $currentSsoUserId)
+                        || ($facultyId !== '' && $currentSsoUserId !== '' && $facultyId === $currentSsoUserId);
+                });
+
+                if ($matchedFaculty) {
+                    $birthdate = $this->normalizeDate(
+                        $matchedFaculty['birthday']
+                            ?? $matchedFaculty['birthdate']
+                            ?? data_get($matchedFaculty, 'profile.birthday')
+                            ?? data_get($matchedFaculty, 'profile.birthdate')
+                            ?? data_get($matchedFaculty, 'profile.date_of_birth')
+                            ?? data_get($matchedFaculty, 'profile.dateOfBirth')
+                            ?? $birthdate
+                    );
+                    $facultyCode = $matchedFaculty['faculty_code'] ?? $facultyCode;
+                    $gender = $this->normalizeGenderLabel($matchedFaculty['profile']['gender'] ?? $gender);
+                    $phone = $matchedFaculty['contact_number'] ?? $phone;
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Faculty API fallback by email failed', [
                     'email' => $email,
                     'error' => $e->getMessage(),
                 ]);
@@ -640,6 +707,21 @@ class OIDCController extends Controller
             'program_name' => $programName,
             'year_level' => $yearLevel,
             'section' => $section,
+            'place_of_birth' => $placeOfBirth,
+            'height_m' => $heightM,
+            'weight_kg' => $weightKg,
+            'address' => $address,
+        ]);
+
+        $user->phone = $phone ?: $user->phone;
+        $user->birthdate = $birthdate ?: $user->birthdate;
+        $user->gender = $gender ?: $user->gender;
+        $user->save();
+
+        $supportsExtendedStudentFields = Schema::hasColumns('patients', [
+            'place_of_birth',
+            'height_m',
+            'weight_kg',
         ]);
 
         if ($patient) {
@@ -649,6 +731,11 @@ class OIDCController extends Controller
             $patient->phone = $phone ?: $patient->phone;
             $patient->birthdate = $birthdate ?: $patient->birthdate;
             $patient->gender = $gender ?: $patient->gender;
+            if ($supportsExtendedStudentFields) {
+                $patient->place_of_birth = $placeOfBirth ?: $patient->place_of_birth;
+                $patient->height_m = $heightM ?? $patient->height_m;
+                $patient->weight_kg = $weightKg ?? $patient->weight_kg;
+            }
             $patient->faculty_code = $facultyCode ?: $patient->faculty_code;
             $patient->student_no = $studentNo ?: $patient->student_no;
             $patient->course_code = $programCode ?: $patient->course_code;
@@ -657,18 +744,19 @@ class OIDCController extends Controller
             $patient->section = $section ?: $patient->section;
             $patient->is_pwd = $patient->is_pwd ?? false;
             $patient->is_senior = $patient->is_senior ?? false;
-            $patient->address = $patient->address ?? null;
+            $patient->address = $address ?: $patient->address;
 
             if (empty($patient->password)) {
                 $patient->password = Hash::make(Str::random(16));
             }
 
             $patient->save();
+            $this->syncStudentMedicalHistory($patient, $personalInfo);
 
             return $patient;
         }
 
-        return Patient::create([
+        $patientPayload = [
             'user_id' => $user->id,
             'name' => $user->name ?: $name ?: $email,
             'email' => $user->email,
@@ -684,8 +772,20 @@ class OIDCController extends Controller
             'section' => $section,
             'is_pwd' => false,
             'is_senior' => false,
-            'address' => null,
-        ]);
+            'address' => $address,
+        ];
+
+        if ($supportsExtendedStudentFields) {
+            $patientPayload['place_of_birth'] = $placeOfBirth;
+            $patientPayload['height_m'] = $heightM;
+            $patientPayload['weight_kg'] = $weightKg;
+        }
+
+        $patient = Patient::create($patientPayload);
+
+        $this->syncStudentMedicalHistory($patient, $personalInfo);
+
+        return $patient;
     }
 
     protected function normalizeDate(?string $value): ?string
@@ -699,5 +799,253 @@ class OIDCController extends Controller
         } catch (\Throwable $e) {
             return $value;
         }
+    }
+
+    protected function resolveStudentDataForSync(string $email): array
+    {
+        try {
+            $studentProfile = $this->studentApiService->getStudentByEmail($email);
+            $studentData = is_array($studentProfile['data'] ?? null)
+                ? $studentProfile['data']
+                : [];
+
+            Log::info('Student API profile fetched', [
+                'email' => $email,
+                'student_profile' => $studentProfile,
+            ]);
+
+            if (!empty($studentData)) {
+                return $studentData;
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Student API fetch by email failed; trying search fallback', [
+                'email' => $email,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
+        try {
+            $students = $this->studentApiService->searchStudents($email, 80);
+            $matchedStudent = collect($students)->first(function ($student) use ($email) {
+                return strtolower((string) $this->extractStudentEmail((array) $student)) === strtolower($email);
+            });
+
+            if (is_array($matchedStudent)) {
+                Log::info('Student API search fallback matched profile', [
+                    'email' => $email,
+                    'student_number' => $this->extractStudentNumber($matchedStudent),
+                ]);
+
+                return $matchedStudent;
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Student API search fallback failed', [
+                'email' => $email,
+                'message' => $e->getMessage(),
+            ]);
+        }
+
+        return [];
+    }
+
+    protected function extractStudentEmail(array $studentData): ?string
+    {
+        return $studentData['email']
+            ?? $studentData['emailAddress']
+            ?? $studentData['email_address']
+            ?? $studentData['institutional_email']
+            ?? $studentData['institutionalEmail']
+            ?? null;
+    }
+
+    protected function extractStudentPhone(array $studentData): string
+    {
+        return (string) (
+            $studentData['mobileNumber']
+            ?? $studentData['mobile_number']
+            ?? $studentData['contactNumber']
+            ?? $studentData['contact_number']
+            ?? $studentData['phone']
+            ?? ''
+        );
+    }
+
+    protected function extractStudentNumber(array $studentData): ?string
+    {
+        return $studentData['studentNumber']
+            ?? $studentData['student_number']
+            ?? $studentData['studentNo']
+            ?? $studentData['student_no']
+            ?? null;
+    }
+
+    protected function extractStudentProgramCode(array $studentData): ?string
+    {
+        return $studentData['program']['code']
+            ?? $studentData['programCode']
+            ?? $studentData['program_code']
+            ?? $studentData['course']['code']
+            ?? $studentData['courseCode']
+            ?? $studentData['course_code']
+            ?? null;
+    }
+
+    protected function extractStudentProgramName(array $studentData): ?string
+    {
+        $programName = $studentData['program']['name']
+            ?? $studentData['program']
+            ?? $studentData['course']['name']
+            ?? $studentData['course']
+            ?? null;
+
+        return is_string($programName) ? $programName : null;
+    }
+
+    protected function normalizeGenderLabel(?string $value): ?string
+    {
+        $gender = strtolower(trim((string) $value));
+
+        if ($gender === '') {
+            return null;
+        }
+
+        if (str_starts_with($gender, 'm')) {
+            return 'Male';
+        }
+
+        if (str_starts_with($gender, 'f')) {
+            return 'Female';
+        }
+
+        return $value;
+    }
+
+    protected function normalizeNullableFloat(mixed $value): ?float
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (! is_numeric($value)) {
+            return null;
+        }
+
+        return (float) $value;
+    }
+
+    protected function cleanStringValue(mixed $value): ?string
+    {
+        if (! is_scalar($value)) {
+            return null;
+        }
+
+        $cleaned = trim((string) $value);
+
+        return $cleaned !== '' ? $cleaned : null;
+    }
+
+    protected function formatStudentAddress(array $addresses): ?string
+    {
+        if ($addresses === []) {
+            return null;
+        }
+
+        $preferredAddress = collect($addresses)->first(function ($address) {
+            $type = strtolower(trim((string) data_get($address, 'addressType')));
+
+            return in_array($type, ['current', 'present', 'home', 'permanent'], true);
+        }) ?? $addresses[0];
+
+        $parts = array_filter([
+            $this->cleanStringValue(data_get($preferredAddress, 'streetDetail.string'))
+                ?: $this->cleanStringValue(data_get($preferredAddress, 'streetDetail')),
+            $this->cleanStringValue(data_get($preferredAddress, 'barangay.name')),
+            $this->cleanStringValue(data_get($preferredAddress, 'city.name')),
+            $this->cleanStringValue(data_get($preferredAddress, 'province.name.string'))
+                ?: $this->cleanStringValue(data_get($preferredAddress, 'province.name')),
+            $this->cleanStringValue(data_get($preferredAddress, 'region.name')),
+        ]);
+
+        if ($parts === []) {
+            return null;
+        }
+
+        return implode(', ', array_values($parts));
+    }
+
+    protected function syncStudentMedicalHistory(Patient $patient, array $personalInfo): void
+    {
+        $emergencyPerson = $this->cleanStringValue(
+            $personalInfo['emergencyContactName'] ?? $personalInfo['emergency_contact_name'] ?? null
+        );
+        $emergencyNumber = $this->cleanStringValue(
+            $personalInfo['emergencyContactNumber'] ?? $personalInfo['emergency_contact_number'] ?? null
+        );
+
+        if (! $emergencyPerson && ! $emergencyNumber) {
+            return;
+        }
+
+        $medicalHistory = MedicalHistory::firstOrNew(['patient_id' => $patient->id]);
+
+        if ($emergencyPerson && empty($medicalHistory->emergency_person)) {
+            $medicalHistory->emergency_person = $emergencyPerson;
+        }
+
+        if ($emergencyNumber && empty($medicalHistory->emergency_number)) {
+            $medicalHistory->emergency_number = $emergencyNumber;
+        }
+
+        if (! $medicalHistory->exists && empty($medicalHistory->emergency_relation)) {
+            $medicalHistory->emergency_relation = 'Not specified';
+        }
+
+        if ($medicalHistory->isDirty()) {
+            $medicalHistory->save();
+        }
+    }
+
+    protected function resolveLocalRoleId(?string $roleSlug): ?int
+    {
+        $normalizedSlug = strtolower(trim((string) $roleSlug));
+
+        if ($normalizedSlug === '') {
+            return null;
+        }
+
+        $roleId = Role::where('slug', $normalizedSlug)->value('id');
+
+        if ($roleId) {
+            return (int) $roleId;
+        }
+
+        $coreRoleNames = [
+            'admin' => 'Admin',
+            'dentist' => 'Dentist',
+            'patient' => 'Patient',
+        ];
+
+        if (!isset($coreRoleNames[$normalizedSlug])) {
+            return null;
+        }
+
+        $role = Role::updateOrCreate(
+            ['slug' => $normalizedSlug],
+            ['name' => $coreRoleNames[$normalizedSlug]]
+        );
+
+        Log::warning('OIDC auto-restored missing core role', [
+            'role_slug' => $normalizedSlug,
+            'role_id' => $role->id,
+        ]);
+
+        return (int) $role->id;
+    }
+
+    protected function renderInactiveAccessPage(): HttpResponse
+    {
+        return response()->view('errors.403', [
+            'exception' => new AccessDeniedHttpException('Your account is inactive. Please contact the administrator.'),
+        ], 403);
     }
 }

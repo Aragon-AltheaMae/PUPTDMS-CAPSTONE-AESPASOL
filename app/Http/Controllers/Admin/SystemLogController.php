@@ -12,7 +12,14 @@ class SystemLogController extends Controller
 {
     public function index(Request $request)
     {
+
         if (!session('admin_logged_in')) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'message' => 'Your admin session has expired.',
+                ], 401);
+            }
+
             return redirect('/admin/login');
         }
 
@@ -169,11 +176,20 @@ class SystemLogController extends Controller
     public function checkLatest(Request $request)
     {
         $status = $this->normalizeStatus($request->input('status', 'active'));
-        $latest = $this->statusScopedQuery($status)->latest()->first();
+        $latest =
+            $this
+            ->statusScopedQuery($status)
+            ->orderByDesc('id')
+            ->first();
 
         return response()->json([
-            'latest_id' => $latest?->id ?? 0,
-            'total' => $this->statusScopedQuery($status)->count(),
+            'latest_id' =>
+            $latest?->id ?? 0,
+
+            'total' =>
+            $this
+                ->statusScopedQuery($status)
+                ->count(),
         ]);
     }
 
@@ -237,20 +253,68 @@ class SystemLogController extends Controller
         $status = $this->normalizeStatus($request->input('status', 'archived'));
         $request->merge(['status' => $status]);
 
-        $logs = $this->buildFilteredQuery($request)
-            ->orderBy('created_at', $request->input('sort') === 'asc' ? 'asc' : 'desc')
+        $perPageInput =
+            (int) $request->input(
+                'per_page',
+                10
+            );
+
+        $perPage = in_array(
+            $perPageInput,
+            [10, 20, 50, 100],
+            true
+        )
+            ? $perPageInput
+            : 10;
+
+        $page = max(
+            1,
+            (int) $request->input(
+                'page',
+                1
+            )
+        );
+
+        $logs =
+            $this
+            ->buildFilteredQuery(
+                $request
+            )
+            ->orderBy(
+                'created_at',
+                $request->input('sort') === 'asc'
+                    ? 'asc'
+                    : 'desc'
+            )
+            ->forPage(
+                $page,
+                $perPage
+            )
             ->get();
 
         if ($logs->isEmpty()) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'message' => 'No logs found for the selected export filters.',
+                ], 422);
+            }
+
             return redirect()
                 ->route('admin.system_logs', $request->query())
-                ->with('error', 'No logs found for the selected export filters.');
+                ->with(
+                    'error',
+                    'No logs found for the selected export filters.'
+                );
         }
 
         AuditLogger::log(
             'export_pdf',
             'system_logs',
-            'Admin exported ' . $logs->count() . ' system log entr' . ($logs->count() === 1 ? 'y' : 'ies') . ' as PDF.'
+            'Admin exported page ' .
+                $page .
+                ' of the current system log view (' .
+                $logs->count() .
+                ' entries) as PDF.'
         );
 
         $pdf = Pdf::loadView('admin.system-logs-pdf', [
@@ -264,6 +328,9 @@ class SystemLogController extends Controller
                 'date_to' => $request->input('date_to'),
                 'action_type' => $request->input('action_type'),
                 'module' => $request->input('module'),
+
+                'page' => $page,
+                'per_page' => $perPage,
             ],
         ])->setPaper('a4', 'landscape');
 
@@ -273,7 +340,7 @@ class SystemLogController extends Controller
     protected function buildFilteredQuery(Request $request, ?string $statusOverride = null)
     {
         $role = $request->input('role', 'all');
-        $search = $request->input('search');
+        $search = trim((string) $request->input('search', ''));
         $dateFrom = $request->input('date_from');
         $dateTo = $request->input('date_to');
         $actionType = $request->input('action_type');
@@ -294,15 +361,58 @@ class SystemLogController extends Controller
             $query->where('actor_role', $role);
         }
 
-        if ($search) {
-            $query->where(function ($builder) use ($search) {
-                $builder->where('actor_identifier', 'like', "%{$search}%")
-                    ->orWhere('actor_name', 'like', "%{$search}%")
-                    ->orWhere('action', 'like', "%{$search}%")
-                    ->orWhere('module', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%")
-                    ->orWhere('actor_role', 'like', "%{$search}%");
-            });
+        $searchId = ltrim($search, '#');
+
+        if ($search !== '') {
+            $query->where(
+                function ($builder) use (
+                    $search,
+                    $searchId
+                ) {
+                    $builder
+                        ->where(
+                            'actor_identifier',
+                            'like',
+                            "%{$search}%"
+                        )
+                        ->orWhere(
+                            'actor_name',
+                            'like',
+                            "%{$search}%"
+                        )
+                        ->orWhere(
+                            'action',
+                            'like',
+                            "%{$search}%"
+                        )
+                        ->orWhere(
+                            'module',
+                            'like',
+                            "%{$search}%"
+                        )
+                        ->orWhere(
+                            'description',
+                            'like',
+                            "%{$search}%"
+                        )
+                        ->orWhere(
+                            'actor_role',
+                            'like',
+                            "%{$search}%"
+                        );
+
+                    if (
+                        ctype_digit(
+                            $searchId
+                        )
+                    ) {
+                        $builder->orWhere(
+                            'id',
+                            (int) $searchId
+                        );
+                    }
+                }
+            );
         }
 
         if ($actionType) {
@@ -327,8 +437,8 @@ class SystemLogController extends Controller
     protected function statusScopedQuery(string $status)
     {
         return AuditLog::query()
-            ->when($status === 'active', fn ($query) => $query->where('is_archived', false))
-            ->when($status === 'archived', fn ($query) => $query->where('is_archived', true));
+            ->when($status === 'active', fn($query) => $query->where('is_archived', false))
+            ->when($status === 'archived', fn($query) => $query->where('is_archived', true));
     }
 
     protected function normalizeStatus(?string $status): string

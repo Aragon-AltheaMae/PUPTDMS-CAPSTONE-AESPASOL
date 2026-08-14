@@ -251,101 +251,99 @@ span.flatpickr-weekday {
     pointer-events: auto !important;
 }
 
-.flatpickr-day.flatpickr-has-tooltip {
-    position: relative !important;
-    overflow: visible !important;
-    pointer-events: auto !important;
-}
-
 .flatpickr-day.flatpickr-disabled {
     pointer-events: auto !important;
 }
 
-.flatpickr-day.flatpickr-has-tooltip {
-    position: relative !important;
-    overflow: visible !important;
+[data-theme="dark"] .flatpickr-calendar,
+.dark .flatpickr-calendar {
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-1) !important;
+    box-shadow:
+        0 24px 70px rgba(0, 0, 0, 0.48) !important;
 }
 
-.flatpickr-tooltip-box {
-    position: absolute !important;
-    left: 50% !important;
-    bottom: calc(100% + 10px) !important;
-    transform: translateX(-50%) translateY(6px) !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-    z-index: 999999 !important;
-    padding: 8px 10px !important;
-    border-radius: 10px !important;
-    background: linear-gradient(135deg, #8B0000, #660000) !important;
-    color: #ffffff !important;
-    font-size: 11px !important;
-    font-weight: 800 !important;
-    line-height: 1.2 !important;
-    white-space: nowrap !important;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, .35) !important;
-    transition: opacity .18s ease, visibility .18s ease, transform .18s ease !important;
+[data-theme="dark"] .flatpickr-innerContainer,
+[data-theme="dark"] .flatpickr-rContainer,
+[data-theme="dark"] .flatpickr-days,
+[data-theme="dark"] .dayContainer,
+.dark .flatpickr-innerContainer,
+.dark .flatpickr-rContainer,
+.dark .flatpickr-days,
+.dark .dayContainer {
+    background: var(--card) !important;
 }
 
-.flatpickr-day.flatpickr-has-tooltip:hover .flatpickr-tooltip-box {
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: translateX(-50%) translateY(0) !important;
+[data-theme="dark"] .flatpickr-weekdays,
+[data-theme="dark"] .flatpickr-weekdaycontainer,
+.dark .flatpickr-weekdays,
+.dark .flatpickr-weekdaycontainer {
+    background:
+        rgba(139, 0, 0, 0.14) !important;
 }
 
-.flatpickr-tooltip-arrow {
-    position: absolute !important;
-    top: calc(100% - 4px) !important;
-    left: 50% !important;
-    width: 10px !important;
-    height: 10px !important;
-    transform: translateX(-50%) rotate(45deg) !important;
-    background: #8B0000 !important;
-}
-
-[data-theme="dark"] .flatpickr-calendar {
-    background: rgba(7, 17, 31, 0.96) !important;
-    border-color: rgba(255, 255, 255, 0.12) !important;
-    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55) !important;
-}
-
-[data-theme="dark"] .flatpickr-weekdays {
-    background: rgba(139, 0, 0, 0.22) !important;
-}
-
-[data-theme="dark"] span.flatpickr-weekday {
+[data-theme="dark"] span.flatpickr-weekday,
+.dark span.flatpickr-weekday {
     color: #fca5a5 !important;
 }
 
-[data-theme="dark"] .flatpickr-day {
-    color: #e5e7eb !important;
+[data-theme="dark"] .flatpickr-day,
+.dark .flatpickr-day {
+    color: var(--text-1) !important;
 }
 
-[data-theme="dark"] .flatpickr-day:hover {
-    background: rgba(239, 68, 68, 0.18) !important;
-    border-color: rgba(248, 113, 113, 0.35) !important;
+[data-theme="dark"] .flatpickr-day:hover,
+.dark .flatpickr-day:hover {
+    background:
+        rgba(139, 0, 0, 0.18) !important;
+    border-color:
+        rgba(252, 165, 165, 0.30) !important;
     color: #ffffff !important;
 }
 
-[data-theme="dark"] .flatpickr-day.today {
+[data-theme="dark"] .flatpickr-day.today,
+.dark .flatpickr-day.today {
     border-color: #f87171 !important;
     color: #fecaca !important;
 }
 
 [data-theme="dark"] .flatpickr-day.selected,
 [data-theme="dark"] .flatpickr-day.startRange,
-[data-theme="dark"] .flatpickr-day.endRange {
-    background: linear-gradient(135deg, #8b0000, #dc2626) !important;
-    border-color: rgba(252, 165, 165, 0.45) !important;
+[data-theme="dark"] .flatpickr-day.endRange,
+.dark .flatpickr-day.selected,
+.dark .flatpickr-day.startRange,
+.dark .flatpickr-day.endRange {
+    background:
+        linear-gradient(135deg,
+            var(--crimson),
+            var(--crimson-dark)) !important;
+
+    border-color:
+        rgba(252, 165, 165, 0.45) !important;
+
+    color: #ffffff !important;
+
+    box-shadow:
+        0 7px 17px rgba(139, 0, 0, 0.32) !important;
 }
 
 [data-theme="dark"] .flatpickr-day.prevMonthDay,
-[data-theme="dark"] .flatpickr-day.nextMonthDay {
-    color: #64748b !important;
+[data-theme="dark"] .flatpickr-day.nextMonthDay,
+.dark .flatpickr-day.prevMonthDay,
+.dark .flatpickr-day.nextMonthDay {
+    color: var(--text-3) !important;
+    opacity: .62 !important;
 }
 
-[data-theme="dark"] .flatpickr-day.flatpickr-disabled {
-    color: #475569 !important;
+[data-theme="dark"] .flatpickr-day.flatpickr-disabled,
+.dark .flatpickr-day.flatpickr-disabled {
+    color:
+        color-mix(in srgb,
+            var(--text-3) 58%,
+            transparent) !important;
+
+    background: transparent !important;
 }
 
 .flatpickr-innerContainer,
@@ -380,30 +378,6 @@ span.flatpickr-weekday {
     border: 1px solid transparent !important;
     color: #374151 !important;
     font-weight: 700 !important;
-}
-
-.flatpickr-floating-tooltip {
-    position: fixed;
-    z-index: 9999999;
-    transform: translate(-50%, -100%) translateY(6px);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    padding: 8px 10px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #8B0000, #660000);
-    color: #ffffff;
-    font-size: 11px;
-    font-weight: 800;
-    white-space: nowrap;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, .35);
-    transition: .18s ease;
-}
-
-.flatpickr-floating-tooltip.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translate(-50%, -100%) translateY(0);
 }
 
 .flatpickr-day.flatpickr-disabled,

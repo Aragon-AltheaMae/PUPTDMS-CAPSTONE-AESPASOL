@@ -29,6 +29,7 @@ use Carbon\Carbon;
 use App\Models\ClinicSchedule;
 use App\Models\BlockedDate;
 use App\Helpers\PhilippineHolidays;
+use App\Helpers\BookingQuestions;
 
 class OdontogramController extends Controller
 {
@@ -39,10 +40,10 @@ class OdontogramController extends Controller
         $latestProcedureWithOdontogram = $patientOdontogram
             ? null
             : AppointmentProcedure::where('patient_id', $patient->id)
-                ->whereNotNull('odontogram_data')
-                ->latest('updated_at')
-                ->latest('id')
-                ->first();
+            ->whereNotNull('odontogram_data')
+            ->latest('updated_at')
+            ->latest('id')
+            ->first();
 
         return $patientOdontogram?->odontogram_data
             ?? $latestProcedureWithOdontogram?->odontogram_data
@@ -96,7 +97,10 @@ class OdontogramController extends Controller
             ->map(fn($d) => Carbon::parse($d)->toDateString())
             ->toArray();
 
-        $philippineHolidays = PhilippineHolidays::range(0, 1);
+        $philippineHolidays = PhilippineHolidays::range(
+            yearsBefore: 15,
+            yearsAfter: 15
+        );
 
         return compact(
             'appointmentCountsPerDay',
@@ -108,7 +112,7 @@ class OdontogramController extends Controller
         );
     }
 
-    private function getHistoricalCalendarContext(): array
+    private function getExistingAppointmentCalendarContext(): array
     {
         $appointmentCountsPerDay = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
             ->selectRaw('appointment_date, COUNT(*) as count')
@@ -136,7 +140,11 @@ class OdontogramController extends Controller
             ->map(fn($date) => Carbon::parse($date)->toDateString())
             ->toArray();
 
-        $philippineHolidays = PhilippineHolidays::range(2, 2);
+        $philippineHolidays =
+            PhilippineHolidays::range(
+                yearsBefore: 15,
+                yearsAfter: 15
+            );
 
         return compact(
             'appointmentCountsPerDay',
@@ -179,9 +187,9 @@ class OdontogramController extends Controller
         return max(0, ($hours * 3600) + ($minutes * 60) + $seconds);
     }
 
-    private function historicalDraftSessionKey(Patient $patient): string
+    private function existingAppointmentDraftSessionKey(Patient $patient): string
     {
-        return 'historical_appointment_draft_patient_' . $patient->id;
+        return 'existing_appointment_draft_patient_' . $patient->id;
     }
 
     private function yesNoValue($value): string
@@ -189,62 +197,6 @@ class OdontogramController extends Controller
         $normalized = strtoupper(trim((string) $value));
         return $normalized === 'YES' ? 'YES' : 'NO';
     }
-
-    private function getHistoricalDentalQuestions(): array
-    {
-        return [
-            ['code' => 'bleeding_gums', 'label' => 'Do your gums bleed while brushing/flossing?'],
-            ['code' => 'sensitive_temp', 'label' => 'Are your teeth sensitive to hot or cold?'],
-            ['code' => 'sensitive_taste', 'label' => 'Are your teeth sensitive to sweets or sour?'],
-            ['code' => 'tooth_pain', 'label' => 'Do you feel any pain in your teeth?'],
-            ['code' => 'sores', 'label' => 'Do you have any sores/lumps in or near your mouth?'],
-            ['code' => 'injuries', 'label' => 'Have you had any head, neck, or jaw injuries?'],
-            ['code' => 'clicking', 'label' => 'Does your jaw click, pop, or make noise when opening?'],
-            ['code' => 'joint_pain', 'label' => 'Do you feel pain near your ears or jaw joints?'],
-            ['code' => 'difficulty_moving', 'label' => 'Do you have difficulty opening or moving your jaw?'],
-            ['code' => 'difficulty_chewing', 'label' => 'Do you have difficulty chewing, speaking, or swallowing?'],
-            ['code' => 'jaw_headaches', 'label' => 'Do you frequently experience jaw-related headaches?'],
-            ['code' => 'clench_grind', 'label' => 'Do you clench or grind your teeth?'],
-            ['code' => 'biting', 'label' => 'Do you bite your lips, cheeks, nails, or tongue?'],
-            ['code' => 'teeth_loosening', 'label' => 'Do your teeth feel loose or shifting?'],
-            ['code' => 'food_teeth', 'label' => 'Does food usually get stuck between your teeth?'],
-            ['code' => 'med_reaction', 'label' => 'Have you had any bad reaction to dental anesthesia or medicine?'],
-            ['code' => 'periodontal', 'label' => 'Have you had periodontal or gum treatment before?'],
-            ['code' => 'difficult_extraction', 'label' => 'Have you experienced difficult tooth extraction?'],
-            ['code' => 'prolonged_bleeding', 'label' => 'Do you experience prolonged bleeding after dental work?'],
-            ['code' => 'dentures', 'label' => 'Do you wear dentures or removable prosthesis?'],
-            ['code' => 'ortho_treatment', 'label' => 'Have you undergone orthodontic treatment?'],
-        ];
-    }
-
-    private function getHistoricalMedicalQuestions(): array
-    {
-        return [
-            ['code' => 'good_health', 'label' => 'Are you in good health?', 'type' => 'bool'],
-            ['code' => 'good_health_details', 'label' => 'If no, describe your current health condition', 'type' => 'text'],
-            ['code' => 'had_medical_exam', 'label' => 'Have you had a medical examination in the last year?', 'type' => 'bool'],
-            ['code' => 'medical_exam_date', 'label' => 'Date of last medical examination', 'type' => 'date'],
-            ['code' => 'under_treatment', 'label' => 'Are you presently under medical treatment?', 'type' => 'bool'],
-            ['code' => 'treatment_details', 'label' => 'If yes, what condition is being treated?', 'type' => 'text'],
-            ['code' => 'hospitalized', 'label' => 'Have you ever been hospitalized?', 'type' => 'bool'],
-            ['code' => 'hospital_details', 'label' => 'If yes, specify the reason', 'type' => 'text'],
-            ['code' => 'allergy_medicine', 'label' => 'Are you allergic to any medicine?', 'type' => 'bool'],
-            ['code' => 'allergy_food', 'label' => 'Are you allergic to food or other substances?', 'type' => 'bool'],
-            ['code' => 'allergy_others', 'label' => 'If yes, specify allergies', 'type' => 'text'],
-            ['code' => 'medication', 'label' => 'Are you taking any medication?', 'type' => 'bool'],
-            ['code' => 'medication_details', 'label' => 'If yes, list the medication', 'type' => 'text'],
-            ['code' => 'pregnant', 'label' => 'Are you pregnant?', 'type' => 'bool'],
-            ['code' => 'nursing', 'label' => 'Are you nursing?', 'type' => 'bool'],
-            ['code' => 'birth_control', 'label' => 'Are you taking birth control pills?', 'type' => 'bool'],
-            ['code' => 'tobacco_use', 'label' => 'Do you use tobacco products?', 'type' => 'bool'],
-            ['code' => 'tobacco_per_day', 'label' => 'If yes, how many per day?', 'type' => 'text'],
-            ['code' => 'tobacco_per_week', 'label' => 'If yes, how many per week?', 'type' => 'text'],
-            ['code' => 'headaches', 'label' => 'Do you frequently have headaches?', 'type' => 'bool'],
-            ['code' => 'earaches', 'label' => 'Do you frequently have earaches or hearing issues?', 'type' => 'bool'],
-            ['code' => 'neck_aches', 'label' => 'Do you frequently have neck pain?', 'type' => 'bool'],
-        ];
-    }
-
     private function getPatientHistoryDefaults(Patient $patient): array
     {
         $patient->loadMissing([
@@ -299,15 +251,15 @@ class OdontogramController extends Controller
             'medical_answers' => $medicalAnswers,
             'diseases' => optional($patient->medicalHistory)->diseaseAnswers
                 ? $patient->medicalHistory->diseaseAnswers->filter(fn($row) => $row->has_disease && $row->disease)
-                    ->pluck('disease.code')->values()->all()
+                ->pluck('disease.code')->values()->all()
                 : [],
         ];
     }
 
-    private function validateHistoricalIntake(Request $request): array
+    private function validateExistingAppointmentIntake(Request $request): array
     {
         return $request->validate([
-            'appointment_date' => 'required|date|before_or_equal:today',
+            'appointment_date' => 'required|date',
             'appointment_time' => 'required|date_format:H:i',
             'service_type' => 'required|string|max:255',
             'procedure_duration_hms' => ['required', 'regex:/^\d{2}:\d{2}:\d{2}$/'],
@@ -327,7 +279,7 @@ class OdontogramController extends Controller
         ]);
     }
 
-    private function persistHistoricalPatientHistory(Patient $patient, array $draft): void
+    private function persistExistingAppointmentPatientHistory(Patient $patient, array $draft): void
     {
         DentalHistory::updateOrCreate(
             ['patient_id' => $patient->id],
@@ -782,13 +734,13 @@ class OdontogramController extends Controller
             'procedure',
             'savedOdontogramData',
         ), $this->getProcedureWorkspaceContext(), [
-            'historicalMode' => false,
+            'existingAppointmentMode' => false,
             'serviceTypes' => ServiceType::activeForBooking()->orderBy('name')->get(['name']),
             'saveProcedureUrl' => route('dentist.odontogram.save', $appointment->id),
         ]));
     }
 
-    public function createHistorical(Patient $patient)
+    public function createExistingAppointment(Patient $patient)
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
@@ -796,7 +748,7 @@ class OdontogramController extends Controller
             return redirect('/login');
         }
 
-        session()->forget($this->historicalDraftSessionKey($patient));
+        session()->forget($this->existingAppointmentDraftSessionKey($patient));
 
         $defaults = [
             'appointment_date' => '',
@@ -817,17 +769,24 @@ class OdontogramController extends Controller
             'diseases' => [],
         ];
 
-        return view('dentist.historical-appointment-intake', [
+        return view('dentist.add-existing-appointment', [
             'patient' => $patient,
-            'serviceTypes' => ServiceType::activeForBooking()->orderBy('name')->get(),
-            'diseases' => Disease::orderBy('sort_order')->get(),
+            'serviceTypes' => ServiceType::activeForBooking()
+                ->orderBy('name')
+                ->get(),
+
+            'diseases' => Disease::orderBy('sort_order')
+                ->get(),
+
             'defaults' => $defaults,
-            'dentalQuestions' => $this->getHistoricalDentalQuestions(),
-            'medicalQuestions' => $this->getHistoricalMedicalQuestions(),
-        ] + $this->getHistoricalCalendarContext());
+
+            'dentalQuestions' => BookingQuestions::dental(),
+            'medicalQuestions' => BookingQuestions::medical(),
+
+        ] + $this->getExistingAppointmentCalendarContext());
     }
 
-    public function storeHistoricalIntake(Request $request, Patient $patient)
+    public function storeExistingAppointmentIntake(Request $request, Patient $patient)
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
@@ -835,7 +794,35 @@ class OdontogramController extends Controller
             return redirect('/login');
         }
 
-        $validated = $this->validateHistoricalIntake($request);
+        $rawAppointmentTime =
+            trim(
+                (string)
+                $request->input(
+                    'appointment_time',
+                    ''
+                )
+            );
+
+        if ($rawAppointmentTime !== '') {
+            try {
+                $normalizedAppointmentTime =
+                    $this->normalizeProcedureTime(
+                        $rawAppointmentTime
+                    );
+
+                $request->merge([
+                    'appointment_time' =>
+                    substr(
+                        $normalizedAppointmentTime,
+                        0,
+                        5
+                    ),
+                ]);
+            } catch (\Throwable $error) {
+            }
+        }
+
+        $validated = $this->validateExistingAppointmentIntake($request);
 
         $serviceExists = ServiceType::where('name', $validated['service_type'])
             ->where('is_active_for_booking', true)
@@ -852,23 +839,85 @@ class OdontogramController extends Controller
             ->all();
 
         $validated['medical_answers'] = collect($validated['medical_answers'] ?? [])
-            ->map(function ($value, $code) {
-                if (in_array($code, collect($this->getHistoricalMedicalQuestions())->where('type', 'bool')->pluck('code')->all(), true)) {
-                    return $this->yesNoValue($value);
-                }
+            ->map(
+                function ($value, $code) {
+                    if (
+                        in_array(
+                            $code,
+                            BookingQuestions::medicalCodesByType(
+                                'bool'
+                            ),
+                            true
+                        )
+                    ) {
+                        return $this
+                            ->yesNoValue(
+                                $value
+                            );
+                    }
 
-                return is_string($value) ? trim($value) : $value;
-            })
+                    return is_string(
+                        $value
+                    )
+                        ? trim($value)
+                        : $value;
+                }
+            )
             ->all();
 
+        $appointmentDate =
+            Carbon::parse(
+                $validated['appointment_date']
+            );
+
+        if (
+            $appointmentDate->isSaturday() ||
+            $appointmentDate->isSunday()
+        ) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors([
+                    'appointment_date' =>
+                    'The clinic is closed on Saturdays and Sundays.',
+                ]);
+        }
+
+        $holidayDates =
+            PhilippineHolidays::range(
+                yearsBefore: 15,
+                yearsAfter: 15
+            );
+
+        $appointmentDateIso =
+            $appointmentDate
+            ->toDateString();
+
+        if (
+            isset(
+                $holidayDates[$appointmentDateIso]
+            )
+        ) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors([
+                    'appointment_date' =>
+                    'The clinic is closed on Philippine holidays.',
+                ]);
+        }
+
         session([
-            $this->historicalDraftSessionKey($patient) => $validated,
+            $this->existingAppointmentDraftSessionKey($patient) => $validated,
         ]);
 
-        return redirect()->route('dentist.odontogram.historical.odontogram', ['patient' => $patient->id]);
+        return redirect()->route(
+            'dentist.odontogram.existing-appointment.odontogram',
+            ['patient' => $patient->id]
+        );
     }
 
-    public function showHistoricalOdontogram(Patient $patient)
+    public function showExistingAppointmentOdontogram(Patient $patient)
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
@@ -876,11 +925,11 @@ class OdontogramController extends Controller
             return redirect('/login');
         }
 
-        $draft = session($this->historicalDraftSessionKey($patient));
+        $draft = session($this->existingAppointmentDraftSessionKey($patient));
 
         if (!$draft) {
             return redirect()
-                ->route('dentist.odontogram.historical.create', ['patient' => $patient->id])
+                ->route('dentist.odontogram.existing-appointment.create', ['patient' => $patient->id])
                 ->with('error', 'Please complete the existing appointment details first.');
         }
 
@@ -889,9 +938,10 @@ class OdontogramController extends Controller
             'appointment' => null,
             'procedure' => null,
             'savedOdontogramData' => $this->getSavedOdontogramDataForPatient($patient),
-            'historicalMode' => true,
-            'historicalDraft' => $draft,
-            'saveProcedureUrl' => route('dentist.odontogram.historical.store', $patient->id),
+            'existingAppointmentMode' => true,
+            'existingAppointmentDraft' => $draft,
+            'isExistingAppointment' => true,
+            'saveProcedureUrl' => route('dentist.odontogram.existing-appointment.store', $patient->id),
             'appointmentCountsPerDay' => [],
             'appointmentCountsPerSlot' => [],
             'calendarAppointmentDetails' => [],
@@ -901,7 +951,7 @@ class OdontogramController extends Controller
         ]);
     }
 
-    public function historicalSlotsForDate(Request $request)
+    public function existingAppointmentSlotsForDate(Request $request)
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
@@ -1037,7 +1087,7 @@ class OdontogramController extends Controller
         ]);
     }
 
-    public function storeHistorical(Request $request, Patient $patient)
+    public function storeExistingAppointment(Request $request, Patient $patient)
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
@@ -1047,7 +1097,7 @@ class OdontogramController extends Controller
             ], 403);
         }
 
-        $draft = session($this->historicalDraftSessionKey($patient));
+        $draft = session($this->existingAppointmentDraftSessionKey($patient));
 
         if (!$draft) {
             return response()->json([
@@ -1110,7 +1160,7 @@ class OdontogramController extends Controller
             $procedureCompletedAt,
             &$result
         ) {
-            $this->persistHistoricalPatientHistory($patient, $draft);
+            $this->persistExistingAppointmentPatientHistory($patient, $draft);
 
             $appointment = Appointment::create($appointmentPayload);
 
@@ -1124,7 +1174,7 @@ class OdontogramController extends Controller
             );
         });
 
-        session()->forget($this->historicalDraftSessionKey($patient));
+        session()->forget($this->existingAppointmentDraftSessionKey($patient));
 
         return response()->json([
             'message' => 'Existing appointment saved successfully.',

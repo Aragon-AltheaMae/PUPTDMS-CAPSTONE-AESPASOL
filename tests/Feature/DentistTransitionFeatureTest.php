@@ -30,6 +30,7 @@ class DentistTransitionFeatureTest extends TestCase
                 'last_working_date' => '2026-07-20',
                 'access_ends_at' => '2026-07-20 17:00:00',
                 'handover_notes' => 'Ready for handover.',
+                'remarks' => 'No additional remarks.',
             ]);
 
         $response->assertRedirect();

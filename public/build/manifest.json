@@ -408,12 +408,21 @@
     "src": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-DrB6J-tU.css",
+    "file": "assets/app-W0NcGbwj.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
     "names": [
       "app.css"
+    ]
+  },
+  "resources/css/pages/auth/backup-login.css": {
+    "file": "assets/backup-login-C5TYrSvl.css",
+    "src": "resources/css/pages/auth/backup-login.css",
+    "isEntry": true,
+    "name": "backup-login",
+    "names": [
+      "backup-login.css"
     ]
   },
   "resources/css/pages/auth/login.css": {
@@ -426,7 +435,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-CYpidmN9.js",
+    "file": "assets/app-CiizEveF.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,

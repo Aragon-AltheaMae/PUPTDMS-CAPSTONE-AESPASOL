@@ -1,122 +1,180 @@
 <div id="cancelAppointmentModal" class="ui-modal modal-theme-danger" aria-hidden="true" role="dialog" aria-modal="true"
     aria-labelledby="cancelAppointmentModalTitle" onclick="handleCancelBackdropClick(event)">
 
-    <div class="ui-modal-card modal-lg cancel-modal-panel">
-        <div class="modal-hd appointment-modal-header cancel-modal-header">
+    <div class="ui-modal-card modal-md">
 
-            <div class="modal-header-custom">
-                <div class="appointment-modal-header-icon cancel-modal-icon">
+        <div class="modal-hd">
+
+            <div class="modal-heading">
+
+                <div class="modal-icon">
                     <i class="fa-solid fa-triangle-exclamation"></i>
                 </div>
 
-                <div class="appointment-modal-header-copy">
-                    <span class="appointment-modal-eyebrow">
-                        Appointment Action
-                    </span>
+                <div class="modal-copy">
 
-                    <h2 id="cancelAppointmentModalTitle" class="appointment-modal-title">
+                    <h2 id="cancelAppointmentModalTitle" class="modal-title">
                         Cancel Appointment
                     </h2>
 
-                    <p class="appointment-modal-subtitle">
+                    <p class="modal-subtitle">
                         This action cannot be undone.
                     </p>
+
                 </div>
+
             </div>
 
             <button type="button" onclick="closeCancelAppointmentModal()" class="modal-x"
                 aria-label="Close cancellation modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
+
         </div>
 
-        <form id="cancelAppointmentForm" data-discard-form data-discard-title="Discard cancellation?"
-            data-discard-subtitle="A cancellation reason has been selected."
-            data-discard-message="The selected cancellation reason will be cleared. Do you want to discard this change?">
+        <form id="cancelAppointmentForm" data-global-validation data-discard-form
+            data-discard-title="Discard cancellation?" data-discard-subtitle="A cancellation reason has been selected."
+            data-discard-message="The selected cancellation reason will be cleared. Do you want to discard this change?"
+            novalidate>
 
-            <div class="modal-bd cancel-modal-body">
-                <div class="modal-profile-card modal-profile-card-single cancel-patient-summary">
-                    <div class="modal-profile-main">
-                        <div class="modal-profile-avatar">
-                            <i class="fa-regular fa-user"></i>
-                        </div>
+            <div class="modal-bd">
 
-                        <div class="modal-profile-main-copy">
-                            <span class="modal-profile-eyebrow">
-                                Cancelling appointment for
+                <div class="global-info-profile">
+
+                    <div class="global-info-profile-icon">
+                        <i class="fa-regular fa-user"></i>
+                    </div>
+
+                    <div class="global-info-profile-copy">
+
+                        <span class="global-info-label">
+                            Cancelling appointment for
+                        </span>
+
+                        <strong id="cancelPatientName" class="global-info-profile-name">
+                            —
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                <div class="global-info-grid">
+
+                    <div class="global-info-item">
+
+                        <span
+                            class="
+                                global-info-icon
+                                status-cancelled
+                            ">
+                            <i class="fa-regular fa-calendar-xmark"></i>
+                        </span>
+
+                        <div class="global-info-copy">
+
+                            <span class="global-info-label">
+                                Scheduled Date
                             </span>
 
-                            <strong id="cancelPatientName" class="modal-profile-name">
+                            <strong id="cancelAppointmentDate" class="global-info-value">
                                 —
                             </strong>
+
                         </div>
+
                     </div>
 
-                    <div class="modal-profile-details modal-profile-details-single">
-                        <div class="modal-profile-detail">
-                            <span class="modal-profile-detail-icon">
-                                <i class="fa-regular fa-calendar-xmark"></i>
-                            </span>
-
-                            <div>
-                                <span class="modal-profile-label">
-                                    Scheduled Date
-                                </span>
-
-                                <strong id="cancelAppointmentDate" class="modal-profile-value">
-                                    —
-                                </strong>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
-                <div class="mb-5">
-                    <p class="text-[12px] font-semibold text-gray-500 uppercase tracking-wide mb-2.5">
-                        Reason <span class="text-red-400 font-normal normal-case">* required</span>
-                    </p>
-                    <div class="flex flex-wrap gap-2" id="cancelReasonChips" onchange="clearReasonError()">
-                        <div class="reason-chip"><input type="radio" name="cancelReason" id="r1"
-                                value="Patient no-show"><label for="r1"><i
-                                    class="fa-regular fa-circle-xmark text-[11px]"></i> Patient no-show</label></div>
-                        <div class="reason-chip"><input type="radio" name="cancelReason" id="r2"
-                                value="Doctor unavailable"><label for="r2"><i
-                                    class="fa-solid fa-user-doctor text-[11px]"></i> Doctor unavailable</label></div>
-                        <div class="reason-chip"><input type="radio" name="cancelReason" id="r3"
-                                value="Patient request"><label for="r3"><i class="fa-regular fa-hand text-[11px]"></i>
-                                Patient request</label></div>
-                        <div class="reason-chip"><input type="radio" name="cancelReason" id="r4"
-                                value="Emergency"><label for="r4"><i class="fa-solid fa-bolt text-[11px]"></i>
-                                Emergency</label></div>
-                        <div class="reason-chip"><input type="radio" name="cancelReason" id="r5"
-                                value="Rescheduled"><label for="r5"><i class="fa-solid fa-rotate text-[11px]"></i>
-                                Rescheduled</label></div>
+                <div class="modal-form-section global-form-group" data-global-field>
+
+                    <div class="global-label-row">
+                        <label class="global-form-label">
+                            Cancellation Reason
+                        </label>
                     </div>
-                    <div id="reasonError"
-                        class="hidden mt-2.5 flex items-center gap-1.5 text-red-500 text-[12px] font-semibold">
-                        <i class="fa-solid fa-circle-exclamation text-[11px]"></i> Please select a reason before
-                        cancelling.
+
+                    <div id="cancelReasonChips" class="flex flex-wrap gap-2" role="radiogroup"
+                        aria-label="Cancellation Reason">
+
+                        <div class="reason-chip">
+                            <input type="radio" name="cancelReason" id="r1" value="Patient no-show" required
+                                data-required-message="Select the reason for cancelling this appointment.">
+
+                            <label for="r1">
+                                <i class="fa-regular fa-circle-xmark"></i>
+                                Patient no-show
+                            </label>
+                        </div>
+
+                        <div class="reason-chip">
+                            <input type="radio" name="cancelReason" id="r2" value="Doctor unavailable"
+                                required>
+
+                            <label for="r2">
+                                <i class="fa-solid fa-user-doctor"></i>
+                                Doctor unavailable
+                            </label>
+                        </div>
+
+                        <div class="reason-chip">
+                            <input type="radio" name="cancelReason" id="r3" value="Patient request" required>
+
+                            <label for="r3">
+                                <i class="fa-regular fa-hand"></i>
+                                Patient request
+                            </label>
+                        </div>
+
+                        <div class="reason-chip">
+                            <input type="radio" name="cancelReason" id="r4" value="Emergency" required>
+
+                            <label for="r4">
+                                <i class="fa-solid fa-bolt"></i>
+                                Emergency
+                            </label>
+                        </div>
+
+                        <div class="reason-chip">
+                            <input type="radio" name="cancelReason" id="r5" value="Rescheduled" required>
+
+                            <label for="r5">
+                                <i class="fa-solid fa-rotate"></i>
+                                Rescheduled
+                            </label>
+                        </div>
+
                     </div>
+
+                    <div class="global-field-error" data-error-for="cancelReason" aria-hidden="true">
+                    </div>
+
                 </div>
+
             </div>
-            <div class="modal-ft cancel-modal-footer">
+
+            <div class="modal-ft">
 
                 <button type="button" onclick="closeCancelAppointmentModal()" class="ui-btn ui-btn-secondary">
-
                     <i class="fa-solid fa-arrow-left"></i>
                     <span>Keep Appointment</span>
                 </button>
 
                 <button type="button" id="confirmCancelBtn" onclick="confirmCancelAppointment()"
                     class="ui-btn ui-btn-danger">
-
                     <i class="fa-solid fa-ban"></i>
                     <span>Yes, Cancel</span>
                 </button>
+
             </div>
+
         </form>
+
     </div>
+
 </div>
+
 <script>
     let selectedCancelUrl = null;
     let selectedCancelAppointmentId = null;
@@ -132,10 +190,9 @@
         document.getElementById('cancelPatientName').textContent = patientName;
         document.getElementById('cancelAppointmentDate').textContent = appointmentDate;
         document.querySelectorAll('input[name="cancelReason"]').forEach(r => r.checked = false);
-        clearReasonError();
         const confirmBtn = document.getElementById('confirmCancelBtn');
         confirmBtn.disabled = false;
-        confirmBtn.innerHTML = '<i class="fa-solid fa-ban text-xs mr-1.5"></i>Yes, Cancel';
+        confirmBtn.innerHTML = `<i class="fa-solid fa-ban"></i><span>Yes, Cancel</span>`;
         const modal = document.getElementById('cancelAppointmentModal');
 
         if (!modal) return;
@@ -207,27 +264,27 @@
         }
     }
 
-    function clearReasonError() {
-        document.getElementById('cancelReasonChips').classList.remove('invalid', 'chips-error-shake');
-        document.getElementById('reasonError').classList.add('hidden');
-    }
-
-    document.querySelectorAll('input[name="cancelReason"]').forEach(r => {
-        r.addEventListener('change', clearReasonError);
-    });
-
     async function confirmCancelAppointment() {
-        const selectedReason = document.querySelector('input[name="cancelReason"]:checked')?.value || null;
+        const form = document.getElementById('cancelAppointmentForm');
 
-        if (!selectedReason) {
-            const chips = document.getElementById('cancelReasonChips');
-            document.getElementById('reasonError').classList.remove('hidden');
-            chips.classList.add('invalid');
-            chips.classList.remove('chips-error-shake');
-            void chips.offsetWidth;
-            chips.classList.add('chips-error-shake');
+        const validation =
+            window.validateGlobalForm?.(form);
+
+        if (
+            validation &&
+            !validation.valid
+        ) {
+            window.focusGlobalInvalidField?.(
+                validation.firstInvalid
+            );
+
             return;
         }
+
+        const selectedReason =
+            document.querySelector(
+                'input[name="cancelReason"]:checked'
+            )?.value || '';
 
         if (!selectedCancelUrl) {
             return;
@@ -235,7 +292,7 @@
 
         const btn = document.getElementById('confirmCancelBtn');
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-xs mr-1.5"></i>Cancelling…';
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i><span>Cancelling…</span>`;
 
         try {
             const response = await fetch(selectedCancelUrl, {
@@ -255,16 +312,14 @@
             const data = await response.json();
 
             if (response.ok && data.success) {
-                if (selectedCancelAppointmentId) {
-                    sessionStorage.setItem(`appointmentCancelReason:${selectedCancelAppointmentId}`,
-                        selectedReason);
-                }
                 closeCancelAppointmentModal({
                     force: true
                 });
+
                 if (typeof closeDayAppointmentsModal === 'function') {
                     closeDayAppointmentsModal();
                 }
+
                 sessionStorage.setItem('dentistToast', JSON.stringify({
                     title: 'Appointment cancelled',
                     message: `${document.getElementById('cancelPatientName')?.textContent || 'Appointment'} was cancelled successfully.`,
@@ -275,11 +330,20 @@
                 window.location.reload();
             } else {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-ban text-xs mr-1.5"></i>Yes, Cancel';
+                btn.innerHTML = `
+        <i class="fa-solid fa-ban"></i>
+        <span>Yes, Cancel</span>
+    `;
             }
         } catch (error) {
+            console.error('Cancel appointment failed:', error);
+
             btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-ban text-xs mr-1.5"></i>Yes, Cancel';
+
+            btn.innerHTML = `
+        <i class="fa-solid fa-ban"></i>
+        <span>Yes, Cancel</span>
+    `;
         }
     }
 

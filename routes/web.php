@@ -1,57 +1,53 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Role;
-use Illuminate\Support\Facades\DB;
-use App\Models\Patient;
 use App\Helpers\AuditLogger;
-use App\Http\Controllers\AppointmentController;
-use App\Http\Controllers\Dentist\InventoryController;
-use App\Http\Controllers\DocumentRequestController;
-use App\Http\Controllers\RecordController;
-use App\Http\Controllers\HomepageController;
-use App\Http\Controllers\PatientController;
-use App\Http\Controllers\Dentist\DentistPatientController;
-use App\Http\Controllers\Dentist\DentistAppointmentController;
-use App\Http\Controllers\Admin\AdminAuthController;
-use App\Http\Controllers\Admin\AdminSessionManagementController;
-use App\Http\Controllers\Admin\RolePermissionController;
 use App\Helpers\PhilippineHolidays;
-use App\Http\Controllers\Admin\SystemLogController;
-use App\Http\Controllers\Admin\UserManagementController;
-use App\Http\Controllers\Admin\DentistTransitionController;
 use App\Http\Controllers\Admin\AcademicPeriodController;
-use App\Http\Controllers\Admin\AdminPatientController;
-use App\Http\Controllers\Admin\ServiceTypeController;
-use App\Http\Controllers\Admin\ClinicScheduleController;
+use App\Http\Controllers\Admin\AdminAppointmentController;
 use App\Http\Controllers\Admin\AdminDashboardController;
-use App\Http\Controllers\Admin\SystemSettingsController;
+use App\Http\Controllers\Admin\AdminInventoryController;
+use App\Http\Controllers\Admin\AdminPatientController;
+use App\Http\Controllers\Admin\AdminReportController;
+use App\Http\Controllers\Admin\AdminSessionManagementController;
+use App\Http\Controllers\Admin\ClinicScheduleController;
+use App\Http\Controllers\Admin\DentalRecordController;
+use App\Http\Controllers\Admin\DentistTransitionController;
 use App\Http\Controllers\Admin\DocumentRequestController as AdminDocumentRequestController;
-use App\Http\Controllers\Auth\OIDCController;
+use App\Http\Controllers\Admin\DocumentTemplateController;
+use App\Http\Controllers\Admin\ExternalAdminController;
+use App\Http\Controllers\Admin\RolePermissionController;
+use App\Http\Controllers\Admin\ServiceTypeController;
+use App\Http\Controllers\Admin\SystemLogController;
+use App\Http\Controllers\Admin\SystemSettingsController;
+use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\Auth\BackupLoginController;
 use App\Http\Controllers\Auth\LogoutController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\Security\SessionManagementController;
-use App\Http\Controllers\Admin\AdminAppointmentController;
-use App\Http\Controllers\Dentist\DentistDashboardController;
-use App\Http\Controllers\Admin\AdminInventoryController;
-use App\Http\Controllers\Admin\AdminReportController;
-use App\Http\Controllers\Admin\ExternalAdminController;
-use App\Http\Controllers\FacultyController;
-use App\Http\Controllers\Admin\DocumentTemplateController;
-use App\Services\StudentApiService;
-use App\Services\FacultyApiService;
-use App\Http\Controllers\Admin\DentalRecordController;
+use App\Http\Controllers\Auth\OIDCController;
 use App\Http\Controllers\ChatbotController;
-use App\Http\Controllers\Dentist\OdontogramController;
+use App\Http\Controllers\Dentist\DentistAppointmentController;
 use App\Http\Controllers\Dentist\DentistClinicScheduleController;
+use App\Http\Controllers\Dentist\DentistDashboardController;
+use App\Http\Controllers\Dentist\DentistPatientController;
+use App\Http\Controllers\Dentist\InventoryController;
+use App\Http\Controllers\Dentist\OdontogramController;
 use App\Http\Controllers\Dentist\WalkInController;
+use App\Http\Controllers\DocumentRequestController;
+use App\Http\Controllers\FacultyController;
+use App\Http\Controllers\HomepageController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\RecordController;
+use App\Http\Controllers\Security\SessionManagementController;
+use App\Models\Patient;
+use App\Models\Role;
+use App\Services\StudentApiService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Route;
 
-
-//api nila albert
+// api nila albert
 
 Route::get('/debug-ogos-config', function () {
     return response()->json([
@@ -65,12 +61,11 @@ Route::get('/debug-ogos-config', function () {
 
 Route::get('/test-student-api', function (StudentApiService $studentApiService) {
     $email = 'student5@gmail.com'; // palitan mo kung needed
+
     return response()->json($studentApiService->getStudentByEmail($email));
 });
 
-
-
-//kela matt
+// kela matt
 Route::get('/faculties', [FacultyController::class, 'getFacultyList']);
 
 Route::get('/faculty-integration', function () {
@@ -97,7 +92,6 @@ Route::middleware(['web'])->group(function () {
         ->name('oidc.callback');
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | PUBLIC AUTH PAGES
@@ -105,7 +99,6 @@ Route::middleware(['web'])->group(function () {
 */
 
 Route::get('/', fn() => redirect('/login'));
-
 
 // Patient Login
 Route::view('/login', 'auth.login')->name('login');
@@ -116,8 +109,6 @@ Route::get('/register', function () {
     return view('auth.register');
 })->name('register');
 
-
-
 /*
 |--------------------------------------------------------------------------
 | PUBLIC AUTH ACTIONS
@@ -127,12 +118,12 @@ Route::get('/register', function () {
 // Patient Registration
 Route::post('/register', function (Request $request) {
     $validated = $request->validate([
-        'name'      => 'required|string|min:2|max:255',
-        'email'     => 'required|email|unique:patients,email|unique:users,email',
-        'phone'     => 'nullable|string|max:20',
+        'name' => 'required|string|min:2|max:255',
+        'email' => 'required|email|unique:patients,email|unique:users,email',
+        'phone' => 'nullable|string|max:20',
         'birthdate' => 'required|date|before:today|after:120 years ago',
-        'gender'    => 'required|in:Male,Female',
-        'password'  => [
+        'gender' => 'required|in:Male,Female',
+        'password' => [
             'required',
             'string',
             'min:8',
@@ -140,17 +131,17 @@ Route::post('/register', function (Request $request) {
             'regex:/^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/',
         ],
     ], [
-        'name.min'           => 'Name must be at least 2 characters.',
-        'email.unique'       => 'This email is already registered.',
-        'email.email'        => 'Please enter a valid email address.',
+        'name.min' => 'Name must be at least 2 characters.',
+        'email.unique' => 'This email is already registered.',
+        'email.email' => 'Please enter a valid email address.',
         'birthdate.required' => 'Birthdate is required.',
-        'birthdate.before'   => 'Birthdate cannot be in the future.',
-        'birthdate.after'    => 'Please enter a valid birthdate.',
-        'gender.required'    => 'Please select a gender.',
-        'gender.in'          => 'Gender must be Male or Female.',
-        'password.min'       => 'Password must be at least 8 characters.',
+        'birthdate.before' => 'Birthdate cannot be in the future.',
+        'birthdate.after' => 'Please enter a valid birthdate.',
+        'gender.required' => 'Please select a gender.',
+        'gender.in' => 'Gender must be Male or Female.',
+        'password.min' => 'Password must be at least 8 characters.',
         'password.confirmed' => 'Passwords do not match.',
-        'password.regex'     => 'Password must contain at least one letter, one number, and one special character.',
+        'password.regex' => 'Password must contain at least one letter, one number, and one special character.',
     ]);
 
     try {
@@ -158,21 +149,21 @@ Route::post('/register', function (Request $request) {
             $patientRole = Role::where('slug', 'patient')->firstOrFail();
 
             $user = User::create([
-                'name'     => $validated['name'],
-                'email'    => $validated['email'],
+                'name' => $validated['name'],
+                'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
-                'role_id'  => $patientRole->id,
-                'status'   => 'active',
+                'role_id' => $patientRole->id,
+                'status' => 'active',
             ]);
 
             Patient::create([
-                'user_id'   => $user->id,
-                'name'      => $validated['name'],
-                'email'     => $validated['email'],
-                'phone'     => $validated['phone'] ?? '',
+                'user_id' => $user->id,
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'] ?? '',
                 'birthdate' => $validated['birthdate'],
-                'gender'    => $validated['gender'],
-                'password'  => $user->password,
+                'gender' => $validated['gender'],
+                'password' => $user->password,
             ]);
         });
 
@@ -188,7 +179,6 @@ Route::post('/register', function (Request $request) {
 // Single Login POST — handles patient, dentist, and admin
 // ── PATIENT ──
 Route::post('/login', [BackupLoginController::class, 'store'])->name('login.store');
-
 
 // Logout (all roles)
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
@@ -210,7 +200,6 @@ Route::post(
 )
     ->middleware('auth')
     ->name('session.activity');
-
 
 Route::middleware('auth')->prefix('notifications')->name('notifications.')->group(function () {
     Route::post('/{notificationId}/read', [NotificationController::class, 'markAsRead'])
@@ -263,7 +252,6 @@ Route::prefix('admin')
 
         Route::get('/external-admins/{adminId}', [ExternalAdminController::class, 'show'])
             ->name('admin.external_admins.show');
-
 
         /*
         |--------------------------------------------------------------------------
@@ -326,7 +314,6 @@ Route::prefix('admin')
         Route::delete('/role-permissions/{id}/destroy', [RolePermissionController::class, 'destroyRole'])
             ->name('admin.role_permissions.destroy_role');
 
-
         /*
         |--------------------------------------------------------------------------
         | SYSTEM LOGS
@@ -356,7 +343,6 @@ Route::prefix('admin')
         Route::post('/system-logs/archive', [SystemLogController::class, 'archive'])
             ->name('admin.system_logs.archive');
 
-
         /*
         |--------------------------------------------------------------------------
         | PATIENT DIRECTORY
@@ -370,7 +356,6 @@ Route::prefix('admin')
 
         Route::get('/patient/{patient}', [AdminPatientController::class, 'show'])
             ->name('admin.admin.patient.profile');
-
 
         /*
         |--------------------------------------------------------------------------
@@ -388,7 +373,7 @@ Route::prefix('admin')
         Route::get('/patients/list', function () {
             $user = Auth::user();
 
-            if (!$user || !in_array(optional($user->role)->slug, ['super_admin', 'admin'])) {
+            if (! $user || ! in_array(optional($user->role)->slug, ['super_admin', 'admin'])) {
                 return response()->json(['message' => 'Unauthorized'], 403);
             }
             $patients = Patient::select('id', 'name', 'email', 'phone')
@@ -397,7 +382,6 @@ Route::prefix('admin')
 
             return response()->json($patients);
         })->name('admin.patients.list');
-
 
         /*
         |--------------------------------------------------------------------------
@@ -421,7 +405,6 @@ Route::prefix('admin')
 
         Route::post('/admin/academic-periods/sync-flss', [AcademicPeriodController::class, 'syncFromFlss'])
             ->name('admin.academic_periods.sync_flss');
-
 
         /*
         |--------------------------------------------------------------------------
@@ -469,7 +452,7 @@ Route::prefix('admin')
             ->name('admin.inventory.destroy');
     });
 
-// DOCUMENT REQUEST 
+// DOCUMENT REQUEST
 Route::prefix('admin')
     ->middleware(['auth', 'role:admin'])
     ->group(function () {
@@ -533,7 +516,7 @@ Route::prefix('admin')
         Route::post('/system-settings', [SystemSettingsController::class, 'update'])
             ->name('admin.system_settings.update');
     });
-/*  
+/*
 |--------------------------------------------------------------------------
 | ADMIN USER MANAGEMENT ROUTES
 |--------------------------------------------------------------------------
@@ -622,7 +605,7 @@ Route::post('/impersonate', function (Request $request) {
     /** @var \App\Models\User $user */
     $user = Auth::user();
 
-    if (!$user || !$user->hasAnyRole(['super_admin', 'admin'])) {
+    if (! $user || ! $user->hasAnyRole(['super_admin', 'admin'])) {
         return response()->json(['message' => 'Unauthorized'], 403);
     }
 
@@ -632,7 +615,7 @@ Route::post('/impersonate', function (Request $request) {
 
     $targetRole = strtolower(trim($request->role));
 
-    if (!session()->has('impersonator_role')) {
+    if (! session()->has('impersonator_role')) {
         session([
             'impersonator_role' => optional(Auth::user()->role)->slug,
             'impersonator_admin_id' => Auth::id(),
@@ -655,7 +638,7 @@ Route::post('/impersonate', function (Request $request) {
         );
 
         return response()->json([
-            'redirect' => route('dentist.dentist.dashboard')
+            'redirect' => route('dentist.dentist.dashboard'),
         ]);
     }
 
@@ -667,9 +650,9 @@ Route::post('/impersonate', function (Request $request) {
 
         $patient = Patient::find($request->patient_id);
 
-        if (!$patient) {
+        if (! $patient) {
             return response()->json([
-                'message' => 'Selected patient not found.'
+                'message' => 'Selected patient not found.',
             ], 422);
         }
 
@@ -685,22 +668,21 @@ Route::post('/impersonate', function (Request $request) {
         );
 
         return response()->json([
-            'redirect' => route('patient.dashboard')
+            'redirect' => route('patient.dashboard'),
         ]);
     }
 
     return response()->json([
-        'message' => 'Unsupported role: ' . $targetRole
+        'message' => 'Unsupported role: ' . $targetRole,
     ], 422);
 })->name('admin.impersonate');
-
 
 Route::post('/stop-impersonation', function () {
 
     /** @var \App\Models\User $user */
     $user = Auth::user();
 
-    if (!$user || !$user->hasAnyRole(['super_admin', 'admin'])) {
+    if (! $user || ! $user->hasAnyRole(['super_admin', 'admin'])) {
         return response()->json(['message' => 'Unauthorized'], 403);
     }
 
@@ -722,7 +704,6 @@ Route::post('/stop-impersonation', function () {
 
     return redirect()->route('admin.admin.dashboard');
 })->name('admin.stop_impersonation');
-
 
 /*
 |--------------------------------------------------------------------------
@@ -820,6 +801,18 @@ Route::prefix('patient')->middleware(['role:patient'])->group(function () {
         ->middleware('permission:book_appointments')
         ->name('book.appointment.store');
 
+            Route::get('/book-appointment/draft', [AppointmentController::class, 'getDraft'])
+        ->middleware('permission:book_appointments')
+        ->name('book.appointment.draft.show');
+
+    Route::put('/book-appointment/draft', [AppointmentController::class, 'saveDraft'])
+        ->middleware('permission:book_appointments')
+        ->name('book.appointment.draft.save');
+
+    Route::delete('/book-appointment/draft', [AppointmentController::class, 'deleteDraft'])
+        ->middleware('permission:book_appointments')
+        ->name('book.appointment.draft.delete');
+
     Route::post('/book-appointment/validate-signature', [AppointmentController::class, 'validateSignature'])
         ->name('book.appointment.validate-signature');
 
@@ -857,7 +850,7 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         ->name('dentist.patient.signature.invalid');
 
     Route::get('/dashboard', function () {
-        $now   = \Carbon\Carbon::now();
+        $now = \Carbon\Carbon::now();
         $today = $now->toDateString();
 
         $todayAppointments = \App\Models\Appointment::with('patient')
@@ -893,7 +886,7 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
                 return $items->map(function ($appointment) {
                     $name = $appointment->patient->name ?? 'Unknown Patient';
 
-                    $time = !empty($appointment->appointment_time)
+                    $time = ! empty($appointment->appointment_time)
                         ? \Carbon\Carbon::parse($appointment->appointment_time)->format('h:i A')
                         : '—';
 
@@ -972,17 +965,24 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
 
         $gadLabels = ['Student', 'Administrative', 'Faculty', 'Dependent'];
         $gadFemale = [];
-        $gadMale   = [];
+        $gadMale = [];
 
         foreach ($gadLabels as $label) {
             $key = $label === 'Student' ? null : $label;
             $gadFemale[] = (int) $gadRaw->where('office_type', $key)->where('gender', 'Female')->sum('total');
-            $gadMale[]   = (int) $gadRaw->where('office_type', $key)->where('gender', 'Male')->sum('total');
+            $gadMale[] = (int) $gadRaw->where('office_type', $key)->where('gender', 'Male')->sum('total');
         }
 
         $philippineHolidays = PhilippineHolidays::range(yearsBefore: 1, yearsAfter: 5);
         $notifications = collect([]);
         $unavailableDates = [];
+
+        $clinicStatus = strtolower(
+            (string) \App\Models\SystemSetting::getSetting(
+                'clinic_status',
+                'in'
+            )
+        );
 
         return view('dentist.dentist-dashboard', compact(
             'todayAppointments',
@@ -999,7 +999,8 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
             'medicineSupplies',
             'gadLabels',
             'gadFemale',
-            'gadMale'
+            'gadMale',
+            'clinicStatus'
         ));
     })->middleware('permission:access_dentist_dashboard')->name('dentist.dentist.dashboard');
 
@@ -1135,15 +1136,17 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         ->middleware('permission:manage_reports')
         ->name('dentist.dentist.report.daily-treatment');
 
-    Route::get('/report/dental-services', function () {
-        return view('dentist.dental-services');
-    })
+    Route::get('/report/dental-services', [\App\Http\Controllers\Dentist\DentalServicesRecordController::class, 'index'])
         ->middleware('permission:manage_reports')
         ->name('dentist.dentist.report.dental-services');
 
     Route::get('/report/daily-treatment-record/list', [\App\Http\Controllers\Dentist\DentistReportController::class, 'dailyTreatmentRecordList'])
         ->middleware('permission:manage_reports')
         ->name('dentist.dentist.reports.daily-treatment-record.list');
+
+    Route::post('/report/daily-treatment-record/store', [\App\Http\Controllers\Dentist\DentistReportController::class, 'storeDailyTreatmentRecord'])
+        ->middleware('permission:manage_reports')
+        ->name('dentist.dentist.reports.daily-treatment-record.store');
 
     Route::get('/report/templates/{template}/print', [\App\Http\Controllers\Dentist\DentistReportController::class, 'printTemplate'])
         ->middleware('permission:manage_reports')
@@ -1156,9 +1159,13 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
     Route::get('/walk-in/search-patient', [WalkInController::class, 'searchPatient'])
         ->name('dentist.walk-in.search-patient');
 
+    Route::get(
+        '/walk-in/patients/{patient}/booking-information',
+        [WalkInController::class, 'patientBookingInformation']
+    )->name('dentist.walk-in.patient-booking-information');
+
     Route::post('/walk-in/guest', [WalkInController::class, 'storeGuest'])
         ->name('dentist.walk-in.guest.store');
-
     Route::post('/walk-in/start', [WalkInController::class, 'startWalkIn'])
         ->name('dentist.walk-in.start');
 
@@ -1193,39 +1200,39 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
     Route::post('/document-requests/generate', [DocumentRequestController::class, 'generate'])
         ->name('dentist.dentist.documentrequests.generate');
 
-
     // Odontogram
     Route::get('/odontogram/patient/{patient}/start', [OdontogramController::class, 'startForPatient'])
         ->middleware('permission:manage_appointments')
         ->name('dentist.odontogram.start');
 
-    Route::get('/odontogram/patient/{patient}/historical', [OdontogramController::class, 'createHistorical'])
-        ->middleware('permission:manage_appointments')
-        ->name('dentist.odontogram.historical.create');
-
-    Route::post('/odontogram/patient/{patient}/historical', [OdontogramController::class, 'storeHistoricalIntake'])
-        ->middleware('permission:manage_appointments')
-        ->name('dentist.odontogram.historical.intake.store');
-
-    Route::get('/odontogram/historical/slots', [OdontogramController::class, 'historicalSlotsForDate'])
-        ->middleware('permission:manage_appointments')
-        ->name('dentist.odontogram.historical.slots');
-
-    Route::get('/odontogram/patient/{patient}/historical/odontogram', [OdontogramController::class, 'showHistoricalOdontogram'])
-        ->middleware('permission:manage_appointments')
-        ->name('dentist.odontogram.historical.odontogram');
-
-    Route::get('/odontogram/appointment/{appointment}', [OdontogramController::class, 'show'])
+    Route::get('/odontogram/{appointment}', [OdontogramController::class, 'show'])
         ->middleware('permission:manage_appointments')
         ->name('dentist.odontogram');
 
-    Route::post('/odontogram/appointment/{appointment}/save', [OdontogramController::class, 'save'])
+    Route::post('/odontogram/{appointment}/save', [OdontogramController::class, 'save'])
         ->middleware('permission:manage_appointments')
         ->name('dentist.odontogram.save');
 
-    Route::post('/odontogram/patient/{patient}/historical/save', [OdontogramController::class, 'storeHistorical'])
+    // Add Existing Appointment - Odontogram
+    Route::get('/odontogram/patient/{patient}/existing-appointment', [OdontogramController::class, 'createExistingAppointment'])
         ->middleware('permission:manage_appointments')
-        ->name('dentist.odontogram.historical.store');
+        ->name('dentist.odontogram.existing-appointment.create');
+
+    Route::post('/odontogram/patient/{patient}/existing-appointment', [OdontogramController::class, 'storeExistingAppointmentIntake'])
+        ->middleware('permission:manage_appointments')
+        ->name('dentist.odontogram.existing-appointment.intake.store');
+
+    Route::get('/odontogram/existing-appointment/slots', [OdontogramController::class, 'existingAppointmentSlotsForDate'])
+        ->middleware('permission:manage_appointments')
+        ->name('dentist.odontogram.existing-appointment.slots');
+
+    Route::get('/odontogram/patient/{patient}/existing-appointment/odontogram', [OdontogramController::class, 'showExistingAppointmentOdontogram'])
+        ->middleware('permission:manage_appointments')
+        ->name('dentist.odontogram.existing-appointment.odontogram');
+
+    Route::post('/odontogram/patient/{patient}/existing-appointment/save', [OdontogramController::class, 'storeExistingAppointment'])
+        ->middleware('permission:manage_appointments')
+        ->name('dentist.odontogram.existing-appointment.store');
 
     // Inventory
     Route::get('/inventory', [InventoryController::class, 'index'])
@@ -1248,11 +1255,23 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         ->middleware('permission:manage_inventory')
         ->name('dentist.dentist.inventory.destroy');
 
-    //clinic status
+    // clinic status
     Route::post('/dentist/clinic-status', [DentistDashboardController::class, 'updateClinicStatus'])
         ->name('dentist.clinic-status.update');
-});
 
+    // Dentist Continuity Transitions
+    Route::get('/transitions', [\App\Http\Controllers\Dentist\DentistTransitionController::class, 'index'])
+        ->name('dentist.dentist.transitions.index');
+
+    Route::get('/transitions/{transition}', [\App\Http\Controllers\Dentist\DentistTransitionController::class, 'show'])
+        ->name('dentist.dentist.transitions.show');
+
+    Route::put('/transitions/{transition}/assignments', [\App\Http\Controllers\Dentist\DentistTransitionController::class, 'assignments'])
+        ->name('dentist.dentist.transitions.assignments');
+
+    Route::put('/transitions/{transition}/checklist', [\App\Http\Controllers\Dentist\DentistTransitionController::class, 'checklist'])
+        ->name('dentist.dentist.transitions.checklist');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -1269,35 +1288,8 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         return view('dentist.daily-treatment');
     })->name('dentist.dentist.report.daily-treatment');
 
-    Route::get('/dental-services', function () {
-        return view('dentist.dental-services');
-    })->name('dentist.dentist.report.dental-services');
+    Route::get('/dental-services', [\App\Http\Controllers\Dentist\DentalServicesRecordController::class, 'index'])
+        ->name('dentist.dentist.report.dental-services');
 });*/
 
 Route::post('/chat/send', [ChatbotController::class, 'chat']);
-
-if (app()->environment('local')) {
-    Route::get('/dev/error-pages/{code}', function (string $code) {
-        $allowedCodes = [
-            '401',
-            '402',
-            '403',
-            '404',
-            '419',
-            '429',
-            '500',
-            '503',
-        ];
-
-        abort_unless(
-            in_array($code, $allowedCodes, true),
-            404
-        );
-
-        return response()->view(
-            "errors.{$code}",
-            [],
-            (int) $code
-        );
-    })->where('code', '[0-9]+');
-}

@@ -10,7 +10,7 @@
     <div class="w-full">
         <section class="page-banner document-template-banner">
             <div class="page-banner-inner">
-                <div class="min-w-0">
+                <div>
                     <div class="page-greeting">
                         <i class="fa-solid fa-file-shield"></i>
                         Template Management
@@ -35,7 +35,7 @@
         $archivedTemplates = $stats['archived'] ?? 0;
         @endphp
 
-        <section class="stat-grid template-stat-grid" id="statCards" aria-label="Template summary">
+        <section class="stat-grid" id="statCards" aria-label="Template summary">
             <article class="stat-card s-all" data-template-stat="total">
                 <div class="stat-icon-wrapper">
                     <i class="fa-solid fa-layer-group"></i>
@@ -67,214 +67,283 @@
             </article>
         </section>
 
-        <section class="section-card template-toolbar-card" aria-label="Template filters">
-            <div class="section-card-body">
-                <div class="template-controls">
-                    <div class="template-search-row">
-                        <div class="search-wrap global-search template-search-wrap" data-search-wrapper>
-                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                            <input type="text" id="templateSearch" class="search-input no-voice" data-search-input
-                                placeholder="Search templates..." autocomplete="off">
-                            <button type="button" id="templateSearchClear" class="search-clear" data-search-clear
-                                aria-label="Clear search" title="Clear search">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-                        </div>
+        <section class="table-card" aria-label="Template filters">
+            <div class="table-toolbar">
 
-                        <div class="template-voice-toggle">
-                            <button type="button" id="templateMicToggleBtn" class="voice-search-mic external"
-                                aria-label="Toggle voice input" aria-pressed="false">
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
-                            <span id="templateVoiceStatus" class="voice-status hidden" aria-live="polite"></span>
-                        </div>
+                <div class="table-toolbar-actions">
+
+                    <div class="voice-search-row table-toolbar-search">
+                        <x-search-bar id="templateSearch" placeholder="Search templates..."
+                            clear-label="Clear template search" />
+
+                        <x-voice-input target="#templateSearch" status-id="templateVoiceStatus"
+                            label="Voice search document templates" title="Voice search" />
                     </div>
 
-                    <div class="template-filter-groups">
-                        <div class="tab-bar template-filter-tabs" role="group" aria-label="Filter by category">
-                            <button type="button" class="tab-btn active" data-filter="" data-filter-type="category">
-                                <i class="fa-solid fa-grip tab-icon"></i>
-                                <span class="tab-label">All</span>
-                            </button>
-                            <button type="button" class="tab-btn" data-filter="clearance" data-filter-type="category">
-                                <i class="fa-solid fa-file-circle-check tab-icon"></i>
-                                <span class="tab-label">Clearance</span>
-                            </button>
-                            <button type="button" class="tab-btn" data-filter="record" data-filter-type="category">
-                                <i class="fa-solid fa-folder-open tab-icon"></i>
-                                <span class="tab-label">Record</span>
-                            </button>
-                            <button type="button" class="tab-btn" data-filter="report" data-filter-type="category">
-                                <i class="fa-solid fa-chart-line tab-icon"></i>
-                                <span class="tab-label">Report</span>
-                            </button>
-                            <button type="button" class="tab-btn" data-filter="inventory" data-filter-type="category">
-                                <i class="fa-solid fa-boxes-stacked tab-icon"></i>
-                                <span class="tab-label">Inventory</span>
-                            </button>
-                        </div>
+                    <button id="templateFilterBtn" type="button" class="global-filter-btn"
+                        onclick="openTemplateFilterDrawer()">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span>Filter</span>
 
-                        <div class="tab-bar template-filter-tabs template-status-tabs" role="group"
-                            aria-label="Filter by status">
-                            <button type="button" class="tab-btn active" data-filter="" data-filter-type="status">
-                                All Status
-                            </button>
-                            <button type="button" class="tab-btn" data-filter="active" data-filter-type="status">
-                                <span class="template-status-dot is-active"></span>
-                                Active
-                            </button>
-                            <button type="button" class="tab-btn" data-filter="archived" data-filter-type="status">
-                                <span class="template-status-dot is-archived"></span>
-                                Archived
-                            </button>
-                        </div>
-                    </div>
+                        <span id="templateFilterBadge" class="filter-badge"></span>
+                    </button>
+
+                    <button id="templateFilterResetBtn" type="button" class="global-filter-reset-btn hidden"
+                        onclick="resetTemplateFilters()" aria-label="Clear template filters">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+
                 </div>
+
             </div>
         </section>
 
-        @if (empty($templates) || $templates->isEmpty())
-        <section class="section-card template-empty-card">
-            <div class="empty-state">
-                <div class="empty-state-icon">
-                    <i class="fa-solid fa-file-circle-xmark"></i>
-                </div>
-                <h2 class="empty-state-title">No templates available</h2>
-                <p class="empty-state-sub">No default document templates are currently available.</p>
-            </div>
-        </section>
-        @else
-        <section class="templates-grid" id="templatesGrid" aria-label="Document template cards">
-            @foreach ($templates as $tpl)
-            @php
-            $category = strtolower(trim((string) ($tpl->category ?? '')));
-            $dt = strtolower((string) ($tpl->document_type ?? ''));
+        <div id="templateResultsRegion">
+            @if (empty($templates) || $templates->isEmpty())
+            <section class="section-card template-empty-card">
+                <div id="templateBaseEmptyState" class="empty-state-host"></div>
+            </section>
+            @else
+            <section class="templates-grid" id="templatesGrid" aria-label="Document template cards">
+                @foreach ($templates as $tpl)
+                @php
+                $category = strtolower(trim((string) ($tpl->category ?? '')));
+                $dt = strtolower((string) ($tpl->document_type ?? ''));
 
-            if ($category === '') {
-            if (str_contains($dt, 'clearance')) {
-            $category = 'clearance';
-            } elseif (str_contains($dt, 'record')) {
-            $category = 'record';
-            } elseif (str_contains($dt, 'report')) {
-            $category = 'report';
-            } elseif (str_contains($dt, 'inventory')) {
-            $category = 'inventory';
-            } else {
-            $category = 'other';
-            }
-            }
+                if ($category === '') {
+                if (str_contains($dt, 'clearance')) {
+                $category = 'clearance';
+                } elseif (str_contains($dt, 'record')) {
+                $category = 'record';
+                } elseif (str_contains($dt, 'report')) {
+                $category = 'report';
+                } elseif (str_contains($dt, 'inventory')) {
+                $category = 'inventory';
+                } else {
+                $category = 'other';
+                }
+                }
 
-            if (!in_array($category, ['clearance', 'record', 'report', 'inventory'], true)) {
-            $category = 'other';
-            }
+                if (!in_array($category, ['clearance', 'record', 'report', 'inventory'], true)) {
+                $category = 'other';
+                }
 
-            $templateCode = $tpl->code ?? 'TPL-' . str_pad($tpl->id, 4, '0', STR_PAD_LEFT);
-            $statusClass = $tpl->status === 'active' ? 'badge-active' : 'badge-archived';
-            @endphp
+                $templateCode = $tpl->code ?? 'TPL-' . str_pad($tpl->id, 4, '0', STR_PAD_LEFT);
+                $statusClass = $tpl->status === 'active' ? 'status-active' : 'status-archived';
+                @endphp
 
-            <article class="template-card status-{{ $tpl->status }}" data-id="{{ $tpl->id }}"
-                data-name="{{ strtolower((string) $tpl->name) }}"
-                data-type="{{ strtolower((string) $tpl->document_type) }}" data-category="{{ $category }}"
-                data-status="{{ $tpl->status }}" data-template-name="{{ e($tpl->name) }}"
-                data-archive-url="{{ route('admin.document-template.archive', $tpl->id) }}"
-                data-activate-url="{{ route('admin.document-template.activate', $tpl->id) }}" tabindex="0" role="button"
-                aria-label="Preview {{ $tpl->name }}" onclick="openTemplatePreview({{ $tpl->id }})">
-                <div class="template-card-top">
-                    <div class="template-top-row">
-                        <div class="template-doc-icon">
-                            @if ($category === 'clearance')
-                            <i class="fa-solid fa-file-circle-check"></i>
-                            @elseif($category === 'record')
-                            <i class="fa-solid fa-folder-open"></i>
-                            @elseif($category === 'report')
-                            <i class="fa-solid fa-chart-line"></i>
-                            @elseif($category === 'inventory')
-                            <i class="fa-solid fa-boxes-stacked"></i>
-                            @else
-                            <i class="fa-solid fa-file-lines"></i>
-                            @endif
+                <article class="template-card status-{{ $tpl->status }}" data-id="{{ $tpl->id }}"
+                    data-name="{{ strtolower((string) $tpl->name) }}"
+                    data-type="{{ strtolower((string) $tpl->document_type) }}" data-category="{{ $category }}"
+                    data-status="{{ $tpl->status }}" data-template-name="{{ e($tpl->name) }}"
+                    data-archive-url="{{ route('admin.document-template.archive', $tpl->id) }}"
+                    data-activate-url="{{ route('admin.document-template.activate', $tpl->id) }}" tabindex="0"
+                    role="button" aria-label="Preview {{ $tpl->name }}" onclick="openTemplatePreview({{ $tpl->id }})">
+                    <div class="template-card-top">
+                        <div class="template-top-row">
+                            <div class="template-doc-icon">
+                                @if ($category === 'clearance')
+                                <i class="fa-solid fa-file-circle-check"></i>
+                                @elseif($category === 'record')
+                                <i class="fa-solid fa-folder-open"></i>
+                                @elseif($category === 'report')
+                                <i class="fa-solid fa-chart-line"></i>
+                                @elseif($category === 'inventory')
+                                <i class="fa-solid fa-boxes-stacked"></i>
+                                @else
+                                <i class="fa-solid fa-file-lines"></i>
+                                @endif
+                            </div>
+
+                            <div class="template-badge-stack">
+                                <span class="status-badge {{ $statusClass }}" data-template-status-badge>
+                                    {{ ucfirst($tpl->status) }}
+                                </span>
+
+                                @if ($tpl->is_default)
+                                <span class="status-badge status-default" data-template-default-badge>
+                                    Default
+                                </span>
+                                @endif
+                            </div>
                         </div>
 
-                        <div class="template-badge-stack">
-                            <span class="status-badge {{ $statusClass }}" data-template-status-badge>
-                                {{ ucfirst($tpl->status) }}
+                        <div class="template-title-block">
+                            <h2 class="template-name">{{ $tpl->name }}</h2>
+                            <div class="template-code">{{ $templateCode }}</div>
+                        </div>
+                    </div>
+
+                    <div class="template-card-body">
+                        <p class="template-description">
+                            {{ $tpl->description ?? ($tpl->notes ?? 'Default system template.') }}
+                        </p>
+
+                        <div class="template-meta-row">
+                            <span class="template-meta-item">
+                                <i class="fa-solid fa-tag template-meta-icon"></i>
+                                <span>{{ ucwords(str_replace('_', ' ', $tpl->document_type)) }}</span>
                             </span>
 
-                            @if ($tpl->is_default)
-                            <span class="status-badge template-default-badge" data-template-default-badge>
-                                Default
-                            </span>
-                            @endif
+                            <div class="template-actions" data-template-actions>
+                                <button type="button" class="ui-action-btn ui-action-view"
+                                    data-tooltip="Preview template" data-tooltip-tone="view"
+                                    aria-label="Preview template"
+                                    onclick="event.stopPropagation(); openTemplatePreview({{ $tpl->id }})">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+
+                                @if ($tpl->status === 'active')
+                                <button type="button" class="ui-action-btn ui-action-warning"
+                                    data-tooltip="Archive template" aria-label="Archive template"
+                                    data-template-action="archive" data-template-id="{{ $tpl->id }}"
+                                    onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
+                                    <i class="fa-solid fa-box-archive"></i>
+                                </button>
+                                @elseif ($tpl->status === 'archived')
+                                <button type="button" class="ui-action-btn ui-action-success"
+                                    data-tooltip="Activate template" aria-label="Activate template"
+                                    data-template-action="activate" data-template-id="{{ $tpl->id }}"
+                                    onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                </button>
+                                @endif
+                            </div>
                         </div>
                     </div>
+                </article>
+                @endforeach
+            </section>
 
-                    <div class="template-title-block">
-                        <h2 class="template-name">{{ $tpl->name }}</h2>
-                        <div class="template-code">{{ $templateCode }}</div>
-                    </div>
-                </div>
+            <section id="templateClientEmpty" class="section-card template-empty-card template-client-empty" hidden>
+                <div id="templateDynamicEmptyState" class="empty-state-host"></div>
+            </section>
+            @endif
+        </div>
 
-                <div class="template-card-body">
-                    <p class="template-description">
-                        {{ $tpl->description ?? ($tpl->notes ?? 'Default system template.') }}
-                    </p>
+        <x-pagination-bar id="templatePagebar" info-id="templatePageInfo" pagination-id="templatePagination"
+            page-size-id="templatePageSize" position="bottom" :show-entries="true" label="templates"
+            data-current-page="{{ $templates->currentPage() }}" data-last-page="{{ $templates->lastPage() }}"
+            data-total="{{ $templates->total() }}" data-from="{{ $templates->firstItem() ?? 0 }}"
+            data-to="{{ $templates->lastItem() ?? 0 }}" data-per-page="{{ $templates->perPage() }}" />
 
-                    <div class="template-meta-row">
-                        <span class="template-meta-item">
-                            <i class="fa-solid fa-tag template-meta-icon"></i>
-                            <span>{{ ucwords(str_replace('_', ' ', $tpl->document_type)) }}</span>
-                        </span>
-
-                        <div class="template-actions" data-template-actions>
-                            <button type="button" class="ui-action-btn ui-action-view template-action-btn"
-                                data-tooltip="Preview template" data-tooltip-tone="view" aria-label="Preview template"
-                                onclick="event.stopPropagation(); openTemplatePreview({{ $tpl->id }})">
-                                <i class="fa-solid fa-eye"></i>
-                            </button>
-
-                            @if ($tpl->status === 'active')
-                            <button type="button"
-                                class="ui-action-btn ui-action-warning template-action-btn template-archive-btn"
-                                data-tooltip="Archive template" data-tooltip-tone="reschedule"
-                                aria-label="Archive template" data-template-action="archive"
-                                data-template-id="{{ $tpl->id }}"
-                                onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
-                                <i class="fa-solid fa-box-archive"></i>
-                            </button>
-                            @elseif($tpl->status === 'archived')
-                            <button type="button"
-                                class="ui-action-btn ui-action-success template-action-btn template-activate-btn"
-                                data-tooltip="Activate template" data-tooltip-tone="start"
-                                aria-label="Activate template" data-template-action="activate"
-                                data-template-id="{{ $tpl->id }}"
-                                onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
-                                <i class="fa-solid fa-circle-check"></i>
-                            </button>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </article>
-            @endforeach
-        </section>
-
-        <section id="templateClientEmpty" class="section-card template-empty-card template-client-empty" hidden>
-            <div class="empty-state">
-                <div class="empty-state-icon">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </div>
-                <h2 class="empty-state-title" id="templateEmptyTitle">No templates found</h2>
-                <p class="empty-state-sub" id="templateEmptySub">No templates match your current search or
-                    filters.</p>
-                <button type="button" id="clearTemplateFiltersBtn" class="empty-state-btn">
-                    <i class="fa-solid fa-rotate-left"></i>
-                    Clear search
-                </button>
-            </div>
-        </section>
-        @endif
     </div>
 </main>
+
+<x-filter-drawer id="templateFilterDrawer" title="Template Filters" close-id="closeTemplateFilterDrawer"
+    close-callback="closeTemplateFilterDrawer()" clear-id="clearTemplateFiltersDrawer" clear-label="Clear Filters"
+    cancel-id="cancelTemplateFilterDrawer" cancel-callback="closeTemplateFilterDrawer()" cancel-label="Cancel"
+    apply-id="applyTemplateFilters" apply-label="Show Results">
+
+    <div id="templateActiveFilters" class="filter-active-section hidden">
+        <div class="filter-active-header">
+
+            <span class="filter-active-title">
+                Active Filters
+            </span>
+
+            <button type="button" id="clearTemplateFilterChips"
+                class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>Clear All</span>
+            </button>
+
+        </div>
+
+        <div id="templateFilterChips" class="active-filters-container"></div>
+    </div>
+
+
+    <x-filter-group title="Category">
+
+        <div class="filter-chip-row">
+
+            <label class="choice-chip">
+                <input type="radio" name="template_filter_category" value="" class="filter-input radio-red chip-radio"
+                    checked>
+
+                <span>
+                    All Categories
+                </span>
+            </label>
+
+            <label class="choice-chip">
+                <input type="radio" name="template_filter_category" value="clearance"
+                    class="filter-input radio-red chip-radio">
+
+                <span>
+                    Clearance
+                </span>
+            </label>
+
+            <label class="choice-chip">
+                <input type="radio" name="template_filter_category" value="record"
+                    class="filter-input radio-red chip-radio">
+
+                <span>
+                    Record
+                </span>
+            </label>
+
+            <label class="choice-chip">
+                <input type="radio" name="template_filter_category" value="report"
+                    class="filter-input radio-red chip-radio">
+
+                <span>
+                    Report
+                </span>
+            </label>
+
+            <label class="choice-chip">
+                <input type="radio" name="template_filter_category" value="inventory"
+                    class="filter-input radio-red chip-radio">
+
+                <span>
+                    Inventory
+                </span>
+            </label>
+
+        </div>
+
+    </x-filter-group>
+
+
+    <x-filter-group title="Status" class="filter-group-last">
+
+        <div class="filter-chip-row">
+
+            <label class="choice-chip">
+                <input type="radio" name="template_filter_status" value="" class="filter-input radio-red chip-radio"
+                    checked>
+
+                <span>
+                    All Status
+                </span>
+            </label>
+
+            <label class="choice-chip">
+                <input type="radio" name="template_filter_status" value="active"
+                    class="filter-input radio-red chip-radio">
+
+                <span>
+                    Active
+                </span>
+            </label>
+
+            <label class="choice-chip">
+                <input type="radio" name="template_filter_status" value="archived"
+                    class="filter-input radio-red chip-radio">
+
+                <span>
+                    Archived
+                </span>
+            </label>
+
+        </div>
+
+    </x-filter-group>
+
+</x-filter-drawer>
 
 <div id="templatePreviewBackdrop" class="ui-modal modal-theme-primary" aria-hidden="true">
 
@@ -377,8 +446,8 @@
                 </div>
             </div>
 
-            <button type="button" class="modal-x" data-template-archive-close aria-label="Close archive modal">
-
+            <button type="button" class="modal-x" data-close-modal="templateArchiveModal"
+                aria-label="Close archive modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -409,16 +478,14 @@
         </div>
 
         <div class="modal-ft">
-            <button type="button" class="ui-btn ui-btn-secondary" data-template-archive-close>
-
+            <button type="button" class="ui-btn ui-btn-secondary" data-close-modal="templateArchiveModal">
                 <i class="fa-solid fa-arrow-left"></i>
                 <span>Keep</span>
             </button>
 
             <button type="button" class="ui-btn ui-btn-warning" id="confirmTemplateArchiveBtn">
-
                 <i class="fa-solid fa-box-archive"></i>
-                <span>Yes, Archive</span>
+                <span>Archive</span>
             </button>
         </div>
     </div>
@@ -501,7 +568,9 @@
     }
 
     function getStatusBadgeClass(status) {
-        return status === 'active' ? 'badge-active' : 'badge-archived';
+        return status === 'active' ?
+            'status-active' :
+            'status-archived';
     }
 
     function getStatusLabel(status) {
@@ -534,7 +603,7 @@
 
         actions.innerHTML = `
         <button type="button"
-            class="ui-action-btn ui-action-view template-action-btn"
+            class="ui-action-btn ui-action-view"
             data-tooltip="Preview template"
             data-tooltip-tone="view"
             aria-label="Preview template"
@@ -542,24 +611,24 @@
             <i class="fa-solid fa-eye"></i>
         </button>
         ${status === 'active' ? `
-                <button type="button"
-        class="ui-action-btn ui-action-warning template-action-btn template-archive-btn"
-        data-tooltip="Archive template"
-        data-tooltip-tone="reschedule"
-        aria-label="Archive template"
-                    data-template-action="archive" data-template-id="${id}"
-                    onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
-                    <i class="fa-solid fa-box-archive"></i>
-                </button>
-            ` : `
-                <button type="button"
-        class="ui-action-btn ui-action-success template-action-btn template-activate-btn"
-        data-tooltip="Activate template" data-tooltip-tone="start"
-        aria-label="Activate template" data-template-action="activate" data-template-id="${id}"
-        onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
-                    <i class="fa-solid fa-circle-check"></i>
-                </button>
-            `}
+                    <button type="button"
+            class="ui-action-btn ui-action-warning"
+            data-tooltip="Archive template"
+            data-tooltip-tone="reschedule"
+            aria-label="Archive template"
+                        data-template-action="archive" data-template-id="${id}"
+                        onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
+                        <i class="fa-solid fa-box-archive"></i>
+                    </button>
+                ` : `
+                    <button type="button"
+            class="ui-action-btn ui-action-success"
+            data-tooltip="Activate template" data-tooltip-tone="start"
+            aria-label="Activate template" data-template-action="activate" data-template-id="${id}"
+            onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </button>
+                `}
     `;
     }
 
@@ -654,10 +723,10 @@
 
             ${d.is_default
                 ? `
-                        <span class="status-badge">
-                            Default
-                        </span>
-                    `
+                            <span class="status-badge">
+                                Default
+                            </span>
+                        `
                 : ''
             }
         </div>
@@ -681,25 +750,25 @@
 
         ${d.status === 'active'
                 ? `
-                    <button type="button"
-                        class="ui-btn ui-btn-warning"
-                        data-template-action="archive"
-                        data-template-id="${d.id}">
+                        <button type="button"
+                            class="ui-btn ui-btn-warning"
+                            data-template-action="archive"
+                            data-template-id="${d.id}">
 
-                        <i class="fa-solid fa-box-archive"></i>
-                        <span>Archive</span>
-                    </button>
-                `
+                            <i class="fa-solid fa-box-archive"></i>
+                            <span>Archive</span>
+                        </button>
+                    `
                 : `
-                    <button type="button"
-                        class="ui-btn ui-btn-success"
-                        data-template-action="activate"
-                        data-template-id="${d.id}">
+                        <button type="button"
+                            class="ui-btn ui-btn-success"
+                            data-template-action="activate"
+                            data-template-id="${d.id}">
 
-                        <i class="fa-solid fa-circle-check"></i>
-                        <span>Activate</span>
-                    </button>
-                `
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>Activate</span>
+                        </button>
+                    `
             }
     `;
     }
@@ -752,76 +821,198 @@
         }
     }
 
-    function hasActiveTemplateFilters() {
-        const q = (document.getElementById('templateSearch')?.value || '').trim();
-        const activeCategory = document.querySelector('.tab-btn[data-filter-type="category"].active')?.dataset.filter ||
-            '';
-        const activeStatus = document.querySelector('.tab-btn[data-filter-type="status"].active')?.dataset.filter || '';
-        return Boolean(q || activeCategory || activeStatus);
+    let appliedTemplateCategory = '';
+    let appliedTemplateStatus = '';
+    let templatePageLoading = false;
+    let templateSearchTimer = null;
+
+    let templatePerPage =
+        Number(
+            document
+                .getElementById(
+                    'templatePagebar'
+                )
+                ?.dataset
+                .perPage
+        ) || 10;
+
+    function getTemplateFilterCount() {
+        return (
+            (appliedTemplateCategory ? 1 : 0) +
+            (appliedTemplateStatus ? 1 : 0)
+        );
     }
 
-    function filterTemplateCards() {
-        const q = (document.getElementById('templateSearch')?.value || '').trim().toLowerCase();
-        const activeCategory = document.querySelector('.tab-btn[data-filter-type="category"].active')?.dataset.filter ||
-            '';
-        const activeStatus = document.querySelector('.tab-btn[data-filter-type="status"].active')?.dataset.filter || '';
-        const grid = document.getElementById('templatesGrid');
-        const cards = document.querySelectorAll('.template-card');
-        const empty = document.getElementById('templateClientEmpty');
-        const title = document.getElementById('templateEmptyTitle');
-        const sub = document.getElementById('templateEmptySub');
-        const clearBtn = document.getElementById('clearTemplateFiltersBtn');
+    function getTemplatePreviewFilters() {
+        const category =
+            document.querySelector(
+                'input[name="template_filter_category"]:checked'
+            )?.value || '';
 
-        let visible = 0;
+        const status =
+            document.querySelector(
+                'input[name="template_filter_status"]:checked'
+            )?.value || '';
 
-        cards.forEach(card => {
-            const haystack = `${card.dataset.name || ''} ${card.dataset.type || ''}`;
-            const matchSearch = !q || haystack.includes(q);
-            const matchCategory = !activeCategory || card.dataset.category === activeCategory;
-            const matchStatus = !activeStatus || card.dataset.status === activeStatus;
-            const show = matchSearch && matchCategory && matchStatus;
+        return {
+            category,
+            status,
+        };
+    }
 
-            card.hidden = !show;
-            if (show) visible++;
-        });
+    function syncTemplateFilterRadios() {
+        document
+            .querySelectorAll(
+                'input[name="template_filter_category"]'
+            )
+            .forEach(radio => {
+                radio.checked =
+                    radio.value ===
+                    appliedTemplateCategory;
+            });
 
-        if (grid) grid.hidden = visible === 0;
-        if (empty) empty.hidden = visible !== 0;
+        document
+            .querySelectorAll(
+                'input[name="template_filter_status"]'
+            )
+            .forEach(radio => {
+                radio.checked =
+                    radio.value ===
+                    appliedTemplateStatus;
+            });
+    }
 
-        if (visible === 0 && title && sub && clearBtn) {
-            if (q) {
-                title.textContent = `No results found for “${document.getElementById('templateSearch').value.trim()}”`;
-                sub.textContent = 'Clear your search or adjust the template filters.';
-                clearBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> Clear search';
-            } else if (hasActiveTemplateFilters()) {
-                title.textContent = 'No templates match your filter';
-                sub.textContent = 'Clear the selected filter to show all available templates.';
-                clearBtn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> Clear filters';
-            } else {
-                title.textContent = 'No templates available';
-                sub.textContent = 'No default document templates are currently available.';
-                clearBtn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> Refresh list';
-            }
+    function renderTemplateFilterChips() {
+        const section =
+            document.getElementById(
+                'templateActiveFilters'
+            );
+
+        const host =
+            document.getElementById(
+                'templateFilterChips'
+            );
+
+        if (!section || !host) {
+            return;
         }
-    }
 
-    function clearTemplateFilters() {
-        const searchInput = document.getElementById('templateSearch');
-        if (searchInput) {
-            searchInput.value = '';
-            searchInput.dispatchEvent(new Event('input', {
-                bubbles: true
-            }));
+        const chips = [];
+
+        if (appliedTemplateCategory) {
+            chips.push({
+                key: 'category',
+                label: appliedTemplateCategory
+                    .charAt(0)
+                    .toUpperCase() +
+                    appliedTemplateCategory.slice(1),
+            });
         }
 
-        ['category', 'status'].forEach(type => {
-            const tabs = document.querySelectorAll(`.tab-btn[data-filter-type="${type}"]`);
-            tabs.forEach((tab, index) => tab.classList.toggle('active', index === 0));
-        });
+        if (appliedTemplateStatus) {
+            chips.push({
+                key: 'status',
+                label: appliedTemplateStatus
+                    .charAt(0)
+                    .toUpperCase() +
+                    appliedTemplateStatus.slice(1),
+            });
+        }
 
-        filterTemplateCards();
-        searchInput?.focus();
+        section.classList.toggle(
+            'hidden',
+            chips.length === 0
+        );
+
+        host.innerHTML = chips
+            .map(chip => `
+            <span class="filter-chip">
+                <span>
+                    ${templateEscapeHtml(chip.label)}
+                </span>
+
+                <button
+                    type="button"
+                    class="filter-chip-remove"
+                    data-template-filter-remove="${chip.key}"
+                    aria-label="Remove ${chip.label} filter"
+                >
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </span>
+        `)
+            .join('');
     }
+
+    function updateTemplateFilterUi() {
+        const count =
+            getTemplateFilterCount();
+
+        const badge =
+            document.getElementById(
+                'templateFilterBadge'
+            );
+
+        const filterButton =
+            document.getElementById(
+                'templateFilterBtn'
+            );
+
+        const resetButton =
+            document.getElementById(
+                'templateFilterResetBtn'
+            );
+
+        if (badge) {
+            badge.textContent = count;
+
+            badge.classList.toggle(
+                'show',
+                count > 0
+            );
+        }
+
+        filterButton?.classList.toggle(
+            'has-filters',
+            count > 0
+        );
+
+        resetButton?.classList.toggle(
+            'hidden',
+            count === 0
+        );
+
+        renderTemplateFilterChips();
+    }
+
+    window.openTemplateFilterDrawer =
+        function () {
+            syncTemplateFilterRadios();
+
+            window.openFilterDrawer?.(
+                'templateFilterDrawer'
+            );
+        };
+
+    window.closeTemplateFilterDrawer =
+        function () {
+            window.closeFilterDrawer?.(
+                'templateFilterDrawer'
+            );
+        };
+
+    function resetTemplateFilters() {
+        appliedTemplateCategory = '';
+        appliedTemplateStatus = '';
+
+        syncTemplateFilterRadios();
+        updateTemplateFilterUi();
+
+        loadTemplatePage(1);
+    }
+
+    window.resetTemplateFilters =
+        resetTemplateFilters;
 
     function openTemplateArchiveModal(actionData) {
         pendingTemplateAction = actionData;
@@ -881,11 +1072,25 @@
                 throw new Error(payload.message || 'Unable to update template.');
             }
 
-            applyTemplateStatus(actionData.id, {
-                ...payload,
-                action: actionData.action
-            });
+            updateStats(
+                payload.stats || {}
+            );
+
             closeTemplateArchiveModal();
+
+            const currentPage =
+                Number(
+                    document
+                        .getElementById(
+                            'templatePagebar'
+                        )
+                        ?.dataset
+                        .currentPage
+                ) || 1;
+
+            await loadTemplatePage(
+                currentPage
+            );
 
             window.showToast?.({
                 type: actionData.action === 'archive' ? 'warning' : 'success',
@@ -931,191 +1136,451 @@
         submitTemplateAction(actionData);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        const searchInput = document.getElementById('templateSearch');
-        const clearBtn = document.getElementById('templateSearchClear');
-        const micBtn = document.getElementById('templateMicToggleBtn');
-        const status = document.getElementById('templateVoiceStatus');
+    function renderTemplateEmptyState() {
+        const host =
+            document.getElementById(
+                'templateBaseEmptyState'
+            );
 
-        document.querySelectorAll('.tab-btn[data-filter-type]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const type = btn.dataset.filterType;
-                document.querySelectorAll(`.tab-btn[data-filter-type="${type}"]`).forEach(b => b
-                    .classList.remove('active'));
-                btn.classList.add('active');
-                filterTemplateCards();
-            });
-        });
-
-        searchInput?.addEventListener('input', filterTemplateCards);
-        clearBtn?.addEventListener('click', clearTemplateFilters);
-        document.getElementById('clearTemplateFiltersBtn')?.addEventListener('click', clearTemplateFilters);
-
-        document.querySelectorAll('[data-template-archive-close]').forEach(button => {
-            button.addEventListener('click', closeTemplateArchiveModal);
-        });
-
-        document.getElementById('confirmTemplateArchiveBtn')?.addEventListener('click', () => {
-            if (pendingTemplateAction) submitTemplateAction(pendingTemplateAction);
-        });
-
-        if (searchInput && clearBtn && micBtn && status && SpeechRecognition) {
-            let listening = false;
-            let manualStop = false;
-            let recognition = null;
-
-            const setStatus = (text, state) => {
-                status.textContent = text;
-                status.className = 'voice-status';
-                if (state) status.classList.add(`is-${state}`);
-                status.classList.remove('hidden');
-            };
-
-            const hideStatus = (delay = 0) => {
-                window.setTimeout(() => status.classList.add('hidden'), delay);
-            };
-
-            const setMicState = (isActive) => {
-                micBtn.classList.toggle('mic-active', isActive);
-                micBtn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-                micBtn.innerHTML = isActive ?
-                    '<i class="fa-solid fa-stop"></i>' :
-                    '<i class="fa-solid fa-microphone"></i>';
-            };
-
-            const stopListeningNow = () => {
-                manualStop = true;
-                listening = false;
-                setMicState(false);
-                setStatus('Voice input stopped.', 'success');
-                hideStatus(1200);
-
-                if (recognition) {
-                    try {
-                        recognition.abort();
-                    } catch (error) {
-                        try {
-                            recognition.stop();
-                        } catch (err) { }
-                    }
-                }
-            };
-
-            const createRecognition = () => {
-                const r = new SpeechRecognition();
-                r.lang = 'en-US';
-                r.continuous = false;
-                r.interimResults = true;
-                r.maxAlternatives = 1;
-
-                let sawSpeech = false;
-                let timeoutId = null;
-                const LISTEN_TIMEOUT = 6000;
-                const clearTimeout_ = () => {
-                    if (timeoutId) {
-                        clearTimeout(timeoutId);
-                        timeoutId = null;
-                    }
-                };
-
-                r.onstart = () => {
-                    timeoutId = window.setTimeout(() => {
-                        if (listening && !sawSpeech) r.stop();
-                    }, LISTEN_TIMEOUT);
-                };
-
-                r.onspeechend = () => {
-                    clearTimeout_();
-                    try {
-                        r.stop();
-                    } catch (error) { }
-                };
-
-                r.onresult = (event) => {
-                    let transcript = '';
-
-                    for (let i = event.resultIndex; i < event.results.length; i++) {
-                        const result = event.results[i];
-                        const chunk = result?.[0]?.transcript?.trim() || '';
-                        if (!chunk) continue;
-
-                        sawSpeech = true;
-                        transcript = result.isFinal ? `${transcript} ${chunk}`.trim() : (transcript ||
-                            chunk);
-                    }
-
-                    transcript = transcript.trim();
-                    if (transcript) {
-                        clearTimeout_();
-                        searchInput.value = transcript;
-                        searchInput.dispatchEvent(new Event('input', {
-                            bubbles: true
-                        }));
-                        setStatus('Listening...', 'listening');
-                    }
-                };
-
-                r.onerror = () => {
-                    clearTimeout_();
-                    listening = false;
-                    if (manualStop) {
-                        manualStop = false;
-                        return;
-                    }
-                    setMicState(false);
-                    setStatus("Didn't catch that. Try again.", 'error');
-                    hideStatus(2500);
-                };
-
-                r.onend = () => {
-                    clearTimeout_();
-                    if (manualStop) {
-                        manualStop = false;
-                        listening = false;
-                        setMicState(false);
-                        return;
-                    }
-
-                    const hadSpeech = sawSpeech || !!searchInput.value.trim();
-                    listening = false;
-                    setMicState(false);
-                    setStatus(hadSpeech ? 'Voice captured.' : "Didn't catch that. Try again.",
-                        hadSpeech ? 'success' : 'error');
-                    hideStatus(hadSpeech ? 2200 : 2500);
-                };
-
-                return r;
-            };
-
-            micBtn.addEventListener('click', () => {
-                if (listening && recognition) {
-                    stopListeningNow();
-                    return;
-                }
-
-                recognition = createRecognition();
-
-                try {
-                    recognition.start();
-                } catch (error) {
-                    setStatus('Unable to start voice input.', 'error');
-                    hideStatus(2500);
-                    setMicState(false);
-                    listening = false;
-                    return;
-                }
-
-                listening = true;
-                setMicState(true);
-                setStatus('Listening...', 'listening');
-            });
-        } else if (micBtn && !SpeechRecognition) {
-            micBtn.disabled = true;
-            micBtn.setAttribute('aria-disabled', 'true');
+        if (!host) {
+            return;
         }
 
+        const searchInput =
+            document.getElementById(
+                'templateSearch'
+            );
+
+        const query =
+            String(
+                searchInput?.value || ''
+            ).trim();
+
+
+        if (query) {
+            window.EmptyState?.renderSearch({
+                host:
+                    '#templateBaseEmptyState',
+
+                input:
+                    '#templateSearch',
+
+                query,
+
+                message:
+                    'Try a different template name or clear your search.',
+            });
+
+            return;
+        }
+
+
+        if (
+            appliedTemplateCategory ||
+            appliedTemplateStatus
+        ) {
+            window.EmptyState?.render({
+                host:
+                    '#templateBaseEmptyState',
+
+                icon:
+                    'fa-sliders',
+
+                title:
+                    'No templates match your filters',
+
+                message:
+                    'Try another category or status.',
+
+                actionHtml: `
+                <button
+                    type="button"
+                    class="empty-state-btn"
+                    onclick="resetTemplateFilters()"
+                >
+                    <i class="fa-solid fa-rotate-left"></i>
+                    Clear filters
+                </button>
+            `,
+            });
+
+            return;
+        }
+
+
+        window.EmptyState?.render({
+            host:
+                '#templateBaseEmptyState',
+
+            icon:
+                'fa-file-circle-xmark',
+
+            title:
+                'No templates available',
+
+            message:
+                'No default document templates are currently available.',
+        });
+    }
+
+    function renderTemplatePagination() {
+        const pagebar =
+            document.getElementById(
+                'templatePagebar'
+            );
+
+        const info =
+            document.getElementById(
+                'templatePageInfo'
+            );
+
+        const pagination =
+            document.getElementById(
+                'templatePagination'
+            );
+
+        if (
+            !pagebar ||
+            !info ||
+            !pagination
+        ) {
+            return;
+        }
+
+
+        window.renderGlobalPagination?.({
+            currentPage:
+                Number(
+                    pagebar.dataset.currentPage
+                ) || 1,
+
+            lastPage:
+                Number(
+                    pagebar.dataset.lastPage
+                ) || 1,
+
+            total:
+                Number(
+                    pagebar.dataset.total
+                ) || 0,
+
+            from:
+                Number(
+                    pagebar.dataset.from
+                ) || 0,
+
+            to:
+                Number(
+                    pagebar.dataset.to
+                ) || 0,
+
+            containers: [
+                pagination
+            ],
+
+            infoElements: [
+                info
+            ],
+
+            bars: [
+                pagebar
+            ],
+
+            itemLabel:
+                'templates',
+
+            onPageChange:
+                loadTemplatePage,
+        });
+    }
+
+    async function loadTemplatePage(
+        page = 1
+    ) {
+        if (templatePageLoading) {
+            return;
+        }
+
+        templatePageLoading = true;
+
+        const searchInput =
+            document.getElementById(
+                'templateSearch'
+            );
+
+        const pagebar =
+            document.getElementById(
+                'templatePagebar'
+            );
+
+        const url =
+            new URL(
+                window.location.href
+            );
+
+
+        url.searchParams.set(
+            'page',
+            String(page)
+        );
+
+        url.searchParams.set(
+            'per_page',
+            String(templatePerPage)
+        );
+
+
+        const searchValue =
+            String(
+                searchInput?.value || ''
+            ).trim();
+
+
+        if (searchValue) {
+            url.searchParams.set(
+                'search',
+                searchValue
+            );
+        } else {
+            url.searchParams.delete(
+                'search'
+            );
+        }
+
+
+        if (appliedTemplateCategory) {
+            url.searchParams.set(
+                'category',
+                appliedTemplateCategory
+            );
+        } else {
+            url.searchParams.delete(
+                'category'
+            );
+        }
+
+
+        if (appliedTemplateStatus) {
+            url.searchParams.set(
+                'status',
+                appliedTemplateStatus
+            );
+        } else {
+            url.searchParams.delete(
+                'status'
+            );
+        }
+
+
+        try {
+            pagebar?.classList.add(
+                'is-loading'
+            );
+
+
+            const response =
+                await fetch(
+                    url.toString(),
+                    {
+                        headers: {
+                            Accept:
+                                'application/json',
+
+                            'X-Requested-With':
+                                'XMLHttpRequest',
+                        },
+
+                        credentials:
+                            'same-origin',
+                    }
+                );
+
+
+            if (!response.ok) {
+                throw new Error(
+                    'Unable to load document templates.'
+                );
+            }
+
+
+            const payload =
+                await response.json();
+
+
+            if (
+                !payload.success ||
+                !payload.results_html
+            ) {
+                throw new Error(
+                    'Invalid document template response.'
+                );
+            }
+
+
+            const parsed =
+                new DOMParser()
+                    .parseFromString(
+                        payload.results_html,
+                        'text/html'
+                    );
+
+
+            const newRegion =
+                parsed.getElementById(
+                    'templateResultsRegion'
+                );
+
+            const currentRegion =
+                document.getElementById(
+                    'templateResultsRegion'
+                );
+
+
+            if (
+                !newRegion ||
+                !currentRegion
+            ) {
+                throw new Error(
+                    'Unable to update document template results.'
+                );
+            }
+
+
+            currentRegion.innerHTML =
+                newRegion.innerHTML;
+
+
+            const pagination =
+                payload.pagination || {};
+
+
+            if (pagebar) {
+                pagebar.dataset.currentPage =
+                    String(
+                        pagination.current_page
+                        ?? 1
+                    );
+
+                pagebar.dataset.lastPage =
+                    String(
+                        pagination.last_page
+                        ?? 1
+                    );
+
+                pagebar.dataset.total =
+                    String(
+                        pagination.total
+                        ?? 0
+                    );
+
+                pagebar.dataset.from =
+                    String(
+                        pagination.from
+                        ?? 0
+                    );
+
+                pagebar.dataset.to =
+                    String(
+                        pagination.to
+                        ?? 0
+                    );
+
+                pagebar.dataset.perPage =
+                    String(
+                        pagination.per_page
+                        ?? templatePerPage
+                    );
+            }
+
+
+            if (payload.stats) {
+                updateStats(
+                    payload.stats
+                );
+            }
+
+
+            window.history.replaceState(
+                {},
+                '',
+                url.toString()
+            );
+
+            renderTemplateEmptyState();
+            renderTemplatePagination();
+
+
+        } catch (error) {
+            window.showToast?.({
+                type: 'error',
+
+                title:
+                    'Unable to load templates',
+
+                message:
+                    error.message ||
+                    'Please try again.',
+
+                duration: 4500,
+            });
+        } finally {
+            templatePageLoading =
+                false;
+
+            pagebar?.classList.remove(
+                'is-loading'
+            );
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+
         document.getElementById('closeTemplatePreview')?.addEventListener('click', closePreviewModal);
+
+        const templateSearch =
+            document.getElementById(
+                'templateSearch'
+            );
+
+        templateSearch
+            ?.addEventListener(
+                'input',
+                () => {
+                    clearTimeout(
+                        templateSearchTimer
+                    );
+
+                    templateSearchTimer =
+                        window.setTimeout(
+                            () => {
+                                loadTemplatePage(1);
+                            },
+                            300
+                        );
+                }
+            );
+
+        document
+            .getElementById(
+                'templatePageSize'
+            )
+            ?.addEventListener(
+                'change',
+                event => {
+                    const value =
+                        Number(
+                            event.target.value
+                        );
+
+                    templatePerPage =
+                        [10, 20, 50, 100]
+                            .includes(value)
+                            ? value
+                            : 10;
+
+                    loadTemplatePage(1);
+                }
+            );
 
         document.addEventListener('keydown', function (event) {
             if (event.key !== 'Escape') return;
@@ -1136,8 +1601,6 @@
             }
         });
 
-        filterTemplateCards();
-
         document
             .getElementById('templatePreviewFooter')
             ?.addEventListener('click', function (event) {
@@ -1150,6 +1613,91 @@
 
                 window.handleTemplateActionClick(actionButton);
             });
+
+        document
+            .getElementById(
+                'applyTemplateFilters'
+            )
+            ?.addEventListener(
+                'click',
+                () => {
+                    const preview =
+                        getTemplatePreviewFilters();
+
+                    appliedTemplateCategory =
+                        preview.category;
+
+                    appliedTemplateStatus =
+                        preview.status;
+
+                    updateTemplateFilterUi();
+
+                    window
+                        .closeTemplateFilterDrawer
+                        ?.();
+
+                    loadTemplatePage(1);
+                }
+            );
+
+        document
+            .getElementById(
+                'clearTemplateFiltersDrawer'
+            )
+            ?.addEventListener(
+                'click',
+                () => {
+                    resetTemplateFilters();
+                    syncTemplateFilterRadios();
+                }
+            );
+
+        document
+            .getElementById(
+                'clearTemplateFilterChips'
+            )
+            ?.addEventListener(
+                'click',
+                resetTemplateFilters
+            );
+
+        document
+            .getElementById(
+                'templateFilterChips'
+            )
+            ?.addEventListener(
+                'click',
+                event => {
+                    const button =
+                        event.target.closest(
+                            '[data-template-filter-remove]'
+                        );
+
+                    if (!button) {
+                        return;
+                    }
+
+                    const key =
+                        button.dataset
+                            .templateFilterRemove;
+
+                    if (key === 'category') {
+                        appliedTemplateCategory = '';
+                    }
+
+                    if (key === 'status') {
+                        appliedTemplateStatus = '';
+                    }
+
+                    syncTemplateFilterRadios();
+                    updateTemplateFilterUi();
+
+                    loadTemplatePage(1);
+                }
+            );
+        renderTemplateEmptyState();
+        updateTemplateFilterUi();
+        renderTemplatePagination();
     });
 </script>
 @endsection

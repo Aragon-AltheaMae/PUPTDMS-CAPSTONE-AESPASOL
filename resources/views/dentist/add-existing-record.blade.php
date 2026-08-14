@@ -5,89 +5,511 @@
 @section('title', 'Add Existing Record')
 
 @section('content')
-<main id="mainContent" class="dentist-page-shell existing-record-page">
-    <div class="w-full animate-fade-up pt-6">
-        <div class="flex items-center justify-between mb-4">
-            <h1 class="existing-record-title text-2xl sm:text-3xl font-extrabold text-[#660000]">
-                <i class="fa-solid fa-folder-open mr-2 text-[#8B0000]"></i>
-                Add Existing Record
-            </h1>
-            <span class="existing-record-chip text-xs text-[#9e9690] font-semibold bg-white border border-[#e8e2dd] px-3 py-1.5 rounded-full shadow-sm">
-                Select a patient to import a paper record
-            </span>
+<main id="mainContent" class="dentist-page-shell existing-record-page page-enter">
+    <div class="w-full">
+        <div class="dentist-hero page-title-row mb-6">
+            <div class="dentist-hero-content">
+
+                <div class="dentist-hero-icon">
+                    <i class="fa-solid fa-folder-open"></i>
+                </div>
+
+                <div class="min-w-0">
+
+                    <div class="dentist-hero-eyebrow">
+                        <i class="fa-solid fa-tooth"></i>
+                        Existing Records
+                    </div>
+
+                    <h2 class="dentist-hero-title">
+                        Add Existing Record
+                    </h2>
+
+                </div>
+
+            </div>
         </div>
 
-        <div class="section-card existing-record-search-card mb-6">
-            <div class="relative">
-                <i class="fa-solid fa-magnifying-glass existing-record-search-icon absolute left-4 top-1/2 -translate-y-1/2 text-[#9e9690] text-sm"></i>
-                <input type="text" id="patientSearchInput"
-                    class="existing-record-search-input w-full border border-[#e8e2dd] rounded-xl bg-white outline-none pl-10 pr-10 py-3 text-sm"
-                    placeholder="Search by name, ID, email, or program..."
-                    autocomplete="off">
-                <button type="button" id="clearSearch" class="existing-record-clear-btn absolute right-3 top-1/2 -translate-y-1/2 text-[#9e9690] hover:text-[#8B0000] hidden">
-                    <i class="fa-solid fa-circle-xmark text-lg"></i>
+        <div class="existing-record-directory mb-5">
+            <div class="existing-record-directory-copy">
+                <div class="global-icon-box global-icon-box-sm">
+                    <i class="fa-solid fa-database"></i>
+                </div>
+
+                <div>
+                    <p class="existing-record-directory-subtitle">
+                        Select a patient from student,
+                        faculty, or administrative records
+                        to encode an existing appointment.
+                    </p>
+                </div>
+            </div>
+
+            <div class="existing-record-role-filters" aria-label="Filter patients by role">
+                <button type="button" class="existing-record-role-filter is-active" data-patient-role-filter="">
+                    All
+                </button>
+
+                <button type="button" class="existing-record-role-filter" data-patient-role-filter="patient">
+                    Patient
+                </button>
+
+                <button type="button" class="existing-record-role-filter" data-patient-role-filter="faculty">
+                    Faculty
+                </button>
+
+                <button type="button" class="existing-record-role-filter" data-patient-role-filter="admin">
+                    Administrative
                 </button>
             </div>
         </div>
 
-        <div id="patientGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            @forelse($patients as $patient)
-            <div class="patient-select-card" data-name="{{ strtolower($patient->name) }}" data-email="{{ strtolower($patient->email) }}" data-student="{{ strtolower($patient->student_no ?? '') }}" data-program="{{ strtolower($patient->course_name ?? '') }}">
-                <div class="patient-select-card-body">
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1 min-w-0">
-                            <p class="patient-select-name">{{ $patient->name }}</p>
-                            <p class="patient-select-meta">{{ $patient->email }}</p>
-                        </div>
-                        <span class="patient-select-badge">{{ $patient->student_no ?: ($patient->gender ?? 'Patient') }}</span>
-                    </div>
-                    <div class="patient-select-details">
-                        @if($patient->course_name)
-                        <span class="patient-select-tag"><i class="fa-solid fa-graduation-cap text-[10px] mr-1"></i>{{ $patient->course_name }}</span>
-                        @endif
-                        @if($patient->year_level)
-                        <span class="patient-select-tag"><i class="fa-solid fa-layer-group text-[10px] mr-1"></i>Year {{ $patient->year_level }}</span>
-                        @endif
-                        @if($patient->section)
-                        <span class="patient-select-tag"><i class="fa-solid fa-users text-[10px] mr-1"></i>Section {{ $patient->section }}</span>
-                        @endif
-                    </div>
-                </div>
-                <div class="patient-select-actions">
-                    <a href="{{ route('dentist.odontogram.historical.create', ['patient' => $patient->id]) }}" class="select-patient-btn">
-                        <i class="fa-solid fa-arrow-right"></i>
-                        Continue
-                    </a>
-                </div>
-            </div>
-            @empty
-            <div class="col-span-full empty-state py-12">
-                <i class="fa-solid fa-folder-open text-4xl text-[#e8e2dd] mb-3"></i>
-                <p class="text-sm text-[#9e9690]">No patients recorded yet.</p>
-            </div>
-            @endforelse
-        </div>
+        <x-search-bar id="patientSearchInput" placeholder="Search by name, ID, email, or program..."
+            callback="handleExistingRecordSearch" :debounce="250" clear-label="Clear patient search" class="mb-6" />
 
-        <div id="noResults" class="hidden empty-state py-12" hidden>
-            <i class="fa-solid fa-magnifying-glass text-3xl text-[#e8e2dd] mb-3"></i>
-            <p class="text-sm text-[#9e9690]">No matching patients found.</p>
-        </div>
+        <x-pagination-bar id="existingRecordPaginationTopBar" info-id="existingRecordPageInfoTop"
+            pagination-id="existingRecordPaginationTop" position="top" :show-entries="true"
+            page-size-id="existingRecordPerPage" page-size-callback="handleExistingRecordPerPageChange"
+            label="patient records" />
+
+        <div id="patientGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-5 mb-5"
+            aria-live="polite"></div>
+
+        <x-pagination-bar id="existingRecordPaginationBottomBar" info-id="existingRecordPageInfoBottom"
+            pagination-id="existingRecordPaginationBottom" position="bottom" label="patient records" hidden />
+
+        <div id="existingRecordEmptyState" class="empty-state-host"></div>
     </div>
 </main>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const input = document.getElementById('patientSearchInput');
-    const clearBtn = document.getElementById('clearSearch');
-    const patientGrid = document.getElementById('patientGrid');
-    const initialMarkup = patientGrid ? patientGrid.innerHTML : '';
-    const initialCards = patientGrid ? Array.from(patientGrid.querySelectorAll('.patient-select-card')) : [];
-    const noResults = document.getElementById('noResults');
-    const searchEndpoint = @json(route('dentist.walk-in.search-patient'));
-    const recordUrlTemplate = @json(route('dentist.odontogram.historical.create', ['patient' => '__PATIENT__']));
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.getElementById('patientSearchInput');
+        const patientGrid = document.getElementById('patientGrid');
+        const searchEndpoint = @json(route('dentist.walk-in.search-patient'));
+        const recordUrlTemplate = @json(route('dentist.odontogram.existing-appointment.create', ['patient' => '__PATIENT__']));
+
     let activeRequestId = 0;
-    let searchTimer = null;
-    let latestAllPatients = null;
+    let patientCurrentPage = 1;
+    let patientPageSize = 10;
+    let patientPaginationMeta = {
+        currentPage: 1,
+        lastPage: 1,
+        total: 0,
+        from: null,
+        to: null,
+    };
+    
+    renderPatientPagination();
+    window.handleExistingRecordSearch =
+        function (value) {
+            patientCurrentPage = 1;
+
+            const query =
+                String(value || '')
+                    .trim();
+
+            loadPatients(
+                query,
+                query === ''
+            );
+        };
+
+    function buildPatientSkeletons(
+        count = patientPageSize
+    ) {
+        const skeletonCount =
+            Math.min(
+                Math.max(
+                    Number(count) || 10,
+                    4
+                ),
+                12
+            );
+
+        return Array
+            .from(
+                { length: skeletonCount },
+                () => `
+                <div
+                    class="
+                        skeleton-shell
+                        p-4
+                        min-h-[170px]
+                    "
+                    aria-hidden="true"
+                >
+                    <div
+                        class="
+                            flex
+                            items-start
+                            gap-3
+                        "
+                    >
+                        <div
+                            class="
+                                skeleton-circle
+                                w-11
+                                h-11
+                                flex-shrink-0
+                            "
+                        ></div>
+
+                        <div
+                            class="
+                                flex-1
+                                min-w-0
+                            "
+                        >
+                            <div
+                                class="
+                                    skeleton-line
+                                    h-4
+                                    w-3/5
+                                    mb-3
+                                "
+                            ></div>
+
+                            <div
+                                class="
+                                    skeleton-line
+                                    h-3
+                                    w-4/5
+                                    mb-2
+                                "
+                            ></div>
+
+                            <div
+                                class="
+                                    skeleton-pill
+                                    h-6
+                                    w-20
+                                "
+                            ></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5">
+                        <div
+                            class="
+                                skeleton-line
+                                h-3
+                                w-2/3
+                                mb-2
+                            "
+                        ></div>
+
+                        <div
+                            class="
+                                skeleton-block
+                                h-9
+                                w-full
+                                mt-4
+                            "
+                        ></div>
+                    </div>
+                </div>
+            `
+            )
+            .join('');
+    }
+
+    function renderPatientSkeletons() {
+        window.EmptyState?.hide(
+            '#existingRecordEmptyState'
+        );
+
+        patientGrid.innerHTML =
+            buildPatientSkeletons();
+    }
+
+    const roleFilterButtons =
+        document.querySelectorAll(
+            '[data-patient-role-filter]'
+        );
+
+    let activeRoleFilter = '';
+
+    roleFilterButtons.forEach(
+        button => {
+            button.addEventListener(
+                'click',
+                () => {
+                    activeRoleFilter =
+                        button.dataset
+                            .patientRoleFilter ||
+                        '';
+
+                    roleFilterButtons
+                        .forEach(item => {
+                            item.classList.toggle(
+                                'is-active',
+                                item === button
+                            );
+                        });
+
+                    patientCurrentPage = 1;
+
+                    const query =
+                        input.value.trim();
+
+                    loadPatients(
+                        query,
+                        query === ''
+                    );
+                }
+            );
+        }
+    );
+
+    async function loadPatients(query = '', showAll = false, options = {}) {
+        if (!patientGrid) return;
+
+        const showLoading = options.showLoading !== false;
+        const requestId = ++activeRequestId;
+        const params = new URLSearchParams();
+
+        if (query) {
+            params.set('q', query);
+        }
+
+        if (showAll) {
+            params.set('show_all', '1');
+        }
+
+        if (activeRoleFilter) {
+            params.set(
+                'role',
+                activeRoleFilter
+            );
+        }
+
+        params.set(
+            'page',
+            String(patientCurrentPage)
+        );
+
+        params.set(
+            'per_page',
+            String(patientPageSize)
+        );
+
+        if (showLoading) {
+            renderPatientSkeletons();
+        }
+
+        try {
+            const response = await fetch(`${searchEndpoint}?${params.toString()}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Search failed with status ${response.status}`);
+            }
+
+            const result = await response.json();
+
+            if (requestId !== activeRequestId) {
+                return;
+            }
+
+            const normalizedPatients = Array.isArray(result)
+                ? result
+                : Array.isArray(result.data)
+                    ? result.data
+                    : [];
+
+            patientPaginationMeta = {
+                currentPage:
+                    Number(
+                        result.current_page
+                    ) || 1,
+
+                lastPage:
+                    Number(
+                        result.last_page
+                    ) || 1,
+
+                total:
+                    Number(
+                        result.total
+                    ) || normalizedPatients.length,
+
+                from:
+                    result.from ?? (
+                        normalizedPatients.length
+                            ? (
+                                (
+                                    Number(
+                                        result.current_page ||
+                                        patientCurrentPage
+                                    ) - 1
+                                ) *
+                                patientPageSize
+                            ) + 1
+                            : null
+                    ),
+
+                to:
+                    result.to ?? (
+                        normalizedPatients.length
+                            ? (
+                                (
+                                    Number(
+                                        result.current_page ||
+                                        patientCurrentPage
+                                    ) - 1
+                                ) *
+                                patientPageSize
+                            ) +
+                            normalizedPatients.length
+                            : null
+                    ),
+            };
+
+            patientCurrentPage =
+                patientPaginationMeta.currentPage;
+
+            renderPatients(normalizedPatients);
+            renderPatientPagination();
+
+        } catch (error) {
+            if (
+                requestId !==
+                activeRequestId
+            ) {
+                return;
+            }
+
+            console.error(error);
+
+            patientGrid.innerHTML = '';
+
+            window.EmptyState?.render({
+                host:
+                    '#existingRecordEmptyState',
+
+                icon:
+                    'fa-triangle-exclamation',
+
+                title:
+                    'Unable to load patient records',
+
+                message:
+                    'Patient records could not be loaded right now. Please try again.',
+            });
+        }
+    }
+
+    function renderPatientPagination() {
+        const top =
+            document.getElementById(
+                'existingRecordPaginationTop'
+            );
+
+        const bottom =
+            document.getElementById(
+                'existingRecordPaginationBottom'
+            );
+
+        const topBar =
+            document.getElementById(
+                'existingRecordPaginationTopBar'
+            );
+
+        const bottomBar =
+            document.getElementById(
+                'existingRecordPaginationBottomBar'
+            );
+
+        const topInfo =
+            document.getElementById(
+                'existingRecordPageInfoTop'
+            );
+
+        const bottomInfo =
+            document.getElementById(
+                'existingRecordPageInfoBottom'
+            );
+
+        window.renderGlobalPagination?.({
+            ...patientPaginationMeta,
+
+            containers: [
+                top,
+                bottom,
+            ],
+
+            bars: [
+                topBar,
+                bottomBar,
+            ],
+
+            infoElements: [
+                topInfo,
+                bottomInfo,
+            ],
+
+            itemLabel:
+                'patient records',
+
+            onPageChange(page) {
+                patientCurrentPage =
+                    page;
+
+                const query =
+                    input.value.trim();
+
+                loadPatients(
+                    query,
+                    query === ''
+                );
+
+                patientGrid
+                    ?.scrollIntoView({
+                        behavior:
+                            'smooth',
+
+                        block:
+                            'start',
+                    });
+            },
+        });
+    }
+
+    window
+        .handleExistingRecordPerPageChange =
+        function (value) {
+            const allowed = [
+                10,
+                20,
+                50,
+                100,
+            ];
+
+            const requested =
+                Number(value);
+
+            patientPageSize =
+                allowed.includes(
+                    requested
+                )
+                    ? requested
+                    : 10;
+
+            patientCurrentPage = 1;
+
+            const query =
+                input.value.trim();
+
+            loadPatients(
+                query,
+                query === ''
+            );
+        };
 
     function escapeHtml(value) {
         return String(value || '')
@@ -106,236 +528,224 @@ document.addEventListener('DOMContentLoaded', function () {
         return recordUrlTemplate.replace('__PATIENT__', encodeURIComponent(String(patient.id || '')));
     }
 
-    function patientMatchesQuery(patient, normalizedQuery) {
-        const haystack = [
-            patient.name || '',
-            patient.email || '',
-            patient.student_number || '',
-            patient.program || '',
-            patient.type || '',
-        ].join(' ').toLowerCase();
-
-        return haystack.includes(normalizedQuery);
-    }
-
-    function renderEmptyState(message) {
-        if (!patientGrid) return;
-
-        patientGrid.innerHTML = '';
-        noResults.classList.remove('hidden');
-        noResults.removeAttribute('hidden');
-        noResults.querySelector('p').textContent = message;
-    }
-
-    function renderInitialPatients() {
-        if (!patientGrid) return;
-
-        if (Array.isArray(latestAllPatients)) {
-            renderPatients(latestAllPatients);
-            return;
-        }
-
-        patientGrid.innerHTML = initialMarkup;
-        noResults.classList.add('hidden');
-        noResults.setAttribute('hidden', 'hidden');
-    }
-
-    function filterInitialPatients(query) {
-        if (!patientGrid) return false;
-
-        const normalizedQuery = String(query || '').trim().toLowerCase();
-
-        if (!normalizedQuery) {
-            renderInitialPatients();
-            return true;
-        }
-
-        if (Array.isArray(latestAllPatients)) {
-            const filteredPatients = latestAllPatients.filter(function (patient) {
-                return patientMatchesQuery(patient, normalizedQuery);
-            });
-
-            if (!filteredPatients.length) {
-                return false;
-            }
-
-            renderPatients(filteredPatients);
-            return true;
-        }
-
-        const filteredCards = initialCards.filter(function (card) {
-            const haystack = [
-                card.dataset.name || '',
-                card.dataset.email || '',
-                card.dataset.student || '',
-                card.dataset.program || '',
-            ].join(' ');
-
-            return haystack.includes(normalizedQuery);
-        });
-
-        if (!filteredCards.length) {
-            return false;
-        }
-
-        patientGrid.innerHTML = filteredCards.map(function (card) {
-            return card.outerHTML;
-        }).join('');
-
-        noResults.classList.add('hidden');
-        noResults.setAttribute('hidden', 'hidden');
-
-        return true;
-    }
-
     function renderPatients(patients) {
         if (!patientGrid) return;
 
         if (!patients.length) {
-            renderEmptyState('No matching patients found.');
+            const query =
+                input.value.trim();
+
+            patientGrid.innerHTML = '';
+
+            if (query) {
+                window.EmptyState?.renderSearch({
+                    host:
+                        '#existingRecordEmptyState',
+
+                    input:
+                        '#patientSearchInput',
+
+                    query,
+
+                    message:
+                        'Try a different name, ID, email, or program.',
+                });
+            } else {
+                window.EmptyState?.render({
+                    host:
+                        '#existingRecordEmptyState',
+
+                    icon:
+                        'fa-user-slash',
+
+                    title:
+                        'No patient records found',
+
+                    message:
+                        'No patient records are currently available.',
+                });
+            }
+
             return;
         }
 
-        noResults.classList.add('hidden');
-        noResults.setAttribute('hidden', 'hidden');
+        window.EmptyState?.hide(
+            '#existingRecordEmptyState'
+        );
 
-        patientGrid.innerHTML = patients.map(function (patient) {
+        const html = patients.map(function (patient) {
             const patientName = patient.name || 'Patient';
             const patientEmail = patient.email || '';
-            const badge = patient.student_number || patient.type || 'Patient';
+            const patientType =
+                patient.type || 'Patient';
+
+            const avatarUrl =
+                window.PatientUI
+                    ?.safeUrl(
+                        patient.avatar_url
+                    ) || '';
+
+            const patientInitials =
+                window.PatientUI
+                    ?.getInitials(
+                        patientName
+                    ) || 'P';
+
+            const roleClass =
+                window.PatientUI
+                    ?.getRoleClass(
+                        patientType
+                    ) || 'role-none';
+
             const tags = [];
 
-            if (patient.program) {
-                tags.push(`<span class="patient-select-tag"><i class="fa-solid fa-graduation-cap text-[10px] mr-1"></i>${escapeHtml(patient.program)}</span>`);
+            if (patient.student_number) {
+                tags.push(`
+        <span class="patient-select-tag">
+            <i class="fa-solid fa-id-card"></i>
+            ${escapeHtml(
+                    patient.student_number
+                )}
+        </span>
+    `);
             }
 
-            if (patient.type) {
-                tags.push(`<span class="patient-select-tag"><i class="fa-solid fa-id-badge text-[10px] mr-1"></i>${escapeHtml(patient.type)}</span>`);
+            if (patient.program) {
+                tags.push(`
+        <span class="patient-select-tag">
+            <i class="fa-solid fa-graduation-cap"></i>
+            ${escapeHtml(
+                    patient.program
+                )}
+        </span>
+    `);
             }
 
             return `
-                <div class="patient-select-card" data-name="${escapeHtml(String(patientName).toLowerCase())}" data-email="${escapeHtml(String(patientEmail).toLowerCase())}">
-                    <div class="patient-select-card-body">
-                        <div class="flex items-start justify-between">
-                            <div class="flex-1 min-w-0">
-                                <p class="patient-select-name">${escapeHtml(patientName)}</p>
-                                <p class="patient-select-meta">${escapeHtml(patientEmail)}</p>
-                            </div>
-                            <span class="patient-select-badge">${escapeHtml(badge)}</span>
-                        </div>
-                        <div class="patient-select-details">
-                            ${tags.join('')}
-                        </div>
-                    </div>
-                    <div class="patient-select-actions">
-                        <a href="${escapeHtml(buildRecordUrl(patient))}" class="select-patient-btn">
-                            <i class="fa-solid fa-arrow-right"></i>
-                            Continue
-                        </a>
-                    </div>
+    <div
+        class="
+            patient-select-card
+            ${roleClass}
+        "
+    >
+        <div class="patient-select-card-body">
+
+            <div class="patient-select-profile">
+
+                <span
+                    class="
+                        patient-avatar
+                        patient-avatar-md
+                    "
+                >
+                    ${avatarUrl
+                    ? `
+                                <img
+                                    src="${escapeHtml(
+                        avatarUrl
+                    )}"
+                                    alt="${escapeHtml(
+                        patientName
+                    )}"
+                                    loading="lazy"
+                                    onerror="
+                                        this.parentElement.innerHTML =
+                                        '<span>${escapeHtml(
+                        patientInitials
+                    )}</span>';
+                                    "
+                                >
+                            `
+                    : `
+                                <span>
+                                    ${escapeHtml(
+                        patientInitials
+                    )}
+                                </span>
+                            `
+                }
+                </span>
+
+                <div class="patient-select-identity">
+                    <p class="patient-select-name">
+                        ${escapeHtml(
+                    patientName
+                )}
+                    </p>
+
+                    <p class="patient-select-meta">
+                        ${escapeHtml(
+                    patientEmail
+                )}
+                    </p>
                 </div>
-            `;
+
+                <span
+                    class="
+                        badge-role
+                        ${roleClass}
+                    "
+                >
+                    ${escapeHtml(
+                    patientType
+                )}
+                </span>
+            </div>
+
+            <div class="patient-select-details">
+                ${tags.join('')}
+            </div>
+        </div>
+
+        <div class="patient-select-actions">
+            <a
+                href="${escapeHtml(
+                    buildRecordUrl(
+                        patient
+                    )
+                )}"
+                class="
+                    ui-btn
+                    ui-btn-primary
+                    w-full
+                "
+            >
+                <i
+                    class="
+                        fa-solid
+                        fa-file-circle-plus
+                    "
+                ></i>
+
+                Add Existing Appointment
+            </a>
+        </div>
+    </div>
+`;
         }).join('');
-    }
 
-    async function loadPatients(query = '', showAll = false, options = {}) {
-        if (!patientGrid) return;
-
-        const showLoading = options.showLoading !== false;
-        const requestId = ++activeRequestId;
-        const params = new URLSearchParams();
-
-        if (query) {
-            params.set('q', query);
-        }
-
-        if (showAll) {
-            params.set('show_all', '1');
-        }
-
-        params.set('limit', '80');
-
-        if (showLoading) {
-            patientGrid.innerHTML = `
-                <div class="col-span-full empty-state py-12">
-                    <i class="fa-solid fa-rotate text-3xl text-[#e8e2dd] mb-3"></i>
-                    <p class="text-sm text-[#9e9690]">Loading patient records...</p>
-                </div>
-            `;
-            noResults.classList.add('hidden');
-            noResults.setAttribute('hidden', 'hidden');
-        }
-
-        try {
-            const response = await fetch(`${searchEndpoint}?${params.toString()}`, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json',
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error(`Search failed with status ${response.status}`);
-            }
-
-            const patients = await response.json();
-
-            if (requestId !== activeRequestId) {
-                return;
-            }
-
-            const normalizedPatients = Array.isArray(patients) ? patients : [];
-
-            if (showAll && query === '') {
-                latestAllPatients = normalizedPatients;
-            }
-
-            renderPatients(normalizedPatients);
-        } catch (error) {
-            if (requestId !== activeRequestId) {
-                return;
-            }
-
-            console.error(error);
-
-            if (showLoading) {
-                renderEmptyState('Unable to load patient records right now.');
-            }
+        if (
+            typeof window
+                .swapSkeletonContent ===
+            'function'
+        ) {
+            window.swapSkeletonContent(
+                'patientGrid',
+                html
+            );
+        } else {
+            patientGrid.innerHTML =
+                html;
         }
     }
-
-    input.addEventListener('input', function () {
-        const query = input.value.trim();
-
-        clearBtn.classList.toggle('hidden', !query);
-
-        if (searchTimer) {
-            clearTimeout(searchTimer);
+    loadPatients(
+        '',
+        true,
+        {
+            showLoading: true
         }
+    );
 
-        searchTimer = setTimeout(function () {
-            if (query === '') {
-                renderInitialPatients();
-                return;
-            }
-
-            if (filterInitialPatients(query)) {
-                return;
-            }
-
-            loadPatients(query, false);
-        }, 120);
-    });
-
-    clearBtn.addEventListener('click', function () {
-        input.value = '';
-        clearBtn.classList.add('hidden');
-        renderInitialPatients();
-        input.focus();
-    });
-
-    renderInitialPatients();
-    loadPatients('', true, { showLoading: false });
     input.focus();
 });
 </script>

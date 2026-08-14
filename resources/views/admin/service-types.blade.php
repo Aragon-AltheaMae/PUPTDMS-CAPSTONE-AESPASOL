@@ -47,34 +47,32 @@
                                         <span class="required-mark">*</span>
                                     </label>
 
-                                    <div class="voice-search-row" data-voice-field>
-                                        <div class="global-control-wrap" data-clearable-field>
-                                            <i class="fa-solid fa-tag global-control-icon"></i>
+                                    <div class="global-voice-row" data-voice-field>
 
-                                            <input type="text" id="serviceNameInput" name="name"
-                                                value="{{ old('name') }}"
-                                                class="form-input-custom global-control-with-icon no-voice"
-                                                placeholder="e.g. Tooth Extraction" autocomplete="off" required
-                                                data-clearable-input>
+                                        <div class="global-voice-control" data-clearable-field>
+                                            <div class="global-control-wrap">
 
-                                            <button type="button" id="serviceNameClearBtn"
-                                                class="search-clear field-clear-btn" data-field-clear
-                                                aria-label="Clear service name" title="Clear service name">
-                                                <i class="fa-solid fa-xmark"></i>
-                                            </button>
+                                                <i class="fa-solid fa-tag global-control-icon"></i>
+
+                                                <input type="text" id="serviceNameInput" name="name"
+                                                    value="{{ old('name') }}"
+                                                    class="form-input-custom global-control-with-icon"
+                                                    placeholder="e.g. Tooth Extraction" autocomplete="off"
+                                                    data-field-label="Service Name"
+                                                    data-required-message="Please enter a service name."
+                                                    data-clearable-input required>
+
+                                                <button type="button" class="search-clear field-clear-btn"
+                                                    data-field-clear aria-label="Clear service name">
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                </button>
+
+                                            </div>
                                         </div>
 
-                                        <div class="voice-input-toggle">
-                                            <button type="button" class="voice-search-mic external" data-voice-trigger
-                                                data-voice-target="#serviceNameInput"
-                                                data-voice-status="#serviceNameVoiceStatus"
-                                                aria-label="Voice input for service name">
-                                                <i class="fa-solid fa-microphone"></i>
-                                            </button>
+                                        <x-voice-input target="#serviceNameInput" status-id="serviceNameVoiceStatus"
+                                            label="Voice input for service name" title="Voice input" />
 
-                                            <span id="serviceNameVoiceStatus" class="voice-status hidden"
-                                                data-voice-status aria-live="polite"></span>
-                                        </div>
                                     </div>
                                 </div>
 
@@ -102,33 +100,29 @@
                                         </div>
                                     </div>
 
-                                    <div class="voice-search-row" data-voice-field>
-                                        <div class="global-control-wrap global-form-textarea-wrap" data-clearable-field>
-                                            <textarea id="serviceDescInput" name="description"
-                                                class="form-input-custom global-form-textarea no-voice"
-                                                placeholder="Brief details about the service..." maxlength="255"
-                                                data-char-limit="255" data-char-counter="#serviceDescCount"
-                                                data-clearable-input>{{ old('description') }}</textarea>
+                                    <div class="global-voice-row" data-voice-field>
 
-                                            <button type="button" id="serviceDescClearBtn"
-                                                class="search-clear field-clear-btn field-clear-btn--textarea"
-                                                data-field-clear aria-label="Clear description"
-                                                title="Clear description">
-                                                <i class="fa-solid fa-xmark"></i>
-                                            </button>
+                                        <div class="global-voice-control" data-clearable-field>
+                                            <div class="global-form-textarea-wrap">
+
+                                                <textarea id="serviceDescInput" name="description"
+                                                    class="form-input-custom global-form-textarea"
+                                                    placeholder="Brief details about the service..." maxlength="255"
+                                                    data-char-limit="255" data-char-counter="#serviceDescCount"
+                                                    data-clearable-input>{{ old('description') }}</textarea>
+
+                                                <button type="button"
+                                                    class="search-clear field-clear-btn field-clear-btn--textarea"
+                                                    data-field-clear aria-label="Clear description">
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                </button>
+
+                                            </div>
                                         </div>
 
-                                        <div class="voice-input-toggle">
-                                            <button type="button" class="voice-search-mic external" data-voice-trigger
-                                                data-voice-target="#serviceDescInput"
-                                                data-voice-status="#serviceDescVoiceStatus"
-                                                aria-label="Voice input for service description">
-                                                <i class="fa-solid fa-microphone"></i>
-                                            </button>
+                                        <x-voice-input target="#serviceDescInput" status-id="serviceDescVoiceStatus"
+                                            label="Voice input for service description" title="Voice input" />
 
-                                            <span id="serviceDescVoiceStatus" class="voice-status hidden"
-                                                data-voice-status aria-live="polite"></span>
-                                        </div>
                                     </div>
                                 </div>
 
@@ -188,7 +182,7 @@
 
                                             <td class="table-cell-main">
                                                 <div class="table-primary">
-                                                    <span class="table-tag table-tag-danger" aria-hidden="true">
+                                                    <span class="service-grid-icon" aria-hidden="true">
                                                         <i class="fa-solid fa-tooth"></i>
                                                     </span>
 
@@ -200,11 +194,13 @@
 
                                             <td class="table-cell-center">
                                                 @if ($service->is_active_for_booking)
-                                                <span class="table-status table-status-success">
+                                                <span class="status-pill status-active">
+                                                    <span class="status-dot"></span>
                                                     Visible
                                                 </span>
                                                 @else
-                                                <span class="table-status table-status-neutral">
+                                                <span class="status-pill status-inactive">
+                                                    <span class="status-dot"></span>
                                                     Hidden
                                                 </span>
                                                 @endif
@@ -241,20 +237,7 @@
                                         @empty
                                         <tr>
                                             <td colspan="4" class="table-empty-state-cell">
-                                                <div class="empty-state">
-                                                    <div class="empty-icon">
-                                                        <i class="fa-solid fa-folder-open"></i>
-                                                    </div>
-
-                                                    <p class="service-empty-title">
-                                                        No services found
-                                                    </p>
-
-                                                    <p class="service-empty-subtitle">
-                                                        Your clinic doesn't have any service types yet.
-                                                        Use the form to add one.
-                                                    </p>
-                                                </div>
+                                                <div id="serviceTypeListEmptyState" class="empty-state-host"></div>
                                             </td>
                                         </tr>
                                         @endforelse
@@ -269,39 +252,51 @@
                                 @foreach ($services as $service)
                                 <article class="table-record-card" data-service-id="{{ $service->id }}">
                                     <div class="service-grid-card">
-                                        <span class="table-tag table-tag-neutral service-grid-id">
-                                            #{{ $service->id }}
-                                        </span>
+                                        <div class="service-grid-topline">
 
-                                        <div class="service-grid-main">
-                                            <div class="table-tag table-tag-danger service-grid-icon"
-                                                aria-hidden="true">
-                                                <i class="fa-solid fa-tooth"></i>
+                                            <span class="service-grid-id">
+                                                #{{ $service->id }}
+                                            </span>
+
+                                            <div class="service-grid-statuses">
+
+                                                @if ($service->is_active_for_booking)
+                                                <span class="status-pill status-active">
+                                                    <span class="status-dot"></span>
+                                                    Visible
+                                                </span>
+                                                @else
+                                                <span class="status-pill status-inactive">
+                                                    <span class="status-dot"></span>
+                                                    Hidden
+                                                </span>
+                                                @endif
+
+                                                @if ($service->is_default)
+                                                <span class="status-pill status-default">
+                                                    <span class="status-dot"></span>
+                                                    Default
+                                                </span>
+                                                @endif
+
                                             </div>
 
+                                        </div>
+
+                                        <div class="service-grid-main">
+
+                                            <span class="service-grid-icon" aria-hidden="true">
+                                                <i class="fa-solid fa-tooth"></i>
+                                            </span>
+
                                             <div class="service-grid-copy">
+
                                                 <h3 class="table-record-title">
                                                     {{ $service->name }}
                                                 </h3>
 
-                                                <div class="service-grid-statuses">
-                                                    @if ($service->is_active_for_booking)
-                                                    <span class="table-status table-status-success">
-                                                        Visible
-                                                    </span>
-                                                    @else
-                                                    <span class="table-status table-status-neutral">
-                                                        Hidden
-                                                    </span>
-                                                    @endif
-
-                                                    @if ($service->is_default)
-                                                    <span class="table-tag table-tag-info">
-                                                        Default
-                                                    </span>
-                                                    @endif
-                                                </div>
                                             </div>
+
                                         </div>
 
                                         <p class="service-type-card-desc">
@@ -339,20 +334,7 @@
                                 @endforeach
                             </div>
                             @else
-                            <div class="empty-state table-grid-empty">
-                                <div class="empty-icon">
-                                    <i class="fa-solid fa-folder-open"></i>
-                                </div>
-
-                                <p class="service-empty-title">
-                                    No services found
-                                </p>
-
-                                <p class="service-empty-subtitle">
-                                    Your clinic doesn't have any service types yet.
-                                    Use the form to add one.
-                                </p>
-                            </div>
+                            <div id="serviceTypeGridEmptyState" class="empty-state-host table-grid-empty"></div>
                             @endif
                         </div>
                     </div>
@@ -404,25 +386,24 @@
                         <span class="required-mark">*</span>
                     </label>
 
-                    <div class="voice-search-row" data-voice-field>
-                        <div class="global-control-wrap">
-                            <i class="fa-solid fa-tag global-control-icon"></i>
+                    <div class="global-voice-row" data-voice-field>
 
-                            <input type="text" id="manageServiceName" name="name"
-                                class="form-input-custom global-control-with-icon no-voice" maxlength="255"
-                                autocomplete="off" required>
+                        <div class="global-voice-control">
+                            <div class="global-control-wrap">
+
+                                <i class="fa-solid fa-tag global-control-icon"></i>
+
+                                <input type="text" id="manageServiceName" name="name"
+                                    class="form-input-custom global-control-with-icon" maxlength="255"
+                                    autocomplete="off" data-field-label="Service Name"
+                                    data-required-message="Please enter a service name." required>
+
+                            </div>
                         </div>
 
-                        <div class="voice-input-toggle">
-                            <button type="button" class="voice-search-mic external" data-voice-trigger
-                                data-voice-target="#manageServiceName" data-voice-status="#manageServiceNameVoiceStatus"
-                                aria-label="Voice input for service name">
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
+                        <x-voice-input target="#manageServiceName" status-id="manageServiceNameVoiceStatus"
+                            label="Voice input for service name" title="Voice input" />
 
-                            <span id="manageServiceNameVoiceStatus" class="voice-status hidden" data-voice-status
-                                aria-live="polite"></span>
-                        </div>
                     </div>
                 </div>
 
@@ -450,29 +431,26 @@
                         </div>
                     </div>
 
-                    <div class="voice-search-row" data-voice-field>
-                        <div class="global-form-textarea-wrap">
-                            <textarea id="manageServiceDescription" name="description"
-                                class="form-input-custom global-form-textarea no-voice" maxlength="255"
-                                data-char-limit="255" data-char-counter="#manageServiceDescCount"
-                                placeholder="Brief details about the service..."></textarea>
+                    <div class="global-voice-row" data-voice-field>
+
+                        <div class="global-voice-control">
+                            <div class="global-form-textarea-wrap">
+
+                                <textarea id="manageServiceDescription" name="description"
+                                    class="form-input-custom global-form-textarea" maxlength="255" data-char-limit="255"
+                                    data-char-counter="#manageServiceDescCount"
+                                    placeholder="Brief details about the service..."></textarea>
+
+                            </div>
                         </div>
 
-                        <div class="voice-input-toggle">
-                            <button type="button" class="voice-search-mic external" data-voice-trigger
-                                data-voice-target="#manageServiceDescription"
-                                data-voice-status="#manageServiceDescVoiceStatus"
-                                aria-label="Voice input for service description">
-                                <i class="fa-solid fa-microphone"></i>
-                            </button>
+                        <x-voice-input target="#manageServiceDescription" status-id="manageServiceDescVoiceStatus"
+                            label="Voice input for service description" title="Voice input" />
 
-                            <span id="manageServiceDescVoiceStatus" class="voice-status hidden" data-voice-status
-                                aria-live="polite"></span>
-                        </div>
                     </div>
                 </div>
 
-                <div class="field-group full">
+                <div class="global-form-group modal-field-full" data-global-field>
                     <div class="service-booking-row">
                         <div class="service-booking-copy">
                             <div class="service-booking-icon">
@@ -548,13 +526,17 @@
         </div>
 
         <div class="modal-bd">
-            <div class="modal-profile-card modal-profile-card-single">
+
+            <div class="modal-profile-card">
+
                 <div class="modal-profile-main">
+
                     <div class="modal-profile-avatar">
                         <i class="fa-solid fa-tooth"></i>
                     </div>
 
                     <div class="modal-profile-main-copy">
+
                         <span class="modal-profile-eyebrow">
                             Service Type
                         </span>
@@ -562,11 +544,29 @@
                         <strong id="serviceDetailsName" class="modal-profile-name">
                             —
                         </strong>
+
+                        <div class="service-details-status-row">
+
+                            <span id="serviceDetailsVisibility" class="status-pill status-active">
+                                <span class="status-dot"></span>
+                                Visible
+                            </span>
+
+                            <span id="serviceDetailsDefault" class="status-pill status-default">
+                                <span class="status-dot"></span>
+                                Default
+                            </span>
+
+                        </div>
+
                     </div>
+
                 </div>
 
                 <div class="modal-profile-details modal-profile-details-single">
+
                     <div class="modal-profile-detail">
+
                         <div class="modal-profile-detail-icon">
                             <i class="fa-solid fa-hashtag"></i>
                         </div>
@@ -580,67 +580,43 @@
                                 —
                             </strong>
                         </div>
+
                     </div>
+
                 </div>
+
             </div>
 
-            <div class="modal-form-grid-2">
-                <div class="modal-form-section">
-                    <div class="modal-section-heading">
-                        <div class="modal-section-icon">
-                            <i class="fa-solid fa-align-left"></i>
-                        </div>
+            <div class="modal-form-section">
 
-                        <div>
-                            <h4>Description</h4>
-                            <p>
-                                Information shown for this service.
-                            </p>
-                        </div>
+                <div class="modal-section-heading">
+
+                    <div class="modal-section-icon">
+                        <i class="fa-solid fa-align-left"></i>
                     </div>
 
-                    <div class="global-readonly-field service-details-description">
-                        <i class="fa-solid fa-file-lines"></i>
+                    <div>
+                        <h4>Description</h4>
 
-                        <span id="serviceDetailsDescription">
-                            No description provided.
-                        </span>
+                        <p>
+                            Information shown for this service.
+                        </p>
                     </div>
+
                 </div>
 
-                <div class="modal-form-section">
-                    <div class="modal-section-heading">
-                        <div class="modal-section-icon">
-                            <i class="fa-solid fa-sliders"></i>
-                        </div>
+                <div class="global-readonly-field">
 
-                        <div>
-                            <h4>Service Status</h4>
-                            <p>
-                                Booking and system classification.
-                            </p>
-                        </div>
-                    </div>
+                    <i class="fa-solid fa-file-lines"></i>
 
-                    <div class="service-details-status-list">
-                        <div class="global-readonly-field">
-                            <i class="fa-solid fa-calendar-check"></i>
+                    <span id="serviceDetailsDescription">
+                        No description provided.
+                    </span>
 
-                            <span id="serviceDetailsVisibility">
-                                —
-                            </span>
-                        </div>
-
-                        <div class="global-readonly-field">
-                            <i class="fa-solid fa-shield-halved"></i>
-
-                            <span id="serviceDetailsDefault">
-                                —
-                            </span>
-                        </div>
-                    </div>
                 </div>
+
             </div>
+
         </div>
 
         <div class="modal-ft">
@@ -829,15 +805,31 @@ $serviceTypeRoutes = [
         idElement.textContent =
             `#${id}`;
 
-        visibilityElement.textContent =
+        visibilityElement.className =
             isActiveForBooking
-                ? 'Visible in appointment booking'
-                : 'Hidden from appointment booking';
+                ? 'status-pill status-active'
+                : 'status-pill status-inactive';
 
-        defaultElement.textContent =
-            isDefault
-                ? 'Default system service'
-                : 'Custom clinic service';
+        visibilityElement.innerHTML =
+            `
+        <span class="status-dot"></span>
+        ${isActiveForBooking
+                ? 'Visible'
+                : 'Hidden'
+            }
+    `;
+
+        defaultElement.className =
+            'status-pill status-default';
+
+        defaultElement.innerHTML =
+            `
+        <span class="status-dot"></span>
+        ${isDefault
+                ? 'Default'
+                : 'Custom'
+            }
+    `;
 
         window.openModal(
             'serviceDetailsModal'
@@ -895,18 +887,6 @@ $serviceTypeRoutes = [
             }
         }
 
-        function visibilityBadge(service) {
-            return service.is_active_for_booking ?
-                `<span class="service-visibility-badge is-visible"><i class="fa-solid fa-thumbtack"></i> Visible</span>` :
-                `<span class="service-visibility-badge is-hidden"><i class="fa-solid fa-eye-slash"></i> Hidden</span>`;
-        }
-
-        function defaultBadge(service) {
-            return service.is_default ?
-                `<span class="service-badge service-badge-bookable">Default</span>` :
-                '';
-        }
-
         function actionButtons(service) {
             const deleteButton =
                 service.is_default
@@ -952,15 +932,20 @@ $serviceTypeRoutes = [
     `;
         }
 
-        function emptyStateHtml() {
-            return `
-            <div class="empty-state">
-                <div class="empty-icon"><i class="fa-solid fa-folder-open"></i></div>
-                <p class="service-empty-title">No services found</p>
-                <p class="service-empty-subtitle">
-                    Your clinic doesn't have any service types yet. Use the form to add one.
-                </p>
-            </div>`;
+        function renderServiceEmptyState(
+            host
+        ) {
+            if (!host) {
+                return;
+            }
+
+            window.EmptyState?.render({
+                host,
+                icon: 'fa-tooth',
+                title: 'No services found',
+                message:
+                    'Service types will appear here once they are added.',
+            });
         }
 
         function renderServiceTable() {
@@ -973,15 +958,24 @@ $serviceTypeRoutes = [
 
             if (!serviceTypeServices.length) {
                 tbody.innerHTML = `
-            <tr>
-                <td
-                    colspan="4"
-                    class="table-empty-state-cell"
-                >
-                    ${emptyStateHtml()}
-                </td>
-            </tr>
-        `;
+        <tr>
+            <td
+                colspan="4"
+                class="table-empty-state-cell"
+            >
+                <div
+                    id="serviceTypeListEmptyState"
+                    class="empty-state-host"
+                ></div>
+            </td>
+        </tr>
+    `;
+
+                renderServiceEmptyState(
+                    document.getElementById(
+                        'serviceTypeListEmptyState'
+                    )
+                );
 
                 return;
             }
@@ -992,29 +986,29 @@ $serviceTypeRoutes = [
                         const visibility =
                             service.is_active_for_booking
                                 ? `
-                            <span class="table-status table-status-success">
-                                Visible
-                            </span>
-                        `
+                    <span class="status-pill status-active">
+                        <span class="status-dot"></span>
+                        Visible
+                    </span>
+                `
                                 : `
-                            <span class="table-status table-status-neutral">
-                                Hidden
-                            </span>
-                        `;
+                    <span class="status-pill status-inactive">
+                        <span class="status-dot"></span>
+                        Hidden
+                    </span>
+                `;
 
                         return `
-                    <tr data-service-id="${service.id}">
+            <tr data-service-id="${service.id}">
                         <td>
-                            <span class="table-tag table-tag-neutral">
+                            <span class="service-grid-id">
                                 #${service.id}
                             </span>
                         </td>
 
                         <td class="table-cell-main">
                             <div class="table-primary">
-                                <span
-                                    class="table-tag table-tag-danger"
-                                    aria-hidden="true">
+                                <span class="service-grid-icon" aria-hidden="true">
                                     <i class="fa-solid fa-tooth"></i>
                                 </span>
 
@@ -1049,21 +1043,17 @@ $serviceTypeRoutes = [
 
             if (!serviceTypeServices.length) {
                 gridView.innerHTML = `
-            <div class="empty-state table-grid-empty">
-                <div class="empty-icon">
-                    <i class="fa-solid fa-folder-open"></i>
-                </div>
+        <div
+            id="serviceTypeGridEmptyState"
+            class="empty-state-host table-grid-empty"
+        ></div>
+    `;
 
-                <p class="service-empty-title">
-                    No services found
-                </p>
-
-                <p class="service-empty-subtitle">
-                    Your clinic doesn't have any service types yet.
-                    Use the form to add one.
-                </p>
-            </div>
-        `;
+                renderServiceEmptyState(
+                    document.getElementById(
+                        'serviceTypeGridEmptyState'
+                    )
+                );
 
                 return;
             }
@@ -1074,23 +1064,26 @@ $serviceTypeRoutes = [
                         const visibility =
                             service.is_active_for_booking
                                 ? `
-                            <span class="table-status table-status-success">
-                                Visible
-                            </span>
-                        `
+                                <span class="status-pill status-active">
+                                    <span class="status-dot"></span>
+                                    Visible
+                                </span>
+                            `
                                 : `
-                            <span class="table-status table-status-neutral">
-                                Hidden
-                            </span>
-                        `;
+                                <span class="status-pill status-inactive">
+                                    <span class="status-dot"></span>
+                                    Hidden
+                                </span>
+                            `;
 
                         const defaultBadge =
                             service.is_default
                                 ? `
-                            <span class="table-tag table-tag-info">
-                                Default
-                            </span>
-                        `
+            <span class="status-pill status-default">
+                <span class="status-dot"></span>
+                Default
+            </span>
+        `
                                 : '';
 
                         const deleteButton =
@@ -1120,34 +1113,36 @@ $serviceTypeRoutes = [
                         data-service-id="${service.id}"
                     >
                         <div class="service-grid-card">
-                            <span
-                                class="
-                                    table-tag
-                                    table-tag-neutral
-                                    service-grid-id
-                                "
-                            >
-                                #${service.id}
-                            </span>
+                            <div class="service-grid-topline">
+
+                                <span class="service-grid-id">
+                                    #${service.id}
+                                </span>
+
+                                <div class="service-grid-statuses">
+                                    ${visibility}
+                                    ${defaultBadge}
+                                </div>
+
+                            </div>
 
                             <div class="service-grid-main">
-                                <div
-    class="table-tag table-tag-danger service-grid-icon"
-    aria-hidden="true"
->
-    <i class="fa-solid fa-tooth"></i>
-</div>
+
+                                <span
+                                    class="service-grid-icon"
+                                    aria-hidden="true"
+                                >
+                                    <i class="fa-solid fa-tooth"></i>
+                                </span>
 
                                 <div class="service-grid-copy">
+
                                     <h3 class="table-record-title">
                                         ${escapeHtml(service.name)}
                                     </h3>
 
-                                    <div class="service-grid-statuses">
-                                        ${visibility}
-                                        ${defaultBadge}
-                                    </div>
                                 </div>
+
                             </div>
 
                             <p class="service-type-card-desc">
@@ -1403,8 +1398,32 @@ $serviceTypeRoutes = [
             defaultNote.classList.toggle('admin-hidden', !isDefault);
             defaultNote.style.display = isDefault ? 'block' : 'none';
 
-            window.openModal('manageServiceModal');
+            window.openModal(
+                'manageServiceModal'
+            );
 
+            requestAnimationFrame(() => {
+                window.DiscardChanges
+                    ?.captureForm(form);
+            });
+
+            window.initGlobalVoiceInputs?.(
+                form
+            );
+
+            document.dispatchEvent(
+                new CustomEvent(
+                    'voice:refresh',
+                    {
+                        detail: {
+                            root:
+                                document.getElementById(
+                                    'manageServiceModal'
+                                )
+                        }
+                    }
+                )
+            );
             setTimeout(() => {
                 nameInput.focus();
             }, 180);
@@ -1438,9 +1457,20 @@ $serviceTypeRoutes = [
         }
 
         function bindAjaxForms() {
-            const addForm = document.getElementById('addServiceForm');
-            const manageForm = document.getElementById('manageServiceForm');
-            const deleteForm = document.getElementById('deleteServiceForm');
+            const addForm =
+                document.getElementById(
+                    'addServiceForm'
+                );
+
+            const manageForm =
+                document.getElementById(
+                    'manageServiceForm'
+                );
+
+            const deleteForm =
+                document.getElementById(
+                    'deleteServiceForm'
+                );
 
             addForm?.addEventListener(
                 'submit',
@@ -1448,7 +1478,9 @@ $serviceTypeRoutes = [
                     event.preventDefault();
 
                     const validation =
-                        window.validateGlobalForm?.(addForm);
+                        window.validateGlobalForm?.(
+                            addForm
+                        );
 
                     if (
                         validation &&
@@ -1463,13 +1495,16 @@ $serviceTypeRoutes = [
                         );
 
                     try {
-                        const data = await submitJson(
-                            addForm,
-                            submitButton,
-                            'Saving...'
-                        );
+                        const data =
+                            await submitJson(
+                                addForm,
+                                submitButton,
+                                'Saving...'
+                            );
 
-                        addOrUpdateService(data.service);
+                        addOrUpdateService(
+                            data.service
+                        );
 
                         addForm.reset();
 
@@ -1480,9 +1515,12 @@ $serviceTypeRoutes = [
                                 )
                                 .forEach(field => {
                                     field.dispatchEvent(
-                                        new Event('input', {
-                                            bubbles: true
-                                        })
+                                        new Event(
+                                            'input',
+                                            {
+                                                bubbles: true
+                                            }
+                                        )
                                     );
                                 });
                         });
@@ -1509,9 +1547,9 @@ $serviceTypeRoutes = [
                             'success',
                             'Service added',
                             data.service
-                                ?.is_active_for_booking ?
-                                'Patients can now select it when booking.' :
-                                'Saved in Service Types and hidden from booking.'
+                                ?.is_active_for_booking
+                                ? 'Patients can now select it when booking.'
+                                : 'Saved in Service Types and hidden from booking.'
                         );
                     } catch (error) {
                         showServiceFormErrors(
@@ -1528,54 +1566,119 @@ $serviceTypeRoutes = [
                             )
                         );
                     }
-                },
-                true
+                }
             );
 
-            manageForm?.addEventListener('submit', async (event) => {
-                event.preventDefault();
-                const validation =
-                    window.validateGlobalForm?.(manageForm);
+            manageForm?.addEventListener(
+                'submit',
+                async event => {
+                    event.preventDefault();
 
-                if (validation && !validation.valid) {
-                    return;
+                    const validation =
+                        window.validateGlobalForm?.(
+                            manageForm
+                        );
+
+                    if (
+                        validation &&
+                        !validation.valid
+                    ) {
+                        return;
+                    }
+
+                    const submitButton =
+                        manageForm.querySelector(
+                            '[type="submit"]'
+                        );
+
+                    try {
+                        const data =
+                            await submitJson(
+                                manageForm,
+                                submitButton,
+                                'Saving...'
+                            );
+
+                        addOrUpdateService(
+                            data.service
+                        );
+
+                        window.DiscardChanges
+                            ?.captureForm(
+                                manageForm
+                            );
+
+                        window.closeModal(
+                            'manageServiceModal'
+                        );
+
+                        showServiceToast(
+                            'success',
+                            'Changes saved',
+                            'Service details and booking visibility updated.'
+                        );
+                    } catch (error) {
+                        showServiceFormErrors(
+                            manageForm,
+                            error
+                        );
+
+                        showServiceToast(
+                            'error',
+                            'Update failed',
+                            firstValidationMessage(
+                                error,
+                                'Unable to update service type.'
+                            )
+                        );
+                    }
                 }
-                const submitButton = manageForm.querySelector('[type="submit"]');
+            );
 
-                try {
-                    const data = await submitJson(manageForm, submitButton, 'Saving...');
-                    addOrUpdateService(data.service);
-                    window.closeModal('manageServiceModal');
-                    showServiceToast(
-                        'success',
-                        'Changes saved',
-                        'Service details and booking visibility updated.'
-                    );
-                } catch (error) {
-                    showServiceToast('error', 'Update failed', firstValidationMessage(error,
-                        'Unable to update service type.'));
+            deleteForm?.addEventListener(
+                'submit',
+                async event => {
+                    event.preventDefault();
+
+                    const submitButton =
+                        deleteForm.querySelector(
+                            '[type="submit"]'
+                        );
+
+                    try {
+                        const data =
+                            await submitJson(
+                                deleteForm,
+                                submitButton,
+                                'Deleting...'
+                            );
+
+                        removeService(
+                            data.deleted_id ||
+                            deleteForm.dataset.serviceId
+                        );
+
+                        window.closeModal(
+                            'deleteServiceModal'
+                        );
+
+                        showServiceToast(
+                            'success',
+                            'Service deleted',
+                            'Removed from the service list.'
+                        );
+                    } catch (error) {
+                        showServiceToast(
+                            'error',
+                            'Delete failed',
+                            firstValidationMessage(
+                                error,
+                                'Unable to delete service type.'
+                            )
+                        );
+                    }
                 }
-            });
-
-            deleteForm?.addEventListener('submit', async (event) => {
-                event.preventDefault();
-
-                const submitButton = deleteForm.querySelector('[type="submit"]');
-
-                try {
-                    const data = await submitJson(deleteForm, submitButton, 'Deleting...');
-                    removeService(data.deleted_id || deleteForm.dataset.serviceId);
-                    window.closeModal('deleteServiceModal');
-                    showServiceToast(
-                        'success',
-                        'Service deleted',
-                        'Removed from the service list.'
-                    );
-                } catch (error) {
-                    showServiceToast('error', 'Delete failed', firstValidationMessage(error,
-                        'Unable to delete service type.'));
-                }
-            });
+            );
         }
 
         document.addEventListener('click', (event) => {

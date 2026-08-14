@@ -68,6 +68,7 @@
 
           <form method="POST" action="{{ route('login.store') }}" class="backup-form">
             @csrf
+            <input type="hidden" name="browser_name" id="browserNameInput">
 
             <div class="backup-field">
               <label for="email">Email Address</label>
@@ -86,7 +87,7 @@
 
           <div class="backup-switch">
             <span>SSO is available again?</span>
-            <a href="/auth/oidc/redirect">Return to SSO login</a>
+            <a href="/auth/oidc/redirect" data-oidc-login-link>Return to SSO login</a>
           </div>
 
           <div class="backup-note">
@@ -98,4 +99,53 @@
     </div>
   </section>
 </div>
+<script>
+  function detectBrowserName() {
+    const userAgent = navigator.userAgent || '';
+
+    if (navigator.brave) {
+      return 'Brave';
+    }
+
+    if (userAgent.includes('Edg/')) {
+      return 'Edge';
+    }
+
+    if (userAgent.includes('OPR/')) {
+      return 'Opera';
+    }
+
+    if (userAgent.includes('Firefox/')) {
+      return 'Firefox';
+    }
+
+    if (userAgent.includes('Chrome/')) {
+      return 'Chrome';
+    }
+
+    if (userAgent.includes('Safari/')) {
+      return 'Safari';
+    }
+
+    return 'Browser';
+  }
+
+  function applyBrowserHintToOidcLinks() {
+    const browserName = detectBrowserName();
+
+    document.querySelectorAll('[data-oidc-login-link]').forEach(link => {
+      const url = new URL(link.getAttribute('href'), window.location.origin);
+      url.searchParams.set('browser_name', browserName);
+      link.setAttribute('href', url.pathname + url.search);
+    });
+
+    const input = document.getElementById('browserNameInput');
+
+    if (input) {
+      input.value = browserName;
+    }
+  }
+
+  applyBrowserHintToOidcLinks();
+</script>
 @endsection

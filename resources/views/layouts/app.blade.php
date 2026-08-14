@@ -186,11 +186,9 @@
 
     @include('partials.footer')
 
-    @include('partials.voice-logic')
-
-    @if ($isAdmin || $isDentist)
-        @include('components.discard-changes')
-    @endif
+    @include('components.active-appointment-modal')
+    
+    @include('components.discard-changes')
 
     @include('partials.global-toast')
 

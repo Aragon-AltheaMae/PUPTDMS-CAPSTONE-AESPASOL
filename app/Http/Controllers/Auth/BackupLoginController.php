@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class BackupLoginController extends Controller
 {
@@ -25,8 +27,10 @@ class BackupLoginController extends Controller
         return view('auth.backup-login');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): RedirectResponse|Response
     {
+        $this->concurrentSessionService->rememberBrowserHint($request);
+
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
@@ -61,9 +65,7 @@ class BackupLoginController extends Controller
             $this->hitRateLimiter($request);
             $this->logFailedAttempt($user->email, 'Backup login blocked because the local admin account is inactive.', $user);
 
-            return back()
-                ->withInput($request->only('email'))
-                ->with('error', 'Your local account is inactive. Please contact the administrator.');
+            return $this->renderInactiveAccessPage();
         }
 
         $roleSlug = optional($user->role)->slug;
@@ -124,6 +126,7 @@ class BackupLoginController extends Controller
         $request->session()->forget(['patient_id', 'dentist_id', 'dentist_email']);
         $request->session()->put('admin_id', $user->id);
         $request->session()->put('admin_email', $user->email);
+        $this->concurrentSessionService->syncCurrentSessionMetadata($request);
 
         $sessionResult = $this->concurrentSessionService->enforceLimitForCurrentSession(
             $user,
@@ -258,5 +261,12 @@ class BackupLoginController extends Controller
         }
 
         return $supportsColumns;
+    }
+
+    private function renderInactiveAccessPage(): Response
+    {
+        return response()->view('errors.403', [
+            'exception' => new AccessDeniedHttpException('Your account is inactive. Please contact the administrator.'),
+        ], 403);
     }
 }

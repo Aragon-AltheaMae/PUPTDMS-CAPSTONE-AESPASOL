@@ -291,7 +291,7 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                         @if ($schedules->count())
                         <div id="scheduleRulesListView" class="schedule-rules-view">
                             <div class="overflow-x-auto px-2 pb-2 sm:px-0 sm:pb-0">
-                                <table class="sched-table">
+                                <table class="data-table sched-table">
                                     <thead>
                                         <tr>
                                             <th>Day(s)</th>
@@ -824,17 +824,8 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                                     </button>
                                 </div>
 
-                                <div class="voice-input-toggle">
-                                    <button type="button" class="voice-search-mic external" data-voice-trigger
-                                        data-voice-target="#ruleNotes" data-voice-status="#ruleNotesVoiceStatus"
-                                        aria-label="Voice input for schedule notes" aria-pressed="false">
-
-                                        <i class="fa-solid fa-microphone"></i>
-                                    </button>
-
-                                    <span id="ruleNotesVoiceStatus" class="voice-status hidden" data-voice-status
-                                        aria-live="polite"></span>
-                                </div>
+                                <x-voice-input target="#ruleNotes" status-id="ruleNotesVoiceStatus"
+                                    label="Voice input for schedule notes" title="Voice input" />
                             </div>
                         </div>
                     </div>
@@ -1089,9 +1080,16 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                         </span>
                     </div>
 
-                    <input type="text" id="blockNote" name="note" class="form-ctrl" maxlength="150"
-                        data-char-limit="150" data-char-counter="#blockNoteCount"
-                        placeholder="e.g. National holiday, maintenance, outreach event...">
+                    <div class="global-voice-row">
+                        <div class="global-voice-control">
+                            <input type="text" id="blockNote" name="note" class="form-ctrl" maxlength="150"
+                                data-char-limit="150" data-char-counter="#blockNoteCount"
+                                placeholder="e.g. National holiday, maintenance, outreach event...">
+                        </div>
+
+                        <x-voice-input target="#blockNote" status-id="blockNoteVoiceStatus"
+                            label="Voice input for blocked date note" title="Voice input" />
+                    </div>
 
                     <div class="form-help">
                         Add extra context for admins viewing blocked dates later.

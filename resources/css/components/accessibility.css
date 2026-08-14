@@ -70,9 +70,13 @@ body.filter-lock .asw-widget {
 
 [data-theme="dark"] .asw-menu {
     background:
-        radial-gradient(circle at top left, rgba(255, 255, 255, .12), rgba(202, 8, 8, .13) 42%, transparent 72%),
-        linear-gradient(145deg, rgba(17, 24, 39, .86), rgba(35, 0, 0, .72)) !important;
-    border-color: rgba(255, 255, 255, .14) !important;
+        radial-gradient(circle at top left,
+            rgba(255, 255, 255, .08),
+            rgba(139, 0, 0, .15) 42%,
+            transparent 72%),
+        var(--card) !important;
+
+    border-color: var(--border) !important;
 }
 
 .asw-menu-header {
@@ -118,8 +122,8 @@ body.filter-lock .asw-widget {
 }
 
 [data-theme="dark"] .asw-card {
-    background: rgba(15, 23, 42, .72) !important;
-    border-color: rgba(255, 255, 255, .10) !important;
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
 }
 
 .asw-card-title,
@@ -432,8 +436,10 @@ body.filter-lock .asw-widget {
 
 [data-theme="dark"] .asw-menu .asw-card {
     background:
-        radial-gradient(circle at top left, rgba(255, 255, 255, .10), transparent 55%),
-        linear-gradient(145deg, rgba(30, 41, 59, .82), rgba(45, 0, 0, .52)) !important;
+        radial-gradient(circle at top left,
+            rgba(255, 255, 255, .08),
+            transparent 55%),
+        var(--surface) !important;
     border-color: rgba(255, 255, 255, .12) !important;
 }
 
@@ -452,10 +458,9 @@ body.filter-lock .asw-widget {
 }
 
 [data-theme="dark"] .asw-menu .asw-select {
-    background:
-        linear-gradient(135deg, rgba(30, 41, 59, .92), rgba(68, 0, 0, .76)) !important;
-    border-color: rgba(255, 255, 255, .14) !important;
-    color: #fff !important;
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+    color: var(--text-1) !important;
 }
 
 .asw-menu .asw-profile-toggle {
@@ -504,7 +509,7 @@ body.filter-lock .asw-widget {
 }
 
 [data-theme="dark"] .asw-menu .asw-profile-toggle input[type="checkbox"] {
-    background: #475569 !important;
+    background: var(--bg-panel) !important;
 }
 
 [data-theme="dark"] .asw-menu .asw-profile-toggle input[type="checkbox"]:checked {

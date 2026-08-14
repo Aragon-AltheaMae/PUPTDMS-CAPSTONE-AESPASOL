@@ -67,9 +67,17 @@
                                 </div>
 
                                 <button id="statusBtn" onclick="openStatusModal()"
-                                    class="ui-btn ui-btn-success ui-btn-sm banner-status-btn">
+                                    class="ui-btn {{ ($clinicStatus ?? 'in') === 'in' ? 'ui-btn-success' : 'ui-btn-danger' }} ui-btn-sm banner-status-btn">
                                     <span id="statusLabel" class="flex items-center gap-2">
-                                        <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span> IN
+
+                                        @if (($clinicStatus ?? 'in') === 'in')
+                                            <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                                            IN
+                                        @else
+                                            <span class="w-2 h-2 bg-white rounded-full"></span>
+                                            OUT
+                                        @endif
+
                                     </span>
                                 </button>
                             </div>
@@ -282,38 +290,69 @@
 @section('scripts')
     <script>
         function buildUpcomingAppointments() {
-            const apptDetails = dashboardData.apptDetails || {};
+            const apptDetails =
+                dashboardData.dashboardAppointmentDetails || {};
+
             const today = new Date();
+            today.setHours(0, 0, 0, 0);
 
-            const pad = n => String(n).padStart(2, '0');
-            const dateKey = date => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+            const pad = n =>
+                String(n).padStart(2, '0');
 
-            const days = Array.from({
-                length: 7
-            }, (_, i) => {
-                const d = new Date(today);
-                d.setDate(today.getDate() + i);
-                return d;
-            });
+            const dateKey = date =>
+                `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 
+            let windowStart = new Date(today);
             let selectedKey = dateKey(today);
 
-            function statusClass(status = '') {
-                const s = String(status || '').toLowerCase();
+            function getVisibleDays() {
+                return Array.from({
+                    length: 7
+                }, (_, index) => {
+                    const date = new Date(windowStart);
 
-                if (s.includes('cancel')) return 'upcoming-status-cancelled';
-                if (s.includes('resched')) return 'upcoming-status-rescheduled';
-                if (s.includes('complete')) return 'upcoming-status-completed';
+                    date.setDate(
+                        windowStart.getDate() + index
+                    );
+
+                    return date;
+                });
+            }
+
+            function statusClass(status = '') {
+                const s =
+                    String(status || '').toLowerCase();
+
+                if (s.includes('cancel')) {
+                    return 'upcoming-status-cancelled';
+                }
+
+                if (s.includes('resched')) {
+                    return 'upcoming-status-rescheduled';
+                }
+
+                if (s.includes('complete')) {
+                    return 'upcoming-status-completed';
+                }
 
                 return 'upcoming-status-upcoming';
             }
 
             function avatarClass(status = '') {
-                const s = String(status || '').toLowerCase();
+                const s =
+                    String(status || '').toLowerCase();
 
-                if (s.includes('cancel')) return 'avatar-cancelled';
-                if (s.includes('resched')) return 'avatar-rescheduled';
-                if (s.includes('complete')) return 'avatar-completed';
+                if (s.includes('cancel')) {
+                    return 'avatar-cancelled';
+                }
+
+                if (s.includes('resched')) {
+                    return 'avatar-rescheduled';
+                }
+
+                if (s.includes('complete')) {
+                    return 'avatar-completed';
+                }
 
                 return 'avatar-upcoming';
             }
@@ -328,117 +367,336 @@
                     .toUpperCase();
             }
 
-            function render(selectedDateKey) {
+            function render(selectedDateKey = selectedKey) {
+                const days = getVisibleDays();
+
+                const visibleKeys =
+                    days.map(dateKey);
+
+                if (
+                    !visibleKeys.includes(selectedDateKey)
+                ) {
+                    selectedDateKey =
+                        visibleKeys[0];
+                }
+
                 selectedKey = selectedDateKey;
-                const appointments = apptDetails[selectedKey] || [];
 
-                const dateButtons = days.map(d => {
-                    const key = dateKey(d);
-                    const active = key === selectedKey;
-                    const count = (apptDetails[key] || []).length;
-                    const hasAppointments = count > 0;
+                const appointments =
+                    apptDetails[selectedKey] || [];
 
-                    return `
-<button type="button" onclick="renderUpcomingAppointmentsDay('${key}')"
-class="upcoming-date-btn ${active ? 'active' : ''} ${hasAppointments ? 'has-appointments' : ''}">
-${hasAppointments ? `<span class="upcoming-date-badge">${count}</span>` : ''}
-<div class="text-sm font-extrabold">${d.getDate()}</div>
-<div class="text-[10px] font-semibold opacity-70">
-${d.toLocaleDateString('en-US', { weekday: 'short' })}
-</div>
-</button>
-`;
-                }).join('');
+                const dateButtons =
+                    days.map(d => {
+                        const key = dateKey(d);
 
-                const items = appointments.length ?
-                    appointments.slice(0, 3).map(appt => {
-                        const name = appt.name || 'Unknown Patient';
-                        const initials = getInitials(name);
-                        const photo = appt.patientPhotoUrl || appt.profile_photo_url || appt.avatar || null;
+                        const active =
+                            key === selectedKey;
+
+                        const count =
+                            (apptDetails[key] || []).length;
+
+                        const hasAppointments =
+                            count > 0;
+
+                        const isToday =
+                            key === dateKey(today);
 
                         return `
-<a href="${appt.patientProfileUrl || '{{ route('dentist.dentist.appointments') }}'}"
-class="upcoming-item hover:bg-red-50/40 rounded-xl transition" >
+<button
+    type="button"
+    onclick="renderUpcomingAppointmentsDay('${key}')"
+    class="
+        upcoming-date-btn
+        ${active ? 'active' : ''}
+        ${hasAppointments ? 'has-appointments' : ''}
+        ${isToday ? 'is-today' : ''}
+    "
+>
+    ${hasAppointments
+                            ? `<span class="upcoming-date-badge">${count}</span>`
+                            : ''
+                        }
 
-<span class="upcoming-time-dot ${statusClass(appt.status)}"></span>
+    <div class="text-sm font-extrabold">
+        ${d.getDate()}
+    </div>
 
-<div class="patient-avatar patient-avatar-sm upcoming-avatar ${avatarClass(appt.status)}">
-${
-photo
-? `<img src="${escHtml(photo)}" alt="${escHtml(name)}">`
-: `<span>${escHtml(initials)}</span>`
-}
-</div>
-
-<div class="flex-1 min-w-0">
-<div class="flex items-center justify-between gap-2">
-<p class="text-sm font-bold text-gray-800 truncate">${escHtml(name)}</p>
-<span class="text-[11px] font-bold text-[#8B0000] flex-shrink-0">${escHtml(appt.time || '—')}</span>
-</div>
-<p class="text-xs text-gray-500 truncate">${escHtml(appt.service || 'General Service')}</p>
-</div>
-</a >
+    <div class="text-[10px] font-semibold opacity-70">
+        ${d.toLocaleDateString(
+                            'en-US',
+                            { weekday: 'short' }
+                        )}
+    </div>
+</button>
 `;
-                    }).join('') :
-                    `
-<div class="upcoming-empty-state text-gray-400" >
-<div>
-<i class="fa-regular fa-calendar-xmark text-3xl mb-3 text-[#8B0000]/40"></i>
-<p class="text-sm font-semibold">No appointments for this day</p>
-</div>
-</div>
+                    }).join('');
+
+                const items = appointments.length ?
+                    appointments
+                    .slice(0, 3)
+                    .map(appt => {
+                        const name =
+                            appt.name ||
+                            'Unknown Patient';
+
+                        const initials =
+                            getInitials(name);
+
+                        const photo =
+                            appt.patientPhotoUrl ||
+                            appt.profile_photo_url ||
+                            appt.avatar ||
+                            null;
+
+                        return `
+<a
+    href="${
+        appt.patientProfileUrl ||
+        '{{ route('dentist.dentist.appointments') }}'
+    }"
+    class="
+        upcoming-item
+        hover:bg-red-50/40
+        rounded-xl
+        transition
+    "
+>
+    <span
+        class="
+            upcoming-time-dot
+            ${statusClass(appt.status)}
+        "
+    ></span>
+
+    <div
+        class="
+            patient-avatar
+            patient-avatar-sm
+            ${avatarClass(appt.status)}
+        "
+    >
+        ${
+            photo
+                ? `
+                                                    <img
+                                                        src="${escHtml(photo)}"
+                                                        alt="${escHtml(name)}"
+                                                    >
+                                                `
+                : `
+                                                    <span>
+                                                        ${escHtml(initials)}
+                                                    </span>
+                                                `
+        }
+    </div>
+
+    <div class="flex-1 min-w-0">
+        <div
+            class="
+                flex
+                items-center
+                justify-between
+                gap-2
+            "
+        >
+            <p
+                class="
+                    text-sm
+                    font-bold
+                    text-gray-800
+                    truncate
+                "
+            >
+                ${escHtml(name)}
+            </p>
+
+            <span
+                class="
+                    text-[11px]
+                    font-bold
+                    text-[#8B0000]
+                    flex-shrink-0
+                "
+            >
+                ${escHtml(
+                    appt.time || '—'
+                )}
+            </span>
+        </div>
+
+        <p class="text-xs text-gray-500 truncate">
+            ${escHtml(
+                appt.service ||
+                'General Service'
+            )}
+        </p>
+    </div>
+</a>
 `;
+                    })
+                    .join('') :
+                    (
+                        window.EmptyState?.buildHtml ?
+                        window.EmptyState.buildHtml({
+                            title: 'No appointments for this day',
+
+                            message: 'Scheduled appointments for this date will appear here.',
+
+                            icon: 'fa-calendar-xmark',
+
+                            className: 'upcoming-empty-state'
+                        }) :
+                        ''
+                    );
+
+                const firstVisibleDate = days[0];
+                const lastVisibleDate =
+                    days[days.length - 1];
+
+                const rangeLabel =
+                    `${firstVisibleDate.toLocaleDateString(
+                    'en-US',
+                    {
+                        month: 'short',
+                        day: 'numeric'
+                    }
+                )} – ${lastVisibleDate.toLocaleDateString(
+                    'en-US',
+                    {
+                        month: 'short',
+                        day: 'numeric'
+                    }
+                )
+                }`;
 
                 const html = `
-<article class="card upcoming-card" >
+<article class="card upcoming-card">
+
 <header class="card-header">
-<div class="card-header-left">
-<div class="card-header-icon"><i class="fa-regular fa-calendar-days"></i></div>
-<h3 class="card-title">
-Upcoming Appointments
-</h3>
-</div>
+
+    <div class="card-header-left">
+        <div class="card-header-icon">
+            <i class="fa-regular fa-calendar-days"></i>
+        </div>
+
+        <div>
+            <h3 class="card-title">
+                Upcoming Appointments
+            </h3>
+
+            <p class="upcoming-range-label">
+                ${rangeLabel}
+            </p>
+        </div>
+    </div>
+
 </header>
 
 <div class="card-body upcoming-card-body">
-<div class="upcoming-date-strip mb-3">
-${dateButtons}
-</div>
 
-<div class="upcoming-list-area divide-y divide-gray-100">
-${items}
-</div>
+    <div class="upcoming-date-navigation">
 
-<a href="{{ route('dentist.dentist.appointments') }}"
-class="card-link upcoming-view-all">
-View all appointments <i class="fa-solid fa-arrow-right"></i>
-</a>
+        <button
+            type="button"
+            class="upcoming-date-nav-btn"
+            onclick="changeUpcomingAppointmentWindow(-7)"
+            aria-label="Previous 7 days"
+            data-tooltip="Previous 7 days"
+        >
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <div class="upcoming-date-strip">
+            ${dateButtons}
+        </div>
+
+        <button
+            type="button"
+            class="upcoming-date-nav-btn"
+            onclick="changeUpcomingAppointmentWindow(7)"
+            aria-label="Next 7 days"
+            data-tooltip="Next 7 days"
+        >
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+    </div>
+
+    <div
+        class="
+            upcoming-list-area
+            divide-y
+            divide-gray-100
+        "
+    >
+        ${items}
+    </div>
+
+    <a
+        href="{{ route('dentist.dentist.appointments') }}"
+        class="card-link upcoming-view-all"
+    >
+        View all appointments
+        <i class="fa-solid fa-arrow-right"></i>
+    </a>
+
 </div>
 </article>
 `;
 
-                const container = document.getElementById('upcomingAppointmentsContainer');
+                const container =
+                    document.getElementById(
+                        'upcomingAppointmentsContainer'
+                    );
 
                 if (container) {
                     if (!container.dataset.loaded) {
-                        swapSkeletonContent('upcomingAppointmentsContainer', html);
-                        container.dataset.loaded = 'true';
+                        swapSkeletonContent(
+                            'upcomingAppointmentsContainer',
+                            html
+                        );
+
+                        container.dataset.loaded =
+                            'true';
                     } else {
                         container.innerHTML = html;
                     }
                 }
+
             }
 
-            window.renderUpcomingAppointmentsDay = render;
+            window.renderUpcomingAppointmentsDay =
+                function(key) {
+                    render(key);
+                };
+
+            window.changeUpcomingAppointmentWindow =
+                function(daysToMove) {
+                    windowStart.setDate(
+                        windowStart.getDate() +
+                        daysToMove
+                    );
+
+                    selectedKey =
+                        dateKey(windowStart);
+
+                    render(selectedKey);
+                };
             render(selectedKey);
+
         }
 
         const dashboardData = {
             gadLabels: {!! json_encode($gadLabels) !!},
             gadFemale: {!! json_encode($gadFemale) !!},
             gadMale: {!! json_encode($gadMale) !!},
+
             apptCounts: {!! json_encode($calendarAppointmentCounts) !!},
             apptDetails: {!! json_encode($calendarAppointmentDetails) !!},
+
+            dashboardAppointmentDetails: {!! json_encode($dashboardAppointmentDetails ?? []) !!},
+
             unavailableDates: {!! json_encode($blockedDates ?? []) !!},
             holidays: {!! json_encode($philippineHolidays ?? []) !!},
         };
@@ -446,11 +704,17 @@ View all appointments <i class="fa-solid fa-arrow-right"></i>
         const KPI_DATA = {!! json_encode(
             (object) [
                 'dentalCases' => $dentalCasesThisMonth ?? 0,
+        
                 'dentalCasesDelta' => $dentalCasesDelta,
+        
                 'totalAppts' => $totalApptsThisMonth ?? 0,
+        
                 'totalApptsDelta' => $totalApptsDelta,
+        
                 'todayCount' => $todayAppointments?->whereNotIn('status', ['cancelled'])?->count() ?? 0,
+        
                 'todayUpcoming' => $todayAppointments?->whereIn('status', ['upcoming', 'rescheduled'])?->count() ?? 0,
+        
                 'todayCompleted' => $todayAppointments?->where('status', 'completed')?->count() ?? 0,
             ],
         ) !!};
@@ -509,7 +773,7 @@ Total <span class="font-semibold">${totalCases}</span>
             if (!hasData) {
                 const html = `
 <div class="card gad-analytics-card p-5 sm:p-6 flex flex-col" >
-${ cardHeader }
+${cardHeader}
 <div class="relative z-10 flex-grow flex items-center justify-center w-full min-h-[255px]">
 <div class="gad-empty-panel text-center">
 <div class="gad-empty-icon-wrap">
@@ -534,7 +798,7 @@ Completed treatment records for this month will appear here once available.
 
             const chartHtml = `
 <div class="card gad-analytics-card p-5 sm:p-6 flex flex-col" >
-${ cardHeader }
+${cardHeader}
 <div class="gad-chart-shell relative z-10 flex-grow flex items-center justify-center w-full">
 <canvas id="gadChart" style="display:block;width:100%;height:100%;min-height:240px;"></canvas>
 </div>
@@ -624,6 +888,19 @@ ${ cardHeader }
         function buildKpiGrid() {
             const kpiData = KPI_DATA;
 
+            const clinicStatusLabel =
+                dentistIsIn ? 'Open' : 'Closed';
+
+            const clinicStatusIcon =
+                dentistIsIn ?
+                'fa-door-open' :
+                'fa-door-closed';
+
+            const clinicStatusColor =
+                dentistIsIn ?
+                '#00A96E' :
+                '#EF4444';
+
             const deltaBadge = (value) => {
                 if (value === null || typeof value === 'undefined') return '';
                 const tone = value >= 0 ? 'status-completed' : 'status-cancelled';
@@ -664,7 +941,13 @@ ${ cardHeader }
 <article class="stat-card s-green dashboard-kpi-card dashboard-clinic-status-card">
 <div class="stat-card-info">
 <span class="stat-label">Clinic Status</span>
-<strong id="statusKpiLabel" class="stat-num">Open</strong>
+<strong
+    id="statusKpiLabel"
+    class="stat-num"
+    style="color:${clinicStatusColor}"
+>
+    ${clinicStatusLabel}
+</strong>
 <div class="stat-footer dashboard-live-clock">
 <span class="dashboard-live-dot"></span>
 <span id="kpi-clock-hhmm">00:00</span>
@@ -673,7 +956,13 @@ ${ cardHeader }
 </div>
 </div>
 <div class="dashboard-kpi-actions">
-<div class="stat-icon-wrapper"><i id="statusKpiIcon" class="fa-solid fa-door-open"></i></div>
+<div class="stat-icon-wrapper">
+    <i
+        id="statusKpiIcon"
+        class="fa-solid ${clinicStatusIcon}"
+        style="color:${clinicStatusColor}"
+    ></i>
+</div>
 <button type="button" onclick="openStatusModal()" class="ui-btn ui-btn-secondary ui-btn-sm status-change-btn">Change</button>
 </div>
 </article>
@@ -762,7 +1051,7 @@ ${rows}
 View All <i class="fa-solid fa-arrow-right"></i>
 </a>
 </header>
-<div class="card-body">${ tableHtml }</div>
+<div class="card-body">${tableHtml}</div>
 </article>
 `;
 
@@ -849,7 +1138,7 @@ ${rows}
 View All <i class="fa-solid fa-arrow-right"></i>
 </a>
 </header>
-<div class="card-body">${ tableHtml }</div>
+<div class="card-body">${tableHtml}</div>
 </article>
 `;
 
@@ -960,8 +1249,6 @@ View All <i class="fa-solid fa-arrow-right"></i>
         });
 
         (function() {
-            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
             function tickClock() {
                 const now = new Date();
@@ -978,8 +1265,6 @@ View All <i class="fa-solid fa-arrow-right"></i>
                 hmEl.textContent = String(displayHour).padStart(2, '0') + ':' + String(m).padStart(2, '0');
                 document.getElementById('kpi-clock-ss').textContent = ':' + String(s).padStart(2, '0');
                 document.getElementById('kpi-clock-ampm').textContent = ampm;
-                document.getElementById('kpi-clock-date').textContent = days[now.getDay()] + ', ' + months[now
-                    .getMonth()] + ' ' + now.getDate();
 
                 const dayicon = document.getElementById('kpi-clock-dayicon');
                 const bigicon = document.getElementById('kpi-clock-icon');
@@ -995,7 +1280,7 @@ View All <i class="fa-solid fa-arrow-right"></i>
             setInterval(tickClock, 1000);
         })();
 
-        let dentistIsIn = true;
+        let dentistIsIn = @json(($clinicStatus ?? 'in') === 'in');
 
         function openStatusModal() {
             const modal = document.getElementById('statusModal');
@@ -1134,21 +1419,18 @@ View All <i class="fa-solid fa-arrow-right"></i>
                 .replace(/'/g, "\\'");
         }
 
-
-        function getSmartTooltipClass(dayNumber, firstDow, totalDays) {
-            const col = (firstDow + dayNumber - 1) % 7;
-
-            if (col >= 5) return 'tooltip-left';
-            if (col <= 1) return 'tooltip-right';
-            return 'tooltip-center';
-        }
-
-        function buildDayHoverCard(dateStr, appointments, placement = 'hover-bottom') {
+        function buildDayHoverCard(
+            dateStr,
+            appointments,
+            placement = 'hover-bottom',
+            alignment = 'hover-align-center'
+        ) {
             const safeAppointments = Array.isArray(appointments) ? appointments : [];
 
             if (!safeAppointments.length) {
                 return `
-<div class="card day-hover-card ${placement} w-[320px] opacity-0 invisible pointer-events-none transition-all duration-150 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto" >
+<div
+    class="card day-hover-card ${placement} ${alignment} w-[320px]">
 <div class="absolute -top-3 left-0 right-0 h-3"></div>
 <div class="card-header">
 <div class="card-header-left">
@@ -1176,7 +1458,8 @@ View All <i class="fa-solid fa-arrow-right"></i>
 
                 const safeName = escJs(appt.name || 'Unknown Patient');
                 const safeService = escJs(appt.service || 'General Service');
-                const safeSchedule = escJs(`${ formatModalDate(appt.date || dateStr) } • ${ appt.time || '—' } `);
+                const safeSchedule = escJs(
+                    `${formatModalDate(appt.date || dateStr)} • ${appt.time || '—'} `);
                 const rawProfileUrl = appt.patientProfileUrl || '#';
                 const profileUrl =
                     `${rawProfileUrl}${rawProfileUrl.includes('?') ? '&' : '?'}from=dashboard`;
@@ -1201,27 +1484,27 @@ class="ui-btn ui-btn-primary ui-btn-sm">
 </a>
 
 ${canReschedule ? `
-    <button type="button"
-    onclick="event.stopPropagation(); openRescheduleModalFromDay('${escJs(appt.id)}', '${safeName}', '${safeSchedule}', '${safeService}', '${escJs(appt.rescheduleUrl || '#')}')"
-    class="ui-btn ui-btn-warning ui-btn-sm">
-    <i class="fa-solid fa-rotate-right text-[10px]"></i> Reschedule
-    </button>
-    ` : ''}
+                                                                                    <button type="button"
+                                                                                    onclick="event.stopPropagation(); openRescheduleModalFromDay('${escJs(appt.id)}', '${safeName}', '${safeSchedule}', '${safeService}', '${escJs(appt.rescheduleUrl || '#')}')"
+                                                                                    class="ui-btn ui-btn-warning ui-btn-sm">
+                                                                                    <i class="fa-solid fa-rotate-right text-[10px]"></i> Reschedule
+                                                                                    </button>
+                                                                                    ` : ''}
 
 ${canCancel ? `
-    <button type="button"
-    onclick="event.stopPropagation(); cancelAppointmentFromModal('${escJs(appt.cancelUrl || '#')}', '${safeName}', '${safeSchedule}')"
-    class="ui-btn ui-btn-danger ui-btn-sm">
-    <i class="fa-solid fa-ban text-[10px]"></i> Cancel
-    </button>
-    ` : ''}
+                                                                                    <button type="button"
+                                                                                    onclick="event.stopPropagation(); cancelAppointmentFromModal('${escJs(appt.cancelUrl || '#')}', '${safeName}', '${safeSchedule}')"
+                                                                                    class="ui-btn ui-btn-danger ui-btn-sm">
+                                                                                    <i class="fa-solid fa-ban text-[10px]"></i> Cancel
+                                                                                    </button>
+                                                                                    ` : ''}
 </div>
 </div>
 `;
             }).join('');
 
             return `
-<div class="card day-hover-card ${placement} w-[340px] opacity-0 invisible pointer-events-none transition-all duration-150 group-hover:opacity-100 group-hover:visible group-hover:pointer-events-auto" >
+<div class=" card day-hover-card ${placement} ${alignment} w-[320px]">
 <div class="absolute -top-3 left-0 right-0 h-3"></div>
 <div class="card-header">
 <div class="card-header-left">
@@ -1309,7 +1592,8 @@ ${items}
             const isHoverDevice = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
 
             function renderDentistCalendar(year, month) {
-                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September",
+                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August",
+                    "September",
                     "October", "November", "December"
                 ];
                 const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -1318,7 +1602,7 @@ ${items}
                 const holidays = getHolidaysForMonth(year, month);
 
                 const headerHtml = dayLabels.map((l, i) =>
-                    `<div class="text-center text-[0.6rem] font-bold py-1 pb-2 uppercase tracking-widest ${(i === 0 || i === 6) ? 'cal-day-weekend' : 'cal-day-label'}" > ${ l }</div> `
+                    `<div class="text-center text-[0.6rem] font-bold py-1 pb-2 uppercase tracking-widest ${(i === 0 || i === 6) ? 'cal-day-weekend' : 'cal-day-label'}" > ${l}</div> `
                 ).join('');
 
                 let cells = '';
@@ -1347,24 +1631,24 @@ ${items}
 <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-yellow-400 text-[10px] leading-none flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-white" >
 <i class="fa-solid fa-star text-[8px]"></i>
 </span> `;
-                        tooltipTxt = `<i class="fa-solid fa-star mr-1 text-white" ></i > ${ holiday } `;
+                        tooltipTxt = `<i class="fa-solid fa-star mr-1 text-white" ></i > ${holiday} `;
                         tooltipTone = 'yellow';
                     }
 
                     if (hasAppts && !isUnavail) {
                         if (isFull) {
                             tooltipTxt =
-                                `<i class="fa-solid fa-circle-xmark mr-1 text-red-300" ></i > Fully booked — ${ count } patient${ count > 1 ? 's' : '' } `;
+                                `<i class="fa-solid fa-circle-xmark mr-1 text-red-300" ></i > Fully booked — ${count} patient${count > 1 ? 's' : ''} `;
                             tooltipTone = 'red';
                         } else {
                             tooltipTxt =
-                                `<i class="fa-solid fa-user-clock mr-1 text-emerald-300" ></i > ${ count } patient${ count > 1 ? 's' : '' } scheduled`;
+                                `<i class="fa-solid fa-user-clock mr-1 text-emerald-300" ></i > ${count} patient${count > 1 ? 's' : ''} scheduled`;
                             tooltipTone = 'green';
                         }
                         const dotClass = isFull ? 'bg-red-600' : 'bg-emerald-600';
                         badgeHtml = `
 <span class="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full ${dotClass} text-[9px] font-bold leading-none flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-white" >
-${ count }
+${count}
 </span> `;
                     }
 
@@ -1380,7 +1664,8 @@ ${ count }
                             ` <i class="fa-solid fa-ban mr-1 text-gray-300" ></i > Not available`;
                         tooltipTone = 'gray';
                     } else if (!hasAppts && !holiday && !isToday && !isUnavail) {
-                        tooltipTxt = `<i class="fa-regular fa-calendar mr-1 text-gray-300" ></i > No scheduled patients`;
+                        tooltipTxt =
+                            `<i class="fa-regular fa-calendar mr-1 text-gray-300" ></i > No scheduled patients`;
                         tooltipTone = 'gray';
                     }
 
@@ -1393,7 +1678,7 @@ ${ count }
                         cellClass += " full";
                     } else if (hasAppts) {
                         cellClass +=
-                            " bg-emerald-50 text-emerald-700 font-bold border-emerald-200 cursor-pointer hover:bg-emerald-100 transition-colors";
+                            " has-patients font-bold cursor-pointer";
                     } else if (isUnavail) {
                         cellClass += " disabled text-gray-400";
                     } else {
@@ -1401,6 +1686,17 @@ ${ count }
                     }
 
                     const col = (firstDow + d - 1) % 7;
+                    let hoverAlignment =
+                        'hover-align-center';
+
+                    if (col <= 1) {
+                        hoverAlignment =
+                            'hover-align-right';
+                    } else if (col >= 4) {
+                        hoverAlignment =
+                            'hover-align-left';
+                    }
+
                     const tooltipSide = col >= 5 ? "tooltip-left" : col <= 1 ? "tooltip-right" : "tooltip-center";
                     const tooltipPalette = {
                         dark: {
@@ -1443,15 +1739,23 @@ ${tooltipTxt}
 </div>
 ` : '';
 
-                    const hoverCardHtml = showHoverCard ? buildDayHoverCard(dateStr, dayAppointments, hoverPlacement) : '';
+                    const hoverCardHtml =
+                        showHoverCard ?
+                        buildDayHoverCard(
+                            dateStr,
+                            dayAppointments,
+                            hoverPlacement,
+                            hoverAlignment
+                        ) :
+                        '';
                     const clickOpen = canOpenModal && !isHoverDevice ?
                         `onclick = "openDayAppointmentsModal('${dateStr}', decodeURIComponent('${encodedAppointments}'))"` :
                         '';
 
                     cells += `
-<div class="cal-cell-wrap relative flex items-center justify-center group" ${ clickOpen }>
-${ tooltipHtml }
-${ hoverCardHtml }
+<div class="cal-cell-wrap relative flex items-center justify-center group" ${clickOpen}>
+${tooltipHtml}
+${hoverCardHtml}
 <div class="${cellClass}" data-date="${dateStr}">
 <span>${d}</span>
 ${badgeHtml}
@@ -1476,7 +1780,7 @@ ${badgeHtml}
 <div class="cal-grid">${headerHtml}</div>
 <div class="cal-grid" style="row-gap: 0.5rem;">${cells}</div>
 </div>
-${ renderUnifiedCalendarLegend('dentist') }
+${renderUnifiedCalendarLegend('dentist')}
 </div> `;
 
                     swapSkeletonContent('dentistCalendarContainer', html);
@@ -1582,7 +1886,7 @@ ${ renderUnifiedCalendarLegend('dentist') }
                     const displayTime = escHtml(appt.time || '—');
 
                     const safeName = (appt.name || 'Unknown Patient').replace(/'/g, "\\'");
-                    const safeSchedule = `${ formatModalDate(appt.date || dateStr) } • ${ appt.time || '—' } `
+                    const safeSchedule = `${formatModalDate(appt.date || dateStr)} • ${appt.time || '—'} `
                         .replace(
                             /'/g, "\\'");
                     const safeService = (appt.service || '').replace(/'/g, "\\'");
@@ -1590,14 +1894,14 @@ ${ renderUnifiedCalendarLegend('dentist') }
                     const photo = appt.patientPhotoUrl || appt.profile_photo_url || appt.avatar || null;
                     const avatarHtml = photo ?
                         `<img src = "${escHtml(photo)}" alt = "${displayName}" > ` :
-                        `<span > ${ escHtml(initial) }</span> `;
+                        `<span > ${escHtml(initial)}</span> `;
 
                     return `
 <article class="card scheduled-patient-card" >
 <div class="scheduled-patient-head">
 <a href="${profileUrl}${profileUrl.includes('?') ? '&' : '?'}from=dashboard"
 onclick="closeDayAppointmentsModal()"
-class="patient-avatar patient-avatar-sm scheduled-patient-avatar">
+class="patient-avatar patient-avatar-sm">
 ${avatarHtml}
 </a>
 
@@ -1631,22 +1935,22 @@ class="ui-btn ui-btn-primary ui-btn-sm scheduled-action-btn">
 </a>
 
 ${canReschedule ? `
-    <button type="button"
-    onclick="openRescheduleModalFromDay('${appt.id}', '${safeName}', '${safeSchedule}', '${safeService}', '${rescheduleUrl}')"
-    class="ui-btn ui-btn-warning ui-btn-sm scheduled-action-btn">
-    <i class="fa-solid fa-rotate-right"></i>
-    <span>Reschedule</span>
-    </button>
-    ` : ''}
+                                                                                    <button type="button"
+                                                                                    onclick="openRescheduleModalFromDay('${appt.id}', '${safeName}', '${safeSchedule}', '${safeService}', '${rescheduleUrl}')"
+                                                                                    class="ui-btn ui-btn-warning ui-btn-sm scheduled-action-btn">
+                                                                                    <i class="fa-solid fa-rotate-right"></i>
+                                                                                    <span>Reschedule</span>
+                                                                                    </button>
+                                                                                    ` : ''}
 
 ${canCancel ? `
-    <button type="button"
-    onclick="cancelAppointmentFromModal('${cancelUrl}', '${safeName}', '${safeSchedule}')"
-    class="ui-btn ui-btn-danger ui-btn-sm scheduled-action-btn">
-    <i class="fa-solid fa-ban"></i>
-    <span>Cancel</span>
-    </button>
-    ` : ''}
+                                                                                    <button type="button"
+                                                                                    onclick="cancelAppointmentFromModal('${cancelUrl}', '${safeName}', '${safeSchedule}')"
+                                                                                    class="ui-btn ui-btn-danger ui-btn-sm scheduled-action-btn">
+                                                                                    <i class="fa-solid fa-ban"></i>
+                                                                                    <span>Cancel</span>
+                                                                                    </button>
+                                                                                    ` : ''}
 </div>
 </article>
 `;

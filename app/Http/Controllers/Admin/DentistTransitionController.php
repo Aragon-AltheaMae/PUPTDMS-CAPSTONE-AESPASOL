@@ -5,9 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AssignDentistSuccessorsRequest;
 use App\Http\Requests\CancelDentistTransitionRequest;
+use App\Http\Requests\DentistTransitionRequest;
 use App\Http\Requests\FinalizeDentistTransitionRequest;
-use App\Http\Requests\StoreDentistTransitionRequest;
-use App\Http\Requests\UpdateDentistTransitionRequest;
 use App\Models\DentistTransition;
 use App\Models\User;
 use App\Services\DentistTransitionService;
@@ -24,41 +23,95 @@ class DentistTransitionController extends Controller
     {
         $this->authorizeAction('view_dentist_transitions');
 
-        $query = DentistTransition::query()
-            ->with(['dentist.role', 'defaultSuccessor', 'checklistItems'])
+        $perPageInput = (int) $request->input('per_page', 10);
+        $perPage = in_array($perPageInput, [10, 20, 50, 100], true) ? $perPageInput : 10;
+
+        $standardTransitionTypes = array_values(array_filter(
+            DentistTransition::TYPES,
+            fn ($type) => $type !== 'other'
+        ));
+
+        $baseQuery = DentistTransition::query()
+            ->with(['dentist.role', 'defaultSuccessor', 'items.successorDentist', 'checklistItems'])
             ->latest();
 
-        if ($status = trim((string) $request->get('status', ''))) {
-            $query->where('status', $status);
-        }
+        $search = trim((string) $request->get('search', ''));
 
-        if ($type = trim((string) $request->get('transition_type', ''))) {
-            $query->where('transition_type', $type);
-        }
-
-        if ($dentist = trim((string) $request->get('dentist', ''))) {
-            $query->whereHas('dentist', function ($builder) use ($dentist) {
-                $builder->where('name', 'like', '%' . $dentist . '%');
+        if ($search !== '') {
+            $baseQuery->where(function ($builder) use ($search) {
+                $builder->whereHas('dentist', function ($query) use ($search) {
+                    $query->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%');
+                })->orWhereHas('defaultSuccessor', function ($query) use ($search) {
+                    $query->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%');
+                });
             });
         }
 
+        if ($status = trim((string) $request->get('status', ''))) {
+            $baseQuery->where('status', $status);
+        }
+
+        if ($type = trim((string) $request->get('transition_type', ''))) {
+            if ($type === 'other') {
+                $customType = trim((string) $request->get('transition_type_other', ''));
+
+                if ($customType !== '') {
+                    $baseQuery->where('transition_type', $customType);
+                } else {
+                    $baseQuery->whereNotIn('transition_type', $standardTransitionTypes);
+                }
+            } else {
+                $baseQuery->where('transition_type', $type);
+            }
+        }
+
         if ($successor = trim((string) $request->get('successor', ''))) {
-            $query->whereHas('defaultSuccessor', function ($builder) use ($successor) {
+            $baseQuery->whereHas('defaultSuccessor', function ($builder) use ($successor) {
                 $builder->where('name', 'like', '%' . $successor . '%');
             });
         }
 
         if ($effectiveDate = trim((string) $request->get('effective_date', ''))) {
-            $query->whereDate('access_ends_at', $effectiveDate);
+            $baseQuery->whereDate('access_ends_at', $effectiveDate);
         }
 
-        $transitions = $query->paginate(10)->withQueryString();
+        $query = clone $baseQuery;
+        $transitions = $query->paginate($perPage)->withQueryString();
 
-        return view('admin.dentist-transitions.index', [
+        $statsQuery = clone $baseQuery;
+        $stats = [
+            'total' => (clone $statsQuery)->count(),
+            'active' => (clone $statsQuery)->whereIn('status', ['draft', 'pending_review', 'handover_in_progress', 'scheduled'])->count(),
+            'completed' => (clone $statsQuery)->where('status', 'completed')->count(),
+        ];
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'transitions' => $transitions->getCollection()
+                    ->map(fn (DentistTransition $transition) => $this->formatTransitionForResponse($transition))
+                    ->values(),
+                'pagination' => [
+                    'total' => $transitions->total(),
+                    'from' => $transitions->firstItem() ?? 0,
+                    'to' => $transitions->lastItem() ?? 0,
+                    'current_page' => $transitions->currentPage(),
+                    'last_page' => $transitions->lastPage(),
+                    'per_page' => $transitions->perPage(),
+                ],
+                'stats' => $stats,
+            ]);
+        }
+
+        return view('admin.dentist-continuity', [
+            'pageMode' => 'index',
             'transitions' => $transitions,
+            'stats' => $stats,
             'statuses' => DentistTransition::STATUSES,
             'types' => DentistTransition::TYPES,
-            'filters' => $request->only(['status', 'transition_type', 'dentist', 'successor', 'effective_date']),
+            'perPage' => $perPage,
+            'filters' => $request->only(['search', 'status', 'transition_type', 'transition_type_other', 'successor', 'effective_date']),
         ]);
     }
 
@@ -66,7 +119,8 @@ class DentistTransitionController extends Controller
     {
         $this->authorizeAction('create_dentist_transitions');
 
-        return view('dentist.dentist-continuity', [
+        return view('admin.dentist-continuity', [
+            'pageMode' => 'form',
             'transition' => new DentistTransition(),
             'dentists' => $this->activeDentists(),
             'types' => DentistTransition::TYPES,
@@ -75,7 +129,7 @@ class DentistTransitionController extends Controller
         ]);
     }
 
-    public function store(StoreDentistTransitionRequest $request)
+    public function store(DentistTransitionRequest $request)
     {
         $this->authorizeAction('create_dentist_transitions');
 
@@ -99,12 +153,14 @@ class DentistTransitionController extends Controller
             'items.patient',
             'items.originalDentist',
             'items.successorDentist',
+            'items.documentRequest',
             'checklistItems.completedBy',
         ]);
 
         $transition = $this->service->generateTransitionItems($transition);
 
-        return view('admin.dentist-transitions.show', [
+        return view('admin.dentist-continuity', [
+            'pageMode' => 'show',
             'transition' => $transition,
             'summary' => $this->service->generateImpactSummary($transition),
             'dentists' => $this->activeDentists($transition->dentist_id),
@@ -116,7 +172,8 @@ class DentistTransitionController extends Controller
     {
         $this->authorizeAction('update_dentist_transitions');
 
-        return view('dentist.dentist-continuity', [
+        return view('admin.dentist-continuity', [
+            'pageMode' => 'form',
             'transition' => $transition,
             'dentists' => $this->activeDentists($transition->dentist_id),
             'types' => DentistTransition::TYPES,
@@ -125,7 +182,7 @@ class DentistTransitionController extends Controller
         ]);
     }
 
-    public function update(UpdateDentistTransitionRequest $request, DentistTransition $transition)
+    public function update(DentistTransitionRequest $request, DentistTransition $transition)
     {
         $this->authorizeAction('update_dentist_transitions');
 
@@ -154,6 +211,7 @@ class DentistTransitionController extends Controller
         $this->authorizeAction('assign_dentist_successors');
 
         $this->service->updateSuccessorAssignments($transition, $request->validated(), $request->user());
+        $this->service->notifyTransitionParticipants($transition, 'assignments_updated');
 
         return back()->with('success', 'Successor assignments updated successfully.');
     }
@@ -168,6 +226,7 @@ class DentistTransitionController extends Controller
         ]);
 
         $this->service->updateChecklist($transition, $request->only('checklist'), $request->user());
+        $this->service->notifyTransitionParticipants($transition, 'checklist_updated');
 
         return back()->with('success', 'Handover checklist updated successfully.');
     }
@@ -235,5 +294,43 @@ class DentistTransitionController extends Controller
         $allowed = $user->hasPermission($permission) || $user->hasPermission('manage_dentist_accounts');
 
         abort_unless($allowed, 403, 'Unauthorized.');
+    }
+
+    private function formatTransitionForResponse(DentistTransition $transition): array
+    {
+        $transitionType = (string) $transition->transition_type;
+        $status = (string) $transition->status;
+
+        return [
+            'id' => $transition->id,
+            'dentist_name' => $transition->dentist->name ?? 'Unknown dentist',
+            'dentist_email' => $transition->dentist->email ?? 'No email',
+            'transition_type' => $transitionType,
+            'transition_type_label' => in_array($transitionType, DentistTransition::TYPES, true)
+                ? str_replace('_', ' ', ucfirst($transitionType))
+                : $transitionType,
+            'last_working_date' => optional($transition->last_working_date)->format('M d, Y'),
+            'access_expiration' => optional($transition->access_ends_at)->format('M d, Y'),
+            'successor_name' => $this->resolveSuccessorName($transition),
+            'progress_percentage' => (int) $transition->progress_percentage,
+            'status' => $status,
+            'status_label' => str_replace('_', ' ', ucfirst($status)),
+            'show_url' => route('admin.dentist-transitions.show', $transition),
+            'edit_url' => !in_array($status, ['completed', 'cancelled'], true)
+                ? route('admin.dentist-transitions.edit', $transition)
+                : null,
+        ];
+    }
+
+    private function resolveSuccessorName(DentistTransition $transition): string
+    {
+        if ($transition->defaultSuccessor?->name) {
+            return $transition->defaultSuccessor->name;
+        }
+
+        $firstAssignedSuccessor = $transition->items
+            ->first(fn ($item) => $item->successorDentist?->name);
+
+        return $firstAssignedSuccessor?->successorDentist?->name ?? 'Not assigned';
     }
 }

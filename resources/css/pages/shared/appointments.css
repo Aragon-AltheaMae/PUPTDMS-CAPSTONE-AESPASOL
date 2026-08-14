@@ -57,35 +57,8 @@
 }
 
 .appt-card:hover {
-    border-color: rgba(139, 0, 0, .25);
+    border-color: rgba(139, 0, 0, 0.624);
     box-shadow: 0 6px 24px rgba(139, 0, 0, .09);
-}
-
-.appt-card::before {
-    content: "";
-
-    position: absolute;
-    z-index: 2;
-
-    left: -1px;
-    top: -1px;
-
-    width: 5px;
-    height: calc(100% + 2px);
-
-    background: #8B0000;
-    border-radius: 16px 0 0 16px;
-
-    opacity: 0;
-    pointer-events: none;
-
-    transition:
-        opacity .2s ease,
-        background-color .2s ease;
-}
-
-.appt-card:hover::before {
-    opacity: 1;
 }
 
 [data-theme="dark"] .bg-white,
@@ -112,8 +85,8 @@
 }
 
 .mode-list .desktop-appointments-table .appt-card:hover {
-    border-color: rgba(139, 0, 0, .18);
-    box-shadow: 0 8px 20px rgba(139, 0, 0, .05);
+    border-color: rgba(139, 0, 0, 0.624);
+    box-shadow: 0 8px 20px rgba(139, 0, 0, 0.152);
 }
 
 .mode-list .desktop-appointments-table .appt-card .grid {
@@ -122,8 +95,6 @@
     padding-bottom: 16px;
 }
 
-[data-theme="dark"] #mainContent .appt-table-head,
-.dark #mainContent .appt-table-head,
 [data-theme="dark"] #mainContent .appt-card,
 .dark #mainContent .appt-card,
 [data-theme="dark"] #mainContent .mobile-appt-card,
@@ -175,7 +146,9 @@
 
 #mainContent.shared-appointments-page.dentist-appointments-view .appointment-table-grid {
     grid-template-columns:
-        140px 115px 150px minmax(240px, 1fr) 115px 135px 190px !important;
+        140px 115px 150px minmax(220px, 1fr) 110px 125px minmax(150px, 175px) !important;
+
+    column-gap: 14px !important;
 }
 
 #mainContent.shared-appointments-page.mode-list .appt-table-head>*,
@@ -382,14 +355,6 @@
     border: 1px solid rgba(203, 213, 225, 0.14) !important;
 }
 
-[data-theme="dark"] #pastSection .appt-table-head,
-.dark #pastSection .appt-table-head {
-    background:
-        linear-gradient(145deg, rgba(13, 17, 23, 0.88), rgba(22, 27, 34, 0.78)) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-    color: #94A3B8 !important;
-}
-
 [data-theme="dark"] #mainContent .service-badge-default,
 .dark #mainContent .service-badge-default {
     background: rgba(139, 0, 0, 0.18) !important;
@@ -535,6 +500,23 @@
     white-space: nowrap;
 }
 
+.appt-patient-name-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    margin-bottom: 6px;
+}
+
+.appt-patient-name-row+.global-info-group {
+    margin-top: 0;
+}
+
+.appt-patient-name-row .appt-patient-name {
+    min-width: 0;
+    flex: 0 1 auto;
+}
+
 .appt-program-cell {
     min-width: 0;
     text-align: left;
@@ -574,11 +556,11 @@
 .mode-list .desktop-appointments-table .appt-actions-wrap {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    width: 100%;
-    min-width: max-content;
-    gap: 8px;
-    padding-left: 10px;
+    justify-content: center;
+    width: auto;
+    min-width: 0;
+    gap: 7px;
+    padding: 0;
     flex-wrap: nowrap;
     overflow: visible;
 }
@@ -596,10 +578,12 @@
 }
 
 .mode-list .desktop-appointments-table .appt-table-head {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background: #fafafa;
+    background:
+        var(--table-header-surface);
+    color:
+        var(--table-heading-muted);
+    border-color:
+        var(--table-border);
 }
 
 .mode-list .desktop-appointments-table .appt-row-date .date-main {
@@ -2638,13 +2622,18 @@
         display: inline-flex !important;
     }
 
-    #mainContent.shared-appointments-page.admin-appointments-view .desktop-appointments-table,
     #mainContent.shared-appointments-page.admin-appointments-view.mode-list .desktop-appointments-table {
+        display: block !important;
+    }
+
+    #mainContent.shared-appointments-page.admin-appointments-view.mode-list .mobile-appointments-list {
         display: none !important;
     }
 
-    #mainContent.shared-appointments-page.admin-appointments-view .mobile-appointments-list,
-    #mainContent.shared-appointments-page.admin-appointments-view.mode-list .mobile-appointments-list,
+    #mainContent.shared-appointments-page.admin-appointments-view.mode-grid .desktop-appointments-table {
+        display: none !important;
+    }
+
     #mainContent.shared-appointments-page.admin-appointments-view.mode-grid .mobile-appointments-list {
         display: grid !important;
         grid-template-columns: 1fr !important;

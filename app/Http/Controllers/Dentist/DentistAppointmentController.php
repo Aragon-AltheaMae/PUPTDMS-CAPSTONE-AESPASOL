@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Dentist;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AppointmentCancelledMail;
+use App\Mail\AppointmentRescheduleMail;
 use App\Models\Appointment;
 use App\Models\User;
 use Carbon\Carbon;
@@ -16,6 +18,7 @@ use App\Notifications\AppointmentRescheduledNotification;
 use App\Models\ServiceType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 
 
@@ -25,6 +28,10 @@ class DentistAppointmentController extends Controller
     {
         $now = Carbon::now();
 
+        $gracePeriodMinutes = 60;
+
+        $cutoff = $now->copy()->subMinutes($gracePeriodMinutes);
+
         $updatePayload = [
             'status' => 'cancelled',
             'updated_at' => $now,
@@ -32,17 +39,33 @@ class DentistAppointmentController extends Controller
 
         if (Schema::hasColumn('appointments', 'cancellation_reason')) {
             $updatePayload['cancellation_reason'] = DB::raw(
-                "COALESCE(NULLIF(cancellation_reason, ''), 'Appointment was not started or processed on the scheduled time.')"
+                "COALESCE(
+                NULLIF(cancellation_reason, ''),
+                'Appointment was not started within the 1-hour grace period.'
+            )"
             );
         }
 
         Appointment::query()
             ->whereIn('status', ['upcoming', 'rescheduled'])
-            ->where(function ($query) use ($now) {
-                $query->whereDate('appointment_date', '<', $now->toDateString())
-                    ->orWhere(function ($sameDay) use ($now) {
-                        $sameDay->whereDate('appointment_date', $now->toDateString())
-                            ->whereTime('appointment_time', '<', $now->format('H:i:s'));
+            ->where(function ($query) use ($cutoff) {
+                $query
+                    ->whereDate(
+                        'appointment_date',
+                        '<',
+                        $cutoff->toDateString()
+                    )
+                    ->orWhere(function ($sameDay) use ($cutoff) {
+                        $sameDay
+                            ->whereDate(
+                                'appointment_date',
+                                $cutoff->toDateString()
+                            )
+                            ->whereTime(
+                                'appointment_time',
+                                '<',
+                                $cutoff->format('H:i:s')
+                            );
                     });
             })
             ->update($updatePayload);
@@ -61,7 +84,7 @@ class DentistAppointmentController extends Controller
 
         $today = Carbon::today()->toDateString();
 
-        $upcomingAppointments = Appointment::with('patient')
+        $upcomingAppointments = Appointment::with(['patient', 'procedure', 'followUpAppointments'])
             ->whereIn('status', ['upcoming', 'rescheduled'])
             ->whereDate('appointment_date', '>=', $today)
             ->orderBy('appointment_date', 'asc')
@@ -70,7 +93,7 @@ class DentistAppointmentController extends Controller
 
         $appointments = $upcomingAppointments;
 
-        $pastAppointments = Appointment::with('patient')
+        $pastAppointments = Appointment::with(['patient', 'procedure', 'followUpAppointments'])
             ->where(function ($q) use ($today) {
                 $q->whereIn('status', ['completed', 'cancelled'])
                     ->orWhere(function ($sub) use ($today) {
@@ -302,6 +325,8 @@ class DentistAppointmentController extends Controller
 
         $appointment = Appointment::with('patient.user')->findOrFail($id);
 
+        $cancelledBy = Auth::user()?->name ?? 'the dentist';
+
         $appointment->update([
             'status' => 'cancelled',
             'cancellation_reason' => $request->reason,
@@ -309,7 +334,6 @@ class DentistAppointmentController extends Controller
 
         $patientUser = optional($appointment->patient)->user;
 
-        // fallback kung walang relationship
         if (!$patientUser && !empty(optional($appointment->patient)->email)) {
             $patientUser = User::where('email', $appointment->patient->email)->first();
         }
@@ -318,11 +342,30 @@ class DentistAppointmentController extends Controller
             $patientUser->notify(
                 new AppointmentCancelledNotification(
                     $appointment,
-                    Auth::user()?->name ?? 'the dentist',
+                    $cancelledBy,
                     $request->reason
                 )
             );
         }
+
+        try {
+            $patientEmail = optional($appointment->patient)->email;
+
+            if ($patientEmail) {
+                Mail::to($patientEmail)
+                    ->send(new AppointmentCancelledMail(
+                        $appointment,
+                        $cancelledBy,
+                        $request->reason
+                    ));
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Appointment cancellation email failed.', [
+                'appointment_id' => $appointment->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
         return response()->json(['success' => true]);
     }
 
@@ -358,6 +401,9 @@ class DentistAppointmentController extends Controller
             ], 422);
         }
 
+        $oldAppointmentDate = $appointment->appointment_date;
+        $oldAppointmentTime = $appointment->appointment_time;
+
         $appointment->update([
             'appointment_date' => $request->new_appointment_date,
             'appointment_time' => $mysqlTime,
@@ -371,13 +417,34 @@ class DentistAppointmentController extends Controller
             $patientUser = User::where('email', $appointment->patient->email)->first();
         }
 
+        $rescheduledBy = Auth::user()?->name ?? 'the dentist';
+
         if ($patientUser) {
             $patientUser->notify(
                 new AppointmentRescheduledNotification(
                     $appointment,
-                    Auth::user()?->name ?? 'the dentist'
+                    $rescheduledBy
                 )
             );
+        }
+
+        try {
+            $patientEmail = optional($appointment->patient)->email;
+
+            if ($patientEmail) {
+                Mail::to($patientEmail)
+                    ->send(new AppointmentRescheduleMail(
+                        $appointment,
+                        $oldAppointmentDate,
+                        $oldAppointmentTime,
+                        $rescheduledBy
+                    ));
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Appointment reschedule email failed.', [
+                'appointment_id' => $appointment->id,
+                'error' => $e->getMessage(),
+            ]);
         }
 
         AuditLogger::log(

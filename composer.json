@@ -18,10 +18,13 @@
         "laravel/reverb": "^1.0",
         "laravel/socialite": "^5.25",
         "laravel/tinker": "^2.10.1",
+        "matomo/device-detector": "^6.5",
         "phpoffice/phpspreadsheet": "^5.8",
         "pusher/pusher-php-server": "*",
         "setasign/fpdf": "^1.9",
         "setasign/fpdi": "^2.6",
+        "symfony/http-client": "^8.1",
+        "symfony/mailgun-mailer": "^8.1",
         "tymon/jwt-auth": "^2.3"
     },
     "require-dev": {

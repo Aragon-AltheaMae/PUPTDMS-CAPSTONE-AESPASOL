@@ -133,6 +133,22 @@ $nextVisitText =
 isset($upcomingAppointment) && $upcomingAppointment
 ? \Carbon\Carbon::parse($upcomingAppointment->appointment_date)->format('M d, Y')
 : 'No appointment yet';
+
+$birthdate = optional($patient)->birthdate ?: optional(optional($patient)->user)->birthdate;
+$gender = optional($patient)->gender ?: optional(optional($patient)->user)->gender;
+$age = null;
+$birthdateDisplay = 'N/A';
+
+if ($birthdate) {
+try {
+$birthdateCarbon = \Carbon\Carbon::parse($birthdate);
+$age = $birthdateCarbon->age;
+$birthdateDisplay = $birthdateCarbon->format('M d, Y');
+} catch (\Throwable $e) {
+$age = null;
+$birthdateDisplay = 'N/A';
+}
+}
 @endphp
 
 <main id="mainContent" class="patient-page-shell patient-dashboard-page page-enter">
@@ -191,14 +207,23 @@ isset($upcomingAppointment) && $upcomingAppointment
                     </div>
 
                     <div class="greeting-banner-actions">
-                        <a href="{{ route('patient.book.appointment') }}"
-                            class="book-appointment-btn inline-flex items-center justify-center gap-2 rounded-full text-white shadow transition">
+                        <a href="{{ route('patient.book.appointment') }}" class="ui-btn ui-btn-primary ui-btn-shimmer"
+                            onclick="
+                                if (
+                                    window.UPCOMING_DATA?.exists &&
+                                    ['upcoming', 'rescheduled'].includes(
+                                        String(window.UPCOMING_DATA.status || '').toLowerCase()
+                                    )
+                                ) {
+                                    event.preventDefault();
+                                    window.openModal?.('activeAppointmentModal');
+                                }
+                            ">
                             <i class="fa-solid fa-calendar-plus"></i>
                             <span>Book Appointment</span>
                         </a>
 
-                        <a href="{{ route('patient.record') }}"
-                            class="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-white/20">
+                        <a href="{{ route('patient.record') }}" class="ui-btn ui-btn-ghost-light">
                             <i class="fa-solid fa-folder-open"></i>
                             <span>View Records</span>
                         </a>
@@ -208,7 +233,7 @@ isset($upcomingAppointment) && $upcomingAppointment
         </div>
 
         <div id="upcomingAppointmentWrapper" class="skeleton-section">
-            <div class="dashboard-glass skeleton-card skeleton-shell skeleton-fade-swap rounded-[1rem] overflow-hidden">
+            <div class="card skeleton-card skeleton-shell skeleton-fade-swap">
 
                 <div class="flex items-center justify-between px-6 py-4 bg-gray-50 border-b border-gray-100">
                     <div class="flex items-center gap-3">
@@ -287,9 +312,9 @@ isset($upcomingAppointment) && $upcomingAppointment
             </div>
         </div>
 
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-stretch dashboard-grid-tight mt-5">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start dashboard-grid-tight mt-5">
             <div class="xl:col-span-5">
-                <div id="requestDocsContainer" class="h-full">
+                <div id="requestDocsContainer">
                     <div
                         class="dashboard-glass rounded-[1rem] overflow-hidden h-full skeleton-shell skeleton-fade-swap">
                         <div class="p-4 sm:p-5">
@@ -369,30 +394,74 @@ isset($upcomingAppointment) && $upcomingAppointment
                     </div>
                 </div>
             </div>
-
-            <dialog id="activeAppointmentModal" class="modal">
-                <div class="modal-box p-8 rounded-[1.5rem] bg-white text-center shadow-2xl w-[min(92vw,400px)]">
-                    <div
-                        class="mx-auto mb-5 w-20 h-20 rounded-full bg-red-50 flex items-center justify-center border-4 border-white shadow-sm">
-                        <i class="fa-solid fa-calendar-xmark text-[#8B0000] text-3xl"></i>
-                    </div>
-                    <h3 class="text-2xl font-extrabold text-gray-800 mb-3">Active Appointment</h3>
-                    <p class="text-sm text-gray-500 mb-8 leading-relaxed">You already have an active appointment
-                        scheduled.
-                        Please complete or cancel it before booking a new one.</p>
-                    <div class="flex flex-col gap-3">
-                        <a href="{{ route('patient.appointment.index') }}"
-                            class="w-full py-3.5 rounded-[0.85rem] bg-[#8B0000] text-white font-bold hover:bg-[#660000] transition-colors shadow-md">View
-                            My Appointments</a>
-                        <button id="closeActiveApptModalBtn" type="button"
-                            class="w-full py-3.5 rounded-[0.85rem] bg-gray-100 text-gray-700 font-bold hover:bg-gray-200 transition-colors">Close</button>
-                    </div>
-                </div>
-            </dialog>
-
-
         </div>
 </main>
+
+@if (session('appointment_confirmation'))
+@php
+$appointmentConfirmation = session('appointment_confirmation');
+@endphp
+
+<x-booking.confirmed-modal id="appointmentConfirmedModal" eyebrow="Appointment Booking" title="Appointment Confirmed"
+    subtitle="Your appointment has been successfully scheduled." header-icon="fa-check" section-icon="fa-calendar-check"
+    section-eyebrow="Booking Status" section-title="Booking successfully completed"
+    section-message="Your selected appointment schedule has been saved and confirmed." detail-label="Appointment Status"
+    :result-title="$appointmentConfirmation['status'] ?? 'Confirmed'" message-title="Schedule details"
+    message-id="appointmentConfirmedMessage">
+    <div class="confirmed-modal-schedule-grid">
+
+        <div class="confirmed-modal-schedule-item">
+            <span class="confirmed-modal-schedule-icon">
+                <i class="fa-regular fa-calendar"></i>
+            </span>
+
+            <div>
+                <span class="confirmed-modal-schedule-label">
+                    Date
+                </span>
+
+                <strong class="confirmed-modal-schedule-value">
+                    {{ $appointmentConfirmation['date'] ?? 'N/A' }}
+                </strong>
+            </div>
+        </div>
+
+        <div class="confirmed-modal-schedule-item">
+            <span class="confirmed-modal-schedule-icon">
+                <i class="fa-regular fa-clock"></i>
+            </span>
+
+            <div>
+                <span class="confirmed-modal-schedule-label">
+                    Time
+                </span>
+
+                <strong class="confirmed-modal-schedule-value">
+                    {{ $appointmentConfirmation['time'] ?? 'N/A' }}
+                </strong>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="confirmed-modal-schedule-note">
+        <i class="fa-solid fa-circle-info"></i>
+
+        <span>
+            Please arrive on time and bring your
+            school or office ID.
+        </span>
+    </div>
+
+    <x-slot:footer>
+        <button type="button" id="appointmentConfirmedDoneBtn" class="ui-btn ui-btn-primary">
+            <i class="fa-solid fa-check"></i>
+            Done
+        </button>
+    </x-slot:footer>
+
+</x-booking.confirmed-modal>
+@endif
 
 <div id="privateInformationModal" class="ui-modal modal-theme-warning" role="dialog" aria-modal="true"
     aria-labelledby="privateInformationModalTitle" aria-describedby="privateInformationModalDescription">
@@ -483,6 +552,66 @@ isset($upcomingAppointment) && $upcomingAppointment
 
 @section('scripts')
 <script>
+    @if (session('appointment_draft_completed'))
+        localStorage.removeItem(
+            "appointmentDraft:v1"
+        );
+    @endif
+
+    @if (session('appointment_confirmation'))
+        document.addEventListener(
+            'DOMContentLoaded',
+            () => {
+                window.openModal?.(
+                    'appointmentConfirmedModal'
+                );
+
+                document.documentElement.classList.add(
+                    'appointment-confirmed-open',
+                    'modal-lock'
+                );
+
+                document.body.classList.add(
+                    'appointment-confirmed-open',
+                    'modal-lock'
+                );
+
+                document
+                    .getElementById(
+                        'appointmentConfirmedDoneBtn'
+                    )
+                    ?.addEventListener(
+                        'click',
+                        (event) => {
+
+                            const button = event.currentTarget;
+
+                            button.blur();
+
+                            requestAnimationFrame(() => {
+
+                                window.closeModal?.(
+                                    'appointmentConfirmedModal'
+                                );
+
+                                document.documentElement.classList.remove(
+                                    'appointment-confirmed-open',
+                                    'modal-lock'
+                                );
+
+                                document.body.classList.remove(
+                                    'appointment-confirmed-open',
+                                    'modal-lock'
+                                );
+
+                            });
+
+                        }
+                    );
+            }
+        );
+    @endif
+
     function renderGreeting() {
         const nameEl = document.getElementById("patientName");
         const greetingEl = document.getElementById("greetingText");
@@ -552,7 +681,7 @@ isset($upcomingAppointment) && $upcomingAppointment
         ];
     }
 
-    $profileRows = [['Date of Birth', isset($patient -> birthdate) ?\Carbon\Carbon:: parse($patient -> birthdate) -> format('F d, Y') : '—'], ['Age', $patient -> age ?? '—'], ['Gender', $patient -> gender ?? '—'], ['Contact', $patient -> phone ?? '—'], ['Email', $patient -> email ?? '—']];
+    $profileRows = [['Date of Birth', $birthdateDisplay !== 'N/A' ?\Carbon\Carbon:: parse($birthdate) -> format('F d, Y') : '—'], ['Age', $age !== null ? $age. ' yrs' : '—'], ['Gender', $gender ?? '—'], ['Contact', $patient -> phone ?? '—'], ['Email', $patient -> email ?? '—']];
     @endphp
 
     var UPCOMING_DATA = @json($upcomingJs);
@@ -563,9 +692,9 @@ isset($upcomingAppointment) && $upcomingAppointment
         roleLabel: "{{ $patient->faculty_code ? 'Faculty' : ($patient->student_no ? 'Student' : 'Patient') }}",
         facultyCode: "{{ $patient->faculty_code ?? '' }}",
         studentNo: "{{ $patient->student_no ?? '' }}",
-        age: "{{ $patient->age ?? (\Carbon\Carbon::parse($patient->birthdate ?? now())->age ?? 'N/A') }}",
-        birthdate: "{{ isset($patient->birthdate) ? \Carbon\Carbon::parse($patient->birthdate)->format('M d, Y') : 'N/A' }}",
-        gender: "{{ $patient->gender ?? 'N/A' }}",
+        age: "{{ $age ?? '' }}",
+        birthdate: "{{ $birthdateDisplay }}",
+        gender: "{{ $gender ?? 'N/A' }}",
         contact: "{{ $patient->phone ?? 'N/A' }}",
         email: "{{ $patient->email ?? 'N/A' }}",
         emergencyName: "{{ optional($patient->medicalHistory)->emergency_person ?? 'Not specified' }}",
@@ -582,21 +711,10 @@ isset($upcomingAppointment) && $upcomingAppointment
     var ROUTE_RECORD = "{{ route('patient.record') }}";
 
     @if (session('activeAppointmentModal'))
-        document.addEventListener("DOMContentLoaded", function () {
-            var modal = document.getElementById("activeAppointmentModal");
-            var closeBtn = document.getElementById("closeActiveApptModalBtn");
-            if (!modal) return;
-            modal.showModal();
-            modal.addEventListener('click', function (e) {
-                var box = modal.querySelector('.modal-box');
-                if (box && !box.contains(e.target)) e.preventDefault();
-            });
-            modal.addEventListener('cancel', function (e) {
-                e.preventDefault();
-            });
-            if (closeBtn) closeBtn.addEventListener("click", function () {
-                modal.close();
-            });
+        document.addEventListener('DOMContentLoaded', function () {
+            window.openModal?.(
+                'activeAppointmentModal'
+            );
         });
     @endif
 
@@ -770,9 +888,9 @@ isset($upcomingAppointment) && $upcomingAppointment
             shouldMask
         );
 
-        const tooltip = shouldMask
-            ? 'Show private information'
-            : 'Hide private information';
+        const tooltip = shouldMask ?
+            'Show private information' :
+            'Hide private information';
 
         button.setAttribute(
             'data-masked',
@@ -787,9 +905,9 @@ isset($upcomingAppointment) && $upcomingAppointment
         button.setAttribute('aria-label', tooltip);
         button.setAttribute('data-tooltip', tooltip);
 
-        button.innerHTML = shouldMask
-            ? '<i class="fa-regular fa-eye"></i>'
-            : '<i class="fa-regular fa-eye-slash"></i>';
+        button.innerHTML = shouldMask ?
+            '<i class="fa-regular fa-eye"></i>' :
+            '<i class="fa-regular fa-eye-slash"></i>';
     }
 
     function handlePrivateInformationToggle(button) {
@@ -879,130 +997,188 @@ isset($upcomingAppointment) && $upcomingAppointment
     }
 
     function renderUpcomingAppointment() {
-        var wrapper = document.getElementById('upcomingAppointmentWrapper');
-        if (!wrapper) return;
-
-        var d = UPCOMING_DATA;
-
-        if (d.exists) {
-            var statusPillCls = d.isRescheduled ?
-                'bg-yellow-100 text-yellow-800 border-yellow-200' :
-                'bg-green-100 text-green-800 border-green-200';
-
-            var statusDotCls = d.isRescheduled ? 'bg-yellow-500' : 'bg-green-500';
-
-            var statusDarkPill = d.isRescheduled ?
-                'dark:bg-yellow-400/20 dark:text-yellow-100 dark:border-yellow-400/30' :
-                'dark:bg-emerald-500/20 dark:text-emerald-100 dark:border-emerald-500/30';
-
-            window.swapSkeletonContent('upcomingAppointmentWrapper',
-                '<div class="upcoming-card-polished bg-white dark:bg-[#161B22] rounded-[1rem] border border-gray-200 dark:border-white/10 shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">' +
-
-                '<div class="px-4 sm:px-5 py-4 sm:py-4.5 mb-3">' +
-                '<div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_auto] gap-4 xl:gap-5 items-center">' +
-
-                '<div class="min-w-0">' +
-                '<div class="flex items-start gap-3">' +
-
-                '<div class="relative flex-shrink-0 mt-0.5">' +
-                '<div class="upcoming-tooth-glass w-12 h-12 rounded-[0.95rem] text-white flex items-center justify-center">' +
-                '<i class="fa-solid fa-tooth text-[15px] relative z-[1] drop-shadow-[0_1px_2px_rgba(0,0,0,0.22)]"></i>' +
-                '</div>' +
-                '<span class="upcoming-live-dot absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full ' +
-                statusDotCls + ' border-2 border-white dark:border-[#161B22]"></span>' +
-                '</div>' +
-
-                '<div class="min-w-0 flex-1">' +
-                '<div class="flex flex-wrap items-center gap-2">' +
-                '<h3 class="text-lg sm:text-[1.15rem] font-extrabold text-gray-900 dark:text-[#F3F4F6] leading-tight truncate">' +
-                window.escapeHtml(d.service) + '</h3>' +
-                '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border ' +
-                statusPillCls + ' ' + statusDarkPill + '">' +
-                '<span class="w-1.5 h-1.5 rounded-full ' + statusDotCls + '"></span>' +
-                window.escapeHtml(d.status) +
-                '</span>' +
-                '</div>' +
-
-                '<div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600 dark:text-gray-400">' +
-                '<span class="inline-flex items-center gap-2">' +
-                '<i class="fa-regular fa-calendar text-gray-400 dark:text-gray-500"></i>' +
-                '<span class="font-medium">' + window.escapeHtml(d.date) + '</span>' +
-                '</span>' +
-
-                '<span class="inline-flex items-center gap-2">' +
-                '<i class="fa-regular fa-clock text-gray-400 dark:text-gray-500"></i>' +
-                '<span class="font-medium">' + window.escapeHtml(d.time_fmt) + '</span>' +
-                '</span>' +
-
-                '<span class="inline-flex items-center gap-2 min-w-0">' +
-                '<i class="fa-solid fa-user-doctor text-gray-400 dark:text-gray-500"></i>' +
-                '<span class="font-medium truncate">' + window.escapeHtml(d.dentist) + '</span>' +
-                '</span>' +
-                '</div>' +
-
-                '<div class="mt-3 flex items-center gap-3">' +
-                '<div class="h-[2px] w-10 rounded-full bg-gradient-to-r from-red-200 to-red-300 dark:from-red-900/50 dark:to-red-800/50"></div>' +
-                '<span class="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500">Upcoming Visit</span>' +
-                '</div>' +
-                '</div>' +
-                '</div>' +
-                '</div>' +
-
-                '<div class="xl:min-w-[180px]">' +
-                '<div class="flex flex-col sm:flex-row xl:flex-col items-stretch gap-2.5">' +
-                '<div class="upcoming-reminder-chip">' +
-                '<span class="upcoming-reminder-icon">' +
-                '<i class="fa-regular fa-bell text-[12px]"></i>' +
-                '</span>' +
-                '<span class="text-[0.76rem] font-bold text-[#7f1d1d] dark:text-[#FCA5A5]">Please arrive 10 minutes early</span>' +
-                '</div>' +
-
-                '<a href="' + window.escapeHtml(d.indexUrl) +
-                '" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[0.85rem] bg-[#8B0000] hover:bg-[#660000] text-white text-sm font-bold transition-all duration-300 shadow-sm hover:-translate-y-0.5">' +
-                '<span>Manage Appointment</span>' +
-                '<i class="fa-solid fa-arrow-right text-[11px]"></i>' +
-                '</a>' +
-                '</div>' +
-                '</div>' +
-
-                '</div>' +
-                '</div>' +
-
-                '</div>'
+        const wrapper =
+            document.getElementById(
+                'upcomingAppointmentWrapper'
             );
+
+        if (!wrapper) {
             return;
         }
 
-        window.swapSkeletonContent('upcomingAppointmentWrapper',
-            '<div class="upcoming-card-polished bg-white dark:bg-[#161B22] rounded-[1rem] border border-gray-200 dark:border-white/10 shadow-sm overflow-hidden">' +
-            '<div class="px-4 sm:px-5 py-4">' +
-            '<div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_auto] gap-4 items-center">' +
+        const d = UPCOMING_DATA;
 
-            '<div class="flex items-start gap-3">' +
-            '<div class="upcoming-tooth-glass w-12 h-12 rounded-[0.95rem] text-white flex items-center justify-center flex-shrink-0">' +
-            '<i class="fa-regular fa-calendar text-base relative z-[1] drop-shadow-[0_1px_2px_rgba(0,0,0,0.22)]"></i>' +
-            '</div>' +
+        if (d.exists) {
+            const statusClass =
+                d.isRescheduled
+                    ? 'status-rescheduled'
+                    : 'status-upcoming';
+
+            window.swapSkeletonContent(
+                'upcomingAppointmentWrapper',
+
+                '<section class="card">' +
+
+                '<div class="card-header">' +
+
+                '<div class="card-header-left">' +
+
+                '<span class="card-header-icon ' +
+                statusClass +
+                '">' +
+                '<i class="fa-solid fa-tooth"></i>' +
+                '</span>' +
+
+                '<div class="min-w-0">' +
+
+                '<div class="flex flex-wrap items-center gap-2">' +
+
+                '<h3 class="card-title">' +
+                window.escapeHtml(
+                    d.service
+                ) +
+                '</h3>' +
+
+                '<span class="status-pill ' +
+                statusClass +
+                '">' +
+
+                '<span class="status-dot"></span>' +
+
+                window.escapeHtml(
+                    d.status
+                ) +
+
+                '</span>' +
+
+                '</div>' +
+
+                '<div class="card-subtitle flex flex-wrap items-center gap-x-4 gap-y-1">' +
+
+                '<span class="inline-flex items-center gap-1.5">' +
+                '<i class="fa-regular fa-calendar"></i>' +
+                window.escapeHtml(
+                    d.date
+                ) +
+                '</span>' +
+
+                '<span class="inline-flex items-center gap-1.5">' +
+                '<i class="fa-regular fa-clock"></i>' +
+                window.escapeHtml(
+                    d.time_fmt
+                ) +
+                '</span>' +
+
+                '<span class="inline-flex items-center gap-1.5 min-w-0">' +
+                '<i class="fa-solid fa-user-doctor"></i>' +
+                '<span class="truncate">' +
+                window.escapeHtml(
+                    d.dentist
+                ) +
+                '</span>' +
+                '</span>' +
+
+                '</div>' +
+
+                '</div>' +
+
+                '</div>' +
+
+                '</div>' +
+
+
+                '<div class="card-body">' +
+
+                '<div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-3 items-center">' +
+
+                '<div class="info-card flex items-center gap-3">' +
+
+                '<span class="card-header-icon ' +
+                statusClass +
+                '">' +
+                '<i class="fa-regular fa-bell"></i>' +
+                '</span>' +
+
+                '<div class="min-w-0">' +
+
+                '<div class="card-title">' +
+                'Appointment Reminder' +
+                '</div>' +
+
+                '<div class="card-subtitle">' +
+                'Please arrive 10 minutes early.' +
+                '</div>' +
+
+                '</div>' +
+
+                '</div>' +
+
+
+                '<a href="' +
+                window.escapeHtml(
+                    d.indexUrl
+                ) +
+                '" class="ui-btn ui-btn-primary">' +
+
+                '<span>Manage Appointment</span>' +
+                '<i class="fa-solid fa-arrow-right"></i>' +
+
+                '</a>' +
+
+                '</div>' +
+
+                '</div>' +
+
+                '</section>'
+            );
+
+            return;
+        }
+
+
+        window.swapSkeletonContent(
+            'upcomingAppointmentWrapper',
+
+            '<section class="card">' +
+
+            '<div class="card-header">' +
+
+            '<div class="card-header-left">' +
+
+            '<span class="card-header-icon">' +
+            '<i class="fa-regular fa-calendar"></i>' +
+            '</span>' +
 
             '<div class="min-w-0">' +
-            '<h3 class="text-lg sm:text-[1.1rem] font-extrabold text-gray-900 dark:text-[#F3F4F6]">No upcoming appointment</h3>' +
-            '<p class="mt-1 text-sm text-gray-500 dark:text-gray-400 leading-relaxed max-w-[560px]">Choose a preferred date and time from the calendar, or book now to secure your next dental visit.</p>' +
-            '<div class="mt-3 flex items-center gap-3">' +
-            '<div class="upcoming-ready-line h-[2px] w-10 rounded-full"></div>' +
-            '<span class="text-[11px] font-bold uppercase tracking-[0.18em] text-gray-400 dark:text-gray-500">Ready when you are</span>' +
-            '</div>' +
-            '</div>' +
+
+            '<h3 class="card-title">' +
+            'No upcoming appointment' +
+            '</h3>' +
+
+            '<p class="card-subtitle">' +
+            'Choose a preferred date and time to schedule your next dental visit.' +
+            '</p>' +
+
             '</div>' +
 
-            '<div class="flex flex-col sm:flex-row items-stretch gap-2.5 xl:min-w-[180px]">' +
-            '<button type="button" onclick="scrollToCalendar(event)" class="check-dates-btn inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-[0.85rem] text-sm font-bold">' +
-            '<i class="fa-solid fa-arrow-down"></i>' +
+            '</div>' +
+
+            '</div>' +
+
+            '<div class="card-body">' +
+
+            '<button type="button" ' +
+            'onclick="scrollToCalendar(event)" ' +
+            'class="ui-btn ui-btn-primary ui-btn-block">' +
+
+            '<i class="fa-solid fa-calendar-days"></i>' +
             '<span>Check Available Dates</span>' +
+
             '</button>' +
-            '</div>' +
 
             '</div>' +
-            '</div>' +
-            '</div>'
+
+            '</section>'
         );
     }
 
@@ -1018,25 +1194,29 @@ isset($upcomingAppointment) && $upcomingAppointment
 
         if (pData.facultyCode && pData.facultyCode !== 'null') {
             roleBadge =
-                '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-[#8B0000] border border-red-100 text-xs font-bold">' +
-                '<i class="fa-solid fa-user-tie"></i> Faculty' +
+                '<span class="badge-role role-faculty">' +
+                '<i class="fa-solid fa-user-tie"></i>' +
+                '<span>Faculty</span>' +
                 '</span>';
             identityLabel = 'Faculty Code';
             identityRaw = pData.facultyCode;
             identityMasked = maskIdCode(pData.facultyCode);
         } else if (pData.studentNo && pData.studentNo !== 'null') {
             roleBadge =
-                '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-[#8B0000] border border-red-100 text-xs font-bold">' +
-                '<i class="fa-solid fa-user-graduate"></i> Student' +
+                '<span class="badge-role role-student">' +
+                '<i class="fa-solid fa-user-graduate"></i>' +
+                '<span>Student</span>' +
                 '</span>';
             identityLabel = 'Student No';
             identityRaw = pData.studentNo;
             identityMasked = maskIdCode(pData.studentNo);
         } else {
             roleBadge =
-                '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 text-[#8B0000] border border-red-100 text-xs font-bold">' +
-                '<i class="fa-solid fa-user"></i> Patient' +
+                '<span class="badge-role role-patient">' +
+                '<i class="fa-solid fa-user"></i>' +
+                '<span>Patient</span>' +
                 '</span>';
+
             identityLabel = '';
             identityRaw = '';
             identityMasked = '';
@@ -1071,197 +1251,305 @@ isset($upcomingAppointment) && $upcomingAppointment
             '</button>';
 
         var identityRow = identityLabel ?
-            '<div class="flex justify-between items-start gap-3">' +
-            '<span class="text-gray-400 font-semibold text-xs flex items-center gap-2 mt-0.5 flex-shrink-0 w-[92px]">' +
-            '<i class="fa-regular fa-id-badge w-3"></i> ' + window.escapeHtml(identityLabel) +
+            '<div class="patient-profile-row">' +
+            '<span class="patient-profile-label">' +
+            '<i class="fa-regular fa-id-badge"></i>' +
+            '<span>' + window.escapeHtml(identityLabel) + '</span>' +
             '</span>' +
-            '<span id="maskedIdentityValue" data-masked="true" class="text-gray-800 font-medium text-right break-words leading-snug flex-1 min-w-0">' +
+            '<span id="maskedIdentityValue" data-masked="true" class="patient-profile-value">' +
             window.escapeHtml(identityMasked) +
             '</span>' +
             '</div>' :
             '';
 
         var emergencySection = hasEmergency ?
-            '<div class="space-y-1">' +
-            '<p class="text-sm font-bold text-gray-900">' + window.escapeHtml(pData.emergencyName) + '</p>' +
-            '<div class="flex items-center justify-between gap-3">' +
-            '<p class="text-xs font-medium text-gray-600">' +
-            (pData.emergencyRelation ? '<span class="text-gray-400">(' + window.escapeHtml(pData.emergencyRelation) +
-                ')</span>' : '') +
+            '<div class="patient-profile-emergency-content">' +
+            '<p class="patient-profile-emergency-name">' +
+            window.escapeHtml(pData.emergencyName) +
             '</p>' +
-            '<span id="maskedEmergencyNumber" data-masked="true" class="text-xs font-medium text-gray-700 text-right">' +
-            window.escapeHtml(maskedEmergency) + '</span>' +
+
+            '<div class="patient-profile-emergency-meta">' +
+
+            '<span class="patient-profile-emergency-relation">' +
+            (
+                pData.emergencyRelation ?
+                    '(' + window.escapeHtml(pData.emergencyRelation) + ')' :
+                    ''
+            ) +
+            '</span>' +
+
+            '<span id="maskedEmergencyNumber" data-masked="true" class="patient-profile-emergency-number">' +
+            window.escapeHtml(maskedEmergency) +
+            '</span>' +
+
             '</div>' +
             '</div>' :
-            '<div class="text-center py-2">' +
-            '<i class="fa-solid fa-user-plus text-red-300 text-lg mb-1"></i>' +
-            '<p class="text-xs text-gray-400 font-medium">No emergency contact added</p>' +
+
+            '<div class="patient-profile-empty">' +
+            '<i class="fa-solid fa-user-plus"></i>' +
+            '<p>No emergency contact added</p>' +
             '</div>';
 
-        window.swapSkeletonContent('profileSkeletonContainer',
-            '<div class="dashboard-card-polished dashboard-glass overflow-hidden flex flex-col rounded-[1rem]">' +
-            '<div class="h-20 bg-gradient-to-r from-[#8B0000] to-[#b30000] relative"></div>' +
+        window.swapSkeletonContent(
+            'profileSkeletonContainer',
 
-            '<div class="px-4 pb-4 relative flex flex-col items-center mt-[-34px]">' +
-            '<div class="relative mb-3">' +
-            '<img src="' + pData.avatar +
-            '" alt="Profile" class="w-[68px] h-[68px] rounded-full object-cover border-4 border-white shadow-md bg-white">' +
+            '<div class="dashboard-card-polished dashboard-glass patient-profile-card">' +
+
+            '<div class="patient-profile-cover"></div>' +
+
+            '<div class="patient-profile-header">' +
+
+            '<div class="patient-profile-avatar">' +
+            (
+                window.PatientUI?.buildAvatarHtml({
+                    name: pData.name,
+                    url: pData.avatar,
+                    size: 'lg',
+                    escapeHtml: window.escapeHtml
+                }) || ''
+            ) +
             '</div>' +
 
-            '<div class="mt-1 flex items-center justify-center gap-2 max-w-full">' +
-            '<h2 class="text-[17px] font-extrabold text-gray-900 text-center leading-tight break-words">' +
+            '<div class="patient-profile-name-row">' +
+            '<h2 class="patient-profile-name">' +
             window.escapeHtml(pData.name) +
             '</h2>' +
             globalToggle +
             '</div>' +
 
-            '<div class="mt-3 flex flex-wrap items-center justify-center gap-2">' +
+            '<div class="patient-profile-badges">' +
             roleBadge +
-            '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 text-xs font-bold">' +
-            '<i class="fa-solid fa-circle-check"></i> Profile Active' +
+
+            '<span class="status-pill status-active">' +
+            '<span class="status-dot"></span>' +
+            '<span>Profile Active</span>' +
             '</span>' +
             '</div>' +
+
             '</div>' +
 
-            '<div class="border-t border-gray-100"></div>' +
+            '<div class="patient-profile-divider"></div>' +
 
-            '<div class="px-4 py-3 space-y-2.5 text-sm flex-1">' +
+            '<div class="patient-profile-details">' +
 
-            '<div class="flex justify-between items-center gap-4">' +
-            '<span class="text-gray-400 font-semibold text-xs flex items-center gap-2">' +
-            '<i class="fa-solid fa-cake-candles w-3"></i> Age <br> Date of Birth' +
+            '<div class="patient-profile-row">' +
+            '<span class="patient-profile-label">' +
+            '<i class="fa-solid fa-cake-candles"></i>' +
+            '<span>Age / Date of Birth</span>' +
             '</span>' +
-            '<span class="text-gray-800 font-medium text-right">' +
-            window.escapeHtml(pData.age ? pData.age + " yrs" : "N/A") +
-            '<span class="text-gray-400 text-xs font-normal block">' +
+
+            '<span class="patient-profile-value">' +
+            window.escapeHtml(
+                pData.age ?
+                    pData.age + ' yrs' :
+                    'N/A'
+            ) +
+
+            '<small>' +
             window.escapeHtml(pData.birthdate) +
-            '</span>' +
+            '</small>' +
+
             '</span>' +
             '</div>' +
 
-            '<div class="flex justify-between items-center gap-4">' +
-            '<span class="text-gray-400 font-semibold text-xs flex items-center gap-2">' +
-            '<i class="fa-solid fa-venus-mars w-3"></i> Gender' +
+            '<div class="patient-profile-row">' +
+            '<span class="patient-profile-label">' +
+            '<i class="fa-solid fa-venus-mars"></i>' +
+            '<span>Gender</span>' +
             '</span>' +
-            '<span class="text-gray-800 font-medium text-right">' +
+
+            '<span class="patient-profile-value">' +
             window.escapeHtml(pData.gender) +
             '</span>' +
             '</div>' +
 
             identityRow +
 
-            '<div class="flex justify-between items-start gap-4">' +
-            '<span class="text-gray-400 font-semibold text-xs flex items-center gap-2 mt-0.5">' +
-            '<i class="fa-solid fa-phone w-3"></i> Contact' +
+            '<div class="patient-profile-row">' +
+            '<span class="patient-profile-label">' +
+            '<i class="fa-solid fa-phone"></i>' +
+            '<span>Contact</span>' +
             '</span>' +
-            '<span id="maskedContactValue" data-masked="true" class="text-gray-800 font-medium text-right break-words leading-snug flex-1 min-w-0">' +
+
+            '<span id="maskedContactValue" data-masked="true" class="patient-profile-value">' +
             window.escapeHtml(maskedContact) +
             '</span>' +
             '</div>' +
 
-            '<div class="flex justify-between items-start gap-3">' +
-            '<span class="text-gray-400 font-semibold text-xs flex items-center gap-2 mt-0.5 flex-shrink-0 w-[92px]">' +
-            '<i class="fa-solid fa-envelope w-3"></i> Email' +
+            '<div class="patient-profile-row">' +
+            '<span class="patient-profile-label">' +
+            '<i class="fa-solid fa-envelope"></i>' +
+            '<span>Email</span>' +
             '</span>' +
-            '<span id="maskedEmailValue" data-masked="true" class="text-gray-800 font-medium text-right break-words leading-snug flex-1 min-w-0">' +
+
+            '<span id="maskedEmailValue" data-masked="true" class="patient-profile-value">' +
             window.escapeHtml(maskedEmail) +
             '</span>' +
             '</div>' +
 
             '</div>' +
 
-            '<div class="profile-emergency-panel bg-red-50/50 px-4 py-3 border-t border-red-100 mt-auto">' +
-            '<p class="text-[10px] font-bold text-red-800 uppercase tracking-widest mb-2 flex items-center gap-1.5">' +
-            '<i class="fa-solid fa-heart-pulse"></i> Emergency Contact' +
-            '</p>' +
-            emergencySection +
+            '<div class="patient-profile-emergency">' +
+
+            '<div class="patient-profile-emergency-title">' +
+            '<i class="fa-solid fa-heart-pulse"></i>' +
+            '<span>Emergency Contact</span>' +
             '</div>' +
+
+            emergencySection +
+
+            '</div>' +
+
             '</div>'
         );
     }
 
     function renderRequestDocs() {
-        var container = document.getElementById("requestDocsContainer");
-        if (!container) return;
+        var container =
+            document.getElementById(
+                'requestDocsContainer'
+            );
 
-        window.swapSkeletonContent('requestDocsContainer',
-            '<div class="dashboard-card-polished dental-overview-card bg-gradient-to-br from-[#ffffff] via-[#fff3f3] to-[#ffeaea] border border-[#eadede] shadow-sm rounded-[1rem] overflow-hidden h-full flex flex-col">' +
+        if (!container) {
+            return;
+        }
 
-            '<div class="px-5 sm:px-6 py-4 border-b border-[#efe3e3] dark:border-white/10 bg-gradient-to-r from-[#fff6f6] via-[#fffdfd] to-[#fff1f1] dark:from-[#161B22] dark:via-[#161B22] dark:to-[#161B22]">' +
+        window.swapSkeletonContent(
+            'requestDocsContainer',
+            '<div class="dashboard-card-polished request-doc-section">' +
+
+            '<div class="request-doc-section-header">' +
             '<div class="flex items-start justify-between gap-4">' +
+
             '<div class="min-w-0">' +
-            '<div class="inline-flex items-center gap-2 text-[10px] font-bold tracking-[0.18em] uppercase text-[#8B0000] mb-2">' +
+            '<div class="request-doc-eyebrow">' +
             '<i class="fa-solid fa-file-lines"></i>' +
             '<span>Patient Services</span>' +
             '</div>' +
-            '<h2 class="text-lg sm:text-xl font-extrabold text-gray-900 leading-tight">Request Documents</h2>' +
+
+            '<h2 class="request-doc-section-title">' +
+            'Request Documents' +
+            '</h2>' +
             '</div>' +
-            '<div class="hidden sm:flex w-11 h-11 rounded-[0.85rem] glass-icon-red items-center justify-center flex-shrink-0">' +
-            '<i class="fa-solid fa-folder-open text-base"></i>' +
-            '</div>' +
+
+            '<div class="hidden sm:flex glass-icon-red request-doc-section-icon">' +
+            '<i class="fa-solid fa-folder-open"></i>' +
             '</div>' +
 
             '</div>' +
+            '</div>' +
 
-            '<div class="p-4 sm:p-5 flex-1 bg-gradient-to-b from-[#fffefe] via-[#fff8f8] to-[#fff3f3]">' +
+            '<div class="request-doc-section-body">' +
             '<div class="space-y-3">' +
 
-            '<button type="button" data-doc-open="dentalHealthRecordModal" class="group request-doc-card relative w-full text-left rounded-[0.9rem] border border-red-100 bg-white p-4 shadow-sm transition-all duration-200">' +
+            '<button type="button" ' +
+            'data-doc-open="dentalHealthRecordModal" ' +
+            'class="request-doc-card request-doc-card-primary">' +
+
             '<div class="flex items-start gap-3">' +
-            '<div class="icon-box w-14 h-14 rounded-[0.85rem] bg-red-50 text-[#8B0000] flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:scale-105">' +
-            '<i class="fa-solid fa-file-medical text-lg"></i>' +
+
+            '<div class="icon-box request-doc-icon">' +
+            '<i class="fa-solid fa-file-medical"></i>' +
             '</div>' +
 
             '<div class="min-w-0 flex-1">' +
+
             '<div class="flex flex-wrap items-center gap-2">' +
-            '<h3 class="text-base font-extrabold text-gray-900 group-hover:text-[#8B0000] transition-colors">Dental Health Record</h3>' +
-            '<span class="inline-flex items-center rounded-full bg-red-50 text-[#8B0000] px-2.5 py-1 text-[10px] font-bold border border-red-100">Most Requested</span>' +
+            '<h3 class="request-doc-title">' +
+            'Dental Health Record' +
+            '</h3>' +
+
+            '<span class="request-doc-badge request-doc-badge-primary">' +
+            'Most Requested' +
+            '</span>' +
             '</div>' +
 
-            '<p class="mt-2 text-xs text-gray-500 leading-relaxed">Request a copy of your dental history, diagnosis notes, treatment details, and related medical information.</p>' +
+            '<p class="request-doc-description">' +
+            'Request a copy of your dental history, diagnosis notes, treatment details, and related medical information.' +
+            '</p>' +
 
-            '<div class="mt-3 flex flex-wrap gap-2">' +
-            '<span class="inline-flex items-center rounded-full bg-gray-50 text-gray-600 px-2.5 py-1 text-[11px] font-semibold border border-gray-200">All Records</span>' +
-            '<span class="inline-flex items-center rounded-full bg-gray-50 text-gray-600 px-2.5 py-1 text-[11px] font-semibold border border-gray-200">Medical</span>' +
-            '<span class="inline-flex items-center rounded-full bg-gray-50 text-gray-600 px-2.5 py-1 text-[11px] font-semibold border border-gray-200">Diagnosis</span>' +
-            '</div>' +
+            '<div class="request-doc-meta">' +
+            '<span class="request-doc-meta-pill">All Records</span>' +
+            '<span class="request-doc-meta-pill">Medical</span>' +
+            '<span class="request-doc-meta-pill">Diagnosis</span>' +
             '</div>' +
 
-            '<div class="flex-shrink-0 text-gray-300 group-hover:text-[#8B0000] transition-colors">' +
-            '<i class="doc-arrow fa-solid fa-arrow-up-right-from-square text-base transition-all duration-300 opacity-70"></i>' +
             '</div>' +
+
+            '<div class="request-doc-arrow">' +
+            '<i class="doc-arrow fa-solid fa-arrow-up-right-from-square"></i>' +
+            '</div>' +
+
             '</div>' +
             '</button>' +
 
-            '<button type="button" data-doc-open="dentalClearanceModal" class="group request-doc-card relative w-full text-left rounded-[0.9rem] border border-gray-200 bg-white p-4 shadow-sm transition-all duration-200">' +
+            '<button type="button" ' +
+            'data-doc-open="dentalClearanceModal" ' +
+            'class="request-doc-card request-doc-card-warning">' +
+
             '<div class="flex items-start gap-3">' +
-            '<div class="icon-box w-14 h-14 rounded-[0.85rem] bg-amber-50 text-[#c96a00] flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:scale-105">' +
-            '<i class="fa-solid fa-file-circle-check text-lg"></i>' +
+
+            '<div class="icon-box request-doc-icon">' +
+            '<i class="fa-solid fa-file-circle-check"></i>' +
             '</div>' +
 
             '<div class="min-w-0 flex-1">' +
+
             '<div class="flex flex-wrap items-center gap-2">' +
-            '<h3 class="text-base font-extrabold text-gray-900 group-hover:text-[#8B0000] transition-colors">Dental Clearance</h3>' +
-            '<span class="inline-flex items-center rounded-full bg-amber-50 text-[#b86100] px-2.5 py-1 text-[10px] font-bold border border-amber-100">School / Requirement</span>' +
+            '<h3 class="request-doc-title">' +
+            'Dental Clearance' +
+            '</h3>' +
+
+            '<span class="request-doc-badge request-doc-badge-warning">' +
+            'School / Requirement' +
+            '</span>' +
             '</div>' +
 
-            '<p class="mt-2 text-xs text-gray-500 leading-relaxed">Request a dental clearance for school submission, annual compliance, or other official requirements.</p>' +
+            '<p class="request-doc-description">' +
+            'Request a dental clearance for school submission, annual compliance, or other official requirements.' +
+            '</p>' +
 
-            '<div class="mt-3 flex flex-wrap gap-2">' +
-            '<span class="inline-flex items-center rounded-full bg-gray-50 text-gray-600 px-2.5 py-1 text-[11px] font-semibold border border-gray-200">Standard</span>' +
-            '<span class="inline-flex items-center rounded-full bg-gray-50 text-gray-600 px-2.5 py-1 text-[11px] font-semibold border border-gray-200">Annual</span>' +
-            '</div>' +
+            '<div class="request-doc-meta">' +
+            '<span class="request-doc-meta-pill">Standard</span>' +
+            '<span class="request-doc-meta-pill">Annual</span>' +
             '</div>' +
 
-            '<div class="flex-shrink-0 text-gray-300 group-hover:text-[#8B0000] transition-colors">' +
-            '<i class="doc-arrow fa-solid fa-arrow-up-right-from-square text-base transition-all duration-300 opacity-70"></i>' +
             '</div>' +
+
+            '<div class="request-doc-arrow">' +
+            '<i class="doc-arrow fa-solid fa-arrow-up-right-from-square"></i>' +
+            '</div>' +
+
             '</div>' +
             '</button>' +
+
             '</div>' +
             '</div>' +
+
             '</div>'
         );
+    }
+
+    function openDashboardRecordModal(encodedRecord) {
+        try {
+            const record = JSON.parse(
+                decodeURIComponent(encodedRecord)
+            );
+
+            if (typeof window.openRecordModal === 'function') {
+                window.openRecordModal(record);
+                return;
+            }
+
+            if (typeof openRecordModal === 'function') {
+                openRecordModal(record);
+            }
+        } catch (error) {
+            console.error(
+                'Unable to open dental record.',
+                error
+            );
+        }
     }
 
     function renderRecords() {
@@ -1279,56 +1567,89 @@ isset($upcomingAppointment) && $upcomingAppointment
             (count === 1 ? "1 completed visit recorded" : count + " completed visits recorded");
 
         if (!HOME_RECORDS || HOME_RECORDS.length === 0) {
-            window.swapSkeletonContent('dentalOverviewContainer',
-                '<div class="dashboard-card-polished dental-overview-card bg-gradient-to-br from-[#ffffff] via-[#fff3f3] to-[#ffeaea] border border-[#eadede] shadow-sm rounded-[1rem] overflow-hidden h-full flex flex-col">' +
-                '<div class="px-5 sm:px-6 py-4 border-b border-[#efe3e3] bg-gradient-to-r from-[#fff6f6] via-[#fffdfd] to-[#fff1f1]">' +
+            window.swapSkeletonContent(
+                'dentalOverviewContainer',
+
+                '<div class="dashboard-card-polished dental-summary-section">' +
+
+                '<div class="dental-summary-header">' +
+
                 '<div class="flex items-start justify-between gap-4">' +
+
                 '<div class="min-w-0">' +
-                '<div class="inline-flex items-center gap-2 text-[10px] font-bold tracking-[0.18em] uppercase text-[#8B0000] mb-2">' +
-                '<i class="fa-solid fa-tooth"></i><span>Patient Dental Summary</span>' +
+                '<div class="dental-summary-eyebrow">' +
+                '<i class="fa-solid fa-tooth"></i>' +
+                '<span>Patient Dental Summary</span>' +
                 '</div>' +
-                '<h2 class="text-lg sm:text-xl font-extrabold text-gray-900 leading-tight">Dental Overview</h2>' +
-                '<p class="text-sm text-gray-500 mt-1">Quick summary of your visits, treatments, and latest dental activity.</p>' +
+
+                '<h2 class="dental-summary-title">' +
+                'Dental Overview' +
+                '</h2>' +
+
+                '<p class="dental-summary-subtitle">' +
+                'Quick summary of your visits, treatments, and latest dental activity.' +
+                '</p>' +
                 '</div>' +
-                '<div class="hidden sm:flex w-11 h-11 rounded-[0.85rem] glass-icon-red items-center justify-center flex-shrink-0">' +
-                '<i class="fa-solid fa-chart-line text-base"></i>' +
+
+                '<div class="hidden sm:flex glass-icon-red dental-summary-header-icon">' +
+                '<i class="fa-solid fa-chart-line"></i>' +
                 '</div>' +
+
                 '</div>' +
-                '<div class="mt-4 grid grid-cols-2 xl:grid-cols-3 gap-2.5">' +
-                '<div class="rounded-[0.85rem] bg-white border border-gray-200 px-3 py-3">' +
-                '<p class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Total Visits</p>' +
-                '<p class="mt-1 text-base font-extrabold text-gray-900">0</p>' +
+
+                '<div class="dental-summary-stats">' +
+
+                '<div class="dental-summary-stat">' +
+                '<span class="dental-summary-stat-label">Total Visits</span>' +
+                '<strong class="dental-summary-stat-value">0</strong>' +
                 '</div>' +
-                '<div class="rounded-[0.85rem] bg-white border border-gray-200 px-3 py-3">' +
-                '<p class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Latest Record</p>' +
-                '<p class="mt-1 text-sm font-extrabold text-gray-900">No record yet</p>' +
+
+                '<div class="dental-summary-stat">' +
+                '<span class="dental-summary-stat-label">Latest Record</span>' +
+                '<strong class="dental-summary-stat-value dental-summary-stat-value-sm">' +
+                'No record yet' +
+                '</strong>' +
                 '</div>' +
-                '<div class="rounded-[0.85rem] bg-white border border-gray-200 px-3 py-3 col-span-2 xl:col-span-1">' +
-                '<p class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Status</p>' +
-                '<p class="overview-status-text mt-1 text-sm font-extrabold text-[#8B0000]">Waiting for first completed visit</p>' +
+
+                '<div class="dental-summary-stat dental-summary-stat-wide">' +
+                '<span class="dental-summary-stat-label">Status</span>' +
+                '<strong class="dental-summary-status">' +
+                'Waiting for first completed visit' +
+                '</strong>' +
                 '</div>' +
+
                 '</div>' +
+
                 '</div>' +
-                '<div class="p-5 sm:p-5 flex-1 flex flex-col bg-gradient-to-b from-[#fffefe] via-[#fff8f8] to-[#fff3f3]">' +
-                '<div class="flex-1 flex flex-col justify-center">' +
-                '<div class="rounded-[0.95rem] border border-dashed border-gray-200 bg-gradient-to-b from-[#fffdfd] to-[#fff6f6] px-5 py-7 text-center">' +
-                '<div class="w-14 h-14 rounded-[0.85rem] bg-red-50 text-[#8B0000]/50 flex items-center justify-center mx-auto mb-4">' +
-                '<i class="fa-solid fa-tooth text-xl"></i>' +
+
+                '<div class="dental-summary-body dental-summary-empty-body">' +
+
+                '<div class="dental-summary-empty">' +
+
+                '<div class="dental-summary-empty-icon">' +
+                '<i class="fa-solid fa-tooth"></i>' +
                 '</div>' +
-                '<p class="text-base font-extrabold text-gray-900 mb-2">No dental activity yet</p>' +
-                '<p class="text-sm text-gray-500 leading-relaxed max-w-[360px] mx-auto mb-4">Your latest treatment summary, completed visits, and diagnosis highlights will appear here after your first finished appointment.</p>' +
-                '<div class="flex flex-wrap items-center justify-center gap-2 mb-5">' +
-                '<span class="inline-flex items-center rounded-full bg-white border border-gray-200 text-gray-600 px-3 py-1 text-xs font-semibold">Visit history</span>' +
-                '<span class="inline-flex items-center rounded-full bg-white border border-gray-200 text-gray-600 px-3 py-1 text-xs font-semibold">Treatments</span>' +
-                '<span class="inline-flex items-center rounded-full bg-white border border-gray-200 text-gray-600 px-3 py-1 text-xs font-semibold">Diagnosis summary</span>' +
+
+                '<h3>No dental activity yet</h3>' +
+
+                '<p>' +
+                'Your latest treatment summary, completed visits, and diagnosis highlights will appear here after your first finished appointment.' +
+                '</p>' +
+
+                '<div class="dental-summary-empty-tags">' +
+                '<span>Visit history</span>' +
+                '<span>Treatments</span>' +
+                '<span>Diagnosis summary</span>' +
                 '</div>' +
-                '<a href="' + ROUTE_BOOK +
-                '" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-[0.85rem] bg-[#8B0000] hover:bg-[#660000] text-white text-sm font-bold transition-all duration-300 hover:-translate-y-0.5">' +
-                '<i class="fa-solid fa-calendar-plus"></i> Book First Appointment' +
+
+                '<a href="' + ROUTE_BOOK + '" class="ui-btn ui-btn-primary">' +
+                '<i class="fa-solid fa-calendar-plus"></i>' +
+                '<span>Book First Appointment</span>' +
                 '</a>' +
+
                 '</div>' +
                 '</div>' +
-                '</div>' +
+
                 '</div>'
             );
             if (viewAll) viewAll.classList.add("hidden");
@@ -1344,47 +1665,77 @@ isset($upcomingAppointment) && $upcomingAppointment
             var dispDate = r.date;
 
             html +=
-                '<div class="dashboard-card-polished rounded-[1rem] border border-gray-200 bg-white p-4 hover:border-red-200 hover:shadow-sm transition-all duration-300 hover:-translate-y-0.5">' +
-                '<div class="flex items-start justify-between gap-3">' +
-                '<div class="flex items-start gap-3 min-w-0">' +
-                '<div class="w-10 h-10 rounded-[0.85rem] ' + (idx === 0 ? 'bg-red-50 text-[#8B0000]' :
-                    'bg-gray-50 text-gray-600') + ' flex items-center justify-center flex-shrink-0">' +
-                '<i class="fa-solid fa-tooth text-sm"></i>' +
-                '</div>' +
-                '<div class="min-w-0">' +
-                '<div class="flex flex-wrap items-center gap-2">' +
-                '<p class="text-sm font-extrabold text-gray-900 truncate">' + window.escapeHtml(r.service) +
-                '</p>' +
-                '<span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold border ' +
-                ((r.status || '').toLowerCase() === 'completed' ?
-                    'bg-green-50 text-green-700 border-green-100' : 'bg-red-50 text-red-700 border-red-100') +
+                '<article class="dental-record-card ' +
+                (idx === 0 ? 'is-latest' : '') +
                 '">' +
-                window.escapeHtml((r.status || '').toLowerCase() === 'completed' ? 'Completed' : 'Cancelled') +
+
+                '<div class="dental-record-main">' +
+
+                '<div class="dental-record-icon">' +
+                '<i class="fa-solid fa-tooth"></i>' +
+                '</div>' +
+
+                '<div class="dental-record-copy">' +
+
+                '<div class="dental-record-title-row">' +
+
+                '<h3 class="dental-record-title">' +
+                window.escapeHtml(r.service) +
+                '</h3>' +
+
+                '<span class="status-pill ' +
+                (
+                    (r.status || '').toLowerCase() === 'completed' ?
+                        'status-completed' :
+                        'status-cancelled'
+                ) +
+                '">' +
+
+                '<span class="status-dot"></span>' +
+
+                window.escapeHtml(
+                    (r.status || '').toLowerCase() === 'completed' ?
+                        'Completed' :
+                        'Cancelled'
+                ) +
+
                 '</span>' +
+
                 '</div>' +
-                '<div class="mt-2 flex flex-wrap items-center gap-2">' +
-                '<span class="inline-flex items-center gap-1.5 rounded-full bg-gray-50 border border-gray-200 text-gray-600 px-2.5 py-1 text-[11px] font-bold">' +
-                '<i class="fa-regular fa-calendar opacity-70"></i>' + window.escapeHtml(dispDate) +
+
+                '<div class="dental-record-meta">' +
+
+                '<span>' +
+                '<i class="fa-regular fa-calendar"></i>' +
+                window.escapeHtml(dispDate) +
                 '</span>' +
-                '<span class="inline-flex items-center gap-1.5 rounded-full bg-gray-50 border border-gray-200 text-gray-600 px-2.5 py-1 text-[11px] font-bold">' +
-                '<i class="fa-regular fa-clock opacity-70"></i>' + window.escapeHtml(dispTime) +
+
+                '<span>' +
+                '<i class="fa-regular fa-clock"></i>' +
+                window.escapeHtml(dispTime) +
                 '</span>' +
+
+                '</div>' +
+
                 '</div>' +
                 '</div>' +
-                '</div>' +
-                '<button type="button" class="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-gray-50 hover:bg-[#8B0000] hover:text-white text-gray-700 text-[11px] font-bold border border-gray-200 hover:border-transparent transition-all duration-300 flex-shrink-0" onclick="openRecordModalFromData(\'' +
-                encoded + '\')">' +
-                '<i class="fa-solid fa-eye text-[10px]"></i>' +
+
+                '<button type="button" ' +
+                'class="ui-btn ui-btn-secondary ui-btn-sm dental-record-action" ' +
+                'onclick="openDashboardRecordModal(\'' + encoded + '\')">' +
+
+                '<i class="fa-solid fa-eye"></i>' +
                 '<span>View Details</span>' +
+
                 '</button>' +
-                '</div>' +
-                '</div>';
+
+                '</article>';
         });
 
         html +=
             '<div class="pt-2">' +
             '<a href="' + ROUTE_RECORD +
-            '" class="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-[0.85rem] bg-[#8B0000] hover:bg-[#660000] text-white text-sm font-bold transition-all duration-300 hover:-translate-y-0.5">' +
+            '" class="ui-btn ui-btn-primary w-full">' +
             '<i class="fa-solid fa-folder-open"></i>' +
             '<span>View All Records</span>' +
             '<i class="fa-solid fa-arrow-right text-[11px]"></i>' +
@@ -1392,44 +1743,69 @@ isset($upcomingAppointment) && $upcomingAppointment
             '</div>' +
             '</div>';
 
-        window.swapSkeletonContent('dentalOverviewContainer',
-            '<div class="dashboard-card-polished dental-overview-card bg-gradient-to-br from-[#ffffff] via-[#fff3f3] to-[#ffeaea] border border-[#eadede] shadow-sm rounded-[1rem] overflow-hidden h-full flex flex-col">' +
-            '<div class="px-5 sm:px-6 py-4 border-b border-[#efe3e3] bg-gradient-to-r from-[#fff6f6] via-[#fffdfd] to-[#fff1f1]">' +
+        window.swapSkeletonContent(
+            'dentalOverviewContainer',
+
+            '<div class="dashboard-card-polished dental-summary-section">' +
+
+            '<div class="dental-summary-header">' +
+
             '<div class="flex items-start justify-between gap-4">' +
+
             '<div class="min-w-0">' +
-            '<div class="inline-flex items-center gap-2 text-[10px] font-bold tracking-[0.18em] uppercase text-[#8B0000] mb-2">' +
-            '<i class="fa-solid fa-tooth"></i><span>Patient Dental Summary</span>' +
-            '</div>' +
-            '<h2 class="text-lg sm:text-xl font-extrabold text-gray-900 leading-tight">Dental Overview</h2>' +
-            '<p class="text-sm text-gray-500 mt-1">Latest 3 records from your dental activity.</p>' +
-            '</div>' +
-            '<div class="hidden sm:flex w-11 h-11 rounded-[0.85rem] glass-icon-red items-center justify-center flex-shrink-0">' +
-            '<i class="fa-solid fa-chart-line text-base"></i>' +
-            '</div>' +
+
+            '<div class="dental-summary-eyebrow">' +
+            '<i class="fa-solid fa-tooth"></i>' +
+            '<span>Patient Dental Summary</span>' +
             '</div>' +
 
-            '<div class="mt-4 grid grid-cols-2 xl:grid-cols-3 gap-2.5">' +
-            '<div class="rounded-[0.85rem] bg-white border border-gray-200 px-3 py-3">' +
-            '<p class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Total Visits</p>' +
-            '<p class="mt-1 text-base font-extrabold text-gray-900">' + count + '</p>' +
+            '<h2 class="dental-summary-title">' +
+            'Dental Overview' +
+            '</h2>' +
+
+            '<p class="dental-summary-subtitle">' +
+            'Latest 3 records from your dental activity.' +
+            '</p>' +
+
             '</div>' +
 
-            '<div class="rounded-[0.85rem] bg-white border border-gray-200 px-3 py-3">' +
-            '<p class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Latest Record</p>' +
-            '<p class="mt-1 text-sm font-extrabold text-gray-900">' + window.escapeHtml(dispLatestDate) + '</p>' +
+            '<div class="hidden sm:flex glass-icon-red dental-summary-header-icon">' +
+            '<i class="fa-solid fa-chart-line"></i>' +
             '</div>' +
 
-            '<div class="rounded-[0.85rem] bg-white border border-gray-200 px-3 py-3 col-span-2 xl:col-span-1">' +
-            '<p class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Status</p>' +
-            '<p class="overview-status-text mt-1 text-sm font-extrabold text-[#8B0000]">' + window.escapeHtml(
-                dispOverviewStatus) + '</p>' +
-            '</div>' +
-            '</div>' +
             '</div>' +
 
-            '<div class="p-5 sm:p-5 flex-1 bg-gradient-to-b from-[#fffefe] via-[#fff8f8] to-[#fff3f3]">' +
+            '<div class="dental-summary-stats">' +
+
+            '<div class="dental-summary-stat">' +
+            '<span class="dental-summary-stat-label">Total Visits</span>' +
+            '<strong class="dental-summary-stat-value">' +
+            count +
+            '</strong>' +
+            '</div>' +
+
+            '<div class="dental-summary-stat">' +
+            '<span class="dental-summary-stat-label">Latest Record</span>' +
+            '<strong class="dental-summary-stat-value dental-summary-stat-value-sm">' +
+            window.escapeHtml(dispLatestDate) +
+            '</strong>' +
+            '</div>' +
+
+            '<div class="dental-summary-stat dental-summary-stat-wide">' +
+            '<span class="dental-summary-stat-label">Status</span>' +
+            '<strong class="dental-summary-status">' +
+            window.escapeHtml(dispOverviewStatus) +
+            '</strong>' +
+            '</div>' +
+
+            '</div>' +
+
+            '</div>' +
+
+            '<div class="dental-summary-body">' +
             html +
             '</div>' +
+
             '</div>'
         );
     }
@@ -1479,37 +1855,30 @@ isset($upcomingAppointment) && $upcomingAppointment
     }
 
     function scrollToCalendar(event) {
-        if (event) {
-            event.preventDefault();
+        event?.preventDefault();
 
-            const btn = event.currentTarget;
+        const calendar =
+            document.getElementById(
+                'calendarSkeletonContainer'
+            );
 
-            const rect = btn.getBoundingClientRect();
-            const ripple = document.createElement("span");
-            const size = Math.max(rect.width, rect.height);
-
-            ripple.className = "btn-ripple";
-            ripple.style.width = size + "px";
-            ripple.style.height = size + "px";
-            ripple.style.left = (event.clientX - rect.left - size / 2) + "px";
-            ripple.style.top = (event.clientY - rect.top - size / 2) + "px";
-
-            btn.appendChild(ripple);
-            setTimeout(() => ripple.remove(), 500);
+        if (!calendar) {
+            return;
         }
-
-        const calendar = document.getElementById('calendarSkeletonContainer');
-        if (!calendar) return;
 
         calendar.scrollIntoView({
             behavior: 'smooth',
             block: 'center'
         });
 
-        calendar.classList.add('calendar-focus-pulse');
+        calendar.classList.add(
+            'calendar-focus-pulse'
+        );
 
-        setTimeout(() => {
-            calendar.classList.remove('calendar-focus-pulse');
+        window.setTimeout(() => {
+            calendar.classList.remove(
+                'calendar-focus-pulse'
+            );
         }, 1200);
     }
 

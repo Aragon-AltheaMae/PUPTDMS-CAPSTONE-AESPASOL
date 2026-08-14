@@ -11,11 +11,11 @@
     --chatbot-bottom: var(--widget-bottom);
     --back-top-bottom: calc(var(--widget-bottom) + var(--fab-size) + var(--fab-gap));
     --menu-bottom: calc(var(--widget-bottom) + var(--fab-size) + 12px);
-    --bg-main: #0d0f12;
-    --bg-card: #0d0f12;
-    --bg-card-soft: #111827;
-    --bg-panel: #161B22;
-    --bg-panel-soft: #1C2128;
+    --bg-main: #101111;
+    --bg-card: #151515;
+    --bg-card-soft: #1b1b1b;
+    --bg-panel: #161616;
+    --bg-panel-soft: #262626;
     --border-dark: rgba(255, 255, 255, 0.10);
     --text-primary: #F3F4F6;
     --text-secondary: #C9D1D9;
@@ -189,7 +189,7 @@
     --surface: #FAFAF8;
     --card: #FFFFFF;
     --border: #EDE8E4;
-    --text-1: #1C1410;
+    --text-1: #1e1e1e;
     --text-2: #5C5550;
     --text-3: #9E9690;
     --gold: #C9A84C;
@@ -392,19 +392,34 @@
     --status-denied-border: rgba(203, 213, 225, 0.22);
     --status-denied-solid: #CBD5E1;
 
-    --page-bg: #0d0f12;
-    --page-text: #E5E7EB;
+    --page-bg: #101111;
+    --page-text: #f3f4f6;
 
-    --sidebar-bg: #07111F;
-    --sidebar-border: #1E293B;
+    --surface: #151515;
+    --card: #1b1b1b;
+    --border: rgba(255, 255, 255, 0.10);
+
+    --text-1: #f3f4f6;
+    --text-2: #c9c9c9;
+    --text-3: #8f8f8f;
+
+    --crimson-light: rgba(139, 0, 0, 0.18);
+    --crimson-mid: rgba(139, 0, 0, 0.24);
+    --crimson-soft: rgba(139, 0, 0, 0.14);
+
+    --sidebar-bg: #151515;
+    --sidebar-border: rgba(255, 255, 255, 0.09);
     --sidebar-shadow: 4px 0 24px rgba(0, 0, 0, .35);
-    --sidebar-link-text: #CBD5E1;
-    --sidebar-link-hover-bg: rgba(139, 0, 0, .38);
-    --sidebar-icon-bg: rgba(139, 0, 0, 0.18);
-    --sidebar-muted-text: #64748B;
 
-    --drawer-bg: #07111F;
-    --drawer-footer-border: #1E293B;
+    --sidebar-link-text: #c9c9c9;
+    --sidebar-link-hover-bg: rgba(139, 0, 0, .30);
+
+    --sidebar-icon-bg: rgba(139, 0, 0, 0.18);
+
+    --sidebar-muted-text: #8f8f8f;
+
+    --drawer-bg: #151515;
+    --drawer-footer-border: rgba(255, 255, 255, 0.09);
     --drawer-overlay-bg: rgba(0, 0, 0, .68);
 
     --danger-soft-bg: rgba(139, 0, 0, .18);

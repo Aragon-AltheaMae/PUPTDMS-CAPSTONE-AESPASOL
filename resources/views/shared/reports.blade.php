@@ -22,7 +22,6 @@ $reportCharts = $reportCharts ?? [];
 $reportInventory = $reportInventory ?? [];
 
 /* Admin */
-$stats = $reportStats['patients'] ?? [];
 $treatments = $reportStats['treatments'] ?? [
 'total' => 0,
 'breakdown' => collect(),
@@ -60,40 +59,22 @@ $appointmentsToday = $reportStats['appointments_today'] ?? 0;
 $appointmentsDelta = $reportStats['appointments_delta'] ?? 0;
 
 $casesThisMonth = $reportStats['cases_this_month'] ?? 0;
-$casesDelta = $reportStats['cases_delta'] ?? null;
 
 $totalAppointmentsThisMonth = $reportStats['total_appointments_this_month'] ?? 0;
-
-$cancelledAppointments = $reportStats['cancelled_appointments'] ?? 0;
-
 $completedAppointments = $reportStats['completed_appointments'] ?? $casesThisMonth;
-
 $cancellationRate = $reportStats['cancellation_rate'] ?? 0;
-
 $avgPatientsPerDay = $reportStats['average_patients_per_day'] ?? 0;
-
 $returningPatients = $reportStats['returning_patients'] ?? 0;
-
 $newPatients = $reportStats['new_patients'] ?? 0;
-
 $lowStockItems = $reportStats['low_stock_items'] ?? 0;
-
 $gadLabels = $reportCharts['gad']['labels'] ?? [];
-
 $gadFemale = $reportCharts['gad']['female'] ?? [];
-
 $gadMale = $reportCharts['gad']['male'] ?? [];
-
 $weekLabels = $reportCharts['weekly']['labels'] ?? [];
-
 $weeklyDatasets = $reportCharts['weekly']['datasets'] ?? [];
-
 $medicineItems = collect($reportInventory['medicine_items'] ?? []);
-
 $suppliesItems = collect($reportInventory['supplies_items'] ?? []);
-
 $lowStockMedicine = collect($reportInventory['low_stock_medicine'] ?? []);
-
 $lowStockSupplies = collect($reportInventory['low_stock_supplies'] ?? []);
 
 $topServices = collect($topServices ?? []);
@@ -258,19 +239,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                     </canvas>
                 </div>
                 @else
-                <div class="empty-state">
-                    <div class="empty-state-icon">
-                        <i class="fa-solid fa-chart-pie"></i>
-                    </div>
-
-                    <div class="empty-state-title">
-                        No treatment data available
-                    </div>
-
-                    <p class="empty-state-sub">
-                        Treatment distribution will appear after completed appointments are recorded.
-                    </p>
-                </div>
+                <div id="treatmentDistributionEmptyState" class="empty-state-host"></div>
                 @endif
             </div>
         </div>
@@ -488,13 +457,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             </table>
                         </div>
                         @else
-                        <div class="empty-state">
-                            <div class="empty-state-icon">
-                                <i class="fa-solid fa-box-open"></i>
-                            </div>
-                            <div class="empty-state-title">No dental supply records available</div>
-                            <div class="empty-state-sub">There are no inventory usage records to display yet.</div>
-                        </div>
+                        <div id="adminInventoryEmptyState" class="empty-state-host"></div>
                         @endif
                     </div>
 
@@ -511,30 +474,64 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         </div>
 
                         @if ($inventoryItems->count())
-                        <div class="inventory-kpi-grid">
-                            <div class="inventory-kpi-card kpi-used">
-                                <span class="inventory-kpi-label">Total used</span>
-                                <strong>{{ number_format($inventoryTotalUsed) }}</strong>
-                                <small>This month</small>
+                        <div class="stat-grid">
+
+                            <div class="stat-card s-blue">
+                                <div class="stat-card-info">
+                                    <div class="stat-label">Total Used</div>
+                                    <div class="stat-num">
+                                        {{ number_format($inventoryTotalUsed) }}
+                                    </div>
+                                    <div class="stat-footer">This month</div>
+                                </div>
+
+                                <div class="stat-icon-wrapper">
+                                    <i class="fa-solid fa-arrow-trend-down"></i>
+                                </div>
                             </div>
 
-                            <div class="inventory-kpi-card kpi-stock">
-                                <span class="inventory-kpi-label">Available stock</span>
-                                <strong>{{ number_format($inventoryTotalStock) }}</strong>
-                                <small>Units remaining</small>
+                            <div class="stat-card s-green">
+                                <div class="stat-card-info">
+                                    <div class="stat-label">Available Stock</div>
+                                    <div class="stat-num">
+                                        {{ number_format($inventoryTotalStock) }}
+                                    </div>
+                                    <div class="stat-footer">Units remaining</div>
+                                </div>
+
+                                <div class="stat-icon-wrapper">
+                                    <i class="fa-solid fa-boxes-stacked"></i>
+                                </div>
                             </div>
 
-                            <div class="inventory-kpi-card kpi-critical">
-                                <span class="inventory-kpi-label">Critical items</span>
-                                <strong>{{ number_format($inventoryCriticalCount) }}</strong>
-                                <small>Need urgent review</small>
+                            <div class="stat-card s-red">
+                                <div class="stat-card-info">
+                                    <div class="stat-label">Critical Items</div>
+                                    <div class="stat-num">
+                                        {{ number_format($inventoryCriticalCount) }}
+                                    </div>
+                                    <div class="stat-footer">Need urgent review</div>
+                                </div>
+
+                                <div class="stat-icon-wrapper">
+                                    <i class="fa-solid fa-triangle-exclamation"></i>
+                                </div>
                             </div>
 
-                            <div class="inventory-kpi-card kpi-reorder">
-                                <span class="inventory-kpi-label">Suggested reorder</span>
-                                <strong>{{ number_format($inventoryReorderUnits) }}</strong>
-                                <small>Total units</small>
+                            <div class="stat-card s-amber">
+                                <div class="stat-card-info">
+                                    <div class="stat-label">Suggested Reorder</div>
+                                    <div class="stat-num">
+                                        {{ number_format($inventoryReorderUnits) }}
+                                    </div>
+                                    <div class="stat-footer">Total units</div>
+                                </div>
+
+                                <div class="stat-icon-wrapper">
+                                    <i class="fa-solid fa-cart-plus"></i>
+                                </div>
                             </div>
+
                         </div>
 
                         <div class="forecast-note">
@@ -623,14 +620,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             </table>
                         </div>
                         @else
-                        <div class="empty-state">
-                            <div class="empty-state-icon">
-                                <i class="fa-solid fa-truck-ramp-box"></i>
-                            </div>
-                            <div class="empty-state-title">No stock movement data available</div>
-                            <div class="empty-state-sub">There are no inventory records available for reorder
-                                forecasting yet.</div>
-                        </div>
+                        <div id="adminStockMovementEmptyState" class="empty-state-host"></div>
                         @endif
                     </div>
 
@@ -680,552 +670,517 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         Clinic Performance Overview
                     </div>
 
-                    <div class="kpi-grid-layout report-kpi-grid mb-8">
+                    <div class="stat-grid mb-8">
 
-                        <a href="{{ route('dentist.dentist.patients') }}" class="kpi-card kpi-card-patients group">
-                            <div class="kpi-icon kpi-icon-patients">
+                        <a href="{{ route('dentist.dentist.patients') }}" class="stat-card s-crimson">
+
+                            <div class="stat-card-info">
+                                <div class="stat-label">Patients This Month</div>
+
+                                <div class="stat-num">
+                                    {{ $patientsThisMonth }}
+                                </div>
+
+                                <div class="stat-footer">
+                                    @if (!is_null($patientsDelta))
+                                    <span class="{{ $patientsDelta >= 0 ? 'text-green-600' : 'text-red-600' }}">
+                                        <i class="fa-solid fa-arrow-{{ $patientsDelta >= 0 ? 'up' : 'down' }}"></i>
+                                        {{ abs($patientsDelta) }}%
+                                    </span>
+                                    @else
+                                    <span>No data last month</span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="stat-icon-wrapper">
                                 <i class="fa-solid fa-users"></i>
                             </div>
-
-                            <div class="flex-1 min-w-0">
-                                <div class="kpi-value">{{ $patientsThisMonth }}</div>
-                                <div class="kpi-label">Patients This Month</div>
-
-                                @if (!is_null($patientsDelta))
-                                <div class="kpi-delta {{ $patientsDelta >= 0 ? 'up' : 'down' }}">
-                                    <i class="fa-solid fa-arrow-{{ $patientsDelta >= 0 ? 'up' : 'down' }}"></i>
-                                    {{ abs($patientsDelta) }}%
-                                </div>
-                                @else
-                                <div class="kpi-delta neutral">No data last month</div>
-                                @endif
-                            </div>
-
-                            <i class="fa-solid fa-chevron-right kpi-arrow"></i>
                         </a>
 
-                        <a href="{{ route('dentist.dentist.appointments') }}"
-                            class="kpi-card kpi-card-appointments group">
-                            <div class="kpi-icon kpi-icon-appointments">
+                        <a href="{{ route('dentist.dentist.appointments') }}" class="stat-card s-amber">
+
+                            <div class="stat-card-info">
+                                <div class="stat-label">Appointments Today</div>
+
+                                <div class="stat-num">
+                                    {{ $appointmentsToday }}
+                                </div>
+
+                                <div class="stat-footer">
+                                    @if ($appointmentsDelta > 0)
+                                    <span class="text-green-600">
+                                        <i class="fa-solid fa-arrow-up"></i>
+                                        {{ $appointmentsDelta }} more
+                                    </span>
+                                    @elseif ($appointmentsDelta < 0) <span class="text-red-600">
+                                        <i class="fa-solid fa-arrow-down"></i>
+                                        {{ abs($appointmentsDelta) }} fewer
+                                        </span>
+                                        @else
+                                        <span>Same as yesterday</span>
+                                        @endif
+                                </div>
+                            </div>
+
+                            <div class="stat-icon-wrapper">
                                 <i class="fa-solid fa-calendar-check"></i>
                             </div>
+                        </a>
 
-                            <div class="flex-1 min-w-0">
-                                <div class="kpi-value">{{ $appointmentsToday }}</div>
-                                <div class="kpi-label">Appointments Today</div>
-
-                                @if ($appointmentsDelta > 0)
-                                <div class="kpi-delta up">
-                                    <i class="fa-solid fa-arrow-up"></i>
-                                    {{ $appointmentsDelta }} more
+                        <div class="stat-card s-red">
+                            <div class="stat-card-info">
+                                <div class="stat-label">
+                                    Cancellation Rate
                                 </div>
-                                @elseif ($appointmentsDelta < 0) <div class="kpi-delta down">
-                                    <i class="fa-solid fa-arrow-down"></i>
-                                    {{ abs($appointmentsDelta) }} fewer
+
+                                <div class="stat-num">
+                                    {{ $cancellationRate }}%
+                                </div>
+
+                                <div class="stat-footer">
+                                    Based on recorded appointments
+                                </div>
                             </div>
-                            @else
-                            <div class="kpi-delta neutral">Same as yesterday</div>
-                            @endif
+
+                            <div class="stat-icon-wrapper">
+                                <i class="fa-solid fa-calendar-xmark"></i>
+                            </div>
+                        </div>
+
+                        <a href="{{ route('dentist.dentist.inventory') }}" class="stat-card s-amber">
+                            <div class="stat-card-info">
+                                <div class="stat-label">
+                                    Low Stock Items
+                                </div>
+
+                                <div class="stat-num">
+                                    {{ $lowStockItems }}
+                                </div>
+
+                                <div class="stat-footer">
+                                    @if ($lowStockItems > 0)
+                                    <span class="text-red-600">
+                                        <i class="fa-solid fa-circle-exclamation"></i>
+                                        Requires reorder
+                                    </span>
+                                    @else
+                                    <span class="text-green-600">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        All stocked up
+                                    </span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="stat-icon-wrapper">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                        </a>
                     </div>
 
-                    <i class="fa-solid fa-chevron-right kpi-arrow"></i>
-                    </a>
-
-                    <div class="kpi-card kpi-card-cancellation">
-                        <div class="kpi-icon kpi-icon-cancellation">
-                            <i class="fa-solid fa-calendar-xmark"></i>
-                        </div>
-
-                        <div class="flex-1 min-w-0">
-                            <div class="kpi-value">{{ $cancellationRate }}%</div>
-                            <div class="kpi-label">Cancellation Rate</div>
-                            <div class="kpi-delta neutral">Based on recorded appointments</div>
-                        </div>
-                    </div>
-
-                    <a href="{{ route('dentist.dentist.inventory') }}" class="kpi-card kpi-card-low-stock group">
-                        <div class="kpi-icon kpi-icon-low-stock">
-                            <i class="fa-solid fa-triangle-exclamation"></i>
-                        </div>
-
-                        <div class="flex-1 min-w-0">
-                            <div class="kpi-value kpi-value-low-stock">{{ $lowStockItems }}</div>
-                            <div class="kpi-label kpi-label-low-stock">Low Stock Items</div>
-
-                            @if ($lowStockItems > 0)
-                            <div class="kpi-delta down">
-                                <i class="fa-solid fa-circle-exclamation"></i>
-                                Requires reorder
-                            </div>
-                            @else
-                            <div class="kpi-delta up">
-                                <i class="fa-solid fa-circle-check"></i>
-                                All stocked up
-                            </div>
-                            @endif
-                        </div>
-                        <i class="fa-solid fa-chevron-right kpi-arrow"></i>
-                    </a>
-    </div>
-
-    <div class="analytics-section-label">
-        <i class="fa-solid fa-chart-column"></i>
-        Patient and Clinic Insights
-    </div>
-
-    <div class="card mb-6">
-        <div class="card-header">
-            <div class="card-header-left">
-                <span class="card-header-icon">
-                    <i class="fa-solid fa-chart-simple"></i>
-                </span>
-
-                <div>
-                    <h3 class="card-title">Monthly Clinic Overview</h3>
-                    <p class="card-subtitle">
-                        Comparison of patient and treatment activity
-                    </p>
-                </div>
-            </div>
-
-            <span class="metric-chip">Current month</span>
-        </div>
-
-        <div class="card-body">
-            <div class="relative h-[300px]">
-                <canvas id="clinicOverviewChart"></canvas>
-            </div>
-        </div>
-    </div>
-
-    <div class="analytics-main-grid">
-        @php
-        $cleanPeriods = collect($periodOptions)
-        ->unique()
-        ->sortByDesc(function ($date) {
-        return \Carbon\Carbon::parse($date);
-        });
-        @endphp
-
-        <div class="card lg:col-span-1">
-            <div class="card-header">
-                <div class="card-header-left">
-                    <span class="card-header-icon">
+                    <div class="analytics-section-label">
                         <i class="fa-solid fa-chart-column"></i>
-                    </span>
-
-                    <div>
-                        <h3 class="card-title">GAD Report</h3>
-                        <p class="card-subtitle">
-                            Gender-disaggregated clinic records
-                        </p>
+                        Patient and Clinic Insights
                     </div>
-                </div>
 
-                <div class="card-header-right w-full sm:w-48">
-                    <select id="gadPeriodSelect" class="js-custom-select" data-placeholder="Select period">
+                    <div class="card mb-6">
+                        <div class="card-header">
+                            <div class="card-header-left">
+                                <span class="card-header-icon">
+                                    <i class="fa-solid fa-chart-simple"></i>
+                                </span>
 
-                        @foreach ($cleanPeriods as $opt)
-                        <option value="{{ $opt }}">
-                            {{ $opt }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="report-chart-legend" id="gadChartLegend"></div>
-                <div id="gadChartWrap" class="relative flex-1 min-h-[260px]">
-                    <canvas id="gadChart"></canvas>
-                    <div id="gadEmptyState" class="chart-empty hidden absolute inset-0">
-                        <i class="fa-solid fa-chart-column"></i>
-                        <p>No records found</p><span>for the selected period</span>
-                    </div>
-                    <div id="gadLoadingState" class="chart-loading hidden absolute inset-0"><i
-                            class="fa-solid fa-spinner"></i></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card lg:col-span-1">
-            <div class="card-header">
-                <div class="card-header-left">
-                    <span class="card-header-icon">
-                        <i class="fa-solid fa-chart-line"></i>
-                    </span>
-
-                    <div>
-                        <h3 class="card-title">Weekly Cases</h3>
-                        <p class="card-subtitle">
-                            Weekly treatment and appointment activity
-                        </p>
-                    </div>
-                </div>
-
-                <div class="card-header-right w-48 max-w-full">
-                    <select id="weeklyPeriodSelect" class="js-custom-select" data-placeholder="Select period">
-
-                        @foreach ($cleanPeriods as $opt)
-                        <option value="{{ $opt }}">
-                            {{ $opt }}
-                        </option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-            <div class="card-body">
-                <div id="weeklyChartWrap" class="relative flex-1 min-h-[260px]">
-                    <canvas id="weeklyDentalCasesChart"></canvas>
-                    <div id="weeklyEmptyState" class="chart-empty hidden absolute inset-0">
-                        <i class="fa-solid fa-chart-line"></i>
-                        <p>No appointment data</p><span>for the selected period</span>
-                    </div>
-                    <div id="weeklyLoadingState" class="chart-loading hidden absolute inset-0"><i
-                            class="fa-solid fa-spinner"></i></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <span class="chart-title">
-                    <i class="fa-solid fa-user-group"></i>
-                    Returning vs New Patients
-                </span>
-            </div>
-
-            <div class="card-body">
-                <div class="relative h-[280px]">
-                    @if (($returningPatients ?? 0) > 0 || ($newPatients ?? 0) > 0)
-                    <canvas id="patientSegmentChart"></canvas>
-                    @else
-                    <div class="chart-empty absolute inset-0">
-                        <i class="fa-solid fa-user-group"></i>
-                        <p>No patient segment data</p>
-                        <span>Returning and new patient insights will appear here.</span>
-                    </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-
-    </div>
-    <div class="analytics-secondary-grid">
-        <div class="card">
-            <div class="card-header">
-                <div class="flex items-center gap-2 min-w-0">
-                    <span class="chart-title">
-                        <i class="fa-solid fa-star"></i>
-                        Top Dental Services
-                    </span>
-                </div>
-                <span class="metric-chip">Top this month</span>
-            </div>
-
-            <div class="card-body">
-                @if ($topServices->count() > 0)
-                <div class="service-list">
-                    @foreach ($topServices->take(5)->values() as $index => $service)
-                    <div class="service-row">
-                        <div class="service-meta">
-                            <div class="service-rank">{{ $index + 1 }}</div>
-                            <div class="service-name">
-                                {{ $service->name ?? ($service['name'] ?? 'Service') }}
+                                <div>
+                                    <h3 class="card-title">Monthly Clinic Overview</h3>
+                                    <p class="card-subtitle">
+                                        Comparison of patient and treatment activity
+                                    </p>
+                                </div>
                             </div>
+
+                            <span class="metric-chip">Current month</span>
                         </div>
-                        <div class="service-count">
-                            {{ $service->total ?? ($service['total'] ?? 0) }} cases
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-                @else
-                <div class="chart-empty py-6">
-                    <i class="fa-solid fa-tooth"></i>
-                    <p>No service data available</p>
-                    <span>Top performed treatments will appear here.</span>
-                </div>
-                @endif
-            </div>
-        </div>
 
-        <section class="card quick-actions-card">
-            <div class="card-header">
-                <div class="card-header-left">
-                    <span class="card-header-icon">
-                        <i class="fa-solid fa-bolt"></i>
-                    </span>
-
-                    <div>
-                        <h2 class="card-title">Quick Reports</h2>
-                        <p class="card-subtitle">
-                            Frequently used report shortcuts
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="quick-actions-list">
-                <a href="{{ route('dentist.dentist.report.dental-services') }}" class="quick-action quick-action-card">
-                    <span class="quick-action-icon">
-                        <i class="fa-solid fa-tooth"></i>
-                    </span>
-
-                    <span class="quick-action-copy">
-                        <span class="quick-action-title">Dental Services</span>
-                        <span class="quick-action-sub">View and export full service logs</span>
-                    </span>
-
-                    <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
-                    <i class="fa-solid fa-tooth quick-action-bg-icon"></i>
-                </a>
-
-                <a href="{{ route('dentist.dentist.report.daily-treatment') }}" class="quick-action quick-action-card">
-                    <span class="quick-action-icon">
-                        <i class="fa-solid fa-notes-medical"></i>
-                    </span>
-
-                    <span class="quick-action-copy">
-                        <span class="quick-action-title">Daily Treatment Record</span>
-                        <span class="quick-action-sub">Track daily patient treatments</span>
-                    </span>
-
-                    <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
-                    <i class="fa-solid fa-notes-medical quick-action-bg-icon"></i>
-                </a>
-            </div>
-        </section>
-    </div>
-
-    <section class="card printable-forms-card mb-8">
-        <div class="card-header">
-            <div class="card-header-left">
-                <span class="card-header-icon">
-                    <i class="fa-solid fa-file-signature"></i>
-                </span>
-
-                <div>
-                    <h2 class="card-title">Printable Forms</h2>
-                    <p class="card-subtitle">
-                        Clinic forms and certificates available for printing
-                    </p>
-                </div>
-            </div>
-
-            <span class="metric-chip">
-                {{ $documentTemplates->count() }}
-                active {{ Str::plural('template', $documentTemplates->count()) }}
-            </span>
-        </div>
-
-        <div class="card-body">
-            @if ($documentTemplates->count())
-            <div class="printable-template-grid">
-                @foreach ($documentTemplates as $template)
-                <article class="printable-template-item">
-                    <div class="printable-template-main">
-                        <span class="printable-template-icon">
-                            <i class="fa-solid fa-file-medical"></i>
-                        </span>
-
-                        <div class="printable-template-copy">
-                            <h3 class="printable-template-title">
-                                {{ $template->name }}
-                            </h3>
-
-                            <p class="printable-template-code">
-                                {{ $template->code ?: 'Template Code N/A' }}
-                            </p>
-
-                            <div class="printable-template-meta">
-                                <span class="status-pill s-active">
-                                    {{ Str::headline($template->document_type) }}
-                                </span>
-
-                                <span class="status-pill s-neutral">
-                                    {{ $template->category ?: 'General' }}
-                                </span>
-
-                                <span class="status-pill s-ongoing">
-                                    {{ $template->paper_size ?: 'A4' }}
-                                </span>
+                        <div class="card-body">
+                            <div class="relative h-[300px]">
+                                <canvas id="clinicOverviewChart"></canvas>
                             </div>
                         </div>
                     </div>
 
-                    <a href="{{ route('dentist.dentist.report.templates.print', $template->id) }}" target="_blank"
-                        rel="noopener" class="ui-btn ui-btn-primary ui-btn-sm">
-                        <i class="fa-solid fa-print"></i>
-                        Print
-                    </a>
-                </article>
-                @endforeach
-            </div>
-            @else
-            <div class="empty-state">
-                <div class="empty-state-icon">
-                    <i class="fa-solid fa-file-circle-xmark"></i>
-                </div>
-
-                <div class="empty-state-title">
-                    No active document templates
-                </div>
-
-                <div class="empty-state-sub">
-                    Active clinic forms and certificates will appear here.
-                </div>
-            </div>
-            @endif
-        </div>
-    </section>
-
-    <div class="card report-inventory-shell mb-8">
-        <div class="card-header">
-            <span class="chart-title text-base"><i class="fa-solid fa-boxes-stacked"></i> Inventory
-                Analytics</span>
-            <a href="{{ route('dentist.dentist.inventory') }}" class="ui-btn ui-btn-secondary ui-btn-sm">
-                <i class="fa-solid fa-boxes-stacked"></i>
-                Manage Inventory
-            </a>
-        </div>
-
-        <div class="card-body">
-            <div class="report-inventory-grid grid grid-cols-1 md:grid-cols-3 gap-8">
-
-                <div class="col-span-1 inventory-chart-panel">
-                    <h3 class="text-center text-[11px] font-bold text-gray-500 mb-4 uppercase tracking-wider">
-                        Medicine
-                        Stock</h3>
-                    <div class="relative h-[220px] w-full">
-                        @if ($medicineItems->count() > 0)
-                        <canvas id="medicinePieChart"></canvas>
-                        @else
-                        <div class="chart-empty absolute inset-0">
-                            <i class="fa-solid fa-pills"></i>
-
-                            <p>No medicine stock available</p>
-
-                            <span>
-                                Add medicines to track inventory levels.
-                            </span>
-
-                            <button type="button" class="ui-btn ui-btn-primary ui-btn-sm"
-                                onclick="window.location.assign('{{ route('dentist.dentist.inventory') }}')">
-                                <i class="fa-solid fa-plus"></i>
-                                Add Medicine
-                            </button>
-                        </div>
-                        @endif
-                    </div>
-                </div>
-
-                <div class="col-span-1 report-inventory-panel">
-                    <h3 class="text-center text-[11px] font-bold text-gray-500 mb-4 uppercase tracking-wider">
-                        Medical
-                        Supplies</h3>
-                    <div class="relative h-[220px] w-full">
-                        @if ($suppliesItems->count() > 0)
-                        <canvas id="suppliesPieChart"></canvas>
-                        @else
-                        <div class="chart-empty absolute inset-0">
-                            <i class="fa-solid fa-box-open"></i>
-
-                            <p>No medical supplies found</p>
-
-                            <span>
-                                Add supplies to monitor usage and stock.
-                            </span>
-
-                            <button type="button" class="ui-btn ui-btn-primary ui-btn-sm"
-                                onclick="window.location.assign('{{ route('dentist.dentist.inventory') }}')">
-                                <i class="fa-solid fa-plus"></i>
-                                Add Supply
-                            </button>
-                        </div>
-                        @endif
-                    </div>
-                </div>
-
-                <div class="col-span-1 bg-gray-50 rounded-xl p-5 low-stock-alert-card">
-                    <div class="low-stock-alert-header flex items-center gap-2 mb-4">
-                        <span class="low-stock-title-icon">
-                            <i class="fa-solid fa-triangle-exclamation"></i>
-                        </span>
-                        <span class="text-sm font-bold text-gray-800">Low Stock Alerts</span>
-                    </div>
-
-                    @if ($lowStockMedicine->count() > 0 || $lowStockSupplies->count() > 0)
-                    <div class="overflow-y-auto max-h-[190px] pr-2 scroll-smooth">
-
-                        @if ($lowStockMedicine->count() > 0)
-                        @foreach ($lowStockMedicine as $item)
+                    <div class="analytics-main-grid">
                         @php
-                        $remaining = $item->qty - $item->used;
-                        $pct = $item->qty > 0 ? round(($remaining / $item->qty) * 100) : 0;
-                        $barClass = $pct <= 15 ? 'bg-red-500' : 'bg-orange-400' ; @endphp <div class="stock-row">
-                            <div class="stock-name">
-                                <span class="truncate pr-2">{{ $item->name }}</span>
-                                <span class="text-red-600 font-bold text-[10px] whitespace-nowrap">{{ $remaining }}
-                                    left</span>
+                        $cleanPeriods = collect($periodOptions)
+                        ->unique()
+                        ->sortByDesc(function ($date) {
+                        return \Carbon\Carbon::parse($date);
+                        });
+                        @endphp
+
+                        <div class="card lg:col-span-1">
+                            <div class="card-header">
+                                <div class="card-header-left">
+                                    <span class="card-header-icon">
+                                        <i class="fa-solid fa-chart-column"></i>
+                                    </span>
+
+                                    <div>
+                                        <h3 class="card-title">GAD Report</h3>
+                                        <p class="card-subtitle">
+                                            Gender-disaggregated clinic records
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="card-header-right w-full sm:w-48">
+                                    <select id="gadPeriodSelect" class="js-custom-select"
+                                        data-placeholder="Select period">
+
+                                        @foreach ($cleanPeriods as $opt)
+                                        <option value="{{ $opt }}">
+                                            {{ $opt }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
-                            <div class="stock-bar-bg">
-                                <div class="stock-bar-fill {{ $barClass }}" style="width:{{ $pct }}%"></div>
+                            <div class="card-body">
+                                <div class="report-chart-legend"></div>
+                                <div id="gadChartWrap" class="relative flex-1 min-h-[260px]">
+                                    <canvas id="gadChart"></canvas>
+                                    <div id="gadEmptyState" class="empty-state-host absolute inset-0"></div>
+                                    <div id="gadLoadingState" class="chart-loading hidden absolute inset-0"><i
+                                            class="fa-solid fa-spinner"></i></div>
+                                </div>
                             </div>
+                        </div>
+
+                        <div class="card lg:col-span-1">
+                            <div class="card-header">
+                                <div class="card-header-left">
+                                    <span class="card-header-icon">
+                                        <i class="fa-solid fa-chart-line"></i>
+                                    </span>
+
+                                    <div>
+                                        <h3 class="card-title">Weekly Cases</h3>
+                                        <p class="card-subtitle">
+                                            Weekly treatment and appointment activity
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="card-header-right w-48 max-w-full">
+                                    <select id="weeklyPeriodSelect" class="js-custom-select"
+                                        data-placeholder="Select period">
+
+                                        @foreach ($cleanPeriods as $opt)
+                                        <option value="{{ $opt }}">
+                                            {{ $opt }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="weeklyChartWrap" class="relative flex-1 min-h-[260px]">
+                                    <canvas id="weeklyDentalCasesChart"></canvas>
+                                    <div id="weeklyEmptyState" class="empty-state-host absolute inset-0"></div>
+                                    <div id="weeklyLoadingState" class="chart-loading hidden absolute inset-0"><i
+                                            class="fa-solid fa-spinner"></i></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="chart-title">
+                                    <i class="fa-solid fa-user-group"></i>
+                                    Returning vs New Patients
+                                </span>
+                            </div>
+
+                            <div class="card-body">
+                                <div class="relative h-[280px]">
+                                    @if (($returningPatients ?? 0) > 0 || ($newPatients ?? 0) > 0)
+                                    <canvas id="patientSegmentChart"></canvas>
+                                    @else
+                                    <div id="patientSegmentEmptyState" class="empty-state-host"></div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
-                    @endforeach
-                    @endif
+                    <div class="analytics-secondary-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <span class="chart-title">
+                                        <i class="fa-solid fa-star"></i>
+                                        Top Dental Services
+                                    </span>
+                                </div>
+                                <span class="metric-chip">Top this month</span>
+                            </div>
 
-                    @if ($lowStockSupplies->count() > 0)
-                    @foreach ($lowStockSupplies as $item)
-                    @php
-                    $remaining = $item->qty - $item->used;
-                    $pct = $item->qty > 0 ? round(($remaining / $item->qty) * 100) : 0;
-                    $barClass = $pct <= 15 ? 'bg-red-500' : 'bg-orange-400' ; @endphp <div class="stock-row">
-                        <div class="stock-name">
-                            <span class="truncate pr-2">{{ $item->name }}</span>
-                            <span class="text-red-600 font-bold text-[10px] whitespace-nowrap">{{ $remaining }}
-                                left</span>
+                            <div class="card-body">
+                                @if ($topServices->count() > 0)
+                                <div class="service-list">
+                                    @foreach ($topServices->take(5)->values() as $index => $service)
+                                    <div class="service-row">
+                                        <div class="service-meta">
+                                            <div class="service-rank">{{ $index + 1 }}</div>
+                                            <div class="service-name">
+                                                {{ $service->name ?? ($service['name'] ?? 'Service') }}
+                                            </div>
+                                        </div>
+                                        <div class="service-count">
+                                            {{ $service->total ?? ($service['total'] ?? 0) }} cases
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+                                @else
+                                <div id="topServicesEmptyState" class="empty-state-host"></div>
+                                @endif
+                            </div>
                         </div>
-                        <div class="stock-bar-bg">
-                            <div class="stock-bar-fill {{ $barClass }}" style="width:{{ $pct }}%"></div>
+
+                        <section class="card quick-actions-card">
+                            <div class="card-header">
+                                <div class="card-header-left">
+                                    <span class="card-header-icon">
+                                        <i class="fa-solid fa-bolt"></i>
+                                    </span>
+
+                                    <div>
+                                        <h2 class="card-title">Quick Reports</h2>
+                                        <p class="card-subtitle">
+                                            Frequently used report shortcuts
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="quick-actions-list">
+                                <a href="{{ route('dentist.dentist.report.dental-services') }}"
+                                    class="quick-action quick-action-card">
+                                    <span class="quick-action-icon">
+                                        <i class="fa-solid fa-tooth"></i>
+                                    </span>
+
+                                    <span class="quick-action-copy">
+                                        <span class="quick-action-title">Dental Services</span>
+                                        <span class="quick-action-sub">View and export full service logs</span>
+                                    </span>
+
+                                    <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
+                                    <i class="fa-solid fa-tooth quick-action-bg-icon"></i>
+                                </a>
+
+                                <a href="{{ route('dentist.dentist.report.daily-treatment') }}"
+                                    class="quick-action quick-action-card">
+                                    <span class="quick-action-icon">
+                                        <i class="fa-solid fa-notes-medical"></i>
+                                    </span>
+
+                                    <span class="quick-action-copy">
+                                        <span class="quick-action-title">Daily Treatment Record</span>
+                                        <span class="quick-action-sub">Track daily patient treatments</span>
+                                    </span>
+
+                                    <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
+                                    <i class="fa-solid fa-notes-medical quick-action-bg-icon"></i>
+                                </a>
+                            </div>
+                        </section>
+                    </div>
+
+                    <section class="card printable-forms-card mb-8">
+                        <div class="card-header">
+                            <div class="card-header-left">
+                                <span class="card-header-icon">
+                                    <i class="fa-solid fa-file-signature"></i>
+                                </span>
+
+                                <div>
+                                    <h2 class="card-title">Printable Forms</h2>
+                                    <p class="card-subtitle">
+                                        Clinic forms and certificates available for printing
+                                    </p>
+                                </div>
+                            </div>
+
+                            <span class="metric-chip">
+                                {{ $documentTemplates->count() }}
+                                active {{ Str::plural('template', $documentTemplates->count()) }}
+                            </span>
                         </div>
-                </div>
-                @endforeach
-                @endif
-            </div>
-        </div>
-        @else
-        @php
-        $hasAnyInventoryData = $medicineItems->count() > 0 || $suppliesItems->count() > 0;
-        @endphp
 
-        @if ($hasAnyInventoryData)
-        <div class="flex flex-col items-center justify-center h-[160px] text-center">
-            <div class="stock-good-icon">
-                <i class="fa-solid fa-check"></i>
-            </div>
-            <p class="text-sm font-bold text-gray-700">Stock levels are good</p>
-            <p class="text-xs text-gray-500 mt-1">No items require immediate restocking.</p>
-        </div>
-        @else
-        <div class="flex flex-col items-center justify-center h-[160px] text-center">
-            <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
-                <i class="fa-solid fa-boxes-stacked text-gray-400 text-lg"></i>
-            </div>
-            <p class="text-sm font-bold text-gray-700">No inventory records yet</p>
-            <p class="text-xs text-gray-500 mt-1">Add medicine or supply items to monitor low
-                stock
-                alerts.</p>
+                        <div class="card-body">
+                            @if ($documentTemplates->count())
+                            <div class="printable-template-grid">
+                                @foreach ($documentTemplates as $template)
+                                <article class="printable-template-item">
+                                    <div class="printable-template-main">
+                                        <span class="printable-template-icon">
+                                            <i class="fa-solid fa-file-medical"></i>
+                                        </span>
 
-            <button type="button" class="ui-btn ui-btn-primary ui-btn-sm"
-                onclick="window.location.assign('{{ route('dentist.dentist.inventory') }}')">
-                <i class="fa-solid fa-plus"></i>
-                Add Item
-            </button>
-        </div>
-        @endif
-        @endif
-    </div>
+                                        <div class="printable-template-copy">
+                                            <h3 class="printable-template-title">
+                                                {{ $template->name }}
+                                            </h3>
+
+                                            <p class="printable-template-code">
+                                                {{ $template->code ?: 'Template Code N/A' }}
+                                            </p>
+
+                                            <div class="printable-template-meta">
+                                                <span class="status-pill s-active">
+                                                    {{ Str::headline($template->document_type) }}
+                                                </span>
+
+                                                <span class="status-pill s-neutral">
+                                                    {{ $template->category ?: 'General' }}
+                                                </span>
+
+                                                <span class="status-pill s-ongoing">
+                                                    {{ $template->paper_size ?: 'A4' }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <a href="{{ route('dentist.dentist.report.templates.print', $template->id) }}"
+                                        target="_blank" rel="noopener" class="ui-btn ui-btn-primary ui-btn-sm">
+                                        <i class="fa-solid fa-print"></i>
+                                        Print
+                                    </a>
+                                </article>
+                                @endforeach
+                            </div>
+                            @else
+                            <div id="printableFormsEmptyState" class="empty-state-host"></div>
+                            @endif
+                        </div>
+                    </section>
+
+                    <div class="card report-inventory-shell mb-8">
+                        <div class="card-header">
+                            <span class="chart-title text-base"><i class="fa-solid fa-boxes-stacked"></i> Inventory
+                                Analytics</span>
+                            <a href="{{ route('dentist.dentist.inventory') }}"
+                                class="ui-btn ui-btn-secondary ui-btn-sm">
+                                <i class="fa-solid fa-boxes-stacked"></i>
+                                Manage Inventory
+                            </a>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="report-inventory-grid grid grid-cols-1 md:grid-cols-3 gap-8">
+
+                                <div class="col-span-1 inventory-chart-panel">
+                                    <h3
+                                        class="text-center text-[11px] font-bold text-gray-500 mb-4 uppercase tracking-wider">
+                                        Medicine
+                                        Stock</h3>
+                                    <div class="relative h-[220px] w-full">
+                                        @if ($medicineItems->count() > 0)
+                                        <canvas id="medicinePieChart"></canvas>
+                                        @else
+                                        <div id="medicineInventoryEmptyState" class="empty-state-host"></div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="col-span-1 report-inventory-panel">
+                                    <h3
+                                        class="text-center text-[11px] font-bold text-gray-500 mb-4 uppercase tracking-wider">
+                                        Medical
+                                        Supplies</h3>
+                                    <div class="relative h-[220px] w-full">
+                                        @if ($suppliesItems->count() > 0)
+                                        <canvas id="suppliesPieChart"></canvas>
+                                        @else
+                                        <div id="medicalSuppliesEmptyState" class="empty-state-host"></div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="col-span-1 bg-gray-50 rounded-xl p-5 low-stock-alert-card">
+                                    <div class="low-stock-alert-header flex items-center gap-2 mb-4">
+                                        <span class="low-stock-title-icon">
+                                            <i class="fa-solid fa-triangle-exclamation"></i>
+                                        </span>
+                                        <span class="text-sm font-bold text-gray-800">Low Stock Alerts</span>
+                                    </div>
+
+                                    @if ($lowStockMedicine->count() > 0 || $lowStockSupplies->count() > 0)
+                                    <div class="overflow-y-auto max-h-[190px] pr-2 scroll-smooth">
+
+                                        @if ($lowStockMedicine->count() > 0)
+                                        @foreach ($lowStockMedicine as $item)
+                                        @php
+                                        $remaining = $item->qty - $item->used;
+                                        $pct = $item->qty > 0 ? round(($remaining / $item->qty) * 100) : 0;
+                                        $barClass = $pct <= 15 ? 'bg-red-500' : 'bg-orange-400' ; @endphp <div
+                                            class="stock-row">
+                                            <div class="stock-name">
+                                                <span class="truncate pr-2">{{ $item->name }}</span>
+                                                <span class="text-red-600 font-bold text-[10px] whitespace-nowrap">{{
+                                                    $remaining }}
+                                                    left</span>
+                                            </div>
+                                            <div class="stock-bar-bg">
+                                                <div class="stock-bar-fill {{ $barClass }}" style="width:{{ $pct }}%">
+                                                </div>
+                                            </div>
+                                    </div>
+                                    @endforeach
+                                    @endif
+
+                                    @if ($lowStockSupplies->count() > 0)
+                                    @foreach ($lowStockSupplies as $item)
+                                    @php
+                                    $remaining = $item->qty - $item->used;
+                                    $pct = $item->qty > 0 ? round(($remaining / $item->qty) * 100) : 0;
+                                    $barClass = $pct <= 15 ? 'bg-red-500' : 'bg-orange-400' ; @endphp <div
+                                        class="stock-row">
+                                        <div class="stock-name">
+                                            <span class="truncate pr-2">{{ $item->name }}</span>
+                                            <span class="text-red-600 font-bold text-[10px] whitespace-nowrap">{{
+                                                $remaining }}
+                                                left</span>
+                                        </div>
+                                        <div class="stock-bar-bg">
+                                            <div class="stock-bar-fill {{ $barClass }}" style="width:{{ $pct }}%"></div>
+                                        </div>
+                                </div>
+                                @endforeach
+                                @endif
+                            </div>
+                        </div>
+                        @else
+                        @php
+                        $hasAnyInventoryData = $medicineItems->count() > 0 || $suppliesItems->count() > 0;
+                        @endphp
+
+                        @if ($hasAnyInventoryData)
+                        <div class="flex flex-col items-center justify-center h-[160px] text-center">
+                            <div class="stock-good-icon">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <p class="text-sm font-bold text-gray-700">Stock levels are good</p>
+                            <p class="text-xs text-gray-500 mt-1">No items require immediate restocking.</p>
+                        </div>
+                        @else
+                        <div id="inventoryRecordsEmptyState" class="empty-state-host"></div>
+                        @endif
+                        @endif
+                    </div>
     </div>
 
     @endif
@@ -1329,7 +1284,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 @endif
 
 @if ($isDentistView)
-<div id="createReportModal" class="ui-modal modal-theme-create" aria-hidden="true">
+<div id="createReportModal" class="ui-modal" aria-hidden="true">
 
     <div class="ui-modal-card modal-lg" role="dialog" aria-modal="true" aria-labelledby="createReportTitle"
         onclick="event.stopPropagation()">
@@ -1397,18 +1352,8 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                                     </div>
                                 </div>
 
-                                <div class="voice-input-toggle">
-                                    <button type="button" id="reportNameMicBtn" class="voice-search-mic external"
-                                        data-voice-trigger data-voice-target="#reportName"
-                                        data-voice-status="#reportNameVoiceStatus"
-                                        aria-label="Voice input for report name">
-                                        <i class="fa-solid fa-microphone"></i>
-                                    </button>
-
-                                    <span id="reportNameVoiceStatus" class="voice-status hidden" data-voice-status
-                                        aria-live="polite">
-                                    </span>
-                                </div>
+                                <x-voice-input target="#reportName" status-id="reportNameVoiceStatus"
+                                    label="Voice input for report name" title="Voice input" />
                             </div>
                         </div>
 
@@ -1444,46 +1389,66 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                     </div>
 
                     <div class="modal-field" data-global-field>
-                        <label class="global-form-label" for="dateFrom">
-                            From
-                            <span class="required-mark">*</span>
-                        </label>
+                        <div class="modal-field modal-field-full report-date-range-section">
+                            <div class="report-date-range-heading">
+                                <div>
+                                    <div class="report-date-range-title">
+                                        Date Range
+                                    </div>
 
-                        <div class="fp-date-input-wrap">
-                            <input id="dateFrom" name="date_from" type="text"
-                                class="form-input-custom js-flatpickr-date-max-today" placeholder="Select start date"
-                                data-field-label="From Date" data-required-message="Please select a start date."
-                                data-validation-rule="notFutureDate" readonly required>
-
-                            <i class="fa-regular fa-calendar fp-date-icon"></i>
-                        </div>
-
-                        <div id="dateFromErr" class="global-field-error" data-error-for="dateFrom" aria-live="polite"
-                            aria-hidden="true">
-                        </div>
-                    </div>
-
-                    <div class="modal-field" data-global-field>
-                        <label class="global-form-label" for="dateTo">
-                            To
-                            <span class="modal-helper-text">(optional)</span>
-                        </label>
-
-                        <div class="fp-date-input-wrap">
-                            <input id="dateTo" name="date_to" type="text"
-                                class="form-input-custom js-flatpickr-date-max-today" placeholder="Select end date"
-                                data-field-label="To Date" data-required-message="Please select an end date."
-                                data-validation-rule="notFutureDate" readonly>
-
-                            <i class="fa-regular fa-calendar fp-date-icon"></i>
-
-                            <div id="dateToErr" class="global-field-error" data-error-for="dateTo" aria-live="polite"
-                                aria-hidden="true">
+                                    <p class="report-date-range-subtitle">
+                                        Select a single date or define a custom range.
+                                    </p>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="modal-field modal-field-full">
-                            <p class="modal-helper-text">
+                            <div class="report-date-range-grid">
+
+                                <div class="modal-field" data-global-field>
+                                    <label class="global-form-label" for="dateFrom">
+                                        From
+                                        <span class="required-mark">*</span>
+                                    </label>
+
+                                    <div class="fp-date-input-wrap">
+                                        <input id="dateFrom" name="date_from" type="text"
+                                            class="form-input-custom js-flatpickr-date-max-today"
+                                            placeholder="Select start date" data-field-label="From Date"
+                                            data-required-message="Please select a start date."
+                                            data-validation-rule="notFutureDate" readonly required>
+
+                                        <i class="fa-regular fa-calendar fp-date-icon" aria-hidden="true"></i>
+                                    </div>
+
+                                    <div id="dateFromErr" class="global-field-error" data-error-for="dateFrom"
+                                        aria-live="polite" aria-hidden="true"></div>
+                                </div>
+
+                                <div class="modal-field" data-global-field>
+                                    <label class="global-form-label" for="dateTo">
+                                        To
+                                        <span class="modal-helper-text">
+                                            (optional)
+                                        </span>
+                                    </label>
+
+                                    <div class="fp-date-input-wrap">
+                                        <input id="dateTo" name="date_to" type="text"
+                                            class="form-input-custom js-flatpickr-date-max-today"
+                                            placeholder="Select end date" data-field-label="To Date"
+                                            data-required-message="Please select an end date."
+                                            data-validation-rule="notFutureDate" readonly>
+
+                                        <i class="fa-regular fa-calendar fp-date-icon" aria-hidden="true"></i>
+                                    </div>
+
+                                    <div id="dateToErr" class="global-field-error" data-error-for="dateTo"
+                                        aria-live="polite" aria-hidden="true"></div>
+                                </div>
+
+                            </div>
+
+                            <p class="report-date-range-helper">
                                 <i class="fa-solid fa-circle-info"></i>
                                 Leave “To” empty to report on a single date.
                             </p>
@@ -1498,16 +1463,14 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             <div class="modal-inline-control">
                                 <div class="modal-inline-main">
                                     <div class="global-number-stepper" data-global-number-stepper>
-
                                         <button type="button" class="global-number-stepper-btn" data-number-step="-1"
                                             aria-label="Decrease quantity">
                                             <i class="fa-solid fa-minus"></i>
                                         </button>
 
-                                        <input id="reportQty" name="quantity" type="number" min="1" max="100" step="1"
-                                            class="global-number-stepper-input" placeholder="1–100"
-                                            data-number-stepper-input data-field-label="Quantity"
-                                            data-required-message="Please enter a quantity."
+                                        <input id="reportQty" name="quantity" type="number" value="1" min="1" max="100"
+                                            step="1" class="global-number-stepper-input" data-number-stepper-input
+                                            data-field-label="Quantity" data-required-message="Please enter a quantity."
                                             data-validation-rule="wholeNumber" required>
 
                                         <button type="button" class="global-number-stepper-btn" data-number-step="1"
@@ -1523,8 +1486,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             </div>
 
                             <div id="reportQtyErr" class="global-field-error" data-error-for="reportQty"
-                                aria-live="polite" aria-hidden="true">
-                            </div>
+                                aria-live="polite" aria-hidden="true"></div>
                         </div>
                     </div>
                 </div>
@@ -1609,8 +1571,34 @@ $customReportTemplates = collect($customReportTemplates ?? []);
         const lineTotals = @json($charts['line']['totals'] ?? []);
         const lineNew = @json($charts['line']['new_patients'] ?? []);
 
-        const textColor = 'rgba(107,114,128,1)';
-        const gridColor = 'rgba(0,0,0,0.06)';
+        const isAdminReportDark = () =>
+            document.documentElement
+                .getAttribute('data-theme') ===
+            'dark' ||
+            document.documentElement
+                .classList
+                .contains('dark');
+
+        const adminChartTextColor = () =>
+            isAdminReportDark()
+                ? '#C9D1D9'
+                : '#374151';
+
+        const adminChartGridColor = () =>
+            isAdminReportDark()
+                ? 'rgba(255,255,255,0.10)'
+                : 'rgba(148,163,184,0.22)';
+
+        const adminChartBorderColor = () =>
+            isAdminReportDark()
+                ? '#161B22'
+                : '#ffffff';
+
+        const textColor =
+            adminChartTextColor();
+
+        const gridColor =
+            adminChartGridColor();
 
         const sharedScales = {
             x: {
@@ -1643,11 +1631,52 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             }
         };
 
+        const renderEmptyState = (
+            host,
+            options
+        ) => {
+            if (
+                !window.EmptyState ||
+                !document.getElementById(host)
+            ) {
+                return;
+            }
+
+            window.EmptyState.render({
+                host: `#${host}`,
+                ...options
+            });
+        };
+
+        renderEmptyState(
+            'treatmentDistributionEmptyState', {
+            title: 'No treatment data available',
+            message: 'Treatment distribution will appear after completed appointments are recorded.',
+            icon: 'fa-chart-pie'
+        }
+        );
+
+        renderEmptyState(
+            'adminInventoryEmptyState', {
+            title: 'No dental supply records available',
+            message: 'There are no inventory usage records to display yet.',
+            icon: 'fa-box-open'
+        }
+        );
+
+        renderEmptyState(
+            'adminStockMovementEmptyState', {
+            title: 'No stock movement data available',
+            message: 'There are no inventory records available for reorder forecasting yet.',
+            icon: 'fa-truck-ramp-box'
+        }
+        );
+
         const appointmentStatusCanvas =
             document.getElementById('appointmentStatusChart');
 
         if (appointmentStatusCanvas) {
-            new Chart(appointmentStatusCanvas, {
+            new window.Chart(appointmentStatusCanvas, {
                 type: 'doughnut',
 
                 data: {
@@ -1671,7 +1700,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         ],
 
                         borderWidth: 3,
-                        borderColor: '#ffffff',
+                        borderColor: adminChartBorderColor(),
                         hoverOffset: 7
                     }]
                 },
@@ -1686,15 +1715,14 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             display: false
                         },
 
-                        tooltip:
-                            window.getGlobalChartTooltipOptions({
-                                label(context) {
-                                    const value =
-                                        Number(context.raw || 0);
+                        tooltip: window.getGlobalChartTooltipOptions?.({
+                            label(context) {
+                                const value =
+                                    Number(context.raw || 0);
 
-                                    return `${context.label}: ${value}`;
-                                }
-                            })
+                                return `${context.label}: ${value}`;
+                            }
+                        }) || {}
                     }
                 }
             });
@@ -1704,7 +1732,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             document.getElementById('documentRequestChart');
 
         if (documentRequestCanvas) {
-            new Chart(documentRequestCanvas, {
+            new window.Chart(documentRequestCanvas, {
                 type: 'bar',
 
                 data: {
@@ -1743,12 +1771,11 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         legend: {
                             display: false
                         },
-                        tooltip:
-                            window.getGlobalChartTooltipOptions({
-                                label(context) {
-                                    return `${context.dataset.label}: ${context.raw}`;
-                                }
-                            })
+                        tooltip: window.getGlobalChartTooltipOptions?.({
+                            label(context) {
+                                return `${context.dataset.label}: ${context.raw}`;
+                            }
+                        }) || {}
                     },
 
                     scales: {
@@ -1796,7 +1823,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
         const barCanvas = document.getElementById('barChart');
 
         if (barCanvas) {
-            new Chart(barCanvas, {
+            new window.Chart(barCanvas, {
                 type: 'bar',
                 data: {
                     labels: barLabels,
@@ -1816,12 +1843,11 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             display: false
                         },
 
-                        tooltip:
-                            window.getGlobalChartTooltipOptions({
-                                label(context) {
-                                    return `${context.dataset.label}: ${context.formattedValue}`;
-                                }
-                            })
+                        tooltip: window.getGlobalChartTooltipOptions?.({
+                            label(context) {
+                                return `${context.dataset.label}: ${context.formattedValue}`;
+                            }
+                        }) || {}
                     },
                     scales: sharedScales
                 }
@@ -1831,7 +1857,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
         const pieColors = ['#378ADD', '#1D9E75', '#D85A30', '#BA7517', '#7F77DD', '#9ca3af'];
 
         if (document.getElementById('pieChart') && pieLabels.length && pieData.length) {
-            new Chart(document.getElementById('pieChart'), {
+            new window.Chart(document.getElementById('pieChart'), {
                 type: 'doughnut',
                 data: {
                     labels: pieLabels,
@@ -1839,7 +1865,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         data: pieData,
                         backgroundColor: pieColors.slice(0, pieLabels.length),
                         borderWidth: 3,
-                        borderColor: '#ffffff',
+                        borderColor: adminChartBorderColor(),
                         hoverOffset: 7
                     }]
                 },
@@ -1851,12 +1877,11 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         legend: {
                             display: false
                         },
-                        tooltip:
-                            window.getGlobalChartTooltipOptions({
-                                label(context) {
-                                    return `${context.label}: ${context.formattedValue}`;
-                                }
-                            })
+                        tooltip: window.getGlobalChartTooltipOptions?.({
+                            label(context) {
+                                return `${context.label}: ${context.formattedValue}`;
+                            }
+                        }) || {}
                     }
                 }
             });
@@ -1864,7 +1889,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
         const lineCanvas = document.getElementById('lineChart');
         if (lineCanvas) {
-            new Chart(lineCanvas, {
+            new window.Chart(lineCanvas, {
                 type: 'line',
                 data: {
                     labels: lineLabels,
@@ -1905,12 +1930,11 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         legend: {
                             display: false
                         },
-                        tooltip:
-                            window.getGlobalChartTooltipOptions({
-                                label(context) {
-                                    return `${context.dataset.label}: ${context.formattedValue}`;
-                                }
-                            })
+                        tooltip: window.getGlobalChartTooltipOptions?.({
+                            label(context) {
+                                return `${context.dataset.label}: ${context.formattedValue}`;
+                            }
+                        }) || {}
                     },
                     scales: {
                         x: {
@@ -1946,6 +1970,90 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                 }
             });
         }
+
+        function applyAdminReportChartTheme() {
+            if (!window.Chart) {
+                return;
+            }
+
+            const textColor =
+                adminChartTextColor();
+
+            const gridColor =
+                adminChartGridColor();
+
+            const borderColor =
+                adminChartBorderColor();
+
+            [
+                'lineChart',
+                'pieChart',
+                'appointmentStatusChart',
+                'documentRequestChart',
+                'barChart'
+            ].forEach(chartId => {
+                const chart =
+                    window.Chart.getChart?.(
+                        chartId
+                    );
+
+                if (!chart) {
+                    return;
+                }
+
+                const scales =
+                    chart.options?.scales;
+
+                if (scales) {
+                    Object.values(scales)
+                        .forEach(scale => {
+                            if (scale.ticks) {
+                                scale.ticks.color =
+                                    textColor;
+                            }
+
+                            if (scale.grid) {
+                                scale.grid.color =
+                                    gridColor;
+                            }
+
+                            if (scale.title) {
+                                scale.title.color =
+                                    textColor;
+                            }
+                        });
+                }
+
+                const legendLabels =
+                    chart.options
+                        ?.plugins
+                        ?.legend
+                        ?.labels;
+
+                if (legendLabels) {
+                    legendLabels.color =
+                        textColor;
+                }
+
+                if (
+                    chart.config.type ===
+                    'doughnut'
+                ) {
+                    chart.data.datasets
+                        .forEach(dataset => {
+                            dataset.borderColor =
+                                borderColor;
+                        });
+                }
+
+                chart.update('none');
+            });
+        }
+
+        window.addEventListener(
+            'global-theme-change',
+            applyAdminReportChartTheme
+        );
     });
 </script>
 
@@ -2022,15 +2130,15 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             );
 
             if (confirmButtonIcon) {
-                confirmButtonIcon.className = isLoading
-                    ? 'fa-solid fa-spinner fa-spin'
-                    : 'fa-solid fa-wand-magic-sparkles';
+                confirmButtonIcon.className = isLoading ?
+                    'fa-solid fa-spinner fa-spin' :
+                    'fa-solid fa-wand-magic-sparkles';
             }
 
             if (confirmButtonLabel) {
-                confirmButtonLabel.textContent = isLoading
-                    ? 'Generating...'
-                    : 'Generate AI Report';
+                confirmButtonLabel.textContent = isLoading ?
+                    'Generating...' :
+                    'Generate AI Report';
             }
 
             if (cancelButton) {
@@ -2091,20 +2199,8 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
             clearConfirmationError();
 
-            modal.classList.remove('closing');
-            modal.classList.add('open');
-
-            modal.setAttribute(
-                'aria-hidden',
-                'false'
-            );
-
-            document.documentElement.classList.add(
-                'modal-lock'
-            );
-
-            document.body.classList.add(
-                'modal-lock'
+            window.openModal?.(
+                'aiReportConfirmModal'
             );
 
             window.setTimeout(() => {
@@ -2117,37 +2213,13 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                 return;
             }
 
-            if (
-                !modal.classList.contains('open')
-            ) {
-                return;
-            }
-
             clearConfirmationError();
 
-            modal.classList.add('closing');
-            modal.classList.remove('open');
-
-            modal.setAttribute(
-                'aria-hidden',
-                'true'
+            window.closeModal?.(
+                'aiReportConfirmModal'
             );
 
-            window.setTimeout(() => {
-                modal.classList.remove(
-                    'closing'
-                );
-
-                document.documentElement
-                    .classList
-                    .remove('modal-lock');
-
-                document.body
-                    .classList
-                    .remove('modal-lock');
-
-                openButton.focus();
-            }, 180);
+            openButton?.focus();
         }
 
         openButton.addEventListener(
@@ -2206,27 +2278,6 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         reportUrl
                     );
                 }, 100);
-            }
-        );
-
-        modal.addEventListener(
-            'click',
-            event => {
-                if (event.target === modal) {
-                    closeModal();
-                }
-            }
-        );
-
-        document.addEventListener(
-            'keydown',
-            event => {
-                if (
-                    event.key === 'Escape' &&
-                    modal.classList.contains('open')
-                ) {
-                    closeModal();
-                }
             }
         );
 
@@ -2347,10 +2398,99 @@ $customReportTemplates = collect($customReportTemplates ?? []);
     const reportChartGridColor = () => isReportDark() ? 'rgba(255,255,255,0.10)' : 'rgba(148,163,184,0.22)';
     const reportChartBorderColor = () => isReportDark() ? '#161B22' : '#ffffff';
 
-    if (window.Chart) {
-        Chart.defaults.color = reportChartTextColor();
-        Chart.defaults.borderColor = reportChartGridColor();
+    const REPORT_CHART_IDS = [
+        'clinicOverviewChart',
+        'gadChart',
+        'weeklyDentalCasesChart',
+        'patientSegmentChart',
+        'medicinePieChart',
+        'suppliesPieChart'
+    ];
+
+    function applyReportChartTheme() {
+        if (!window.Chart) {
+            return;
+        }
+
+        const textColor =
+            reportChartTextColor();
+
+        const gridColor =
+            reportChartGridColor();
+
+        const borderColor =
+            reportChartBorderColor();
+
+        window.Chart.defaults.color =
+            textColor;
+
+        window.Chart.defaults.borderColor =
+            gridColor;
+
+        REPORT_CHART_IDS.forEach(chartId => {
+            const chart =
+                window.Chart.getChart?.(
+                    chartId
+                );
+
+            if (!chart) {
+                return;
+            }
+
+            const scales =
+                chart.options?.scales;
+
+            if (scales) {
+                Object.values(scales)
+                    .forEach(scale => {
+                        if (scale.ticks) {
+                            scale.ticks.color =
+                                textColor;
+                        }
+
+                        if (scale.grid) {
+                            scale.grid.color =
+                                gridColor;
+                        }
+
+                        if (scale.title) {
+                            scale.title.color =
+                                textColor;
+                        }
+                    });
+            }
+
+            const legendLabels =
+                chart.options
+                    ?.plugins
+                    ?.legend
+                    ?.labels;
+
+            if (legendLabels) {
+                legendLabels.color =
+                    textColor;
+            }
+
+            if (
+                chart.config.type ===
+                'doughnut'
+            ) {
+                chart.data.datasets
+                    .forEach(dataset => {
+                        dataset.borderColor =
+                            borderColor;
+                    });
+            }
+
+            chart.update('none');
+        });
     }
+    window.addEventListener(
+        'global-theme-change',
+        () => {
+            applyReportChartTheme();
+        }
+    );
 </script>
 
 <script>
@@ -2471,7 +2611,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             clinicOverviewChartInstance.destroy();
         }
 
-        clinicOverviewChartInstance = new Chart(canvas, {
+        clinicOverviewChartInstance = new window.Chart(canvas, {
             type: 'bar',
 
             data: {
@@ -2548,12 +2688,11 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         display: false
                     },
 
-                    tooltip:
-                        window.getGlobalChartTooltipOptions({
-                            label(context) {
-                                return `${context.label}: ${context.raw}`;
-                            }
-                        })
+                    tooltip: window.getGlobalChartTooltipOptions?.({
+                        label(context) {
+                            return `${context.label}: ${context.raw}`;
+                        }
+                    }) || {}
                 }
             }
         });
@@ -2561,14 +2700,16 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
     function buildPatientSegmentChart() {
         const total = PATIENT_SEGMENT_DATA.values.reduce((a, b) => a + b, 0);
-        if (total === 0) return;
+        const canvas = document.getElementById('patientSegmentChart');
+
+        if (total === 0 || !canvas || !window.Chart) return;
 
         if (patientSegmentChartInstance) {
             patientSegmentChartInstance.destroy();
             patientSegmentChartInstance = null;
         }
 
-        patientSegmentChartInstance = new Chart(document.getElementById('patientSegmentChart'), {
+        patientSegmentChartInstance = new window.Chart(canvas, {
             type: 'doughnut',
             data: {
                 labels: PATIENT_SEGMENT_DATA.labels,
@@ -2599,12 +2740,11 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         }
                     },
 
-                    tooltip:
-                        window.getGlobalChartTooltipOptions({
-                            label(context) {
-                                return `${context.label}: ${context.formattedValue}`;
-                            }
-                        })
+                    tooltip: window.getGlobalChartTooltipOptions?.({
+                        label(context) {
+                            return `${context.label}: ${context.formattedValue}`;
+                        }
+                    }) || {}
                 }
             }
         });
@@ -2679,6 +2819,23 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
         form.reset();
 
+        const quantityField =
+            document.getElementById(
+                'reportQty'
+            );
+
+        if (quantityField) {
+            quantityField.value = '1';
+
+            quantityField.dispatchEvent(
+                new Event(
+                    'input', {
+                    bubbles: true
+                }
+                )
+            );
+        }
+
         ['dateFrom', 'dateTo'].forEach(id => {
             const input = document.getElementById(id);
 
@@ -2718,12 +2875,9 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
         banner?.classList.add('hidden');
 
-        const quantity =
-            document.getElementById('reportQty');
-
-        if (quantity) {
-            quantity.disabled = false;
-            quantity.placeholder = '1–100';
+        if (quantityField) {
+            quantityField.disabled = false;
+            quantityField.placeholder = '1–100';
         }
 
         const counter =
@@ -2749,43 +2903,191 @@ $customReportTemplates = collect($customReportTemplates ?? []);
     let gadChartInstance = null,
         weeklyChartInstance = null;
 
-    function setReportChartState(canvasId, emptyId, loadingId, state) {
-        const canvas = document.getElementById(canvasId);
-        const empty = document.getElementById(emptyId);
-        const loading = document.getElementById(loadingId);
+    function setReportChartState(
+        canvasId,
+        emptyId,
+        loadingId,
+        state,
+        emptyOptions = {}
+    ) {
+        const canvas =
+            document.getElementById(canvasId);
 
-        if (!canvas || !empty || !loading) return;
+        const empty =
+            document.getElementById(emptyId);
 
-        empty.classList.remove('flex');
-        loading.classList.remove('flex');
+        const loading =
+            document.getElementById(loadingId);
 
-        empty.classList.add('hidden');
+        if (!canvas || !empty || !loading) {
+            return;
+        }
+
         loading.classList.add('hidden');
-
-        empty.style.display = 'none';
+        loading.classList.remove('flex');
         loading.style.display = 'none';
+
+        window.EmptyState?.hide(empty);
 
         if (state === 'empty') {
             canvas.style.display = 'none';
-            empty.classList.remove('hidden');
-            empty.classList.add('flex');
-            empty.style.display = 'flex';
+
+            window.EmptyState?.render({
+                host: empty,
+                title: emptyOptions.title ||
+                    'No records found',
+                message: emptyOptions.message ||
+                    '',
+                icon: emptyOptions.icon ||
+                    'fa-folder-open'
+            });
+
             return;
         }
 
         if (state === 'loading') {
             canvas.style.display = 'none';
+
             loading.classList.remove('hidden');
             loading.classList.add('flex');
             loading.style.display = 'flex';
+
             return;
         }
-
         canvas.style.display = 'block';
     }
 
+    function renderReportEmptyState(host, options) {
+        const element =
+            document.querySelector(host);
+
+        if (!element || !window.EmptyState) {
+            return;
+        }
+
+        window.EmptyState.render({
+            host: element,
+            ...options
+        });
+    }
+
+    function renderDentistReportEmptyStates() {
+        if (!window.EmptyState) {
+            return;
+        }
+
+        renderReportEmptyState(
+            '#inventoryRecordsEmptyState',
+            {
+                title: 'No inventory records yet',
+                message:
+                    'Add medicine or supply items to monitor low stock alerts.',
+                icon: 'fa-boxes-stacked',
+                actionHtml: `
+                <button
+                    type="button"
+                    class="ui-btn ui-btn-primary ui-btn-sm"
+                    onclick="window.location.assign(
+                        '{{ route('dentist.dentist.inventory') }}'
+                    )"
+                >
+                    <i class="fa-solid fa-plus"></i>
+                    Add Item
+                </button>
+            `
+            }
+        );
+
+        renderReportEmptyState(
+            '#printableFormsEmptyState',
+            {
+                title: 'No active document templates',
+                message:
+                    'Active clinic forms and certificates will appear here.',
+                icon: 'fa-file-circle-xmark'
+            }
+        );
+
+        renderReportEmptyState(
+            '#topServicesEmptyState',
+            {
+                title: 'No service data available',
+                message:
+                    'Top performed treatments will appear here.',
+                icon: 'fa-tooth'
+            }
+        );
+
+        renderReportEmptyState(
+            '#medicineInventoryEmptyState',
+            {
+                title: 'No medicine stock available',
+                message:
+                    'Add medicines to track inventory levels.',
+                icon: 'fa-pills',
+                className: 'empty-state-compact',
+
+                actionHtml: `
+            <button
+                type="button"
+                class="ui-btn ui-btn-primary ui-btn-sm"
+                onclick="window.location.assign(
+                    '{{ route('dentist.dentist.inventory') }}'
+                )"
+            >
+                <i class="fa-solid fa-plus"></i>
+                Add Medicine
+            </button>
+        `
+            }
+        );
+
+        renderReportEmptyState(
+            '#patientSegmentEmptyState',
+            {
+                title: 'No patient segment data',
+                message:
+                    'Returning and new patient insights will appear here.',
+                icon: 'fa-user-group'
+            }
+        );
+
+        renderReportEmptyState(
+            '#medicalSuppliesEmptyState',
+            {
+                title: 'No medical supplies found',
+                message:
+                    'Add supplies to monitor usage and stock.',
+                icon: 'fa-box-open',
+                className: 'empty-state-compact',
+
+                actionHtml: `
+            <button
+                type="button"
+                class="ui-btn ui-btn-primary ui-btn-sm"
+                onclick="window.location.assign(
+                    '{{ route('dentist.dentist.inventory') }}'
+                )"
+            >
+                <i class="fa-solid fa-plus"></i>
+                Add Supply
+            </button>
+        `
+            }
+        );
+    }
+
     function showGadEmpty() {
-        setReportChartState('gadChart', 'gadEmptyState', 'gadLoadingState', 'empty');
+        setReportChartState(
+            'gadChart',
+            'gadEmptyState',
+            'gadLoadingState',
+            'empty', {
+            title: 'No records found',
+            message: 'No GAD records are available for the selected period.',
+            icon: 'fa-chart-column'
+        }
+        );
     }
 
     function showGadLoading() {
@@ -2797,7 +3099,16 @@ $customReportTemplates = collect($customReportTemplates ?? []);
     }
 
     function showWeeklyEmpty() {
-        setReportChartState('weeklyDentalCasesChart', 'weeklyEmptyState', 'weeklyLoadingState', 'empty');
+        setReportChartState(
+            'weeklyDentalCasesChart',
+            'weeklyEmptyState',
+            'weeklyLoadingState',
+            'empty', {
+            title: 'No appointment data',
+            message: 'No weekly treatment or appointment activity is available for the selected period.',
+            icon: 'fa-chart-line'
+        }
+        );
     }
 
     function showWeeklyLoading() {
@@ -2809,11 +3120,17 @@ $customReportTemplates = collect($customReportTemplates ?? []);
     }
 
     function buildGadChart(labels, female, male) {
+        const canvas = document.getElementById('gadChart');
+
+        if (!canvas || !window.Chart) {
+            return;
+        }
+
         if (gadChartInstance) {
             gadChartInstance.destroy();
             gadChartInstance = null;
         }
-        gadChartInstance = new Chart(document.getElementById('gadChart'), {
+        gadChartInstance = new window.Chart(document.getElementById('gadChart'), {
             type: 'bar',
             data: {
                 labels,
@@ -2845,12 +3162,11 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             boxWidth: 8
                         }
                     },
-                    tooltip:
-                        window.getGlobalChartTooltipOptions({
-                            label(context) {
-                                return `${context.dataset.label}: ${context.parsed.x} cases`;
-                            }
-                        })
+                    tooltip: window.getGlobalChartTooltipOptions?.({
+                        label(context) {
+                            return `${context.dataset.label}: ${context.parsed.x} cases`;
+                        }
+                    }) || {}
                 },
                 scales: {
                     x: {
@@ -2886,11 +3202,17 @@ $customReportTemplates = collect($customReportTemplates ?? []);
     }
 
     function buildWeeklyChart(labels, datasets) {
+        const canvas = document.getElementById('weeklyDentalCasesChart');
+
+        if (!canvas || !window.Chart) {
+            return;
+        }
+
         if (weeklyChartInstance) {
             weeklyChartInstance.destroy();
             weeklyChartInstance = null;
         }
-        weeklyChartInstance = new Chart(document.getElementById('weeklyDentalCasesChart'), {
+        weeklyChartInstance = new window.Chart(document.getElementById('weeklyDentalCasesChart'), {
             type: 'line',
             data: {
                 labels,
@@ -2911,12 +3233,11 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             boxWidth: 8
                         }
                     },
-                    tooltip:
-                        window.getGlobalChartTooltipOptions({
-                            label(context) {
-                                return `${context.dataset.label}: ${context.parsed.y} cases`;
-                            }
-                        })
+                    tooltip: window.getGlobalChartTooltipOptions?.({
+                        label(context) {
+                            return `${context.dataset.label}: ${context.parsed.y} cases`;
+                        }
+                    }) || {}
                 },
                 scales: {
                     x: {
@@ -2958,7 +3279,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
         if (!canvas || !window.Chart || !Array.isArray(items) || items.length === 0) return;
 
-        new Chart(canvas, {
+        new window.Chart(canvas, {
             type: 'doughnut',
             data: {
                 labels: items.map(i => i.name),
@@ -2986,12 +3307,11 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             padding: 12
                         }
                     },
-                    tooltip:
-                        window.getGlobalChartTooltipOptions({
-                            label(context) {
-                                return `${context.label}: ${context.parsed} remaining`;
-                            }
-                        })
+                    tooltip: window.getGlobalChartTooltipOptions?.({
+                        label(context) {
+                            return `${context.label}: ${context.parsed} remaining`;
+                        }
+                    }) || {}
                 }
             }
         });
@@ -3090,18 +3410,41 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
     document.addEventListener('DOMContentLoaded', function () {
 
+        if (window.EmptyState) {
+            renderDentistReportEmptyStates();
+        } else {
+            window.addEventListener(
+                'load',
+                renderDentistReportEmptyStates, {
+                once: true
+            }
+            );
+        }
+
         if (window.initGlobalVoiceInputs) {
             window.initGlobalVoiceInputs(document.getElementById('createReportModal'));
         }
 
-        waitForChartJs().then(() => {
+        waitForChartJs().then(chartReady => {
+            if (!chartReady) {
+                return;
+            }
+
+            applyReportChartTheme();
             initReportCharts();
         });
 
-        document.getElementById('gadPeriodSelect').addEventListener('change', function () {
+        const gadPeriodSelect =
+            document.getElementById('gadPeriodSelect');
+
+        const weeklyPeriodSelect =
+            document.getElementById('weeklyPeriodSelect');
+
+        gadPeriodSelect?.addEventListener('change', function () {
             reloadGadChart(this.value);
         });
-        document.getElementById('weeklyPeriodSelect').addEventListener('change', function () {
+
+        weeklyPeriodSelect?.addEventListener('change', function () {
             reloadWeeklyChart(this.value);
         });
 
@@ -3226,9 +3569,9 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                 'dental_clearance'
             ].includes(documentType);
 
-            const quantity = automaticQuantity
-                ? 1
-                : Number(quantityField.value);
+            const quantity = automaticQuantity ?
+                1 :
+                Number(quantityField.value);
 
             const endpoint =
                 endpointMap[documentType];
@@ -3383,132 +3726,6 @@ $customReportTemplates = collect($customReportTemplates ?? []);
         });
 
         syncReportQuantityState();
-
-        document.getElementById('reportName').addEventListener('input', function () {
-            const len = this.value.length,
-                counter = document.getElementById('reportNameCounter');
-            counter.textContent = `${len} / 100`;
-            counter.classList.toggle('text-red-500', len >= 90);
-            counter.classList.toggle('text-gray-400', len < 90);
-            if (this.value.trim()) clearError('reportName', 'reportNameErr');
-            document.getElementById('formErrorBanner').classList.add('hidden');
-        });
-
-        document.getElementById('reportType').addEventListener('change', function () {
-            if (this.value) clearError('reportType', 'reportTypeErr');
-
-            const selectedOption = this.selectedOptions[0];
-            const documentType = selectedOption ? selectedOption.dataset.documentType : '';
-            const qtyInput = document.getElementById('reportQty');
-            const qtyErr = document.getElementById('reportQtyErr');
-            const banner = document.getElementById('formErrorBanner');
-            const qtyButtons = document.querySelectorAll('[data-qty-minus], [data-qty-plus]');
-
-            const isCertificateRequest = ['annual_dental_clearance', 'dental_clearance'].includes(
-                documentType);
-
-            if (isCertificateRequest) {
-                qtyInput.value = '';
-                qtyInput.placeholder = 'Auto';
-                qtyInput.disabled = true;
-                qtyInput.classList.add('bg-gray-100', 'cursor-not-allowed');
-
-                qtyButtons.forEach(btn => {
-                    btn.disabled = true;
-                    btn.classList.add('is-disabled');
-                });
-
-                if (qtyErr) {
-                    qtyErr.classList.add('hidden');
-                    qtyErr.classList.remove('flex');
-                }
-
-                banner.innerHTML = `
-            <i class="fa-solid fa-circle-info text-blue-500 flex-shrink-0"></i>
-            <span>Certificate reports will generate based on approved requests in the selected date range.</span>
-        `;
-                banner.classList.remove('hidden');
-                banner.classList.add('flex');
-                banner.classList.remove('bg-red-50', 'border-red-200', 'text-red-700');
-                banner.classList.add('bg-blue-50', 'border-blue-200', 'text-blue-700');
-            } else {
-                qtyInput.disabled = false;
-                qtyInput.placeholder = '1 – 100';
-                qtyInput.classList.remove('bg-gray-100', 'cursor-not-allowed');
-
-                qtyButtons.forEach(btn => {
-                    btn.disabled = false;
-                    btn.classList.remove('is-disabled');
-                });
-
-                banner.classList.add('hidden');
-                banner.classList.remove('flex', 'bg-blue-50', 'border-blue-200', 'text-blue-700');
-                banner.classList.add('bg-red-50', 'border-red-200', 'text-red-700');
-            }
-        });
-
-        function checkDates() {
-            const from = document.getElementById('dateFrom').value,
-                to = document.getElementById('dateTo').value;
-            ['dateFromErr', 'dateFutureErr', 'dateRangeErr'].forEach(id => {
-                let el = document.getElementById(id);
-                if (el) {
-                    el.classList.add('hidden');
-                    el.classList.remove('flex');
-                }
-            });
-            ['dateFrom', 'dateTo'].forEach(id => {
-                let el = document.getElementById(id);
-                if (el) {
-                    el.classList.remove('border-red-400');
-                    el.classList.add('border-gray-300');
-                }
-            });
-            if (!from && !to) return;
-            const fromFuture = from && from > todayStr,
-                toFuture = to && to > todayStr;
-            if (fromFuture || toFuture) {
-                document.getElementById('dateFutureErr').classList.remove('hidden');
-                document.getElementById('dateFutureErr').classList.add('flex');
-                if (fromFuture) {
-                    document.getElementById('dateFrom').classList.add('border-red-400');
-                    document.getElementById('dateFrom').classList.remove('border-gray-300');
-                }
-                if (toFuture) {
-                    document.getElementById('dateTo').classList.add('border-red-400');
-                    document.getElementById('dateTo').classList.remove('border-gray-300');
-                }
-                return;
-            }
-            if (from && to && new Date(to) < new Date(from)) {
-                document.getElementById('dateRangeErr').classList.remove('hidden');
-                document.getElementById('dateRangeErr').classList.add('flex');
-                document.getElementById('dateTo').classList.add('border-red-400');
-                document.getElementById('dateTo').classList.remove('border-gray-300');
-            }
-            document.getElementById('formErrorBanner').classList.add('hidden');
-        }
-        document.getElementById('dateFrom').addEventListener('change', checkDates);
-        document.getElementById('dateTo').addEventListener('change', checkDates);
-
-        const qtyInput = document.getElementById('reportQty');
-        qtyInput.addEventListener('keydown', e => {
-            if (['-', '+', 'e', 'E', '.', ','].includes(e.key)) e.preventDefault();
-        });
-        qtyInput.addEventListener('input', function () {
-            let val = this.value.replace(/[^0-9]/g, '');
-            if (val !== '' && parseInt(val, 10) > 100) val = '100';
-            this.value = val;
-            const qty = parseInt(val, 10);
-            if (!isNaN(qty) && qty >= 1 && qty <= 100) clearError('reportQty', 'reportQtyErr');
-            document.getElementById('formErrorBanner').classList.add('hidden');
-        });
-        qtyInput.addEventListener('paste', e => {
-            e.preventDefault();
-            const num = parseInt((e.clipboardData || window.clipboardData).getData('text').replace(
-                /[^0-9]/g, ''), 10);
-            if (!isNaN(num)) qtyInput.value = Math.min(Math.max(num, 1), 100);
-        });
     });
 </script>
 @endif

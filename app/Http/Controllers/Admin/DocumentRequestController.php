@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Dentist\DentistReportController;
 use App\Models\DocumentRequest;
 use App\Notifications\DocumentRequestApprovedNotification;
 use App\Notifications\DocumentRequestRejectedNotification;
@@ -10,6 +11,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
+
+use Illuminate\Support\Facades\Mail;
+
+use App\Mail\DocumentRequestApprovedMail;
+use App\Mail\DocumentRequestRejectedMail;
 
 class DocumentRequestController extends Controller
 {
@@ -85,12 +91,20 @@ class DocumentRequestController extends Controller
             ]);
         }
 
+        $refreshItems = DocumentRequest::query()
+            ->select('id')
+            ->orderByDesc('id')
+            ->get()
+            ->map(fn($item) => [
+                'id' => $item->id,
+            ])
+            ->values();
+
         return view('shared.document-requests', [
             'role' => 'admin',
-
+            'refreshItems' => $refreshItems,
             'requests' => $requests,
             'stats' => $stats,
-
             'search' => $search,
             'status' => $status,
             'type' => $type,
@@ -163,14 +177,18 @@ class DocumentRequestController extends Controller
     public function approve($id)
     {
         try {
-            $documentRequest = DocumentRequest::with('patient.user')->findOrFail($id);
+            $documentRequest = DB::transaction(function () use ($id) {
+                $requestItem = DocumentRequest::with('patient.user')->findOrFail($id);
 
-            $documentRequest->update([
-                'status' => 'approved',
-            ]);
+                $requestItem->update([
+                    'status' => 'approved',
+                    'approved_at' => now(),
+                    'approved_by' => auth()->id(),
+                    'rejection_reason' => null,
+                ]);
 
-            $documentRequest->refresh();
-            $documentRequest->loadMissing('patient.user');
+                return $requestItem->fresh(['patient.user', 'approvedBy']);
+            });
 
             if ($documentRequest->patient?->user) {
                 $documentRequest->patient->user->notify(
@@ -183,13 +201,36 @@ class DocumentRequestController extends Controller
                 ]);
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Document request approved successfully.',
-                'status' => 'approved',
-                'request' => $this->formatRequestPayload($documentRequest),
-                'stats' => $this->getDocumentRequestStats(),
-            ]);
+            try {
+                $documentRequest->loadMissing('patient');
+
+                $patientEmail = $documentRequest->patient?->email;
+
+                if ($patientEmail) {
+                    Mail::to($patientEmail)
+                        ->send(new DocumentRequestApprovedMail($documentRequest));
+
+                    Log::info('Document request approval email sent.', [
+                        'document_request_id' => $documentRequest->id,
+                        'patient_id' => $documentRequest->patient_id,
+                        'email' => $patientEmail,
+                    ]);
+                } else {
+                    Log::warning('Document request approval email not sent: patient has no email.', [
+                        'document_request_id' => $documentRequest->id,
+                        'patient_id' => $documentRequest->patient_id,
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Document request approval email failed.', [
+                    'document_request_id' => $documentRequest->id,
+                    'patient_id' => $documentRequest->patient_id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            return app(DentistReportController::class)
+                ->buildApprovedDocumentRequestPdfResponse($documentRequest);
         } catch (\Throwable $e) {
             Log::error('Document request approval failed.', [
                 'document_request_id' => $id,
@@ -228,6 +269,34 @@ class DocumentRequestController extends Controller
                 Log::warning('Document request rejected but patient user was not found.', [
                     'document_request_id' => $documentRequest->id,
                     'patient_id' => $documentRequest->patient_id,
+                ]);
+            }
+
+            try {
+                $documentRequest->loadMissing('patient');
+
+                $patientEmail = $documentRequest->patient?->email;
+
+                if ($patientEmail) {
+                    Mail::to($patientEmail)
+                        ->send(new DocumentRequestRejectedMail($documentRequest));
+
+                    Log::info('Document request rejection email sent.', [
+                        'document_request_id' => $documentRequest->id,
+                        'patient_id' => $documentRequest->patient_id,
+                        'email' => $patientEmail,
+                    ]);
+                } else {
+                    Log::warning('Document request rejection email not sent: patient has no email.', [
+                        'document_request_id' => $documentRequest->id,
+                        'patient_id' => $documentRequest->patient_id,
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Document request rejection email failed.', [
+                    'document_request_id' => $documentRequest->id,
+                    'patient_id' => $documentRequest->patient_id,
+                    'error' => $e->getMessage(),
                 ]);
             }
 

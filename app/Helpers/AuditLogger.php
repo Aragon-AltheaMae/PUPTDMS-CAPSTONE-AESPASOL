@@ -5,6 +5,8 @@ namespace App\Helpers;
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use App\Support\BrowserDetection;
 
 class AuditLogger
 {
@@ -32,6 +34,10 @@ class AuditLogger
             $actorIdentifier = session('admin_id') ?? ($user->id ?? null);
         }
 
+        $deviceDetails = BrowserDetection::deviceDetailsFromRequest(
+            Request::instance()
+        );
+
         AuditLog::create([
             'actor_id' => $user?->id,
             'actor_name' => $actorName,
@@ -42,6 +48,47 @@ class AuditLogger
             'description' => $description,
             'ip_address' => Request::ip(),
             'user_agent' => Request::userAgent(),
+            'browser_name' => self::supportsBrowserNameColumn()
+                ? $deviceDetails['browser_name']
+                : null,
+
+            'device_type' => self::supportsDeviceColumns()
+                ? $deviceDetails['device_type']
+                : null,
+
+            'device_name' => self::supportsDeviceColumns()
+                ? $deviceDetails['device_name']
+                : null,
+
+            'os_name' => self::supportsDeviceColumns()
+                ? $deviceDetails['os_name']
+                : null,
         ]);
+    }
+
+    private static function supportsBrowserNameColumn(): bool
+    {
+        static $supportsColumn;
+
+        if ($supportsColumn === null) {
+            $supportsColumn = Schema::hasColumn('audit_logs', 'browser_name');
+        }
+
+        return $supportsColumn;
+    }
+
+    private static function supportsDeviceColumns(): bool
+    {
+        static $supportsColumns;
+
+        if ($supportsColumns === null) {
+            $supportsColumns = Schema::hasColumns('audit_logs', [
+                'device_type',
+                'device_name',
+                'os_name',
+            ]);
+        }
+
+        return $supportsColumns;
     }
 }

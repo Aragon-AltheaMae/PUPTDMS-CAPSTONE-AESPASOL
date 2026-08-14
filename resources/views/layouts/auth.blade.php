@@ -44,7 +44,6 @@
     <div class="auth-container">
         @yield('content')
         @include('partials.global-toast')
-        @include('partials.voice-logic')
         @include('partials.chatbot')
 
         {{-- Sienna Accessibility Widget --}}

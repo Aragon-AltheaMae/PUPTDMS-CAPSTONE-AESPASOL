@@ -1,21 +1,59 @@
-.empty-state-host {
+.empty-state-controlled {
     display: none;
+}
+
+.empty-state-controlled.show,
+.empty-state-controlled.is-visible {
     width: 100%;
-}
 
-.empty-state-host.show,
-.empty-state-host.is-visible {
-    display: block;
-}
-
-.empty-state {
-    min-height: 360px;
-    padding: 64px 20px 72px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
     text-align: center;
+}
+
+.empty-state {
+    width: 100%;
+    min-height: 360px;
+    padding: 64px 20px 72px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+}
+
+.empty-state.empty-state-compact {
+    min-height: 220px;
+    height: 220px;
+    padding: 20px 14px;
+    justify-content: center;
+}
+
+.empty-state.empty-state-compact .empty-state-icon {
+    width: 58px !important;
+    height: 58px !important;
+    min-width: 58px !important;
+    border-radius: 18px !important;
+    margin-bottom: 14px !important;
+}
+
+.empty-state.empty-state-compact .empty-state-icon i {
+    font-size: 24px !important;
+}
+
+.empty-state.empty-state-compact .empty-state-sub {
+    margin-top: 6px;
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.empty-state.empty-state-compact .ui-btn {
+    margin-top: 14px;
 }
 
 .empty-state.is-hidden,
@@ -69,51 +107,77 @@
 }
 
 .empty-state-title {
-    margin: 0;
-    color: #6B7280;
-    font-size: 18px;
+    width: 100%;
     max-width: min(100%, 720px);
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0 auto;
+    color: var(--text-2);
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 1.25;
     text-align: center;
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
-    line-height: 1.25;
-    font-weight: 900;
 }
 
 .empty-state-sub {
-    margin: 10px auto 0;
-    color: #9CA3AF;
-    font-size: 15px;
+    width: 100%;
     max-width: min(100%, 680px);
-    margin-left: auto;
-    margin-right: auto;
+
+    margin: 10px auto 0;
+
+    color: var(--text-3);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.45;
+
     text-align: center;
+
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
-    line-height: 1.45;
-    font-weight: 600;
 }
 
 .empty-state-btn {
     margin-top: 24px;
+    margin-left: auto;
+    margin-right: auto;
+
     min-height: 38px;
     padding: 0 18px;
+
     border-radius: 999px;
-    border: 1px dashed #CBD5E1;
+    border: 1px dashed var(--border);
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: #FFFFFF;
-    color: #9CA3AF;
+
+    background: var(--card);
+    color: var(--text-3);
+
     font-size: 13px;
     font-weight: 800;
     line-height: 1;
+
     transition: all .18s ease;
+}
+
+.empty-title,
+.empty-sub {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.empty-title {
+    color: var(--text-1);
+}
+
+.empty-sub {
+    color: var(--text-3);
 }
 
 .empty-state-btn i {
@@ -145,23 +209,23 @@
 
 [data-theme="dark"] #mainContent .empty-state-title,
 .dark #mainContent .empty-state-title {
-    color: #64748B !important;
+    color: var(--text-2) !important;
 }
 
 [data-theme="dark"] #mainContent .empty-state-sub,
 .dark #mainContent .empty-state-sub {
-    color: #94A3B8 !important;
+    color: var(--text-3) !important;
 }
 
-[data-theme="dark"] #mainContent .empty-state-btn,
-.dark #mainContent .empty-state-btn {
+[data-theme="dark"] .empty-state-btn,
+.dark .empty-state-btn {
     background: transparent !important;
-    border-color: rgba(148, 163, 184, 0.45) !important;
-    color: #94A3B8 !important;
+    border-color: var(--border) !important;
+    color: var(--text-3) !important;
 }
 
-[data-theme="dark"] #mainContent .empty-state-btn:hover,
-.dark #mainContent .empty-state-btn:hover {
+[data-theme="dark"] .empty-state-btn:hover,
+.dark .empty-state-btn:hover {
     background: rgba(139, 0, 0, 0.16) !important;
     border-color: rgba(252, 165, 165, 0.40) !important;
     color: #FCA5A5 !important;
@@ -182,53 +246,31 @@
 .dark .empty-icon-box,
 .dark .appointment-filter-empty-icon {
     background:
-        radial-gradient(circle at top left, rgba(139, 0, 0, 0.28), transparent 42%),
-        linear-gradient(145deg, rgba(22, 27, 34, 0.95), rgba(13, 17, 23, 0.92)) !important;
+        radial-gradient(circle at top left,
+            rgba(139, 0, 0, 0.26),
+            transparent 42%),
+        var(--card) !important;
+
     color: #FCA5A5 !important;
-    border: 1px solid rgba(252, 165, 165, 0.20) !important;
+
+    border:
+        1px solid color-mix(in srgb,
+            var(--border) 65%,
+            var(--crimson) 35%) !important;
+
     box-shadow:
-        0 18px 36px rgba(0, 0, 0, 0.28),
-        inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
-}
-
-[data-theme="dark"] .empty-state-title,
-.dark .empty-state-title {
-    color: #64748B !important;
-}
-
-[data-theme="dark"] .empty-state-sub,
-.dark .empty-state-sub {
-    color: #94A3B8 !important;
-}
-
-[data-theme="dark"] .empty-state-btn,
-.dark .empty-state-btn {
-    background: transparent !important;
-    border-color: rgba(148, 163, 184, 0.45) !important;
-    color: #94A3B8 !important;
-}
-
-[data-theme="dark"] .empty-state-btn:hover,
-.dark .empty-state-btn:hover {
-    background: rgba(139, 0, 0, 0.16) !important;
-    border-color: rgba(252, 165, 165, 0.40) !important;
-    color: #FCA5A5 !important;
+        0 18px 36px rgba(0, 0, 0, 0.26),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
 }
 
 [data-theme="dark"] .empty-title,
 .dark .empty-title {
-    color: #F3F4F6 !important;
+    color: var(--text-1) !important;
 }
 
 [data-theme="dark"] .empty-sub,
 .dark .empty-sub {
-    color: #8B949E !important;
-}
-
-[data-theme="dark"] .empty-icon-box,
-.dark .empty-icon-box {
-    background: #30363D !important;
-    border: 1px solid #484F58 !important;
+    color: var(--text-3) !important;
 }
 
 @media (max-width: 767px) {
@@ -236,10 +278,6 @@
     #mainContent .empty-state {
         min-height: 340px !important;
         padding: 56px 18px 64px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        text-align: center !important;
     }
 
     #mainContent :is(.empty-state-icon,

@@ -33,6 +33,11 @@
                 Keep editing
             </button>
 
+            <button type="button" class="discard-modal-btn discard-modal-btn-save" data-discard-save hidden>
+                <i class="fa-solid fa-floppy-disk"></i>
+                Save Draft
+            </button>
+
             <button type="button" class="discard-modal-btn discard-modal-btn-discard" data-discard-confirm>
                 <i class="fa-solid fa-trash"></i>
                 Discard
@@ -47,6 +52,7 @@
 
         const formState = new WeakMap();
         let pendingDiscardCallback = null;
+        let pendingDiscardForm = null;
         let lastFocusedElement = null;
 
         function getDiscardModal() {
@@ -213,32 +219,109 @@
         }
 
         function openDiscardModal(modal, onDiscard) {
-            const discardModal = getDiscardModal();
+            const discardModal =
+                getDiscardModal();
 
             if (!discardModal) {
                 onDiscard?.();
                 return;
             }
 
-            pendingDiscardCallback = onDiscard;
-            lastFocusedElement = document.activeElement;
+            const form =
+                modal?.matches?.(
+                    'form[data-discard-form]'
+                ) ?
+                modal :
+                getWatchedForms(
+                    modal
+                )[0] || null;
 
-            const text = getModalText(modal);
-            const title = discardModal.querySelector('#globalDiscardTitle');
-            const subtitle = discardModal.querySelector('#globalDiscardSubtitle');
-            const message = discardModal.querySelector('#globalDiscardMessage');
+            pendingDiscardCallback =
+                onDiscard;
 
-            if (title) title.textContent = text.title;
-            if (subtitle) subtitle.textContent = text.subtitle;
-            if (message) message.textContent = text.message;
+            pendingDiscardForm =
+                form;
 
-            discardModal.classList.add('open');
-            discardModal.setAttribute('aria-hidden', 'false');
-            document.body.classList.add('modal-lock', 'discard-lock');
+            lastFocusedElement =
+                document.activeElement;
 
-            requestAnimationFrame(() => {
-                discardModal.querySelector('[data-discard-keep]')?.focus();
-            });
+            const text =
+                getModalText(modal);
+
+            const title =
+                discardModal.querySelector(
+                    '#globalDiscardTitle'
+                );
+
+            const subtitle =
+                discardModal.querySelector(
+                    '#globalDiscardSubtitle'
+                );
+
+            const message =
+                discardModal.querySelector(
+                    '#globalDiscardMessage'
+                );
+
+            if (title) {
+                title.textContent =
+                    text.title;
+            }
+
+            if (subtitle) {
+                subtitle.textContent =
+                    text.subtitle;
+            }
+
+            if (message) {
+                message.textContent =
+                    text.message;
+            }
+
+            const saveButton =
+                discardModal.querySelector(
+                    '[data-discard-save]'
+                );
+
+            const saveHandlerName =
+                form?.dataset
+                .discardSaveHandler;
+
+            const canSaveDraft =
+                Boolean(
+                    saveHandlerName &&
+                    typeof window[
+                        saveHandlerName
+                    ] === 'function'
+                );
+
+            if (saveButton) {
+                saveButton.hidden = !canSaveDraft;
+            }
+
+            discardModal.classList.add(
+                'open'
+            );
+
+            discardModal.setAttribute(
+                'aria-hidden',
+                'false'
+            );
+
+            document.body.classList.add(
+                'modal-lock',
+                'discard-lock'
+            );
+
+            requestAnimationFrame(
+                () => {
+                    discardModal
+                        .querySelector(
+                            '[data-discard-keep]'
+                        )
+                        ?.focus();
+                }
+            );
         }
 
         function closeDiscardModal() {
@@ -249,6 +332,7 @@
             discardModal.classList.remove('open');
             discardModal.setAttribute('aria-hidden', 'true');
             pendingDiscardCallback = null;
+            pendingDiscardForm = null;
             document.body.classList.remove('discard-lock');
 
             if (!document.querySelector('.ui-modal.open, .modal-overlay.open')) {
@@ -262,10 +346,107 @@
             lastFocusedElement = null;
         }
 
-        function discardNow() {
-            const callback = pendingDiscardCallback;
+        async function discardNow() {
+            const callback =
+                pendingDiscardCallback;
+
+            const form =
+                pendingDiscardForm;
+
+            const handlerName =
+                form?.dataset
+                .discardHandler;
+
+            if (
+                handlerName &&
+                typeof window[
+                    handlerName
+                ] === 'function'
+            ) {
+                const result =
+                    await window[
+                        handlerName
+                    ](form);
+
+                if (result === false) {
+                    return;
+                }
+            }
+
             closeDiscardModal();
+
             callback?.();
+        }
+
+        async function saveDraftNow() {
+            const callback =
+                pendingDiscardCallback;
+
+            const form =
+                pendingDiscardForm;
+
+            const handlerName =
+                form?.dataset
+                .discardSaveHandler;
+
+            if (
+                !handlerName ||
+                typeof window[
+                    handlerName
+                ] !== 'function'
+            ) {
+                return;
+            }
+
+            const discardModal =
+                getDiscardModal();
+
+            const saveButton =
+                discardModal?.querySelector(
+                    '[data-discard-save]'
+                );
+
+            const originalHtml =
+                saveButton?.innerHTML;
+
+            if (saveButton) {
+                saveButton.disabled = true;
+
+                saveButton.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Saving...
+        `;
+            }
+
+            try {
+                const result =
+                    await window[
+                        handlerName
+                    ](form);
+
+                if (result === false) {
+                    return;
+                }
+
+                closeDiscardModal();
+
+                callback?.();
+
+            } catch (error) {
+                console.error(
+                    'Unable to save draft.',
+                    error
+                );
+
+            } finally {
+                if (saveButton) {
+                    saveButton.disabled =
+                        false;
+
+                    saveButton.innerHTML =
+                        originalHtml;
+                }
+            }
         }
 
         function confirmClose(modalOrId, onDiscard) {
@@ -357,17 +538,44 @@
             });
         }, true);
 
-        document.addEventListener('click', event => {
-            if (event.target.closest('[data-discard-keep]')) {
-                event.preventDefault();
-                closeDiscardModal();
-            }
+        document.addEventListener(
+            'click',
+            event => {
+                if (
+                    event.target.closest(
+                        '[data-discard-keep]'
+                    )
+                ) {
+                    event.preventDefault();
 
-            if (event.target.closest('[data-discard-confirm]')) {
-                event.preventDefault();
-                discardNow();
+                    closeDiscardModal();
+
+                    return;
+                }
+
+                if (
+                    event.target.closest(
+                        '[data-discard-save]'
+                    )
+                ) {
+                    event.preventDefault();
+
+                    saveDraftNow();
+
+                    return;
+                }
+
+                if (
+                    event.target.closest(
+                        '[data-discard-confirm]'
+                    )
+                ) {
+                    event.preventDefault();
+
+                    discardNow();
+                }
             }
-        });
+        );
 
         document.addEventListener('keydown', event => {
             const discardModal = getDiscardModal();
@@ -379,6 +587,65 @@
                 closeDiscardModal();
             }
         });
+
+        document.addEventListener(
+            'click',
+            event => {
+                const link =
+                    event.target.closest(
+                        '[data-discard-navigation]'
+                    );
+
+                if (!link) {
+                    return;
+                }
+
+                const href =
+                    link.getAttribute(
+                        'href'
+                    );
+
+                if (
+                    !href ||
+                    href === '#' ||
+                    link.target === '_blank'
+                ) {
+                    return;
+                }
+
+                const formSelector =
+                    link.dataset
+                    .discardFormTarget;
+
+                const form =
+                    formSelector ?
+                    document.querySelector(
+                        formSelector
+                    ) :
+                    document.querySelector(
+                        'form[data-discard-form]'
+                    );
+
+                if (
+                    !form ||
+                    !isFormDirty(form)
+                ) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.stopImmediatePropagation();
+
+                openDiscardModal(
+                    form,
+                    () => {
+                        window.location.href =
+                            href;
+                    }
+                );
+            },
+            true
+        );
 
         window.DiscardChanges = {
             captureForm,

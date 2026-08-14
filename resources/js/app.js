@@ -1,5 +1,14 @@
 import './bootstrap';
+import './odontogram-preview';
 import './header';
+import './pagination-bar';
+import './profile-avatar';
+import './search-bar';
+import './empty-state';
+import './voice-logic';
+import './booking-workflow';
+import './booking-signature';
+import './filter-select';
 
 import '@fontsource/inter/300.css';
 import '@fontsource/inter/400.css';
@@ -174,31 +183,63 @@ window.buildFlatpickrCalendarOptions = function buildFlatpickrCalendarOptions(co
 };
 
 function decorateFlatpickrDays(instance) {
-    if (!instance?.calendarContainer) return;
+    if (!instance?.calendarContainer) {
+        return;
+    }
 
-    const minDate = normalizeDateOnly(instance.config?.minDate);
-    const maxDate = normalizeDateOnly(instance.config?.maxDate);
+    const minDate =
+        normalizeDateOnly(
+            instance.config?.minDate
+        );
 
-    instance.calendarContainer.querySelectorAll('.flatpickr-day').forEach((dayElem) => {
-        dayElem.classList.remove('flatpickr-has-tooltip');
-        delete dayElem.dataset.tooltip;
+    const maxDate =
+        normalizeDateOnly(
+            instance.config?.maxDate
+        );
 
-        if (!dayElem.dateObj) return;
+    instance.calendarContainer
+        .querySelectorAll('.flatpickr-day')
+        .forEach(dayElem => {
 
-        const dayDate = normalizeDateOnly(dayElem.dateObj);
-        if (!dayDate) return;
+            dayElem.removeAttribute(
+                'data-tooltip'
+            );
 
-        if (minDate && dayDate < minDate) {
-            dayElem.classList.add('flatpickr-has-tooltip');
-            dayElem.dataset.tooltip = "You can't select previous date";
-            return;
-        }
+            if (!dayElem.dateObj) {
+                return;
+            }
 
-        if (maxDate && dayDate > maxDate) {
-            dayElem.classList.add('flatpickr-has-tooltip');
-            dayElem.dataset.tooltip = "You can't select future date";
-        }
-    });
+            const dayDate =
+                normalizeDateOnly(
+                    dayElem.dateObj
+                );
+
+            if (!dayDate) {
+                return;
+            }
+
+            if (
+                minDate &&
+                dayDate < minDate
+            ) {
+                dayElem.setAttribute(
+                    'data-tooltip',
+                    "You can't select previous date"
+                );
+
+                return;
+            }
+
+            if (
+                maxDate &&
+                dayDate > maxDate
+            ) {
+                dayElem.setAttribute(
+                    'data-tooltip',
+                    "You can't select future date"
+                );
+            }
+        });
 }
 
 function syncFlatpickrHeader(instance) {
@@ -253,6 +294,9 @@ function updateMonthOnlyInput(instance, options = {}) {
 }
 
 function buildFlatpickrHeader(instance) {
+    const GLOBAL_CALENDAR_MIN_YEAR = 2000;
+    const GLOBAL_CALENDAR_FUTURE_YEARS = 10;
+
     if (!instance?.calendarContainer) return;
 
     const currentMonth = instance.calendarContainer.querySelector(
@@ -302,12 +346,12 @@ function buildFlatpickrHeader(instance) {
     const minimumYear =
         instance.config.minDate instanceof Date
             ? instance.config.minDate.getFullYear()
-            : instance.currentYear - 80;
+            : GLOBAL_CALENDAR_MIN_YEAR;
 
     const maximumYear =
         instance.config.maxDate instanceof Date
             ? instance.config.maxDate.getFullYear()
-            : instance.currentYear + 10;
+            : instance.currentYear + GLOBAL_CALENDAR_FUTURE_YEARS;
 
     for (let year = minimumYear; year <= maximumYear; year++) {
         const option = document.createElement('option');
@@ -386,6 +430,9 @@ function initGlobalFlatpickr() {
     );
 
     dateInputs.forEach(el => {
+        if (el._flatpickr) {
+            return;
+        }
         let options = { ...baseOptions };
 
         const parentPopup = el.closest(
@@ -552,34 +599,6 @@ document.addEventListener("DOMContentLoaded", () => {
     initMonthOnlyFlatpickr();
 });
 
-document.addEventListener('mousemove', (e) => {
-    const day = e.target.closest('.flatpickr-day');
-
-    let tooltip = document.querySelector('.flatpickr-floating-tooltip');
-
-    if (!tooltip) {
-        tooltip = document.createElement('div');
-        tooltip.className = 'flatpickr-floating-tooltip';
-        document.body.appendChild(tooltip);
-    }
-
-    const message = day?.dataset?.tooltip || '';
-
-    if (!message) {
-        tooltip.classList.remove('show');
-        return;
-    }
-
-    tooltip.textContent = message;
-    tooltip.style.left = `${e.clientX}px`;
-    tooltip.style.top = `${e.clientY - 12}px`;
-    tooltip.classList.add('show');
-});
-
-document.addEventListener('mouseleave', () => {
-    document.querySelector('.flatpickr-floating-tooltip')?.classList.remove('show');
-});
-
 let activeFlatpickrInstance = null;
 
 function ensureFlatpickrBackdrop() {
@@ -689,14 +708,17 @@ function initBackToTop() {
         button.type = 'button';
         button.className = 'back-to-top floating-btn';
         button.setAttribute('aria-label', 'Back to top');
-        button.setAttribute('title', 'Back to top');
         button.setAttribute('data-tooltip', 'Back to top');
+        button.setAttribute('data-tooltip-tone', 'view');
         button.innerHTML = '<i class="fa-solid fa-arrow-up"></i>';
 
         document.body.appendChild(button);
     }
 
+    button.removeAttribute('title');
     button.setAttribute('data-tooltip', 'Back to top');
+    button.setAttribute('data-tooltip-tone', 'view');
+
     if (button.dataset.backToTopInitialized === 'true') return;
     button.dataset.backToTopInitialized = 'true';
 
@@ -752,14 +774,15 @@ function initBackToTop() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initBackToTop();
-    initAiHelpPopover();
+    initAssistiveHelpPopover();
 });
 
-function initAiHelpPopover() {
-    if (document.querySelector('.ai-help-popover')) return;
+function initAssistiveHelpPopover() {
+    if (document.querySelector('.assistive-help-popover')) return;
 
     const popover = document.createElement('div');
-    popover.className = 'ai-help-popover';
+    popover.className = 'assistive-help-popover';
+
     popover.innerHTML = `
         <strong>Need help?</strong>
         <span>Open assistance tools for chatbot and accessibility options.</span>
@@ -768,10 +791,18 @@ function initAiHelpPopover() {
     document.body.appendChild(popover);
 
     const assistiveBtn = document.getElementById('assistiveMainFab');
+
     if (!assistiveBtn) return;
 
     const showPopover = () => {
-        if (document.getElementById('assistiveFabGroup')?.classList.contains('open')) return;
+        if (
+            document
+                .getElementById('assistiveFabGroup')
+                ?.classList.contains('open')
+        ) {
+            return;
+        }
+
         popover.classList.add('show');
     };
 
@@ -781,7 +812,6 @@ function initAiHelpPopover() {
 
     assistiveBtn.addEventListener('mouseenter', showPopover);
     assistiveBtn.addEventListener('focus', showPopover);
-
     assistiveBtn.addEventListener('mouseleave', hidePopover);
     assistiveBtn.addEventListener('blur', hidePopover);
     assistiveBtn.addEventListener('click', hidePopover);
@@ -2736,6 +2766,9 @@ function initSessionTimeoutModal() {
     let idleTimer = null;
     let sessionExpired = false;
     let redirectStarted = false;
+    const expiredByServer =
+        modal.dataset.sessionExpired === 'true';
+
     let activityRequestRunning = false;
 
     let lastActivityAt = Date.now();
@@ -2762,6 +2795,32 @@ function initSessionTimeoutModal() {
 
         document.body.classList.add(
             'session-expired'
+        );
+
+        document
+            .querySelectorAll('dialog[open]')
+            .forEach(dialog => {
+                try {
+                    dialog.close();
+                } catch (_) {
+                    dialog.removeAttribute('open');
+                }
+            });
+
+        document.documentElement.classList.remove(
+            'intro-modal-open'
+        );
+
+        document.body.classList.remove(
+            'intro-modal-open'
+        );
+
+        document.body.style.removeProperty(
+            'position'
+        );
+
+        document.body.style.removeProperty(
+            'width'
         );
 
         openModal(modal.id);
@@ -2831,10 +2890,6 @@ function initSessionTimeoutModal() {
                 showSessionTimeoutModal();
             }
         } catch (_) {
-            /*
-             * Huwag mag-redirect dahil lamang sa
-             * temporary network error.
-             */
         } finally {
             activityRequestRunning = false;
         }
@@ -2924,6 +2979,26 @@ function initSessionTimeoutModal() {
         true
     );
 
+    document.addEventListener(
+        'click',
+        event => {
+            if (!sessionExpired) return;
+
+            const signInAgainButton =
+                event.target.closest(
+                    '[data-session-timeout-primary]'
+                );
+
+            if (signInAgainButton) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopImmediatePropagation();
+        },
+        true
+    );
+
     primaryButton?.addEventListener(
         'click',
         async () => {
@@ -2958,8 +3033,11 @@ function initSessionTimeoutModal() {
         }
     );
 
-    syncActivityWithServer();
-    scheduleIdleTimeout();
+    if (expiredByServer) {
+        showSessionTimeoutModal();
+    } else {
+        scheduleIdleTimeout();
+    }
 }
 
 function acceptTerms() {
@@ -3045,8 +3123,7 @@ function openModal(id) {
 }
 
 function closeModal(id) {
-    const modal =
-        document.getElementById(id);
+    const modal = document.getElementById(id);
 
     if (
         !modal ||
@@ -3058,46 +3135,77 @@ function closeModal(id) {
         return;
     }
 
-    modal.classList.remove('open');
-    modal.classList.add('closing');
+    const focusedElement = document.activeElement;
+
+    if (modal.contains(focusedElement)) {
+        focusedElement.blur();
+    }
+
     modal.setAttribute(
         'aria-hidden',
         'true'
     );
 
+    modal.classList.remove('open');
+    modal.classList.add('closing');
+
     if (modalTimers[id]) {
         clearTimeout(modalTimers[id]);
     }
 
-    modalTimers[id] =
-        setTimeout(() => {
-            modal.classList.remove(
-                'closing'
+    modalTimers[id] = setTimeout(() => {
+
+        modal.classList.remove(
+            'closing'
+        );
+
+        modalTimers[id] = null;
+
+        const activeModal =
+            document.querySelector(
+                [
+                    '.ui-modal.open',
+                    '.ui-modal.closing',
+                    '.modal-overlay.open',
+                    '.modal-overlay.closing'
+                ].join(',')
             );
 
-            modalTimers[id] = null;
+        if (!activeModal) {
+            document.body.classList.remove(
+                'modal-lock'
+            );
+        }
 
-            const activeModal =
-                document.querySelector(
-                    [
-                        '.ui-modal.open',
-                        '.ui-modal.closing',
-                        '.modal-overlay.open',
-                        '.modal-overlay.closing'
-                    ].join(',')
-                );
-
-            if (!activeModal) {
-                document.body.classList.remove(
-                    'modal-lock'
-                );
-            }
-        }, 180);
+    }, 180);
 }
 
 function closeModalOnBackdrop(event, id) {
     return false;
 }
+
+document.addEventListener('click', function (event) {
+    const closeButton =
+        event.target.closest(
+            '[data-modal-close]'
+        );
+
+    if (!closeButton) {
+        return;
+    }
+
+    const modalId =
+        closeButton.dataset.modalClose;
+
+    if (!modalId) {
+        return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    closeModal(modalId);
+});
 
 document.addEventListener('keydown', function (event) {
     if (event.key !== 'Escape') return;
@@ -3958,11 +4066,28 @@ function isContactInput(field) {
 }
 
 function getGlobalFieldLabel(field) {
-    if (!field) return 'This field';
+    if (!field) {
+        return 'This field';
+    }
 
     const explicitLabel = field.id
-        ? document.querySelector(`label[for="${CSS.escape(field.id)}"]`)
+        ? document.querySelector(
+            `label[for="${CSS.escape(field.id)}"]`
+        )
         : null;
+
+    const questionRow =
+        field.closest('.global-question-row');
+
+    const questionText =
+        questionRow
+            ?.querySelector('.global-question-text')
+            ?.textContent;
+
+    const radioGroupLabel =
+        field
+            .closest('[role="radiogroup"]')
+            ?.getAttribute('aria-label');
 
     const friendlyNames = {
         name: 'Full Name',
@@ -3971,25 +4096,42 @@ function getGlobalFieldLabel(field) {
         password_confirmation: 'Confirm Password',
         role_id: 'Role',
         status: 'Status',
+
+        last_dental_visit: 'Last Dental Visit',
+        previous_dentist: 'Previous Dentist',
+        service_type: 'Dental Service',
+        emergency_person: 'Emergency Contact Person',
+        emergency_number: 'Emergency Contact Number',
+        emergency_relation: 'Relation to Patient',
     };
+
+    const humanizedName = String(
+        field.name || ''
+    )
+        .replace(/\[\]$/, '')
+        .replace(/[_-]+/g, ' ')
+        .replace(/\b\w/g, character =>
+            character.toUpperCase()
+        );
 
     const fallbackName =
         friendlyNames[field.name] ||
-        field.name ||
+        humanizedName ||
         'This field';
 
     const labelText =
+        field.dataset.fieldLabel ||
+        questionText ||
+        radioGroupLabel ||
         explicitLabel?.textContent ||
         field.closest('[data-global-field]')
-            ?.querySelector('label')
+            ?.querySelector(
+                ':scope > label, :scope > .global-form-label'
+            )
             ?.textContent ||
-        field.closest(
-            '.um-field-full, .um-field-grid > div, .um-user-side-card .space-y-4 > div'
-        )?.querySelector('label')?.textContent ||
         field.closest(
             '.field-group, .form-group, .st-form-group'
         )?.querySelector('label')?.textContent ||
-        field.dataset.fieldLabel ||
         fallbackName;
 
     return String(labelText)
@@ -4014,25 +4156,61 @@ function getFormInputValidationMessage(field) {
     const label = getGlobalFieldLabel(field);
 
     if (type === 'radio') {
-        if (!field.required) return '';
+        if (!field.required) {
+            return '';
+        }
 
         const form = field.form || document;
+
         const radioGroup = form.querySelectorAll(
             `input[type="radio"][name="${CSS.escape(field.name)}"]`
         );
 
-        const hasChecked = Array.from(radioGroup)
+        const hasChecked = Array
+            .from(radioGroup)
             .some(radio => radio.checked);
 
-        return hasChecked
-            ? ''
-            : `Please select a ${label.toLowerCase()}.`;
+        if (hasChecked) {
+            return '';
+        }
+
+        const requiredMessage =
+            field.dataset.requiredMessage ||
+            Array.from(radioGroup).find(
+                radio =>
+                    radio.dataset.requiredMessage
+            )?.dataset.requiredMessage;
+
+        if (requiredMessage) {
+            return requiredMessage;
+        }
+
+        const isYesNoQuestion =
+            Boolean(
+                field.closest(
+                    '.global-question-row'
+                )
+            );
+
+        if (isYesNoQuestion) {
+            return 'Please select Yes or No.';
+        }
+
+        return `Please select ${label.toLowerCase()}.`;
     }
 
     if (type === 'checkbox') {
-        return field.required && !field.checked
-            ? `Please check ${label.toLowerCase()}.`
-            : '';
+        if (
+            field.required &&
+            !field.checked
+        ) {
+            return (
+                field.dataset.requiredMessage ||
+                `Please check ${label.toLowerCase()}.`
+            );
+        }
+
+        return '';
     }
 
     if (field.required && !value) {
@@ -4128,6 +4306,77 @@ function registerGlobalValidationRule(name, validator) {
     globalValidationRules.set(name, validator);
 }
 
+registerGlobalValidationRule(
+    'bookingDuration',
+    function (field) {
+        const value =
+            String(
+                field.value || ''
+            ).trim();
+
+        if (!value) {
+            return '';
+        }
+
+        if (
+            !/^\d{2}:\d{2}:\d{2}$/.test(
+                value
+            )
+        ) {
+            return 'Use the HH:MM:SS format.';
+        }
+
+        const [
+            hours,
+            minutes,
+            seconds
+        ] =
+            value
+                .split(':')
+                .map(Number);
+
+        if (
+            minutes > 59 ||
+            seconds > 59
+        ) {
+            return 'Minutes and seconds must be between 00 and 59.';
+        }
+
+        if (
+            hours === 0 &&
+            minutes === 0 &&
+            seconds === 0
+        ) {
+            return 'Procedure duration must be greater than 00:00:00.';
+        }
+
+        return '';
+    }
+);
+
+registerGlobalValidationRule(
+    'philippineMobile',
+    function (field) {
+        const digits =
+            String(field.value || '')
+                .replace(/\D/g, '');
+
+        if (!digits) {
+            return '';
+        }
+
+        if (!digits.startsWith('09')) {
+            return 'Contact number must start with 09.';
+        }
+
+        if (digits.length !== 11) {
+            return 'Contact number must contain exactly 11 digits.';
+        }
+
+        return '';
+    }
+);
+
 function runGlobalValidationRule(field) {
     const ruleName = field?.dataset?.validationRule;
 
@@ -4210,6 +4459,39 @@ registerGlobalValidationRule(
         return consumed > quantity
             ? 'Consumed cannot exceed quantity.'
             : '';
+    }
+);
+
+registerGlobalValidationRule(
+    'strongPassword',
+    function (field) {
+        const value = String(field.value || '');
+
+        if (!value) {
+            return '';
+        }
+
+        if (value.length < 8) {
+            return 'Password must contain at least 8 characters.';
+        }
+
+        if (!/[a-z]/.test(value)) {
+            return 'Password must contain at least one lowercase letter.';
+        }
+
+        if (!/[A-Z]/.test(value)) {
+            return 'Password must contain at least one uppercase letter.';
+        }
+
+        if (!/\d/.test(value)) {
+            return 'Password must contain at least one number.';
+        }
+
+        if (!/[^A-Za-z0-9]/.test(value)) {
+            return 'Password must contain at least one special character.';
+        }
+
+        return '';
     }
 );
 
@@ -4365,93 +4647,246 @@ function ensureGlobalFieldError(field) {
     return error;
 }
 
-function showFormInputValidationMessage(field, message) {
+function showFormInputValidationMessage(
+    field,
+    message = '',
+    successMessage = ''
+) {
     if (!field) return;
 
     field.setCustomValidity('');
 
-    const hasError = Boolean(message);
-    const controlHost = getGlobalFieldControlHost(field);
-    const customSelect = field.closest?.('.custom-select');
+    const hasError =
+        Boolean(message);
 
-    field.classList.toggle('is-invalid', hasError);
+    const hasValue =
+        String(field.value || '')
+            .trim()
+            .length > 0;
+
+    const hasSuccess =
+        !hasError &&
+        hasValue &&
+        Boolean(successMessage);
+
+    const controlHost =
+        getGlobalFieldControlHost(field);
+
+    const customSelect =
+        field.closest?.('.custom-select');
+
+    field.classList.toggle(
+        'is-invalid',
+        hasError
+    );
+
+    field.classList.toggle(
+        'is-valid',
+        !hasError && hasValue
+    );
 
     if (
         controlHost &&
         controlHost !== field &&
         !customSelect
     ) {
-        controlHost.classList.toggle('is-invalid', hasError);
-    }
+        controlHost.classList.toggle(
+            'is-invalid',
+            hasError
+        );
 
-    customSelect?.classList.toggle('is-invalid', hasError);
-
-    const error = ensureGlobalFieldError(field);
-
-    if (error) {
-        error.innerHTML = hasError
-            ? `
-                <i class="fa-solid fa-circle-exclamation"></i>
-                <span>${escapeHtml(message)}</span>
-              `
-            : '';
-
-        error.classList.toggle('show', hasError);
-        error.setAttribute(
-            'aria-hidden',
-            hasError ? 'false' : 'true'
+        controlHost.classList.toggle(
+            'is-valid',
+            !hasError && hasValue
         );
     }
 
-    if (field.id && error) {
-        error.id = `${field.id}-global-error`;
+    customSelect?.classList.toggle(
+        'is-invalid',
+        hasError
+    );
+
+    customSelect?.classList.toggle(
+        'is-valid',
+        !hasError && hasValue
+    );
+
+    const indicator =
+        ensureGlobalFieldError(field);
+
+    if (indicator) {
+        if (hasError) {
+            indicator.innerHTML = `
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span>${escapeHtml(message)}</span>
+            `;
+        } else if (hasSuccess) {
+            indicator.innerHTML = `
+                <i class="fa-solid fa-circle-check"></i>
+                <span>${escapeHtml(successMessage)}</span>
+            `;
+        } else {
+            indicator.innerHTML = '';
+        }
+
+        indicator.classList.toggle(
+            'show',
+            hasError || hasSuccess
+        );
+
+        indicator.classList.toggle(
+            'is-success',
+            hasSuccess
+        );
+
+        indicator.setAttribute(
+            'aria-hidden',
+            hasError || hasSuccess
+                ? 'false'
+                : 'true'
+        );
+    }
+
+    if (field.id && indicator) {
+        indicator.id =
+            `${field.id}-global-error`;
 
         if (hasError) {
-            field.setAttribute('aria-invalid', 'true');
             field.setAttribute(
-                'aria-describedby',
-                error.id
+                'aria-invalid',
+                'true'
             );
         } else {
-            field.removeAttribute('aria-invalid');
+            field.removeAttribute(
+                'aria-invalid'
+            );
+        }
 
-            if (
-                field.getAttribute('aria-describedby') === error.id
-            ) {
-                field.removeAttribute('aria-describedby');
-            }
+        if (hasError || hasSuccess) {
+            field.setAttribute(
+                'aria-describedby',
+                indicator.id
+            );
+        } else if (
+            field.getAttribute(
+                'aria-describedby'
+            ) === indicator.id
+        ) {
+            field.removeAttribute(
+                'aria-describedby'
+            );
         }
     }
 }
 
 function validateFormInputField(field) {
-    const message = getFormInputValidationMessage(field);
+    if (!field) return true;
 
-    showFormInputValidationMessage(field, message);
+    const message =
+        getFormInputValidationMessage(field);
+
+    let successMessage = '';
+
+    if (
+        !message &&
+        field.name === 'password_confirmation' &&
+        String(field.value || '').length > 0 &&
+        field.form
+    ) {
+        const passwordField =
+            field.form.querySelector(
+                '[name="password"]'
+            );
+
+        if (
+            passwordField &&
+            field.value === passwordField.value
+        ) {
+            successMessage =
+                'Passwords match.';
+        }
+    }
+
+    showFormInputValidationMessage(
+        field,
+        message,
+        successMessage
+    );
 
     return !message;
 }
 
-function focusGlobalInvalidField(field) {
+function focusGlobalInvalidField(
+    field
+) {
     if (!field) return;
 
-    const customSelect = field.closest?.('.custom-select');
-
     const target =
-        customSelect?.querySelector('.custom-select-button') ||
-        field;
+        field.closest(
+            [
+                '[data-global-field]',
+                '.global-question-row',
+                '.global-form-group',
+                '.global-choice-group'
+            ].join(',')
+        ) || field;
 
     target.scrollIntoView({
         behavior: 'smooth',
-        block: 'center'
+        block: 'center',
     });
 
-    window.setTimeout(() => {
-        target.focus({
-            preventScroll: true
-        });
-    }, 280);
+    window.setTimeout(
+        () => {
+            const focusTarget =
+                field.matches(
+                    'input, select, textarea, button'
+                )
+                    ? field
+                    : target.querySelector(
+                        'input, select, textarea, button'
+                    );
+
+            focusTarget?.focus({
+                preventScroll: true
+            });
+        },
+        320
+    );
 }
+
+window.focusGlobalInvalidField =
+    focusGlobalInvalidField;
+
+function normalizeGlobalPhilippineMobile(
+    field
+) {
+    if (
+        !field ||
+        field.dataset.validationRule !==
+        'philippineMobile'
+    ) {
+        return;
+    }
+
+    const normalized =
+        String(
+            field.value || ''
+        )
+            .replace(/\D/g, '')
+            .slice(0, 11);
+
+    if (
+        field.value !==
+        normalized
+    ) {
+        field.value =
+            normalized;
+    }
+}
+
+window.normalizeGlobalPhilippineMobile =
+    normalizeGlobalPhilippineMobile;
 
 function bindFormInputValidation(root = document) {
     const scope =
@@ -4473,15 +4908,33 @@ function bindFormInputValidation(root = document) {
             form.setAttribute('novalidate', '');
 
             const validateEventField = event => {
-                const field = event.target;
+                const field =
+                    event.target;
 
                 if (
-                    field instanceof HTMLInputElement ||
-                    field instanceof HTMLTextAreaElement ||
-                    field instanceof HTMLSelectElement
+                    !(
+                        field instanceof
+                        HTMLInputElement
+                    ) &&
+                    !(
+                        field instanceof
+                        HTMLTextAreaElement
+                    ) &&
+                    !(
+                        field instanceof
+                        HTMLSelectElement
+                    )
                 ) {
-                    validateFormInputField(field);
+                    return;
                 }
+
+                normalizeGlobalPhilippineMobile(
+                    field
+                );
+
+                validateFormInputField(
+                    field
+                );
             };
 
             form.addEventListener('input', validateEventField);
@@ -4699,6 +5152,21 @@ function bindGlobalNumberStepper(
         );
 
     if (!input) return;
+    const {
+        min
+    } = getGlobalNumberStepperConfig(
+        stepper,
+        input
+    );
+
+    if (
+        input.value === '' &&
+        Number.isFinite(min) &&
+        min > 0
+    ) {
+        input.value =
+            String(min);
+    }
 
     stepper.dataset.numberStepperInitialized =
         'true';
@@ -5302,21 +5770,63 @@ function initGlobalRefreshWatcher(config = {}) {
             }
         },
 
-        apply() {
-            if (!pendingPayload) return;
-
-            if (typeof config.onRefresh === 'function') {
-                config.onRefresh(pendingPayload);
+        async apply() {
+            if (!pendingPayload) {
+                return;
             }
 
-            this.sync(pendingPayload);
+            const payload =
+                pendingPayload;
 
-            if (config.toast !== false && typeof window.showToast === 'function') {
-                window.showToast({
-                    type: config.toast?.type || 'info',
-                    title: config.toast?.title || 'Updated',
-                    message: config.toast?.message || 'Latest records are now shown.',
-                    duration: config.toast?.duration || 3500
+            try {
+                if (
+                    typeof config.onRefresh ===
+                    'function'
+                ) {
+                    await config.onRefresh(
+                        payload
+                    );
+                }
+
+                this.sync(
+                    payload
+                );
+
+                if (
+                    config.toast !== false &&
+                    typeof window.showToast ===
+                    'function'
+                ) {
+                    window.showToast({
+                        type:
+                            config.toast?.type ||
+                            'info',
+
+                        title:
+                            config.toast?.title ||
+                            'Updated',
+
+                        message:
+                            config.toast?.message ||
+                            'Latest records are now shown.',
+
+                        duration:
+                            config.toast?.duration ||
+                            3500
+                    });
+                }
+
+            } catch (error) {
+                console.error(
+                    `${key} refresh failed:`,
+                    error
+                );
+
+                window.showToast?.({
+                    type: 'error',
+                    title: 'Refresh failed',
+                    message:
+                        'Unable to load the latest records.'
                 });
             }
         },
@@ -6230,86 +6740,170 @@ function syncCustomSelect(wrapper) {
         });
 }
 
-function positionCustomSelectMenu(wrapper) {
+function positionCustomSelectMenu(
+    wrapper
+) {
     if (!wrapper) return;
 
-    const button = wrapper.querySelector('.custom-select-button');
-    const menu = wrapper.querySelector('.custom-select-menu');
-
-    if (!button || !menu) return;
-
-    wrapper.classList.remove('drop-up');
-
-    menu.style.removeProperty('--custom-select-max-height');
-
-    if (wrapper.closest('.flatpickr-calendar')) {
-        const isYearSelect = Boolean(
-            wrapper.querySelector('.custom-flatpickr-year')
+    const button =
+        wrapper.querySelector(
+            '.custom-select-button'
         );
+
+    const menu =
+        wrapper.querySelector(
+            '.custom-select-menu'
+        );
+
+    if (!button || !menu) {
+        return;
+    }
+
+    if (
+        wrapper.closest(
+            '.flatpickr-calendar'
+        )
+    ) {
+        const isYearSelect =
+            Boolean(
+                wrapper.querySelector(
+                    '.custom-flatpickr-year'
+                )
+            );
 
         menu.style.setProperty(
             '--custom-select-max-height',
-            isYearSelect ? '220px' : '210px'
+            isYearSelect
+                ? '220px'
+                : '210px'
         );
 
         return;
     }
 
-    const buttonRect = button.getBoundingClientRect();
+    const buttonRect =
+        button.getBoundingClientRect();
 
-    const scrollContainer = wrapper.closest(
-        '.um-user-modal-body, .modal-body, [data-modal-scroll], dialog'
-    );
+    const scrollContainer =
+        wrapper.closest(
+            [
+                '.um-user-modal-body',
+                '.modal-body',
+                '.modal-bd',
+                '[data-modal-scroll]',
+                '.ui-modal-card',
+                'dialog'
+            ].join(',')
+        );
 
-    const boundaryRect = scrollContainer?.getBoundingClientRect();
+    const boundaryRect =
+        scrollContainer
+            ?.getBoundingClientRect();
 
-    const boundaryTop = boundaryRect
-        ? Math.max(boundaryRect.top, 8)
-        : 8;
+    const boundaryTop =
+        boundaryRect
+            ? Math.max(
+                boundaryRect.top,
+                8
+            )
+            : 8;
 
-    const boundaryBottom = boundaryRect
-        ? Math.min(boundaryRect.bottom, window.innerHeight - 8)
-        : window.innerHeight - 8;
+    const boundaryBottom =
+        boundaryRect
+            ? Math.min(
+                boundaryRect.bottom,
+                window.innerHeight - 8
+            )
+            : window.innerHeight - 8;
 
-    const spaceBelow = boundaryBottom - buttonRect.bottom - 10;
-    const spaceAbove = buttonRect.top - boundaryTop - 10;
+    const spaceBelow =
+        Math.max(
+            0,
+            boundaryBottom -
+            buttonRect.bottom -
+            10
+        );
 
-    const previousDisplay = menu.style.display;
-    const previousVisibility = menu.style.visibility;
-    const previousPointerEvents = menu.style.pointerEvents;
+    const spaceAbove =
+        Math.max(
+            0,
+            buttonRect.top -
+            boundaryTop -
+            10
+        );
 
-    menu.style.display = 'block';
-    menu.style.visibility = 'hidden';
-    menu.style.pointerEvents = 'none';
+    const previousDisplay =
+        menu.style.display;
 
-    const preferredHeight = Math.min(
-        Math.max(menu.scrollHeight, 96),
-        260
-    );
+    const previousVisibility =
+        menu.style.visibility;
 
-    menu.style.display = previousDisplay;
-    menu.style.visibility = previousVisibility;
-    menu.style.pointerEvents = previousPointerEvents;
+    const previousPointerEvents =
+        menu.style.pointerEvents;
+
+    const previousTransition =
+        menu.style.transition;
+
+    menu.style.display =
+        'block';
+
+    menu.style.visibility =
+        'hidden';
+
+    menu.style.pointerEvents =
+        'none';
+
+    menu.style.transition =
+        'none';
+
+    const preferredHeight =
+        Math.min(
+            Math.max(
+                menu.scrollHeight,
+                96
+            ),
+            260
+        );
 
     const shouldOpenUp =
         spaceBelow < preferredHeight &&
         spaceAbove > spaceBelow;
 
-    wrapper.classList.toggle('drop-up', shouldOpenUp);
-
-    const availableSpace = shouldOpenUp
-        ? spaceAbove
-        : spaceBelow;
-
-    const maxHeight = Math.max(
-        96,
-        Math.min(260, availableSpace)
+    wrapper.classList.toggle(
+        'drop-up',
+        shouldOpenUp
     );
+
+    const availableSpace =
+        shouldOpenUp
+            ? spaceAbove
+            : spaceBelow;
+
+    const maxHeight =
+        Math.max(
+            96,
+            Math.min(
+                260,
+                availableSpace
+            )
+        );
 
     menu.style.setProperty(
         '--custom-select-max-height',
         `${maxHeight}px`
     );
+
+    menu.style.display =
+        previousDisplay;
+
+    menu.style.visibility =
+        previousVisibility;
+
+    menu.style.pointerEvents =
+        previousPointerEvents;
+
+    menu.style.transition =
+        previousTransition;
 }
 
 function initCustomSelects(root = document) {

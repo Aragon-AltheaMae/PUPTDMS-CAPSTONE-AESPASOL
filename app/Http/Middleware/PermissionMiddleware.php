@@ -6,11 +6,44 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\Role;
+use Illuminate\Support\Facades\Auth;
 
 class PermissionMiddleware
 {
     public function handle(Request $request, Closure $next, string $permission): Response
     {
+        if (Auth::check() && (Auth::user()?->status ?? 'inactive') !== 'active') {
+            Auth::guard('patient')->logout();
+            Auth::guard('web')->logout();
+            Auth::logout();
+
+            $request->session()->forget([
+                'role',
+                'patient_id',
+                'patient_name',
+                'email',
+                'admin_logged_in',
+                'admin_id',
+                'admin_name',
+                'admin_email',
+                'dentist_id',
+                'dentist_name',
+                'dentist_email',
+                'impersonated_role',
+                'impersonated_patient_id',
+                'impersonator_role',
+                'impersonator_admin_id',
+                'impersonator_admin_email',
+                'last_activity_at',
+                'session_idle_locked',
+            ]);
+
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            abort(403, 'You no longer have access.');
+        }
+
         if (!session()->has('role')) {
             return redirect('/login');
         }

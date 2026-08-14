@@ -30,6 +30,9 @@
 @import './components/impersonation-banner.css';
 @import './pages/error-pages.css';
 @import './pages/auth/login.css';
+@import './components/odontogram-preview.css';
+@import './components/booking-workflow.css';
+@import './components/filter-select.css';
 
 /* Shared page styles */
 @import './pages/dentist/dentist-shared.css';
@@ -42,15 +45,16 @@
 @import './pages/shared/clinic-schedule.css';
 @import "./pages/shared/inventory.css";
 @import './pages/shared/reports.css';
+@import './pages/shared/active-sessions.css';
 
 /* Dentist pages */
 @import './pages/dentist/dentist-dashboard.css';
 @import './pages/dentist/dental-services.css';
 @import './pages/dentist/daily-treatment.css';
-@import './pages/dentist/dentist-book-appointment.css';
 @import './pages/dentist/odontogram.css';
 @import './pages/dentist/dentist-walk-in.css';
 @import './pages/dentist/add-existing-record.css';
+@import './pages/dentist/add-existing-appointment.css';
 
 /* Patient pages */
 @import './pages/patient/dashboard.css';
@@ -62,8 +66,8 @@
 
 /* Admin pages */
 @import './pages/admin/admin-dashboard.css';
-@import './pages/admin/admin-dental-records.css';
-@import './pages/admin/admin-document-templates.css';
+@import './pages/admin/dental-records.css';
+@import './pages/admin/document-templates.css';
 @import './pages/admin/academic-period.css';
 @import './pages/admin/cms-access.css';
 @import './pages/admin/faculty-integration.css';
@@ -73,6 +77,7 @@
 @import './pages/admin/system-settings.css';
 @import './pages/admin/user-management.css';
 @import './pages/admin/ai-generated-report.css';
+@import './pages/admin/session-management.css';
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 @plugin "daisyui";

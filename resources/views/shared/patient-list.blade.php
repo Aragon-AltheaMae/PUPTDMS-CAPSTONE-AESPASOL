@@ -122,117 +122,65 @@ $notifCount = $notifications->count();
                                 class="patient-toolbar-actions flex items-center gap-2 order-1 md:order-2 w-full md:w-auto justify-end">
 
                                 <div class="patient-search-row relative flex-1 md:flex-none flex items-center gap-2">
-                                    <div class="search-wrap global-search flex-1 md:w-64" data-search-wrapper>
-                                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                                    <x-search-bar id="searchInput" placeholder="Search patient"
+                                        callback="handlePatientDirectorySearch" :debounce="250"
+                                        class="flex-1 md:w-64" />
 
-                                        <input id="searchInput" type="text" placeholder="Search patient"
-                                            data-search-input class="search-input" />
-
-                                        <button type="button" class="search-clear" data-search-clear
-                                            aria-label="Clear search">
-                                            <i class="fa-solid fa-xmark text-xs"></i>
-                                        </button>
-                                    </div>
-
-                                    <div class="voice-input-toggle">
-                                        <span class="voice-status hidden" data-voice-status></span>
-                                        <button type="button" class="voice-search-mic external"
-                                            data-global-voice-trigger data-voice-target="#searchInput"
-                                            aria-label="Use voice search" title="Voice search">
-                                            <i class="fa-solid fa-microphone"></i>
-                                        </button>
-                                    </div>
+                                    <x-voice-input target="#searchInput" status-id="patientSearchVoiceStatus"
+                                        label="Use voice search" title="Voice search" />
                                 </div>
                                 <div class="patient-sort-row">
 
-                                    <div class="patient-stats-dropdown" id="patientStatsDropdown">
-                                        <button type="button" class="patient-stats-trigger s-all"
-                                            id="patientStatsToggle" aria-expanded="false">
-                                            <span class="patient-stats-trigger-left">
-                                                <span class="patient-stats-trigger-icon s-all">
-                                                    <i class="fa-solid fa-users"></i>
-                                                </span>
+                                    @php
+                                    $patientStatusOptions = [
+                                    [
+                                    'value' => 'all',
+                                    'label' => 'All Patients',
+                                    'icon' => 'fa-users',
+                                    'tone' => 'status-all',
+                                    'count' => $allCount ?? 0,
+                                    ],
+                                    [
+                                    'value' => 'today',
+                                    'label' => 'Today',
+                                    'icon' => 'fa-clock',
+                                    'tone' => 'status-today',
+                                    'count' => $todayCount ?? 0,
+                                    ],
+                                    [
+                                    'value' => 'upcoming',
+                                    'label' => 'Upcoming',
+                                    'icon' => 'fa-calendar-check',
+                                    'tone' => 'status-upcoming',
+                                    'count' => $upcomingCount ?? 0,
+                                    ],
+                                    [
+                                    'value' => 'rescheduled',
+                                    'label' => 'Rescheduled',
+                                    'icon' => 'fa-calendar-plus',
+                                    'tone' => 'status-rescheduled',
+                                    'count' => $rescheduledCount ?? 0,
+                                    ],
+                                    [
+                                    'value' => 'completed',
+                                    'label' => 'Completed',
+                                    'icon' => 'fa-check-double',
+                                    'tone' => 'status-completed',
+                                    'count' => $completedCount ?? 0,
+                                    ],
+                                    [
+                                    'value' => 'cancelled',
+                                    'label' => 'Cancelled',
+                                    'icon' => 'fa-calendar-xmark',
+                                    'tone' => 'status-cancelled',
+                                    'count' => $cancelledCount ?? 0,
+                                    ],
+                                    ];
+                                    @endphp
 
-                                                <span class="patient-stats-trigger-text">
-                                                    <span class="patient-stats-trigger-label">Status</span>
-                                                    <strong id="patientStatsSelectedLabel">All Patients</strong>
-                                                </span>
-                                            </span>
-
-                                            <span class="patient-stats-trigger-right">
-                                                <span class="patient-stats-count-badge" id="patientStatsSelectedCount">
-                                                    {{ $allCount ?? 0 }}
-                                                </span>
-                                                <i class="fa-solid fa-chevron-down patient-stats-chevron"></i>
-                                            </span>
-                                        </button>
-
-                                        <div class="patient-stats-panel" id="patientStatsPanel">
-                                            <div id="tabsGrid" class="patient-stats-grid">
-                                                <button type="button" class="patient-stat-option filter-btn s-today"
-                                                    data-filter="today">
-                                                    <span class="patient-stat-option-icon">
-                                                        <i class="fa-solid fa-clock"></i>
-                                                    </span>
-                                                    <span class="patient-stat-option-label">Today</span>
-                                                    <span class="patient-stat-option-count" id="statToday">{{
-                                                        $todayCount ?? 0 }}</span>
-                                                </button>
-
-                                                <button type="button" class="patient-stat-option filter-btn s-upcoming"
-                                                    data-filter="upcoming">
-                                                    <span class="patient-stat-option-icon">
-                                                        <i class="fa-solid fa-calendar-check"></i>
-                                                    </span>
-                                                    <span class="patient-stat-option-label">Upcoming</span>
-                                                    <span class="patient-stat-option-count" id="statUpcoming">{{
-                                                        $upcomingCount ?? 0 }}</span>
-                                                </button>
-
-                                                <button type="button"
-                                                    class="patient-stat-option filter-btn s-rescheduled"
-                                                    data-filter="rescheduled">
-                                                    <span class="patient-stat-option-icon">
-                                                        <i class="fa-solid fa-calendar-plus"></i>
-                                                    </span>
-                                                    <span class="patient-stat-option-label">Rescheduled</span>
-                                                    <span class="patient-stat-option-count" id="statRescheduled">{{
-                                                        $rescheduledCount ?? 0 }}</span>
-                                                </button>
-
-                                                <button type="button" class="patient-stat-option filter-btn s-completed"
-                                                    data-filter="completed">
-                                                    <span class="patient-stat-option-icon">
-                                                        <i class="fa-solid fa-check-double"></i>
-                                                    </span>
-                                                    <span class="patient-stat-option-label">Completed</span>
-                                                    <span class="patient-stat-option-count" id="statCompleted">{{
-                                                        $completedCount ?? 0 }}</span>
-                                                </button>
-
-                                                <button type="button" class="patient-stat-option filter-btn s-cancelled"
-                                                    data-filter="cancelled">
-                                                    <span class="patient-stat-option-icon">
-                                                        <i class="fa-solid fa-calendar-xmark"></i>
-                                                    </span>
-                                                    <span class="patient-stat-option-label">Cancelled</span>
-                                                    <span class="patient-stat-option-count" id="statCancelled">{{
-                                                        $cancelledCount ?? 0 }}</span>
-                                                </button>
-
-                                                <button type="button"
-                                                    class="patient-stat-option filter-btn tab-active s-all"
-                                                    data-filter="all">
-                                                    <span class="patient-stat-option-icon">
-                                                        <i class="fa-solid fa-users"></i>
-                                                    </span>
-                                                    <span class="patient-stat-option-label">All Patients</span>
-                                                    <span class="patient-stat-option-count" id="statAll">{{ $allCount ??
-                                                        0 }}</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <x-filter-select id="patientStatusFilter" name="patient_status" label="Status"
+                                        value="all" :options="$patientStatusOptions"
+                                        callback="handlePatientStatusSelect" />
                                 </div>
 
                                 <div class="patient-filter-actions">
@@ -243,20 +191,8 @@ $notifCount = $notifications->count();
                                     </button>
                                 </div>
 
-                                <div class="view-toggle-container" data-global-view-toggle data-view-root="#mainContent"
-                                    data-storage-key="patientListViewMode" aria-label="View options">
-                                    <span class="view-slider" aria-hidden="true"></span>
-
-                                    <button type="button" class="btn-view-mode active" title="List view"
-                                        aria-label="List view" aria-pressed="true" data-view-mode="list">
-                                        <i class="fa-solid fa-list"></i>
-                                    </button>
-
-                                    <button type="button" class="btn-view-mode" title="Grid view" aria-label="Grid view"
-                                        aria-pressed="false" data-view-mode="grid">
-                                        <i class="fa-solid fa-grip"></i>
-                                    </button>
-                                </div>
+                                <x-view-toggle id="patientListViewToggle" root="#mainContent"
+                                    storage-key="patientListViewMode" list-label="List" grid-label="Grid" />
 
                                 <button id="externalClearFilterBtn" type="button" class="global-filter-reset-btn hidden"
                                     title="Reset filters">
@@ -266,49 +202,10 @@ $notifCount = $notifications->count();
                         </div>
                     </div>
 
-                    <div class="global-pagebar global-pagebar-top patient-pagebar">
-                        <div class="global-pagebar-left">
-                            <span id="patientPageInfoTop" class="global-pagebar-info">
-                                Showing <strong>0</strong> patients
-                            </span>
-
-                            <div class="global-page-size-control">
-                                <label for="patientPerPage">Show</label>
-
-                                <div class="global-page-size-select" data-global-page-size
-                                    data-page-size-input="#patientPerPage"
-                                    data-page-size-callback="changePatientPageSize">
-
-                                    <input type="hidden" id="patientPerPage" class="global-page-size-native" value="10">
-
-                                    <button type="button" class="global-page-size-trigger" data-page-size-trigger
-                                        aria-haspopup="listbox" aria-expanded="false">
-
-                                        <span data-page-size-value>10</span>
-                                        <i class="fa-solid fa-chevron-down"></i>
-                                    </button>
-
-                                    <div class="global-page-size-menu" role="listbox">
-                                        @foreach ([10, 20, 50, 100] as $size)
-                                        <button type="button"
-                                            class="global-page-size-option {{ $size === 10 ? 'is-selected' : '' }}"
-                                            data-page-size-option data-value="{{ $size }}" role="option"
-                                            aria-selected="{{ $size === 10 ? 'true' : 'false' }}">
-
-                                            <span>{{ $size }}</span>
-                                            <i class="fa-solid fa-check"></i>
-                                        </button>
-                                        @endforeach
-                                    </div>
-                                </div>
-
-                                <span>per page</span>
-                            </div>
-                        </div>
-
-                        <div id="patientPaginationTop" class="global-pagination-wrap">
-                        </div>
-                    </div>
+                    <x-pagination-bar id="patientPaginationTopBar" info-id="patientPageInfoTop"
+                        pagination-id="patientPaginationTop" position="top" :show-entries="true"
+                        page-size-id="patientPerPage" page-size-callback="changePatientPageSize" :page-size-value="10"
+                        page-size-label="per page" label="patients" class="patient-pagebar" />
 
                     <div class="table-scroll-wrapper">
                         <div class="table-scroll-inner">
@@ -395,7 +292,7 @@ $notifCount = $notifications->count();
 
                     <div id="patientContainer" class="space-y-3 px-3 md:px-6 pb-6 pt-4">
 
-                        @forelse($appointments as $appt)
+                        @foreach ($appointments as $appt)
                         @php
                         $status = strtolower($appt->status ?? '');
                         $isCancelled = $status === 'cancelled';
@@ -424,7 +321,7 @@ $notifCount = $notifications->count();
                         : 'all'))));
 
                         $patient = $appt->patient;
-
+                        $isWalkInAppointment = (bool) ($appt->is_walk_in ?? false);
                         $patientId = $patient?->id ?? $appt->patient_id;
                         $patientName = $patient?->name ?? 'Unknown Patient';
                         $patientStudentNo = filled($patient?->student_no)
@@ -459,9 +356,8 @@ $notifCount = $notifications->count();
 
                         $patientImage = $patient?->profile_image
                         ? asset('storage/' . $patient->profile_image)
-                        : 'https://ui-avatars.com/api/?name=' .
-                        urlencode($patientName) .
-                        '&background=660000&color=FFFFFF&rounded=true&size=128';
+                        : null;
+
                         $dateLabel = Carbon::parse($appt->appointment_date)->format('d M Y');
                         $timeLabel = Carbon::parse($appt->appointment_time)->format('g:i A');
                         $serviceLabel =
@@ -548,13 +444,25 @@ $notifCount = $notifications->count();
 
                                 <div class="patient-list-card-body">
                                     <div class="patient-list-main">
-                                        <img src="{{ $patientImage }}" class="patient-list-avatar"
-                                            alt="{{ $patientName }}" />
-
+                                        <span class="patient-avatar patient-avatar-md" data-patient-avatar
+                                            data-patient-name="{{ $patientName }}"
+                                            data-patient-url="{{ $patientImage }}"></span>
                                         <div class="patient-list-person">
-                                            <h3 class="patient-list-name">
-                                                {{ $patientName }}
-                                            </h3>
+                                            <div class="patient-list-name-row">
+
+                                                <h3 class="patient-list-name">
+                                                    {{ $patientName }}
+                                                </h3>
+
+                                                @if ($isWalkInAppointment)
+                                                <span class="ui-action-btn ui-action-neutral ui-action-indicator"
+                                                    data-tooltip="Walk-in appointment" data-tooltip-tone="neutral"
+                                                    aria-label="Walk-in appointment" tabindex="0">
+                                                    <i class="fa-solid fa-person-walking"></i>
+                                                </span>
+                                                @endif
+
+                                            </div>
 
                                             <div class="patient-list-meta">
                                                 <span class="global-info-pill">
@@ -634,13 +542,26 @@ $notifCount = $notifications->count();
                                 <div class="patient-grid-card-body">
                                     <div class="patient-grid-card-header">
                                         <div class="patient-grid-card-identity">
-                                            <img src="{{ $patientImage }}" class="patient-grid-card-avatar"
-                                                alt="{{ $patientName }}" />
+                                            <span class="patient-avatar patient-avatar-md" data-patient-avatar
+                                                data-patient-name="{{ $patientName }}"
+                                                data-patient-url="{{ $patientImage }}"></span>
 
                                             <div class="patient-grid-card-person">
-                                                <h3 class="patient-grid-card-name">
-                                                    {{ $patientName }}
-                                                </h3>
+                                                <div class="patient-grid-name-row">
+
+                                                    <h3 class="patient-grid-card-name">
+                                                        {{ $patientName }}
+                                                    </h3>
+
+                                                    @if ($isWalkInAppointment)
+                                                    <span class="ui-action-btn ui-action-neutral ui-action-indicator"
+                                                        data-tooltip="Walk-in appointment" data-tooltip-tone="neutral"
+                                                        aria-label="Walk-in appointment" tabindex="0">
+                                                        <i class="fa-solid fa-person-walking"></i>
+                                                    </span>
+                                                    @endif
+
+                                                </div>
 
                                                 <div class="patient-grid-card-meta">
                                                     <span class="global-info-pill">
@@ -691,409 +612,247 @@ $notifCount = $notifications->count();
                         @else
                     </div>
                     @endif
-                    @empty
-                    <div class="empty-state col-span-full w-full">
-                        <div class="empty-state-icon">
-                            <i class="fa-solid fa-tooth"></i>
-                        </div>
+                    @endforeach
 
-                        <p class="empty-state-title">No patients found</p>
-                        <p class="empty-state-sub">
-                            There are no patient appointments in the system yet.
-                        </p>
-                    </div>
-                    @endforelse
+                    <div id="patientBaseEmptyState" class="empty-state-host"></div>
 
-                    <div id="patientSearchEmptyState"
-                        class="empty-state empty-state-controlled col-span-full w-full hidden" hidden>
+                    <div id="patientSearchEmptyState" class="empty-state-host"></div>
 
-                        <div class="empty-state-icon patient-empty-icon">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </div>
-
-                        <p id="patientSearchEmptyTitle" class="empty-state-title">
-                            No results found
-                        </p>
-
-                        <p class="empty-state-sub">
-                            Try a different patient name, student number, program, or service.
-                        </p>
-
-                        <button type="button" id="clearPatientSearchBtn" class="empty-state-btn">
-
-                            <i class="fa-solid fa-xmark"></i>
-                            Clear search
-                        </button>
-                    </div>
-
-                    <div id="patientStatusEmptyState"
-                        class="empty-state empty-state-controlled col-span-full w-full hidden" hidden>
-
-                        <div class="empty-state-icon patient-empty-icon">
-                            <i id="patientStatusEmptyIcon" class="fa-regular fa-calendar-xmark"></i>
-                        </div>
-
-                        <p id="patientStatusEmptyTitle" class="empty-state-title">
-                            No patients found
-                        </p>
-
-                        <p id="patientStatusEmptyText" class="empty-state-sub">
-                            There are currently no patients under this appointment status.
-                        </p>
-
-                        <button type="button" id="resetPatientFiltersBtn" class="empty-state-btn hidden" hidden>
-
-                            <i class="fa-solid fa-rotate-left"></i>
-                            Clear filters
-                        </button>
-                    </div>
+                    <div id="patientStatusEmptyState" class="empty-state-host"></div>
                 </div>
             </div>
         </div>
-        <div class="global-pagebar global-pagebar-bottom patient-pagebar">
-            <span id="patientPageInfoBottom" class="global-pagebar-info">
-                Showing <strong>0</strong> patients
-            </span>
 
-            <div id="patientPaginationBottom" class="global-pagination-wrap">
-            </div>
-        </div>
+        <x-pagination-bar id="patientPaginationBottomBar" info-id="patientPageInfoBottom"
+            pagination-id="patientPaginationBottom" position="bottom" label="patients" class="patient-pagebar" />
+
     </div>
     </div>
     </div>
 </main>
 
-<div id="filterModal" class="filter-drawer-wrapper" aria-hidden="true">
-    <div class="filter-drawer-overlay" onclick="document.getElementById('closeFilterModalBtn').click()"></div>
+<x-filter-drawer id="filterModal" title="Filters" close-id="closeFilterModalBtn" clear-id="clearFiltersModal"
+    clear-label="Clear Filters" cancel-id="cancelFilterBtn" cancel-label="Cancel" apply-id="applyFilters"
+    apply-label="Show 0 results" results-id="showResultsText">
 
-    <div class="filter-drawer-panel">
+    <div id="activeFiltersSection" class="filter-active-section hidden">
 
-        <div class="filter-drawer-header">
-            <div class="filter-drawer-title">
-                <i class="fa-solid fa-sliders"></i>
-                <h2>Filters</h2>
-            </div>
+        <div class="filter-active-header">
 
-            <button id="closeFilterModalBtn" type="button" class="filter-drawer-close" aria-label="Close filters">
+            <span class="filter-active-title">
+                Active Filters
+            </span>
 
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
+            <button id="clearAllChipsBtn" type="button" class="
+                    filter-clear-all
+                    ui-btn
+                    ui-btn-secondary
+                    ui-btn-sm
+                ">
+                <i class="fa-solid fa-rotate-left"></i>
 
-        <div class="filter-drawer-body">
-
-            <div id="activeFiltersSection" class="filter-active-section hidden">
-
-                <div class="filter-active-header">
-                    <span class="filter-active-title">
-                        Active Filters
-                    </span>
-
-                    <button id="clearAllChipsBtn" type="button"
-                        class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm">
-
-                        <i class="fa-solid fa-rotate-left"></i>
-                        <span>Clear All</span>
-                    </button>
-                </div>
-
-                <div id="activeChipsContainer" class="active-filters-container">
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Sort By</h3>
-                <div class="filter-chip-row" id="fSortGroup">
-                    <button type="button" class="ftag ftag-active" data-val="nearest">
-                        Nearest Appointment
-                    </button>
-
-                    <button type="button" class="ftag" data-val="farthest">
-                        Farthest Appointment
-                    </button>
-                    <button type="button" class="ftag" data-val="az">Patient Name A-Z</button>
-                    <button type="button" class="ftag" data-val="za">Patient Name Z-A</button>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Filter by Date Range</h3>
-                <div class="filter-chip-row" id="datePresetGroup">
-                    <button type="button" class="quick-date-chip" data-range="7">Last 7 Days</button>
-                    <button type="button" class="quick-date-chip" data-range="30">Last 30 Days</button>
-                    <button type="button" class="quick-date-chip" data-range="90">Last 3 Months</button>
-                    <button type="button" class="quick-date-chip" data-range="180">Last 6 Months</button>
-                    <button type="button" class="quick-date-chip" data-range="365">Last 12 Months</button>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Custom Date Range</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div class="filter-date-input-wrap">
-                        <input id="fromDate" type="text" class="js-flatpickr-date-range-from" placeholder="Start date"
-                            readonly autocomplete="off" />
-                        <i class="fa-regular fa-calendar"></i>
-                    </div>
-
-                    <div class="filter-date-input-wrap">
-                        <input id="toDate" type="text" class="js-flatpickr-date-range-to" placeholder="End date"
-                            readonly autocomplete="off" />
-                        <i class="fa-regular fa-calendar"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="filter-section-title">Course</h3>
-                <div class="filter-chip-grid">
-                    @foreach ([
-                    'BSIT',
-                    'BSECE',
-                    'BSBA - HRM',
-                    'BSED - ENG',
-                    'BSOA',
-                    'BSPSYCH',
-                    'DIT',
-                    'BSME',
-                    'BSBA -
-                    MM',
-                    'BSED - MATH',
-                    'DOMT',
-                    ] as $course)
-                    <label class="choice-chip">
-                        <input type="radio" name="course" value="{{ $course }}"
-                            class="filter-input radio-red chip-radio" />
-                        <span>{{ $course }}</span>
-                    </label>
-                    @endforeach
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <h3 class="filter-section-title">Year Level</h3>
-                    <div class="filter-chip-row">
-                        <label class="choice-chip">
-                            <input type="radio" name="year" value="1st Year"
-                                class="filter-input radio-red chip-radio" />
-                            <span>1st Year</span>
-                        </label>
-
-                        <label class="choice-chip">
-                            <input type="radio" name="year" value="2nd Year"
-                                class="filter-input radio-red chip-radio" />
-                            <span>2nd Year</span>
-                        </label>
-
-                        <label class="choice-chip">
-                            <input type="radio" name="year" value="3rd Year"
-                                class="filter-input radio-red chip-radio" />
-                            <span>3rd Year</span>
-                        </label>
-
-                        <label class="choice-chip">
-                            <input type="radio" name="year" value="4th Year"
-                                class="filter-input radio-red chip-radio" />
-                            <span>4th Year</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div>
-                    <h3 class="filter-section-title">Section</h3>
-                    <div class="filter-chip-row">
-                        <label class="choice-chip">
-                            <input type="radio" name="section" value="1" class="filter-input radio-red chip-radio" />
-                            <span>1</span>
-                        </label>
-
-                        <label class="choice-chip">
-                            <input type="radio" name="section" value="2" class="filter-input radio-red chip-radio" />
-                            <span>2</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pb-6">
-                <h3 class="filter-section-title">Department</h3>
-                <div class="filter-chip-row">
-                    <label class="choice-chip">
-                        <input type="radio" name="department" value="Administrative"
-                            class="filter-input radio-red chip-radio" />
-                        <span>Administrative</span>
-                    </label>
-
-                    <label class="choice-chip">
-                        <input type="radio" name="department" value="Faculty"
-                            class="filter-input radio-red chip-radio" />
-                        <span>Faculty</span>
-                    </label>
-
-                    <label class="choice-chip">
-                        <input type="radio" name="department" value="Dependent"
-                            class="filter-input radio-red chip-radio" />
-                        <span>Dependent</span>
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <div class="filter-drawer-footer">
-            <button id="clearFiltersModal" type="button" class="filter-clear-btn ui-btn ui-btn-secondary ui-btn-sm">
-
-                <i class="fa-regular fa-trash-can"></i>
-                <span>Clear Filters</span>
+                <span>
+                    Clear All
+                </span>
             </button>
 
-            <div class="filter-footer-actions">
-                <button id="cancelFilterBtn" type="button" class="filter-cancel-btn ui-btn ui-btn-secondary">
-
-                    <i class="fa-solid fa-xmark"></i>
-                    <span>Cancel</span>
-                </button>
-
-                <button id="applyFilters" type="button" class="filter-apply-btn ui-btn ui-btn-primary">
-
-                    <i class="fa-solid fa-check"></i>
-
-                    <span id="showResultsText" class="filter-results-text">
-                        Show 0 results
-                    </span>
-                </button>
-            </div>
         </div>
+
+        <div id="activeChipsContainer" class="active-filters-container"></div>
+
     </div>
-</div>
+
+
+    <x-filter-group title="Sort By">
+
+        <div id="fSortGroup" class="filter-chip-row">
+
+            <button type="button" class="ftag ftag-active" data-val="nearest">
+                Nearest Appointment
+            </button>
+
+            <button type="button" class="ftag" data-val="farthest">
+                Farthest Appointment
+            </button>
+
+            <button type="button" class="ftag" data-val="az">
+                Patient Name A-Z
+            </button>
+
+            <button type="button" class="ftag" data-val="za">
+                Patient Name Z-A
+            </button>
+
+        </div>
+
+    </x-filter-group>
+
+
+    <x-filter-group title="Filter by Date Range">
+
+        <div id="datePresetGroup" class="filter-chip-row">
+
+            <button type="button" class="quick-date-chip" data-range="7">
+                Last 7 Days
+            </button>
+
+            <button type="button" class="quick-date-chip" data-range="30">
+                Last 30 Days
+            </button>
+
+            <button type="button" class="quick-date-chip" data-range="90">
+                Last 3 Months
+            </button>
+
+            <button type="button" class="quick-date-chip" data-range="180">
+                Last 6 Months
+            </button>
+
+            <button type="button" class="quick-date-chip" data-range="365">
+                Last 12 Months
+            </button>
+
+        </div>
+
+    </x-filter-group>
+
+
+    <x-filter-group title="Custom Date Range">
+
+        <div class="filter-date-grid">
+
+            <div class="filter-date-input-wrap">
+
+                <input id="fromDate" type="text" class="js-flatpickr-date-range-from" placeholder="Start date" readonly
+                    autocomplete="off">
+
+                <i class="fa-regular fa-calendar"></i>
+
+            </div>
+
+            <div class="filter-date-input-wrap">
+
+                <input id="toDate" type="text" class="js-flatpickr-date-range-to" placeholder="End date" readonly
+                    autocomplete="off">
+
+                <i class="fa-regular fa-calendar"></i>
+
+            </div>
+
+        </div>
+
+    </x-filter-group>
+
+
+    <x-filter-group title="Course">
+
+        <div class="filter-chip-grid">
+
+            @foreach (['BSIT', 'BSECE', 'BSBA - HRM', 'BSED - ENG', 'BSOA', 'BSPSYCH', 'DIT', 'BSME', 'BSBA - MM', 'BSED
+            - MATH', 'DOMT'] as $course)
+            <label class="choice-chip">
+
+                <input type="radio" name="course" value="{{ $course }}" class="
+                            filter-input
+                            radio-red
+                            chip-radio
+                        ">
+
+                <span>
+                    {{ $course }}
+                </span>
+
+            </label>
+            @endforeach
+
+        </div>
+
+    </x-filter-group>
+
+
+    <div class="filter-two-column-grid">
+
+        <x-filter-group title="Year Level">
+
+            <div class="filter-chip-row">
+
+                @foreach (['1st Year', '2nd Year', '3rd Year', '4th Year'] as $year)
+                <label class="choice-chip">
+
+                    <input type="radio" name="year" value="{{ $year }}" class="
+                                filter-input
+                                radio-red
+                                chip-radio
+                            ">
+
+                    <span>
+                        {{ $year }}
+                    </span>
+
+                </label>
+                @endforeach
+
+            </div>
+
+        </x-filter-group>
+
+
+        <x-filter-group title="Section">
+
+            <div class="filter-chip-row">
+
+                @foreach (['1', '2'] as $section)
+                <label class="choice-chip">
+
+                    <input type="radio" name="section" value="{{ $section }}" class="
+                                filter-input
+                                radio-red
+                                chip-radio
+                            ">
+
+                    <span>
+                        {{ $section }}
+                    </span>
+
+                </label>
+                @endforeach
+
+            </div>
+
+        </x-filter-group>
+
+    </div>
+
+
+    <x-filter-group title="Department" class="filter-group-last">
+
+        <div class="filter-chip-row">
+
+            @foreach (['Administrative', 'Faculty', 'Dependent'] as $department)
+            <label class="choice-chip">
+
+                <input type="radio" name="department" value="{{ $department }}" class="
+                            filter-input
+                            radio-red
+                            chip-radio
+                        ">
+
+                <span>
+                    {{ $department }}
+                </span>
+
+            </label>
+            @endforeach
+
+        </div>
+
+    </x-filter-group>
+
+</x-filter-drawer>
 @endsection
 
 @section('scripts')
 <script>
-    function getPatientDropdownMeta(status) {
-        const map = {
-            today: {
-                label: 'Today',
-                icon: 'fa-clock',
-                tone: 's-today',
-                countId: 'statToday'
-            },
-            upcoming: {
-                label: 'Upcoming',
-                icon: 'fa-calendar-check',
-                tone: 's-upcoming',
-                countId: 'statUpcoming'
-            },
-            rescheduled: {
-                label: 'Rescheduled',
-                icon: 'fa-calendar-plus',
-                tone: 's-rescheduled',
-                countId: 'statRescheduled'
-            },
-            completed: {
-                label: 'Completed',
-                icon: 'fa-check-double',
-                tone: 's-completed',
-                countId: 'statCompleted'
-            },
-            cancelled: {
-                label: 'Cancelled',
-                icon: 'fa-calendar-xmark',
-                tone: 's-cancelled',
-                countId: 'statCancelled'
-            },
-            all: {
-                label: 'All Patients',
-                icon: 'fa-users',
-                tone: 's-all',
-                countId: 'statAll'
-            }
-        };
-
-        return map[status] || map.all;
-    }
-
-    function getPatientDropdownCount(status) {
-        const meta = getPatientDropdownMeta(status);
-        return document.getElementById(meta.countId)?.textContent?.trim() || '0';
-    }
-
-    function updatePatientStatsDropdownLabel() {
-        const activeBtn =
-            document.querySelector('#tabsGrid .filter-btn.tab-active') ||
-            document.querySelector('#tabsGrid .filter-btn[data-filter="all"]');
-
-        const labelEl = document.getElementById('patientStatsSelectedLabel');
-        const countEl = document.getElementById('patientStatsSelectedCount');
-        const leadingIcon = document.querySelector('#patientStatsToggle .patient-stats-trigger-icon');
-
-        if (!activeBtn || !labelEl || !countEl) return;
-
-        const status = activeBtn.getAttribute('data-filter') || 'all';
-        const meta = getPatientDropdownMeta(status);
-
-        labelEl.textContent = meta.label;
-        countEl.textContent = getPatientDropdownCount(status);
-
-        if (leadingIcon) {
-            leadingIcon.className = `patient-stats-trigger-icon ${meta.tone}`;
-            leadingIcon.innerHTML = `<i class="fa-solid ${meta.icon}"></i>`;
-        }
-        var trigger =
-            document.getElementById(
-                "patientStatsToggle"
-            );
-
-        if (trigger) {
-            trigger.classList.remove(
-                "s-today",
-                "s-upcoming",
-                "s-rescheduled",
-                "s-completed",
-                "s-cancelled",
-                "s-all"
-            );
-
-            trigger.classList.add(meta.tone);
-        }
-        document.querySelectorAll('#tabsGrid .filter-btn').forEach(function (btn) {
-            btn.classList.toggle('tab-active', btn.getAttribute('data-filter') === status);
-        });
-    }
-
-    window.updatePatientStatsDropdownLabel = updatePatientStatsDropdownLabel;
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const dropdown = document.getElementById('patientStatsDropdown');
-        const toggle = document.getElementById('patientStatsToggle');
-        const panel = document.getElementById('patientStatsPanel');
-
-        if (!dropdown || !toggle || !panel) return;
-
-        function closePatientStatsDropdown() {
-            dropdown.classList.remove('open');
-            toggle.setAttribute('aria-expanded', 'false');
-        }
-
-        toggle.addEventListener('click', function (e) {
-            e.stopPropagation();
-            const isOpen = dropdown.classList.toggle('open');
-            toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-        });
-
-        panel.addEventListener('click', function (e) {
-            e.stopPropagation();
-        });
-
-        document.addEventListener('click', closePatientStatsDropdown);
-
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') closePatientStatsDropdown();
-        });
-
-        updatePatientStatsDropdownLabel();
-    });
-
     document.addEventListener("DOMContentLoaded", function () {
         let patientFilterModal = null;
         let patientSearchInput = null;
@@ -1141,15 +900,26 @@ $notifCount = $notifications->count();
         }
 
         function resetAllFilters() {
-            resetPatientPanelFilters(false);
+            resetPatientPanelFilters(
+                false
+            );
 
-            searchKeyword = "";
+            searchKeyword = '';
 
             if (patientSearchInput) {
-                patientSearchInput.value = "";
+                patientSearchInput.value = '';
+
+                window.syncInputClearButton?.(
+                    patientSearchInput
+                );
             }
 
-            selectPatientStatus("all");
+            selectPatientStatus(
+                'all'
+            );
+
+            currentPage = 1;
+
             applyFilters();
         }
 
@@ -1183,26 +953,13 @@ $notifCount = $notifications->count();
             var patientSearchEmptyState =
                 document.getElementById("patientSearchEmptyState");
 
-            var patientSearchEmptyTitle =
-                document.getElementById("patientSearchEmptyTitle");
-
             var patientStatusEmptyState =
                 document.getElementById("patientStatusEmptyState");
 
-            var patientStatusEmptyIcon =
-                document.getElementById("patientStatusEmptyIcon");
-
-            var patientStatusEmptyTitle =
-                document.getElementById("patientStatusEmptyTitle");
-
-            var patientStatusEmptyText =
-                document.getElementById("patientStatusEmptyText");
-
-            var clearPatientSearchBtn =
-                document.getElementById("clearPatientSearchBtn");
-
-            var resetPatientFiltersBtn =
-                document.getElementById("resetPatientFiltersBtn");
+            var patientBaseEmptyState =
+                document.getElementById(
+                    "patientBaseEmptyState"
+                );
 
             patientFilterModal = filterModal;
             patientSearchInput = searchInput;
@@ -1213,20 +970,76 @@ $notifCount = $notifications->count();
             var activeTab = "all";
             var searchKeyword = "";
 
-            function selectPatientStatus(status) {
-                var nextStatus = status || "all";
+            window.handlePatientStatusSelect =
+                function (value) {
+                    activeTab =
+                        String(value || 'all')
+                            .trim()
+                            .toLowerCase();
+                    searchKeyword = '';
 
-                document.querySelectorAll(
-                    "#tabsGrid .filter-btn"
-                ).forEach(function (button) {
-                    button.classList.toggle(
-                        "tab-active",
-                        button.getAttribute("data-filter") === nextStatus
-                    );
-                });
+                    if (searchInput) {
+                        searchInput.value = '';
 
-                activeTab = nextStatus;
-                updatePatientStatsDropdownLabel();
+                        window.syncInputClearButton?.(
+                            searchInput
+                        );
+                    }
+
+                    currentPage = 1;
+
+                    applyFilters();
+                };
+
+
+            window.handlePatientDirectorySearch =
+                function (value) {
+                    searchKeyword =
+                        String(value || '')
+                            .trim()
+                            .toLowerCase();
+                    if (
+                        searchKeyword &&
+                        activeTab !== 'all'
+                    ) {
+                        activeTab = 'all';
+
+                        window.setGlobalFilterSelectValue?.(
+                            'patientStatusFilter',
+                            'all', {
+                            callback: false,
+                            focus: false
+                        }
+                        );
+                    }
+
+                    currentPage = 1;
+
+                    applyFilters();
+                };
+
+            function selectPatientStatus(
+                status,
+                options = {}
+            ) {
+                var nextStatus =
+                    String(
+                        status || 'all'
+                    )
+                        .trim()
+                        .toLowerCase();
+
+                activeTab =
+                    nextStatus;
+
+                window.setGlobalFilterSelectValue?.(
+                    'patientStatusFilter',
+                    nextStatus, {
+                    callback: options.callback === true,
+
+                    focus: false
+                }
+                );
             }
 
             var selectedProgram = null,
@@ -1245,38 +1058,6 @@ $notifCount = $notifications->count();
             var yearRadios = Array.from(document.querySelectorAll('input[name="year"]'));
             var sectionRadios = Array.from(document.querySelectorAll('input[name="section"]'));
             var otherRadios = courseRadios.concat(yearRadios, sectionRadios);
-
-            if (clearPatientSearchBtn) {
-                clearPatientSearchBtn.addEventListener(
-                    "click",
-                    function () {
-                        searchKeyword = "";
-
-                        if (searchInput) {
-                            searchInput.value = "";
-
-                            searchInput.dispatchEvent(
-                                new Event("input", {
-                                    bubbles: true
-                                })
-                            );
-
-                            searchInput.focus();
-                        }
-
-                        applyFilters();
-                    }
-                );
-            }
-
-            if (resetPatientFiltersBtn) {
-                resetPatientFiltersBtn.addEventListener(
-                    "click",
-                    function () {
-                        resetPatientPanelFilters();
-                    }
-                );
-            }
 
             if (filterBtn) {
                 filterBtn.onclick = function (e) {
@@ -1890,50 +1671,12 @@ $notifCount = $notifications->count();
                 };
             }
 
-            if (searchInput) {
-                searchInput.addEventListener("input", function () {
-                    searchKeyword = searchInput.value.trim().toLowerCase();
-                    applyFilters();
-                });
-            }
-
             window.bindFilterTagGroup({
                 groupId: "fSortGroup",
                 onChange: function () {
                     renderFilterChips();
                     updateShowResultsButton();
                 }
-            });
-
-            var tabButtons = document.querySelectorAll(
-                "#tabsGrid .filter-btn"
-            );
-
-            tabButtons.forEach(function (btn) {
-                btn.addEventListener("click", function () {
-                    selectPatientStatus(
-                        btn.getAttribute("data-filter") || "all"
-                    );
-
-                    var dropdown =
-                        document.getElementById("patientStatsDropdown");
-
-                    var toggle =
-                        document.getElementById("patientStatsToggle");
-
-                    if (dropdown) {
-                        dropdown.classList.remove("open");
-                    }
-
-                    if (toggle) {
-                        toggle.setAttribute(
-                            "aria-expanded",
-                            "false"
-                        );
-                    }
-
-                    applyFilters();
-                });
             });
 
             if (applyFiltersBtn) {
@@ -1987,227 +1730,206 @@ $notifCount = $notifications->count();
                 };
             }
 
-            var pageInfoTop = document.getElementById("patientPageInfoTop");
-            var pageInfoBottom = document.getElementById("patientPageInfoBottom");
+            var pageInfoTop =
+                document.getElementById(
+                    "patientPageInfoTop"
+                );
 
-            var paginationTop = document.getElementById("patientPaginationTop");
-            var paginationBottom = document.getElementById("patientPaginationBottom");
+            var pageInfoBottom =
+                document.getElementById(
+                    "patientPageInfoBottom"
+                );
 
-            var perPageInput = document.getElementById("patientPerPage");
+            var paginationTop =
+                document.getElementById(
+                    "patientPaginationTop"
+                );
 
-            var PER_PAGE = Number(perPageInput?.value || 10);
+            var paginationBottom =
+                document.getElementById(
+                    "patientPaginationBottom"
+                );
+
+            var perPageInput =
+                document.getElementById(
+                    "patientPerPage"
+                );
+
+            var PER_PAGE =
+                Number(
+                    perPageInput?.value || 10
+                );
+
             var currentPage = 1;
+
             var currentItems = [];
 
-            function patientBuildPagination() {
-                var totalItems = currentItems.length;
-                var lastPage = Math.max(1, Math.ceil(totalItems / PER_PAGE));
-                var current = Math.min(Math.max(currentPage, 1), lastPage);
-
-                if (totalItems === 0 || lastPage <= 1) {
-                    return "";
-                }
-
-                var windowSize = 5;
-                var half = Math.floor(windowSize / 2);
-
-                var start = Math.max(1, current - half);
-                var end = Math.min(lastPage, start + windowSize - 1);
-
-                if (end - start + 1 < windowSize) {
-                    start = Math.max(1, end - windowSize + 1);
-                }
-
-                var html =
-                    '<nav class="global-pagination" aria-label="Patient pagination">';
-
-                if (current <= 1) {
-                    html +=
-                        '<button type="button" class="global-page-disabled" ' +
-                        'aria-label="Previous page" disabled>' +
-                        '<i class="fa-solid fa-chevron-left global-page-icon"></i>' +
-                        '</button>';
-                } else {
-                    html +=
-                        '<button type="button" class="global-page-btn" ' +
-                        'aria-label="Previous page" ' +
-                        'onclick="patientGoPage(' + (current - 1) + ')">' +
-                        '<i class="fa-solid fa-chevron-left global-page-icon"></i>' +
-                        '</button>';
-                }
-
-                if (start > 1) {
-                    html +=
-                        '<button type="button" class="global-page-btn" ' +
-                        'onclick="patientGoPage(1)">1</button>';
-
-                    if (start > 2) {
-                        html +=
-                            '<span class="global-page-ellipsis" aria-hidden="true">' +
-                            '&hellip;' +
-                            '</span>';
-                    }
-                }
-
-                for (var page = start; page <= end; page++) {
-                    if (page === current) {
-                        html +=
-                            '<span class="global-page-current" aria-current="page">' +
-                            page +
-                            '</span>';
-                    } else {
-                        html +=
-                            '<button type="button" class="global-page-btn" ' +
-                            'onclick="patientGoPage(' + page + ')">' +
-                            page +
-                            '</button>';
-                    }
-                }
-
-                if (end < lastPage) {
-                    if (end < lastPage - 1) {
-                        html +=
-                            '<span class="global-page-ellipsis" aria-hidden="true">' +
-                            '&hellip;' +
-                            '</span>';
-                    }
-
-                    html +=
-                        '<button type="button" class="global-page-btn" ' +
-                        'onclick="patientGoPage(' + lastPage + ')">' +
-                        lastPage +
-                        '</button>';
-                }
-
-                if (current >= lastPage) {
-                    html +=
-                        '<button type="button" class="global-page-disabled" ' +
-                        'aria-label="Next page" disabled>' +
-                        '<i class="fa-solid fa-chevron-right global-page-icon"></i>' +
-                        '</button>';
-                } else {
-                    html +=
-                        '<button type="button" class="global-page-btn" ' +
-                        'aria-label="Next page" ' +
-                        'onclick="patientGoPage(' + (current + 1) + ')">' +
-                        '<i class="fa-solid fa-chevron-right global-page-icon"></i>' +
-                        '</button>';
-                }
-
-                html += "</nav>";
-
-                return html;
-            }
-
             function renderPatientPagebars() {
-                var totalItems = currentItems.length;
-                var lastPage = Math.max(1, Math.ceil(totalItems / PER_PAGE));
+                const totalItems =
+                    currentItems.length;
 
-                if (currentPage > lastPage) {
-                    currentPage = lastPage;
-                }
+                const lastPage =
+                    Math.max(
+                        1,
+                        Math.ceil(
+                            totalItems /
+                            PER_PAGE
+                        )
+                    );
 
-                if (currentPage < 1) {
-                    currentPage = 1;
-                }
+                currentPage =
+                    Math.min(
+                        Math.max(
+                            1,
+                            currentPage
+                        ),
+                        lastPage
+                    );
 
-                var from = totalItems > 0 ?
-                    ((currentPage - 1) * PER_PAGE) + 1 :
-                    0;
+                const from =
+                    totalItems > 0 ?
+                        (
+                            (
+                                currentPage - 1
+                            ) * PER_PAGE
+                        ) + 1 :
+                        null;
 
-                var to = totalItems > 0 ?
-                    Math.min(currentPage * PER_PAGE, totalItems) :
-                    0;
+                const to =
+                    totalItems > 0 ?
+                        Math.min(
+                            currentPage *
+                            PER_PAGE,
+                            totalItems
+                        ) :
+                        null;
 
-                var infoHtml = totalItems > 0 ?
-                    'Showing <strong>' + from + '–' + to +
-                    '</strong> of <strong>' + totalItems +
-                    '</strong> ' + (totalItems === 1 ? 'patient' : 'patients') :
-                    'Showing <strong>0</strong> patients';
+                window.renderGlobalPagination?.({
+                    currentPage,
 
-                if (pageInfoTop) {
-                    pageInfoTop.innerHTML = infoHtml;
-                }
+                    lastPage,
 
-                if (pageInfoBottom) {
-                    pageInfoBottom.innerHTML = infoHtml;
-                }
+                    total: totalItems,
 
-                var paginationHtml = patientBuildPagination();
+                    from,
 
-                if (paginationTop) {
-                    paginationTop.innerHTML = paginationHtml;
-                }
+                    to,
 
-                if (paginationBottom) {
-                    paginationBottom.innerHTML = paginationHtml;
-                }
+                    containers: [
+                        document.getElementById(
+                            'patientPaginationTop'
+                        ),
+                        document.getElementById(
+                            'patientPaginationBottom'
+                        ),
+                    ],
+
+                    bars: [
+                        document.getElementById(
+                            'patientPaginationTopBar'
+                        ),
+                        document.getElementById(
+                            'patientPaginationBottomBar'
+                        ),
+                    ],
+
+                    infoElements: [
+                        document.getElementById(
+                            'patientPageInfoTop'
+                        ),
+                        document.getElementById(
+                            'patientPageInfoBottom'
+                        ),
+                    ],
+
+                    itemLabel: totalItems === 1 ?
+                        'patient' : 'patients',
+
+                    onPageChange(page) {
+                        currentPage = page;
+
+                        updatePage();
+
+                        document
+                            .querySelector(
+                                '.patient-table-card'
+                            )
+                            ?.scrollIntoView({
+                                behavior: 'smooth',
+
+                                block: 'start',
+                            });
+                    },
+                });
+
+                const perPageInput =
+                    document.getElementById(
+                        'patientPerPage'
+                    );
 
                 if (perPageInput) {
-                    perPageInput.value = String(PER_PAGE);
+                    perPageInput.value =
+                        String(PER_PAGE);
 
-                    window.syncGlobalPageSizeSelect?.(
-                        perPageInput,
-                        PER_PAGE
-                    );
+                    window
+                        .syncGlobalPageSizeSelect?.(
+                            perPageInput,
+                            PER_PAGE
+                        );
                 }
-            }
-
-            function setPatientEmptyVisible(element, visible) {
-                if (!element) return;
-
-                element.hidden = !visible;
-
-                element.classList.toggle("hidden", !visible);
-                element.classList.toggle("show", visible);
-                element.classList.toggle("is-visible", visible);
             }
 
             function getCurrentPatientStatus() {
-                var activeButton = document.querySelector(
-                    "#tabsGrid .filter-btn.tab-active"
-                );
-
-                return activeButton ?
-                    activeButton.getAttribute("data-filter") || "all" :
-                    activeTab || "all";
+                return activeTab || 'all';
             }
 
             function getPatientStatusEmptyMeta(status) {
                 var map = {
                     today: {
-                        icon: "fa-solid fa-clock",
+                        icon: "fa-clock",
+
                         title: "No patients today",
+
                         text: "There are currently no patient appointments scheduled for today."
                     },
 
                     upcoming: {
-                        icon: "fa-regular fa-calendar-check",
+                        icon: "fa-calendar-check",
+
                         title: "No upcoming patients",
+
                         text: "There are currently no upcoming patient appointments."
                     },
 
                     rescheduled: {
-                        icon: "fa-solid fa-rotate-right",
+                        icon: "fa-rotate-right",
+
                         title: "No rescheduled patients",
+
                         text: "There are currently no rescheduled patient appointments."
                     },
 
                     completed: {
-                        icon: "fa-solid fa-circle-check",
+                        icon: "fa-circle-check",
+
                         title: "No completed patients",
+
                         text: "Completed patient appointments will appear here."
                     },
 
                     cancelled: {
-                        icon: "fa-regular fa-calendar-xmark",
+                        icon: "fa-calendar-xmark",
+
                         title: "No cancelled patients",
+
                         text: "Cancelled patient appointments will appear here."
                     },
 
                     all: {
-                        icon: "fa-solid fa-sliders",
+                        icon: "fa-sliders",
+
                         title: "No patients match your filters",
+
                         text: "Try removing or changing the selected filter criteria."
                     }
                 };
@@ -2216,116 +1938,121 @@ $notifCount = $notifications->count();
             }
 
             function updateFilteredEmptyState() {
-                var hasResults = currentItems.length > 0;
-                var hasSearch = searchKeyword.trim().length > 0;
+                var hasResults =
+                    currentItems.length > 0;
 
-                var hasAdvancedFilters = Boolean(
-                    selectedProgram ||
-                    selectedYearLevel ||
-                    selectedSection ||
-                    selectedDepartment ||
-                    activeFromDate ||
-                    activeToDate ||
-                    activeDatePreset ||
-                    nameSort ||
-                    dateSort !== "nearest"
-                );
+                var hasSearch =
+                    searchKeyword
+                        .trim()
+                        .length > 0;
 
-                var currentStatus = getCurrentPatientStatus();
-
-                var isStatusOnlyEmptyState = !hasSearch &&
-                    !hasAdvancedFilters &&
-                    currentStatus !== "all";
-
-                setPatientEmptyVisible(
-                    patientSearchEmptyState,
-                    false
-                );
-
-                setPatientEmptyVisible(
-                    patientStatusEmptyState,
-                    false
-                );
-
-                if (resetPatientFiltersBtn) {
-                    var showClearFiltersButton =
-                        hasAdvancedFilters &&
-                        !isStatusOnlyEmptyState;
-
-                    resetPatientFiltersBtn.hidden = !showClearFiltersButton;
-
-                    resetPatientFiltersBtn.classList.toggle(
-                        "hidden",
-                        !showClearFiltersButton
+                var hasAdvancedFilters =
+                    Boolean(
+                        selectedProgram ||
+                        selectedYearLevel ||
+                        selectedSection ||
+                        selectedDepartment ||
+                        activeFromDate ||
+                        activeToDate ||
+                        activeDatePreset ||
+                        nameSort ||
+                        dateSort !== 'nearest'
                     );
 
-                    resetPatientFiltersBtn.classList.toggle(
-                        "is-hidden",
-                        !showClearFiltersButton
-                    );
+                var currentStatus =
+                    getCurrentPatientStatus();
 
-                    resetPatientFiltersBtn.style.display =
-                        showClearFiltersButton ?
-                            "inline-flex" :
-                            "none";
-                }
+                window.EmptyState?.hide(
+                    patientBaseEmptyState
+                );
+
+                window.EmptyState?.hide(
+                    patientSearchEmptyState
+                );
+
+                window.EmptyState?.hide(
+                    patientStatusEmptyState
+                );
 
                 if (hasResults) {
                     return;
                 }
 
                 if (allPatients.length === 0) {
+                    window.EmptyState?.render({
+                        host: patientBaseEmptyState,
+
+                        icon: 'fa-tooth',
+
+                        title: 'No patients found',
+
+                        message: 'There are no patient appointments in the system yet.',
+                    });
+
                     return;
                 }
 
                 if (hasSearch) {
-                    if (patientSearchEmptyTitle) {
-                        patientSearchEmptyTitle.textContent =
-                            'No results for "' +
-                            searchKeyword +
-                            '"';
-                    }
+                    window.EmptyState?.renderSearch({
+                        host: patientSearchEmptyState,
 
-                    setPatientEmptyVisible(
-                        patientSearchEmptyState,
-                        true
-                    );
+                        input: searchInput,
+
+                        query: searchKeyword,
+
+                        message: 'Try a different patient name, student number, program, or service.',
+                    });
 
                     return;
                 }
 
                 if (
-                    currentStatus === "all" &&
+                    currentStatus === 'all' &&
                     !hasAdvancedFilters
                 ) {
                     return;
                 }
 
-                var meta = getPatientStatusEmptyMeta(
-                    hasAdvancedFilters ?
-                        "all" :
-                        currentStatus
-                );
+                var meta =
+                    getPatientStatusEmptyMeta(
+                        hasAdvancedFilters ?
+                            'all' :
+                            currentStatus
+                    );
 
-                if (patientStatusEmptyIcon) {
-                    patientStatusEmptyIcon.className =
-                        meta.icon;
-                }
+                window.EmptyState?.render({
+                    host: patientStatusEmptyState,
 
-                if (patientStatusEmptyTitle) {
-                    patientStatusEmptyTitle.textContent =
-                        meta.title;
-                }
+                    icon: meta.icon,
 
-                if (patientStatusEmptyText) {
-                    patientStatusEmptyText.textContent =
-                        meta.text;
-                }
+                    title: meta.title,
 
-                setPatientEmptyVisible(
-                    patientStatusEmptyState,
-                    true
-                );
+                    message: meta.text,
+
+                    actionHtml: hasAdvancedFilters ?
+                        `
+                    <button
+                        type="button"
+                        class="empty-state-btn"
+                        data-patient-clear-filters
+                    >
+                        <i class="fa-solid fa-rotate-left"></i>
+                        Clear filters
+                    </button>
+                ` :
+                        '',
+                });
+
+                document
+                    .querySelector(
+                        '#patientStatusEmptyState [data-patient-clear-filters]'
+                    )
+                    ?.addEventListener(
+                        'click',
+                        function () {
+                            resetPatientPanelFilters();
+                        }
+                    );
             }
 
             function updatePage() {
@@ -2355,34 +2082,6 @@ $notifCount = $notifications->count();
                 updateFilteredEmptyState();
                 renderPatientPagebars();
             }
-
-            window.patientGoPage = function (page) {
-                var lastPage = Math.max(
-                    1,
-                    Math.ceil(currentItems.length / PER_PAGE)
-                );
-
-                var nextPage = Number(page) || 1;
-
-                if (nextPage < 1 || nextPage > lastPage) {
-                    return;
-                }
-
-                if (nextPage === currentPage) {
-                    return;
-                }
-
-                currentPage = nextPage;
-
-                updatePage();
-
-                document
-                    .querySelector(".patient-table-card")
-                    ?.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start"
-                    });
-            };
 
             window.changePatientPageSize = function (value) {
                 var nextSize = Number(value);
@@ -2530,22 +2229,19 @@ $notifCount = $notifications->count();
 
             syncMutualExclusion();
 
-            document.querySelectorAll('.filter-btn').forEach(function (b) {
-                b.classList.remove('tab-active');
-            });
+            activeTab = 'all';
 
-            var allPatientsBtn = document.querySelector(
-                '.filter-btn[data-filter="all"]'
+            window.setGlobalFilterSelectValue?.(
+                'patientStatusFilter',
+                'all', {
+                callback: false,
+                focus: false
+            }
             );
 
-            if (allPatientsBtn) {
-                allPatientsBtn.classList.add('tab-active');
-            }
-
-            activeTab = "all";
-
-            updatePatientStatsDropdownLabel();
-            window.initGlobalPageSizeSelects?.(document);
+            window.initGlobalPageSizeSelects?.(
+                document
+            );
 
             applyFilters();
 

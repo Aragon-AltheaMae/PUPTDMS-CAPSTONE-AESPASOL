@@ -318,3 +318,7 @@ php artisan config:cache
 ```
 
 If a migration changed the database, restore the staging database backup.
+<<<<<<< HEAD
+
+=======
+>>>>>>> fixdev

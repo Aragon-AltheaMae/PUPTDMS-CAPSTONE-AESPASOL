@@ -90,7 +90,6 @@ class EnsureSessionActivity
             $timeoutSeconds;
 
         if ($alreadyLocked || $hasTimedOut) {
-
             $request->session()->put(
                 'session_idle_locked',
                 true
@@ -107,12 +106,38 @@ class EnsureSessionActivity
                 ], 401);
             }
 
-            return redirect()->route(
-                'login',
-                [
-                    'reason' => 'idle',
-                ]
-            );
+            if ($alreadyLocked || $hasTimedOut) {
+
+                $request->session()->put(
+                    'session_idle_locked',
+                    true
+                );
+
+                if (
+                    $request->expectsJson() ||
+                    $request->ajax()
+                ) {
+                    return response()->json([
+                        'expired' => true,
+                        'message' =>
+                        'Your session has expired due to inactivity.',
+                    ], 401);
+                }
+
+                if ($request->isMethod('GET')) {
+
+                    $request->attributes->set(
+                        'session_idle_expired',
+                        true
+                    );
+
+                    return $next($request);
+                }
+
+                return response()->json([
+                    'expired' => true,
+                ], 401);
+            }
         }
 
         return $next($request);
