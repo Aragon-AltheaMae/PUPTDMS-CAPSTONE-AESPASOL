@@ -610,9 +610,9 @@ class AppointmentController extends Controller
                 $hasReusableSignature ? 'nullable' : 'required',
                 'file',
                 'mimes:jpg,jpeg,png',
-                'max:25600', // 25 MB
+                'max:25600',
             ],
-            'signature_source' => 'nullable|in:drawn',
+            'signature_source' => 'nullable|in:drawn,upload',
 
             'diseases'   => 'array',
             'diseases.*' => 'string|exists:diseases,code',
@@ -780,7 +780,6 @@ class AppointmentController extends Controller
                 );
 
                 if (!($aiResult['accepted'] ?? false)) {
-
                     $reason =
                         $aiResult['reason']
                         ?? 'The uploaded image did not pass signature validation.';
@@ -789,10 +788,6 @@ class AppointmentController extends Controller
                         $aiResult['detected_type']
                         ?? 'unknown';
 
-                    $confidence =
-                        $aiResult['confidence']
-                        ?? 0;
-
                     return redirect()
                         ->back()
                         ->withInput()
@@ -800,8 +795,7 @@ class AppointmentController extends Controller
                             'patient_signature' =>
                             'Signature could not be processed. Please try again. ' .
                                 'Reason: ' . $reason .
-                                ' Detected: ' . $detectedType .
-                                ' Confidence: ' . $confidence,
+                                ' Detected: ' . $detectedType,
                         ]);
                 }
             } else {
