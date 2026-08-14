@@ -236,23 +236,11 @@ function createBookingSignature(root) {
             result.detected_type ||
             '';
 
-        const confidence =
-            result.confidence !==
-                undefined &&
-                result.confidence !== null
-                ? Number(
-                    result.confidence
-                ).toFixed(2)
-                : '';
-
         let detail = reason;
 
-        if (
-            detectedType &&
-            confidence
-        ) {
+        if (detectedType) {
             detail +=
-                ` Detected: ${detectedType} · Confidence: ${confidence}`;
+                ` Detected: ${detectedType}`;
         }
 
         showSignatureStatus(
