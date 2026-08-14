@@ -3123,8 +3123,7 @@ function openModal(id) {
 }
 
 function closeModal(id) {
-    const modal =
-        document.getElementById(id);
+    const modal = document.getElementById(id);
 
     if (
         !modal ||
@@ -3136,41 +3135,49 @@ function closeModal(id) {
         return;
     }
 
-    modal.classList.remove('open');
-    modal.classList.add('closing');
+    const focusedElement = document.activeElement;
+
+    if (modal.contains(focusedElement)) {
+        focusedElement.blur();
+    }
+
     modal.setAttribute(
         'aria-hidden',
         'true'
     );
 
+    modal.classList.remove('open');
+    modal.classList.add('closing');
+
     if (modalTimers[id]) {
         clearTimeout(modalTimers[id]);
     }
 
-    modalTimers[id] =
-        setTimeout(() => {
-            modal.classList.remove(
-                'closing'
+    modalTimers[id] = setTimeout(() => {
+
+        modal.classList.remove(
+            'closing'
+        );
+
+        modalTimers[id] = null;
+
+        const activeModal =
+            document.querySelector(
+                [
+                    '.ui-modal.open',
+                    '.ui-modal.closing',
+                    '.modal-overlay.open',
+                    '.modal-overlay.closing'
+                ].join(',')
             );
 
-            modalTimers[id] = null;
+        if (!activeModal) {
+            document.body.classList.remove(
+                'modal-lock'
+            );
+        }
 
-            const activeModal =
-                document.querySelector(
-                    [
-                        '.ui-modal.open',
-                        '.ui-modal.closing',
-                        '.modal-overlay.open',
-                        '.modal-overlay.closing'
-                    ].join(',')
-                );
-
-            if (!activeModal) {
-                document.body.classList.remove(
-                    'modal-lock'
-                );
-            }
-        }, 180);
+    }, 180);
 }
 
 function closeModalOnBackdrop(event, id) {

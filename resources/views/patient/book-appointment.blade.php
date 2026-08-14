@@ -2038,9 +2038,40 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
     function editSignatureFromReview() {
 
+        const reuseInput =
+            document.getElementById(
+                "reuse_existing_signature"
+            );
+
+        if (reuseInput) {
+            reuseInput.value = "0";
+        }
+
+
+        const existingCard =
+            document.querySelector(
+                ".signature-existing-card"
+            );
+
+        const editorWrapper =
+            document.getElementById(
+                "signatureEditorWrapper"
+            );
+
+
+        existingCard?.classList.add("hidden");
+
+        editorWrapper?.classList.remove("hidden");
+
+
         openMedicalHistoryEditorFromReview({
             focusSignature: true
         });
+
+
+        setTimeout(() => {
+            buildSummary();
+        }, 250);
 
     }
 
@@ -2064,22 +2095,37 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
         let sigHTML = hasReusableSignature ?
             `
-        <div class="booking-summary-saved-info">
-            <p class="text-emerald-700 font-semibold">
-                <i class="fa-solid fa-circle-check mr-1"></i>
-                Existing signature on file
-            </p>
+            <div class="space-y-3">
 
-            <p class="booking-summary-muted mt-1">
-                Your previously verified signature will be reused.
-            </p>
-        </div>
-    ` :
+                <div class="booking-summary-saved-info">
+                    <p class="text-emerald-700 font-semibold">
+                        <i class="fa-solid fa-circle-check mr-1"></i>
+                        Existing signature on file
+                    </p>
+
+                    <p class="booking-summary-muted mt-1">
+                        Your previously verified signature will be reused.
+                    </p>
+                </div>
+
+                @if ($patient->medicalHistory?->patient_signature)
+                    <div class="signature-summary-preview">
+                        <img
+                            src="{{ asset('storage/' . $patient->medicalHistory->patient_signature) }}"
+                            alt="Existing signature"
+                            class="max-w-[220px] max-h-[130px] rounded-lg border border-[#e8e2dd]"
+                        >
+                    </div>
+                @endif
+
+            </div>
             `
-        <span class="text-[#9e9690] italic">
-            Not uploaded
-        </span>
-    `;
+            :
+            `
+            <span class="text-[#9e9690] italic">
+                Not uploaded
+            </span>
+            `;
 
         if (sigFile && sigFile.size > 0) {
             const url = URL.createObjectURL(sigFile);

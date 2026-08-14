@@ -1111,6 +1111,162 @@ function createBookingSignature(root) {
         return true;
     }
 
+    function cropCanvasToSignature() {
+
+        if (!signatureCanvas) {
+            return null;
+        }
+
+        const ctx =
+            signatureCanvas.getContext('2d');
+
+        const width =
+            signatureCanvas.width;
+
+        const height =
+            signatureCanvas.height;
+
+        const imageData =
+            ctx.getImageData(
+                0,
+                0,
+                width,
+                height
+            );
+
+        const data =
+            imageData.data;
+
+
+        let minX = width;
+        let minY = height;
+        let maxX = 0;
+        let maxY = 0;
+
+
+        for (
+            let y = 0;
+            y < height;
+            y++
+        ) {
+
+            for (
+                let x = 0;
+                x < width;
+                x++
+            ) {
+
+                const index =
+                    (y * width + x) * 4;
+
+
+                const alpha =
+                    data[index + 3];
+
+
+                const r =
+                    data[index];
+
+                const g =
+                    data[index + 1];
+
+                const b =
+                    data[index + 2];
+
+
+                // ignore white background
+                if (
+                    alpha > 0 &&
+                    (
+                        r < 240 ||
+                        g < 240 ||
+                        b < 240
+                    )
+                ) {
+
+                    minX =
+                        Math.min(
+                            minX,
+                            x
+                        );
+
+                    minY =
+                        Math.min(
+                            minY,
+                            y
+                        );
+
+                    maxX =
+                        Math.max(
+                            maxX,
+                            x
+                        );
+
+                    maxY =
+                        Math.max(
+                            maxY,
+                            y
+                        );
+                }
+            }
+        }
+
+
+        if (
+            minX >= maxX ||
+            minY >= maxY
+        ) {
+            return null;
+        }
+
+
+        const padding = 20;
+
+
+        const crop =
+            document.createElement(
+                'canvas'
+            );
+
+
+        crop.width =
+            maxX - minX + padding * 2;
+
+        crop.height =
+            maxY - minY + padding * 2;
+
+
+        const cropCtx =
+            crop.getContext('2d');
+
+
+        cropCtx.fillStyle =
+            '#ffffff';
+
+        cropCtx.fillRect(
+            0,
+            0,
+            crop.width,
+            crop.height
+        );
+
+
+        cropCtx.drawImage(
+            signatureCanvas,
+            minX,
+            minY,
+            maxX - minX,
+            maxY - minY,
+            padding,
+            padding,
+            maxX - minX,
+            maxY - minY
+        );
+
+
+        return crop;
+    }
+
     function useDrawn() {
         if (!signatureCanvas) {
             return;
@@ -1134,7 +1290,23 @@ function createBookingSignature(root) {
 
         redrawSignatureCanvas();
 
-        signatureCanvas.toBlob(
+        const croppedCanvas = cropCanvasToSignature();
+
+        if (!croppedCanvas) {
+            showSignatureError(
+                '',
+                {
+                    reason:
+                        'Please draw your signature first.',
+                    detected_type:
+                        'blank_signature'
+                }
+            );
+
+            return;
+        }
+
+        croppedCanvas.toBlob(
             blob => {
                 if (!blob) {
                     showSignatureError(
@@ -1413,7 +1585,7 @@ function createBookingSignature(root) {
             if (reuseExistingInput) {
                 reuseExistingInput.value = '0';
             }
-            
+
             signatureEditorWrapper
                 ?.classList
                 .remove('hidden');
@@ -1427,6 +1599,14 @@ function createBookingSignature(root) {
 
             sigInput?.removeAttribute(
                 'disabled'
+            );
+
+
+            setMode('draw');
+
+            window.setTimeout(
+                resize,
+                100
             );
 
 

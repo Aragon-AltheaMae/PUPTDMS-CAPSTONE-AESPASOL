@@ -2199,20 +2199,8 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
             clearConfirmationError();
 
-            modal.classList.remove('closing');
-            modal.classList.add('open');
-
-            modal.setAttribute(
-                'aria-hidden',
-                'false'
-            );
-
-            document.documentElement.classList.add(
-                'modal-lock'
-            );
-
-            document.body.classList.add(
-                'modal-lock'
+            window.openModal?.(
+                'aiReportConfirmModal'
             );
 
             window.setTimeout(() => {
@@ -2225,37 +2213,13 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                 return;
             }
 
-            if (
-                !modal.classList.contains('open')
-            ) {
-                return;
-            }
-
             clearConfirmationError();
 
-            modal.classList.add('closing');
-            modal.classList.remove('open');
-
-            modal.setAttribute(
-                'aria-hidden',
-                'true'
+            window.closeModal?.(
+                'aiReportConfirmModal'
             );
 
-            window.setTimeout(() => {
-                modal.classList.remove(
-                    'closing'
-                );
-
-                document.documentElement
-                    .classList
-                    .remove('modal-lock');
-
-                document.body
-                    .classList
-                    .remove('modal-lock');
-
-                openButton.focus();
-            }, 180);
+            openButton?.focus();
         }
 
         openButton.addEventListener(
@@ -2314,27 +2278,6 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         reportUrl
                     );
                 }, 100);
-            }
-        );
-
-        modal.addEventListener(
-            'click',
-            event => {
-                if (event.target === modal) {
-                    closeModal();
-                }
-            }
-        );
-
-        document.addEventListener(
-            'keydown',
-            event => {
-                if (
-                    event.key === 'Escape' &&
-                    modal.classList.contains('open')
-                ) {
-                    closeModal();
-                }
             }
         );
 
