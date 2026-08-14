@@ -348,7 +348,9 @@
     font-family: inherit;
     font-size: .95rem;
     line-height: 1;
-    cursor: pointer;
+    position: relative;
+    z-index: 5;
+    pointer-events: auto;
 
     transition:
         background-color .18s ease,
@@ -664,6 +666,9 @@
 
 .ui-modal-card {
     position: relative;
+    z-index: 2;
+    pointer-events: auto;
+
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -710,6 +715,38 @@ body:has([id$="Modal"].opacity-100:not(.pointer-events-none)) {
     overflow: hidden !important;
     overscroll-behavior: none !important;
     scrollbar-gutter: stable;
+}
+
+html:has(.ui-modal.open) #mobileBottomNav,
+body:has(.ui-modal.open) #mobileBottomNav,
+html:has(.modal-overlay.open) #mobileBottomNav,
+body:has(.modal-overlay.open) #mobileBottomNav,
+html:has(dialog[open]) #mobileBottomNav,
+body:has(dialog[open]) #mobileBottomNav,
+
+html:has(.ui-modal.open) #mobFabMenu,
+body:has(.ui-modal.open) #mobFabMenu,
+html:has(.modal-overlay.open) #mobFabMenu,
+body:has(.modal-overlay.open) #mobFabMenu,
+html:has(dialog[open]) #mobFabMenu,
+body:has(dialog[open]) #mobFabMenu,
+
+html:has(.ui-modal.open) .floating-actions,
+body:has(.ui-modal.open) .floating-actions,
+html:has(.modal-overlay.open) .floating-actions,
+body:has(.modal-overlay.open) .floating-actions,
+html:has(dialog[open]) .floating-actions,
+body:has(dialog[open]) .floating-actions,
+
+html:has(.ui-modal.open) .back-to-top,
+body:has(.ui-modal.open) .back-to-top,
+html:has(.modal-overlay.open) .back-to-top,
+body:has(.modal-overlay.open) .back-to-top,
+html:has(dialog[open]) .back-to-top,
+body:has(dialog[open]) .back-to-top {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
 }
 
 .global-confirm-alert {
@@ -1297,7 +1334,7 @@ body:has([id$="Modal"].opacity-100:not(.pointer-events-none)) {
         width: 100% !important;
         max-width: 100% !important;
         max-height: 90dvh !important;
-        border-radius: 24px 24px 0 0 !important;
+        border-radius: 24px !important;
     }
 
     .ui-modal .modal-hd {
@@ -1325,8 +1362,9 @@ body:has([id$="Modal"].opacity-100:not(.pointer-events-none)) {
     }
 
     .ui-modal {
-        align-items: flex-end !important;
-        padding: 0 !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 18px !important;
     }
 
     .ui-modal .modal-box-inner.ui-modal-card,
@@ -1334,7 +1372,7 @@ body:has([id$="Modal"].opacity-100:not(.pointer-events-none)) {
         width: 100% !important;
         max-width: 100% !important;
         max-height: 90dvh !important;
-        border-radius: 24px 24px 0 0 !important;
+        border-radius: 24px !important;
     }
 
     .ui-modal .modal-ft {
@@ -3979,20 +4017,31 @@ body.session-expired {
     }
 }
 
-body.appointment-confirmed-open .mobile-bottom-nav,
-body.appointment-confirmed-open .patient-mobile-nav,
-html.appointment-confirmed-open .mobile-bottom-nav,
-html.appointment-confirmed-open .patient-mobile-nav {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
+.appointment-confirmed-card {
+    animation: confirmedModalIn .22s ease forwards;
 }
 
-body.appointment-confirmed-open .floating-actions,
-body.appointment-confirmed-open .floating-nav,
-html.appointment-confirmed-open .floating-actions,
-html.appointment-confirmed-open .floating-nav {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
+@keyframes confirmedModalIn {
+
+    from {
+        opacity: 0;
+        transform: scale(.96) translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+
+}
+
+@media(max-width:640px) {
+
+    .appointment-confirmed-card {
+        width: calc(100% - 2rem);
+        max-width: 420px;
+        margin: auto;
+        border-radius: 1.5rem;
+    }
+
 }

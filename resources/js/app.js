@@ -3184,6 +3184,29 @@ function closeModalOnBackdrop(event, id) {
     return false;
 }
 
+document.addEventListener('click', function (event) {
+    const closeButton =
+        event.target.closest(
+            '[data-modal-close]'
+        );
+
+    if (!closeButton) {
+        return;
+    }
+
+    const modalId =
+        closeButton.dataset.modalClose;
+
+    if (!modalId) {
+        return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    closeModal(modalId);
+});
+
 document.addEventListener('keydown', function (event) {
     if (event.key !== 'Escape') return;
 

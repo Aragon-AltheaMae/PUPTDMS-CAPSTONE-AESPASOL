@@ -4,7 +4,7 @@ body.role-patient {
 }
 
 body.role-patient .patient-page-shell {
-    padding: 78px 0.75rem 1.25rem;
+    padding: 50px 0.75rem 1.25rem;
     min-height: 100dvh;
     flex: 1 1 auto;
     background: #F9FAFB;
@@ -24,12 +24,6 @@ body.role-patient .patient-page-shell {
         padding-left: 1.5rem;
         padding-right: 1.5rem;
     }
-}
-
-[data-theme="dark"] body.role-patient .patient-page-shell,
-.dark body.role-patient .patient-page-shell {
-    background: #101111 !important;
-    color: #F3F4F6 !important;
 }
 
 body.role-patient #mobileBottomNav {

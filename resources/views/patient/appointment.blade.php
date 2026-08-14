@@ -131,10 +131,10 @@ $appt->service_type .
                     </div>
                 </div>
 
-                <a href="{{ route('patient.book.appointment') }}" class="appt-secondary-btn">
+                <button type="button" class="appt-secondary-btn" onclick="handleScheduleCheckup()">
                     <i class="fa-solid fa-calendar-plus"></i>
                     Schedule Check-Up
-                </a>
+                </button>
             </div>
             </section>
 
@@ -254,18 +254,24 @@ $appt->service_type .
                     <button
                         class="appt-tab appt-active flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-[13px] font-bold rounded-lg text-gray-500 transition-all"
                         id="apptFutureTab" onclick="apptShowFuture()">
+
                         Future Visits
-                        <span
-                            class="appt-count text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 transition-all">{{
-                            $futureCount }}</span>
+
+                        <span class="status-pill s-upcoming appt-count">
+                            <span class="status-dot"></span>
+                            {{ $futureCount }}
+                        </span>
                     </button>
                     <button
                         class="appt-tab flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-[13px] font-bold rounded-lg text-gray-500 transition-all"
                         id="apptPastTab" onclick="apptShowPast()">
+
                         Past Visits
-                        <span
-                            class="appt-count text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 transition-all">{{
-                            $pastCount }}</span>
+
+                        <span class="status-pill s-ended appt-count">
+                            <span class="status-dot"></span>
+                            {{ $pastCount }}
+                        </span>
                     </button>
                 </div>
 
@@ -293,10 +299,11 @@ $appt->service_type .
                     }
 
                     $rawStatus = strtolower($appt->status ?? 'scheduled');
-                    $badgeColors = match ($rawStatus) {
-                    'upcoming' => 'bg-orange-100 text-orange-700',
-                    'confirmed' => 'bg-emerald-100 text-emerald-700',
-                    default => 'bg-orange-100 text-orange-700',
+                    $statusClass = match ($rawStatus) {
+                    'confirmed' => 's-confirmed',
+                    'upcoming',
+                    'scheduled' => 's-upcoming',
+                    default => 's-upcoming',
                     };
                     $showDot = in_array($rawStatus, ['upcoming', 'scheduled']);
                     @endphp
@@ -323,11 +330,8 @@ $appt->service_type .
                                     $appt->service_type }}{{ $appt->other_services ? ' (' . $appt->other_services . ')'
                                     : ''
                                     }}</span>
-                                <span
-                                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase {{ $badgeColors }}">
-                                    @if ($showDot)
-                                    <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
-                                    @endif
+                                <span class="status-pill {{ $statusClass }}">
+                                    <span class="status-dot"></span>
                                     {{ ucfirst($rawStatus) }}
                                 </span>
                             </div>
@@ -511,9 +515,9 @@ $appt->service_type .
                                     $appt->service_type }}{{ $appt->other_services ? ' (' . $appt->other_services . ')'
                                     : ''
                                     }}</span>
-                                <span
-                                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
-                                    <i class="fa-solid fa-user-check"></i> Completed
+                                <span class="status-pill s-completed">
+                                    <span class="status-dot"></span>
+                                    Completed
                                 </span>
                             </div>
                             <div class="flex flex-wrap items-center gap-4 text-sm font-medium text-gray-400">
@@ -640,32 +644,6 @@ $appt->service_type .
                     @endforelse
                 </div>
             </section>
-
-            <dialog id="activeAppointmentModal" class="modal">
-                <div
-                    class="modal-box p-8 rounded-[1.5rem] bg-white dark:bg-[#101111] text-center shadow-2xl w-[min(92vw,400px)]">
-                    <div
-                        class="mx-auto mb-5 w-20 h-20 rounded-full bg-red-50 flex items-center justify-center border-4 border-white shadow-sm">
-                        <i class="fa-solid fa-calendar-xmark text-[#8B0000] text-3xl"></i>
-                    </div>
-                    <h3 class="text-2xl font-extrabold text-gray-800 dark:text-gray-100 mb-3">One Appointment at a Time
-                    </h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
-                        {{ session('activeAppointmentMsg') ??
-                        'You already have an active appointment. Please wait until it is
-                        completed before booking another one.' }}
-                    </p>
-                    <div class="flex flex-col gap-3">
-                        <a href="{{ route('patient.appointment.index') }}"
-                            class="w-full py-3.5 rounded-xl bg-[#8B0000] text-white font-bold hover:bg-[#660000] transition-colors shadow-md">
-                            <i class="fa-regular fa-calendar-check mr-2"></i> View My Appointment
-                        </a>
-                        <button type="button" id="closeActiveApptModalBtn"
-                            class="w-full py-3.5 rounded-xl bg-gray-100 text-gray-700 font-bold hover:bg-gray-200 transition-colors">Close</button>
-                    </div>
-                </div>
-                <form method="dialog" class="modal-backdrop"><button>close</button></form>
-            </dialog>
     </div>
 </main>
 
@@ -809,7 +787,7 @@ $appt->service_type .
     </div>
 </div>
 @include('components.appointment-calendar-script', [
-'mode' => 'patient-appointment',
+'mode' => 'patient-dashboard',
 'renderStyle' => 'patient',
 'calendarContainerId' => 'calendarSkeletonContainer',
 'dateInputId' => null,
@@ -982,6 +960,29 @@ $appt->service_type .
                 }
             });
         });
+    }
+
+    function handleScheduleCheckup() {
+
+        const hasActiveAppointment = @json(
+            collect($futureVisits ?? [])
+            -> whereNotIn('status', ['completed', 'cancelled'])
+            -> count() > 0
+        );
+
+
+        if (hasActiveAppointment) {
+
+            window.openModal?.(
+                'activeAppointmentModal'
+            );
+
+            return;
+        }
+
+
+        window.location.href =
+            "{{ route('patient.book.appointment') }}";
     }
 
     function openAccordion(acc) {
@@ -1399,27 +1400,5 @@ $appt->service_type .
             calendar.classList.remove('calendar-focus-pulse');
         }, 1200);
     }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        @if (session('activeAppointmentModal'))
-            var activeModal = document.getElementById("activeAppointmentModal");
-        var closeActiveBtn = document.getElementById("closeActiveApptModalBtn");
-        if (activeModal) {
-            activeModal.showModal();
-            activeModal.addEventListener('click', function (e) {
-                var box = activeModal.querySelector('.modal-box');
-                if (box && !box.contains(e.target)) e.preventDefault();
-            });
-            activeModal.addEventListener('cancel', function (e) {
-                e.preventDefault();
-            });
-            if (closeActiveBtn) {
-                closeActiveBtn.addEventListener("click", function () {
-                    activeModal.close();
-                });
-            }
-        }
-        @endif
-    });
 </script>
 @endsection

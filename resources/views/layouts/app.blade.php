@@ -186,6 +186,8 @@
 
     @include('partials.footer')
 
+    @include('components.active-appointment-modal')
+    
     @include('components.discard-changes')
 
     @include('partials.global-toast')
