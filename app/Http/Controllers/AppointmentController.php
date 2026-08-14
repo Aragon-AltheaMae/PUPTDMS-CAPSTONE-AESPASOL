@@ -317,20 +317,19 @@ class AppointmentController extends Controller
             $patient->medicalHistory?->signature_review_status !==
             'invalid_reupload_required';
 
-        // continue with your existing create() code...
 
         // DO NOT REMOVE
-        // $hasActiveAppointment = Appointment::where('patient_id', $patientId)
-        //     ->whereIn('status', ['upcoming', 'rescheduled'])
-        //     ->exists();
+        $hasActiveAppointment = Appointment::where('patient_id', $patientId)
+            ->whereIn('status', ['upcoming', 'rescheduled'])
+            ->exists();
 
-        // if ($hasActiveAppointment) {
-        //     return redirect()->back()->with([
-        //         'activeAppointmentModal' => true,
-        //         'activeAppointmentMsg' =>
-        //         "You already have an active appointment. Please wait until it is completed before booking another one."
-        //     ]);
-        // }
+        if ($hasActiveAppointment) {
+            return redirect()->back()->with([
+                'activeAppointmentModal' => true,
+                'activeAppointmentMsg' =>
+                "You already have an active appointment. Please wait until it is completed before booking another one."
+            ]);
+        }
 
         $appointmentCountsPerDay = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
             ->selectRaw('appointment_date, COUNT(*) as count')

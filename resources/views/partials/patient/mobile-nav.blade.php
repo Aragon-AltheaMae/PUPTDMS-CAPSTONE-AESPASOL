@@ -1,7 +1,7 @@
 <nav id="mobileBottomNav" data-dashboard-url="{{ route('homepage') }}"
     class="bg-white/95 backdrop-blur-md shadow-[0_12px_40px_rgba(0,0,0,0.15)] rounded-full border border-gray-100 transition-colors duration-300 dark:bg-[#0d1117]/95 dark:border-[#21262d] dark:shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
 
-    <div class="grid grid-cols-5 items-center w-full h-[66px] relative z-10 px-1">
+    <div class="grid grid-cols-5 items-center w-full h-[66px] relative px-1">
         @php $isHome = request()->routeIs('homepage') || request()->routeIs('patient.dashboard') || request()->is('patient/dashboard'); @endphp
         <a href="{{ route('homepage') }}"
             class="flex flex-col items-center justify-center w-full h-full relative pb-1 transition-all duration-300 {{ $isHome ? 'text-[#8B0000] dark:text-[#ff6b6b]' : 'text-gray-400 hover:text-gray-600 dark:text-gray-500' }}">
