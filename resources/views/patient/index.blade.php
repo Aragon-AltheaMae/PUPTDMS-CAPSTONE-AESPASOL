@@ -207,7 +207,18 @@ $birthdateDisplay = 'N/A';
                     </div>
 
                     <div class="greeting-banner-actions">
-                        <a href="{{ route('patient.book.appointment') }}" class="ui-btn ui-btn-primary ui-btn-shimmer">
+                        <a href="{{ route('patient.book.appointment') }}" class="ui-btn ui-btn-primary ui-btn-shimmer"
+                            onclick="
+                                if (
+                                    window.UPCOMING_DATA?.exists &&
+                                    ['upcoming', 'rescheduled'].includes(
+                                        String(window.UPCOMING_DATA.status || '').toLowerCase()
+                                    )
+                                ) {
+                                    event.preventDefault();
+                                    window.openModal?.('activeAppointmentModal');
+                                }
+                            ">
                             <i class="fa-solid fa-calendar-plus"></i>
                             <span>Book Appointment</span>
                         </a>
@@ -221,8 +232,8 @@ $birthdateDisplay = 'N/A';
             </div>
         </div>
 
-        <div id="upcomingAppointmentWrapper" class="skeleton-section upcoming-wrapper">
-            <div class="dashboard-glass skeleton-card skeleton-shell skeleton-fade-swap upcoming-wrapper-inner">
+        <div id="upcomingAppointmentWrapper" class="skeleton-section">
+            <div class="card skeleton-card skeleton-shell skeleton-fade-swap">
 
                 <div class="flex items-center justify-between px-6 py-4 bg-gray-50 border-b border-gray-100">
                     <div class="flex items-center gap-3">
@@ -383,74 +394,12 @@ $birthdateDisplay = 'N/A';
                     </div>
                 </div>
             </div>
-
-            <div id="activeAppointmentModal" class="ui-modal modal-theme-warning" role="dialog" aria-modal="true"
-                aria-labelledby="activeAppointmentModalTitle" aria-describedby="activeAppointmentModalDescription">
-                <div class="ui-modal-card modal-sm" tabindex="-1">
-
-                    <div class="modal-hd">
-                        <div class="modal-heading">
-
-                            <div class="modal-icon">
-                                <i class="fa-solid fa-calendar-xmark"></i>
-                            </div>
-
-                            <div class="modal-copy">
-                                <h2 id="activeAppointmentModalTitle" class="modal-title">
-                                    Active Appointment
-                                </h2>
-
-                                <p id="activeAppointmentModalDescription" class="modal-subtitle">
-                                    You already have an active appointment scheduled.
-                                </p>
-                            </div>
-                        </div>
-
-                        <button type="button" class="modal-x" data-active-appointment-close
-                            aria-label="Close active appointment notice">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
-                    </div>
-
-                    <div class="modal-bd">
-                        <div class="global-confirm-alert">
-                            <i class="fa-solid fa-calendar-check"></i>
-
-                            <div>
-                                <p>
-                                    You currently have an active appointment.
-                                </p>
-
-                                <span>
-                                    Please complete or cancel it before booking
-                                    another dental appointment.
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal-ft">
-                        <button type="button" class="ui-btn ui-btn-secondary" data-active-appointment-close>
-                            Close
-                        </button>
-
-                        <a href="{{ route('patient.appointment.index') }}" class="ui-btn ui-btn-primary">
-                            <i class="fa-regular fa-calendar-check"></i>
-                            View My Appointments
-                        </a>
-                    </div>
-
-                </div>
-            </div>
         </div>
 </main>
 
 @if (session('appointment_confirmation'))
 @php
-$appointmentConfirmation =
-session(
-'appointment_confirmation'
-);
+$appointmentConfirmation = session('appointment_confirmation');
 @endphp
 
 <x-booking.confirmed-modal id="appointmentConfirmedModal" eyebrow="Appointment Booking" title="Appointment Confirmed"
@@ -472,11 +421,7 @@ session(
                 </span>
 
                 <strong class="confirmed-modal-schedule-value">
-                    {{
-                    $appointmentConfirmation[
-                    'date'
-                    ] ?? 'N/A'
-                    }}
+                    {{ $appointmentConfirmation['date'] ?? 'N/A' }}
                 </strong>
             </div>
         </div>
@@ -492,11 +437,7 @@ session(
                 </span>
 
                 <strong class="confirmed-modal-schedule-value">
-                    {{
-                    $appointmentConfirmation[
-                    'time'
-                    ] ?? 'N/A'
-                    }}
+                    {{ $appointmentConfirmation['time'] ?? 'N/A' }}
                 </strong>
             </div>
         </div>
@@ -636,37 +577,37 @@ session(
                 );
 
                 document
-                .getElementById(
-                    'appointmentConfirmedDoneBtn'
-                )
-                ?.addEventListener(
-                    'click',
-                    (event) => {
+                    .getElementById(
+                        'appointmentConfirmedDoneBtn'
+                    )
+                    ?.addEventListener(
+                        'click',
+                        (event) => {
 
-                        const button = event.currentTarget;
+                            const button = event.currentTarget;
 
-                        button.blur();
+                            button.blur();
 
-                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
 
-                            window.closeModal?.(
-                                'appointmentConfirmedModal'
-                            );
+                                window.closeModal?.(
+                                    'appointmentConfirmedModal'
+                                );
 
-                            document.documentElement.classList.remove(
-                                'appointment-confirmed-open',
-                                'modal-lock'
-                            );
+                                document.documentElement.classList.remove(
+                                    'appointment-confirmed-open',
+                                    'modal-lock'
+                                );
 
-                            document.body.classList.remove(
-                                'appointment-confirmed-open',
-                                'modal-lock'
-                            );
+                                document.body.classList.remove(
+                                    'appointment-confirmed-open',
+                                    'modal-lock'
+                                );
 
-                        });
+                            });
 
-                    }
-                );
+                        }
+                    );
             }
         );
     @endif
@@ -770,97 +711,11 @@ session(
     var ROUTE_RECORD = "{{ route('patient.record') }}";
 
     @if (session('activeAppointmentModal'))
-        document.addEventListener(
-            'DOMContentLoaded',
-            function () {
-                const modal =
-                    document.getElementById(
-                        'activeAppointmentModal'
-                    );
-
-                if (!modal) {
-                    return;
-                }
-
-                const openModal = () => {
-                    modal.classList.remove('closing');
-                    modal.classList.add('open');
-
-                    document.documentElement
-                        .classList.add('modal-lock');
-
-                    document.body
-                        .classList.add('modal-lock');
-
-                    requestAnimationFrame(() => {
-                        modal
-                            .querySelector('.ui-modal-card')
-                            ?.focus();
-                    });
-                };
-
-                const closeModal = () => {
-                    if (
-                        !modal.classList.contains('open')
-                    ) {
-                        return;
-                    }
-
-                    modal.classList.add('closing');
-
-                    window.setTimeout(() => {
-                        modal.classList.remove(
-                            'open',
-                            'closing'
-                        );
-
-                        document.documentElement
-                            .classList.remove(
-                                'modal-lock'
-                            );
-
-                        document.body
-                            .classList.remove(
-                                'modal-lock'
-                            );
-                    }, 170);
-                };
-
-                modal
-                    .querySelectorAll(
-                        '[data-active-appointment-close]'
-                    )
-                    .forEach(button => {
-                        button.addEventListener(
-                            'click',
-                            closeModal
-                        );
-                    });
-
-                modal.addEventListener(
-                    'click',
-                    event => {
-                        if (event.target === modal) {
-                            closeModal();
-                        }
-                    }
-                );
-
-                document.addEventListener(
-                    'keydown',
-                    event => {
-                        if (
-                            event.key === 'Escape' &&
-                            modal.classList.contains('open')
-                        ) {
-                            closeModal();
-                        }
-                    }
-                );
-
-                openModal();
-            }
-        );
+        document.addEventListener('DOMContentLoaded', function () {
+            window.openModal?.(
+                'activeAppointmentModal'
+            );
+        });
     @endif
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -1142,124 +997,188 @@ session(
     }
 
     function renderUpcomingAppointment() {
-        var wrapper = document.getElementById('upcomingAppointmentWrapper');
-        if (!wrapper) return;
-
-        var d = UPCOMING_DATA;
-
-        if (d.exists) {
-            var statusClass = d.isRescheduled ?
-                'status-rescheduled' :
-                'status-upcoming';
-
-            window.swapSkeletonContent('upcomingAppointmentWrapper',
-                '<div class="upcoming-card-polished upcoming-appointment-card shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">' +
-
-                '<div class="px-4 sm:px-5 py-4 sm:py-4.5 mb-3">' +
-                '<div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_auto] gap-4 xl:gap-5 items-center">' +
-
-                '<div class="min-w-0">' +
-                '<div class="flex items-start gap-3">' +
-
-                '<div class="relative flex-shrink-0 mt-0.5">' +
-                '<div class="upcoming-tooth-glass w-12 h-12 rounded-[0.95rem] text-white flex items-center justify-center">' +
-                '<i class="fa-solid fa-tooth text-[15px] relative z-[1] drop-shadow-[0_1px_2px_rgba(0,0,0,0.22)]"></i>' +
-                '</div>' +
-                '<span class="upcoming-live-dot absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full ' +
-                (d.isRescheduled ? 'bg-yellow-500' : 'bg-green-500') +
-                ' border-2 border-white dark:border-[#161B22]"></span>' +
-                '</div>' +
-
-                '<div class="min-w-0 flex-1">' +
-                '<div class="flex flex-wrap items-center gap-2">' +
-                '<h3 class="upcoming-title leading-tight truncate">' +
-                window.escapeHtml(d.service) + '</h3>' +
-                '<span class="status-pill ' + statusClass + '">' +
-                '<span class="status-dot"></span>' +
-                window.escapeHtml(d.status) +
-                '</span>' +
-                '</div>' +
-
-                '<div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 upcoming-meta">' +
-                '<span class="inline-flex items-center gap-2">' +
-                '<i class="fa-regular fa-calendar upcoming-meta-icon"></i>' +
-                '<span class="font-medium">' + window.escapeHtml(d.date) + '</span>' +
-                '</span>' +
-
-                '<span class="inline-flex items-center gap-2">' +
-                '<i class="fa-regular fa-clock upcoming-meta-icon"></i>' +
-                '<span class="font-medium">' + window.escapeHtml(d.time_fmt) + '</span>' +
-                '</span>' +
-
-                '<span class="inline-flex items-center gap-2 min-w-0">' +
-                '<i class="fa-solid fa-user-doctor upcoming-meta-icon"></i>' +
-                '<span class="font-medium truncate">' + window.escapeHtml(d.dentist) + '</span>' +
-                '</span>' +
-                '</div>' +
-
-                '<div class="mt-3 flex items-center gap-3">' +
-                '<div class="h-[2px] w-10 rounded-full bg-gradient-to-r from-red-200 to-red-300 dark:from-red-900/50 dark:to-red-800/50"></div>' +
-                '<span class="text-[11px] font-bold uppercase tracking-[0.18em] upcoming-meta-icon">Upcoming Visit</span>' +
-                '</div>' +
-                '</div>' +
-                '</div>' +
-                '</div>' +
-
-                '<div class="xl:min-w-[180px]">' +
-                '<div class="flex flex-col sm:flex-row xl:flex-col items-stretch gap-2.5">' +
-                '<div class="upcoming-reminder-chip">' +
-                '<span class="upcoming-reminder-icon">' +
-                '<i class="fa-regular fa-bell text-[12px]"></i>' +
-                '</span>' +
-                '<span class="text-[0.76rem] font-bold upcoming-reminder-text">Please arrive 10 minutes early</span>' +
-                '</div>' +
-
-                '<a href="' + window.escapeHtml(d.indexUrl) +
-                '" class="ui-btn ui-btn-primary">' +
-                '<span>Manage Appointment</span>' +
-                '<i class="fa-solid fa-arrow-right text-[11px]"></i>' +
-                '</a>' +
-                '</div>' +
-                '</div>' +
-
-                '</div>' +
-                '</div>' +
-
-                '</div>'
+        const wrapper =
+            document.getElementById(
+                'upcomingAppointmentWrapper'
             );
+
+        if (!wrapper) {
             return;
         }
 
-        window.swapSkeletonContent('upcomingAppointmentWrapper',
-            '<div class="upcoming-card-polished upcoming-appointment-card shadow-sm overflow-hidden">' +
-            '<div class="px-4 sm:px-5 py-4">' +
-            '<div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_auto] gap-4 items-center">' +
+        const d = UPCOMING_DATA;
 
-            '<div class="flex items-start gap-3">' +
-            '<div class="upcoming-tooth-glass w-12 h-12 rounded-[0.95rem] text-white flex items-center justify-center flex-shrink-0">' +
-            '<i class="fa-regular fa-calendar text-base relative z-[1] drop-shadow-[0_1px_2px_rgba(0,0,0,0.22)]"></i>' +
-            '</div>' +
+        if (d.exists) {
+            const statusClass =
+                d.isRescheduled
+                    ? 'status-rescheduled'
+                    : 'status-upcoming';
+
+            window.swapSkeletonContent(
+                'upcomingAppointmentWrapper',
+
+                '<section class="card">' +
+
+                '<div class="card-header">' +
+
+                '<div class="card-header-left">' +
+
+                '<span class="card-header-icon ' +
+                statusClass +
+                '">' +
+                '<i class="fa-solid fa-tooth"></i>' +
+                '</span>' +
+
+                '<div class="min-w-0">' +
+
+                '<div class="flex flex-wrap items-center gap-2">' +
+
+                '<h3 class="card-title">' +
+                window.escapeHtml(
+                    d.service
+                ) +
+                '</h3>' +
+
+                '<span class="status-pill ' +
+                statusClass +
+                '">' +
+
+                '<span class="status-dot"></span>' +
+
+                window.escapeHtml(
+                    d.status
+                ) +
+
+                '</span>' +
+
+                '</div>' +
+
+                '<div class="card-subtitle flex flex-wrap items-center gap-x-4 gap-y-1">' +
+
+                '<span class="inline-flex items-center gap-1.5">' +
+                '<i class="fa-regular fa-calendar"></i>' +
+                window.escapeHtml(
+                    d.date
+                ) +
+                '</span>' +
+
+                '<span class="inline-flex items-center gap-1.5">' +
+                '<i class="fa-regular fa-clock"></i>' +
+                window.escapeHtml(
+                    d.time_fmt
+                ) +
+                '</span>' +
+
+                '<span class="inline-flex items-center gap-1.5 min-w-0">' +
+                '<i class="fa-solid fa-user-doctor"></i>' +
+                '<span class="truncate">' +
+                window.escapeHtml(
+                    d.dentist
+                ) +
+                '</span>' +
+                '</span>' +
+
+                '</div>' +
+
+                '</div>' +
+
+                '</div>' +
+
+                '</div>' +
+
+
+                '<div class="card-body">' +
+
+                '<div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_auto] gap-3 items-center">' +
+
+                '<div class="info-card flex items-center gap-3">' +
+
+                '<span class="card-header-icon ' +
+                statusClass +
+                '">' +
+                '<i class="fa-regular fa-bell"></i>' +
+                '</span>' +
+
+                '<div class="min-w-0">' +
+
+                '<div class="card-title">' +
+                'Appointment Reminder' +
+                '</div>' +
+
+                '<div class="card-subtitle">' +
+                'Please arrive 10 minutes early.' +
+                '</div>' +
+
+                '</div>' +
+
+                '</div>' +
+
+
+                '<a href="' +
+                window.escapeHtml(
+                    d.indexUrl
+                ) +
+                '" class="ui-btn ui-btn-primary">' +
+
+                '<span>Manage Appointment</span>' +
+                '<i class="fa-solid fa-arrow-right"></i>' +
+
+                '</a>' +
+
+                '</div>' +
+
+                '</div>' +
+
+                '</section>'
+            );
+
+            return;
+        }
+
+
+        window.swapSkeletonContent(
+            'upcomingAppointmentWrapper',
+
+            '<section class="card">' +
+
+            '<div class="card-header">' +
+
+            '<div class="card-header-left">' +
+
+            '<span class="card-header-icon">' +
+            '<i class="fa-regular fa-calendar"></i>' +
+            '</span>' +
 
             '<div class="min-w-0">' +
-            '<h3 class="text-lg sm:text-[1.1rem] font-extrabold upcoming-title">No upcoming appointment</h3>' +
-            '<p class="mt-1 upcoming-description leading-relaxed max-w-[560px]">Choose a preferred date and time from the calendar, or book now to secure your next dental visit.</p>' +
-            '<div class="mt-3 flex items-center gap-3">' +
-            '<div class="upcoming-ready-line h-[2px] w-10 rounded-full"></div>' +
-            '<span class="text-[11px] font-bold uppercase tracking-[0.18em] upcoming-meta-icon">Ready when you are</span>' +
-            '</div>' +
-            '</div>' +
+
+            '<h3 class="card-title">' +
+            'No upcoming appointment' +
+            '</h3>' +
+
+            '<p class="card-subtitle">' +
+            'Choose a preferred date and time to schedule your next dental visit.' +
+            '</p>' +
+
             '</div>' +
 
-            '<div class="flex flex-col sm:flex-row items-stretch gap-2.5 xl:min-w-[180px]">' +
-            '<button type="button" onclick="scrollToCalendar(event)" class="ui-btn ui-btn-primary">' +
-            '<i class="fa-solid fa-arrow-down"></i>' +
+            '</div>' +
+
+            '</div>' +
+
+            '<div class="card-body">' +
+
+            '<button type="button" ' +
+            'onclick="scrollToCalendar(event)" ' +
+            'class="ui-btn ui-btn-primary ui-btn-block">' +
+
+            '<i class="fa-solid fa-calendar-days"></i>' +
             '<span>Check Available Dates</span>' +
+
             '</button>' +
-            '</div>' +
 
             '</div>' +
-            '</div>' +
-            '</div>'
+
+            '</section>'
         );
     }
 
@@ -1353,9 +1272,9 @@ session(
 
             '<span class="patient-profile-emergency-relation">' +
             (
-                pData.emergencyRelation
-                    ? '(' + window.escapeHtml(pData.emergencyRelation) + ')'
-                    : ''
+                pData.emergencyRelation ?
+                    '(' + window.escapeHtml(pData.emergencyRelation) + ')' :
+                    ''
             ) +
             '</span>' +
 
@@ -1421,9 +1340,9 @@ session(
 
             '<span class="patient-profile-value">' +
             window.escapeHtml(
-                pData.age
-                    ? pData.age + ' yrs'
-                    : 'N/A'
+                pData.age ?
+                    pData.age + ' yrs' :
+                    'N/A'
             ) +
 
             '<small>' +
@@ -1766,18 +1685,18 @@ session(
 
                 '<span class="status-pill ' +
                 (
-                    (r.status || '').toLowerCase() === 'completed'
-                        ? 'status-completed'
-                        : 'status-cancelled'
+                    (r.status || '').toLowerCase() === 'completed' ?
+                        'status-completed' :
+                        'status-cancelled'
                 ) +
                 '">' +
 
                 '<span class="status-dot"></span>' +
 
                 window.escapeHtml(
-                    (r.status || '').toLowerCase() === 'completed'
-                        ? 'Completed'
-                        : 'Cancelled'
+                    (r.status || '').toLowerCase() === 'completed' ?
+                        'Completed' :
+                        'Cancelled'
                 ) +
 
                 '</span>' +

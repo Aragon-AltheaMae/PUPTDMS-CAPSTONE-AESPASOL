@@ -722,11 +722,6 @@
     line-height: 1.15;
 }
 
-.greeting-name-line:hover {
-    letter-spacing: .3px;
-    transition: letter-spacing .25s ease;
-}
-
 .dashboard-greeting-copy p,
 .greeting-banner-copy p {
     color: rgba(255, 255, 255, .92);
@@ -869,7 +864,6 @@
         font-size: clamp(0.98rem, 4.9vw, 1.18rem) !important;
         line-height: 1.05 !important;
         font-weight: 900 !important;
-        letter-spacing: -0.055em !important;
     }
 
     #mainContent #patientName,
@@ -923,8 +917,8 @@
     body.role-patient #mainContent .greeting-banner-actions>a {
         width: 100% !important;
         min-height: 38px !important;
-        padding: 0.55rem 0.85rem !important;
-        font-size: 0.78rem !important;
+        padding: 0.45rem 0.85rem !important;
+        font-size: 0.58rem !important;
         line-height: 1 !important;
     }
 }

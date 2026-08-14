@@ -2103,7 +2103,6 @@
     .greeting-title {
         font-size: 0.86rem !important;
         line-height: 1.08 !important;
-        letter-spacing: -0.02em !important;
         max-width: 100% !important;
     }
 
@@ -2124,7 +2123,6 @@
         font-size: clamp(1rem, 5vw, 1.16rem) !important;
         line-height: 1.04 !important;
         font-weight: 900 !important;
-        letter-spacing: -0.06em !important;
     }
 
     .greeting-name-prefix,
