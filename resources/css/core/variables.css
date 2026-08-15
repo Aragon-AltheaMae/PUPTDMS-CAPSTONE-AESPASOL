@@ -226,6 +226,64 @@
     --sidebar-icon-bg: rgba(244, 2, 2, 0.07);
     --sidebar-muted-text: #b0b7c3;
 
+    --sidebar-item-text: var(--sidebar-link-text);
+    --sidebar-item-muted: var(--sidebar-muted-text);
+
+    --sidebar-icon-color: var(--crimson);
+    --sidebar-icon-surface: var(--sidebar-icon-bg);
+    --sidebar-icon-border: transparent;
+
+    --sidebar-hover-surface: rgba(139, 0, 0, .065);
+    --sidebar-hover-text: var(--crimson);
+    --sidebar-hover-icon-surface: rgba(139, 0, 0, .08);
+    --sidebar-hover-icon-border: rgba(139, 0, 0, .30);
+    --sidebar-hover-icon-color: var(--crimson);
+
+    --sidebar-active-from: var(--crimson);
+    --sidebar-active-to: var(--crimson-dark);
+    --sidebar-active-text: #ffffff;
+    --sidebar-active-icon-surface: rgba(255, 255, 255, .20);
+    --sidebar-active-icon-color: #ffffff;
+
+    --sidebar-tooltip-bg-from: var(--crimson);
+    --sidebar-tooltip-bg-to: var(--crimson-dark);
+    --sidebar-tooltip-text: #ffffff;
+
+    --sidebar-section-text: var(--crimson);
+    --sidebar-section-subtext: var(--text-3);
+
+    --sidebar-divider: var(--drawer-footer-border);
+
+    --sidebar-flyout-bg: var(--card);
+    --sidebar-flyout-border: var(--border);
+    --sidebar-flyout-text: var(--text-2);
+    --sidebar-flyout-muted: var(--text-3);
+
+    /* Mobile drawer */
+    --drawer-section-text: var(--crimson);
+    --drawer-link-text: var(--sidebar-link-text);
+
+    --drawer-icon-bg: var(--sidebar-icon-bg);
+    --drawer-icon-color: var(--crimson);
+
+    --drawer-hover-bg: rgba(139, 0, 0, .065);
+    --drawer-hover-text: var(--crimson);
+    --drawer-hover-icon-bg: rgba(139, 0, 0, .08);
+    --drawer-hover-icon-border: rgba(139, 0, 0, .30);
+    --drawer-hover-icon-color: var(--crimson);
+
+    /* Logout */
+    --sidebar-logout-bg-start: #fff7f7;
+    --sidebar-logout-bg-end: #ffffff;
+    --sidebar-logout-border: rgba(220, 38, 38, .14);
+    --sidebar-logout-text: #dc2626;
+    --sidebar-logout-icon-bg: rgba(220, 38, 38, .10);
+
+    --sidebar-logout-hover-start: #dc2626;
+    --sidebar-logout-hover-end: #991b1b;
+    --sidebar-logout-hover-text: #ffffff;
+    --sidebar-logout-hover-icon-bg: rgba(255, 255, 255, .16);
+
     --drawer-bg: #ffffff;
     --drawer-footer-border: #f3f4f6;
     --drawer-overlay-bg: rgba(0, 0, 0, .45);
@@ -416,7 +474,59 @@
 
     --sidebar-icon-bg: rgba(139, 0, 0, 0.18);
 
-    --sidebar-muted-text: #8f8f8f;
+    --sidebar-muted-text: #c4c2c2;
+
+    --sidebar-item-text: var(--sidebar-link-text);
+    --sidebar-item-muted: var(--sidebar-muted-text);
+
+    --sidebar-icon-color: #fca5a5;
+    --sidebar-icon-surface: var(--sidebar-icon-bg);
+    --sidebar-icon-border: rgba(248, 113, 113, .08);
+
+    --sidebar-hover-surface: rgba(139, 0, 0, .20);
+    --sidebar-hover-text: #fca5a5;
+    --sidebar-hover-icon-surface: rgba(139, 0, 0, .38);
+    --sidebar-hover-icon-border: rgba(252, 165, 165, .32);
+    --sidebar-hover-icon-color: #ffffff;
+
+    --sidebar-active-text: #ffffff;
+    --sidebar-active-icon-surface: rgba(255, 255, 255, .20);
+    --sidebar-active-icon-color: #ffffff;
+
+    --sidebar-section-text: #c4c2c2;
+    --sidebar-section-subtext: var(--text-3);
+
+    --sidebar-divider: var(--border);
+
+    --sidebar-flyout-bg: var(--card);
+    --sidebar-flyout-border: var(--border);
+    --sidebar-flyout-text: #d1d5db;
+    --sidebar-flyout-muted: #c4c2c2;
+
+    /* Mobile drawer */
+    --drawer-section-text: #fdc8c8;
+    --drawer-link-text: #d1d5db;
+
+    --drawer-icon-bg: var(--sidebar-icon-bg);
+    --drawer-icon-color: #fca5a5;
+
+    --drawer-hover-bg: rgba(139, 0, 0, .20);
+    --drawer-hover-text: #fca5a5;
+    --drawer-hover-icon-bg: rgba(139, 0, 0, .38);
+    --drawer-hover-icon-border: rgba(252, 165, 165, .32);
+    --drawer-hover-icon-color: #ffffff;
+
+    /* Logout */
+    --sidebar-logout-bg-start: rgba(127, 29, 29, .22);
+    --sidebar-logout-bg-end: rgba(69, 10, 10, .20);
+    --sidebar-logout-border: rgba(248, 113, 113, .22);
+    --sidebar-logout-text: #fca5a5;
+    --sidebar-logout-icon-bg: rgba(248, 113, 113, .14);
+
+    --sidebar-logout-hover-start: #b91c1c;
+    --sidebar-logout-hover-end: #7f1d1d;
+    --sidebar-logout-hover-text: #ffffff;
+    --sidebar-logout-hover-icon-bg: rgba(255, 255, 255, .14);
 
     --drawer-bg: #151515;
     --drawer-footer-border: rgba(255, 255, 255, 0.09);
