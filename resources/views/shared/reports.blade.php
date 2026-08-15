@@ -672,8 +672,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
                     <div class="stat-grid mb-8">
 
-                        <a href="{{ route('dentist.dentist.patients') }}" class="stat-card s-crimson">
-
+                        <a href="{{ route('dentist.dentist.patients') }}" class="stat-card s-crimson stat-card-link">
                             <div class="stat-card-info">
                                 <div class="stat-label">Patients This Month</div>
 
@@ -696,9 +695,13 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             <div class="stat-icon-wrapper">
                                 <i class="fa-solid fa-users"></i>
                             </div>
+
+                            <span class="stat-card-link-indicator" aria-hidden="true">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </span>
                         </a>
 
-                        <a href="{{ route('dentist.dentist.appointments') }}" class="stat-card s-amber">
+                        <a href="{{ route('dentist.dentist.appointments') }}" class="stat-card s-amber stat-card-link">
 
                             <div class="stat-card-info">
                                 <div class="stat-label">Appointments Today</div>
@@ -726,6 +729,10 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             <div class="stat-icon-wrapper">
                                 <i class="fa-solid fa-calendar-check"></i>
                             </div>
+
+                            <span class="stat-card-link-indicator" aria-hidden="true">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </span>
                         </a>
 
                         <div class="stat-card s-red">
@@ -748,7 +755,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             </div>
                         </div>
 
-                        <a href="{{ route('dentist.dentist.inventory') }}" class="stat-card s-amber">
+                        <a href="{{ route('dentist.dentist.inventory') }}" class="stat-card s-amber stat-card-link">
                             <div class="stat-card-info">
                                 <div class="stat-label">
                                     Low Stock Items
@@ -776,6 +783,10 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             <div class="stat-icon-wrapper">
                                 <i class="fa-solid fa-triangle-exclamation"></i>
                             </div>
+
+                            <span class="stat-card-link-indicator" aria-hidden="true">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </span>
                         </a>
                     </div>
 
@@ -833,7 +844,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                                     </div>
                                 </div>
 
-                                <div class="card-header-right w-full sm:w-48">
+                                <div class="card-header-right global-select-compact">
                                     <select id="gadPeriodSelect" class="js-custom-select"
                                         data-placeholder="Select period">
 
@@ -871,7 +882,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                                     </div>
                                 </div>
 
-                                <div class="card-header-right w-48 max-w-full">
+                                <div class="card-header-right global-select-compact">
                                     <select id="weeklyPeriodSelect" class="js-custom-select"
                                         data-placeholder="Select period">
 
@@ -1021,47 +1032,73 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
                         <div class="card-body">
                             @if ($documentTemplates->count())
-                            <div class="printable-template-grid">
-                                @foreach ($documentTemplates as $template)
-                                <article class="printable-template-item">
-                                    <div class="printable-template-main">
-                                        <span class="printable-template-icon">
-                                            <i class="fa-solid fa-file-medical"></i>
-                                        </span>
 
-                                        <div class="printable-template-copy">
-                                            <h3 class="printable-template-title">
-                                                {{ $template->name }}
-                                            </h3>
+                            <div id="printableFormsCarousel" class="printable-forms-carousel" data-printable-carousel>
+                                <div class="printable-carousel-toolbar" data-printable-toolbar>
+                                    <button type="button" class="card-arrow-btn printable-carousel-btn"
+                                        data-printable-prev aria-label="Previous printable forms"
+                                        data-tooltip="Previous forms">
+                                        <i class="fa-solid fa-chevron-left"></i>
+                                    </button>
 
-                                            <p class="printable-template-code">
-                                                {{ $template->code ?: 'Template Code N/A' }}
-                                            </p>
+                                    <span class="printable-carousel-counter" data-printable-counter>
+                                        1 / 1
+                                    </span>
 
-                                            <div class="printable-template-meta">
-                                                <span class="status-pill s-active">
-                                                    {{ Str::headline($template->document_type) }}
-                                                </span>
+                                    <button type="button" class="card-arrow-btn printable-carousel-btn"
+                                        data-printable-next aria-label="Next printable forms" data-tooltip="Next forms">
+                                        <i class="fa-solid fa-chevron-right"></i>
+                                    </button>
+                                </div>
 
-                                                <span class="status-pill s-neutral">
-                                                    {{ $template->category ?: 'General' }}
-                                                </span>
+                                <div class="printable-template-grid" data-printable-grid>
+                                    @foreach ($documentTemplates as $template)
+                                    <article class="printable-template-item" data-printable-item>
+                                        <div class="printable-template-main">
+                                            <span class="printable-template-icon">
+                                                <i class="fa-solid fa-file-medical"></i>
+                                            </span>
 
-                                                <span class="status-pill s-ongoing">
-                                                    {{ $template->paper_size ?: 'A4' }}
-                                                </span>
+                                            <div class="printable-template-copy">
+                                                <h3 class="printable-template-title">
+                                                    {{ $template->name }}
+                                                </h3>
+
+                                                <p class="printable-template-code">
+                                                    {{ $template->code ?: 'Template Code N/A' }}
+                                                </p>
+
+                                                <div class="printable-template-meta">
+                                                    <span class="status-pill s-active">
+                                                        {{ Str::headline($template->document_type) }}
+                                                    </span>
+
+                                                    <span class="status-pill s-neutral">
+                                                        {{ $template->category ?: 'General' }}
+                                                    </span>
+
+                                                    <span class="status-pill s-ongoing">
+                                                        {{ $template->paper_size ?: 'A4' }}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <a href="{{ route('dentist.dentist.report.templates.print', $template->id) }}"
-                                        target="_blank" rel="noopener" class="ui-btn ui-btn-primary ui-btn-sm">
-                                        <i class="fa-solid fa-print"></i>
-                                        Print
-                                    </a>
-                                </article>
-                                @endforeach
+                                        <a href="{{ route('dentist.dentist.report.templates.print', $template->id) }}"
+                                            target="_blank" rel="noopener" class="ui-btn ui-btn-primary ui-btn-sm"
+                                            data-tooltip="Print form" data-tooltip-tone="view"
+                                            aria-label="Print {{ $template->name }}">
+                                            <i class="fa-solid fa-print"></i>
+
+                                            <span class="printable-print-label">
+                                                Print
+                                            </span>
+                                        </a>
+                                    </article>
+                                    @endforeach
+                                </div>
                             </div>
+
                             @else
                             <div id="printableFormsEmptyState" class="empty-state-host"></div>
                             @endif
@@ -1087,7 +1124,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                                         class="text-center text-[11px] font-bold text-gray-500 mb-4 uppercase tracking-wider">
                                         Medicine
                                         Stock</h3>
-                                    <div class="relative h-[220px] w-full">
+                                    <div class="report-inventory-content">
                                         @if ($medicineItems->count() > 0)
                                         <canvas id="medicinePieChart"></canvas>
                                         @else
@@ -1101,7 +1138,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                                         class="text-center text-[11px] font-bold text-gray-500 mb-4 uppercase tracking-wider">
                                         Medical
                                         Supplies</h3>
-                                    <div class="relative h-[220px] w-full">
+                                    <div class="report-inventory-content">
                                         @if ($suppliesItems->count() > 0)
                                         <canvas id="suppliesPieChart"></canvas>
                                         @else
@@ -1112,7 +1149,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
                                 <div class="col-span-1 bg-gray-50 rounded-xl p-5 low-stock-alert-card">
                                     <div class="low-stock-alert-header flex items-center gap-2 mb-4">
-                                        <span class="low-stock-title-icon">
+                                        <span class="card-header-icon s-danger">
                                             <i class="fa-solid fa-triangle-exclamation"></i>
                                         </span>
                                         <span class="text-sm font-bold text-gray-800">Low Stock Alerts</span>
@@ -1169,13 +1206,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         @endphp
 
                         @if ($hasAnyInventoryData)
-                        <div class="flex flex-col items-center justify-center h-[160px] text-center">
-                            <div class="stock-good-icon">
-                                <i class="fa-solid fa-check"></i>
-                            </div>
-                            <p class="text-sm font-bold text-gray-700">Stock levels are good</p>
-                            <p class="text-xs text-gray-500 mt-1">No items require immediate restocking.</p>
-                        </div>
+                        <div id="inventoryHealthyState" class="empty-state-host"></div>
                         @else
                         <div id="inventoryRecordsEmptyState" class="empty-state-host"></div>
                         @endif
@@ -1580,19 +1611,19 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                 .contains('dark');
 
         const adminChartTextColor = () =>
-            isAdminReportDark()
-                ? '#C9D1D9'
-                : '#374151';
+            isAdminReportDark() ?
+                '#C9D1D9' :
+                '#374151';
 
         const adminChartGridColor = () =>
-            isAdminReportDark()
-                ? 'rgba(255,255,255,0.10)'
-                : 'rgba(148,163,184,0.22)';
+            isAdminReportDark() ?
+                'rgba(255,255,255,0.10)' :
+                'rgba(148,163,184,0.22)';
 
         const adminChartBorderColor = () =>
-            isAdminReportDark()
-                ? '#161B22'
-                : '#ffffff';
+            isAdminReportDark() ?
+                '#161B22' :
+                '#ffffff';
 
         const textColor =
             adminChartTextColor();
@@ -2294,6 +2325,240 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
 @if ($isDentistView)
 <script>
+    function initPrintableFormsCarousel() {
+        const carousel =
+            document.querySelector(
+                '[data-printable-carousel]'
+            );
+
+        if (!carousel) {
+            return;
+        }
+
+        const grid =
+            carousel.querySelector(
+                '[data-printable-grid]'
+            );
+
+        const items =
+            Array.from(
+                carousel.querySelectorAll(
+                    '[data-printable-item]'
+                )
+            );
+
+        const toolbar =
+            carousel.querySelector(
+                '[data-printable-toolbar]'
+            );
+
+        const previousButton =
+            carousel.querySelector(
+                '[data-printable-prev]'
+            );
+
+        const nextButton =
+            carousel.querySelector(
+                '[data-printable-next]'
+            );
+
+        const counter =
+            carousel.querySelector(
+                '[data-printable-counter]'
+            );
+
+        if (!grid || !items.length) {
+            return;
+        }
+
+        const ITEMS_PER_PAGE = 2;
+
+        let currentPage = 0;
+        let animating = false;
+
+        const mobileQuery =
+            window.matchMedia(
+                '(max-width: 700px)'
+            );
+
+        function isMobile() {
+            return mobileQuery.matches;
+        }
+
+        function totalPages() {
+            return Math.ceil(
+                items.length /
+                ITEMS_PER_PAGE
+            );
+        }
+
+        function renderPage() {
+            if (!isMobile()) {
+                items.forEach(item => {
+                    item.hidden = false;
+                });
+
+                if (toolbar) {
+                    toolbar.hidden = true;
+                }
+
+                return;
+            }
+
+            const pages =
+                totalPages();
+
+            currentPage =
+                Math.min(
+                    currentPage,
+                    pages - 1
+                );
+
+            const start =
+                currentPage *
+                ITEMS_PER_PAGE;
+
+            const end =
+                start +
+                ITEMS_PER_PAGE;
+
+            items.forEach(
+                (item, index) => {
+                    item.hidden =
+                        index < start ||
+                        index >= end;
+                }
+            );
+
+            if (toolbar) {
+                toolbar.hidden =
+                    pages <= 1;
+            }
+
+            if (counter) {
+                counter.textContent =
+                    `${currentPage + 1} / ${pages}`;
+            }
+
+            if (previousButton) {
+                previousButton.disabled =
+                    currentPage === 0;
+            }
+
+            if (nextButton) {
+                nextButton.disabled =
+                    currentPage ===
+                    pages - 1;
+            }
+        }
+
+        function changePage(direction) {
+            if (
+                !isMobile() ||
+                animating
+            ) {
+                return;
+            }
+
+            const nextPage =
+                currentPage +
+                direction;
+
+            const pages =
+                totalPages();
+
+            if (
+                nextPage < 0 ||
+                nextPage >= pages
+            ) {
+                return;
+            }
+
+            const reducedMotion =
+                window.matchMedia(
+                    '(prefers-reduced-motion: reduce)'
+                ).matches;
+
+            const outClass =
+                direction > 0
+                    ? 'global-carousel-out-left'
+                    : 'global-carousel-out-right';
+
+            const inClass =
+                direction > 0
+                    ? 'global-carousel-in-right'
+                    : 'global-carousel-in-left';
+
+            if (reducedMotion) {
+                currentPage =
+                    nextPage;
+
+                renderPage();
+
+                return;
+            }
+
+            animating = true;
+
+            grid.classList.add(
+                outClass
+            );
+
+            window.setTimeout(() => {
+                grid.classList.remove(
+                    outClass
+                );
+
+                currentPage =
+                    nextPage;
+
+                renderPage();
+
+                grid.classList.add(
+                    inClass
+                );
+
+                window.setTimeout(() => {
+                    grid.classList.remove(
+                        inClass
+                    );
+
+                    animating = false;
+                }, 280);
+
+            }, 180);
+        }
+
+        previousButton?.addEventListener(
+            'click',
+            () => changePage(-1)
+        );
+
+        nextButton?.addEventListener(
+            'click',
+            () => changePage(1)
+        );
+
+        mobileQuery.addEventListener(
+            'change',
+            () => {
+                currentPage = 0;
+                animating = false;
+
+                grid.classList.remove(
+                    'global-carousel-out-left',
+                    'global-carousel-out-right',
+                    'global-carousel-in-left',
+                    'global-carousel-in-right'
+                );
+
+                renderPage();
+            }
+        );
+
+        renderPage();
+    }
+
     const PATIENT_SEGMENT_DATA = {
         labels: ['Returning Patients', 'New Patients'],
         values: [
@@ -2392,6 +2657,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
         '#641e16',
         '#f1948a'
     ];
+
     const isReportDark = () => document.documentElement.getAttribute('data-theme') === 'dark' || document
         .documentElement.classList.contains('dark');
     const reportChartTextColor = () => isReportDark() ? '#C9D1D9' : '#374151';
@@ -2977,57 +3243,59 @@ $customReportTemplates = collect($customReportTemplates ?? []);
         }
 
         renderReportEmptyState(
-            '#inventoryRecordsEmptyState',
-            {
-                title: 'No inventory records yet',
-                message:
-                    'Add medicine or supply items to monitor low stock alerts.',
-                icon: 'fa-boxes-stacked',
-                actionHtml: `
-                <button
-                    type="button"
-                    class="ui-btn ui-btn-primary ui-btn-sm"
-                    onclick="window.location.assign(
-                        '{{ route('dentist.dentist.inventory') }}'
-                    )"
-                >
-                    <i class="fa-solid fa-plus"></i>
-                    Add Item
-                </button>
-            `
-            }
+            '#inventoryHealthyState', {
+            title: 'Stock levels are good',
+            message: 'No items require immediate restocking.',
+            icon: 'fa-circle-check',
+            className: 'empty-state-compact'
+        }
         );
 
         renderReportEmptyState(
-            '#printableFormsEmptyState',
-            {
-                title: 'No active document templates',
-                message:
-                    'Active clinic forms and certificates will appear here.',
-                icon: 'fa-file-circle-xmark'
-            }
+            '#inventoryRecordsEmptyState', {
+            title: 'No inventory records yet',
+            message: 'Add medicine or supply items to monitor low stock alerts.',
+            icon: 'fa-boxes-stacked',
+            className: 'empty-state-compact',
+
+            actionHtml: `
+            <button
+                type="button"
+                class="ui-btn ui-btn-primary ui-btn-sm"
+                onclick="window.location.assign(
+                    '{{ route('dentist.dentist.inventory') }}'
+                )"
+            >
+                <i class="fa-solid fa-plus"></i>
+                Add Item
+            </button>
+        `
+        }
+        );
+        renderReportEmptyState(
+            '#printableFormsEmptyState', {
+            title: 'No active document templates',
+            message: 'Active clinic forms and certificates will appear here.',
+            icon: 'fa-file-circle-xmark'
+        }
         );
 
         renderReportEmptyState(
-            '#topServicesEmptyState',
-            {
-                title: 'No service data available',
-                message:
-                    'Top performed treatments will appear here.',
-                icon: 'fa-tooth'
-            }
+            '#topServicesEmptyState', {
+            title: 'No service data available',
+            message: 'Top performed treatments will appear here.',
+            icon: 'fa-tooth'
+        }
         );
 
         renderReportEmptyState(
-            '#medicineInventoryEmptyState',
-            {
-                title: 'No medicine stock available',
-                message:
-                    'Add medicines to track inventory levels.',
-                icon: 'fa-pills',
-                className: 'empty-state-compact',
+            '#medicineInventoryEmptyState', {
+            title: 'No medicine stock available',
+            message: 'Add medicines to track inventory levels.',
+            icon: 'fa-pills',
+            className: 'empty-state-compact',
 
-                actionHtml: `
+            actionHtml: `
             <button
                 type="button"
                 class="ui-btn ui-btn-primary ui-btn-sm"
@@ -3039,29 +3307,25 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                 Add Medicine
             </button>
         `
-            }
+        }
         );
 
         renderReportEmptyState(
-            '#patientSegmentEmptyState',
-            {
-                title: 'No patient segment data',
-                message:
-                    'Returning and new patient insights will appear here.',
-                icon: 'fa-user-group'
-            }
+            '#patientSegmentEmptyState', {
+            title: 'No patient segment data',
+            message: 'Returning and new patient insights will appear here.',
+            icon: 'fa-user-group'
+        }
         );
 
         renderReportEmptyState(
-            '#medicalSuppliesEmptyState',
-            {
-                title: 'No medical supplies found',
-                message:
-                    'Add supplies to monitor usage and stock.',
-                icon: 'fa-box-open',
-                className: 'empty-state-compact',
+            '#medicalSuppliesEmptyState', {
+            title: 'No medical supplies found',
+            message: 'Add supplies to monitor usage and stock.',
+            icon: 'fa-box-open',
+            className: 'empty-state-compact',
 
-                actionHtml: `
+            actionHtml: `
             <button
                 type="button"
                 class="ui-btn ui-btn-primary ui-btn-sm"
@@ -3073,7 +3337,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                 Add Supply
             </button>
         `
-            }
+        }
         );
     }
 
@@ -3410,6 +3674,8 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
     document.addEventListener('DOMContentLoaded', function () {
 
+        initPrintableFormsCarousel();
+
         if (window.EmptyState) {
             renderDentistReportEmptyStates();
         } else {
@@ -3726,6 +3992,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
         });
 
         syncReportQuantityState();
+        initPrintableFormsCarousel();
     });
 </script>
 @endif

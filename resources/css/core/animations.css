@@ -1162,6 +1162,124 @@
 
 }
 
+@keyframes upcomingCarouselOutLeft {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(-34px);
+    }
+}
+
+@keyframes upcomingCarouselOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(34px);
+    }
+}
+
+@keyframes upcomingCarouselInRight {
+    from {
+        opacity: 0;
+        transform: translateX(34px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes upcomingCarouselInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-34px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.upcoming-carousel-out-left {
+    animation:
+        upcomingCarouselOutLeft .18s cubic-bezier(.4, 0, 1, 1) both;
+
+    pointer-events: none;
+    will-change: transform, opacity;
+}
+
+.upcoming-carousel-out-right {
+    animation:
+        upcomingCarouselOutRight .18s cubic-bezier(.4, 0, 1, 1) both;
+
+    pointer-events: none;
+    will-change: transform, opacity;
+}
+
+.upcoming-carousel-in-right {
+    animation:
+        upcomingCarouselInRight .28s cubic-bezier(.22, 1, .36, 1) both;
+
+    will-change: transform, opacity;
+}
+
+.upcoming-carousel-in-left {
+    animation:
+        upcomingCarouselInLeft .28s cubic-bezier(.22, 1, .36, 1) both;
+
+    will-change: transform, opacity;
+}
+
+.global-carousel-out-left {
+    animation:
+        upcomingCarouselOutLeft .18s cubic-bezier(.4, 0, 1, 1) both;
+
+    pointer-events: none;
+
+    will-change:
+        transform,
+        opacity;
+}
+
+.global-carousel-out-right {
+    animation:
+        upcomingCarouselOutRight .18s cubic-bezier(.4, 0, 1, 1) both;
+
+    pointer-events: none;
+
+    will-change:
+        transform,
+        opacity;
+}
+
+.global-carousel-in-right {
+    animation:
+        upcomingCarouselInRight .28s cubic-bezier(.22, 1, .36, 1) both;
+
+    will-change:
+        transform,
+        opacity;
+}
+
+.global-carousel-in-left {
+    animation:
+        upcomingCarouselInLeft .28s cubic-bezier(.22, 1, .36, 1) both;
+
+    will-change:
+        transform,
+        opacity;
+}
+
 @media (prefers-reduced-motion: reduce) {
 
     .page-enter,
@@ -1170,7 +1288,15 @@
     .fade-up,
     .fade-in,
     .spin,
-    .dot-pulse {
+    .dot-pulse,
+    .upcoming-carousel-out-left,
+    .upcoming-carousel-out-right,
+    .upcoming-carousel-in-left,
+    .upcoming-carousel-in-right,
+    .global-carousel-out-left,
+    .global-carousel-out-right,
+    .global-carousel-in-left,
+    .global-carousel-in-right {
         animation: none !important;
     }
 

@@ -66,18 +66,16 @@
                                     <i class="fa-solid fa-stethoscope"></i>
                                 </div>
 
-                                <button id="statusBtn" onclick="openStatusModal()"
-                                    class="ui-btn {{ ($clinicStatus ?? 'in') === 'in' ? 'ui-btn-success' : 'ui-btn-danger' }} ui-btn-sm banner-status-btn">
-                                    <span id="statusLabel" class="flex items-center gap-2">
+                                <button id="statusBtn" type="button" onclick="openStatusModal()"
+                                    class="ui-btn {{ ($clinicStatus ?? 'in') === 'in' ? 'ui-btn-success' : 'ui-btn-danger' }} ui-btn-sm"
+                                    data-tooltip="{{ ($clinicStatus ?? 'in') === 'in' ? 'Clinic is open' : 'Clinic is closed' }}"
+                                    data-tooltip-tone="{{ ($clinicStatus ?? 'in') === 'in' ? 'start' : 'cancel' }}">
+                                    <span id="statusDot"
+                                        class="status-dot {{ ($clinicStatus ?? 'in') === 'in' ? 'status-active' : 'status-cancelled' }}"
+                                        aria-hidden="true"></span>
 
-                                        @if (($clinicStatus ?? 'in') === 'in')
-                                            <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-                                            IN
-                                        @else
-                                            <span class="w-2 h-2 bg-white rounded-full"></span>
-                                            OUT
-                                        @endif
-
+                                    <span id="statusLabel">
+                                        {{ strtoupper($clinicStatus ?? 'in') }}
                                     </span>
                                 </button>
                             </div>
@@ -86,7 +84,7 @@
                 </div>
             </div>
 
-            <div id="kpiGridContainer" class="stat-grid dashboard-kpi-grid skeleton-section skeleton-fade-swap">
+            <div id="statCards" class="stat-grid dashboard-kpi-grid skeleton-section skeleton-fade-swap">
                 <div class="skeleton-shell space-y-4">
                     @for ($i = 0; $i < 5; $i++)
                         <div class="rounded-2xl h-32 skeleton-block">
@@ -225,64 +223,118 @@
 
     </main>
 
-    <div id="statusModal"
-        class="fixed inset-0 z-[999] flex items-center justify-center bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
-        <div id="statusModalBox"
-            class="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-0 overflow-hidden scale-90 transition-all duration-300">
-            <div id="modalBanner"
-                class="bg-gradient-to-r from-[#660000] to-[#8B0000] px-6 pt-6 pb-4 text-white text-center">
-                <div id="modalIcon"
-                    class="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl bg-white/20">
-                    <i class="fa-solid fa-door-closed"></i>
+    <div id="statusModal" class="ui-modal modal-theme-danger" aria-hidden="true">
+        <div class="ui-modal-card modal-sm" role="dialog" aria-modal="true" aria-labelledby="statusModalTitle"
+            onclick="event.stopPropagation()">
+
+            <div class="modal-hd">
+
+                <div class="modal-heading">
+
+                    <span id="statusModalIcon" class="modal-icon">
+                        <i class="fa-solid fa-door-closed"></i>
+                    </span>
+
+                    <div class="modal-copy">
+
+                        <h2 id="statusModalTitle" class="modal-title">
+                            Close the Clinic
+                        </h2>
+
+                        <p id="statusModalSubtitle" class="modal-subtitle">
+                            Change your current clinic availability.
+                        </p>
+
+                    </div>
+
                 </div>
-                <h2 id="modalTitle" class="text-xl font-extrabold">Close the Clinic?</h2>
-                <p id="modalSubtitle" class="text-sm opacity-80 mt-1">You are about to mark yourself as
-                    <strong>OUT</strong>
-                </p>
+
+                <button type="button" class="modal-x" onclick="closeStatusModal()"
+                    aria-label="Close clinic status dialog" data-tooltip="Close" data-tooltip-tone="neutral">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
             </div>
-            <div class="px-6 py-5">
-                <p id="modalBody" class="text-sm text-[#555] text-center leading-relaxed">
-                    This will indicate that the clinic is <span class="font-semibold text-red-700">currently closed</span>.
-                    Patients will not be able to book new appointments while you are out.
-                </p>
-                <div class="flex gap-3 mt-5">
-                    <button onclick="closeStatusModal()"
-                        class="flex-1 btn btn-ghost border border-gray-200 rounded-xl font-semibold text-gray-600 hover:bg-gray-100">Cancel</button>
-                    <button id="confirmStatusBtn" onclick="confirmStatus()"
-                        class="flex-1 btn rounded-xl font-bold text-white bg-[#8B0000] hover:bg-[#660000] border-none shadow">Confirm</button>
+
+            <div class="modal-bd">
+
+                <div id="statusModalAlert" class="global-confirm-alert">
+                    <i id="statusModalAlertIcon" class="fa-solid fa-circle-exclamation"></i>
+
+                    <div>
+                        <strong id="statusModalAlertTitle">
+                            Mark clinic as OUT?
+                        </strong>
+
+                        <span id="statusModalBody">
+                            Patients will not be able to book new appointments while the clinic is closed.
+                            All appointments scheduled for today will be marked as cancelled. You can reopen the clinic at
+                            any time.
+                        </span>
+                    </div>
                 </div>
+
             </div>
+
+            <div class="modal-ft">
+
+                <button type="button" class="ui-btn ui-btn-secondary" onclick="closeStatusModal()">
+                    Cancel
+                </button>
+
+                <button id="confirmStatusBtn" type="button" class="ui-btn ui-btn-warning" onclick="confirmStatus()">
+                    <i class="fa-solid fa-check"></i>
+                    Confirm
+                </button>
+
+            </div>
+
         </div>
     </div>
 
-    <div id="dayAppointmentsModal"
-        class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
-        <div id="dayAppointmentsModalBox"
-            class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 p-0 overflow-hidden scale-90 transition-all duration-300">
+    <div id="dayAppointmentsModal" class="ui-modal modal-theme-primary" aria-hidden="true">
+        <div class="ui-modal-card modal-md" role="dialog" aria-modal="true" aria-labelledby="dayAppointmentsModalTitle"
+            onclick="event.stopPropagation()">
 
-            <div class="bg-gradient-to-r from-[#660000] to-[#8B0000] px-6 py-4 text-white">
-                <div class="flex items-start justify-between gap-4">
-                    <div>
-                        <h2 class="text-base font-extrabold">Scheduled Patients</h2>
-                        <p id="dayAppointmentsModalDate" class="text-sm opacity-80 mt-1"></p>
+            <div class="modal-hd">
+
+                <div class="modal-heading">
+
+                    <span class="modal-icon">
+                        <i class="fa-solid fa-users"></i>
+                    </span>
+
+                    <div class="modal-copy">
+                        <h2 id="dayAppointmentsModalTitle" class="modal-title">
+                            Scheduled Patients
+                        </h2>
+
+                        <p id="dayAppointmentsModalDate" class="modal-subtitle"></p>
                     </div>
-                    <button type="button" onclick="closeDayAppointmentsModal()"
-                        class="text-white/80 hover:text-white text-2xl leading-none">
-                        &times;
-                    </button>
+
                 </div>
+
+                <button type="button" class="modal-x" onclick="closeDayAppointmentsModal()"
+                    aria-label="Close scheduled patients" data-tooltip="Close" data-tooltip-tone="neutral">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
             </div>
 
-            <div class="px-6 py-5 max-h-[70vh] overflow-y-auto">
-                <div id="dayAppointmentsModalList" class="space-y-3"></div>
+            <div class="modal-bd">
+
+                <div id="dayAppointmentsModalList" class="scheduled-modal-list"></div>
+
             </div>
 
-            <div class="px-6 pb-5">
-                <button type="button" onclick="closeDayAppointmentsModal()"
-                    class="w-full btn rounded-xl font-semibold border-none bg-gray-100 text-gray-700 hover:bg-gray-200">
+            <div class="modal-ft">
+
+                <button type="button" class="ui-btn ui-btn-secondary ui-btn-sm" onclick="closeDayAppointmentsModal()">
                     Close
                 </button>
+
             </div>
+
         </div>
     </div>
 @endsection
@@ -305,95 +357,203 @@
             let windowStart = new Date(today);
             let selectedKey = dateKey(today);
 
+            let upcomingWindowAnimating = false;
+
+            const UPCOMING_CAROUSEL_OUT_MS = 180;
+            const UPCOMING_CAROUSEL_IN_MS = 280;
+
             function getVisibleDays() {
                 return Array.from({
-                    length: 7
-                }, (_, index) => {
-                    const date = new Date(windowStart);
+                        length: 7
+                    },
+                    (_, index) => {
+                        const date =
+                            new Date(windowStart);
 
-                    date.setDate(
-                        windowStart.getDate() + index
-                    );
+                        date.setDate(
+                            windowStart.getDate() +
+                            index
+                        );
 
-                    return date;
-                });
+                        return date;
+                    }
+                );
             }
 
             function statusClass(status = '') {
                 const s =
-                    String(status || '').toLowerCase();
+                    String(status || '')
+                    .toLowerCase()
+                    .trim();
 
                 if (s.includes('cancel')) {
-                    return 'upcoming-status-cancelled';
+                    return 'status-cancelled';
                 }
 
                 if (s.includes('resched')) {
-                    return 'upcoming-status-rescheduled';
+                    return 'status-rescheduled';
                 }
 
                 if (s.includes('complete')) {
-                    return 'upcoming-status-completed';
+                    return 'status-completed';
                 }
 
-                return 'upcoming-status-upcoming';
+                return 'status-upcoming';
             }
 
-            function avatarClass(status = '') {
-                const s =
-                    String(status || '').toLowerCase();
+            function buildAvatar(appt, name) {
+                const photo =
+                    appt.patientPhotoUrl ||
+                    appt.patient_photo_url ||
+                    appt.profile_photo_url ||
+                    appt.avatar ||
+                    '';
 
-                if (s.includes('cancel')) {
-                    return 'avatar-cancelled';
-                }
-
-                if (s.includes('resched')) {
-                    return 'avatar-rescheduled';
-                }
-
-                if (s.includes('complete')) {
-                    return 'avatar-completed';
-                }
-
-                return 'avatar-upcoming';
+                return `
+<span
+class="
+patient-avatar
+patient-avatar-sm
+"
+data-patient-avatar
+data-patient-name="${escHtml(name)}"
+data-patient-url="${escHtml(photo)}"
+></span>
+`;
             }
 
-            function getInitials(name = 'Unknown') {
-                return String(name)
-                    .trim()
-                    .split(/\s+/)
-                    .map(n => n[0])
-                    .slice(0, 2)
-                    .join('')
-                    .toUpperCase();
+            function initUpcomingAvatars(root) {
+                window.PatientUI
+                    ?.initAvatars
+                    ?.(root);
             }
 
-            function render(selectedDateKey = selectedKey) {
+            function clearUpcomingCarouselClasses(element) {
+                if (!element) return;
+
+                element.classList.remove(
+                    'upcoming-carousel-out-left',
+                    'upcoming-carousel-out-right',
+                    'upcoming-carousel-in-left',
+                    'upcoming-carousel-in-right'
+                );
+            }
+
+            function runUpcomingCarousel(
+                direction,
+                elements,
+                updateContent
+            ) {
+                const targets =
+                    elements.filter(Boolean);
+
+                const reducedMotion =
+                    window.matchMedia(
+                        '(prefers-reduced-motion: reduce)'
+                    ).matches;
+
+                if (
+                    !direction ||
+                    !targets.length ||
+                    reducedMotion
+                ) {
+                    updateContent();
+                    return;
+                }
+
+                upcomingWindowAnimating = true;
+
+                const outClass =
+                    direction > 0 ?
+                    'upcoming-carousel-out-left' :
+                    'upcoming-carousel-out-right';
+
+                const inClass =
+                    direction > 0 ?
+                    'upcoming-carousel-in-right' :
+                    'upcoming-carousel-in-left';
+
+                targets.forEach(element => {
+                    clearUpcomingCarouselClasses(
+                        element
+                    );
+
+                    element.classList.add(
+                        outClass
+                    );
+                });
+
+                window.setTimeout(() => {
+                    targets.forEach(element => {
+                        element.classList.remove(
+                            outClass
+                        );
+                    });
+
+                    updateContent();
+
+                    requestAnimationFrame(() => {
+                        targets.forEach(element => {
+                            clearUpcomingCarouselClasses(
+                                element
+                            );
+
+                            element.classList.add(
+                                inClass
+                            );
+                        });
+
+                        window.setTimeout(() => {
+                            targets.forEach(element => {
+                                element.classList.remove(
+                                    inClass
+                                );
+                            });
+
+                            upcomingWindowAnimating =
+                                false;
+                        }, UPCOMING_CAROUSEL_IN_MS);
+                    });
+                }, UPCOMING_CAROUSEL_OUT_MS);
+            }
+
+            function render(
+                selectedDateKey = selectedKey,
+                carouselDirection = 0
+            ) {
                 const days = getVisibleDays();
 
                 const visibleKeys =
                     days.map(dateKey);
 
                 if (
-                    !visibleKeys.includes(selectedDateKey)
+                    !visibleKeys.includes(
+                        selectedDateKey
+                    )
                 ) {
                     selectedDateKey =
                         visibleKeys[0];
                 }
 
-                selectedKey = selectedDateKey;
+                selectedKey =
+                    selectedDateKey;
 
                 const appointments =
                     apptDetails[selectedKey] || [];
 
                 const dateButtons =
-                    days.map(d => {
-                        const key = dateKey(d);
+                    days
+                    .map(d => {
+                        const key =
+                            dateKey(d);
 
                         const active =
                             key === selectedKey;
 
                         const count =
-                            (apptDetails[key] || []).length;
+                            (
+                                apptDetails[key] || []
+                            ).length;
 
                         const hasAppointments =
                             count > 0;
@@ -403,35 +563,44 @@
 
                         return `
 <button
-    type="button"
-    onclick="renderUpcomingAppointmentsDay('${key}')"
-    class="
-        upcoming-date-btn
-        ${active ? 'active' : ''}
-        ${hasAppointments ? 'has-appointments' : ''}
-        ${isToday ? 'is-today' : ''}
-    "
+type="button"
+onclick="renderUpcomingAppointmentsDay('${key}')"
+class="
+upcoming-date-btn
+${active ? 'active status-today' : ''}
+${hasAppointments ? 'has-appointments' : ''}
+${isToday ? 'is-today' : ''}
+"
 >
-    ${hasAppointments
-                            ? `<span class="upcoming-date-badge">${count}</span>`
-                            : ''
-                        }
+${
+hasAppointments
+? `
+    <span class="upcoming-date-badge">
+    ${count}
+    </span>
+    `
+: ''
+}
 
-    <div class="text-sm font-extrabold">
-        ${d.getDate()}
-    </div>
+<div class="text-sm font-extrabold">
+${d.getDate()}
+</div>
 
-    <div class="text-[10px] font-semibold opacity-70">
-        ${d.toLocaleDateString(
-                            'en-US',
-                            { weekday: 'short' }
-                        )}
-    </div>
+<div class="text-[10px] font-semibold opacity-70">
+${d.toLocaleDateString(
+'en-US',
+{
+weekday: 'short'
+}
+)}
+</div>
 </button>
 `;
-                    }).join('');
+                    })
+                    .join('');
 
-                const items = appointments.length ?
+                const items =
+                    appointments.length ?
                     appointments
                     .slice(0, 3)
                     .map(appt => {
@@ -439,106 +608,89 @@
                             appt.name ||
                             'Unknown Patient';
 
-                        const initials =
-                            getInitials(name);
-
-                        const photo =
-                            appt.patientPhotoUrl ||
-                            appt.profile_photo_url ||
-                            appt.avatar ||
-                            null;
-
                         return `
 <a
-    href="${
-        appt.patientProfileUrl ||
-        '{{ route('dentist.dentist.appointments') }}'
-    }"
-    class="
-        upcoming-item
-        hover:bg-red-50/40
-        rounded-xl
-        transition
-    "
+href="${
+appt.patientProfileUrl ||
+'{{ route('dentist.dentist.appointments') }}'
+}"
+class="
+upcoming-item
+hover:bg-red-50/40
+rounded-xl
+transition
+"
 >
-    <span
-        class="
-            upcoming-time-dot
-            ${statusClass(appt.status)}
-        "
-    ></span>
+<span
+class="
+status-dot
+${statusClass(appt.status)}
+"
+aria-hidden="true"
+></span>
 
-    <div
-        class="
-            patient-avatar
-            patient-avatar-sm
-            ${avatarClass(appt.status)}
-        "
-    >
-        ${
-            photo
-                ? `
-                                                    <img
-                                                        src="${escHtml(photo)}"
-                                                        alt="${escHtml(name)}"
-                                                    >
-                                                `
-                : `
-                                                    <span>
-                                                        ${escHtml(initials)}
-                                                    </span>
-                                                `
-        }
-    </div>
+${buildAvatar(
+appt,
+name
+)}
 
-    <div class="flex-1 min-w-0">
-        <div
-            class="
-                flex
-                items-center
-                justify-between
-                gap-2
-            "
-        >
-            <p
-                class="
-                    text-sm
-                    font-bold
-                    text-gray-800
-                    truncate
-                "
-            >
-                ${escHtml(name)}
-            </p>
+<div class="flex-1 min-w-0">
+<div
+class="
+flex
+items-center
+justify-between
+gap-2
+"
+>
+<p
+class="
+text-sm
+font-bold
+text-gray-800
+truncate
+"
+>
+${escHtml(name)}
+</p>
 
-            <span
-                class="
-                    text-[11px]
-                    font-bold
-                    text-[#8B0000]
-                    flex-shrink-0
-                "
-            >
-                ${escHtml(
-                    appt.time || '—'
-                )}
-            </span>
-        </div>
+<span
+class="
+text-[11px]
+font-bold
+text-[#8B0000]
+flex-shrink-0
+"
+>
+${escHtml(
+appt.time ||
+'—'
+)}
+</span>
+</div>
 
-        <p class="text-xs text-gray-500 truncate">
-            ${escHtml(
-                appt.service ||
-                'General Service'
-            )}
-        </p>
-    </div>
+<p
+class="
+text-xs
+text-gray-500
+truncate
+"
+>
+${escHtml(
+appt.service ||
+'General Service'
+)}
+</p>
+</div>
 </a>
 `;
                     })
                     .join('') :
                     (
-                        window.EmptyState?.buildHtml ?
-                        window.EmptyState.buildHtml({
+                        window.EmptyState
+                        ?.buildHtml ?
+                        window.EmptyState
+                        .buildHtml({
                             title: 'No appointments for this day',
 
                             message: 'Scheduled appointments for this date will appear here.',
@@ -550,129 +702,238 @@
                         ''
                     );
 
-                const firstVisibleDate = days[0];
+                const firstVisibleDate =
+                    days[0];
+
                 const lastVisibleDate =
-                    days[days.length - 1];
+                    days[
+                        days.length - 1
+                    ];
 
                 const rangeLabel =
                     `${firstVisibleDate.toLocaleDateString(
-                    'en-US',
-                    {
-                        month: 'short',
-                        day: 'numeric'
-                    }
-                )} – ${lastVisibleDate.toLocaleDateString(
-                    'en-US',
-                    {
-                        month: 'short',
-                        day: 'numeric'
-                    }
-                )
-                }`;
-
-                const html = `
-<article class="card upcoming-card">
-
-<header class="card-header">
-
-    <div class="card-header-left">
-        <div class="card-header-icon">
-            <i class="fa-regular fa-calendar-days"></i>
-        </div>
-
-        <div>
-            <h3 class="card-title">
-                Upcoming Appointments
-            </h3>
-
-            <p class="upcoming-range-label">
-                ${rangeLabel}
-            </p>
-        </div>
-    </div>
-
-</header>
-
-<div class="card-body upcoming-card-body">
-
-    <div class="upcoming-date-navigation">
-
-        <button
-            type="button"
-            class="upcoming-date-nav-btn"
-            onclick="changeUpcomingAppointmentWindow(-7)"
-            aria-label="Previous 7 days"
-            data-tooltip="Previous 7 days"
-        >
-            <i class="fa-solid fa-chevron-left"></i>
-        </button>
-
-        <div class="upcoming-date-strip">
-            ${dateButtons}
-        </div>
-
-        <button
-            type="button"
-            class="upcoming-date-nav-btn"
-            onclick="changeUpcomingAppointmentWindow(7)"
-            aria-label="Next 7 days"
-            data-tooltip="Next 7 days"
-        >
-            <i class="fa-solid fa-chevron-right"></i>
-        </button>
-
-    </div>
-
-    <div
-        class="
-            upcoming-list-area
-            divide-y
-            divide-gray-100
-        "
-    >
-        ${items}
-    </div>
-
-    <a
-        href="{{ route('dentist.dentist.appointments') }}"
-        class="card-link upcoming-view-all"
-    >
-        View all appointments
-        <i class="fa-solid fa-arrow-right"></i>
-    </a>
-
-</div>
-</article>
-`;
+'en-US',
+{
+month: 'short',
+day: 'numeric'
+}
+)} – ${lastVisibleDate.toLocaleDateString(
+'en-US',
+{
+month: 'short',
+day: 'numeric'
+}
+)}`;
 
                 const container =
                     document.getElementById(
                         'upcomingAppointmentsContainer'
                     );
 
-                if (container) {
-                    if (!container.dataset.loaded) {
-                        swapSkeletonContent(
-                            'upcomingAppointmentsContainer',
-                            html
-                        );
-
-                        container.dataset.loaded =
-                            'true';
-                    } else {
-                        container.innerHTML = html;
-                    }
+                if (!container) {
+                    return;
                 }
 
+                if (
+                    !container.dataset.loaded
+                ) {
+                    const html = `
+<article class="card upcoming-card">
+
+<header class="card-header">
+
+<div class="card-header-left">
+<div class="card-header-icon">
+<i class="fa-regular fa-calendar-days"></i>
+</div>
+
+<div>
+<h3 class="card-title">
+Upcoming Appointments
+</h3>
+
+<p
+class="upcoming-range-label"
+data-upcoming-range
+>
+${rangeLabel}
+</p>
+</div>
+</div>
+
+<button
+type="button"
+class="ui-btn ui-btn-secondary ui-btn-sm"
+onclick="goToUpcomingToday()"
+data-tooltip="Return to today"
+>
+<i class="fa-solid fa-calendar-day"></i>
+Today
+</button>
+
+</header>
+
+<div class="card-body upcoming-card-body">
+
+<div class="upcoming-date-navigation">
+
+<button
+type="button"
+class="upcoming-date-nav-btn"
+onclick="changeUpcomingAppointmentWindow(-7)"
+aria-label="Previous 7 days"
+data-tooltip="Previous 7 days"
+>
+<i class="fa-solid fa-chevron-left"></i>
+</button>
+
+<div
+class="upcoming-date-strip"
+data-upcoming-date-strip
+>
+${dateButtons}
+</div>
+
+<button
+type="button"
+class="upcoming-date-nav-btn"
+onclick="changeUpcomingAppointmentWindow(7)"
+aria-label="Next 7 days"
+data-tooltip="Next 7 days"
+>
+<i class="fa-solid fa-chevron-right"></i>
+</button>
+
+</div>
+
+<div
+class="
+upcoming-list-area
+divide-y
+divide-gray-100
+"
+data-upcoming-list
+>
+${items}
+</div>
+
+<a
+href="{{ route('dentist.dentist.appointments') }}"
+class="card-link upcoming-view-all"
+>
+View all appointments
+<i class="fa-solid fa-arrow-right"></i>
+</a>
+
+</div>
+
+</article>
+`;
+
+                    swapSkeletonContent(
+                        'upcomingAppointmentsContainer',
+                        html
+                    );
+
+                    window.setTimeout(() => {
+                        window.PatientUI
+                            ?.initAvatars
+                            ?.(
+                                document.getElementById(
+                                    'dentistCalendarContainer'
+                                )
+                            );
+                    }, 180);
+
+                    container.dataset.loaded =
+                        'true';
+
+                    setTimeout(
+                        () => {
+                            initUpcomingAvatars(
+                                container
+                            );
+                        },
+                        180
+                    );
+
+                    return;
+                }
+
+                const rangeElement =
+                    container.querySelector(
+                        '[data-upcoming-range]'
+                    );
+
+                const stripElement =
+                    container.querySelector(
+                        '[data-upcoming-date-strip]'
+                    );
+
+                const listElement =
+                    container.querySelector(
+                        '[data-upcoming-list]'
+                    );
+
+                const updateUpcomingContent = () => {
+                    if (rangeElement) {
+                        rangeElement.textContent =
+                            rangeLabel;
+                    }
+
+                    if (stripElement) {
+                        stripElement.innerHTML =
+                            dateButtons;
+                    }
+
+                    if (listElement) {
+                        listElement.innerHTML =
+                            items;
+
+                        initUpcomingAvatars(
+                            listElement
+                        );
+                    }
+                };
+
+                if (carouselDirection !== 0) {
+                    runUpcomingCarousel(
+                        carouselDirection,
+                        [
+                            stripElement
+                        ],
+                        updateUpcomingContent
+                    );
+
+                    return;
+                }
+
+                updateUpcomingContent();
             }
 
             window.renderUpcomingAppointmentsDay =
                 function(key) {
-                    render(key);
+                    if (upcomingWindowAnimating) {
+                        return;
+                    }
+
+                    render(
+                        key,
+                        0
+                    );
                 };
 
             window.changeUpcomingAppointmentWindow =
                 function(daysToMove) {
+                    if (upcomingWindowAnimating) {
+                        return;
+                    }
+
+                    const direction =
+                        daysToMove > 0 ?
+                        1 :
+                        -1;
+
                     windowStart.setDate(
                         windowStart.getDate() +
                         daysToMove
@@ -681,10 +942,58 @@
                     selectedKey =
                         dateKey(windowStart);
 
-                    render(selectedKey);
+                    render(
+                        selectedKey,
+                        direction
+                    );
                 };
-            render(selectedKey);
 
+            window.goToUpcomingToday =
+                function() {
+                    if (upcomingWindowAnimating) {
+                        return;
+                    }
+
+                    const todayKey =
+                        dateKey(today);
+
+                    const currentStart =
+                        new Date(windowStart);
+
+                    currentStart.setHours(
+                        0,
+                        0,
+                        0,
+                        0
+                    );
+
+                    let direction = 0;
+
+                    if (
+                        currentStart.getTime() <
+                        today.getTime()
+                    ) {
+                        direction = 1;
+                    } else if (
+                        currentStart.getTime() >
+                        today.getTime()
+                    ) {
+                        direction = -1;
+                    }
+
+                    windowStart =
+                        new Date(today);
+
+                    selectedKey =
+                        todayKey;
+
+                    render(
+                        todayKey,
+                        direction
+                    );
+                };
+
+            render(selectedKey);
         }
 
         const dashboardData = {
@@ -896,11 +1205,6 @@ ${cardHeader}
                 'fa-door-open' :
                 'fa-door-closed';
 
-            const clinicStatusColor =
-                dentistIsIn ?
-                '#00A96E' :
-                '#EF4444';
-
             const deltaBadge = (value) => {
                 if (value === null || typeof value === 'undefined') return '';
                 const tone = value >= 0 ? 'status-completed' : 'status-cancelled';
@@ -908,7 +1212,7 @@ ${cardHeader}
             };
 
             const html = `
-<article class="stat-card s-crimson dashboard-kpi-card" >
+<article class="stat-card s-crimson" >
 <div class="stat-card-info">
 <span class="stat-label">Dental Cases</span>
 <strong class="stat-num">${kpiData.dentalCases}</strong>
@@ -917,7 +1221,7 @@ ${cardHeader}
 <div class="stat-icon-wrapper"><i class="fa-solid fa-tooth"></i></div>
 </article>
 
-<article class="stat-card s-red dashboard-kpi-card">
+<article class="stat-card s-red">
 <div class="stat-card-info">
 <span class="stat-label">Appointments</span>
 <strong class="stat-num">${kpiData.totalAppts}</strong>
@@ -926,7 +1230,7 @@ ${cardHeader}
 <div class="stat-icon-wrapper"><i class="fa-regular fa-calendar-check"></i></div>
 </article>
 
-<article class="stat-card s-blue dashboard-kpi-card">
+<article class="stat-card s-blue">
 <div class="stat-card-info">
 <span class="stat-label">Today's Patients</span>
 <strong class="stat-num">${kpiData.todayCount}</strong>
@@ -938,15 +1242,16 @@ ${cardHeader}
 <div class="stat-icon-wrapper"><i class="fa-solid fa-user-clock"></i></div>
 </article>
 
-<article class="stat-card s-green dashboard-kpi-card dashboard-clinic-status-card">
-<div class="stat-card-info">
+<article
+    id="clinicStatusStatCard"
+    class="stat-card ${dentistIsIn ? 's-active' : 's-cancelled'} dashboard-clinic-status-card">
+    <div class="stat-card-info">
 <span class="stat-label">Clinic Status</span>
 <strong
     id="statusKpiLabel"
     class="stat-num"
-    style="color:${clinicStatusColor}"
 >
-    ${clinicStatusLabel}
+${clinicStatusLabel}
 </strong>
 <div class="stat-footer dashboard-live-clock">
 <span class="dashboard-live-dot"></span>
@@ -957,18 +1262,34 @@ ${cardHeader}
 </div>
 <div class="dashboard-kpi-actions">
 <div class="stat-icon-wrapper">
-    <i
-        id="statusKpiIcon"
-        class="fa-solid ${clinicStatusIcon}"
-        style="color:${clinicStatusColor}"
-    ></i>
+<i
+    id="statusKpiIcon"
+    class="fa-solid ${clinicStatusIcon}"
+></i>
 </div>
-<button type="button" onclick="openStatusModal()" class="ui-btn ui-btn-secondary ui-btn-sm status-change-btn">Change</button>
-</div>
+<button
+    type="button"
+    onclick="openStatusModal()"
+    class="ui-btn ui-btn-secondary ui-btn-sm clinic-change-btn-desktop"
+>
+    <i class="fa-solid fa-pen-to-square"></i>
+    Change
+</button>
+
+<button
+    type="button"
+    onclick="openStatusModal()"
+    class="ui-action-btn ui-action-view clinic-change-btn-mobile"
+    aria-label="Change clinic status"
+    data-tooltip="Change clinic status"
+    data-tooltip-tone="view"
+>
+    <i class="fa-solid fa-pen-to-square"></i>
+</button></div>
 </article>
 `;
 
-            swapSkeletonContent('kpiGridContainer', html);
+            swapSkeletonContent('statCards', html);
         }
 
         function buildMedicalSupplies() {
@@ -1022,15 +1343,15 @@ ${rows}
             } else {
                 tableHtml = `
 <div class="empty-state inventory-dashboard-empty">
-    <div class="inventory-empty-icon">
-        <i class="fa-solid fa-box-open"></i>
-    </div>
+<div class="inventory-empty-icon">
+<i class="fa-solid fa-box-open"></i>
+</div>
 
-    <h4 class="empty-state-title">No medical supplies yet</h4>
+<h4 class="empty-state-title">No medical supplies yet</h4>
 
-    <p class="empty-state-sub">
-        Medical supply records will appear here once inventory items are available.
-    </p>
+<p class="empty-state-sub">
+Medical supply records will appear here once inventory items are available.
+</p>
 </div>
 `;
             }
@@ -1109,15 +1430,15 @@ ${rows}
             } else {
                 tableHtml = `
 <div class="empty-state inventory-dashboard-empty">
-    <div class="inventory-empty-icon">
-        <i class="fa-solid fa-prescription-bottle-medical"></i>
-    </div>
+<div class="inventory-empty-icon">
+<i class="fa-solid fa-prescription-bottle-medical"></i>
+</div>
 
-    <h4 class="empty-state-title">No medicine items yet</h4>
+<h4 class="empty-state-title">No medicine items yet</h4>
 
-    <p class="empty-state-sub">
-        Medicine inventory records will appear here once items are available.
-    </p>
+<p class="empty-state-sub">
+Medicine inventory records will appear here once items are available.
+</p>
 </div>
 `;
             }
@@ -1283,48 +1604,112 @@ View All <i class="fa-solid fa-arrow-right"></i>
         let dentistIsIn = @json(($clinicStatus ?? 'in') === 'in');
 
         function openStatusModal() {
-            const modal = document.getElementById('statusModal');
-            const box = document.getElementById('statusModalBox');
-            const banner = document.getElementById('modalBanner');
-            const icon = document.getElementById('modalIcon');
-            const title = document.getElementById('modalTitle');
-            const sub = document.getElementById('modalSubtitle');
-            const body = document.getElementById('modalBody');
+            const modal =
+                document.getElementById(
+                    'statusModal'
+                );
+
+            const icon =
+                document.getElementById(
+                    'statusModalIcon'
+                );
+
+            const title =
+                document.getElementById(
+                    'statusModalTitle'
+                );
+
+            const subtitle =
+                document.getElementById(
+                    'statusModalSubtitle'
+                );
+
+            const alertTitle =
+                document.getElementById(
+                    'statusModalAlertTitle'
+                );
+
+            const body =
+                document.getElementById(
+                    'statusModalBody'
+                );
+
+            const confirmBtn =
+                document.getElementById(
+                    'confirmStatusBtn'
+                );
+
+            modal.classList.remove(
+                'modal-theme-warning',
+                'modal-theme-success',
+                'modal-theme-danger'
+            );
 
             if (dentistIsIn) {
-                banner.className = 'bg-gradient-to-r from-[#660000] to-[#8B0000] px-6 pt-6 pb-4 text-white text-center';
-                icon.innerHTML = '<i class="fa-solid fa-door-closed"></i>';
-                title.textContent = 'Close the Clinic?';
-                sub.innerHTML = 'You are about to mark yourself as <strong>OUT</strong>';
-                body.innerHTML =
-                    'This will indicate that the clinic is <span class="font-semibold text-red-700">currently closed</span>. Patients will not be able to book new appointments while you are out.';
+                modal.classList.add(
+                    'modal-theme-danger'
+                );
+
+                icon.innerHTML =
+                    '<i class="fa-solid fa-door-closed"></i>';
+
+                title.textContent =
+                    'Close the Clinic';
+
+                subtitle.textContent =
+                    'You are about to mark yourself as OUT.';
+
+                alertTitle.textContent =
+                    'Mark clinic as OUT?';
+
+                body.textContent =
+                    'All appointments scheduled for today will be marked as cancelled. ';
+
+                confirmBtn.className =
+                    'ui-btn ui-btn-danger';
+
+                confirmBtn.innerHTML =
+                    '<i class="fa-solid fa-door-closed"></i> Mark as OUT';
             } else {
-                banner.className = 'bg-gradient-to-r from-green-600 to-green-700 px-6 pt-6 pb-4 text-white text-center';
-                icon.innerHTML = '<i class="fa-solid fa-door-open"></i>';
-                title.textContent = 'Open the Clinic?';
-                sub.innerHTML = 'You are about to mark yourself as <strong>IN</strong>';
-                body.innerHTML =
-                    'This will indicate that the clinic is <span class="font-semibold text-green-700">now open</span>. Patients will be able to see your availability and book appointments.';
+                modal.classList.add(
+                    'modal-theme-success'
+                );
+
+                icon.innerHTML =
+                    '<i class="fa-solid fa-door-open"></i>';
+
+                title.textContent =
+                    'Open the Clinic?';
+
+                subtitle.textContent =
+                    'You are about to mark yourself as IN.';
+
+                alertTitle.textContent =
+                    'Mark clinic as IN?';
+
+                body.textContent =
+                    'Patients will be able to view your availability and book appointments again.';
+
+                confirmBtn.className =
+                    'ui-btn ui-btn-success';
+
+                confirmBtn.innerHTML =
+                    '<i class="fa-solid fa-door-open"></i> Mark as IN';
             }
 
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-            modal.classList.add('opacity-100');
-            setTimeout(() => box.classList.replace('scale-90', 'scale-100'), 10);
+            window.openModal?.(
+                'statusModal'
+            );
         }
 
         function closeStatusModal() {
-            const modal = document.getElementById('statusModal');
-            const box = document.getElementById('statusModalBox');
-            box.classList.replace('scale-100', 'scale-90');
-            setTimeout(() => {
-                modal.classList.add('opacity-0', 'pointer-events-none');
-                modal.classList.remove('opacity-100');
-            }, 150);
+            window.closeModal?.(
+                'statusModal'
+            );
         }
 
         async function confirmStatus() {
             const confirmBtn = document.getElementById('confirmStatusBtn');
-
             const newStatus = dentistIsIn ? 'out' : 'in';
 
             confirmBtn.disabled = true;
@@ -1354,39 +1739,89 @@ View All <i class="fa-solid fa-arrow-right"></i>
 
                 const btn = document.getElementById('statusBtn');
                 const label = document.getElementById('statusLabel');
+                const dot = document.getElementById('statusDot');
                 const kpiLabel = document.getElementById('statusKpiLabel');
                 const kpiIcon = document.getElementById('statusKpiIcon');
+                const statCard = document.getElementById('clinicStatusStatCard');
 
                 if (dentistIsIn) {
-                    btn.classList.remove('ui-btn-danger');
-                    btn.classList.add('ui-btn-success');
-                    btn.style.removeProperty('background');
-                    label.innerHTML = '<span class="w-2 h-2 bg-white rounded-full animate-pulse"></span> IN';
+                    btn.classList.remove(
+                        'ui-btn-danger'
+                    );
+
+                    btn.classList.add(
+                        'ui-btn-success'
+                    );
+
+                    btn.dataset.tooltip =
+                        'Clinic is open';
+
+                    btn.dataset.tooltipTone =
+                        'start';
+
+                    label.textContent =
+                        'IN';
+
+                    dot.className =
+                        'status-dot status-active';
 
                     if (kpiLabel) {
-                        kpiLabel.textContent = 'Open';
-                        kpiLabel.style.color = '#00A96E';
-                    }
+                            kpiLabel.textContent = 'Open';
+                        }
 
-                    if (kpiIcon) {
-                        kpiIcon.className = 'fa-solid fa-door-open text-base';
-                        kpiIcon.style.color = '#00A96E';
-                    }
+                        if (kpiIcon) {
+                            kpiIcon.className =
+                                'fa-solid fa-door-open';
+                        }
+
+                        if (statCard) {
+                            statCard.classList.remove(
+                                's-cancelled'
+                            );
+
+                            statCard.classList.add(
+                                's-active'
+                            );
+                        }
                 } else {
-                    btn.classList.remove('ui-btn-success');
-                    btn.classList.add('ui-btn-danger');
-                    btn.style.removeProperty('background');
-                    label.innerHTML = '<span class="w-2 h-2 bg-white rounded-full"></span> OUT';
+                    btn.classList.remove(
+                        'ui-btn-success'
+                    );
+
+                    btn.classList.add(
+                        'ui-btn-danger'
+                    );
+
+                    btn.dataset.tooltip =
+                        'Clinic is closed';
+
+                    btn.dataset.tooltipTone =
+                        'cancel';
+
+                    label.textContent =
+                        'OUT';
+
+                    dot.className =
+                        'status-dot status-cancelled';
 
                     if (kpiLabel) {
-                        kpiLabel.textContent = 'Closed';
-                        kpiLabel.style.color = '#EF4444';
-                    }
+                            kpiLabel.textContent = 'Closed';
+                        }
 
-                    if (kpiIcon) {
-                        kpiIcon.className = 'fa-solid fa-door-closed text-base';
-                        kpiIcon.style.color = '#EF4444';
-                    }
+                        if (kpiIcon) {
+                            kpiIcon.className =
+                                'fa-solid fa-door-closed';
+                        }
+
+                        if (statCard) {
+                            statCard.classList.remove(
+                                's-active'
+                            );
+
+                            statCard.classList.add(
+                                's-cancelled'
+                            );
+                        }
                 }
 
                 closeStatusModal();
@@ -1396,13 +1831,21 @@ View All <i class="fa-solid fa-arrow-right"></i>
                 alert(error.message || "Something went wrong while updating clinic status.");
             } finally {
                 confirmBtn.disabled = false;
-                confirmBtn.innerHTML = 'Confirm';
+                if (dentistIsIn) {
+                    confirmBtn.className =
+                        'ui-btn ui-btn-danger';
+
+                    confirmBtn.innerHTML =
+                        '<i class="fa-solid fa-door-closed"></i> Mark as OUT';
+                } else {
+                    confirmBtn.className =
+                        'ui-btn ui-btn-success';
+
+                    confirmBtn.innerHTML =
+                        '<i class="fa-solid fa-door-open"></i> Mark as IN';
+                }
             }
         }
-
-        document.getElementById('statusModal').addEventListener('click', function(e) {
-            if (e.target === this) closeStatusModal();
-        });
 
         function escHtml(str = '') {
             return String(str)
@@ -1425,100 +1868,252 @@ View All <i class="fa-solid fa-arrow-right"></i>
             placement = 'hover-bottom',
             alignment = 'hover-align-center'
         ) {
-            const safeAppointments = Array.isArray(appointments) ? appointments : [];
+            const safeAppointments =
+                Array.isArray(appointments) ?
+                appointments : [];
 
             if (!safeAppointments.length) {
-                return `
-<div
-    class="card day-hover-card ${placement} ${alignment} w-[320px]">
-<div class="absolute -top-3 left-0 right-0 h-3"></div>
-<div class="card-header">
-<div class="card-header-left">
-<div>
-<p class="card-title">Scheduled Patients</p>
-<p class="card-subtitle">${escHtml(formatModalDate(dateStr))}</p>
-</div>
-</div>
-</div>
-<div class="card-body text-center">
-<div class="w-11 h-11 mx-auto mb-3 rounded-full bg-[#fff5f5] flex items-center justify-center text-[#8B0000]">
-<i class="fa-regular fa-calendar-xmark"></i>
-</div>
-<p class="text-sm font-semibold text-gray-700">No scheduled patients</p>
-<p class="text-[12px] text-gray-500 mt-1">This date has no booked appointments.</p>
-</div>
-</div>
-`;
+                return '';
             }
 
-            const items = safeAppointments.slice(0, 3).map(appt => {
-                const status = String(appt.status || '').toLowerCase();
-                const canReschedule = ['upcoming', 'rescheduled'].includes(status);
-                const canCancel = ['upcoming', 'rescheduled'].includes(status);
+            const getHoverStatusClass = status => {
+                const value =
+                    String(status || '')
+                    .toLowerCase()
+                    .trim();
 
-                const safeName = escJs(appt.name || 'Unknown Patient');
-                const safeService = escJs(appt.service || 'General Service');
-                const safeSchedule = escJs(
-                    `${formatModalDate(appt.date || dateStr)} • ${appt.time || '—'} `);
-                const rawProfileUrl = appt.patientProfileUrl || '#';
-                const profileUrl =
-                    `${rawProfileUrl}${rawProfileUrl.includes('?') ? '&' : '?'}from=dashboard`;
+                if (value.includes('cancel')) {
+                    return 'status-cancelled';
+                }
 
-                return `
-<div class="card scheduled-hover-patient-card" >
-<div class="flex items-center justify-between gap-3 mb-2">
-<div class="min-w-0">
-<p class="text-[12px] font-bold text-gray-800 truncate">${escHtml(appt.name || 'Unknown Patient')}</p>
-<p class="text-[11px] text-gray-500 truncate">${escHtml(appt.service || 'General Service')} · ${escHtml(appt.time || '—')}</p>
+                if (value.includes('resched')) {
+                    return 'status-rescheduled';
+                }
+
+                if (value.includes('complete')) {
+                    return 'status-completed';
+                }
+
+                return 'status-upcoming';
+            };
+
+            const items =
+                safeAppointments
+                .slice(0, 3)
+                .map(appt => {
+                    const status =
+                        String(
+                            appt.status || ''
+                        )
+                        .toLowerCase()
+                        .trim();
+
+                    const canReschedule = [
+                        'upcoming',
+                        'rescheduled'
+                    ].includes(status);
+
+                    const canCancel = [
+                        'upcoming',
+                        'rescheduled'
+                    ].includes(status);
+
+                    const patientName =
+                        appt.name ||
+                        'Unknown Patient';
+
+                    const service =
+                        appt.service ||
+                        'General Service';
+
+                    const time =
+                        appt.time ||
+                        '—';
+
+                    const photo =
+                        appt.patientPhotoUrl ||
+                        appt.patient_photo_url ||
+                        appt.profile_photo_url ||
+                        appt.avatar ||
+                        '';
+
+                    const rawProfileUrl =
+                        appt.patientProfileUrl ||
+                        '#';
+
+                    const profileUrl =
+                        `${rawProfileUrl}${
+rawProfileUrl.includes('?')
+? '&'
+: '?'
+}from=dashboard`;
+
+                    const safeName =
+                        escJs(patientName);
+
+                    const safeService =
+                        escJs(service);
+
+                    const safeSchedule =
+                        escJs(
+                            `${
+formatModalDate(
+appt.date ||
+dateStr
+)
+} • ${time}`
+                        );
+
+                    return `
+<article class="global-record-card scheduled-hover-patient-card">
+
+<div class="global-record-card-body scheduled-hover-patient-body">
+
+<a
+href="${escHtml(profileUrl)}"
+class="patient-avatar patient-avatar-sm"
+data-patient-avatar
+data-patient-name="${escHtml(patientName)}"
+data-patient-url="${escHtml(photo)}"
+aria-label="View ${escHtml(patientName)} profile"
+></a>
+
+<div class="global-record-identity scheduled-hover-patient-info">
+
+<div class="scheduled-hover-patient-name-row">
+
+<p class="global-record-name">
+${escHtml(patientName)}
+</p>
+
+<span
+class="status-dot ${getHoverStatusClass(appt.status)}"
+aria-hidden="true"
+></span>
+
 </div>
-<a href="${escHtml(profileUrl)}"
-class="text-[11px] font-semibold text-[#8B0000] hover:text-[#660000]">
-View
+
+<div class="global-record-subline">
+<span>
+${escHtml(service)}
+</span>
+
+<span aria-hidden="true">·</span>
+
+<span>
+${escHtml(time)}
+</span>
+</div>
+
+</div>
+
+<div class="ui-action-group scheduled-hover-actions">
+
+<a
+href="${escHtml(profileUrl)}"
+class="ui-action-btn ui-action-view"
+aria-label="View profile"
+data-tooltip="View profile"
+data-tooltip-tone="view"
+>
+<i class="fa-regular fa-user"></i>
 </a>
+
+${
+canReschedule
+? `
+    <button
+    type="button"
+    class="ui-action-btn ui-action-warning"
+    aria-label="Reschedule appointment"
+    data-tooltip="Reschedule appointment"
+    data-tooltip-tone="reschedule"
+    onclick="
+    event.preventDefault();
+    event.stopPropagation();
+    openRescheduleModalFromDay(
+    '${escJs(appt.id)}',
+    '${safeName}',
+    '${safeSchedule}',
+    '${safeService}',
+    '${escJs(appt.rescheduleUrl || '#')}'
+    );
+    "
+    >
+    <i class="fa-solid fa-rotate-right"></i>
+    </button>
+    `
+: ''
+}
+
+${
+canCancel
+? `
+    <button
+    type="button"
+    class="ui-action-btn ui-action-delete"
+    aria-label="Cancel appointment"
+    data-tooltip="Cancel appointment"
+    data-tooltip-tone="cancel"
+    onclick="
+    event.preventDefault();
+    event.stopPropagation();
+    cancelAppointmentFromModal(
+    '${escJs(appt.cancelUrl || '#')}',
+    '${safeName}',
+    '${safeSchedule}'
+    );
+    "
+    >
+    <i class="fa-solid fa-ban"></i>
+    </button>
+    `
+: ''
+}
+
 </div>
 
-<div class="flex flex-wrap gap-2">
-<a href="${escHtml(profileUrl)}"
-class="ui-btn ui-btn-primary ui-btn-sm">
-<i class="fa-regular fa-user text-[10px]"></i> Profile
-</a>
-
-${canReschedule ? `
-                                                                                    <button type="button"
-                                                                                    onclick="event.stopPropagation(); openRescheduleModalFromDay('${escJs(appt.id)}', '${safeName}', '${safeSchedule}', '${safeService}', '${escJs(appt.rescheduleUrl || '#')}')"
-                                                                                    class="ui-btn ui-btn-warning ui-btn-sm">
-                                                                                    <i class="fa-solid fa-rotate-right text-[10px]"></i> Reschedule
-                                                                                    </button>
-                                                                                    ` : ''}
-
-${canCancel ? `
-                                                                                    <button type="button"
-                                                                                    onclick="event.stopPropagation(); cancelAppointmentFromModal('${escJs(appt.cancelUrl || '#')}', '${safeName}', '${safeSchedule}')"
-                                                                                    class="ui-btn ui-btn-danger ui-btn-sm">
-                                                                                    <i class="fa-solid fa-ban text-[10px]"></i> Cancel
-                                                                                    </button>
-                                                                                    ` : ''}
 </div>
-</div>
+
+</article>
 `;
-            }).join('');
+                })
+                .join('');
 
             return `
-<div class=" card day-hover-card ${placement} ${alignment} w-[320px]">
-<div class="absolute -top-3 left-0 right-0 h-3"></div>
-<div class="card-header">
+<div
+class="card day-hover-card ${placement} ${alignment}"
+>
+<div class="day-hover-bridge"></div>
+
+<header class="card-header">
+
 <div class="card-header-left">
 <div>
-<p class="card-title">Scheduled Patients</p>
-<p class="card-subtitle">${escHtml(formatModalDate(dateStr))}</p>
+<p class="card-title">
+Scheduled Patients
+</p>
+
+<p class="card-subtitle">
+${escHtml(
+formatModalDate(
+dateStr
+)
+)}
+</p>
 </div>
 </div>
-<a href="{{ route('dentist.dentist.appointments') }}"
-class="card-link">
+
+<a
+href="{{ route('dentist.dentist.appointments') }}"
+class="card-link"
+>
 View all
 </a>
-</div>
-<div class="card-body space-y-2">
+
+</header>
+
+<div class="card-body scheduled-hover-list">
 ${items}
 </div>
 </div>
@@ -1846,8 +2441,6 @@ ${renderUnifiedCalendarLegend('dentist')}
         }
 
         function openDayAppointmentsModal(dateStr, appointmentsJson) {
-            const modal = document.getElementById('dayAppointmentsModal');
-            const box = document.getElementById('dayAppointmentsModalBox');
             const dateEl = document.getElementById('dayAppointmentsModalDate');
             const listEl = document.getElementById('dayAppointmentsModalList');
 
@@ -1869,118 +2462,202 @@ ${renderUnifiedCalendarLegend('dentist')}
 </div>
 `;
             } else {
-                listEl.innerHTML = appointments.map(appt => {
-                    const badgeClass = getStatusBadgeClass(appt.status);
-                    const initial = (appt.name || '?').charAt(0).toUpperCase();
-                    const profileUrl = appt.patientProfileUrl || '#';
-                    const rescheduleUrl = appt.rescheduleUrl || '#';
-                    const cancelUrl = appt.cancelUrl || '#';
-                    const status = String(appt.status || '').toLowerCase().trim();
+                listEl.innerHTML = appointments
+                    .map(appt => {
+                        const status =
+                            String(appt.status || '')
+                            .toLowerCase()
+                            .trim();
 
-                    const canReschedule = ['upcoming', 'rescheduled'].includes(status);
-                    const canCancel = ['upcoming', 'rescheduled'].includes(status);
+                        const canReschedule = ['upcoming', 'rescheduled']
+                            .includes(status);
 
-                    const displayName = escHtml(appt.name || 'Unknown Patient');
-                    const displayService = escHtml(appt.service || 'General Service');
-                    const displayDate = escHtml(formatModalDate(appt.date || dateStr));
-                    const displayTime = escHtml(appt.time || '—');
+                        const canCancel = ['upcoming', 'rescheduled']
+                            .includes(status);
 
-                    const safeName = (appt.name || 'Unknown Patient').replace(/'/g, "\\'");
-                    const safeSchedule = `${formatModalDate(appt.date || dateStr)} • ${appt.time || '—'} `
-                        .replace(
-                            /'/g, "\\'");
-                    const safeService = (appt.service || '').replace(/'/g, "\\'");
+                        const patientName =
+                            appt.name ||
+                            'Unknown Patient';
 
-                    const photo = appt.patientPhotoUrl || appt.profile_photo_url || appt.avatar || null;
-                    const avatarHtml = photo ?
-                        `<img src = "${escHtml(photo)}" alt = "${displayName}" > ` :
-                        `<span > ${escHtml(initial)}</span> `;
+                        const service =
+                            appt.service ||
+                            'General Service';
 
-                    return `
-<article class="card scheduled-patient-card" >
-<div class="scheduled-patient-head">
-<a href="${profileUrl}${profileUrl.includes('?') ? '&' : '?'}from=dashboard"
+                        const time =
+                            appt.time ||
+                            '—';
+
+                        const photo =
+                            appt.patientPhotoUrl ||
+                            appt.patient_photo_url ||
+                            appt.profile_photo_url ||
+                            appt.avatar ||
+                            '';
+
+                        const rawProfileUrl =
+                            appt.patientProfileUrl ||
+                            '#';
+
+                        const profileUrl =
+                            `${rawProfileUrl}${
+rawProfileUrl.includes('?')
+? '&'
+: '?'
+}from=dashboard`;
+
+                        const safeName =
+                            escJs(patientName);
+
+                        const safeService =
+                            escJs(service);
+
+                        const safeSchedule =
+                            escJs(
+                                `${formatModalDate(
+appt.date || dateStr
+)} • ${time}`
+                            );
+
+                        const statusClass =
+                            status.includes('cancel') ?
+                            'status-cancelled' :
+                            status.includes('resched') ?
+                            'status-rescheduled' :
+                            status.includes('complete') ?
+                            'status-completed' :
+                            'status-upcoming';
+
+                        return `
+<article class="global-record-card scheduled-modal-patient-card">
+
+<div class="global-record-card-body scheduled-modal-patient-body">
+
+<a
+href="${escHtml(profileUrl)}"
 onclick="closeDayAppointmentsModal()"
-class="patient-avatar patient-avatar-sm">
-${avatarHtml}
-</a>
+class="patient-avatar patient-avatar-sm"
+data-patient-avatar
+data-patient-name="${escHtml(patientName)}"
+data-patient-url="${escHtml(photo)}"
+aria-label="View ${escHtml(patientName)} profile"
+></a>
 
-<div class="scheduled-patient-info">
-<a href="${profileUrl}${profileUrl.includes('?') ? '&' : '?'}from=dashboard"
-onclick="closeDayAppointmentsModal()"
-class="scheduled-patient-name">
-${displayName}
-</a>
+<div class="global-record-identity scheduled-modal-patient-info">
 
-<p class="scheduled-patient-meta">
-<i class="fa-solid fa-stethoscope"></i>
-<span class="scheduled-patient-meta-lines">
-<span class="scheduled-patient-service">${displayService}</span>
-<span class="scheduled-patient-schedule">${displayDate} · ${displayTime}</span>
-</span>
+<div class="scheduled-modal-name-row">
+
+<p class="global-record-name">
+${escHtml(patientName)}
 </p>
+
+<span
+class="status-dot ${statusClass}"
+aria-hidden="true"
+></span>
+
 </div>
 
-<span class="${badgeClass}">
-${getAppointmentStatusLabel(appt.status)}
+<div class="global-record-subline scheduled-modal-meta">
+
+<span>
+${escHtml(service)}
 </span>
+
+<span aria-hidden="true">
+·
+</span>
+
+<span>
+${escHtml(time)}
+</span>
+
 </div>
 
-<div class="scheduled-patient-actions">
-<a href="${profileUrl}${profileUrl.includes('?') ? '&' : '?'}from=dashboard"
+</div>
+
+<div class="ui-action-group scheduled-modal-actions">
+
+<a
+href="${escHtml(profileUrl)}"
 onclick="closeDayAppointmentsModal()"
-class="ui-btn ui-btn-primary ui-btn-sm scheduled-action-btn">
+class="ui-action-btn ui-action-view"
+aria-label="View profile"
+data-tooltip="View profile"
+data-tooltip-tone="view"
+>
 <i class="fa-regular fa-user"></i>
-<span>View Profile</span>
 </a>
 
-${canReschedule ? `
-                                                                                    <button type="button"
-                                                                                    onclick="openRescheduleModalFromDay('${appt.id}', '${safeName}', '${safeSchedule}', '${safeService}', '${rescheduleUrl}')"
-                                                                                    class="ui-btn ui-btn-warning ui-btn-sm scheduled-action-btn">
-                                                                                    <i class="fa-solid fa-rotate-right"></i>
-                                                                                    <span>Reschedule</span>
-                                                                                    </button>
-                                                                                    ` : ''}
+${
+canReschedule
+? `
+    <button
+    type="button"
+    class="ui-action-btn ui-action-warning"
+    aria-label="Reschedule appointment"
+    data-tooltip="Reschedule appointment"
+    data-tooltip-tone="reschedule"
+    onclick="
+    openRescheduleModalFromDay(
+    '${escJs(appt.id)}',
+    '${safeName}',
+    '${safeSchedule}',
+    '${safeService}',
+    '${escJs(appt.rescheduleUrl || '#')}'
+    )
+    "
+    >
+    <i class="fa-solid fa-rotate-right"></i>
+    </button>
+    `
+: ''
+}
 
-${canCancel ? `
-                                                                                    <button type="button"
-                                                                                    onclick="cancelAppointmentFromModal('${cancelUrl}', '${safeName}', '${safeSchedule}')"
-                                                                                    class="ui-btn ui-btn-danger ui-btn-sm scheduled-action-btn">
-                                                                                    <i class="fa-solid fa-ban"></i>
-                                                                                    <span>Cancel</span>
-                                                                                    </button>
-                                                                                    ` : ''}
+${
+canCancel
+? `
+    <button
+    type="button"
+    class="ui-action-btn ui-action-delete"
+    aria-label="Cancel appointment"
+    data-tooltip="Cancel appointment"
+    data-tooltip-tone="cancel"
+    onclick="
+    cancelAppointmentFromModal(
+    '${escJs(appt.cancelUrl || '#')}',
+    '${safeName}',
+    '${safeSchedule}'
+    )
+    "
+    >
+    <i class="fa-solid fa-ban"></i>
+    </button>
+    `
+: ''
+}
+
 </div>
+
+</div>
+
 </article>
 `;
-                }).join('');
-            }
-            modal.classList.remove('opacity-0', 'pointer-events-none');
-            modal.classList.add('opacity-100');
+                    })
+                    .join('');
 
-            setTimeout(() => {
-                box.classList.replace('scale-90', 'scale-100');
-            }, 10);
+                window.PatientUI
+                    ?.initAvatars
+                    ?.(listEl);
+                window.openModal?.(
+                    'dayAppointmentsModal'
+                );
+            }
         }
 
         function closeDayAppointmentsModal() {
-            const modal = document.getElementById('dayAppointmentsModal');
-            const box = document.getElementById('dayAppointmentsModalBox');
-
-            box.classList.replace('scale-100', 'scale-90');
-
-            setTimeout(() => {
-                modal.classList.add('opacity-0', 'pointer-events-none');
-                modal.classList.remove('opacity-100');
-            }, 150);
+            window.closeModal?.(
+                'dayAppointmentsModal'
+            );
         }
-
-        document.addEventListener('click', function(e) {
-            const modal = document.getElementById('dayAppointmentsModal');
-            if (e.target === modal) {
-                closeDayAppointmentsModal();
-            }
-        });
     </script>
 @endsection
