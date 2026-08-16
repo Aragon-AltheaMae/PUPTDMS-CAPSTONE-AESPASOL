@@ -11,13 +11,17 @@
     flex-shrink: 0;
     border-radius: 999px;
     background:
-        linear-gradient(135deg,
+        linear-gradient(
+            135deg,
             var(--crimson, #8B0000),
-            var(--crimson-dark, #5F0000));
+            var(--crimson-dark, #5F0000)
+        );
     color: #fff;
     font-size: 1rem;
     font-weight: 700;
     line-height: 1;
+    letter-spacing: 0;
+    text-align: center;
     text-transform: uppercase;
 }
 
