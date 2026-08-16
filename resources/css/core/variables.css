@@ -194,6 +194,10 @@
     --text-3: #9E9690;
     --gold: #C9A84C;
 
+    --auth-landing-accent-text: var(--crimson);
+    --auth-landing-accent-soft: var(--crimson-soft);
+    --auth-landing-accent-border: var(--sidebar-hover-icon-border);
+
     --um-primary: #8B0000;
     --um-primary-dark: #6b0000;
     --um-primary-soft: #fff1f1;
@@ -214,6 +218,8 @@
     --sidebar-w: 230px;
     --sidebar-collapsed-w: 64px;
     --header-h: 64px;
+    --scrollbar-thumb: rgba(139, 0, 0, .38);
+    --scrollbar-thumb-hover: rgba(139, 0, 0, .62);
 
     --page-bg: #f8fafc;
     --page-text: #111827;
@@ -465,9 +471,15 @@
     --crimson-mid: rgba(139, 0, 0, 0.24);
     --crimson-soft: rgba(139, 0, 0, 0.14);
 
+    --auth-landing-accent-text: #fca5a5;
+    --auth-landing-accent-soft: var(--crimson-soft);
+    --auth-landing-accent-border: var(--sidebar-hover-icon-border);
+
     --sidebar-bg: #151515;
     --sidebar-border: rgba(255, 255, 255, 0.09);
     --sidebar-shadow: 4px 0 24px rgba(0, 0, 0, .35);
+    --scrollbar-thumb: rgba(203, 213, 225, .24);
+    --scrollbar-thumb-hover: rgba(203, 213, 225, .42);
 
     --sidebar-link-text: #c9c9c9;
     --sidebar-link-hover-bg: rgba(139, 0, 0, .30);

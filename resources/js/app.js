@@ -1994,6 +1994,17 @@ function initSidebarScrollMemory() {
 }
 
 function applyGlobalTheme(theme = 'light') {
+
+    const html = document.documentElement;
+
+    html.classList.add('theme-transitioning');
+
+    window.clearTimeout(window.__themeTransitionTimer);
+
+    window.__themeTransitionTimer = window.setTimeout(() => {
+        html.classList.remove('theme-transitioning');
+    }, 320);
+    
     const nextTheme =
         theme === 'dark'
             ? 'dark'
@@ -2072,13 +2083,37 @@ function applyGlobalTheme(theme = 'light') {
 
     document
         .querySelectorAll(
-            '#themeIcon'
+            '#themeIcon, [data-global-theme-icon]'
         )
         .forEach(icon => {
-            icon.className =
+            icon.className = isDark
+                ? 'fa-solid fa-sun'
+                : 'fa-solid fa-moon';
+        });
+
+    document
+        .querySelectorAll('[data-global-theme-toggle]')
+        .forEach(button => {
+            button.setAttribute(
+                'aria-label',
                 isDark
-                    ? 'fa-solid fa-moon text-gray-400 text-base'
-                    : 'fa-regular fa-sun text-gray-400 text-base';
+                    ? 'Switch to light mode'
+                    : 'Switch to dark mode'
+            );
+
+            button.setAttribute(
+                'data-tooltip',
+                isDark
+                    ? 'Switch to light mode'
+                    : 'Switch to dark mode'
+            );
+
+            button.setAttribute(
+                'aria-pressed',
+                isDark
+                    ? 'true'
+                    : 'false'
+            );
         });
 
     document
@@ -2163,6 +2198,39 @@ function initGlobalThemeControls(root = document) {
             }));
         });
     });
+
+    scope
+        .querySelectorAll('[data-global-theme-toggle]')
+        .forEach(button => {
+            if (
+                button.dataset.themeInitialized ===
+                'true'
+            ) {
+                return;
+            }
+
+            button.dataset.themeInitialized =
+                'true';
+
+            button.addEventListener(
+                'click',
+                event => {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    const currentTheme =
+                        document.documentElement
+                            .getAttribute('data-theme') ||
+                        'light';
+
+                    applyGlobalTheme(
+                        currentTheme === 'dark'
+                            ? 'light'
+                            : 'dark'
+                    );
+                }
+            );
+        });
 }
 
 function initSidebarThemeDropdowns() {
