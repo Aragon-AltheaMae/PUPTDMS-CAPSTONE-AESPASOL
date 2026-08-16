@@ -434,7 +434,7 @@ class OdontogramController extends Controller
 
         return false;
     }
-
+    
     private function persistProcedureSnapshot(
         Appointment $appointment,
         array $validated,
@@ -516,10 +516,18 @@ class OdontogramController extends Controller
             ->values()
             ->all();
 
-        if (count($cleanOdontogramData) === 0) {
-            throw new HttpResponseException(response()->json([
-                'message' => 'Please apply at least one treatment to the tooth chart before finishing the procedure.',
-            ], 422));
+        $isOralProphylaxis =strcasecmp(trim((string) $appointment->service_type),
+            'Oral Prophylaxis'
+        ) === 0;
+
+        $hasOdontogramChanges = count($cleanOdontogramData) > 0;
+        if (!$isOralProphylaxis &&!$hasOdontogramChanges) {
+            throw new HttpResponseException(
+                response()->json([
+                    'message' =>
+                        'Please apply at least one treatment to the tooth chart before finishing the procedure.',
+                ], 422)
+            );
         }
 
         $legendCache = [];
@@ -563,7 +571,11 @@ class OdontogramController extends Controller
         ];
 
         $savedTeeth = 0;
-        $shouldUpdatePatientOdontogram = $this->shouldUpdatePatientOdontogram($patient, $appointment);
+        $shouldUpdatePatientOdontogram = $hasOdontogramChanges && 
+            $this->shouldUpdatePatientOdontogram(
+                $patient,
+                $appointment
+            );
 
         DB::transaction(function () use (
             $appointment,
@@ -577,9 +589,12 @@ class OdontogramController extends Controller
             $resolveLegendId,
             $surfaceMap,
             $shouldUpdatePatientOdontogram,
+            $hasOdontogramChanges,
             &$savedTeeth
         ) {
-            $submittedToothNumbers = collect($cleanOdontogramData)
+            
+            if ($hasOdontogramChanges) { 
+                $submittedToothNumbers = collect($cleanOdontogramData)
                 ->pluck('tooth')
                 ->map(fn($toothNumber) => (int) $toothNumber)
                 ->all();
@@ -598,25 +613,57 @@ class OdontogramController extends Controller
 
                 $savedTeeth++;
 
-                $toothLegendCode = data_get($entry, 'threeD.code') ?: data_get($entry, 'status.code');
-                $toothLegendLabel = data_get($entry, 'threeD.label') ?: data_get($entry, 'status.label');
+                $toothLegendCode =
+                    data_get($entry, 'threeD.code')
+                    ?: data_get($entry, 'status.code');
 
-                $toothLegendId = $resolveLegendId($toothLegendCode, $toothLegendLabel);
+                $toothLegendLabel =
+                    data_get($entry, 'threeD.label')
+                    ?: data_get($entry, 'status.label');
 
-                $tooth->legends()->sync($toothLegendId ? [$toothLegendId] : []);
+                $toothLegendId =
+                    $resolveLegendId(
+                        $toothLegendCode,
+                        $toothLegendLabel
+                    );
+
+                $tooth->legends()->sync(
+                    $toothLegendId
+                        ? [$toothLegendId]
+                        : []
+                );
 
                 foreach ($surfaceMap as $surfaceKey => $surfaceNumber) {
+
                     $surface = ToothSurface::firstOrCreate([
                         'tooth_id' => $tooth->id,
                         'surface_number' => $surfaceNumber,
                     ]);
 
-                    $surfaceCode = data_get($entry, "surfaces.$surfaceKey.code");
-                    $surfaceLabel = data_get($entry, "surfaces.$surfaceKey.label");
+                    $surfaceCode =
+                        data_get(
+                            $entry,
+                            "surfaces.$surfaceKey.code"
+                        );
 
-                    $surfaceLegendId = $resolveLegendId($surfaceCode, $surfaceLabel);
+                    $surfaceLabel =
+                        data_get(
+                            $entry,
+                            "surfaces.$surfaceKey.label"
+                        );
 
-                    $surface->legends()->sync($surfaceLegendId ? [$surfaceLegendId] : []);
+                    $surfaceLegendId =
+                        $resolveLegendId(
+                            $surfaceCode,
+                            $surfaceLabel
+                        );
+
+                    $surface->legends()->sync(
+                        $surfaceLegendId
+                            ? [$surfaceLegendId]
+                            : []
+                        );
+                    }
                 }
             }
 
@@ -1032,7 +1079,7 @@ class OdontogramController extends Controller
         }
 
         $validated = $request->validate([
-            'odontogram_data' => 'required|array',
+            'odontogram_data' => 'present|array',
             'odontogram_data.*.tooth' => 'nullable|integer|min:1',
 
             'odontogram_data.*.status.code' => 'nullable|string|max:20',
@@ -1052,13 +1099,18 @@ class OdontogramController extends Controller
             'diagnosis' => 'nullable|string',
             'prescriptions' => 'nullable|string',
             'completion_action' => 'nullable|in:finished,follow_up',
-            'has_applied_treatment' => 'required|accepted',
+            'has_applied_treatment' => 'required|boolean',
             'procedure_duration_seconds' => 'nullable|integer|min:0',
         ]);
 
-        if (!$request->boolean('has_applied_treatment')) {
+        $isOralProphylaxis = strcasecmp(trim((string) $appointment->service_type),
+            'Oral Prophylaxis'
+        ) === 0;
+
+        if (!$isOralProphylaxis && !$request->boolean('has_applied_treatment')) {
             return response()->json([
-                'message' => 'Please apply at least one treatment to the tooth chart before finishing the procedure.',
+            'message' =>
+                'Please apply at least one treatment to the tooth chart before finishing the procedure.',
             ], 422);
         }
 
@@ -1106,7 +1158,7 @@ class OdontogramController extends Controller
         }
 
         $validated = $request->validate([
-            'odontogram_data' => 'required|array',
+            'odontogram_data' => 'present|array',
             'odontogram_data.*.tooth' => 'nullable|integer|min:1',
             'odontogram_data.*.status.code' => 'nullable|string|max:20',
             'odontogram_data.*.status.label' => 'nullable|string|max:255',
@@ -1122,12 +1174,20 @@ class OdontogramController extends Controller
             'diagnosis' => 'nullable|string',
             'prescriptions' => 'nullable|string',
             'completion_action' => 'nullable|in:finished',
-            'has_applied_treatment' => 'required|accepted',
+            'has_applied_treatment' => 'required|boolean',
         ]);
 
-        if (!$request->boolean('has_applied_treatment')) {
+        $isOralProphylaxis = strcasecmp(trim((string) ($draft['service_type']?? '')),
+            'Oral Prophylaxis'
+        ) === 0;
+
+        if (!$isOralProphylaxis && !$request->boolean(
+                'has_applied_treatment'
+            )
+        ) {
             return response()->json([
-                'message' => 'Please apply at least one treatment to the tooth chart before saving this appointment.',
+                'message' =>
+                    'Please apply at least one treatment to the tooth chart before saving this appointment.',
             ], 422);
         }
 

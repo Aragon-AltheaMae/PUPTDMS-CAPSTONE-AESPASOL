@@ -464,7 +464,7 @@ class DentistAppointmentController extends Controller
         $request->validate([
             'followup_appointment_date' => 'required|date|after:today',
             'followup_appointment_time' => 'required',
-            'followup_reason' => 'required|string|max:1000',
+            'followup_reason' => 'nullable|string|max:1000',
         ]);
 
         if (Carbon::parse($request->followup_appointment_date)->isToday()) {
@@ -499,7 +499,7 @@ class DentistAppointmentController extends Controller
             'status' => 'upcoming',
             'is_follow_up' => true,
             'follow_up_for_appointment_id' => $originalAppointment->id,
-            'follow_up_reason' => $request->followup_reason,
+            'follow_up_reason' => $request->filled('followup_reason') ? trim($request->followup_reason) :null,
             'follow_up_reminder_sent_at' => null,
             'follow_up_today_reminder_sent_at' => null,
             'follow_up_one_day_reminder_sent_at' => null,
