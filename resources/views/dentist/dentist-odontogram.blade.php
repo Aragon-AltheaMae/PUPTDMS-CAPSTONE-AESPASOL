@@ -22,6 +22,16 @@ $existingAppointmentMode ??
 false
 );
 
+$currentServiceType = $existingAppointmentMode
+    ? data_get($existingAppointmentDraft ?? [], 'service_type', '')
+    : ($appointment?->service_type ?? '');
+
+$isOralProphylaxis =
+    strcasecmp(
+        trim((string) $currentServiceType),
+        'Oral Prophylaxis'
+    ) === 0;
+
 $pageEyebrow =
 $existingAppointmentMode
 ? 'Add Existing Appointment'
@@ -754,13 +764,13 @@ $existingAppointmentMode
                 <div class="section-label mt-5 sm:mt-6">
                     <i class="fa-regular fa-message fa-xs"></i>
                     Reason for Follow-up
-                    <span style="font-weight:400;text-transform:none;letter-spacing:0;">(required)</span>
+                    <span style="font-weight:400;text-transform:none;letter-spacing:0;">(Optional)</span>
                 </div>
 
                 <div class="reason-wrap w-full">
                     <textarea id="followup_reason" name="followup_reason" rows="3"
                         placeholder="e.g. Check healing progress after extraction..."
-                        class="reason-textarea w-full min-h-[92px] resize-none" required></textarea>
+                        class="reason-textarea w-full min-h-[92px] resize-none"></textarea>
                 </div>
 
                 <div class="btn-row flex flex-col-reverse sm:flex-row gap-3">
@@ -838,6 +848,7 @@ $existingAppointmentMode
         const dismissFinishProcedureBtn = document.getElementById('dismissFinishProcedureBtn');
         const finishProcedureModalActionBtn = document.getElementById('finishProcedureModalActionBtn');
         const existingAppointmentMode = @json($existingAppointmentMode);
+        const isOralProphylaxis = @json($isOralProphylaxis);
         const cancelProcedureRedirectUrl = @json(route('dentist.dentist.patient.profile', $patient -> id ?? 1));
         let finishProcedureModalRedirectUrl = null;
         let finishProcedureModalCloseTimer = null;
@@ -2896,16 +2907,17 @@ $existingAppointmentMode
 
             updateHiddenInput();
 
-            if (!hasAppliedTreatmentThisSession) {
+            if (!isOralProphylaxis && !hasAppliedTreatmentThisSession) {
                 alert(
                     'Please apply at least one treatment to the tooth chart before finishing the procedure.'
                 );
+
                 return;
             }
 
             const cleanOdontogramData = getCleanOdontogramDataForSave();
 
-            if (cleanOdontogramData.length === 0) {
+            if (!isOralProphylaxis && cleanOdontogramData.length === 0) {
                 alert(
                     'Please apply at least one treatment to the tooth chart before finishing the procedure.'
                 );
@@ -2918,7 +2930,7 @@ $existingAppointmentMode
                 diagnosis: document.getElementById('diagnosisNotes').value,
                 prescriptions: document.getElementById('prescriptionsNotes').value,
                 completion_action: completionAction,
-                has_applied_treatment: hasAppliedTreatmentThisSession,
+                has_applied_treatment: isOralProphylaxis || hasAppliedTreatmentThisSession,
                 procedure_duration_seconds: existingAppointmentMode
                     ? 0
                     : Math.max(0, Math.floor((Date.now() - procedureStartTimestamp) / 1000)),
@@ -2989,7 +3001,12 @@ $existingAppointmentMode
         finishProcedureBtn.addEventListener('click', function () {
             updateHiddenInput();
 
-            if (!hasAppliedTreatmentThisSession || getCleanOdontogramDataForSave().length === 0) {
+            if (!isOralProphylaxis &&
+                (
+                    !hasAppliedTreatmentThisSession ||
+                    getCleanOdontogramDataForSave().length === 0
+                )
+            ) {
                 openFinishProcedureModal({
                     title: 'Treatment Required',
                     message: 'Please apply at least one treatment to the tooth chart before finishing the procedure.',
@@ -3000,10 +3017,14 @@ $existingAppointmentMode
             }
 
             openFinishProcedureModal({
-                title: existingAppointmentMode ? 'Save Existing Appointment?' : 'Finish Procedure?',
+                title: existingAppointmentMode
+                    ? 'Save Existing Appointment?'
+                    : 'Finish Procedure?',
+
                 message: existingAppointmentMode
                     ? 'Are you sure you want to save this existing appointment? The old visit details, odontogram, and notes will be stored as a completed appointment.'
                     : 'Are you sure you want to finish this procedure? The odontogram and procedure notes will be saved, and this appointment will be marked as completed.',
+
                 icon: 'fa-circle-question',
                 confirmation: true,
             });
@@ -3047,11 +3068,6 @@ $existingAppointmentMode
             if (!timeInput?.value) {
                 document.getElementById('followUpTimeError')?.classList.remove('hidden');
                 document.querySelector('.follow-up-slots-wrap')?.classList.add('error');
-                valid = false;
-            }
-
-            if (!reasonInput?.value.trim()) {
-                reasonInput.focus();
                 valid = false;
             }
 

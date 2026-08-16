@@ -429,7 +429,10 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                             $visitTime = $visit->appointment_time
                             ? Carbon::parse($visit->appointment_time)->format('g:i A')
                             : 'N/A';
-                            $visitService = $visit->service_type ?? 'Appointment';
+                            $rawVisitService = $visit->service_type ?? 'Appointment';
+                            $visitService = strtolower(trim((string) $rawVisitService)) === 'follow-up'
+                                ? 'Follow-up Appointment'
+                                : $rawVisitService;
                             $visitStatus = $visit->status ?? 'upcoming';
                             $visitProcedure = $visit->procedure;
                             $visitFollowUp = $visit->followUpAppointments
@@ -546,9 +549,50 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                             $visitTime = $visit->appointment_time
                             ? Carbon::parse($visit->appointment_time)->format('g:i A')
                             : 'N/A';
-                            $visitService = $visit->service_type ?? 'Appointment';
+                            $rawVisitService = $visit->service_type ?? 'Appointment';
+                            $visitService = strtolower(trim((string) $rawVisitService)) === 'follow-up'
+                                ? 'Follow-up Appointment'
+                                : $rawVisitService;
                             $visitStatus = $visit->status ?? 'completed';
                             $visitProcedure = $visit->procedure;
+                            
+                            $visitOdontogramData = collect($visitProcedure?->odontogram_data ?? []);
+                            $appliedTreatments = $visitOdontogramData
+                                ->flatMap(function ($entry) {
+                                    $labels = collect();
+
+                                    $statusLabel = data_get($entry, 'status.label');
+                                    if ($statusLabel) {
+                                        $labels->push($statusLabel);
+                                    }
+
+                                    $threeDLabel = data_get($entry, 'threeD.label');
+                                    if ($threeDLabel) {
+                                        $labels->push($threeDLabel);
+                                    }
+
+                                    foreach (['top', 'left', 'center', 'right', 'bottom'] as $surface) {
+                                        $surfaceLabel = data_get($entry, "surfaces.$surface.label");
+
+                                        if ($surfaceLabel) {
+                                            $labels->push($surfaceLabel);
+                                        }
+                                    }
+
+                                    return $labels;
+                                })
+                                ->filter()
+                                ->unique()
+                                ->values();
+
+                            $isOralProphylaxis =strcasecmp(trim((string) $visitService),
+                                    'Oral Prophylaxis'
+                                ) === 0;
+
+                            $visitTreatment = $appliedTreatments->isNotEmpty()
+                                ? $appliedTreatments->implode(', ')
+                                : ($isOralProphylaxis ? 'Teeth Cleaning' : 'N/A');
+
                             $visitFollowUp = $visit->followUpAppointments
                             ->sortBy('appointment_time')
                             ->sortBy('appointment_date')
@@ -559,6 +603,7 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                             'time' => $visitTime,
                             'service' => $visitService,
                             'status' => $visitStatus,
+                            'treatment' => $visitTreatment,
                             'duration_seconds' =>
                             $visitProcedure
                             ?->procedure_duration_seconds,

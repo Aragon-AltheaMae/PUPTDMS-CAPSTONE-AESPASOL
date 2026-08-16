@@ -182,11 +182,53 @@
                                                 ($record->procedure_duration ??
                                                     ($record->treatment_duration ?? '60 mins'));
 
-                                        $recordTreatment = $recordProcedure?->completion_action
-                                            ? \Illuminate\Support\Str::of($recordProcedure->completion_action)
-                                                ->replace('_', ' ')
-                                                ->title()
-                                            : $record->remarks ?? '';
+                                        $recordOdontogramData = collect($recordProcedure?->odontogram_data ?? []);
+                                        $appliedTreatments = $recordOdontogramData
+                                            ->flatMap(function ($entry) {
+                                                $labels = collect();
+                                                $statusLabel = data_get($entry, 'status.label');
+
+                                                if ($statusLabel) {
+                                                    $labels->push($statusLabel);
+                                                }
+
+                                                $threeDLabel = data_get($entry, 'threeD.label');
+
+                                                if ($threeDLabel) {
+                                                    $labels->push($threeDLabel);
+                                                }
+
+                                                foreach (
+                                                    ['top', 'left', 'center', 'right', 'bottom']
+                                                    as $surface
+                                                ) {
+                                                    $surfaceLabel = data_get(
+                                                        $entry,
+                                                        "surfaces.$surface.label"
+                                                    );
+
+                                                    if ($surfaceLabel) {
+                                                        $labels->push($surfaceLabel);
+                                                    }
+                                                }
+
+                                                return $labels;
+                                            })
+                                            ->filter()
+                                            ->unique()
+                                            ->values();
+
+                                        $isOralProphylaxis =strcasecmp(trim((string) $record->service_type),
+                                                'Oral Prophylaxis'
+                                            ) === 0;
+
+                                        $recordTreatment = $isOralProphylaxis
+                                                ? 'Teeth Cleaning'
+                                                : (
+                                                    $appliedTreatments->isNotEmpty()
+                                                        ? $appliedTreatments->implode(', ')
+                                                        : 'N/A'
+                                                );
                                     @endphp
 
                                     <div class="rec-row" style="animation-delay:{{ $i * 0.08 }}s;">
@@ -450,11 +492,6 @@
                         });
                 }, 200);
             }
-
-            const params =
-                new URLSearchParams(
-                    window.location.search
-                );
 
             const targetAppointmentId =
                 params.get('appointment');
