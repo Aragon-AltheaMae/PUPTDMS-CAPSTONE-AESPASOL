@@ -870,30 +870,6 @@
     }
 }
 
-@keyframes apptTabPop {
-    0% {
-        transform: scale(.96);
-    }
-
-    60% {
-        transform: scale(1.035);
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
-
-.appt-tab.appt-active::after {
-    animation: apptShine .65s ease;
-}
-
-@keyframes apptShine {
-    to {
-        transform: translateX(120%) skewX(-20deg);
-    }
-}
-
 @keyframes apptModalDesktopIn {
     from {
         opacity: 0;
