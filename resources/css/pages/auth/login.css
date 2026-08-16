@@ -845,10 +845,33 @@
     background: var(--card);
 }
 
-.auth-landing-dentist,
-.auth-landing-faq {
+.auth-landing-dentist {
     background: var(--surface);
     border-block: 1px solid var(--border);
+}
+
+.auth-landing-faq {
+    position: relative;
+    overflow: hidden;
+
+    background:
+        linear-gradient(90deg,
+            rgba(255, 255, 255, .25) 0%,
+            rgba(255, 255, 255, .55) 48%,
+            rgba(255, 255, 255, .88) 78%),
+        url('/images/PUPT_Dental_1.png') left center / cover no-repeat;
+
+    border-block: 1px solid var(--border);
+}
+
+[data-theme="dark"] .auth-landing-faq,
+.dark .auth-landing-faq {
+    background:
+        linear-gradient(90deg,
+            rgba(18, 18, 18, .35) 0%,
+            rgba(18, 18, 18, .68) 48%,
+            rgba(18, 18, 18, .94) 78%),
+        url('/images/PUPT_Dental_1.png') left center / cover no-repeat;
 }
 
 .auth-landing-section-intro {
