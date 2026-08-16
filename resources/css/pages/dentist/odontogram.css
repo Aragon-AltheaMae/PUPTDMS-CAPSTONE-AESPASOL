@@ -101,15 +101,6 @@
     height: 8px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #D1D5DB;
-    border-radius: 999px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-}
-
 .treatment-chip {
     border: 1px solid #FCA5A5;
     background: #FFF1F2;
@@ -1932,13 +1923,6 @@ body.layout-no-sidebar #mainContent.odontogram-page {
     background: rgba(248, 250, 252, 0.08) !important;
     color: #CBD5E1 !important;
     border: 1px solid rgba(203, 213, 225, 0.18) !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page .custom-scrollbar::-webkit-scrollbar-thumb,
-.dark #mainContent.odontogram-page .custom-scrollbar::-webkit-scrollbar-thumb,
-[data-theme="dark"] body:has(#mainContent.odontogram-page) .custom-scrollbar::-webkit-scrollbar-thumb,
-.dark body:has(#mainContent.odontogram-page) .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.32) !important;
 }
 
 [data-theme="dark"] #mainContent.odontogram-page .soft-card,

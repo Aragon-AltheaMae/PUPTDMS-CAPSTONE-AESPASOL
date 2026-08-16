@@ -30,6 +30,8 @@
 @import './components/impersonation-banner.css';
 @import './pages/error-pages.css';
 @import './pages/auth/login.css';
+@import './pages/auth/backup-login.css';
+
 @import './components/odontogram-preview.css';
 @import './components/booking-workflow.css';
 @import './components/filter-select.css';
