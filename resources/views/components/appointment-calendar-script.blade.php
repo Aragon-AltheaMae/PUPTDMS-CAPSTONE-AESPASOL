@@ -102,8 +102,14 @@
         window.createCalendarSource(calendarConfig) :
         null;
 
-    window.__appCalendarSources = window.__appCalendarSources || {};
-    window.__appCalendarSources[calendarConfig.dateInputId] = sharedCalendarSource;
+    window.__appCalendarSources =
+        window.__appCalendarSources || {};
+
+    if (calendarConfig.dateInputId) {
+        window.__appCalendarSources[
+            calendarConfig.dateInputId
+        ] = sharedCalendarSource;
+    }
 
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
@@ -1532,8 +1538,11 @@
         const isInitialAnimatedRender = !hasCalendarRenderedOnce &&
             calendarConfig.mode !== 'booking';
 
-        if (isInitialAnimatedRender) {
-            swapSkeletonContent(
+        if (
+            isInitialAnimatedRender &&
+            typeof window.swapSkeletonContent === 'function'
+        ) {
+            window.swapSkeletonContent(
                 calendarConfig.calendarContainerId,
                 markup
             );
@@ -1562,12 +1571,40 @@
 
             calendarContainer
                 ?.querySelectorAll(
-                    '.custom-select'
+                    '.calendar-split-picker .custom-select'
                 )
                 .forEach(wrapper => {
                     window.syncCustomSelect?.(
                         wrapper
                     );
+
+                    const button =
+                        wrapper.querySelector(
+                            '.custom-select-button'
+                        );
+
+                    if (
+                        button &&
+                        !button.querySelector(
+                            '.calendar-picker-icon'
+                        )
+                    ) {
+                        const iconWrap =
+                            document.createElement('span');
+
+                        iconWrap.className =
+                            'calendar-picker-icon';
+
+                        iconWrap.setAttribute(
+                            'aria-hidden',
+                            'true'
+                        );
+
+                        iconWrap.innerHTML =
+                            '<i class="fa-solid fa-calendar-days"></i>';
+
+                        button.prepend(iconWrap);
+                    }
                 });
 
             bindCalendarClicks(
@@ -1862,6 +1899,71 @@
         );
     }
 
+    function scrollSelectedCalendarDetailsIntoView() {
+        if (
+            calendarConfig.mode !==
+            'patient-dashboard'
+        ) {
+            return;
+        }
+
+        requestAnimationFrame(() => {
+            const container =
+                document.getElementById(
+                    calendarConfig.calendarContainerId
+                );
+
+            const panel =
+                getDashboardAvailabilityPanel();
+
+            if (!container || !panel) {
+                return;
+            }
+
+            const isStackedLayout =
+                window.matchMedia(
+                    '(max-width: 1100px)'
+                ).matches;
+
+            if (!isStackedLayout) {
+                return;
+            }
+
+            const legend =
+                container.querySelector(
+                    '.cal-legend'
+                );
+
+            const target =
+                legend || panel;
+
+            const header =
+                document.querySelector(
+                    '.main-header, header'
+                );
+
+            const headerHeight =
+                header?.getBoundingClientRect()
+                .height || 0;
+
+            const extraOffset =
+                window.innerWidth <= 640 ?
+                10 :
+                18;
+
+            const targetTop =
+                target.getBoundingClientRect().top +
+                window.scrollY -
+                headerHeight -
+                extraOffset;
+
+            window.scrollTo({
+                top: Math.max(0, targetTop),
+                behavior: 'smooth'
+            });
+        });
+    }
+
     function renderCompletedAppointmentPanel(state) {
         const panel = getDashboardAvailabilityPanel();
 
@@ -1976,6 +2078,8 @@
             </div>
         </div>
     `;
+
+        scrollSelectedCalendarDetailsIntoView();
     }
 
     function escapeCalendarText(value) {
@@ -2076,6 +2180,8 @@
         </div>
     `;
 
+            scrollSelectedCalendarDetailsIntoView();
+
             return;
         }
 
@@ -2137,6 +2243,8 @@
                 </div>
             </div>
         `;
+
+        scrollSelectedCalendarDetailsIntoView();
     }
 
     function renderSlots(payload, iso) {
@@ -2377,10 +2485,18 @@
     let currentYear = new Date().getFullYear();
     let currentMonth = new Date().getMonth();
 
-    window.changeMonth = function(dir) {
+    let calendarMonthAnimating = false;
+
+    window.changeMonth = async function(dir) {
+        if (calendarMonthAnimating) {
+            return;
+        }
+
+        const direction = Number(dir);
+
         const candidate = new Date(
             currentYear,
-            currentMonth + Number(dir),
+            currentMonth + direction,
             1
         );
 
@@ -2389,19 +2505,96 @@
             maximum
         } = getMonthBounds();
 
-        if (candidate < minimum || candidate > maximum) {
+        if (
+            candidate < minimum ||
+            candidate > maximum
+        ) {
             return;
         }
+
+        calendarMonthAnimating = true;
 
         clearTimeout(dashboardLoadingTimer);
         dashboardLoadingTimer = null;
 
-        currentYear = candidate.getFullYear();
-        currentMonth = candidate.getMonth();
+        const container =
+            document.getElementById(
+                calendarConfig.calendarContainerId
+            );
+
+        const currentPanel =
+            container?.querySelector(
+                '.dashboard-calendar-main'
+            ) ||
+            container?.querySelector(
+                '.cal-shell'
+            );
+
+        if (currentPanel) {
+            const outgoingClass =
+                direction > 0 ?
+                'global-carousel-out-left' :
+                'global-carousel-out-right';
+
+            currentPanel.classList.add(
+                outgoingClass
+            );
+
+            await new Promise(resolve => {
+                window.setTimeout(
+                    resolve,
+                    180
+                );
+            });
+        }
+
+        currentYear =
+            candidate.getFullYear();
+
+        currentMonth =
+            candidate.getMonth();
+
         selectedDate = null;
         focusedDateIso = null;
 
         renderCalendar();
+
+        requestAnimationFrame(() => {
+            const nextContainer =
+                document.getElementById(
+                    calendarConfig.calendarContainerId
+                );
+
+            const nextPanel =
+                nextContainer?.querySelector(
+                    '.dashboard-calendar-main'
+                ) ||
+                nextContainer?.querySelector(
+                    '.cal-shell'
+                );
+
+            if (!nextPanel) {
+                calendarMonthAnimating = false;
+                return;
+            }
+
+            const incomingClass =
+                direction > 0 ?
+                'global-carousel-in-right' :
+                'global-carousel-in-left';
+
+            nextPanel.classList.add(
+                incomingClass
+            );
+
+            window.setTimeout(() => {
+                nextPanel.classList.remove(
+                    incomingClass
+                );
+
+                calendarMonthAnimating = false;
+            }, 300);
+        });
     };
 
     document.addEventListener("DOMContentLoaded", function() {

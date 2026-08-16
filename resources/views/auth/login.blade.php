@@ -354,7 +354,7 @@
             <div class="auth-landing-service-icon"><i class="fa-solid fa-teeth-open"></i></div>
             <div>
               <span>Preventive</span>
-              <h3>Dental Cleaning</h3>
+              <h3>Oral Prophylaxis</h3>
               <p>Professional cleaning for plaque, tartar, and surface stain removal.</p>
             </div>
           </article>

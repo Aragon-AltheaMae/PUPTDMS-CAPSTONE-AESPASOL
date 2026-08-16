@@ -57,13 +57,23 @@ class AppointmentController extends Controller
         $today = $now->toDateString();
         $nowTime = $now->format('H:i:s');
 
-        $appointments = Appointment::with(['dentist.role'])
+        $appointments = Appointment::with([
+            'dentist.role',
+            'originalDentist.role',
+            'procedure',
+            'followUpAppointments',
+        ])
             ->where('patient_id', $patientId)
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        $futureVisits = Appointment::with(['dentist.role'])
+        $futureVisits = Appointment::with([
+            'dentist.role',
+            'originalDentist.role',
+            'procedure',
+            'followUpAppointments',
+        ])
             ->where('patient_id', $patientId)
             ->whereIn('status', ['upcoming', 'rescheduled'])
             ->where(function ($q) use ($today, $nowTime) {
@@ -77,7 +87,12 @@ class AppointmentController extends Controller
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        $pastVisits = Appointment::with(['dentist.role'])
+        $pastVisits = Appointment::with([
+            'dentist.role',
+            'originalDentist.role',
+            'procedure',
+            'followUpAppointments',
+        ])
             ->where('patient_id', $patientId)
             ->where(function ($q) use ($today, $nowTime) {
                 $q->whereIn('status', ['completed', 'cancelled'])

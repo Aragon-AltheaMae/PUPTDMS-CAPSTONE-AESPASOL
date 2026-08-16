@@ -1,7 +1,3 @@
-.cal-legend {
-    gap: .55rem !important;
-}
-
 .cal-pill {
     display: inline-flex !important;
     align-items: center !important;
@@ -47,36 +43,6 @@
     background: #e5e7eb !important;
     color: #6b7280 !important;
     border-color: #d1d5db !important;
-}
-
-[data-theme="dark"] .cal-pill-green {
-    background: rgba(20, 184, 166, .20) !important;
-    color: #5eead4 !important;
-    border-color: rgba(45, 212, 191, .28) !important;
-}
-
-[data-theme="dark"] .cal-pill-red {
-    background: rgba(248, 113, 113, .20) !important;
-    color: #fca5a5 !important;
-    border-color: rgba(248, 113, 113, .28) !important;
-}
-
-[data-theme="dark"] .cal-pill-maroon {
-    background: rgba(139, 0, 0, .45) !important;
-    color: #fecaca !important;
-    border-color: rgba(252, 165, 165, .25) !important;
-}
-
-[data-theme="dark"] .cal-pill-yellow {
-    background: rgba(245, 158, 11, .22) !important;
-    color: #fde68a !important;
-    border-color: rgba(251, 191, 36, .30) !important;
-}
-
-[data-theme="dark"] .cal-pill-gray {
-    background: rgba(148, 163, 184, .18) !important;
-    color: #cbd5e1 !important;
-    border-color: rgba(203, 213, 225, .22) !important;
 }
 
 .cal-shell {
@@ -136,23 +102,19 @@
     opacity: 0.58;
 }
 
-.cal-shell .cal-cell.selected,
-[data-theme="dark"] .cal-shell .cal-cell.selected,
-.dark .cal-shell .cal-cell.selected {
+.cal-shell .cal-cell.selected {
     background:
         linear-gradient(135deg,
             var(--crimson),
             var(--crimson-dark)) !important;
 
     color: #ffffff !important;
-
     border: 1px solid var(--crimson) !important;
-
     font-weight: 850 !important;
     opacity: 1 !important;
 
     box-shadow:
-        0 8px 18px rgba(139, 0, 0, 0.28) !important;
+        0 8px 18px rgba(139, 0, 0, .28) !important;
 
     transform: none !important;
 }
@@ -601,16 +563,6 @@
         0 16px 34px rgba(139, 0, 0, 0.42) !important;
 }
 
-[data-theme="dark"] .inventory-form-modal .form-input-custom[readonly],
-[data-theme="dark"] .inventory-form-modal .fp-date-input[readonly],
-[data-theme="dark"] .inventory-form-modal .form-input-custom.js-flatpickr-date[readonly],
-.dark .inventory-form-modal .form-input-custom[readonly],
-.dark .inventory-form-modal .fp-date-input[readonly],
-.dark .inventory-form-modal .form-input-custom.js-flatpickr-date[readonly] {
-    background: rgba(13, 17, 23, 0.86) !important;
-    color: #E5E7EB !important;
-}
-
 .dashboard-calendar-availability-header {
     display: flex;
     align-items: flex-start;
@@ -834,33 +786,96 @@
     margin-bottom: 1rem;
 }
 
-body.role-patient #mainContent.patient-dashboard-page #calendarSkeletonContainer .calendar-split-picker {
+.dashboard-calendar-shell .calendar-split-picker {
     width: min(100%, 220px);
-
     margin-inline: auto;
-
-    grid-template-columns:
-        minmax(0, 1fr);
-
+    grid-template-columns: minmax(0, 1fr);
     justify-self: center;
 }
 
-body.role-patient #mainContent.patient-dashboard-page #calendarSkeletonContainer .calendar-split-picker-item {
+.dashboard-calendar-shell .calendar-split-picker-item,
+.dashboard-calendar-shell .calendar-split-picker-item:first-child {
     width: 100%;
     min-width: 0;
 }
 
-body.role-patient #mainContent.patient-dashboard-page #calendarSkeletonContainer .calendar-split-picker-item:first-child {
+.dashboard-calendar-shell .calendar-split-picker .custom-select {
+    width: 100%;
     min-width: 0;
 }
 
-body.role-patient #mainContent.patient-dashboard-page #calendarSkeletonContainer .calendar-split-picker .custom-select {
+.dashboard-calendar-shell .calendar-split-picker .custom-select-button {
+    min-height: 46px;
+
+    display: grid;
+    grid-template-columns:
+        22px minmax(0, 1fr) 22px;
+
+    align-items: center;
+    gap: 8px;
+
+    padding: 0 .8rem;
+
+    text-align: center;
+}
+
+.dashboard-calendar-shell .calendar-split-picker .custom-select-button .calendar-picker-icon {
+    width: 22px;
+    height: 22px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--crimson);
+
+    font-size: .75rem;
+
+    transform: none;
+}
+
+.dashboard-calendar-shell .calendar-split-picker .custom-select-button .calendar-picker-icon i {
+    display: block;
+
+    color: inherit;
+
+    font-size: inherit;
+
+    transform: none !important;
+    transition: none !important;
+}
+
+.dashboard-calendar-shell .calendar-split-picker .custom-select-button [data-custom-select-value] {
     width: 100%;
+    min-width: 0;
+
+    display: block;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    color: var(--text-1);
+
+    text-align: center;
+}
+
+.dashboard-calendar-shell .calendar-split-picker .custom-select-button>i {
+    width: 22px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0;
+
+    color: var(--text-3);
 }
 
 .calendar-split-picker-item {
     flex: 1 1 0;
     width: auto;
+    min-width: 0;
 }
 
 .calendar-split-picker {
@@ -869,10 +884,6 @@ body.role-patient #mainContent.patient-dashboard-page #calendarSkeletonContainer
         minmax(0, 1fr) minmax(0, .58fr);
     gap: .75rem;
     align-items: center;
-}
-
-.calendar-split-picker-item {
-    min-width: 0;
 }
 
 .calendar-year-picker-wrap {
@@ -1048,43 +1059,32 @@ body.role-patient #mainContent.patient-dashboard-page #calendarSkeletonContainer
         gap: .5rem;
     }
 
-    #calendarSkeletonContainer .calendar-split-picker-item {
-        width: 100%;
+    .dashboard-calendar-shell .calendar-split-picker {
+        width: min(100%, 190px);
     }
 
-    #calendarSkeletonContainer .calendar-split-picker .custom-select {
-        width: 100%;
+    .dashboard-calendar-shell .calendar-split-picker .custom-select-button {
+        min-height: 42px;
+
+        grid-template-columns:
+            20px minmax(0, 1fr) 20px;
+
+        gap: 6px;
+
+        padding: 0 .7rem;
+
+        font-size: .76rem;
     }
 
-    #calendarSkeletonContainer .calendar-split-picker .custom-select-button {
-        position: relative;
+    .dashboard-calendar-shell .calendar-split-picker .custom-select-button .calendar-picker-icon {
+        width: 20px;
+        height: 20px;
 
-        width: 100%;
-        min-height: 44px;
-
-        justify-content: center;
-
-        padding-left: 2.25rem;
-        padding-right: 2.25rem;
-
-        text-align: center;
+        font-size: .7rem;
     }
 
-    #calendarSkeletonContainer .calendar-split-picker .custom-select-button [data-custom-select-value] {
-        width: 100%;
-
-        overflow: visible;
-        white-space: nowrap;
-        text-overflow: clip;
-
-        text-align: center;
-    }
-
-    #calendarSkeletonContainer .calendar-split-picker .custom-select-button>i {
-        position: absolute;
-        right: .85rem;
-
-        margin: 0;
+    .dashboard-calendar-shell .calendar-split-picker .custom-select-button>i {
+        width: 20px;
     }
 
     .calendar-split-picker {
@@ -1105,20 +1105,53 @@ body.role-patient #mainContent.patient-dashboard-page #calendarSkeletonContainer
         padding-right: .75rem;
     }
 
-    .dashboard-calendar-summary,
     .dashboard-calendar-filters {
-        justify-content: flex-start;
-    }
-
-    .dashboard-calendar-filters {
-        overflow-x: auto;
-        flex-wrap: nowrap;
-        padding-bottom: .25rem;
-        scrollbar-width: thin;
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: .32rem;
+        overflow: visible;
+        padding-bottom: 0;
     }
 
     .dashboard-calendar-filters button {
+        width: 100%;
+        min-width: 0;
+        min-height: 29px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .25rem;
+
+        padding: 0 .32rem;
+
+        font-size: .58rem;
+        line-height: 1;
+        white-space: nowrap;
+
+        border-radius: 999px;
+    }
+
+    .dashboard-calendar-filters button i {
+        font-size: .56rem;
         flex: 0 0 auto;
+    }
+}
+
+@media (max-width: 380px) {
+    .dashboard-calendar-filters {
+        gap: .25rem;
+    }
+
+    .dashboard-calendar-filters button {
+        min-height: 28px;
+        padding-inline: .22rem;
+        font-size: .53rem;
+    }
+
+    .dashboard-calendar-filters button i {
+        font-size: .5rem;
     }
 }
 
@@ -1135,6 +1168,11 @@ body.role-patient #mainContent.patient-dashboard-page #calendarSkeletonContainer
 
 .dashboard-calendar-shell .dashboard-calendar-main {
     min-width: 0;
+}
+
+.dashboard-calendar-main {
+    position: relative;
+    will-change: transform, opacity;
 }
 
 .dashboard-calendar-side-panel {
