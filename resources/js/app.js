@@ -1588,7 +1588,8 @@ document.addEventListener(
 
         initCharLimitFields(modal);
         initSearchClearButtons(modal);
-        initGlobalVoiceInputs(modal);
+
+        window.initGlobalVoiceInputs?.(modal);
     }
 );
 
@@ -2004,7 +2005,7 @@ function applyGlobalTheme(theme = 'light') {
     window.__themeTransitionTimer = window.setTimeout(() => {
         html.classList.remove('theme-transitioning');
     }, 320);
-    
+
     const nextTheme =
         theme === 'dark'
             ? 'dark'
@@ -6545,196 +6546,6 @@ window.initGlobalPageSizeSelects = initGlobalPageSizeSelects;
 window.syncGlobalPageSizeSelect = syncGlobalPageSizeSelect;
 window.setGlobalPageSizeValue = setGlobalPageSizeValue;
 
-const activeVoiceControllers = new Map();
-
-function getSpeechRecognitionConstructor() {
-    return window.SpeechRecognition || window.webkitSpeechRecognition || null;
-}
-
-function setVoiceStatus(statusEl, message = '', state = 'default') {
-    if (!statusEl) return;
-
-    statusEl.textContent = message;
-    statusEl.classList.remove('hidden', 'is-listening', 'is-success', 'is-error', 'is-default');
-
-    if (!message) {
-        statusEl.classList.add('hidden');
-        return;
-    }
-
-    statusEl.classList.add(`is-${state}`);
-}
-
-function resolveVoiceTarget(button) {
-    const targetSelector = button.dataset.voiceTarget;
-
-    if (targetSelector) {
-        return document.querySelector(targetSelector);
-    }
-
-    const field = button.closest('[data-voice-field], .voice-search-row, .st-voice-row');
-
-    return field?.querySelector('input:not([type="hidden"]), textarea') || null;
-}
-
-function resolveVoiceStatus(button) {
-    const statusSelector = button.dataset.voiceStatus;
-
-    if (statusSelector) {
-        return document.querySelector(statusSelector);
-    }
-
-    const field = button.closest('[data-voice-field], .voice-search-row, .st-voice-row');
-
-    return field?.querySelector('[data-voice-status]') || null;
-}
-
-function stopActiveVoiceExcept(currentButton = null) {
-    activeVoiceControllers.forEach((controller, button) => {
-        if (button === currentButton) return;
-
-        try {
-            controller.recognition.stop();
-        } catch (_) { }
-
-        button.classList.remove('mic-active');
-        setVoiceStatus(controller.statusEl, '', 'default');
-        activeVoiceControllers.delete(button);
-    });
-}
-
-function initGlobalVoiceInputs(root = document) {
-    const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
-
-    const SpeechRecognition = getSpeechRecognitionConstructor();
-
-    const buttons = scope.querySelectorAll(
-        '.voice-search-mic.external[data-voice-trigger], [data-global-voice-trigger]'
-    );
-
-    buttons.forEach((button) => {
-        if (button.dataset.voiceInitialized === 'true') return;
-
-        button.dataset.voiceInitialized = 'true';
-
-        button.addEventListener('click', () => {
-            const input = resolveVoiceTarget(button);
-            const statusEl = resolveVoiceStatus(button);
-
-            if (!input) {
-                setVoiceStatus(statusEl, 'No input found', 'error');
-                return;
-            }
-
-            if (!SpeechRecognition) {
-                setVoiceStatus(statusEl, 'Voice not supported', 'error');
-                return;
-            }
-
-            if (activeVoiceControllers.has(button)) {
-                const active = activeVoiceControllers.get(button);
-
-                try {
-                    active.recognition.stop();
-                } catch (_) { }
-
-                button.classList.remove('mic-active');
-                setVoiceStatus(statusEl, '', 'default');
-                activeVoiceControllers.delete(button);
-                return;
-            }
-
-            stopActiveVoiceExcept(button);
-
-            const recognition = new SpeechRecognition();
-
-            recognition.lang = input.dataset.voiceLang || button.dataset.voiceLang || 'en-US';
-            recognition.continuous = false;
-            recognition.interimResults = true;
-            recognition.maxAlternatives = 1;
-
-            let finalTranscript = '';
-
-            recognition.onstart = () => {
-                button.classList.add('mic-active');
-                setVoiceStatus(statusEl, 'Listening...', 'listening');
-            };
-
-            recognition.onresult = (event) => {
-                let interimTranscript = '';
-
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    const transcript = event.results[i][0]?.transcript?.trim() || '';
-
-                    if (!transcript) continue;
-
-                    if (event.results[i].isFinal) {
-                        finalTranscript += ` ${transcript}`;
-                    } else {
-                        interimTranscript += ` ${transcript}`;
-                    }
-                }
-
-                const spokenText = (finalTranscript || interimTranscript).trim();
-
-                if (!spokenText) return;
-
-                if (input.tagName.toLowerCase() === 'textarea' && input.value.trim()) {
-                    input.value = `${input.value.trim()} ${spokenText}`.trim();
-                } else {
-                    input.value = spokenText;
-                }
-
-                input.dispatchEvent(new Event('input', { bubbles: true }));
-                input.dispatchEvent(new Event('change', { bubbles: true }));
-            };
-
-            recognition.onerror = (event) => {
-                button.classList.remove('mic-active');
-
-                const error = event?.error || 'unknown';
-                const message = error === 'not-allowed'
-                    ? 'Microphone blocked'
-                    : 'Voice input failed';
-
-                setVoiceStatus(statusEl, message, 'error');
-                activeVoiceControllers.delete(button);
-
-                setTimeout(() => {
-                    setVoiceStatus(statusEl, '', 'default');
-                }, 1800);
-            };
-
-            recognition.onend = () => {
-                button.classList.remove('mic-active');
-                activeVoiceControllers.delete(button);
-
-                if (input.value.trim()) {
-                    setVoiceStatus(statusEl, 'Captured', 'success');
-
-                    setTimeout(() => {
-                        setVoiceStatus(statusEl, '', 'default');
-                    }, 1200);
-                } else {
-                    setVoiceStatus(statusEl, '', 'default');
-                }
-            };
-
-            activeVoiceControllers.set(button, {
-                recognition,
-                input,
-                statusEl,
-            });
-
-            recognition.start();
-        });
-    });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    initGlobalVoiceInputs();
-});
-
 document.addEventListener('DOMContentLoaded', () => {
     const openModalSelector = [
         '.modal-overlay.open',
@@ -6764,8 +6575,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     syncModalLock();
 });
-
-window.initGlobalVoiceInputs = initGlobalVoiceInputs;
 
 function closeCustomSelects(except = null) {
     document.querySelectorAll('.custom-select.is-open').forEach(wrapper => {

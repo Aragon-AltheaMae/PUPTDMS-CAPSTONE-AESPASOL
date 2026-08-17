@@ -363,10 +363,8 @@
                         </div>
                     </div>
                 </form>
+                <x-booking.navigation />
             </div>
-
-            <x-booking.navigation />
-
         </div>
     </div>
 </main>

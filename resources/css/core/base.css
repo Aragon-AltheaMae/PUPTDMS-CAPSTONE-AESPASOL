@@ -40,16 +40,26 @@ body.role-dentist {
 
 body.layout-no-sidebar #mainContent,
 body.layout-no-sidebar #siteFooter {
-    margin-left: 0 !important;
     width: 100% !important;
+    max-width: 100% !important;
+
+    margin-left: 0 !important;
+    margin-right: 0 !important;
 }
 
 body.layout-no-sidebar #mainContent {
     padding-left: 0;
 }
 
-body.role-patient.layout-no-sidebar #mainContent {
+body.layout-no-sidebar:has(#sidebar) #mainContent,
+body.role-patient.layout-no-sidebar #mainContent,
+body.role-dentist.layout-no-sidebar #mainContent,
+body.role-admin.layout-no-sidebar #mainContent {
     margin-left: 0 !important;
+    margin-right: 0 !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
 }
 
 body {

@@ -769,6 +769,10 @@
         );
 
         buttons.forEach((button) => {
+            button.classList.remove('hidden');
+
+            resetMic(button);
+
             if (
                 button.dataset.voiceReady ===
                 'true' ||
@@ -778,10 +782,6 @@
             ) {
                 return;
             }
-
-            resetMic(
-                button
-            );
 
             button.classList.add(
                 'voice-control-ready'

@@ -9,9 +9,59 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Helpers\PhilippineHolidays;
 use App\Helpers\AuditLogger;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class DentistPatientController extends Controller
 {
+
+    private function syncOverdueAppointmentsToCancelled(): void
+    {
+        $now = Carbon::now();
+
+        $gracePeriodMinutes = 60;
+
+        $cutoff = $now->copy()->subMinutes($gracePeriodMinutes);
+
+        $updatePayload = [
+            'status' => 'cancelled',
+            'updated_at' => $now,
+        ];
+
+        if (Schema::hasColumn('appointments', 'cancellation_reason')) {
+            $updatePayload['cancellation_reason'] = DB::raw(
+                "COALESCE(
+                NULLIF(cancellation_reason, ''),
+                'Appointment was not started within the 1-hour grace period.'
+            )"
+            );
+        }
+
+        Appointment::query()
+            ->whereIn('status', ['upcoming', 'rescheduled'])
+            ->where(function ($query) use ($cutoff) {
+                $query
+                    ->whereDate(
+                        'appointment_date',
+                        '<',
+                        $cutoff->toDateString()
+                    )
+                    ->orWhere(function ($sameDay) use ($cutoff) {
+                        $sameDay
+                            ->whereDate(
+                                'appointment_date',
+                                $cutoff->toDateString()
+                            )
+                            ->whereTime(
+                                'appointment_time',
+                                '<',
+                                $cutoff->format('H:i:s')
+                            );
+                    });
+            })
+            ->update($updatePayload);
+    }
+
     public function index()
     {
         $activeRole = session('impersonated_role') ?: session('role');
@@ -20,6 +70,7 @@ class DentistPatientController extends Controller
             return redirect('/login');
         }
 
+        $this->syncOverdueAppointmentsToCancelled();
         $today = Carbon::today()->toDateString();
 
         $appointments = Appointment::with('patient')
@@ -109,6 +160,8 @@ class DentistPatientController extends Controller
             return redirect('/login');
         }
 
+        $this->syncOverdueAppointmentsToCancelled();
+
         $patient->loadMissing([
             'user',
             'odontogram',
@@ -130,18 +183,28 @@ class DentistPatientController extends Controller
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        $pastVisits = Appointment::with(['procedure', 'followUpAppointments', 'dentist'])
+        $pastVisits = Appointment::with([
+            'procedure',
+            'followUpAppointments',
+            'dentist',
+        ])
             ->where('patient_id', $patient->id)
-            ->where(function ($query) use ($today) {
-                $query->whereDate('appointment_date', '<', $today)
-                    ->orWhereIn('status', ['completed', 'cancelled']);
-            })
+            ->whereIn('status', [
+                'completed',
+                'cancelled',
+            ])
             ->orderBy('appointment_date', 'desc')
             ->orderBy('appointment_time', 'desc')
             ->get();
 
-        $totalVisits = $pastVisits->count();
-        $lastVisit = $pastVisits->first();
+        $completedVisits = $pastVisits
+            ->where('status', 'completed')
+            ->values();
+
+        $totalVisits = $completedVisits->count();
+
+        $lastVisit = $completedVisits->first();
+
         $nextAppointment = $futureVisits->first();
 
         $philippineHolidays = PhilippineHolidays::range(1, 1);
