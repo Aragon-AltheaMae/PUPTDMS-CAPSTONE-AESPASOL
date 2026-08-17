@@ -523,15 +523,33 @@
         setText('m_service', data.service);
         setText('m_date', data.date);
         setText('m_time', formatRecordTime(data.time));
+        const normalizedRecordStatus = String(
+                data.status || ''
+            )
+            .trim()
+            .toLowerCase();
+
+        const isCancelledRecord =
+            normalizedRecordStatus === 'cancelled' ||
+            normalizedRecordStatus === 'canceled';
+
         setText(
             'm_duration',
-            data.durationSeconds !== null &&
-            data.durationSeconds !== undefined ?
-            formatRecordDurationSeconds(data.durationSeconds) :
-            formatRecordDuration(data.duration)
+            isCancelledRecord ?
+            '—' :
+            (
+                data.durationSeconds !== null &&
+                data.durationSeconds !== undefined ?
+                formatRecordDurationSeconds(
+                    data.durationSeconds
+                ) :
+                formatRecordDuration(
+                    data.duration
+                )
+            )
         );
 
-        var status = String(data.status || '').trim().toLowerCase();
+        var status = normalizedRecordStatus;
         var sEl = document.getElementById('m_status');
 
         if (sEl) {

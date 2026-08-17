@@ -19,6 +19,24 @@
                     : $fallbackUrl,
                 default => $fallbackUrl,
             },
+
+            'appointment.cancelled' => match ($activeRole) {
+                'patient' => Route::has('patient.record')
+                    ? route('patient.record', [
+                        'appointment' => data_get($payload, 'appointment_id'),
+                    ])
+                    : $fallbackUrl,
+
+                'admin', 'super_admin' => Route::has('admin.admin.appointments')
+                    ? route('admin.admin.appointments')
+                    : $fallbackUrl,
+
+                'dentist' => Route::has('dentist.dentist.appointments')
+                    ? route('dentist.dentist.appointments')
+                    : $fallbackUrl,
+
+                default => $fallbackUrl,
+            },
             'document.request.submitted', 'document_request_submitted' => match ($activeRole) {
                 'admin', 'super_admin' => Route::has('admin.document-requests.index')
                     ? route('admin.document-requests.index')

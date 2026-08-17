@@ -801,7 +801,7 @@ Route::prefix('patient')->middleware(['role:patient'])->group(function () {
         ->middleware('permission:book_appointments')
         ->name('book.appointment.store');
 
-    Route::get('/book-appointment/draft', [AppointmentController::class, 'getDraft'])
+            Route::get('/book-appointment/draft', [AppointmentController::class, 'getDraft'])
         ->middleware('permission:book_appointments')
         ->name('book.appointment.draft.show');
 
@@ -977,6 +977,13 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         $notifications = collect([]);
         $unavailableDates = [];
 
+        $clinicStatus = strtolower(
+            (string) \App\Models\SystemSetting::getSetting(
+                'clinic_status',
+                'in'
+            )
+        );
+
         return view('dentist.dentist-dashboard', compact(
             'todayAppointments',
             'appointmentCountsPerDay',
@@ -992,7 +999,8 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
             'medicineSupplies',
             'gadLabels',
             'gadFemale',
-            'gadMale'
+            'gadMale',
+            'clinicStatus'
         ));
     })->middleware('permission:access_dentist_dashboard')->name('dentist.dentist.dashboard');
 

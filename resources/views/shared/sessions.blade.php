@@ -202,7 +202,7 @@
                 <section class="session-panel">
                     <div class="session-panel-head">
                         <div>
-                            <h2>Recent Browser History</h2>
+                            <h2>Sign-in and Session Activity</h2>
                             <p>This section shows your recent sign-in and session-related activity, including browsers used
                                 in the past.</p>
                         </div>

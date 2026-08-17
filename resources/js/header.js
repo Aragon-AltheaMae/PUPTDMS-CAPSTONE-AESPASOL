@@ -211,7 +211,11 @@ document.addEventListener('DOMContentLoaded', function () {
         event.preventDefault();
         event.stopPropagation();
 
-        const destination = link.href;
+        const destination = link.getAttribute('href');
+
+        if (!destination) {
+            return;
+        }
 
         try {
             await submitNotifReadRequest(markReadUrl);
@@ -280,9 +284,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         });
-
         notifMenu.addEventListener('click', function (e) {
-            const openLink = e.target.closest('[data-notif-open-link], .header-notif-link-action, .header-notif-item-title');
+            const openLink = e.target.closest('[data-notif-open-link]');
 
             if (!openLink || !notifMenu.contains(openLink)) {
                 return;
