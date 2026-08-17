@@ -78,7 +78,7 @@
 
     if ($authUser) {
         $databaseNotifications = $authUser
-            ->notifications()
+            ->currentRoleNotifications()
             ->latest()
             ->take(15)
             ->get()

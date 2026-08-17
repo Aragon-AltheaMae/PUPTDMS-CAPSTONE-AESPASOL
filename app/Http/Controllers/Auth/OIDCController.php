@@ -243,35 +243,17 @@ class OIDCController extends Controller
         $roleSlug = null;
 
         foreach ($incomingRoles as $incomingRole) {
-            $incomingRole = strtolower((string) $incomingRole);
-
-            if (str_contains($incomingRole, 'dentist')) {
+            if (str_contains(strtolower((string) $incomingRole), 'dentist')) {
                 $roleSlug = 'dentist';
                 break;
             }
-
-            if (str_contains($incomingRole, 'admin')) {
-                $roleSlug = 'admin';
-            }
-        }
-
-        if (!$roleSlug) {
-            $roleSlug = 'patient';
         }
 
         $assignedAccess = ExternalAdminAccess::where('email', $email)
             ->orWhere('external_admin_id', (string) $ssoUserId)
             ->first();
 
-        $facultyAccess = Faculty::with(['user.role', 'profile'])
-            ->whereHas('user', function ($query) use ($email, $ssoUserId) {
-                $query->where('email', $email);
-
-                if ($ssoUserId) {
-                    $query->orWhere('sso_user_id', $ssoUserId);
-                }
-            })
-            ->first();
+        $facultyAccess = null;
 
         if ($assignedAccess) {
             if (($assignedAccess->cms_status ?? 'inactive') !== 'active') {
@@ -280,16 +262,49 @@ class OIDCController extends Controller
 
             if (!empty($assignedAccess->cms_role)) {
                 $roleSlug = $assignedAccess->cms_role;
+            } else {
+                $roleSlug = 'admin';
             }
-        } elseif ($facultyAccess && $facultyAccess->user) {
-            if (($facultyAccess->user->status ?? 'inactive') !== 'active') {
-                return $this->renderInactiveAccessPage();
+        } else {
+            $hasOidcAdminRole = false;
+            foreach ($incomingRoles as $incomingRole) {
+                if (str_contains(strtolower((string) $incomingRole), 'admin')) {
+                    $hasOidcAdminRole = true;
+                    break;
+                }
             }
 
-            if (!empty($facultyAccess->user->role?->slug)) {
-                $roleSlug = $facultyAccess->user->role->slug;
-                $roleId = $this->resolveLocalRoleId($roleSlug);
+            if ($hasOidcAdminRole) {
+                Log::warning('OIDC admin role denied - not in external_admin_accesses', [
+                    'email' => $email,
+                    'sso_user_id' => $ssoUserId,
+                    'incoming_roles' => $incomingRoles,
+                ]);
             }
+
+            $facultyAccess = Faculty::with(['user.role', 'profile'])
+                ->whereHas('user', function ($query) use ($email, $ssoUserId) {
+                    $query->where('email', $email);
+
+                    if ($ssoUserId) {
+                        $query->orWhere('sso_user_id', $ssoUserId);
+                    }
+                })
+                ->first();
+
+            if ($facultyAccess && $facultyAccess->user) {
+                if (($facultyAccess->user->status ?? 'inactive') !== 'active') {
+                    return $this->renderInactiveAccessPage();
+                }
+
+                if (!empty($facultyAccess->user->role?->slug)) {
+                    $roleSlug = $facultyAccess->user->role->slug;
+                }
+            }
+        }
+
+        if (!$roleSlug) {
+            $roleSlug = 'patient';
         }
 
         $roleId = $this->resolveLocalRoleId($roleSlug);
