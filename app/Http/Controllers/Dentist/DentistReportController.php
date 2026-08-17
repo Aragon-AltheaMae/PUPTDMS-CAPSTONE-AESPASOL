@@ -1426,9 +1426,7 @@ class DentistReportController extends Controller
 
             $diagnosis = trim((string) ($procedureDiagnosisByAppointment[$appointment->id] ?? ''));
 
-            if ($diagnosis === '') {
-                $diagnosis = trim((string) ($appointment->service_type ?? ''));
-            }
+            $diagnosis = trim((string) ($appointment->service_type ?? ''));
 
             if ($diagnosis === '') {
                 $diagnosis = 'Dental Service';
