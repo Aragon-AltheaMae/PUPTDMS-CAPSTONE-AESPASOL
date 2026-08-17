@@ -214,7 +214,7 @@ class DocumentRequestController extends Controller
         $user = Auth::user();
 
         $notifications = $user
-            ? $user->notifications()
+            ? $user->currentRoleNotifications()
             ->latest()
             ->take(10)
             ->get()

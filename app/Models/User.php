@@ -119,6 +119,18 @@ class User extends Authenticatable implements JWTSubject
         return $this->role->permissions()->where('slug', $permissionSlug)->exists();
     }
 
+    public function currentRoleNotifications()
+    {
+        $currentRole = optional($this->role)->slug;
+
+        return $this->notifications()->where(function ($query) use ($currentRole) {
+            $query->where('data->recipient_role', $currentRole)
+                  ->orWhere('data->recipient_role', 'like', '%,' . $currentRole . ',%')
+                  ->orWhere('data->recipient_role', 'like', $currentRole . ',%')
+                  ->orWhere('data->recipient_role', 'like', '%,' . $currentRole);
+        });
+    }
+
     /*
     |--------------------------------------------------------------------------
     | JWT

@@ -339,13 +339,20 @@ class DentistAppointmentController extends Controller
         }
 
         if ($patientUser) {
-            $patientUser->notify(
-                new AppointmentCancelledNotification(
-                    $appointment,
-                    $cancelledBy,
-                    $request->reason
-                )
-            );
+            try {
+                $patientUser->notify(
+                    new AppointmentCancelledNotification(
+                        $appointment,
+                        $cancelledBy,
+                        $request->reason
+                    )
+                );
+            } catch (\Throwable $e) {
+                \Log::error('Appointment cancellation notification failed.', [
+                    'appointment_id' => $appointment->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
         try {
@@ -420,12 +427,19 @@ class DentistAppointmentController extends Controller
         $rescheduledBy = Auth::user()?->name ?? 'the dentist';
 
         if ($patientUser) {
-            $patientUser->notify(
-                new AppointmentRescheduledNotification(
-                    $appointment,
-                    $rescheduledBy
-                )
-            );
+            try {
+                $patientUser->notify(
+                    new AppointmentRescheduledNotification(
+                        $appointment,
+                        $rescheduledBy
+                    )
+                );
+            } catch (\Throwable $e) {
+                \Log::error('Appointment reschedule notification failed.', [
+                    'appointment_id' => $appointment->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
         try {
