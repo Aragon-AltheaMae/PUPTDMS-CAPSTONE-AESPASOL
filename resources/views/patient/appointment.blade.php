@@ -442,7 +442,7 @@ $appt->procedure?->prescriptions
                     ?? 'Not yet assigned';
                     @endphp
 
-                    <div class="global-record-card appt-visit-card appt-visit-card-upcoming"
+                    <div class="global-record-card appt-visit-card appt-visit-card-upcoming {{ $statusClass }}"
                         style="animation-delay: {{ $index * 0.08 }}s">
                         <div class="appt-visit-date">
                             <span class="appt-visit-day">
@@ -468,7 +468,7 @@ $appt->procedure?->prescriptions
 
                                     <span class="status-pill {{ $statusClass }}">
                                         <span class="status-dot"></span>
-                                        {{ ucfirst($rawStatus) }}
+                                        {{ \Illuminate\Support\Str::headline($rawStatus) }}
                                     </span>
                                 </div>
 
@@ -721,7 +721,7 @@ $appt->procedure?->prescriptions
                     ];
                     @endphp
 
-                    <div class="global-record-card appt-visit-card appt-visit-card-past"
+                    <div class="global-record-card appt-visit-card appt-visit-card-past {{ $statusClass }}"
                         style="animation-delay: {{ $index * 0.08 }}s">
                         <div class="appt-visit-date appt-visit-date-muted">
                             <span class="appt-visit-day">
@@ -747,7 +747,7 @@ $appt->procedure?->prescriptions
 
                                     <span class="status-pill {{ $statusClass }}">
                                         <span class="status-dot"></span>
-                                        {{ ucfirst($rawStatus) }}
+                                        {{ \Illuminate\Support\Str::headline($rawStatus) }}
                                     </span>
                                 </div>
                             </div>

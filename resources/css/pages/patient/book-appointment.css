@@ -517,13 +517,6 @@ textarea {
     width: 100%;
 }
 
-body.layout-no-sidebar #mainContent,
-body.layout-no-sidebar #siteFooter {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    width: 100% !important;
-}
-
 [data-theme="dark"] #clearSlotSelectionBtn {
     background: #161b22 !important;
     border-color: rgba(252, 165, 165, 0.25) !important;

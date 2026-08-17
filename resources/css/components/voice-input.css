@@ -88,27 +88,41 @@
     cursor: pointer;
 }
 
-.voice-search-mic.external::before {
-    content: "";
-}
-
 .voice-search-mic.external>i {
     position: relative;
     z-index: 2;
-    display: inline-block !important;
-    align-items: center !important;
-    justify-content: center !important;
+
     width: 1rem;
     height: 1rem;
+
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 1rem;
+
     color: currentColor !important;
-    font-size: 0.86rem !important;
+
+    font-size: .86rem !important;
     line-height: 1 !important;
+
     opacity: 1 !important;
     visibility: visible !important;
+
     pointer-events: none !important;
+
+    transform: none;
+
     transition:
         color 180ms ease,
         transform 180ms ease !important;
+}
+
+.voice-search-mic.external>.fa-microphone,
+.voice-search-mic.external>.fa-stop {
+    display: inline-flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 .voice-search-mic.external:hover {

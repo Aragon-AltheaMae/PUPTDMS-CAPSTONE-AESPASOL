@@ -103,14 +103,23 @@
 
 .booking-page {
     width: 100%;
+    max-width: 100%;
     min-height: 100vh;
-    padding: calc(var(--header-h, 70px) + 2rem) 1rem 4rem;
+
+    margin: 0;
+
+    padding:
+        calc(var(--header-h, 70px) + 2rem) 1rem 4rem;
+
     background: transparent;
 }
 
 .booking-page-inner {
-    width: min(100%, 1180px);
-    margin-inline: auto;
+    width: 100%;
+    max-width: 1180px;
+
+    margin-left: auto;
+    margin-right: auto;
 }
 
 @media (max-width: 768px) {
@@ -364,9 +373,9 @@
     gap: .55rem;
     margin: 0 0 .9rem;
     color: #8B0000;
-    font-size: .78rem;
+    font-size: .72rem;
     font-weight: 800;
-    letter-spacing: .12em;
+    letter-spacing: .1em;
     text-transform: uppercase;
 }
 

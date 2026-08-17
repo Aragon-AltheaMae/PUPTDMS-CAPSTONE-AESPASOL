@@ -78,7 +78,32 @@ $profileIsActive = true;
 
 $patientType = $patient->faculty_code ? 'Faculty' : ($patient->student_no ? 'Student' : 'Patient');
 
-$procedureAppointment = $nextAppointment ?? collect($futureVisits ?? [])->first();
+$procedureAppointment = collect($futureVisits ?? [])
+->first(function ($visit) {
+if (empty($visit->appointment_date)) {
+return false;
+}
+
+$status = strtolower(trim((string) ($visit->status ?? '')));
+
+$eligibleStatus = in_array(
+$status,
+[
+'upcoming',
+'rescheduled',
+'today',
+'scheduled_today',
+],
+true
+);
+
+return $eligibleStatus &&
+Carbon::parse($visit->appointment_date)->isToday();
+});
+
+$canStartProcedure =
+$isDentistProfile &&
+!empty($procedureAppointment);
 $odontogramData = optional($patient->odontogram)->odontogram_data ?? [];
 $odontogramLastUpdatedAt = optional($patient->odontogram)->updated_at;
 $odontogramLastUpdatedBy = optional($patient->odontogram)->updated_by;
@@ -116,9 +141,10 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                     class="ui-btn ui-btn-secondary">
                     <i class="fa-solid fa-clock-rotate-left text-xs"></i> Add Existing Appointment
                 </a>
-                @if ($procedureAppointment)
+                @if ($canStartProcedure)
                 <button type="button" onclick="openStartModal()" class="ui-btn ui-btn-primary">
-                    <i class="fa-solid fa-play text-xs"></i> Start Procedure
+                    <i class="fa-solid fa-play"></i>
+                    <span>Start Procedure</span>
                 </button>
                 @endif
             </div>
@@ -151,15 +177,28 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                             </div>
 
                             <div class="patient-summary-badges">
-                                <span class="patient-type-badge">
-                                    <i
-                                        class="fa-solid {{ $patientType === 'Faculty' ? 'fa-chalkboard-user' : 'fa-user-graduate' }}"></i>
-                                    {{ $patientType }}
+                                @php
+                                $patientRoleClass = match ($patientType) {
+                                'Faculty' => 'role-faculty',
+                                'Student' => 'role-student',
+                                default => 'role-patient',
+                                };
+
+                                $patientRoleIcon = match ($patientType) {
+                                'Faculty' => 'fa-chalkboard-user',
+                                'Student' => 'fa-user-graduate',
+                                default => 'fa-user',
+                                };
+                                @endphp
+
+                                <span class="badge-role {{ $patientRoleClass }}">
+                                    <i class="fa-solid {{ $patientRoleIcon }}"></i>
+                                    <span>{{ $patientType }}</span>
                                 </span>
 
-                                <span class="status-badge status-completed">
-                                    <i class="fa-solid fa-circle-check"></i>
-                                    Profile Active
+                                <span class="status-pill status-active">
+                                    <span class="status-dot"></span>
+                                    <span>Profile Active</span>
                                 </span>
                             </div>
                         </div>
@@ -324,11 +363,8 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
             </aside>
 
             <section class="patient-profile-content">
-                <div id="patientProfileStats" class="stat-grid patient-profile-stat-grid">
+                <div id="statCards" class="stat-grid">
                     <article class="stat-card s-blue">
-                        <div class="stat-icon-wrapper">
-                            <i class="fa-regular fa-calendar-check"></i>
-                        </div>
 
                         <div class="stat-card-info">
                             <p class="stat-num">
@@ -339,15 +375,17 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                                 Total Visits
                             </p>
                         </div>
+
+                        <div class="stat-icon-wrapper">
+                            <i class="fa-regular fa-calendar-check"></i>
+                        </div>
+
                     </article>
 
                     <article class="stat-card s-purple">
-                        <div class="stat-icon-wrapper">
-                            <i class="fa-solid fa-clock-rotate-left"></i>
-                        </div>
 
                         <div class="stat-card-info">
-                            <p class="stat-value stat-value-text">
+                            <p class="stat-value-text">
                                 {{ $lastVisit?->appointment_date
                                 ? Carbon::parse($lastVisit->appointment_date)->format('M d, Y')
                                 : 'No past visits' }}
@@ -357,15 +395,17 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                                 Last Visit
                             </p>
                         </div>
+
+                        <div class="stat-icon-wrapper">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+
                     </article>
 
                     <article class="stat-card s-amber">
-                        <div class="stat-icon-wrapper">
-                            <i class="fa-regular fa-calendar-plus"></i>
-                        </div>
 
                         <div class="stat-card-info">
-                            <p class="stat-value stat-value-text">
+                            <p class="stat-value-text">
                                 {{ $nextAppointment?->appointment_date
                                 ? Carbon::parse($nextAppointment->appointment_date)->format('M d, Y')
                                 : 'No schedule' }}
@@ -375,6 +415,11 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                                 Next Appointment
                             </p>
                         </div>
+
+                        <div class="stat-icon-wrapper">
+                            <i class="fa-regular fa-calendar-plus"></i>
+                        </div>
+
                     </article>
                 </div>
 
@@ -431,8 +476,8 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                             : 'N/A';
                             $rawVisitService = $visit->service_type ?? 'Appointment';
                             $visitService = strtolower(trim((string) $rawVisitService)) === 'follow-up'
-                                ? 'Follow-up Appointment'
-                                : $rawVisitService;
+                            ? 'Follow-up Appointment'
+                            : $rawVisitService;
                             $visitStatus = $visit->status ?? 'upcoming';
                             $visitProcedure = $visit->procedure;
                             $visitFollowUp = $visit->followUpAppointments
@@ -469,60 +514,87 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                             @endphp
 
                             @php
-                            $normalizedVisitStatus = strtolower(trim($visitStatus));
+                            $apptDate = Carbon::parse($visit->appointment_date);
+                            $apptTime = Carbon::parse($visit->appointment_time);
 
-                            $globalStatusClass = match (true) {
-                            str_contains($normalizedVisitStatus, 'resched') => 'status-rescheduled',
-                            str_contains($normalizedVisitStatus, 'complete') => 'status-completed',
-                            str_contains($normalizedVisitStatus, 'cancel') => 'status-cancelled',
-                            in_array($normalizedVisitStatus, ['today', 'scheduled_today'], true) => 'status-today',
-                            default => 'status-upcoming',
+                            $rawStatus = strtolower(
+                            trim((string) ($visit->status ?? 'upcoming'))
+                            );
+
+                            $statusClass = match ($rawStatus) {
+                            'rescheduled' => 'status-rescheduled',
+
+                            'upcoming',
+                            'scheduled',
+                            'confirmed' => 'status-upcoming',
+
+                            'completed' => 'status-completed',
+
+                            'cancelled',
+                            'canceled' => 'status-cancelled',
+
+                            default => 'status-default',
                             };
+
+                            $dentistName =
+                            $visit->dentist?->name
+                            ?? 'Not yet assigned';
                             @endphp
 
-                            <article class="card treatment-visit-card {{ $globalStatusClass }}"
-                                data-appointment-status="{{ $normalizedVisitStatus }}">
-                                <span class="treatment-visit-accent" aria-hidden="true"></span>
+                            <div class="global-record-card appt-visit-card appt-visit-card-upcoming {{ $statusClass }}">
 
-                                <div class="treatment-visit-date">
-                                    <span class="treatment-visit-date-value">
-                                        {{ $visitDate }}
+                                <div class="appt-visit-date">
+                                    <span class="appt-visit-day">
+                                        {{ $apptDate->format('d') }}
                                     </span>
 
-                                    <span class="treatment-visit-time">
-                                        <i class="fa-regular fa-clock"></i>
-                                        {{ $visitTime }}
+                                    <span class="appt-visit-month">
+                                        {{ $apptDate->format('M') }}
+                                    </span>
+
+                                    <span class="appt-visit-year">
+                                        {{ $apptDate->format('Y') }}
                                     </span>
                                 </div>
 
-                                <div class="treatment-visit-main">
-                                    <span class="status-badge {{ $globalStatusClass }}">
-                                        {{ $visitStatus }}
-                                    </span>
+                                <div class="appt-visit-main">
 
-                                    <h3 class="treatment-visit-service">
-                                        {{ $visitService }}
-                                    </h3>
+                                    <div class="appt-visit-head">
 
-                                    <p class="treatment-visit-meta">
-                                        <i class="fa-solid fa-user-doctor"></i>
+                                        <div class="appt-visit-title-group">
 
-                                        <span>
-                                            {{ $visit->dentist->name ?? 'Dr. Angeles' }}
+                                            <h3 class="appt-visit-title">
+                                                {{ $visitService }}
+                                            </h3>
+
+                                            <span class="status-pill {{ $statusClass }}">
+                                                <span class="status-dot"></span>
+                                                {{ Str::headline($rawStatus) }}
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="appt-visit-meta">
+
+                                        <span class="global-info-pill">
+                                            <i class="fa-regular fa-clock"></i>
+                                            <span>
+                                                {{ $apptTime->format('g:i A') }}
+                                            </span>
                                         </span>
-                                    </p>
+
+                                        <span class="global-info-pill">
+                                            <i class="fa-solid fa-user-doctor"></i>
+                                            <span>{{ $dentistName }}</span>
+                                        </span>
+
+                                    </div>
+
                                 </div>
 
-                                <div class="treatment-visit-action">
-                                    <button type="button"
-                                        data-record='@json($visitRecord, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT)'
-                                        onclick="openRecordModal(JSON.parse(this.dataset.record))"
-                                        class="ui-btn ui-btn-secondary ui-btn-sm">
-                                        <i class="fa-regular fa-eye"></i>
-                                        View Details
-                                    </button>
-                                </div>
-                            </article>
+                            </div>
                             @empty
                             <div class="empty-state treatment-history-empty">
                                 <div class="appointment-empty-icon">
@@ -551,47 +623,47 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                             : 'N/A';
                             $rawVisitService = $visit->service_type ?? 'Appointment';
                             $visitService = strtolower(trim((string) $rawVisitService)) === 'follow-up'
-                                ? 'Follow-up Appointment'
-                                : $rawVisitService;
+                            ? 'Follow-up Appointment'
+                            : $rawVisitService;
                             $visitStatus = $visit->status ?? 'completed';
                             $visitProcedure = $visit->procedure;
-                            
+
                             $visitOdontogramData = collect($visitProcedure?->odontogram_data ?? []);
                             $appliedTreatments = $visitOdontogramData
-                                ->flatMap(function ($entry) {
-                                    $labels = collect();
+                            ->flatMap(function ($entry) {
+                            $labels = collect();
 
-                                    $statusLabel = data_get($entry, 'status.label');
-                                    if ($statusLabel) {
-                                        $labels->push($statusLabel);
-                                    }
+                            $statusLabel = data_get($entry, 'status.label');
+                            if ($statusLabel) {
+                            $labels->push($statusLabel);
+                            }
 
-                                    $threeDLabel = data_get($entry, 'threeD.label');
-                                    if ($threeDLabel) {
-                                        $labels->push($threeDLabel);
-                                    }
+                            $threeDLabel = data_get($entry, 'threeD.label');
+                            if ($threeDLabel) {
+                            $labels->push($threeDLabel);
+                            }
 
-                                    foreach (['top', 'left', 'center', 'right', 'bottom'] as $surface) {
-                                        $surfaceLabel = data_get($entry, "surfaces.$surface.label");
+                            foreach (['top', 'left', 'center', 'right', 'bottom'] as $surface) {
+                            $surfaceLabel = data_get($entry, "surfaces.$surface.label");
 
-                                        if ($surfaceLabel) {
-                                            $labels->push($surfaceLabel);
-                                        }
-                                    }
+                            if ($surfaceLabel) {
+                            $labels->push($surfaceLabel);
+                            }
+                            }
 
-                                    return $labels;
-                                })
-                                ->filter()
-                                ->unique()
-                                ->values();
+                            return $labels;
+                            })
+                            ->filter()
+                            ->unique()
+                            ->values();
 
                             $isOralProphylaxis =strcasecmp(trim((string) $visitService),
-                                    'Oral Prophylaxis'
-                                ) === 0;
+                            'Oral Prophylaxis'
+                            ) === 0;
 
                             $visitTreatment = $appliedTreatments->isNotEmpty()
-                                ? $appliedTreatments->implode(', ')
-                                : ($isOralProphylaxis ? 'Teeth Cleaning' : 'N/A');
+                            ? $appliedTreatments->implode(', ')
+                            : ($isOralProphylaxis ? 'Teeth Cleaning' : 'N/A');
 
                             $visitFollowUp = $visit->followUpAppointments
                             ->sortBy('appointment_time')
@@ -628,57 +700,116 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                             @endphp
 
                             @php
-                            $normalizedVisitStatus = strtolower(trim($visitStatus));
+                            $apptDate = Carbon::parse($visit->appointment_date);
+                            $apptTime = Carbon::parse($visit->appointment_time);
 
-                            $globalStatusClass = match (true) {
-                            str_contains($normalizedVisitStatus, 'resched') => 'status-rescheduled',
-                            str_contains($normalizedVisitStatus, 'complete') => 'status-completed',
-                            str_contains($normalizedVisitStatus, 'cancel') => 'status-cancelled',
-                            in_array($normalizedVisitStatus, ['today', 'scheduled_today'], true) => 'status-today',
-                            default => 'status-upcoming',
-                            };
+                            $rawStatus = strtolower(
+                            trim((string) ($visit->status ?? 'completed'))
+                            );
                             @endphp
 
-                            <article class="card treatment-visit-card {{ $globalStatusClass }}"
-                                data-appointment-status="{{ $normalizedVisitStatus }}">
-                                <span class="treatment-visit-accent" aria-hidden="true"></span>
+                            @php
+                            $displayStatus = $rawStatus;
+                            $statusClass = match ($displayStatus) {
+                            'completed' => 'status-completed',
 
-                                <div class="treatment-visit-date">
-                                    <span class="treatment-visit-date-value">
-                                        {{ $visitDate }}
+                            'cancelled',
+                            'canceled' => 'status-cancelled',
+
+                            'rescheduled' => 'status-rescheduled',
+
+                            'upcoming',
+                            'scheduled',
+                            'confirmed' => 'status-upcoming',
+
+                            default => 'status-default',
+                            };
+
+                            $dentistName =
+                            $visit->dentist?->name
+                            ?? 'Not assigned';
+                            @endphp
+
+                            <div class="global-record-card appt-visit-card appt-visit-card-past {{ $statusClass }}">
+
+                                <div class="appt-visit-date appt-visit-date-muted">
+
+                                    <span class="appt-visit-day">
+                                        {{ $apptDate->format('d') }}
                                     </span>
 
-                                    <span class="treatment-visit-time">
-                                        <i class="fa-regular fa-clock"></i>
-                                        {{ $visitTime }}
+                                    <span class="appt-visit-month">
+                                        {{ $apptDate->format('M') }}
                                     </span>
+
+                                    <span class="appt-visit-year">
+                                        {{ $apptDate->format('Y') }}
+                                    </span>
+
                                 </div>
 
-                                <div class="treatment-visit-main">
-                                    <span class="status-badge {{ $globalStatusClass }}">
-                                        {{ $visitStatus }}
-                                    </span>
+                                <div class="appt-visit-main">
 
-                                    <h3 class="treatment-visit-service">
-                                        {{ $visitService }}
-                                    </h3>
+                                    <div class="appt-visit-head">
 
-                                    <p class="treatment-visit-meta">
-                                        <i class="fa-solid fa-tooth"></i>
-                                        Treatment record
-                                    </p>
+                                        <div class="appt-visit-title-group">
+
+                                            <h3 class="appt-visit-title">
+                                                {{ $visitService }}
+                                            </h3>
+
+                                            <span class="status-pill {{ $statusClass }}">
+                                                <span class="status-dot"></span>
+
+                                                <span>
+                                                    {{ Str::headline($displayStatus) }}
+                                                </span>
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="appt-visit-meta">
+
+                                        <span class="global-info-pill">
+                                            <i class="fa-regular fa-clock"></i>
+
+                                            <span>
+                                                {{ $apptTime->format('g:i A') }}
+                                            </span>
+                                        </span>
+
+                                        <span class="global-info-pill">
+                                            <i class="fa-solid fa-user-doctor"></i>
+
+                                            <span>
+                                                {{ $dentistName }}
+                                            </span>
+                                        </span>
+
+                                    </div>
+
                                 </div>
 
-                                <div class="treatment-visit-action">
-                                    <button type="button"
-                                        data-record='@json($visitRecord, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT)'
-                                        onclick="openRecordModal(JSON.parse(this.dataset.record))"
-                                        class="ui-btn ui-btn-secondary ui-btn-sm">
-                                        <i class="fa-regular fa-file-lines"></i>
-                                        View Record
+                                <div class="appt-visit-actions">
+
+                                    <button type="button" data-record='@json(
+                $visitRecord,
+                JSON_HEX_TAG |
+                JSON_HEX_APOS |
+                JSON_HEX_AMP |
+                JSON_HEX_QUOT
+            )' onclick="openRecordModal(
+                JSON.parse(this.dataset.record)
+            )" class="ui-action-btn ui-action-view" aria-label="View details" data-tooltip="View details"
+                                        data-tooltip-tone="view">
+                                        <i class="fa-regular fa-eye"></i>
                                     </button>
+
                                 </div>
-                            </article>
+
+                            </div>
                             @empty
                             <div class="empty-state treatment-history-empty">
                                 <div class="appointment-empty-icon">
@@ -717,204 +848,455 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                         </div>
 
                         <div class="card-header-right">
-                            <span class="status-badge status-completed">
-                                Latest Record
+                            <span class="status-pill status-completed">
+                                <span class="status-dot"></span>
+                                <span>Latest Record</span>
                             </span>
                         </div>
                     </div>
 
-                    <div class="card-body health-lifestyle-body">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="space-y-6">
-                                <div>
-                                    <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                                        Dental History
-                                    </p>
+                    <div class="card-body">
+                        <div class="space-y-6">
 
-                                    <div class="space-y-2 text-sm">
-                                        <p><span class="font-semibold text-gray-600">Last Dental Visit:</span>
-                                            {{ optional($patient->dentalHistory)->last_dental_visit ?? 'N/A' }}</p>
-                                        <p><span class="font-semibold text-gray-600">Previous Dentist:</span>
-                                            {{ optional($patient->dentalHistory)->previous_dentist ?? 'N/A' }}</p>
-                                        <p><span class="font-semibold text-gray-600">Extraction Date:</span>
-                                            {{ $dentalDates->extraction_date ?? 'N/A' }}</p>
-                                        <p><span class="font-semibold text-gray-600">Dentures Date:</span>
-                                            {{ $dentalDates->dentures_date ?? 'N/A' }}</p>
-                                        <p><span class="font-semibold text-gray-600">Orthodontic Treatment Date:</span>
-                                            {{ $dentalDates->ortho_date ?? 'N/A' }}</p>
-                                    </div>
+                            {{-- =========================
+                            DENTAL HISTORY
+                            ========================== --}}
+                            <div>
+                                <div class="section-card-title">
+                                    <i class="fa-solid fa-tooth"></i>
+                                    <span>Dental History</span>
+                                    <span class="section-card-title-line"></span>
                                 </div>
 
-                                <div>
-                                    <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                                        Dental Symptoms & Habits
-                                    </p>
+                                <div class="global-info-grid global-info-grid-2">
 
-                                    <div class="flex flex-wrap gap-1.5">
-                                        @php $hasDentalAnswer = false; @endphp
-
-                                        @foreach ($patient->dentalHistoryAnswers ?? [] as $dentAnswer)
-                                        @if ($dentAnswer->answer)
-                                        @php $hasDentalAnswer = true; @endphp
-                                        <span
-                                            class="bg-teal-50 text-teal-700 text-[11px] font-bold px-2.5 py-1 rounded border border-teal-100">
-                                            {{ str_replace('_', ' ', Str::title(optional($dentAnswer->condition)->code
-                                            ??
-                                            'Symptom')) }}
+                                    <div class="global-info-item global-info-item-compact">
+                                        <span class="global-info-icon status-completed">
+                                            <i class="fa-regular fa-calendar-check"></i>
                                         </span>
-                                        @endif
-                                        @endforeach
 
-                                        @if (!$hasDentalAnswer)
-                                        <span
-                                            class="text-xs text-gray-400 font-medium bg-gray-50 px-3 py-1 rounded border border-gray-100">
-                                            No symptoms reported
-                                        </span>
-                                        @endif
+                                        <div class="global-info-copy">
+                                            <span class="global-info-label">
+                                                Last Dental Visit
+                                            </span>
+
+                                            <strong class="global-info-value">
+                                                {{ optional($patient->dentalHistory)->last_dental_visit
+                                                ? Carbon::parse(
+                                                optional($patient->dentalHistory)->last_dental_visit
+                                                )->format('M d, Y')
+                                                : 'N/A' }}
+                                            </strong>
+                                        </div>
                                     </div>
+
+                                    <div class="global-info-item global-info-item-compact">
+                                        <span class="global-info-icon status-default">
+                                            <i class="fa-solid fa-user-doctor"></i>
+                                        </span>
+
+                                        <div class="global-info-copy">
+                                            <span class="global-info-label">
+                                                Previous Dentist
+                                            </span>
+
+                                            <strong class="global-info-value">
+                                                {{ optional($patient->dentalHistory)->previous_dentist ?? 'N/A' }}
+                                            </strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="global-info-item global-info-item-compact">
+                                        <span class="global-info-icon status-default">
+                                            <i class="fa-solid fa-tooth"></i>
+                                        </span>
+
+                                        <div class="global-info-copy">
+                                            <span class="global-info-label">
+                                                Extraction Date
+                                            </span>
+
+                                            <strong class="global-info-value">
+                                                {{ $dentalDates?->extraction_date
+                                                ? Carbon::parse($dentalDates->extraction_date)->format('M d, Y')
+                                                : 'N/A' }}
+                                            </strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="global-info-item global-info-item-compact">
+                                        <span class="global-info-icon status-default">
+                                            <i class="fa-solid fa-teeth-open"></i>
+                                        </span>
+
+                                        <div class="global-info-copy">
+                                            <span class="global-info-label">
+                                                Dentures Date
+                                            </span>
+
+                                            <strong class="global-info-value">
+                                                {{ $dentalDates?->dentures_date
+                                                ? Carbon::parse($dentalDates->dentures_date)->format('M d, Y')
+                                                : 'N/A' }}
+                                            </strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="global-info-item global-info-item-compact global-info-item-wide">
+                                        <span class="global-info-icon status-default">
+                                            <i class="fa-solid fa-teeth"></i>
+                                        </span>
+
+                                        <div class="global-info-copy">
+                                            <span class="global-info-label">
+                                                Orthodontic Treatment Date
+                                            </span>
+
+                                            <strong class="global-info-value">
+                                                {{ $dentalDates?->ortho_date
+                                                ? Carbon::parse($dentalDates->ortho_date)->format('M d, Y')
+                                                : 'N/A' }}
+                                            </strong>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
 
-                            <div class="space-y-6">
-                                <div>
-                                    <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                                        Medical History
-                                    </p>
 
-                                    <div class="space-y-2 text-sm">
-                                        @forelse($medicalAnswers as $mAns)
-                                        @if ($mAns->answer_bool === true || !empty($mAns->answer_text) ||
-                                        !empty($mAns->answer_date))
-                                        <p>
-                                            <span class="font-semibold text-gray-600">
-                                                {{ str_replace('_', ' ', Str::title(optional($mAns->question)->code ??
-                                                'Question')) }}:
-                                            </span>
-                                            @if ($mAns->answer_bool === true)
-                                            YES
-                                            @endif
-                                            @if (!empty($mAns->answer_text))
-                                            {{ $mAns->answer_text }}
-                                            @endif
-                                            @if (!empty($mAns->answer_date))
-                                            {{ $mAns->answer_date }}
-                                            @endif
-                                        </p>
-                                        @endif
-                                        @empty
-                                        <p class="text-xs text-gray-400">No medical records found.</p>
-                                        @endforelse
-                                    </div>
+                            {{-- =========================
+                            DENTAL SYMPTOMS & HABITS
+                            ========================== --}}
+                            <div>
+                                <div class="section-card-title">
+                                    <i class="fa-solid fa-notes-medical"></i>
+                                    <span>Dental Symptoms & Habits</span>
+                                    <span class="section-card-title-line"></span>
                                 </div>
 
-                                <div>
-                                    <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                                        Medical Conditions
-                                    </p>
+                                <div class="global-info-group">
+                                    @php
+                                    $hasDentalAnswer = false;
+                                    @endphp
 
-                                    <div class="flex flex-wrap gap-1.5">
-                                        @if (isset($patient->medicalHistory->diseaseAnswers) &&
-                                        $patient->medicalHistory->diseaseAnswers->count() > 0)
-                                        @foreach ($patient->medicalHistory->diseaseAnswers as $diseaseAnswer)
-                                        <span
-                                            class="bg-purple-50 text-purple-700 text-[11px] font-bold px-2.5 py-1 rounded border border-purple-100">
+                                    @foreach ($patient->dentalHistoryAnswers ?? [] as $dentAnswer)
+                                    @if ($dentAnswer->answer)
+                                    @php
+                                    $hasDentalAnswer = true;
+                                    @endphp
+
+                                    <span class="status-pill status-completed">
+                                        <span class="status-dot"></span>
+
+                                        <span>
+                                            {{ str_replace(
+                                            '_',
+                                            ' ',
+                                            Str::title(
+                                            optional($dentAnswer->condition)->code
+                                            ?? 'Symptom'
+                                            )
+                                            ) }}
+                                        </span>
+                                    </span>
+                                    @endif
+                                    @endforeach
+
+                                    @if (!$hasDentalAnswer)
+                                    <span class="status-pill status-default">
+                                        <span class="status-dot"></span>
+                                        <span>No symptoms reported</span>
+                                    </span>
+                                    @endif
+                                </div>
+                            </div>
+
+
+                            {{-- =========================
+                            MEDICAL HISTORY
+                            ========================== --}}
+                            <div>
+                                <div class="section-card-title">
+                                    <i class="fa-solid fa-heart-pulse"></i>
+                                    <span>Medical History</span>
+                                    <span class="section-card-title-line"></span>
+                                </div>
+
+                                <div class="global-info-grid global-info-grid-2">
+                                    @php
+                                    $hasMedicalRecord = false;
+                                    @endphp
+
+                                    @foreach ($medicalAnswers as $mAns)
+                                    @if (
+                                    $mAns->answer_bool === true ||
+                                    !empty($mAns->answer_text) ||
+                                    !empty($mAns->answer_date)
+                                    )
+                                    @php
+                                    $hasMedicalRecord = true;
+
+                                    $medicalValue = collect([
+                                    $mAns->answer_bool === true
+                                    ? 'Yes'
+                                    : null,
+
+                                    $mAns->answer_text ?: null,
+
+                                    $mAns->answer_date
+                                    ? Carbon::parse($mAns->answer_date)->format('M d, Y')
+                                    : null,
+                                    ])
+                                    ->filter()
+                                    ->implode(' · ');
+                                    @endphp
+
+                                    <div class="global-info-item global-info-item-compact">
+                                        <span class="global-info-icon status-default">
+                                            <i class="fa-solid fa-stethoscope"></i>
+                                        </span>
+
+                                        <div class="global-info-copy">
+                                            <span class="global-info-label">
+                                                {{ str_replace(
+                                                '_',
+                                                ' ',
+                                                Str::title(
+                                                optional($mAns->question)->code
+                                                ?? 'Question'
+                                                )
+                                                ) }}
+                                            </span>
+
+                                            <strong class="global-info-value">
+                                                {{ $medicalValue }}
+                                            </strong>
+                                        </div>
+                                    </div>
+                                    @endif
+                                    @endforeach
+
+                                    @if (!$hasMedicalRecord)
+                                    <div class="global-info-item global-info-item-compact">
+                                        <span class="global-info-icon status-default">
+                                            <i class="fa-solid fa-circle-info"></i>
+                                        </span>
+
+                                        <div class="global-info-copy">
+                                            <span class="global-info-label">
+                                                Medical History
+                                            </span>
+
+                                            <strong class="global-info-value">
+                                                No medical records found
+                                            </strong>
+                                        </div>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+
+
+                            {{-- =========================
+                            MEDICAL CONDITIONS
+                            ========================== --}}
+                            <div>
+                                <div class="section-card-title">
+                                    <i class="fa-solid fa-disease"></i>
+                                    <span>Medical Conditions</span>
+                                    <span class="section-card-title-line"></span>
+                                </div>
+
+                                <div class="global-info-group">
+                                    @if (
+                                    isset($patient->medicalHistory->diseaseAnswers) &&
+                                    $patient->medicalHistory->diseaseAnswers->count() > 0
+                                    )
+                                    @foreach (
+                                    $patient->medicalHistory->diseaseAnswers
+                                    as $diseaseAnswer
+                                    )
+                                    <span class="status-pill status-pending">
+                                        <span class="status-dot"></span>
+
+                                        <span>
                                             {{ $diseaseAnswer->disease->label ?? 'Condition' }}
                                         </span>
-                                        @endforeach
-                                        @else
-                                        <span
-                                            class="text-xs text-gray-400 font-medium bg-gray-50 px-3 py-1 rounded border border-gray-100">
-                                            None reported
-                                        </span>
-                                        @endif
-                                    </div>
+                                    </span>
+                                    @endforeach
+                                    @else
+                                    <span class="status-pill status-default">
+                                        <span class="status-dot"></span>
+                                        <span>None reported</span>
+                                    </span>
+                                    @endif
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="mt-6 pt-5 border-t border-gray-100">
-                            <div class="flex items-center justify-between gap-3 mb-3">
-                                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                                    Patient Odontogram
-                                </p>
+
+                            {{-- =========================
+                            PATIENT ODONTOGRAM
+                            ========================== --}}
+                            <div>
+                                <div class="section-card-title">
+                                    <i class="fa-solid fa-teeth"></i>
+                                    <span>Patient Odontogram</span>
+                                    <span class="section-card-title-line"></span>
+
+                                    @if (!empty($odontogramData))
+                                    <span class="status-pill status-default">
+                                        <span class="status-dot"></span>
+
+                                        <span>
+                                            {{ $odontogramLastUpdatedAt
+                                            ? 'Updated ' . $odontogramLastUpdatedAt->format('M d, Y')
+                                            : 'Saved Chart' }}
+                                        </span>
+                                    </span>
+                                    @endif
+                                </div>
 
                                 @if (!empty($odontogramData))
-                                <span class="text-[11px] text-gray-500 font-medium">
-                                    {{ $odontogramLastUpdatedAt
-                                    ? 'Updated ' . $odontogramLastUpdatedAt->format('M d, Y h:i A')
-                                    : 'Saved chart' }}
-                                </span>
+                                @include('components.odontogram-preview', [
+                                'odontogramData' => $odontogramData,
+                                ])
+                                @else
+                                <div class="empty-state empty-state-compact">
+                                    <div class="empty-state-icon">
+                                        <i class="fa-solid fa-tooth"></i>
+                                    </div>
+
+                                    <h3 class="empty-state-title">
+                                        No odontogram saved yet
+                                    </h3>
+
+                                    <p class="empty-state-sub">
+                                        This patient does not have a recorded odontogram procedure yet.
+                                    </p>
+                                </div>
                                 @endif
                             </div>
 
-                            @if (!empty($odontogramData))
-                            @include('components.odontogram-preview', [
-                            'odontogramData' => $odontogramData,
-                            ])
-                            @else
-                            <div class="empty-state">
-                                <div class="appointment-empty-icon">
-                                    <i class="fa-solid fa-tooth"></i>
+
+                            {{-- =========================
+                            ADDITIONAL CONCERNS
+                            ========================== --}}
+                            <div>
+                                <div class="section-card-title">
+                                    <i class="fa-regular fa-comment-dots"></i>
+                                    <span>Additional Dental Concerns</span>
+                                    <span class="section-card-title-line"></span>
                                 </div>
 
-                                <h3 class="empty-state-title">
-                                    No odontogram saved yet
-                                </h3>
+                                @php
+                                $concerns =
+                                optional($patient->dentalHistoryConcerns)
+                                ->additional_concerns
+                                ?? null;
+                                @endphp
 
-                                <p class="empty-state-sub">
-                                    This patient does not have a recorded odontogram procedure yet.
-                                </p>
+                                @if ($concerns)
+                                <div class="global-info-item">
+                                    <span class="global-info-icon status-pending">
+                                        <i class="fa-regular fa-comment-dots"></i>
+                                    </span>
+
+                                    <div class="global-info-copy">
+                                        <span class="global-info-label">
+                                            Patient Concern
+                                        </span>
+
+                                        <span class="global-info-value">
+                                            {{ $concerns }}
+                                        </span>
+                                    </div>
+                                </div>
+                                @else
+                                <div class="global-info-item global-info-item-compact">
+                                    <span class="global-info-icon status-default">
+                                        <i class="fa-regular fa-comment"></i>
+                                    </span>
+
+                                    <div class="global-info-copy">
+                                        <span class="global-info-label">
+                                            Additional Dental Concerns
+                                        </span>
+
+                                        <span class="global-info-value">
+                                            No additional concerns added
+                                        </span>
+                                    </div>
+                                </div>
+                                @endif
                             </div>
-                            @endif
+
                         </div>
-
-                        <div class="mt-6 pt-5 border-t border-gray-100">
-                            <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-2">
-                                Additional Dental Concerns
-                            </p>
-
-                            @php
-                            $concerns = optional($patient->dentalHistoryConcerns)->additional_concerns ?? null;
-                            @endphp
-
-                            @if ($concerns)
-                            <div
-                                class="text-[13px] text-gray-700 leading-relaxed bg-yellow-50/50 p-4 rounded-lg border border-yellow-100">
-                                {{ $concerns }}
-                            </div>
-                            @else
-                            <p class="text-xs text-gray-400 italic">No additional concerns added.</p>
-                            @endif
-                        </div>
+                    </div>
                 </section>
         </div>
     </div>
 </main>
 
-@if ($isDentistProfile)
-<div id="startModal" class="ui-modal" role="dialog" aria-modal="true">
-
-    <div class="ui-modal-card modal-sm" id="startModalContent">
+@if ($canStartProcedure)
+<div id="startModal" class="ui-modal modal-theme-primary" aria-hidden="true" role="dialog" aria-modal="true"
+    aria-labelledby="startProcedureModalTitle">
+    <div class="ui-modal-card modal-sm">
 
         <div class="modal-hd">
-            <i class="fa-solid fa-play text-xl"></i>
+            <div class="modal-heading">
+
+                <div class="modal-icon">
+                    <i class="fa-solid fa-play"></i>
+                </div>
+
+                <div class="modal-copy">
+                    <h2 id="startProcedureModalTitle" class="modal-title">
+                        Start Procedure
+                    </h2>
+
+                    <p class="modal-subtitle">
+                        Begin today's scheduled dental procedure.
+                    </p>
+                </div>
+
+            </div>
+
+            <button type="button" class="modal-x" onclick="closeStartModal()" aria-label="Close start procedure modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
         </div>
 
-        <h2 class="text-xl font-extrabold text-gray-900 mb-2">Start Procedure?</h2>
+        <div class="modal-bd">
 
-        <p class="text-sm text-gray-500 mb-6">
-            You are about to start a new dental procedure session for this patient. Do you want to continue?
-        </p>
+            <div class="global-confirm-alert">
+                <i class="fa-solid fa-circle-play"></i>
+
+                <div>
+                    <strong>
+                        Start this dental procedure?
+                    </strong>
+
+                    <span>
+                        Confirm that the patient's appointment details are correct before continuing.
+                    </span>
+                </div>
+            </div>
+
+        </div>
 
         <div class="modal-ft">
-            <button type="button" onclick="closeStartModal()" class="ui-btn ui-btn-secondary flex-1">
+
+            <button type="button" onclick="closeStartModal()" class="ui-btn ui-btn-secondary">
                 Cancel
             </button>
 
-            <button type="button" onclick="confirmStart()" class="ui-btn ui-btn-primary flex-1">
-                Yes, Start
+            <button type="button" onclick="confirmStart()" class="ui-btn ui-btn-primary">
+                <i class="fa-solid fa-play"></i>
+                <span>Start Procedure</span>
             </button>
+
         </div>
+
     </div>
 </div>
 @endif
@@ -1109,36 +1491,11 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
     }
 
     function openStartModal() {
-        const modal = document.getElementById('startModal');
-        const content = document.getElementById('startModalContent');
-
-        if (!modal || !content) return;
-
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-
-        setTimeout(() => {
-            content.classList.remove('scale-95');
-            content.classList.add('scale-100');
-        }, 10);
-
-        document.body.style.overflow = 'hidden';
+        window.openModal?.('startModal');
     }
 
     function closeStartModal() {
-        const modal = document.getElementById('startModal');
-        const content = document.getElementById('startModalContent');
-
-        if (!modal || !content) return;
-
-        content.classList.remove('scale-100');
-        content.classList.add('scale-95');
-
-        setTimeout(() => {
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-            document.body.style.overflow = '';
-        }, 200);
+        window.closeModal?.('startModal');
     }
 </script>
 @endsection
