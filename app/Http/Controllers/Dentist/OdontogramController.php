@@ -30,6 +30,7 @@ use App\Models\ClinicSchedule;
 use App\Models\BlockedDate;
 use App\Helpers\PhilippineHolidays;
 use App\Helpers\BookingQuestions;
+use Illuminate\Support\Facades\Auth;
 
 class OdontogramController extends Controller
 {
@@ -748,7 +749,7 @@ class OdontogramController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return redirect('/login');
         }
 
@@ -773,7 +774,7 @@ class OdontogramController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return redirect('/login');
         }
 
@@ -804,7 +805,7 @@ class OdontogramController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return redirect('/login');
         }
 
@@ -838,7 +839,7 @@ class OdontogramController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return redirect('/login');
         }
 
@@ -973,7 +974,7 @@ class OdontogramController extends Controller
             session('impersonated_role')
             ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized.',
@@ -1161,7 +1162,7 @@ class OdontogramController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return redirect('/login');
         }
 
@@ -1195,7 +1196,7 @@ class OdontogramController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return response()->json([
                 'slots' => [],
                 'message' => 'Unauthorized.',
@@ -1257,7 +1258,7 @@ class OdontogramController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return response()->json([
                 'message' => 'Unauthorized.',
             ], 403);
@@ -1337,7 +1338,7 @@ class OdontogramController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return response()->json([
                 'message' => 'Unauthorized.',
             ], 403);

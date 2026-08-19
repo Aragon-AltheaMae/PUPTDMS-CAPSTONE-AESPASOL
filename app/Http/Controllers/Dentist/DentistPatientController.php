@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Helpers\PhilippineHolidays;
 use App\Helpers\AuditLogger;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -66,7 +67,7 @@ class DentistPatientController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return redirect('/login');
         }
 
@@ -156,7 +157,7 @@ class DentistPatientController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return redirect('/login');
         }
 

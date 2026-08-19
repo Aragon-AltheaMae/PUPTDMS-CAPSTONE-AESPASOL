@@ -76,7 +76,7 @@ class DentistAppointmentController extends Controller
 
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return redirect('/login');
         }
 
@@ -207,7 +207,7 @@ class DentistAppointmentController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return redirect('/login');
         }
 
@@ -299,7 +299,7 @@ class DentistAppointmentController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return redirect('/login');
         }
 

@@ -3180,6 +3180,271 @@ body.doc-modal-lock .floating-action {
     min-height: 0;
 }
 
+.ui-modal .ui-modal-card.modal-report-like {
+    width: min(92vw, 950px);
+    max-width: 950px;
+    max-height: 90dvh;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .modal-hd,
+.ui-modal .ui-modal-card.modal-report-like .modal-bd,
+.ui-modal .ui-modal-card.modal-report-like .modal-ft {
+    background: #ffffff;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .modal-hd {
+    padding: 1.05rem 1.2rem .85rem;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .modal-bd {
+    padding: 1.1rem 1.4rem 1.2rem;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .modal-ft {
+    padding: 1rem 1.4rem 1.25rem;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .modal-heading {
+    gap: .75rem;
+    align-items: center;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .modal-icon {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border-radius: 13px;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .modal-icon i {
+    font-size: 1.05rem;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .modal-title {
+    font-size: 1.05rem;
+    line-height: 1.1;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .modal-subtitle {
+    margin-top: .14rem;
+    font-size: .74rem;
+    line-height: 1.35;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .modal-x {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 12px;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .modal-x i {
+    font-size: 1rem;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .report-date-range-section {
+    display: flex;
+    flex-direction: column;
+    gap: .7rem;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .report-export-scope {
+    display: flex;
+    align-items: center;
+    gap: .28rem;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    padding-bottom: .08rem;
+    margin-bottom: .16rem;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .report-export-scope-chip {
+    flex: 0 0 auto;
+    min-height: 27px;
+    padding: 0 .54rem;
+    border-radius: 999px;
+    border: 1px solid #EEF2F7;
+    background: linear-gradient(180deg, #FFFFFF 0%, #FBFCFE 100%);
+    color: #667085;
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    box-shadow: 0 6px 14px rgba(15, 23, 42, .06);
+    font-size: .64rem;
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .report-export-scope-chip i {
+    color: currentColor;
+    font-size: .56rem;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .report-export-scope-chip.active {
+    background: linear-gradient(135deg, #8B0000, #6B0000);
+    border-color: #8B0000;
+    color: #FFFFFF;
+    box-shadow: 0 12px 26px rgba(139, 0, 0, .2);
+}
+
+.ui-modal .ui-modal-card.modal-report-like .report-export-scope-count {
+    min-width: 15px;
+    height: 15px;
+    padding: 0 4px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #F1F5F9;
+    color: #667085;
+    font-size: .5rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .report-export-scope-chip.active .report-export-scope-count {
+    background: rgba(255, 255, 255, .18);
+    color: #FFFFFF;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .report-date-range-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .report-date-range-title {
+    color: var(--text-1, #111827);
+    font-size: .68rem;
+    font-weight: 900;
+    letter-spacing: .065em;
+    text-transform: uppercase;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .report-date-range-subtitle {
+    margin: .2rem 0 0;
+    color: var(--text-3, #9ca3af);
+    font-size: .66rem;
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .report-date-range-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .75rem;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .report-date-range-helper {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    margin: -.15rem 0 0;
+    color: var(--text-3, #9ca3af);
+    font-size: .68rem;
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .report-date-range-helper i {
+    color: var(--text-3, #9ca3af);
+    font-size: .65rem;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .fp-date-input-wrap {
+    position: relative;
+    width: 100%;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .fp-date-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9CA3AF;
+    font-size: 12px;
+    pointer-events: none;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .form-input-custom {
+    width: 100%;
+    min-height: 44px;
+    padding: 0 2.45rem 0 0.85rem;
+    border-radius: 12px;
+    font-size: .82rem;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .global-form-label {
+    margin-bottom: .38rem;
+    font-size: .8rem;
+    line-height: 1.2;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .modal-helper-text {
+    font-size: .78rem;
+}
+
+.ui-modal .ui-modal-card.modal-report-like .modal-ft .ui-btn {
+    min-height: 46px;
+    border-radius: 14px;
+    font-size: .95rem;
+    font-weight: 800;
+}
+
+@media (max-width: 640px) {
+    .ui-modal .ui-modal-card.modal-report-like {
+        width: min(100%, 430px);
+        max-width: 430px;
+        max-height: calc(100dvh - 24px);
+    }
+
+    .ui-modal .ui-modal-card.modal-report-like .modal-hd {
+        padding: .95rem .95rem .8rem;
+    }
+
+    .ui-modal .ui-modal-card.modal-report-like .modal-bd {
+        padding: .95rem 1rem 1rem;
+    }
+
+    .ui-modal .ui-modal-card.modal-report-like .modal-ft {
+        padding: .9rem 1rem 1rem;
+        flex-direction: column;
+    }
+
+    .ui-modal .ui-modal-card.modal-report-like .report-export-scope {
+        gap: .24rem;
+    }
+
+    .ui-modal .ui-modal-card.modal-report-like .report-export-scope-chip {
+        min-height: 25px;
+        padding: 0 .48rem;
+        gap: .26rem;
+        font-size: .6rem;
+    }
+
+    .ui-modal .ui-modal-card.modal-report-like .report-export-scope-chip i {
+        font-size: .5rem;
+    }
+
+    .ui-modal .ui-modal-card.modal-report-like .report-export-scope-count {
+        min-width: 14px;
+        height: 14px;
+        padding: 0 4px;
+        font-size: .48rem;
+    }
+
+    .ui-modal .ui-modal-card.modal-report-like .report-date-range-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ui-modal .ui-modal-card.modal-report-like .modal-ft .ui-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 .modal-scroll-body {
     flex: 1 1 auto;
     min-height: 0;

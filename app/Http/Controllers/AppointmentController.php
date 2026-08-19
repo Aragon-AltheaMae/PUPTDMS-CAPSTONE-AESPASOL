@@ -316,12 +316,10 @@ class AppointmentController extends Controller
             : [];
 
         $hasExistingDentalHistory =
-            $patient->dentalHistory !== null &&
-            $patient->dentalHistoryAnswers->isNotEmpty();
+            $this->hasExistingDentalHistoryRecord($patient);
 
         $hasExistingMedicalHistory =
-            $patient->medicalHistory !== null &&
-            $patient->medicalHistory->answers->isNotEmpty();
+            $this->hasExistingMedicalHistoryRecord($patient);
 
         $hasExistingBookingInformation =
             $hasExistingDentalHistory &&
@@ -440,6 +438,51 @@ class AppointmentController extends Controller
             'hasExistingBookingInformation',
             'hasReusableSignature'
         ));
+    }
+
+    private function hasExistingDentalHistoryRecord(Patient $patient): bool
+    {
+        if ($patient->dentalHistoryAnswers->isNotEmpty()) {
+            return true;
+        }
+
+        if (filled($patient->dentalHistoryConcerns?->additional_concerns)) {
+            return true;
+        }
+
+        if (
+            filled($patient->dentalHistory?->last_dental_visit) ||
+            filled($patient->dentalHistory?->previous_dentist) ||
+            filled($patient->dentalHistoryDates?->extraction_date) ||
+            filled($patient->dentalHistoryDates?->dentures_date) ||
+            filled($patient->dentalHistoryDates?->ortho_date)
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function hasExistingMedicalHistoryRecord(Patient $patient): bool
+    {
+        if ($patient->medicalHistory?->answers->isNotEmpty()) {
+            return true;
+        }
+
+        if ($patient->medicalHistory?->diseaseAnswers->isNotEmpty()) {
+            return true;
+        }
+
+        if (
+            filled($patient->medicalHistory?->emergency_person) ||
+            filled($patient->medicalHistory?->emergency_number) ||
+            filled($patient->medicalHistory?->emergency_relation) ||
+            filled($patient->medicalHistory?->patient_signature)
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     public function getDraft()

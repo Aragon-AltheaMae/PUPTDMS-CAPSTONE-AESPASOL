@@ -6,11 +6,12 @@
 
     $drawerDisplayName = $authUser?->name ?? ucwords(str_replace('_', ' ', $sidebarRole));
 
-    $drawerDisplayRole = match ($sidebarRole) {
-        'admin' => 'Administrator',
-        'dentist' => 'Dentist',
-        default => ucwords(str_replace('_', ' ', $sidebarRole)),
-    };
+    $drawerDisplayRole = $authUser?->role?->name
+        ?? match ($sidebarRole) {
+            'admin' => 'Administrator',
+            'dentist' => 'Dentist',
+            default => ucwords(str_replace('_', ' ', $sidebarRole)),
+        };
 
     $drawerAvatarUrl = !empty($authUser?->profile_image)
         ? asset('storage/' . $authUser->profile_image)
@@ -28,36 +29,42 @@
                 'items' => [
                     [
                         'route' => 'admin.admin.dashboard',
+                        'permission' => 'access_super_admin_dashboard',
                         'active' => ['admin.admin.dashboard'],
                         'icon' => 'fa-chart-line',
                         'label' => 'Dashboard',
                     ],
                     [
                         'route' => 'admin.patient_directory',
+                        'permission' => 'manage_patient_profiles',
                         'active' => ['admin.patient_directory'],
                         'icon' => 'fa-users',
                         'label' => 'Patients',
                     ],
                     [
                         'route' => 'admin.dental-records.index',
+                        'permission' => 'manage_dental_records',
                         'active' => ['admin.dental-records*'],
                         'icon' => 'fa-tooth',
                         'label' => 'Dental Records',
                     ],
                     [
                         'route' => 'admin.admin.appointments',
+                        'permission' => 'manage_appointments',
                         'active' => ['admin.admin.appointments'],
                         'icon' => 'fa-calendar-check',
                         'label' => 'Appointments',
                     ],
                     [
                         'route' => 'admin.document-requests.index',
+                        'permission' => 'manage_document_requests',
                         'active' => ['admin.document-requests*'],
                         'icon' => 'fa-file-circle-check',
                         'label' => 'Document Request',
                     ],
                     [
                         'route' => 'admin.reports',
+                        'permission' => 'manage_reports',
                         'active' => ['admin.reports'],
                         'icon' => 'fa-file',
                         'label' => 'Reports',
@@ -72,48 +79,56 @@
                 'items' => [
                     [
                         'route' => 'admin.user_management',
+                        'permissions_any' => ['manage_user_accounts', 'manage_user_roles', 'manage_dentist_accounts', 'manage_super_admin_accounts'],
                         'active' => ['admin.user_management*'],
                         'icon' => 'fa-user-gear',
                         'label' => 'User Management',
                     ],
                     [
                         'route' => 'admin.dentist-transitions.index',
+                        'permission' => 'view_dentist_transitions',
                         'active' => ['admin.dentist-transitions*'],
                         'icon' => 'fa-people-arrows',
                         'label' => 'Dentist Continuity',
                     ],
                     [
                         'route' => 'admin.role_permissions',
+                        'permission' => 'manage_user_roles',
                         'active' => ['admin.role_permissions'],
                         'icon' => 'fa-user-shield',
                         'label' => 'Roles & Permissions',
                     ],
                     [
                         'route' => 'admin.service-types',
+                        'permission' => 'manage_system_settings',
                         'active' => ['admin.service-types*'],
                         'icon' => 'fa-list-check',
                         'label' => 'Service Types',
                     ],
                     [
                         'route' => 'admin.clinic_schedule',
+                        'permission' => 'manage_appointments',
                         'active' => ['admin.clinic_schedule*'],
                         'icon' => 'fa-calendar-days',
                         'label' => 'Clinic Schedule',
                     ],
                     [
                         'route' => 'admin.academic_periods',
+                        'permission' => 'set_academic_year',
                         'active' => ['admin.academic_periods*'],
                         'icon' => 'fa-school',
                         'label' => 'Academic Periods',
                     ],
                     [
                         'route' => 'admin.inventory',
+                        'permission' => 'manage_inventory',
                         'active' => ['admin.inventory*'],
                         'icon' => 'fa-boxes-stacked',
                         'label' => 'Inventory',
                     ],
                     [
                         'route' => 'admin.document-template',
+                        'permission' => 'manage_document_templates',
                         'active' => ['admin.document-template*'],
                         'icon' => 'fa-file-pen',
                         'label' => 'Document Templates',
@@ -128,30 +143,35 @@
                 'items' => [
                     [
                         'route' => 'admin.system_settings',
+                        'permission' => 'manage_system_settings',
                         'active' => ['admin.system_settings*'],
                         'icon' => 'fa-sliders',
                         'label' => 'System Settings',
                     ],
                     [
                         'route' => 'admin.assign-cms-access',
+                        'permission' => 'manage_dentist_accounts',
                         'active' => ['admin.assign-cms-access'],
                         'icon' => 'fa-user-shield',
                         'label' => 'Assign CMS Access',
                     ],
                     [
                         'route' => 'admin.faculty.integration',
+                        'permission' => 'manage_dentist_accounts',
                         'active' => ['admin.faculty.integration'],
                         'icon' => 'fa-user-plus',
                         'label' => 'Faculty Integration',
                     ],
                     [
                         'route' => 'admin.system_logs',
+                        'permission' => 'manage_audit_trail',
                         'active' => ['admin.system_logs'],
                         'icon' => 'fa-clipboard-list',
                         'label' => 'System Logs',
                     ],
                     [
                         'route' => 'admin.session_management.index',
+                        'permission' => 'manage_audit_trail',
                         'active' => ['admin.session_management.*'],
                         'icon' => 'fa-shield-halved',
                         'label' => 'Session Dashboard',
@@ -180,6 +200,13 @@
                         'active' => ['dentist.dentist.patients'],
                         'icon' => 'fa-users',
                         'label' => 'Patients',
+                    ],
+                    [
+                        'route' => 'dentist.dental-records.index',
+                        'permission' => 'manage_dental_records',
+                        'active' => ['dentist.dental-records*'],
+                        'icon' => 'fa-tooth',
+                        'label' => 'Dental Records',
                     ],
                     [
                         'route' => 'dentist.walk-in.index',
@@ -217,6 +244,13 @@
                         'label' => 'Document Requests',
                     ],
                     [
+                        'route' => 'dentist.dentist.transitions.index',
+                        'permission' => 'view_dentist_transitions',
+                        'active' => ['dentist.dentist.transitions.*'],
+                        'icon' => 'fa-people-arrows',
+                        'label' => 'Dentist Continuity',
+                    ],
+                    [
                         'route' => 'dentist.dentist.inventory',
                         'permission' => 'manage_inventory',
                         'active' => ['dentist.dentist.inventory'],
@@ -232,6 +266,35 @@
                     ],
                 ],
             ],
+            [
+                'section' => 'System',
+                'label' => 'System',
+                'sublabel' => 'Admin & configuration',
+                'icon' => 'fa-server',
+                'items' => [
+                    [
+                        'route' => 'dentist.user_management',
+                        'permissions_any' => ['manage_user_accounts', 'manage_user_roles', 'manage_dentist_accounts', 'manage_super_admin_accounts'],
+                        'active' => ['dentist.user_management*'],
+                        'icon' => 'fa-user-gear',
+                        'label' => 'User Management',
+                    ],
+                    [
+                        'route' => 'dentist.system_settings',
+                        'permission' => 'manage_system_settings',
+                        'active' => ['dentist.system_settings*'],
+                        'icon' => 'fa-sliders',
+                        'label' => 'System Settings',
+                    ],
+                    [
+                        'route' => 'dentist.document-template',
+                        'permission' => 'manage_document_templates',
+                        'active' => ['dentist.document-template*'],
+                        'icon' => 'fa-file-pen',
+                        'label' => 'Document Templates',
+                    ],
+                ],
+            ],
         ],
 
         'patient' => [
@@ -243,6 +306,7 @@
                 'items' => [
                     [
                         'route' => 'homepage',
+                        'permission' => 'access_patient_dashboard',
                         'active' => ['homepage'],
                         'paths' => ['patient/dashboard'],
                         'icon' => 'fa-house',
@@ -250,6 +314,7 @@
                     ],
                     [
                         'route' => 'patient.appointment.index',
+                        'permissions_any' => ['view_own_appointments', 'book_appointments'],
                         'active' => ['patient.appointment.*'],
                         'paths' => ['patient/appointment*'],
                         'icon' => 'fa-calendar-check',
@@ -257,6 +322,7 @@
                     ],
                     [
                         'route' => 'patient.record',
+                        'permission' => 'view_own_records',
                         'active' => ['patient.record'],
                         'paths' => ['patient/record*'],
                         'icon' => 'fa-folder-open',
@@ -276,7 +342,7 @@
 
     $groups = $sidebarGroups[$sidebarRole] ?? $sidebarGroups['patient'];
 
-    if ($sidebarRole === 'dentist' && $authUser) {
+    if ($authUser) {
         $permissionSlugs = $authUser->role?->permissions->pluck('slug')->all() ?? [];
         $isSuperAdmin = $authUser->role?->slug === 'super_admin';
 
@@ -284,9 +350,30 @@
             ->map(function ($group) use ($permissionSlugs, $isSuperAdmin) {
                 $group['items'] = array_values(array_filter(
                     $group['items'],
-                    fn ($item) => $isSuperAdmin
-                        || empty($item['permission'])
-                        || in_array($item['permission'], $permissionSlugs, true)
+                    function ($item) use ($permissionSlugs, $isSuperAdmin) {
+                        if ($isSuperAdmin) {
+                            return true;
+                        }
+
+                        $requiredPermission = $item['permission'] ?? null;
+                        $requiredAnyPermissions = $item['permissions_any'] ?? [];
+
+                        if ($requiredPermission && !in_array($requiredPermission, $permissionSlugs, true)) {
+                            return false;
+                        }
+
+                        if ($requiredAnyPermissions !== []) {
+                            foreach ($requiredAnyPermissions as $permission) {
+                                if (in_array($permission, $permissionSlugs, true)) {
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        }
+
+                        return true;
+                    }
                 ));
 
                 return $group;

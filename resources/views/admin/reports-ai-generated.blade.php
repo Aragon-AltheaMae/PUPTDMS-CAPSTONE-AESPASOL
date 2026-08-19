@@ -371,6 +371,8 @@
                 ));
 
         $documentRequestAnalysis = $aiReport['document_request_analysis'] ?? [];
+        $hasDocumentRequestAnalysis = !empty($documentRequestAnalysis);
+        $totalReportPages = $hasDocumentRequestAnalysis ? 4 : 3;
 
         $docTotal = data_get($aiReport, 'print_metrics.document_requests_total', 0);
         $docPending = data_get($aiReport, 'print_metrics.document_requests_pending', 0);
@@ -550,7 +552,25 @@
                     <p class="air-print-body-text">{{ implode(' ', $aiReport['inventory_analysis']) }}</p>
                 @endif
             </section>
-            @if (!empty($documentRequestAnalysis))
+            <div class="air-print-fixed-footer">
+                <div class="air-print-footer-left">
+                    <strong>This document contains personal-identifiable information subject to Data Privacy.</strong>
+                    <span>Please keep this document protected and in a safe place.</span>
+                </div>
+
+                <div class="air-print-footer-right">
+                    This is system-generated, signature is not required.
+                </div>
+            </div>
+        </div>
+
+        <div class="air-print-page" data-print-page="3">
+            <div class="air-print-fixed-header">
+                <strong>AI Generated Overall Report</strong>
+                <span>· {{ $aiReport['period'] }} · {{ $hasDocumentRequestAnalysis ? 'Document requests and risk' : 'Risk and recommendations' }}</span>
+            </div>
+
+            @if ($hasDocumentRequestAnalysis)
                 <section class="air-print-section">
                     <div class="air-print-section-title"><span>05</span>
                         <h2>Document request analysis</h2>
@@ -595,46 +615,41 @@
 
                     <p class="air-print-body-text">{{ implode(' ', $documentRequestAnalysis) }}</p>
                 </section>
+
+                <section class="air-print-section">
+                    <div class="air-print-section-title"><span>06</span>
+                        <h2>Risk interpretation</h2>
+                    </div>
+                    <div class="air-print-risk-box">
+                        <strong>{{ $aiReport['risk_level'] }} risk</strong>
+                        <p>{{ $aiReport['risk_explanation'] }}</p>
+                    </div>
+                </section>
+            @else
+                <section class="air-print-section">
+                    <div class="air-print-section-title"><span>06</span>
+                        <h2>Risk interpretation</h2>
+                    </div>
+                    <div class="air-print-risk-box">
+                        <strong>{{ $aiReport['risk_level'] }} risk</strong>
+                        <p>{{ $aiReport['risk_explanation'] }}</p>
+                    </div>
+                </section>
+
+                <section class="air-print-section">
+                    <div class="air-print-section-title"><span>07</span>
+                        <h2>Recommendations</h2>
+                    </div>
+                    <div class="air-print-rec-list">
+                        @foreach ($aiReport['recommendations'] as $index => $recommendation)
+                            <div class="air-print-rec-card">
+                                <strong>{{ $recommendationTitles[$index] ?? 'Recommendation' }}</strong>
+                                <p>{{ $recommendation }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                </section>
             @endif
-
-            <div class="air-print-footer">
-                <div class="air-print-footer-left">
-                    <strong>This document contains personal-identifiable information subject to Data Privacy.</strong>
-                    <span>Please keep this document protected and in a safe place.</span>
-                </div>
-                <span class="air-print-footer-right">This is system-generated, signature is not required.</span>
-            </div>
-        </div>
-
-        <div class="air-print-page" data-print-page="3">
-            <div class="air-print-fixed-header">
-                <strong>AI Generated Overall Report</strong>
-                <span>· {{ $aiReport['period'] }} · Risk and recommendations</span>
-            </div>
-
-            <section class="air-print-section">
-                <div class="air-print-section-title"><span>06</span>
-                    <h2>Risk interpretation</h2>
-                </div>
-                <div class="air-print-risk-box">
-                    <strong>{{ $aiReport['risk_level'] }} risk</strong>
-                    <p>{{ $aiReport['risk_explanation'] }}</p>
-                </div>
-            </section>
-
-            <section class="air-print-section">
-                <div class="air-print-section-title"><span>07</span>
-                    <h2>Recommendations</h2>
-                </div>
-                <div class="air-print-rec-list">
-                    @foreach ($aiReport['recommendations'] as $index => $recommendation)
-                        <div class="air-print-rec-card">
-                            <strong>{{ $recommendationTitles[$index] ?? 'Recommendation' }}</strong>
-                            <p>{{ $recommendation }}</p>
-                        </div>
-                    @endforeach
-                </div>
-            </section>
 
             <div class="air-print-fixed-footer">
                 <div class="air-print-footer-left">
@@ -647,6 +662,40 @@
                 </div>
             </div>
         </div>
+
+        @if ($hasDocumentRequestAnalysis)
+            <div class="air-print-page" data-print-page="4">
+                <div class="air-print-fixed-header">
+                    <strong>AI Generated Overall Report</strong>
+                    <span>· {{ $aiReport['period'] }} · Recommendations</span>
+                </div>
+
+                <section class="air-print-section">
+                    <div class="air-print-section-title"><span>07</span>
+                        <h2>Recommendations</h2>
+                    </div>
+                    <div class="air-print-rec-list">
+                        @foreach ($aiReport['recommendations'] as $index => $recommendation)
+                            <div class="air-print-rec-card">
+                                <strong>{{ $recommendationTitles[$index] ?? 'Recommendation' }}</strong>
+                                <p>{{ $recommendation }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                </section>
+
+                <div class="air-print-fixed-footer">
+                    <div class="air-print-footer-left">
+                        <strong>This document contains personal-identifiable information subject to Data Privacy.</strong>
+                        <span>Please keep this document protected and in a safe place.</span>
+                    </div>
+
+                    <div class="air-print-footer-right">
+                        This is system-generated, signature is not required.
+                    </div>
+                </div>
+            </div>
+        @endif
     </section>
 
     <div id="printReportModal" class="ui-modal" aria-hidden="true">
@@ -746,48 +795,6 @@
                                     </ul>
                                 </section>
 
-                                @if (!empty($documentRequestAnalysis))
-                                    <section class="air-modal-print-section">
-                                        <div class="air-modal-print-section-title">
-                                            <span>05</span>
-                                            <h2>Document request analysis</h2>
-                                        </div>
-
-                                        <table class="air-modal-print-table">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Document request metric</th>
-                                                    <th>Value</th>
-                                                </tr>
-                                                <tr>
-                                                    <td>Total requests</td>
-                                                    <td>{{ $docTotal }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Pending requests</td>
-                                                    <td>{{ $docPending }} / {{ $docPendingRateLabel }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Approved requests</td>
-                                                    <td>{{ $docApproved }} / {{ $docApprovalRateLabel }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Rejected requests</td>
-                                                    <td>{{ $docRejected }} / {{ $docRejectionRateLabel }}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Most requested document</td>
-                                                    <td>{{ $docMostRequested }} — {{ $docMostRequestedCount }} request/s
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-
-                                        <p class="air-modal-print-body-text">{{ implode(' ', $documentRequestAnalysis) }}
-                                        </p>
-                                    </section>
-                                @endif
-
                                 <div class="air-modal-print-footer">
                                     <div>
                                         <strong>This document contains personal-identifiable information subject to Data
@@ -865,11 +872,11 @@
                                         </tbody>
                                     </table>
 
-                                    @if (!empty($aiReport['inventory_analysis']))
-                                        <p class="air-modal-print-body-text">
-                                            {{ implode(' ', $aiReport['inventory_analysis']) }}
-                                        </p>
-                                    @endif
+                                @if (!empty($aiReport['inventory_analysis']))
+                                    <p class="air-modal-print-body-text">
+                                        {{ implode(' ', $aiReport['inventory_analysis']) }}
+                                    </p>
+                                @endif
                                 </section>
 
                                 <div class="air-modal-print-footer">
@@ -885,36 +892,90 @@
                             <div class="air-modal-print-sheet" data-modal-preview-page="3">
                                 <div class="air-modal-print-page-heading">
                                     <strong>AI Generated Overall Report</strong>
-                                    <span> · {{ $aiReport['period'] }} · Risk and recommendations</span>
+                                    <span> · {{ $aiReport['period'] }} · {{ $hasDocumentRequestAnalysis ? 'Document requests and risk' : 'Risk and recommendations' }}</span>
                                 </div>
 
-                                <section class="air-modal-print-section">
-                                    <div class="air-modal-print-section-title">
-                                        <span>06</span>
-                                        <h2>Risk interpretation</h2>
-                                    </div>
+                                @if ($hasDocumentRequestAnalysis)
+                                    <section class="air-modal-print-section">
+                                        <div class="air-modal-print-section-title">
+                                            <span>05</span>
+                                            <h2>Document request analysis</h2>
+                                        </div>
 
-                                    <div class="air-modal-print-risk-box">
-                                        <strong>{{ $aiReport['risk_level'] }} risk</strong>
-                                        <p>{{ $aiReport['risk_explanation'] }}</p>
-                                    </div>
-                                </section>
+                                        <table class="air-modal-print-table">
+                                            <tbody>
+                                                <tr>
+                                                    <th>Document request metric</th>
+                                                    <th>Value</th>
+                                                </tr>
+                                                <tr>
+                                                    <td>Total requests</td>
+                                                    <td>{{ $docTotal }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Pending requests</td>
+                                                    <td>{{ $docPending }} / {{ $docPendingRateLabel }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Approved requests</td>
+                                                    <td>{{ $docApproved }} / {{ $docApprovalRateLabel }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Rejected requests</td>
+                                                    <td>{{ $docRejected }} / {{ $docRejectionRateLabel }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Most requested document</td>
+                                                    <td>{{ $docMostRequested }} — {{ $docMostRequestedCount }} request/s
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
 
-                                <section class="air-modal-print-section">
-                                    <div class="air-modal-print-section-title">
-                                        <span>07</span>
-                                        <h2>Recommendations</h2>
-                                    </div>
+                                        <p class="air-modal-print-body-text">{{ implode(' ', $documentRequestAnalysis) }}
+                                        </p>
+                                    </section>
 
-                                    <div class="air-modal-print-rec-list">
-                                        @foreach ($aiReport['recommendations'] as $index => $recommendation)
-                                            <div class="air-modal-print-rec-card">
-                                                <strong>{{ $recommendationTitles[$index] ?? 'Recommendation' }}</strong>
-                                                <p>{{ $recommendation }}</p>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </section>
+                                    <section class="air-modal-print-section">
+                                        <div class="air-modal-print-section-title">
+                                            <span>06</span>
+                                            <h2>Risk interpretation</h2>
+                                        </div>
+
+                                        <div class="air-modal-print-risk-box">
+                                            <strong>{{ $aiReport['risk_level'] }} risk</strong>
+                                            <p>{{ $aiReport['risk_explanation'] }}</p>
+                                        </div>
+                                    </section>
+                                @else
+                                    <section class="air-modal-print-section">
+                                        <div class="air-modal-print-section-title">
+                                            <span>06</span>
+                                            <h2>Risk interpretation</h2>
+                                        </div>
+
+                                        <div class="air-modal-print-risk-box">
+                                            <strong>{{ $aiReport['risk_level'] }} risk</strong>
+                                            <p>{{ $aiReport['risk_explanation'] }}</p>
+                                        </div>
+                                    </section>
+
+                                    <section class="air-modal-print-section">
+                                        <div class="air-modal-print-section-title">
+                                            <span>07</span>
+                                            <h2>Recommendations</h2>
+                                        </div>
+
+                                        <div class="air-modal-print-rec-list">
+                                            @foreach ($aiReport['recommendations'] as $index => $recommendation)
+                                                <div class="air-modal-print-rec-card">
+                                                    <strong>{{ $recommendationTitles[$index] ?? 'Recommendation' }}</strong>
+                                                    <p>{{ $recommendation }}</p>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </section>
+                                @endif
 
                                 <div class="air-modal-print-footer">
                                     <div>
@@ -925,6 +986,41 @@
                                     <em>This is system-generated, signature is not required.</em>
                                 </div>
                             </div>
+
+                            @if ($hasDocumentRequestAnalysis)
+                                <div class="air-modal-print-sheet" data-modal-preview-page="4">
+                                    <div class="air-modal-print-page-heading">
+                                        <strong>AI Generated Overall Report</strong>
+                                        <span> · {{ $aiReport['period'] }} · Recommendations</span>
+                                    </div>
+
+                                    <section class="air-modal-print-section">
+                                        <div class="air-modal-print-section-title">
+                                            <span>07</span>
+                                            <h2>Recommendations</h2>
+                                        </div>
+
+                                        <div class="air-modal-print-rec-list">
+                                            @foreach ($aiReport['recommendations'] as $index => $recommendation)
+                                                <div class="air-modal-print-rec-card">
+                                                    <strong>{{ $recommendationTitles[$index] ?? 'Recommendation' }}</strong>
+                                                    <p>{{ $recommendation }}</p>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </section>
+
+                                    <div class="air-modal-print-footer">
+                                        <div>
+                                            <strong>This document contains personal-identifiable information subject to
+                                                Data
+                                                Privacy.</strong>
+                                            <span>Please keep this document protected and in a safe place.</span>
+                                        </div>
+                                        <em>This is system-generated, signature is not required.</em>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -1000,7 +1096,7 @@
 
                             <p class="modal-helper-text">
                                 <i class="fa-solid fa-circle-info"></i>
-                                Available report pages: 1 to 3
+                                Available report pages: 1 to {{ $totalReportPages }}
                             </p>
 
                             <div id="customPageRangeError" class="global-field-error" data-error-for="customPageRange"
@@ -1144,7 +1240,7 @@
                 if (!selected || selected.size === 0) {
                     window.showFormInputValidationMessage?.(
                         customPageRange,
-                        'Please enter a valid page range from 1 to 3.'
+                        `Please enter a valid page range from 1 to ${pages.length}.`
                     );
 
                     window.focusGlobalInvalidField?.(

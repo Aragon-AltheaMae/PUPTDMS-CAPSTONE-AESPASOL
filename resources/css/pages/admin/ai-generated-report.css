@@ -482,7 +482,7 @@
     position: relative;
     overflow: hidden;
     box-sizing: border-box;
-    padding: 0 34px 54px;
+    padding: 0 34px 92px;
     background: #fff;
     border: 1px solid #d1d5db;
     box-shadow: 0 14px 35px rgba(15, 23, 42, .18);
@@ -991,7 +991,7 @@
     aspect-ratio: var(--air-preview-page-ratio) !important;
     height: auto !important;
     min-height: 0 !important;
-    padding: 0 28px 42px !important;
+    padding: 0 28px 72px !important;
 }
 
 .air-modal.is-preview-landscape .air-modal-preview-pages {
@@ -1150,7 +1150,7 @@
         display: block !important;
         width: 210mm !important;
         min-height: 297mm !important;
-        padding: 24mm 18mm 28mm !important;
+        padding: 24mm 18mm 44mm !important;
         margin: 0 auto !important;
         background: #fff !important;
         overflow: hidden !important;
@@ -1162,7 +1162,7 @@
     body.print-layout-landscape .air-print-page {
         width: 297mm !important;
         min-height: 210mm !important;
-        padding: 22mm 18mm 24mm !important;
+        padding: 22mm 18mm 34mm !important;
     }
 
     .air-print-page:last-child {

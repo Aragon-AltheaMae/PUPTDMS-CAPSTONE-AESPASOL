@@ -116,6 +116,28 @@
     gap: .5rem;
 }
 
+.system-logs-page #slTable td:nth-child(3),
+.system-logs-page #slTable th:nth-child(3) {
+    text-align: center;
+}
+
+.system-logs-page #slTable td:nth-child(3) .badge-role,
+.system-logs-page #slGridView .table-record-row .badge-role {
+    min-height: 30px;
+    padding: .38rem .82rem;
+    border-radius: 999px;
+    font-size: .74rem;
+    font-weight: 800;
+    white-space: nowrap;
+    vertical-align: middle;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, .04);
+}
+
+.system-logs-page #slTable td:nth-child(3) .badge-role i,
+.system-logs-page #slGridView .table-record-row .badge-role i {
+    font-size: .72rem;
+}
+
 .sl-username {
     font-weight: 600;
     color: #333333;
@@ -346,8 +368,8 @@
 
 .sl-role-tabs {
     display: flex;
-    gap: 6px;
-    padding: .7rem 1.25rem;
+    gap: 5px;
+    padding: .55rem 1rem;
     border-bottom: 1px solid #f3f4f6;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -356,18 +378,20 @@
 .sl-role-tabs .tab-btn {
     position: relative;
     flex: 0 0 auto;
-    min-height: 36px;
+    min-height: 33px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
+    gap: 4px;
     border-radius: 999px;
-    padding: 0 14px;
+    padding: 0 12px;
     border: 1px solid transparent;
     background: #f5f5f5;
     color: #6b7280;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.104);
     transform: none;
+    font-size: .88rem;
+    font-weight: 700;
 }
 
 .sl-role-tabs .tab-btn:hover:not(.active) {
@@ -388,14 +412,14 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 20px;
-    height: 20px;
-    padding: 0 7px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 6px;
     margin-left: 2px;
     border-radius: 999px;
     background: #f3f4f6;
     color: #6b7280;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 900;
     line-height: 1;
 }
@@ -1527,6 +1551,7 @@
     }
 }
 
+
 @media (min-width: 901px) and (max-width: 1280px) {
     .system-logs-page .sl-table-wrap {
         overflow-x: auto !important;
@@ -1566,4 +1591,46 @@
 
 .system-logs-page .table-record-row {
     align-items: start;
+}
+
+@media (min-width: 768px) {
+    #slExportModal .ui-modal-card.modal-report-like {
+        width: min(94vw, 620px) !important;
+        max-width: 620px !important;
+
+        height: auto !important;
+        max-height: min(88dvh, 640px) !important;
+    }
+}
+
+#slExportModal .report-export-scope {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+
+    gap: .45rem !important;
+    flex-wrap: nowrap !important;
+    overflow: visible !important;
+}
+
+#slExportModal .report-export-scope-chip {
+    flex: 1 1 0 !important;
+    justify-content: center !important;
+    min-width: 0 !important;
+}
+
+#slExportModal .modal-ft .ui-btn {
+    min-height: 40px !important;
+    padding: 0.55rem 1rem !important;
+    border-radius: 12px !important;
+    font-size: 0.82rem !important;
+    font-weight: 800 !important;
+    gap: 0.4rem !important;
+}
+
+#slExportModal .modal-ft .ui-btn i {
+    font-size: 0.75rem !important;
 }

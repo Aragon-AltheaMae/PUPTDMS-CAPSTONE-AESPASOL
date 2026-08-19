@@ -195,6 +195,53 @@ function createBookingSignature(root) {
         );
     }
 
+    function resetDrawnSignatureState() {
+        drawnSignatureStrokes =
+            [];
+
+        drawnSignatureCurrentStroke =
+            [];
+
+        drawnSignatureIsDrawing =
+            false;
+
+        drawnSignatureWasUsed =
+            false;
+
+        redrawSignatureCanvas();
+    }
+
+    function clearUploadedSignatureState(
+        options = {}
+    ) {
+        const {
+            preserveStatus = false,
+            resetUploadTitle = true,
+        } = options;
+
+        signatureAiValid = false;
+        signatureAiChecking = false;
+
+        if (sigInput) {
+            sigInput.value = '';
+        }
+
+        if (
+            signatureSourceInput
+        ) {
+            signatureSourceInput.value =
+                '';
+        }
+
+        if (resetUploadTitle) {
+            updateSignatureUploadTitle();
+        }
+
+        if (!preserveStatus) {
+            clearSignatureDisplay();
+        }
+    }
+
     function showSignatureStatus(
         fileName = '',
         message = '',
@@ -500,6 +547,13 @@ function createBookingSignature(root) {
                     : 'upload';
         }
 
+        if (isDrawn) {
+            drawnSignatureWasUsed =
+                true;
+        } else {
+            resetDrawnSignatureState();
+        }
+
         const allowedTypes = [
             'image/jpeg',
             'image/png',
@@ -546,9 +600,6 @@ function createBookingSignature(root) {
         }
 
         if (isDrawn) {
-            drawnSignatureWasUsed =
-                true;
-
             signatureAiValid =
                 true;
 
@@ -556,7 +607,7 @@ function createBookingSignature(root) {
                 false;
 
             showSignatureStatus(
-                file.name,
+                '',
                 'Drawn signature accepted.',
                 'success'
             );
@@ -1010,6 +1061,17 @@ function createBookingSignature(root) {
             return;
         }
 
+        if (
+            signatureSourceInput
+                ?.value ===
+            'upload' &&
+            sigInput?.files?.length
+        ) {
+            clearUploadedSignatureState({
+                preserveStatus: true,
+            });
+        }
+
         resize();
 
         event.preventDefault();
@@ -1093,33 +1155,10 @@ function createBookingSignature(root) {
     }
 
     function clear() {
-        drawnSignatureStrokes =
-            [];
-
-        drawnSignatureCurrentStroke =
-            [];
-
-        drawnSignatureIsDrawing =
-            false;
-
-        drawnSignatureWasUsed =
-            false;
-
-        signatureAiValid =
-            false;
-
-        if (sigInput) {
-            sigInput.value = '';
-        }
-
-        if (
-            signatureSourceInput
-        ) {
-            signatureSourceInput.value =
-                '';
-        }
-
-        redrawSignatureCanvas();
+        resetDrawnSignatureState();
+        clearUploadedSignatureState({
+            preserveStatus: true,
+        });
         clearSignatureDisplay();
 
         root.dispatchEvent(
