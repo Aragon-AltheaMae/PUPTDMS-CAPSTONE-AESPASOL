@@ -13,21 +13,6 @@
     $medicalAnswers = $defaults['medical_answers'] ?? [];
     $selectedDiseases = collect($defaults['diseases'] ?? []);
     $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
-    $patientType = $patient->faculty_code ? 'Faculty' : ($patient->student_no ? 'Student' : 'Patient');
-    $patientRoleClass = match ($patientType) {
-        'Faculty' => 'role-faculty',
-        'Student' => 'role-student',
-        default => 'role-patient',
-    };
-    $patientRoleIcon = match ($patientType) {
-        'Faculty' => 'fa-chalkboard-user',
-        'Student' => 'fa-user-graduate',
-        default => 'fa-user',
-    };
-    $isWalkInContext = request()->boolean('is_walk_in')
-        || request()->boolean('walk_in')
-        || request('from') === 'walk-in';
-    $emergencyCaseLabel = $isWalkInContext ? 'Emergency Case' : 'For standard record';
 @endphp
 
 @section('content')
@@ -35,50 +20,7 @@
         <div class="booking-page-inner">
             <x-booking.workflow-header :back-url="route('dentist.dentist.patient.profile', ['patient' => $patient->id])" back-label="Back to Patient Profile"
                 form-target="#existingAppointmentForm" icon="fa-solid fa-file-circle-plus" title="Add Existing Appointment"
-                subtitle="Encode the completed appointment details before continuing to the odontogram." :steps="['Date & Time', 'Service', 'Dental History', 'Medical History', 'Review']">
-                <div class="flex flex-wrap items-center gap-3">
-                    <span class="text-sm font-semibold text-[#2f3a4c]">
-                        {{ $patient->name }}
-                    </span>
-
-                    <span class="badge-role {{ $patientRoleClass }}">
-                        <i class="fa-solid {{ $patientRoleIcon }}"></i>
-                        <span>{{ $patientType }}</span>
-                    </span>
-                </div>
-            </x-booking.workflow-header>
-
-            <div class="overflow-hidden rounded-[22px] border border-[#d9dfe8] bg-white shadow-[0_14px_34px_rgba(15,23,42,0.06)] mb-6">
-                <div class="grid grid-cols-1 md:grid-cols-[132px_230px_270px_minmax(0,1fr)]">
-                    <div class="flex items-center justify-center border-b border-[#d9dfe8] px-4 py-5 md:border-b-0 md:border-r">
-                        <div
-                            class="inline-flex min-w-[92px] items-center justify-center gap-2 rounded-full bg-[#1f5ca8] px-4 py-1.5 text-sm font-semibold text-white shadow-sm">
-                            <span>Dentist</span>
-                            <i class="fa-solid fa-chevron-down text-[10px]" aria-hidden="true"></i>
-                        </div>
-                    </div>
-
-                    <div
-                        class="flex items-center justify-center border-b border-[#d9dfe8] px-4 py-5 text-center text-[1.02rem] font-semibold text-black md:border-b-0 md:border-r">
-                        Dental Treatment Record
-                    </div>
-
-                    <div
-                        class="flex items-center justify-center border-b border-[#d9dfe8] px-4 py-5 text-center text-[1.02rem] font-medium text-[#202938] md:border-b-0 md:border-r">
-                        {{ $emergencyCaseLabel }} marking
-                    </div>
-
-                    <div class="flex items-center px-5 py-5 text-[0.98rem] leading-6 text-[#202938]">
-                        @if ($isWalkInContext)
-                            - If it is a walk-in patient, it is automatically marked as an
-                            "<strong>Emergency Case</strong>"
-                        @else
-                            - Standard existing appointments stay under
-                            "<strong>Dental Treatment Record</strong>" unless marked from the walk-in flow.
-                        @endif
-                    </div>
-                </div>
-            </div>
+                subtitle="Encode the completed appointment details before continuing to the odontogram." :steps="['Date & Time', 'Service', 'Dental History', 'Medical History', 'Review']" />
 
             <div class="w-full">
 
