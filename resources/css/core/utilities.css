@@ -678,11 +678,18 @@
     background: var(--action-hover-bg);
     color: var(--action-hover-color);
     border-color: var(--action-hover-border);
+
     transform: translateY(-1px);
-    box-shadow:
-        0 8px 18px color-mix(in srgb,
-            var(--action-hover-color) 18%,
-            transparent);
+    box-shadow: none;
+}
+
+[data-theme="dark"] .ui-action-btn,
+.dark .ui-action-btn,
+[data-theme="dark"] .ui-action-btn:hover,
+.dark .ui-action-btn:hover,
+[data-theme="dark"] .ui-action-btn:focus-visible,
+.dark .ui-action-btn:focus-visible {
+    box-shadow: none !important;
 }
 
 .ui-action-btn:active {
@@ -814,6 +821,49 @@
 .ui-action-btn:focus-visible::before {
     transform:
         translateX(-50%) translateY(0) rotate(45deg);
+}
+
+.appt-type-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: var(--text-3) !important;
+    font-size: 10px !important;
+    line-height: 1 !important;
+    cursor: default;
+    transform: none !important;
+}
+
+.appt-type-icon:hover,
+.appt-type-icon:focus,
+.appt-type-icon:focus-visible {
+    width: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    transform: none !important;
+    outline: none !important;
+}
+
+.appt-type-icon i {
+    display: block;
+    color: currentColor;
+    font-size: inherit;
+    line-height: 1;
 }
 
 .ui-action-edit {
@@ -1438,92 +1488,78 @@
     opacity: 0.5;
 }
 
-[data-theme="dark"] .ui-action-edit,
-.dark .ui-action-edit {
-    --action-bg: rgba(37, 99, 235, .16);
-    --action-color: #60A5FA;
-    --action-border: rgba(96, 165, 250, .24);
-
-    --action-hover-bg: #2563EB;
-    --action-hover-color: #FFFFFF;
-    --action-hover-border: #3B82F6;
-}
-
-[data-theme="dark"] .ui-action-delete,
-.dark .ui-action-delete {
-    --action-bg: rgba(220, 38, 38, .16);
-    --action-color: #FCA5A5;
-    --action-border: rgba(248, 113, 113, .24);
-
-    --action-hover-bg: #DC2626;
-    --action-hover-color: #FFFFFF;
-    --action-hover-border: #EF4444;
-}
-
 [data-theme="dark"] .ui-action-warning,
 .dark .ui-action-warning {
-    --action-bg: rgba(217, 119, 6, .16);
-    --action-color: #FCD34D;
-    --action-border: rgba(252, 211, 77, .24);
+    --action-bg:
+        color-mix(in srgb,
+            var(--status-rescheduled-solid) 16%,
+            transparent);
 
-    --action-hover-bg: #D97706;
-    --action-hover-color: #FFFFFF;
-    --action-hover-border: #F59E0B;
+    --action-color:
+        var(--status-rescheduled-text);
+
+    --action-border:
+        color-mix(in srgb,
+            var(--status-rescheduled-solid) 24%,
+            transparent);
 }
 
 [data-theme="dark"] .ui-action-success,
 .dark .ui-action-success {
-    --action-bg: rgba(5, 150, 105, .16);
-    --action-color: #6EE7B7;
-    --action-border: rgba(110, 231, 183, .24);
+    --action-bg:
+        color-mix(in srgb,
+            var(--status-completed-solid) 16%,
+            transparent);
 
-    --action-hover-bg: #059669;
-    --action-hover-color: #FFFFFF;
-    --action-hover-border: #10B981;
+    --action-color:
+        var(--status-completed-text);
+
+    --action-border:
+        color-mix(in srgb,
+            var(--status-completed-solid) 24%,
+            transparent);
 }
 
 [data-theme="dark"] .ui-action-reset,
 .dark .ui-action-reset {
-    --action-bg: rgba(124, 58, 237, .16);
-    --action-color: #C4B5FD;
-    --action-border: rgba(196, 181, 253, .24);
-
-    --action-hover-bg: #7C3AED;
-    --action-hover-color: #FFFFFF;
-    --action-hover-border: #8B5CF6;
+    --action-bg: var(--surface);
+    --action-color: var(--text-2);
+    --action-border: var(--border);
 }
 
 [data-theme="dark"] .ui-action-view,
 .dark .ui-action-view {
-    --action-bg: rgba(139, 0, 0, .16);
-    --action-color: #FCA5A5;
-    --action-border: rgba(252, 165, 165, .24);
-    --action-hover-bg: var(--crimson, #8B0000);
-    --action-hover-color: #FFFFFF;
-    --action-hover-border: #B91C1C;
-    --action-tooltip-bg: var(--crimson, #8B0000);
+    --action-bg:
+        var(--crimson-soft);
+
+    --action-color:
+        var(--status-cancelled-text);
+
+    --action-border:
+        var(--crimson-mid);
 }
 
-[data-theme="dark"] .ui-icon-btn.neutral,
-.dark .ui-icon-btn.neutral {
-    background: rgba(255, 255, 255, .06);
-    color: #cbd5e1;
-    border-color: rgba(255, 255, 255, .12);
+[data-theme="dark"] .ui-action-neutral,
+.dark .ui-action-neutral {
+    --action-bg: var(--surface);
+    --action-color: var(--text-2);
+    --action-border: var(--border);
 }
 
-[data-theme="dark"] .ui-icon-btn.neutral:hover,
-.dark .ui-icon-btn.neutral:hover {
-    background: rgba(139, 0, 0, .22);
-    color: #fca5a5;
-    border-color: rgba(252, 165, 165, .25);
-}
+[data-theme="dark"] .ui-action-edit,
+.dark .ui-action-edit {
+    --action-bg:
+        color-mix(in srgb,
+            var(--status-all-solid) 16%,
+            transparent);
 
-[data-theme="dark"] .ui-btn-edit,
-.dark .ui-btn-edit {
-    background: rgba(37, 99, 235, .22);
-    border-color: rgba(96, 165, 250, .34);
-    color: #93C5FD;
-    box-shadow: 0 8px 18px rgba(0, 0, 0, .24);
+    --action-color:
+        var(--status-all-text);
+
+    --action-border:
+        color-mix(in srgb,
+            var(--status-all-solid) 24%,
+            transparent);
 }
 
 [data-theme="dark"] .ui-btn-edit:hover,
@@ -1575,8 +1611,22 @@
     color: #FEF3C7;
 }
 
-[data-theme="dark"] .ui-btn-delete,
-.dark .ui-btn-delete,
+[data-theme="dark"] .ui-action-delete,
+.dark .ui-action-delete {
+    --action-bg:
+        color-mix(in srgb,
+            var(--status-cancelled-solid) 16%,
+            transparent);
+
+    --action-color:
+        var(--status-cancelled-text);
+
+    --action-border:
+        color-mix(in srgb,
+            var(--status-cancelled-solid) 24%,
+            transparent);
+}
+
 [data-theme="dark"] .ui-btn-danger,
 .dark .ui-btn-danger {
     background: rgba(220, 38, 38, .22);

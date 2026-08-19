@@ -26,38 +26,34 @@
 
     <div class="signature-full-row">
 
-        @if ($hasExistingSignature)
-            <div class="signature-existing-card">
 
-                <div class="signature-existing-header">
-                    <i class="fa-solid fa-circle-check"></i>
+        <div class="signature-existing-card {{ $hasExistingSignature ? '' : 'hidden' }}" data-existing-signature-card>
 
-                    <div>
-                        <p class="signature-existing-title">
-                            Existing signature on file
-                        </p>
+            <div class="signature-existing-header">
+                <i class="fa-solid fa-circle-check"></i>
 
-                        <p class="signature-existing-help">
-                            Your previously verified signature will be reused.
-                        </p>
-                    </div>
+                <div>
+                    <p class="signature-existing-title">
+                        Existing signature on file
+                    </p>
+
+                    <p class="signature-existing-help">
+                        Your previously verified signature will be reused.
+                    </p>
                 </div>
-
-
-                @if ($existingSignatureUrl)
-                    <div class="signature-existing-preview">
-                        <img src="{{ $existingSignatureUrl }}" alt="Existing signature">
-                    </div>
-                @endif
-
-
-                <button type="button" class="ui-btn ui-btn-secondary ui-btn-sm" id="editExistingSignatureBtn">
-                    <i class="fa-solid fa-pen"></i>
-                    Edit Signature
-                </button>
-
             </div>
-        @endif
+
+            <div class="signature-existing-preview {{ $existingSignatureUrl ? '' : 'hidden' }}"
+                data-existing-signature-preview>
+                <img src="{{ $existingSignatureUrl ?? '' }}" alt="Existing signature" data-existing-signature-image>
+            </div>
+
+            <button type="button" class="ui-btn ui-btn-secondary ui-btn-sm" id="editExistingSignatureBtn">
+                <i class="fa-solid fa-pen"></i>
+                Edit Signature
+            </button>
+
+        </div>
 
         <input type="hidden" name="reuse_existing_signature" id="reuse_existing_signature"
             value="{{ $hasExistingSignature ? '1' : '0' }}">
@@ -211,44 +207,3 @@
         @enderror
     </div>
 </div>
-
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-
-        const editBtn = document.getElementById(
-            "editExistingSignatureBtn"
-        );
-
-        const existingCard = document.querySelector(
-            ".signature-existing-card"
-        );
-
-        const editorWrapper = document.getElementById(
-            "signatureEditorWrapper"
-        );
-
-        const reuseInput = document.getElementById(
-            "reuse_existing_signature"
-        );
-
-
-        editBtn?.addEventListener("click", () => {
-
-            existingCard?.classList.add("hidden");
-
-            editorWrapper?.classList.remove("hidden");
-
-
-            if (reuseInput) {
-                reuseInput.value = "0";
-            }
-
-
-            window.BookingSignature
-                ?.get(document)
-                ?.resize();
-
-        });
-
-    });
-</script>

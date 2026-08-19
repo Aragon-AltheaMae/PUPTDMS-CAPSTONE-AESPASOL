@@ -223,7 +223,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
 <div id="introBookingModal" class="ui-modal" aria-hidden="true">
 
-    <div class="ui-modal-card modal-md">
+    <div class="ui-modal-card modal-lg">
 
         <div class="modal-hd">
             <div class="modal-heading">

@@ -1531,6 +1531,26 @@
 
 }
 
+.appt-list-tabs .status-pill {
+    white-space: nowrap;
+    word-break: keep-all;
+    overflow-wrap: normal;
+
+    flex-shrink: 0;
+}
+
+.appt-visit-title-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.appt-visit-title-row .appt-visit-title {
+    min-width: 0;
+}
+
 @media (hover: none) {
 
     .appt-record-accordion:hover,
@@ -1540,12 +1560,4 @@
         box-shadow: inherit !important;
 
     }
-}
-
-.appt-list-tabs .status-pill {
-    white-space: nowrap;
-    word-break: keep-all;
-    overflow-wrap: normal;
-
-    flex-shrink: 0;
 }

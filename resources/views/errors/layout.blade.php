@@ -20,9 +20,11 @@
 <body class="error-page error-page--@yield('tone', 'general')">
 
     @php
-        $primaryUrl = trim($__env->yieldContent('primary_url')) ?: url('/');
+        $customPrimaryUrl = trim($__env->yieldContent('primary_url'));
+        $customPrimaryLabel = trim($__env->yieldContent('primary_label'));
 
-        $primaryLabel = trim($__env->yieldContent('primary_label')) ?: 'Return Home';
+        $primaryUrl = $customPrimaryUrl ?: route('dashboard');
+        $primaryLabel = $customPrimaryLabel ?: 'Back to Dashboard';
     @endphp
 
     <main class="error-stage" style="--error-background-image: url('{{ asset('images/PUP-Pylon.jpg') }}');">
@@ -38,7 +40,7 @@
 
             <header class="error-panel__header">
 
-                <a href="{{ url('/') }}" class="error-brand" aria-label="Return to PUP Taguig Dental Clinic">
+                <a href="{{ $primaryUrl }}" class="error-brand" aria-label="Return to dashboard">
 
                     <span class="error-brand__logo">
                         <img src="{{ asset('images/PUPT-DMS-Logo.png') }}" alt="">

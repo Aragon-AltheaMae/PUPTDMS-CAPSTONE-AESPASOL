@@ -26,17 +26,28 @@
     color: #FCA5A5 !important;
 }
 
-.appt-card.is-today,
-.mobile-appt-card.is-today {
-    background: var(--status-bg) !important;
-    border-color: var(--status-border) !important;
-    box-shadow: 0 2px 12px var(--status-soft) !important;
+#mainContent.shared-appointments-page .appt-card.is-today,
+#mainContent.shared-appointments-page .mobile-appt-card.is-today {
+    background: var(--card) !important;
+
+    border-color:
+        color-mix(in srgb,
+            var(--crimson) 42%,
+            var(--border)) !important;
 }
 
-.appt-card.is-today::before,
-.mobile-appt-card.is-today::before {
-    background: var(--status-solid) !important;
-    opacity: 1 !important;
+#mainContent.shared-appointments-page .appt-card.is-today:hover,
+#mainContent.shared-appointments-page .mobile-appt-card.is-today:hover {
+    border-color:
+        color-mix(in srgb,
+            var(--crimson) 62%,
+            var(--border)) !important;
+
+    box-shadow:
+        inset 4px 0 0 var(--crimson),
+        0 14px 30px color-mix(in srgb,
+            var(--crimson) 17%,
+            transparent) !important;
 }
 
 .appt-card {
@@ -59,17 +70,6 @@
 .appt-card:hover {
     border-color: rgba(139, 0, 0, 0.624);
     box-shadow: 0 6px 24px rgba(139, 0, 0, .09);
-}
-
-[data-theme="dark"] .bg-white,
-[data-theme="dark"] .appt-card,
-[data-theme="dark"] .mobile-appt-card {
-    background-color: #0d1117 !important;
-    border-color: #21262d;
-}
-
-[data-theme="dark"] .appt-card:nth-child(even) {
-    background: #0a0f14 !important;
 }
 
 .mode-list .desktop-appointments-table>.grid,
@@ -99,22 +99,24 @@
 .dark #mainContent .appt-card,
 [data-theme="dark"] #mainContent .mobile-appt-card,
 .dark #mainContent .mobile-appt-card {
-    background:
-        radial-gradient(circle at top left, rgba(139, 0, 0, 0.14), transparent 34%),
-        linear-gradient(145deg, rgba(13, 17, 23, 0.82), rgba(22, 27, 34, 0.72)) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
+    background: var(--card) !important;
+    border-color: var(--border) !important;
+
     box-shadow:
-        0 14px 30px rgba(0, 0, 0, 0.26),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
-    backdrop-filter: blur(16px) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
+        inset 0 1px 0 color-mix(in srgb,
+            var(--text-1) 5%,
+            transparent),
+        0 14px 30px color-mix(in srgb,
+            var(--bg-main) 45%,
+            transparent) !important;
+
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
 [data-theme="dark"] #mainContent .appt-card:nth-child(even),
 .dark #mainContent .appt-card:nth-child(even) {
-    background:
-        radial-gradient(circle at top left, rgba(139, 0, 0, 0.13), transparent 34%),
-        linear-gradient(145deg, rgba(10, 14, 20, 0.88), rgba(17, 24, 39, 0.78)) !important;
+    background: var(--surface) !important;
 }
 
 [data-theme="dark"] #mainContent .appt-card:hover,
@@ -125,16 +127,6 @@
     box-shadow:
         0 18px 38px rgba(0, 0, 0, 0.36),
         0 0 18px rgba(139, 0, 0, 0.14) !important;
-}
-
-[data-theme="dark"] #mainContent .appt-card.is-today,
-.dark #mainContent .appt-card.is-today,
-[data-theme="dark"] #mainContent .mobile-appt-card.is-today,
-.dark #mainContent .mobile-appt-card.is-today {
-    background:
-        radial-gradient(circle at top left, rgba(37, 99, 235, 0.18), transparent 34%),
-        linear-gradient(145deg, rgba(13, 17, 23, 0.86), rgba(22, 27, 34, 0.76)) !important;
-    border-color: rgba(147, 197, 253, 0.28) !important;
 }
 
 #mainContent.shared-appointments-page .appointment-table-grid {
@@ -180,44 +172,6 @@
 #mainContent.shared-appointments-page .appt-patient-heading {
     padding-left: 40px;
     text-align: left;
-}
-
-[data-theme="dark"] #pastSection .appt-card,
-.dark #pastSection .appt-card {
-    opacity: 1 !important;
-    background:
-        radial-gradient(circle at top left, rgba(148, 163, 184, 0.08), transparent 34%),
-        linear-gradient(145deg, rgba(13, 17, 23, 0.78), rgba(22, 27, 34, 0.68)) !important;
-    border-color: rgba(148, 163, 184, 0.16) !important;
-    box-shadow:
-        0 12px 26px rgba(0, 0, 0, 0.24),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
-}
-
-[data-theme="dark"] #pastSection .appt-card::before,
-.dark #pastSection .appt-card::before {
-    background: #64748B !important;
-    opacity: 1 !important;
-}
-
-[data-theme="dark"] #pastSection .appt-card:hover,
-.dark #pastSection .appt-card:hover {
-    border-color: rgba(203, 213, 225, 0.24) !important;
-    box-shadow:
-        0 16px 34px rgba(0, 0, 0, 0.32),
-        0 0 16px rgba(148, 163, 184, 0.08) !important;
-}
-
-[data-theme="dark"] #pastSection .appt-card p,
-.dark #pastSection .appt-card p {
-    color: #CBD5E1 !important;
-}
-
-[data-theme="dark"] #pastSection .appt-card p.text-gray-400,
-[data-theme="dark"] #pastSection .appt-card .text-gray-400,
-.dark #pastSection .appt-card p.text-gray-400,
-.dark #pastSection .appt-card .text-gray-400 {
-    color: #94A3B8 !important;
 }
 
 .mobile-appt-card {
@@ -271,11 +225,9 @@
 }
 
 [data-theme="dark"] #mainContent .appt-row-date .date-main,
-[data-theme="dark"] #mainContent .appt-patient-name,
 [data-theme="dark"] #mainContent .text-gray-800,
 [data-theme="dark"] #mainContent .text-gray-700,
 .dark #mainContent .appt-row-date .date-main,
-.dark #mainContent .appt-patient-name,
 .dark #mainContent .text-gray-800,
 .dark #mainContent .text-gray-700 {
     color: #F8FAFC !important;
@@ -318,43 +270,6 @@
     border-color: rgba(255, 255, 255, 0.10) !important;
 }
 
-[data-theme="dark"] #pastSection .mobile-appt-card,
-.dark #pastSection .mobile-appt-card {
-    opacity: 1 !important;
-    background:
-        radial-gradient(circle at top left, rgba(148, 163, 184, 0.08), transparent 34%),
-        linear-gradient(145deg, rgba(13, 17, 23, 0.80), rgba(22, 27, 34, 0.70)) !important;
-    border-color: rgba(148, 163, 184, 0.16) !important;
-}
-
-[data-theme="dark"] #pastSection .mobile-appt-card::before,
-.dark #pastSection .mobile-appt-card::before {
-    background: #64748B !important;
-}
-
-[data-theme="dark"] #pastSection .mobile-appt-card .bg-gray-50,
-.dark #pastSection .mobile-appt-card .bg-gray-50 {
-    background: rgba(13, 17, 23, 0.62) !important;
-    border-color: rgba(203, 213, 225, 0.12) !important;
-}
-
-[data-theme="dark"] #pastSection,
-.dark #pastSection {
-    color: #E5E7EB !important;
-}
-
-[data-theme="dark"] #pastSection h2,
-.dark #pastSection h2 {
-    color: #CBD5E1 !important;
-}
-
-[data-theme="dark"] #pastSection h2+span,
-.dark #pastSection h2+span {
-    background: rgba(148, 163, 184, 0.14) !important;
-    color: #CBD5E1 !important;
-    border: 1px solid rgba(203, 213, 225, 0.14) !important;
-}
-
 [data-theme="dark"] #mainContent .service-badge-default,
 .dark #mainContent .service-badge-default {
     background: rgba(139, 0, 0, 0.18) !important;
@@ -379,26 +294,6 @@
 .dark #mainContent .service-badge-whitening {
     background: rgba(250, 204, 21, 0.16) !important;
     color: #FDE047 !important;
-}
-
-[data-theme="dark"] #pastSection .service-badge,
-.dark #pastSection .service-badge {
-    opacity: 1 !important;
-    border: 1px solid rgba(203, 213, 225, 0.10) !important;
-}
-
-[data-theme="dark"] #pastSection img,
-.dark #pastSection img {
-    opacity: 1 !important;
-    border-color: rgba(203, 213, 225, 0.18) !important;
-    filter: saturate(0.85);
-}
-
-[data-theme="dark"] #pastSection .appt-program-cell span,
-.dark #pastSection .appt-program-cell span {
-    background: rgba(148, 163, 184, 0.12) !important;
-    color: #CBD5E1 !important;
-    border-color: rgba(203, 213, 225, 0.12) !important;
 }
 
 @media (min-width: 768px) {
@@ -491,7 +386,7 @@
 
 .appt-patient-name {
     margin: 0;
-    color: var(--text);
+    color: var(--text-1);
     font-size: 13px;
     font-weight: 800;
     line-height: 1.25;
@@ -639,13 +534,6 @@
     background: linear-gradient(to bottom, rgba(252, 165, 165, 0.30), rgba(252, 165, 165, 0.04)) !important;
 }
 
-[data-theme="dark"] #pastSection .desktop-appointments-table>.absolute,
-.dark #pastSection .desktop-appointments-table>.absolute {
-    background: linear-gradient(to bottom,
-            rgba(148, 163, 184, 0.28),
-            rgba(148, 163, 184, 0.04)) !important;
-}
-
 .time-chip {
     display: inline-flex;
     align-items: center;
@@ -670,13 +558,6 @@
     background: #1c2128;
     border-color: #21262d;
     color: #9ca3af;
-}
-
-[data-theme="dark"] #pastSection .time-chip,
-.dark #pastSection .time-chip {
-    background: rgba(13, 17, 23, 0.64) !important;
-    border-color: rgba(203, 213, 225, 0.14) !important;
-    color: #CBD5E1 !important;
 }
 
 .timeline-dot {
@@ -715,28 +596,10 @@
     box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.16) !important;
 }
 
-[data-theme="dark"] #pastSection .timeline-dot-past,
-.dark #pastSection .timeline-dot-past {
-    background: #64748B !important;
-    border-color: #0D1117 !important;
-    box-shadow:
-        0 0 0 4px rgba(148, 163, 184, 0.14),
-        0 0 16px rgba(148, 163, 184, 0.18) !important;
-}
-
 .appointment-header-wrap {
     display: flex;
     flex-direction: column;
     gap: 12px;
-}
-
-#mainContent.shared-appointments-page #upcomingSection {
-    padding-bottom: 1.25rem !important;
-}
-
-#mainContent.shared-appointments-page #pastSection {
-    margin-top: 0 !important;
-    padding-bottom: 1.25rem !important;
 }
 
 #mainContent.shared-appointments-page.admin-appointments-view .appointment-header-wrap {
@@ -746,18 +609,6 @@
 #mainContent.shared-appointments-page.admin-appointments-view .admin-appointment-banner {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
-}
-
-#mainContent.shared-appointments-page.admin-appointments-view .today-snapshot-card {
-    margin-top: 0 !important;
-}
-
-#mainContent.shared-appointments-page.dentist-appointments-view #upcomingSection {
-    margin-top: 28px !important;
-}
-
-#mainContent.shared-appointments-page #upcomingSection>.appt-month-group:first-child {
-    margin-top: 0 !important;
 }
 
 @media (max-width: 1024px) {
@@ -860,440 +711,374 @@
     color: #CBD5E1 !important;
 }
 
-.today-snapshot-card {
+#mainContent.shared-appointments-page .today-snapshot-card {
     position: relative;
     overflow: hidden;
+
+    padding: 18px 20px;
+
+    border:
+        1px solid var(--crimson-mid);
+
     border-radius: 20px;
-    padding: 12px;
+
     background:
-        radial-gradient(circle at top left, rgba(139, 0, 0, 0.10), transparent 34%),
-        linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 250, 250, 0.86));
-    border: 1px solid rgba(139, 0, 0, 0.10);
+        radial-gradient(circle at top left,
+            var(--crimson-light),
+            transparent 38%),
+        var(--card);
+
     box-shadow:
-        0 10px 28px rgba(139, 0, 0, 0.06),
-        inset 0 1px 0 rgba(255, 255, 255, 0.70);
+        0 12px 30px color-mix(in srgb,
+            var(--crimson) 7%,
+            transparent);
 }
 
-.today-snapshot-card::after {
-    content: "";
-    position: absolute;
-    right: -48px;
-    bottom: -70px;
-    width: 160px;
-    height: 160px;
-    border-radius: 999px;
-    background: rgba(139, 0, 0, 0.07);
-    pointer-events: none;
-}
-
-[data-theme="dark"] #mainContent .today-snapshot-card,
-.dark #mainContent .today-snapshot-card {
-    background:
-        radial-gradient(circle at top left, rgba(139, 0, 0, 0.20), transparent 34%),
-        linear-gradient(145deg, rgba(13, 17, 23, 0.78), rgba(22, 27, 34, 0.66)) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-    box-shadow:
-        0 18px 38px rgba(0, 0, 0, 0.26),
-        inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
-    backdrop-filter: blur(14px) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(14px) saturate(140%) !important;
-}
-
-.today-snapshot-header {
+#mainContent.shared-appointments-page .today-snapshot-top {
     position: relative;
     z-index: 1;
+
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 14px;
-    margin-bottom: 14px;
+    gap: 16px;
+
+    margin-bottom: 16px;
 }
 
-.compact-snapshot-card .today-snapshot-header {
-    margin-bottom: 14px !important;
-}
+#mainContent.shared-appointments-page .today-snapshot-kicker {
+    display: block;
 
-.today-snapshot-kicker {
-    display: inline-flex;
-    font-size: 11px;
+    color: var(--crimson);
+
+    font-size: 10px;
     font-weight: 900;
-    letter-spacing: 0.12em;
+    line-height: 1;
+
+    letter-spacing: .12em;
     text-transform: uppercase;
-    color: #8B0000;
 }
 
-[data-theme="dark"] #mainContent .today-snapshot-kicker,
-.dark #mainContent .today-snapshot-kicker {
-    color: #f4cfcf !important;
+#mainContent.shared-appointments-page .today-snapshot-caption {
+    margin: 5px 0 0;
+
+    color: var(--text-3);
+
+    font-size: 12px;
+    font-weight: 600;
 }
 
-[data-theme="dark"] #mainContent .today-snapshot-date,
-.dark #mainContent .today-snapshot-date {
-    background: rgba(139, 0, 0, 0.18) !important;
-    color: #FCA5A5 !important;
-    border-color: rgba(252, 165, 165, 0.22) !important;
-}
+#mainContent.shared-appointments-page .today-snapshot-date {
+    margin: 0;
 
-.today-snapshot-date {
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    flex-shrink: 0;
-    padding: 7px 11px;
+
+    min-height: 32px;
+    padding: 0 11px;
+
+    border:
+        1px solid var(--border);
+
     border-radius: 999px;
-    background: rgba(139, 0, 0, 0.06);
-    color: #8B0000;
-    border: 1px solid rgba(139, 0, 0, 0.10);
+
+    background: var(--surface);
+
+    color: var(--text-2);
+
     font-size: 11px;
     font-weight: 800;
-    margin-top: 8px;
-    width: fit-content;
 }
 
-.today-snapshot-next {
+#mainContent.shared-appointments-page .today-snapshot-date i {
+    color: var(--crimson);
+}
+
+#mainContent.shared-appointments-page .today-snapshot-content {
     position: relative;
     z-index: 1;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(250px, .75fr) 1px minmax(0, 1.25fr);
+
+    align-items: stretch;
+
+    gap: 20px;
+}
+
+#mainContent.shared-appointments-page .today-snapshot-primary {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    min-width: 0;
+}
+
+#mainContent.shared-appointments-page .today-snapshot-primary-icon {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    margin-top: 12px;
-    padding: 8px 12px;
-    border-radius: 999px;
-    background: rgba(139, 0, 0, 0.06);
-    color: #6B7280;
-    border: 1px solid rgba(139, 0, 0, 0.10);
+    justify-content: center;
+
+    border:
+        1px solid var(--crimson-mid);
+
+    border-radius: 17px;
+
+    background: var(--crimson-light);
+    color: var(--crimson);
+
+    font-size: 17px;
+}
+
+#mainContent.shared-appointments-page .today-snapshot-primary-copy {
+    min-width: 0;
+}
+
+#mainContent.shared-appointments-page .today-snapshot-label {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: var(--text-3);
+
+    font-size: 9px;
+    font-weight: 900;
+    line-height: 1;
+
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+#mainContent.shared-appointments-page .today-snapshot-count {
+    display: inline;
+
+    color: var(--text-1);
+
+    font-size: 24px;
+    font-weight: 950;
+    line-height: 1;
+}
+
+#mainContent.shared-appointments-page .today-snapshot-count-copy {
+    display: inline;
+
+    margin-left: 4px;
+
+    color: var(--text-1);
+
+    font-size: 14px;
+    font-weight: 800;
+}
+
+#mainContent.shared-appointments-page .today-snapshot-first {
+    margin-top: 6px;
+
+    color: var(--text-3);
+
+    font-size: 11px;
+    font-weight: 650;
+}
+
+#mainContent.shared-appointments-page .today-snapshot-first strong {
+    color: var(--crimson);
+    font-weight: 900;
+}
+
+#mainContent.shared-appointments-page .today-snapshot-empty-title {
+    color: var(--text-1);
+
+    font-size: 15px;
+    font-weight: 850;
+}
+
+#mainContent.shared-appointments-page .today-snapshot-divider {
+    width: 1px;
+    min-height: 72px;
+
+    background: var(--border);
+}
+
+#mainContent.shared-appointments-page .today-snapshot-next-block {
+    min-width: 0;
+}
+
+#mainContent.shared-appointments-page .today-snapshot-next-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    margin-bottom: 9px;
+}
+
+#mainContent.shared-appointments-page .today-snapshot-next-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    min-width: 0;
+}
+
+#mainContent.shared-appointments-page .today-snapshot-next-copy {
+    min-width: 0;
+}
+
+#mainContent.shared-appointments-page .today-snapshot-next-name {
+    display: block;
+
+    color: var(--text-1);
+
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 1.3;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#mainContent.shared-appointments-page .today-snapshot-next-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+
+    margin-top: 5px;
+
+    color: var(--text-3);
+
+    font-size: 10.5px;
+    font-weight: 700;
+}
+
+#mainContent.shared-appointments-page .today-snapshot-next-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#mainContent.shared-appointments-page .today-snapshot-next-meta i {
+    color: var(--crimson);
+}
+
+#mainContent.shared-appointments-page .today-snapshot-service {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    width: fit-content;
+
+    margin-top: 7px;
+
+    color: var(--crimson);
+
+    font-size: 10.5px;
+    font-weight: 800;
+}
+
+#mainContent.shared-appointments-page .today-snapshot-next-empty {
+    min-height: 52px;
+
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    color: var(--text-3);
+
     font-size: 12px;
     font-weight: 700;
 }
 
-.today-snapshot-next i {
-    color: #8B0000;
+#mainContent.shared-appointments-page .today-snapshot-next-empty i {
+    color: var(--crimson);
 }
 
-.today-snapshot-next strong {
-    color: #8B0000;
-    font-weight: 900;
+[data-theme="dark"] #mainContent.shared-appointments-page .today-snapshot-kicker,
+.dark #mainContent.shared-appointments-page .today-snapshot-kicker {
+    color: var(--status-cancelled-text);
 }
 
-.today-snapshot-next.is-clear {
-    background: rgba(22, 163, 74, 0.08);
-    border-color: rgba(22, 163, 74, 0.16);
+[data-theme="dark"] #mainContent.shared-appointments-page .today-snapshot-date i,
+.dark #mainContent.shared-appointments-page .today-snapshot-date i,
+[data-theme="dark"] #mainContent.shared-appointments-page .today-snapshot-first strong,
+.dark #mainContent.shared-appointments-page .today-snapshot-first strong,
+[data-theme="dark"] #mainContent.shared-appointments-page .today-snapshot-next-meta i,
+.dark #mainContent.shared-appointments-page .today-snapshot-next-meta i,
+[data-theme="dark"] #mainContent.shared-appointments-page .today-snapshot-service,
+.dark #mainContent.shared-appointments-page .today-snapshot-service {
+    color: var(--status-cancelled-text);
 }
 
-.today-snapshot-next.is-clear i {
-    color: #16A34A;
-}
-
-[data-theme="dark"] #mainContent .today-snapshot-next,
-.dark #mainContent .today-snapshot-next {
-    background: rgba(13, 17, 23, 0.62) !important;
-    color: #CBD5E1 !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-}
-
-[data-theme="dark"] #mainContent .today-snapshot-next i,
-.dark #mainContent .today-snapshot-next i,
-[data-theme="dark"] #mainContent .today-snapshot-next strong,
-.dark #mainContent .today-snapshot-next strong {
-    color: #FCA5A5 !important;
-}
-
-[data-theme="dark"] #mainContent .today-snapshot-next.is-clear,
-.dark #mainContent .today-snapshot-next.is-clear {
-    background: rgba(22, 163, 74, 0.12) !important;
-    border-color: rgba(134, 239, 172, 0.20) !important;
-}
-
-[data-theme="dark"] #mainContent .today-snapshot-next.is-clear i,
-.dark #mainContent .today-snapshot-next.is-clear i {
-    color: #86EFAC !important;
-}
-
-[data-theme="dark"] #mainContent .today-snapshot-item,
-.dark #mainContent .today-snapshot-item {
-    background: rgba(13, 17, 23, 0.62) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-    box-shadow:
-        0 10px 22px rgba(0, 0, 0, 0.22),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
-}
-
-[data-theme="dark"] #mainContent .today-snapshot-item strong,
-.dark #mainContent .today-snapshot-item strong {
-    color: #F8FAFC !important;
-}
-
-.compact-snapshot-card .today-snapshot-grid {
-    display: none !important;
-}
-
-[data-theme="dark"] #mainContent .snapshot-label,
-.dark #mainContent .snapshot-label {
-    color: #94A3B8 !important;
-}
-
-[data-theme="dark"] #mainContent .snapshot-primary .snapshot-icon,
-.dark #mainContent .snapshot-primary .snapshot-icon {
-    background: rgba(37, 99, 235, 0.16) !important;
-    color: #60A5FA !important;
-    border: 1px solid rgba(96, 165, 250, 0.20);
-}
-
-[data-theme="dark"] #mainContent .snapshot-warning .snapshot-icon,
-.dark #mainContent .snapshot-warning .snapshot-icon {
-    background: rgba(234, 88, 12, 0.16) !important;
-    color: #FDBA74 !important;
-    border: 1px solid rgba(253, 186, 116, 0.20);
-}
-
-[data-theme="dark"] #mainContent .snapshot-success .snapshot-icon,
-.dark #mainContent .snapshot-success .snapshot-icon {
-    background: rgba(22, 163, 74, 0.16) !important;
-    color: #86EFAC !important;
-    border: 1px solid rgba(134, 239, 172, 0.20);
-}
-
-[data-theme="dark"] #mainContent .snapshot-neutral .snapshot-icon,
-.dark #mainContent .snapshot-neutral .snapshot-icon {
-    background: rgba(139, 0, 0, 0.20) !important;
-    color: #FCA5A5 !important;
-    border: 1px solid rgba(252, 165, 165, 0.20);
-}
-
-.snapshot-focus-grid {
-    position: relative;
-    z-index: 1;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-}
-
-.snapshot-focus-item {
-    min-width: 0;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 12px;
-    border-radius: 18px;
-    background: rgba(255, 255, 255, 0.78);
-    border: 1px solid rgba(226, 232, 240, 0.95);
-    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
-}
-
-.snapshot-focus-item.has-appointment {
-    background: rgba(239, 246, 255, 0.78);
-    border-color: rgba(37, 99, 235, 0.18);
-}
-
-.snapshot-focus-item.is-clear {
-    background: rgba(240, 253, 244, 0.74);
-    border-color: rgba(22, 163, 74, 0.18);
-}
-
-.snapshot-focus-item.next-appointment {
-    background: rgba(255, 247, 237, 0.70);
-    border-color: rgba(234, 88, 12, 0.16);
-}
-
-.snapshot-focus-icon {
-    width: 46px;
-    height: 46px;
-    border-radius: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    background: #F9F0F0;
-    color: #8B0000;
-    border: 1px solid rgba(139, 0, 0, 0.12);
-}
-
-.snapshot-focus-item.has-appointment .snapshot-focus-icon {
-    background: #EFF6FF;
-    color: #2563EB;
-    border-color: rgba(37, 99, 235, 0.16);
-}
-
-.snapshot-focus-item.is-clear .snapshot-focus-icon {
-    background: #DCFCE7;
-    color: #16A34A;
-    border-color: rgba(22, 163, 74, 0.18);
-}
-
-.snapshot-focus-item.next-appointment .snapshot-focus-icon {
-    background: #FFF7ED;
-    color: #EA580C;
-    border-color: rgba(234, 88, 12, 0.16);
-}
-
-.snapshot-focus-content {
-    min-width: 0;
-    flex: 1;
-}
-
-.snapshot-focus-label {
-    display: block;
-    margin-bottom: 5px;
-    font-size: 11px;
-    font-weight: 850;
-    letter-spacing: 0.10em;
-    text-transform: uppercase;
-    color: #92969c;
-}
-
-.snapshot-focus-content h4 {
-    margin: 0;
-    color: #111827;
-    font-size: 17px;
-    line-height: 1;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-}
-
-.snapshot-focus-content p {
-    margin-top: 5px;
-    color: #64748B;
-    font-size: 12.5px;
-    line-height: 1.45;
-    font-weight: 700;
-}
-
-.snapshot-focus-content strong {
-    color: #8B0000;
-    font-weight: 900;
-}
-
-.snapshot-chip-row {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-}
-
-.snapshot-mini-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 10px;
-    width: fit-content;
-    max-width: 100%;
-    padding: 6px 10px;
-    border-radius: 999px;
-    background: rgba(139, 0, 0, 0.07);
-    color: #8B0000;
-    border: 1px solid rgba(139, 0, 0, 0.12);
-    font-size: 11px;
-    font-weight: 800;
-    white-space: nowrap;
-}
-
-.snapshot-chip-row .snapshot-mini-chip {
-    margin-top: 0;
-}
-
-.snapshot-mini-chip.today-chip {
-    background: rgba(37, 99, 235, 0.09);
-    color: #2563EB;
-    border-color: rgba(37, 99, 235, 0.16);
-}
-
-[data-theme="dark"] #mainContent .snapshot-focus-item,
-.dark #mainContent .snapshot-focus-item {
-    background: rgba(13, 17, 23, 0.62) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-    box-shadow:
-        0 10px 22px rgba(0, 0, 0, 0.22),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
-}
-
-[data-theme="dark"] #mainContent .snapshot-focus-item.has-appointment,
-.dark #mainContent .snapshot-focus-item.has-appointment {
+[data-theme="dark"] #mainContent.shared-appointments-page .today-snapshot-primary-icon,
+.dark #mainContent.shared-appointments-page .today-snapshot-primary-icon {
     background:
-        radial-gradient(circle at top left, rgba(37, 99, 235, 0.14), transparent 40%),
-        rgba(13, 17, 23, 0.62) !important;
-    border-color: rgba(96, 165, 250, 0.18) !important;
+        color-mix(in srgb,
+            var(--status-cancelled-solid) 18%,
+            transparent);
+
+    border-color:
+        color-mix(in srgb,
+            var(--status-cancelled-solid) 34%,
+            transparent);
+
+    color: var(--status-cancelled-text);
 }
 
-[data-theme="dark"] #mainContent .snapshot-focus-item.is-clear,
-.dark #mainContent .snapshot-focus-item.is-clear {
+[data-theme="dark"] #mainContent.shared-appointments-page .today-snapshot-card,
+.dark #mainContent.shared-appointments-page .today-snapshot-card {
+    border-color:
+        color-mix(in srgb,
+            var(--status-cancelled-solid) 24%,
+            var(--border));
+
     background:
-        radial-gradient(circle at top left, rgba(22, 163, 74, 0.14), transparent 40%),
-        rgba(13, 17, 23, 0.62) !important;
-    border-color: rgba(134, 239, 172, 0.18) !important;
-}
-
-[data-theme="dark"] #mainContent .snapshot-focus-item.next-appointment,
-.dark #mainContent .snapshot-focus-item.next-appointment {
-    background:
-        radial-gradient(circle at top left, rgba(234, 88, 12, 0.13), transparent 40%),
-        rgba(13, 17, 23, 0.62) !important;
-    border-color: rgba(253, 186, 116, 0.16) !important;
-}
-
-[data-theme="dark"] #mainContent .snapshot-focus-label,
-.dark #mainContent .snapshot-focus-label {
-    color: #94A3B8 !important;
-}
-
-[data-theme="dark"] #mainContent .snapshot-focus-content h4,
-.dark #mainContent .snapshot-focus-content h4 {
-    color: #F8FAFC !important;
-}
-
-[data-theme="dark"] #mainContent .snapshot-focus-content p,
-.dark #mainContent .snapshot-focus-content p {
-    color: #CBD5E1 !important;
-}
-
-[data-theme="dark"] #mainContent .snapshot-focus-content strong,
-.dark #mainContent .snapshot-focus-content strong {
-    color: #FCA5A5 !important;
-}
-
-[data-theme="dark"] #mainContent .snapshot-focus-icon,
-.dark #mainContent .snapshot-focus-icon {
-    background: rgba(139, 0, 0, 0.20) !important;
-    color: #FCA5A5 !important;
-    border-color: rgba(252, 165, 165, 0.20) !important;
-}
-
-[data-theme="dark"] #mainContent .snapshot-focus-item.has-appointment .snapshot-focus-icon,
-.dark #mainContent .snapshot-focus-item.has-appointment .snapshot-focus-icon {
-    background: rgba(37, 99, 235, 0.16) !important;
-    color: #60A5FA !important;
-    border-color: rgba(96, 165, 250, 0.20) !important;
-}
-
-[data-theme="dark"] #mainContent .snapshot-focus-item.is-clear .snapshot-focus-icon,
-.dark #mainContent .snapshot-focus-item.is-clear .snapshot-focus-icon {
-    background: rgba(22, 163, 74, 0.16) !important;
-    color: #86EFAC !important;
-    border-color: rgba(134, 239, 172, 0.20) !important;
-}
-
-[data-theme="dark"] #mainContent .snapshot-focus-item.next-appointment .snapshot-focus-icon,
-.dark #mainContent .snapshot-focus-item.next-appointment .snapshot-focus-icon {
-    background: rgba(234, 88, 12, 0.16) !important;
-    color: #FDBA74 !important;
-    border-color: rgba(253, 186, 116, 0.20) !important;
-}
-
-[data-theme="dark"] #mainContent .snapshot-mini-chip,
-.dark #mainContent .snapshot-mini-chip {
-    background: linear-gradient(135deg, #8b00005f, #B91C1C) !important;
-    color: #f9d0d0 !important;
-    border-color: rgba(252, 165, 165, 0.20) !important;
-}
-
-[data-theme="dark"] #mainContent .snapshot-mini-chip.today-chip,
-.dark #mainContent .snapshot-mini-chip.today-chip {
-    background: rgba(37, 99, 235, 0.16) !important;
-    color: #93C5FD !important;
-    border-color: rgba(147, 197, 253, 0.20) !important;
+        radial-gradient(circle at top left,
+            color-mix(in srgb,
+                var(--status-cancelled-solid) 10%,
+                transparent),
+            transparent 42%),
+        var(--card);
 }
 
 @media (max-width: 767px) {
+    #mainContent.shared-appointments-page .today-snapshot-card {
+        padding: 15px;
+        border-radius: 18px;
+    }
+
+    #mainContent.shared-appointments-page .today-snapshot-top {
+        align-items: flex-start;
+        margin-bottom: 14px;
+    }
+
+    #mainContent.shared-appointments-page .today-snapshot-caption {
+        display: none;
+    }
+
+    #mainContent.shared-appointments-page .today-snapshot-content {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    #mainContent.shared-appointments-page .today-snapshot-divider {
+        width: 100%;
+        min-height: 1px;
+        height: 1px;
+    }
+
+    #mainContent.shared-appointments-page .today-snapshot-next-name {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+    }
+
     .appointment-filter-wrap {
         flex-direction: column;
         align-items: stretch;
@@ -1337,11 +1122,6 @@
         box-sizing: border-box;
     }
 
-    .today-snapshot-card {
-        padding: 14px;
-        border-radius: 18px;
-    }
-
     .today-snapshot-header {
         flex-direction: column;
         align-items: flex-start;
@@ -1356,12 +1136,6 @@
     .today-snapshot-item {
         padding: 10px;
         gap: 9px;
-    }
-
-    .snapshot-icon {
-        width: 34px;
-        height: 34px;
-        border-radius: 11px;
     }
 
     .today-snapshot-item strong {
@@ -1406,29 +1180,6 @@
         font-size: 7px !important;
         margin: 0 !important;
     }
-
-    .snapshot-focus-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .snapshot-focus-item {
-        padding: 14px;
-        border-radius: 16px;
-    }
-
-    .snapshot-focus-icon {
-        width: 42px;
-        height: 42px;
-        border-radius: 14px;
-    }
-
-    .snapshot-focus-content h4 {
-        font-size: 15px;
-    }
-
-    .snapshot-focus-content p {
-        font-size: 12px;
-    }
 }
 
 .past-patient-name {
@@ -1446,21 +1197,10 @@
     overflow-wrap: anywhere;
 }
 
-[data-theme="dark"] #pastSection .past-patient-name,
-.dark #pastSection .past-patient-name,
-[data-theme="dark"] #pastSection .past-grid-name,
-.dark #pastSection .past-grid-name {
-    color: #E5E7EB !important;
-}
-
 .past-status-pill {
     max-width: 100%;
     white-space: normal;
     line-height: 1.25;
-}
-
-.mode-list #pastSection .appt-status-cell .past-status-pill {
-    max-width: 150px;
 }
 
 .past-status-text {
@@ -1801,212 +1541,6 @@
     display: flex !important;
 }
 
-.start-procedure-overlay {
-    background: radial-gradient(circle at 15% 12%, rgba(22, 163, 74, .20), transparent 32%), rgba(15, 23, 42, .56);
-    backdrop-filter: blur(8px) saturate(130%);
-    -webkit-backdrop-filter: blur(8px) saturate(130%);
-}
-
-.start-procedure-shell {
-    width: min(94vw, 560px);
-    max-height: calc(100dvh - 32px);
-    border-radius: 24px;
-    overflow: hidden;
-    background: #ffffff;
-    color: #0f172a;
-    box-shadow: 0 28px 70px rgba(15, 23, 42, .22), inset 0 1px 0 rgba(255, 255, 255, .70);
-    animation: modalUp .28s cubic-bezier(.34, 1.56, .64, 1) both;
-}
-
-.start-procedure-header {
-    position: relative;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 1rem;
-    border-bottom: 1px solid #eef2f7;
-    background: #ffffff;
-    overflow: hidden;
-}
-
-.start-procedure-header-left {
-    display: flex;
-    align-items: center;
-    gap: .95rem;
-    min-width: 0;
-}
-
-.start-procedure-icon {
-    width: 54px;
-    height: 54px;
-    border-radius: 16px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
-    background: linear-gradient(145deg, #047857, #16A34A);
-    box-shadow: 0 12px 24px rgba(22, 163, 74, .18);
-    flex-shrink: 0;
-}
-
-.start-procedure-header h2 {
-    margin: 0;
-    color: #0f172a;
-    font-size: 1.35rem;
-    line-height: 1.1;
-    font-weight: 900;
-}
-
-.start-procedure-header p {
-    margin: .28rem 0 0;
-    color: #64748b;
-    font-size: .86rem;
-    line-height: 1.35;
-    font-weight: 600;
-}
-
-.start-procedure-close {
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
-    border: 1px solid #e2e8f0;
-    background: #ffffff;
-    color: #94a3b8;
-    transition: all .2s ease;
-    flex-shrink: 0;
-}
-
-.start-procedure-close:hover {
-    color: #047857;
-    border-color: #bbf7d0;
-    background: #f0fdf4;
-}
-
-.start-procedure-body {
-    display: grid;
-    gap: 1rem;
-    padding: 1.15rem 1.5rem;
-    background: #f8fafc;
-}
-
-.start-procedure-alert,
-.start-procedure-card {
-    border: 1px solid #e9eef5;
-    background: #ffffff;
-    border-radius: 18px;
-    box-shadow: 0 8px 24px rgba(15, 23, 42, .04);
-}
-
-.start-procedure-alert {
-    display: flex;
-    align-items: flex-start;
-    gap: .85rem;
-    padding: 1rem;
-}
-
-.start-procedure-alert-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 999px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: #16A34A;
-    background: #DCFCE7;
-    border: 1px solid #BBF7D0;
-    flex-shrink: 0;
-}
-
-.start-procedure-alert-title {
-    margin: 0;
-    color: #0f172a;
-    font-size: .94rem;
-    font-weight: 900;
-}
-
-.start-procedure-alert-sub {
-    margin: .2rem 0 0;
-    color: #64748b;
-    font-size: .82rem;
-    font-weight: 600;
-    line-height: 1.4;
-}
-
-.start-procedure-card {
-    display: grid;
-    padding: .95rem 1rem;
-    gap: .7rem;
-}
-
-.start-procedure-card-row {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-}
-
-.start-procedure-card-row span {
-    color: #94a3b8;
-    font-size: .70rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-}
-
-.start-procedure-card-row strong {
-    color: #0f172a;
-    font-size: .88rem;
-    font-weight: 900;
-    text-align: right;
-}
-
-.start-procedure-footer {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: .75rem;
-    padding: 1rem;
-    border-top: 1px solid #eef2f7;
-    background: rgba(255, 255, 255, .94);
-}
-
-.start-procedure-btn {
-    min-height: 44px;
-    border-radius: 14px;
-    padding: 0 1.1rem;
-    font-size: .82rem;
-    font-weight: 900;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: .55rem;
-    border: 1px solid transparent;
-    transition: all .2s ease;
-}
-
-.start-procedure-btn-cancel {
-    background: #ffffff;
-    color: #4b5563;
-    border-color: #e5e7eb;
-}
-
-.start-procedure-btn-cancel:hover {
-    background: #f9fafb;
-    border-color: #cbd5e1;
-}
-
-.start-procedure-btn-primary {
-    background: linear-gradient(145deg, #047857, #16A34A);
-    color: #ffffff;
-    box-shadow: 0 10px 20px rgba(22, 163, 74, .16);
-}
-
-.start-procedure-btn-primary:hover {
-    filter: brightness(1.04);
-    transform: translateY(-1px);
-}
-
 [data-theme="dark"] .shared-appointments-page .appointment-status-trigger,
 .dark .shared-appointments-page .appointment-status-trigger {
     background: rgba(13, 17, 23, .82) !important;
@@ -2067,67 +1601,6 @@
     color: var(--appt-option-text) !important;
 }
 
-[data-theme="dark"] .start-procedure-overlay,
-.dark .start-procedure-overlay {
-    background: radial-gradient(circle at 15% 12%, rgba(22, 163, 74, .18), transparent 32%), rgba(2, 6, 23, .74) !important;
-}
-
-[data-theme="dark"] .start-procedure-shell,
-.dark .start-procedure-shell {
-    background: #0D1117 !important;
-    border: 1px solid #21262D !important;
-    color: #E5E7EB !important;
-    box-shadow: 0 28px 70px rgba(0, 0, 0, .62), inset 0 1px 0 rgba(255, 255, 255, .05) !important;
-}
-
-[data-theme="dark"] .start-procedure-header,
-[data-theme="dark"] .start-procedure-footer,
-.dark .start-procedure-header,
-.dark .start-procedure-footer {
-    background: #0D1117 !important;
-    border-color: #21262D !important;
-}
-
-[data-theme="dark"] .start-procedure-body,
-.dark .start-procedure-body {
-    background: #0c111b !important;
-}
-
-[data-theme="dark"] .start-procedure-alert,
-[data-theme="dark"] .start-procedure-card,
-.dark .start-procedure-alert,
-.dark .start-procedure-card {
-    background: #161B22 !important;
-    border-color: #21262D !important;
-}
-
-[data-theme="dark"] .start-procedure-header h2,
-[data-theme="dark"] .start-procedure-alert-title,
-[data-theme="dark"] .start-procedure-card-row strong,
-.dark .start-procedure-header h2,
-.dark .start-procedure-alert-title,
-.dark .start-procedure-card-row strong {
-    color: #F3F4F6 !important;
-}
-
-[data-theme="dark"] .start-procedure-header p,
-[data-theme="dark"] .start-procedure-alert-sub,
-[data-theme="dark"] .start-procedure-card-row span,
-.dark .start-procedure-header p,
-.dark .start-procedure-alert-sub,
-.dark .start-procedure-card-row span {
-    color: #9CA3AF !important;
-}
-
-[data-theme="dark"] .start-procedure-close,
-[data-theme="dark"] .start-procedure-btn-cancel,
-.dark .start-procedure-close,
-.dark .start-procedure-btn-cancel {
-    background: #161B22 !important;
-    border-color: #2b313a !important;
-    color: #9ca3af !important;
-}
-
 @media (max-width: 1180px) {
     .shared-appointments-page .appointment-controls-bar {
         grid-template-columns: 1fr !important;
@@ -2164,54 +1637,6 @@
     .shared-appointments-page .appointment-status-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     }
-
-    .start-procedure-overlay {
-        align-items: flex-end !important;
-        padding: 0 !important;
-    }
-
-    .start-procedure-shell {
-        width: 100% !important;
-        max-width: 100% !important;
-        border-radius: 24px 24px 0 0 !important;
-    }
-
-    .start-procedure-header {
-        padding: 1.35rem 1rem .95rem;
-        padding-top: 2rem;
-    }
-
-    .start-procedure-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 14px;
-    }
-
-    .start-procedure-header h2 {
-        font-size: 1rem;
-    }
-
-    .start-procedure-header p {
-        font-size: .72rem;
-    }
-
-    .start-procedure-body {
-        padding: .95rem 1rem 1rem;
-    }
-
-    .start-procedure-footer {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        padding: .85rem 1rem calc(.95rem + env(safe-area-inset-bottom));
-    }
-
-    .start-procedure-btn {
-        width: 100%;
-        min-width: 0;
-        height: 44px;
-        font-size: 12px;
-        padding: 0 .85rem;
-    }
 }
 
 .shared-appointments-page .appointment-header-wrap {
@@ -2246,8 +1671,6 @@
     z-index: 9999 !important;
 }
 
-.shared-appointments-page #upcomingSection,
-.shared-appointments-page #pastSection,
 .shared-appointments-page .appt-month-group,
 .shared-appointments-page .desktop-appointments-table,
 .shared-appointments-page .mobile-appointments-list,
@@ -2870,16 +2293,6 @@
     color: #F8FAFC !important;
 }
 
-[data-theme="dark"] #mainContent.shared-appointments-page #upcomingSection .appt-month-title,
-.dark #mainContent.shared-appointments-page #upcomingSection .appt-month-title {
-    color: #FCA5A5 !important;
-}
-
-[data-theme="dark"] #mainContent.shared-appointments-page #pastSection .appt-month-title,
-.dark #mainContent.shared-appointments-page #pastSection .appt-month-title {
-    color: #94A3B8 !important;
-}
-
 [data-theme="dark"] #mainContent.shared-appointments-page .appt-month-chevron,
 .dark #mainContent.shared-appointments-page .appt-month-chevron {
     color: #94A3B8 !important;
@@ -2942,7 +2355,7 @@
     display: none !important;
 }
 
-#mainContent.shared-appointments-page.admin-appointments-view .appointment-controls-bar {
+#mainContent.shared-appointments-page .appointment-controls-bar {
     margin-bottom: 1.15rem !important;
 }
 
@@ -3088,4 +2501,37 @@
     transform: translateY(-50%) !important;
     margin: 0 !important;
     z-index: 3;
+}
+
+#mainContent.shared-appointments-page .appointment-month-more-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 14px;
+}
+
+#mainContent.shared-appointments-page .appointment-month-more-btn {
+    min-width: 150px;
+}
+
+#mainContent.shared-appointments-page .appointment-month-more-btn.hidden {
+    display: none !important;
+}
+
+#mainContent.shared-appointments-page .appointment-timeline-line {
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    border-radius: 999px;
+    background: var(--crimson-mid);
+}
+
+#mainContent.shared-appointments-page .mobile-patient-name {
+    margin: 0;
+    color: var(--text-1);
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.35;
 }

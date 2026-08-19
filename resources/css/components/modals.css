@@ -803,7 +803,7 @@ body:has(dialog[open]) .back-to-top {
     margin: 0;
     color: var(--text-1);
     font-size: .84rem;
-    font-weight: 700;
+    font-weight: 750;
     line-height: 1.35;
 }
 
@@ -811,7 +811,7 @@ body:has(dialog[open]) .back-to-top {
     display: block;
     margin-top: .35rem;
     color: var(--modal-accent-dark);
-    font-size: .84rem;
+    font-size: .64rem;
     font-weight: 500;
 }
 
@@ -888,6 +888,14 @@ body:has(dialog[open]) .back-to-top {
 
 .confirmed-modal-details-content {
     min-width: 0;
+}
+
+.confirmed-modal-message {
+    margin: 0;
+    color: var(--text-2);
+    font-size: .82rem;
+    font-weight: 600;
+    line-height: 1.55;
 }
 
 .confirmed-modal-schedule-grid {
@@ -986,6 +994,11 @@ body:has(dialog[open]) .back-to-top {
 
     color: var(--crimson);
     font-size: 11px;
+}
+
+[data-theme="dark"] .confirmed-modal-message,
+.dark .confirmed-modal-message {
+    color: var(--text-2);
 }
 
 [data-theme="dark"] .ui-modal .confirmed-modal-details,

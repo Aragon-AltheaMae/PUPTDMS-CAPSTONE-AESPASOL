@@ -411,16 +411,40 @@ class WalkInController extends Controller
             )->exists();
 
         $hasExistingBookingInformation =
-            $hasExistingAppointment ||
-            (
-                $hasExistingDentalHistory &&
-                $hasExistingMedicalHistory
-            );
+            $hasExistingDentalHistory &&
+            $hasExistingMedicalHistory;
 
         $hasReusableSignature =
             !empty($patient->medicalHistory?->patient_signature) &&
             $patient->medicalHistory?->signature_review_status !==
             'invalid_reupload_required';
+
+        $existingSignatureUrl = null;
+
+        if (
+            $hasReusableSignature &&
+            filled($patient->medicalHistory?->patient_signature)
+        ) {
+            $signaturePath = ltrim(
+                str_replace(
+                    'storage/',
+                    '',
+                    $patient->medicalHistory->patient_signature
+                ),
+                '/'
+            );
+
+            if (
+                Storage::disk('public')->exists(
+                    $signaturePath
+                )
+            ) {
+                $existingSignatureUrl =
+                    Storage::disk('public')->url(
+                        $signaturePath
+                    );
+            }
+        }
 
         return response()->json([
             'success' => true,
@@ -439,6 +463,9 @@ class WalkInController extends Controller
 
             'has_reusable_signature' =>
             $hasReusableSignature,
+
+            'existing_signature_url' =>
+            $existingSignatureUrl,
 
             'dental' =>
             $dentalDefaults,

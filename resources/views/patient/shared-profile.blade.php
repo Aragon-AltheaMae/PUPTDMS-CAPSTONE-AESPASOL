@@ -16,7 +16,7 @@ $layoutRole = $profileMode === 'admin' ? 'admin' : 'dentist';
 
 @php
 use Carbon\Carbon;
-
+use Illuminate\Support\Str;
 $isDentistProfile = $profileMode === 'dentist';
 
 $patientName = $patient->name ?? 'Unknown Patient';
@@ -142,7 +142,7 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                     <i class="fa-solid fa-clock-rotate-left text-xs"></i> Add Existing Appointment
                 </a>
                 @if ($canStartProcedure)
-                <button type="button" onclick="openStartModal()" class="ui-btn ui-btn-primary">
+                <button type="button" onclick="openStartModal()" class="ui-btn ui-btn-success">
                     <i class="fa-solid fa-play"></i>
                     <span>Start Procedure</span>
                 </button>
@@ -1237,68 +1237,38 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
     </div>
 </main>
 
-@if ($canStartProcedure)
-<div id="startModal" class="ui-modal modal-theme-primary" aria-hidden="true" role="dialog" aria-modal="true"
-    aria-labelledby="startProcedureModalTitle">
-    <div class="ui-modal-card modal-sm">
+@if ($canStartProcedure && $procedureAppointment)
+@php
+$startProcedureSchedule =
+Carbon::parse(
+$procedureAppointment->appointment_date
+)->format('l, F j, Y')
+. ' • '
+. (
+$procedureAppointment->appointment_time
+? Carbon::parse(
+$procedureAppointment->appointment_time
+)->format('g:i A')
+: 'Time not recorded'
+);
 
-        <div class="modal-hd">
-            <div class="modal-heading">
+$startProcedureService =
+($procedureAppointment->service_type ?? '') === 'Others'
+? (
+$procedureAppointment->other_services
+?: 'Others'
+)
+: (
+$procedureAppointment->service_type
+?: 'Appointment'
+);
+@endphp
 
-                <div class="modal-icon">
-                    <i class="fa-solid fa-play"></i>
-                </div>
-
-                <div class="modal-copy">
-                    <h2 id="startProcedureModalTitle" class="modal-title">
-                        Start Procedure
-                    </h2>
-
-                    <p class="modal-subtitle">
-                        Begin today's scheduled dental procedure.
-                    </p>
-                </div>
-
-            </div>
-
-            <button type="button" class="modal-x" onclick="closeStartModal()" aria-label="Close start procedure modal">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <div class="modal-bd">
-
-            <div class="global-confirm-alert">
-                <i class="fa-solid fa-circle-play"></i>
-
-                <div>
-                    <strong>
-                        Start this dental procedure?
-                    </strong>
-
-                    <span>
-                        Confirm that the patient's appointment details are correct before continuing.
-                    </span>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="modal-ft">
-
-            <button type="button" onclick="closeStartModal()" class="ui-btn ui-btn-secondary">
-                Cancel
-            </button>
-
-            <button type="button" onclick="confirmStart()" class="ui-btn ui-btn-primary">
-                <i class="fa-solid fa-play"></i>
-                <span>Start Procedure</span>
-            </button>
-
-        </div>
-
-    </div>
-</div>
+<x-start-procedure-modal id="startModal" subtitle="Open the odontogram to begin this appointment."
+    :patient="$patientName" :schedule="$startProcedureSchedule" :service="$startProcedureService" :start-url="route(
+        'dentist.dentist.appointments.start',
+        ['id' => $procedureAppointment->id]
+    )" />
 @endif
 @endsection
 
@@ -1492,10 +1462,6 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
 
     function openStartModal() {
         window.openModal?.('startModal');
-    }
-
-    function closeStartModal() {
-        window.closeModal?.('startModal');
     }
 </script>
 @endsection
