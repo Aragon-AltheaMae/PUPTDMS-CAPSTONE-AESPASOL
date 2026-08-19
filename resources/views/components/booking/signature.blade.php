@@ -134,7 +134,8 @@
                                 <i class="fa-regular fa-image"></i>
                             </span>
 
-                            <p class="signature-upload-title">
+                            <p class="signature-upload-title" data-signature-upload-title
+                                data-default-title="Select your file or drag and drop">
                                 Select your file or drag and drop
                             </p>
 

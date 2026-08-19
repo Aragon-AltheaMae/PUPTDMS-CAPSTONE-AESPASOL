@@ -935,6 +935,48 @@
     color: #ffffff;
 }
 
+.signature-status-success {
+    color: #15803d;
+    font-weight: 600;
+}
+
+.signature-status-error {
+    color: #b91c1c;
+    font-weight: 600;
+}
+
+.signature-status-neutral {
+    color: var(--text-secondary, #6b7280);
+}
+
+.signature-status-success {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+
+    color: #15803d;
+    font-weight: 700;
+}
+
+.signature-success-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 1.25rem;
+
+    border-radius: 50%;
+
+    background: #15803d;
+    color: #ffffff;
+
+    font-size: 0.7rem;
+    line-height: 1;
+}
+
 .signature-result-box {
     width: 100%;
     margin-top: 14px;

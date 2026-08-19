@@ -496,9 +496,9 @@ class OIDCController extends Controller
             return $redirect;
         }
 
-        if ($actualRoleSlug === 'dentist') {
+        if ($clinicalLandingRoute = $this->clinicalLandingRoute($user)) {
             session([
-                'role'          => 'dentist',
+                'role'          => $actualRoleSlug,
                 'dentist_id'    => $user->id,
                 'dentist_name'  => $user->name ?: $name ?: $email,
                 'dentist_email' => $user->email,
@@ -506,9 +506,9 @@ class OIDCController extends Controller
 
             session()->save();
 
-            AuditLogger::log('login', 'authentication', 'Dentist logged in via OIDC');
+            AuditLogger::log('login', 'authentication', "Clinical user ({$actualRoleSlug}) logged in via OIDC");
 
-            $redirect = redirect()->route('dentist.dentist.dashboard')
+            $redirect = redirect()->route($clinicalLandingRoute)
                 ->with('login_as', $user->name ?: $name ?: $email)
                 ->with('show_terms_modal', true);
 
@@ -526,6 +526,24 @@ class OIDCController extends Controller
 
         return redirect()->route('login')
             ->with('error', 'Your account role is not allowed to log in.');
+    }
+
+    private function clinicalLandingRoute(User $user): ?string
+    {
+        foreach ([
+            'access_dentist_dashboard' => 'dentist.dentist.dashboard',
+            'manage_appointments' => 'dentist.dentist.appointments',
+            'manage_patient_profiles' => 'dentist.dentist.patients',
+            'manage_document_requests' => 'dentist.dentist.documentrequests',
+            'manage_inventory' => 'dentist.dentist.inventory',
+            'manage_reports' => 'dentist.dentist.report',
+        ] as $permission => $route) {
+            if ($user->hasPermission($permission)) {
+                return $route;
+            }
+        }
+
+        return null;
     }
 
     protected function syncPatientRecord(

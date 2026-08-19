@@ -56,6 +56,15 @@ function createBookingSignature(root) {
             '#signature_result_box, [data-signature-result]'
         );
 
+    const signatureUploadTitle =
+        root.querySelector(
+            '[data-signature-upload-title]'
+        );
+
+    const defaultSignatureUploadTitle =
+        signatureUploadTitle?.dataset.defaultTitle ||
+        'Select your file or drag and drop';
+
     const signatureCanvas =
         root.querySelector(
             '#signatureCanvas, [data-signature-canvas]'
@@ -125,7 +134,23 @@ function createBookingSignature(root) {
         root.dataset.signatureDeclinedMessage ||
         'Signature could not be processed. Please try again.';
 
+    function updateSignatureUploadTitle(
+        fileName = ''
+    ) {
+        if (!signatureUploadTitle) {
+            return;
+        }
+
+        signatureUploadTitle.textContent =
+            fileName || defaultSignatureUploadTitle;
+
+        signatureUploadTitle.title =
+            fileName || '';
+    }
+
     function clearSignatureDisplay() {
+        updateSignatureUploadTitle();
+
         sigResultBox?.classList.add(
             'hidden'
         );
@@ -134,15 +159,33 @@ function createBookingSignature(root) {
             sigName.textContent = '';
 
             sigName.classList.remove(
+                'hidden',
                 'text-emerald-700',
                 'text-red-600'
             );
         }
 
         if (sigError) {
-            sigError.innerHTML = '';
+            sigError.textContent = '';
+
             sigError.classList.add(
                 'hidden'
+            );
+
+            sigError.classList.remove(
+                'signature-status-success',
+                'signature-status-error',
+                'signature-status-neutral',
+                'text-emerald-700',
+                'text-red-600'
+            );
+
+            sigError.style.removeProperty(
+                'color'
+            );
+
+            sigError.style.removeProperty(
+                'font-weight'
             );
         }
 
@@ -157,70 +200,112 @@ function createBookingSignature(root) {
         message = '',
         type = 'neutral'
     ) {
+        if (
+            type === 'success' &&
+            fileName
+        ) {
+            updateSignatureUploadTitle(
+                fileName
+            );
+        }
+
         sigResultBox?.classList.remove(
             'hidden'
         );
 
         if (sigName) {
-            sigName.textContent =
-                fileName;
+            sigName.textContent = '';
+            sigName.classList.add('hidden');
+        }
 
-            sigName.classList.remove(
+        if (sigError) {
+            sigError.textContent =
+                message || '';
+
+            sigError.classList.remove(
+                'hidden'
+            );
+
+            sigError.classList.remove(
+                'signature-status-success',
+                'signature-status-error',
+                'signature-status-neutral',
                 'text-emerald-700',
                 'text-red-600'
             );
 
+            sigError.style.removeProperty(
+                'color'
+            );
+
+            sigError.style.removeProperty(
+                'font-weight'
+            );
+
             if (type === 'success') {
-                sigName.classList.add(
-                    'text-emerald-700'
+                sigError.classList.add(
+                    'signature-status-success'
+                );
+
+                sigError.innerHTML = `
+        <span class="signature-success-icon">
+            <i class="fa-solid fa-check"></i>
+        </span>
+
+        <span>
+            ${escapeSignatureHtml(message || '')}
+        </span>
+    `;
+
+                sigError.style.setProperty(
+                    'color',
+                    '#15803d',
+                    'important'
+                );
+
+                sigError.style.setProperty(
+                    'font-weight',
+                    '700',
+                    'important'
                 );
             }
 
-            if (type === 'error') {
-                sigName.classList.add(
-                    'text-red-600'
+            else if (type === 'error') {
+                sigError.classList.add(
+                    'signature-status-error'
+                );
+
+                sigError.style.setProperty(
+                    'color',
+                    '#b91c1c',
+                    'important'
+                );
+
+                sigError.style.setProperty(
+                    'font-weight',
+                    '700',
+                    'important'
+                );
+            }
+            else {
+                sigError.classList.add(
+                    'signature-status-neutral'
+                );
+
+                sigError.style.setProperty(
+                    'color',
+                    '#6b7280',
+                    'important'
+                );
+
+                sigError.style.setProperty(
+                    'font-weight',
+                    '600',
+                    'important'
                 );
             }
         }
-
-        if (!sigError) {
-            return;
-        }
-
-        let icon =
-            'fa-circle-info';
-
-        if (type === 'success') {
-            icon =
-                'fa-circle-check';
-        }
-
-        if (type === 'error') {
-            icon =
-                'fa-circle-exclamation';
-        }
-
-        sigError.innerHTML = `
-            <i class="fa-solid ${icon}"></i>
-            <span>
-                ${escapeSignatureHtml(
-            message
-        )}
-            </span>
-        `;
-
-        sigError.classList.remove(
-            'hidden',
-            'is-success',
-            'is-error',
-            'is-neutral'
-        );
-
-        sigError.classList.add(
-            `is-${type}`
-        );
     }
-
     function showSignatureError(
         fileName = '',
         result = {}
@@ -232,25 +317,38 @@ function createBookingSignature(root) {
             result.reason ||
             declinedMessage;
 
-        const detectedType =
-            result.detected_type ||
-            '';
+        updateSignatureUploadTitle();
+        sigResultBox?.classList.add(
+            'hidden'
+        );
 
-        let detail = reason;
-
-        if (detectedType) {
-            detail +=
-                ` Detected: ${detectedType}`;
+        if (sigName) {
+            sigName.textContent = '';
+            sigName.classList.add('hidden');
         }
 
-        showSignatureStatus(
-            fileName,
-            detail,
-            'error'
-        );
+        if (sigError) {
+            sigError.innerHTML = '';
+
+            sigError.classList.add(
+                'hidden'
+            );
+
+            sigError.classList.remove(
+                'signature-status-success',
+                'signature-status-error',
+                'signature-status-neutral',
+                'text-emerald-700',
+                'text-red-600'
+            );
+        }
 
         if (sigInput) {
             sigInput.value = '';
+        }
+
+        if (signatureSourceInput) {
+            signatureSourceInput.value = '';
         }
 
         window.showGlobalGroupError?.(

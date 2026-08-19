@@ -57,6 +57,12 @@
             {{ $subtitle }}
         </p>
 
+        @if (trim((string) $slot) !== '')
+            <div class="mt-3">
+                {{ $slot }}
+            </div>
+        @endif
+
     </div>
 
 </div>

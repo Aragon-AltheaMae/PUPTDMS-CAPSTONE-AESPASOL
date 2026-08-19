@@ -169,54 +169,63 @@
                 'items' => [
                     [
                         'route' => 'dentist.dentist.dashboard',
+                        'permission' => 'access_dentist_dashboard',
                         'active' => ['dentist.dentist.dashboard'],
                         'icon' => 'fa-chart-line',
                         'label' => 'Dashboard',
                     ],
                     [
                         'route' => 'dentist.dentist.patients',
+                        'permission' => 'manage_patient_profiles',
                         'active' => ['dentist.dentist.patients'],
                         'icon' => 'fa-users',
                         'label' => 'Patients',
                     ],
                     [
                         'route' => 'dentist.walk-in.index',
+                        'permission' => 'manage_appointments',
                         'active' => ['dentist.walk-in.*'],
                         'icon' => 'fa-person-walking',
                         'label' => 'Walk-in',
                     ],
                     [
                         'route' => 'dentist.existing-record.index',
+                        'permission' => 'manage_appointments',
                         'active' => ['dentist.existing-record.*'],
                         'icon' => 'fa-folder-open',
                         'label' => 'Add Existing Record',
                     ],
                     [
                         'route' => 'dentist.dentist.appointments',
+                        'permission' => 'manage_appointments',
                         'active' => ['dentist.dentist.appointments'],
                         'icon' => 'fa-calendar-check',
                         'label' => 'Appointments',
                     ],
                     [
                         'route' => 'dentist.dentist.clinic_schedule',
+                        'permission' => 'manage_appointments',
                         'active' => ['dentist.dentist.clinic_schedule*'],
                         'icon' => 'fa-calendar-days',
                         'label' => 'Clinic Schedule',
                     ],
                     [
                         'route' => 'dentist.dentist.documentrequests',
+                        'permission' => 'manage_document_requests',
                         'active' => ['dentist.dentist.documentrequests'],
                         'icon' => 'fa-file-circle-check',
                         'label' => 'Document Requests',
                     ],
                     [
                         'route' => 'dentist.dentist.inventory',
+                        'permission' => 'manage_inventory',
                         'active' => ['dentist.dentist.inventory'],
                         'icon' => 'fa-box',
                         'label' => 'Inventory',
                     ],
                     [
                         'route' => 'dentist.dentist.report',
+                        'permission' => 'manage_reports',
                         'active' => ['dentist.dentist.report'],
                         'icon' => 'fa-file',
                         'label' => 'Reports',
@@ -266,6 +275,26 @@
     ];
 
     $groups = $sidebarGroups[$sidebarRole] ?? $sidebarGroups['patient'];
+
+    if ($sidebarRole === 'dentist' && $authUser) {
+        $permissionSlugs = $authUser->role?->permissions->pluck('slug')->all() ?? [];
+        $isSuperAdmin = $authUser->role?->slug === 'super_admin';
+
+        $groups = collect($groups)
+            ->map(function ($group) use ($permissionSlugs, $isSuperAdmin) {
+                $group['items'] = array_values(array_filter(
+                    $group['items'],
+                    fn ($item) => $isSuperAdmin
+                        || empty($item['permission'])
+                        || in_array($item['permission'], $permissionSlugs, true)
+                ));
+
+                return $group;
+            })
+            ->filter(fn ($group) => !empty($group['items']))
+            ->values()
+            ->all();
+    }
 
     $resolveItemUrl = function ($item) {
         try {
