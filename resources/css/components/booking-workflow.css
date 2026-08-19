@@ -104,13 +104,8 @@
 .booking-page {
     width: 100%;
     max-width: 100%;
-    min-height: 100vh;
-
     margin: 0;
-
-    padding:
-        calc(var(--header-h, 70px) + 2rem) 1rem 4rem;
-
+    padding: calc(var(--header-h, 70px) + 2rem) 1rem 4rem;
     background: transparent;
 }
 

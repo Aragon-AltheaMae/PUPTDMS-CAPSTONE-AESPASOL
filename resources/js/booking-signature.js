@@ -1718,52 +1718,127 @@ function createBookingSignature(root) {
             '#reuse_existing_signature'
         );
 
+    const existingSignatureCard =
+        root.querySelector(
+            '[data-existing-signature-card]'
+        );
+
+    const existingSignaturePreview =
+        root.querySelector(
+            '[data-existing-signature-preview]'
+        );
+
+    const existingSignatureImage =
+        root.querySelector(
+            '[data-existing-signature-image]'
+        );
+
     editExistingSignatureBtn?.addEventListener(
         'click',
-        () => {
+        editExisting
+    );
 
-            editingExistingSignature = true;
+    function setExistingSignature({
+        reusable = false,
+        url = '',
+    } = {}) {
+        editingExistingSignature =
+            false;
 
-            root.dataset.hasExistingSignature = 'false';
+        root.dataset.hasExistingSignature =
+            reusable ? 'true' : 'false';
 
-            if (reuseExistingInput) {
-                reuseExistingInput.value = '0';
-            }
+        if (reuseExistingInput) {
+            reuseExistingInput.value =
+                reusable ? '1' : '0';
+        }
 
-            signatureEditorWrapper
-                ?.classList
-                .remove('hidden');
-
-
-            editExistingSignatureBtn
-                .closest('.signature-existing-card')
-                ?.classList
-                .add('hidden');
-
-
-            sigInput?.removeAttribute(
-                'disabled'
+        existingSignatureCard
+            ?.classList.toggle(
+                'hidden',
+                !reusable
             );
 
-
-            setMode('draw');
-
-            window.setTimeout(
-                resize,
-                100
+        signatureEditorWrapper
+            ?.classList.toggle(
+                'hidden',
+                reusable
             );
 
+        if (existingSignatureImage) {
+            existingSignatureImage.src =
+                url || '';
+        }
 
-            root.dispatchEvent(
-                new CustomEvent(
-                    'booking-signature:editing',
-                    {
-                        bubbles: true
-                    }
-                )
+        existingSignaturePreview
+            ?.classList.toggle(
+                'hidden',
+                !url
+            );
+
+        if (reusable) {
+            clearUploadedSignatureState();
+
+            window.clearGlobalGroupError?.(
+                root,
+                'patient_signature'
             );
         }
-    );
+
+        window.setTimeout(
+            resize,
+            80
+        );
+    }
+
+    function editExisting() {
+        if (
+            root.dataset
+                .hasExistingSignature !==
+            'true'
+        ) {
+            return;
+        }
+
+        editingExistingSignature = true;
+
+        root.dataset.hasExistingSignature =
+            'false';
+
+        if (reuseExistingInput) {
+            reuseExistingInput.value = '0';
+        }
+
+        existingSignatureCard
+            ?.classList.add(
+                'hidden'
+            );
+
+        signatureEditorWrapper
+            ?.classList.remove(
+                'hidden'
+            );
+
+        sigInput?.removeAttribute(
+            'disabled'
+        );
+
+        setMode('draw');
+
+        window.setTimeout(
+            resize,
+            100
+        );
+
+        root.dispatchEvent(
+            new CustomEvent(
+                'booking-signature:editing',
+                {
+                    bubbles: true,
+                }
+            )
+        );
+    }
 
     const controller = {
         root,
@@ -1774,6 +1849,8 @@ function createBookingSignature(root) {
         isBlank,
         isReady,
         validate,
+        setExistingSignature,
+        editExisting,
 
         isChecking() {
             return signatureAiChecking;

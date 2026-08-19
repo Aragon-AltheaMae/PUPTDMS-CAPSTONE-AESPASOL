@@ -104,6 +104,31 @@ Route::get('/', fn() => redirect('/login'));
 Route::view('/login', 'auth.login')->name('login');
 Route::get('/backup-login', [BackupLoginController::class, 'show'])->name('backup.login');
 
+Route::get('/dashboard', function () {
+    if (! Auth::check()) {
+        return redirect()->route('login');
+    }
+
+    $impersonatedRole = session('impersonated_role');
+
+    if ($impersonatedRole === 'patient') {
+        return redirect()->route('patient.dashboard');
+    }
+
+    if ($impersonatedRole === 'dentist') {
+        return redirect()->route('dentist.dentist.dashboard');
+    }
+
+    $role = strtolower((string) optional(Auth::user()->role)->slug);
+
+    return match ($role) {
+        'admin', 'super_admin' => redirect()->route('admin.admin.dashboard'),
+        'dentist', 'dentist_role' => redirect()->route('dentist.dentist.dashboard'),
+        'patient', 'patient_role' => redirect()->route('patient.dashboard'),
+        default => redirect()->route('login'),
+    };
+})->name('dashboard');
+
 // Patient Register
 Route::get('/register', function () {
     return view('auth.register');

@@ -3280,6 +3280,45 @@ document.addEventListener('click', function (event) {
     closeModal(modalId);
 });
 
+document.addEventListener(
+    'click',
+    function (event) {
+        const confirmButton =
+            event.target.closest(
+                '[data-start-modal-confirm]'
+            );
+
+        if (!confirmButton) {
+            return;
+        }
+
+        const modal =
+            confirmButton.closest(
+                '[data-start-procedure-modal]'
+            );
+
+        if (!modal) {
+            return;
+        }
+
+        const startUrl =
+            modal.dataset.startUrl || '';
+
+        if (!startUrl) {
+            console.error(
+                'Start Procedure URL is missing.'
+            );
+
+            return;
+        }
+
+        event.preventDefault();
+
+        window.location.href =
+            startUrl;
+    }
+);
+
 document.addEventListener('keydown', function (event) {
     if (event.key !== 'Escape') return;
 

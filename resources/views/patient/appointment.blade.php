@@ -440,6 +440,9 @@ $appt->procedure?->prescriptions
                     $appt->dentist?->name
                     ?? $appt->originalDentist?->name
                     ?? 'Not yet assigned';
+
+                    $isFollowUpAppointment =
+                    (bool) ($appt->is_follow_up ?? false);
                     @endphp
 
                     <div class="global-record-card appt-visit-card appt-visit-card-upcoming {{ $statusClass }}"
@@ -461,10 +464,25 @@ $appt->procedure?->prescriptions
                         <div class="appt-visit-main">
                             <div class="appt-visit-head">
                                 <div class="appt-visit-title-group">
-                                    <h3 class="appt-visit-title">
-                                        {{ $appt->service_type }}
-                                        {{ $appt->other_services ? ' (' . $appt->other_services . ')' : '' }}
-                                    </h3>
+
+                                    <div class="appt-visit-title-row">
+
+                                        <h3 class="appt-visit-title">
+                                            {{ $appt->service_type }}
+
+                                            {{ $appt->other_services
+                                            ? ' (' . $appt->other_services . ')'
+                                            : '' }}
+                                        </h3>
+
+                                        @if ($isFollowUpAppointment)
+                                        <span class="appt-type-icon" data-tooltip="Follow-up appointment"
+                                            data-tooltip-tone="neutral" aria-label="Follow-up appointment" tabindex="0">
+                                            <i class="fa-solid fa-calendar-plus"></i>
+                                        </span>
+                                        @endif
+
+                                    </div>
 
                                     <span class="status-pill {{ $statusClass }}">
                                         <span class="status-dot"></span>
@@ -633,6 +651,9 @@ $appt->procedure?->prescriptions
                     ?? $appt->originalDentist?->name
                     ?? 'Not assigned';
 
+                    $isFollowUpAppointment =
+                    (bool) ($appt->is_follow_up ?? false);
+
                     $followUp =
                     $appt->followUpAppointments
                     ?->sortBy('appointment_date')
@@ -740,10 +761,24 @@ $appt->procedure?->prescriptions
                         <div class="appt-visit-main">
                             <div class="appt-visit-head">
                                 <div class="appt-visit-title-group">
-                                    <h3 class="appt-visit-title">
-                                        {{ $appt->service_type }}
-                                        {{ $appt->other_services ? ' (' . $appt->other_services . ')' : '' }}
-                                    </h3>
+                                    <div class="appt-visit-title-row">
+
+                                        <h3 class="appt-visit-title">
+                                            {{ $appt->service_type }}
+
+                                            {{ $appt->other_services
+                                            ? ' (' . $appt->other_services . ')'
+                                            : '' }}
+                                        </h3>
+
+                                        @if ($isFollowUpAppointment)
+                                        <span class="appt-type-icon" data-tooltip="Follow-up appointment"
+                                            data-tooltip-tone="neutral" aria-label="Follow-up appointment" tabindex="0">
+                                            <i class="fa-solid fa-calendar-plus"></i>
+                                        </span>
+                                        @endif
+
+                                    </div>
 
                                     <span class="status-pill {{ $statusClass }}">
                                         <span class="status-dot"></span>
