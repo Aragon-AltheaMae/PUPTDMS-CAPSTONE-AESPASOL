@@ -844,7 +844,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
+Route::prefix('dentist')->middleware(['auth'])->group(function () {
     Route::post('/patients/{patient}/signature/invalid', [AppointmentController::class, 'markSignatureInvalid'])
         ->middleware('permission:manage_patient_profiles')
         ->name('dentist.patient.signature.invalid');
@@ -1025,7 +1025,7 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         ->name('dentist.dentist.appointments.follow-up.store');
 
     Route::get('/dentist/appointment-slots', [AppointmentController::class, 'slotsForDate'])
-        ->middleware(['role:dentist'])
+        ->middleware('permission:manage_appointments')
         ->name('dentist.appointment.slots');
 
     Route::post('/appointments/{id}/cancel', [DentistAppointmentController::class, 'cancel'])
@@ -1142,7 +1142,7 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
     Route::get('/report/dental-services', [\App\Http\Controllers\Dentist\DentalServicesRecordController::class, 'index'])
         ->middleware('permission:manage_reports')
         ->name('dentist.dentist.report.dental-services');
-        
+
     Route::get('/report/dental-services/data', [\App\Http\Controllers\Dentist\DentalServicesRecordController::class, 'data'])
         ->middleware('permission:manage_reports')
         ->name('dentist.dentist.report.dental-services.data');
@@ -1228,6 +1228,20 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
     Route::post('/odontogram/patient/{patient}/existing-appointment', [OdontogramController::class, 'storeExistingAppointmentIntake'])
         ->middleware('permission:manage_appointments')
         ->name('dentist.odontogram.existing-appointment.intake.store');
+
+    Route::patch(
+        '/odontogram/patient/{patient}/existing-appointment/history/autosave',
+        [
+            OdontogramController::class,
+            'autosaveExistingAppointmentHistory',
+        ]
+    )
+        ->middleware(
+            'permission:manage_appointments'
+        )
+        ->name(
+            'dentist.odontogram.existing-appointment.history.autosave'
+        );
 
     Route::get('/odontogram/existing-appointment/slots', [OdontogramController::class, 'existingAppointmentSlotsForDate'])
         ->middleware('permission:manage_appointments')

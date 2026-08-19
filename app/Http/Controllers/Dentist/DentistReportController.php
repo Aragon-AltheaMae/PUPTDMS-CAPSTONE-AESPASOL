@@ -306,7 +306,7 @@ class DentistReportController extends Controller
 
         $pathsByCode = [
             'DTR-DEFAULT' => 'daily-treatment-record-template.pdf',
-            'DTR-FACULTY' => 'dental treatment-record-faculty.pdf',
+            'DTR-FACULTY' => 'dental-treatment-record-faculty.pdf',
             'DSRV-DEFAULT' => 'dental-services-template.pdf',
             'DHREC-DEFAULT' => 'dental-health-record-template.pdf',
             'ADCL-DEFAULT' => 'annual-dental-clearance-template.pdf',
@@ -318,7 +318,7 @@ class DentistReportController extends Controller
             'DCASE-DEFAULT' => 'dental-cases-template.pdf',
         ];
 
-        $fileName = $pathsByType[$documentType] ?? $pathsByCode[$code] ?? null;
+        $fileName = $pathsByCode[$code] ?? $pathsByType[$documentType] ?? null;
 
         if (! $fileName) {
             return null;
@@ -674,7 +674,8 @@ class DentistReportController extends Controller
             ? Carbon::parse($validated['date_to'])->endOfDay()
             : $from->copy()->endOfDay();
 
-        $templatePath = storage_path('app/report-templates/dental-services-template.pdf');
+        $templatePath = $this->getPrintableTemplatePdfPath($templateRecord)
+            ?? storage_path('app/report-templates/dental-services-template.pdf');
 
         if (! file_exists($templatePath)) {
             return response()->json([
@@ -691,7 +692,14 @@ class DentistReportController extends Controller
             ->whereDate('appointment_date', '<=', $to->toDateString())
             ->orderBy('appointment_date')
             ->orderBy('appointment_time')
-            ->get();
+            ->get()
+            ->filter(function (Appointment $appointment) use ($templateRecord) {
+                return $this->matchesDentalServicesTemplateAudience(
+                    $appointment,
+                    $templateRecord
+                );
+            })
+            ->values();
 
         if ($records->isEmpty()) {
             return response()->json([
@@ -733,6 +741,90 @@ class DentistReportController extends Controller
         return response($pdf->Output('S'), 200)
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"');
+    }
+
+    private function matchesDentalServicesTemplateAudience(
+        Appointment $appointment,
+        DocumentTemplate $template
+    ): bool {
+        $audience =
+            $this->resolveDentalServicesTemplateAudience(
+                $template
+            );
+
+        if ($audience === 'all') {
+            return true;
+        }
+
+        $patient =
+            $appointment->patient;
+
+        $patientAudience =
+            $this->resolveDentalServicesPatientAudience(
+                $patient
+            );
+
+        if ($audience === 'faculty') {
+            return $patientAudience === 'faculty';
+        }
+
+        if ($audience === 'student') {
+            return $patientAudience === 'student';
+        }
+
+        return true;
+    }
+
+    private function resolveDentalServicesTemplateAudience(
+        DocumentTemplate $template
+    ): string {
+        $haystack = strtolower(trim(implode(' ', array_filter([
+            $template->name,
+            $template->code,
+            $template->notes,
+        ]))));
+
+        if ($haystack === '') {
+            return 'all';
+        }
+
+        if (
+            str_contains($haystack, 'faculty') ||
+            str_contains($haystack, 'administrative')
+        ) {
+            return 'faculty';
+        }
+
+        if (
+            str_contains($haystack, 'student') ||
+            str_contains($haystack, 'students')
+        ) {
+            return 'student';
+        }
+
+        return 'all';
+    }
+
+    private function resolveDentalServicesPatientAudience(
+        $patient
+    ): string {
+        if (! $patient) {
+            return 'unknown';
+        }
+
+        if (filled($patient->faculty_code)) {
+            return 'faculty';
+        }
+
+        if (
+            filled($patient->course_code) ||
+            filled($patient->course_name) ||
+            filled($patient->student_no)
+        ) {
+            return 'student';
+        }
+
+        return 'administrative';
     }
 
     public function downloadMedicineInventoryReport(Request $request)
@@ -945,13 +1037,23 @@ class DentistReportController extends Controller
                 'message' => 'Daily Treatment Record PDF template was not found.',
             ], 404);
         }
-        $records = Appointment::with('patient')
+        $records = Appointment::with([
+            'patient.medicalHistory',
+            'procedure',
+        ])
             ->where('status', 'completed')
             ->whereDate('appointment_date', '>=', $from->toDateString())
             ->whereDate('appointment_date', '<=', $to->toDateString())
             ->orderBy('appointment_date')
             ->orderBy('appointment_time')
-            ->get();
+            ->get()
+            ->filter(function (Appointment $appointment) use ($templateRecord) {
+                return $this->matchesDailyTreatmentTemplateAudience(
+                    $appointment,
+                    $templateRecord
+                );
+            })
+            ->values();
 
         if ($records->isEmpty()) {
             return response()->json([
@@ -996,6 +1098,92 @@ class DentistReportController extends Controller
         return response($pdf->Output('S'), 200)
             ->header('Content-Type', 'application/pdf')
             ->header('Content-Disposition', 'attachment; filename="' . $fileName . '"');
+    }
+
+    private function matchesDailyTreatmentTemplateAudience(
+        Appointment $appointment,
+        DocumentTemplate $template
+    ): bool {
+        $audience =
+            $this->resolveDailyTreatmentTemplateAudience(
+                $template
+            );
+
+        if ($audience === 'all') {
+            return true;
+        }
+
+        $patientAudience =
+            $this->resolveDailyTreatmentPatientAudience(
+                $appointment->patient
+            );
+
+        if ($audience === 'faculty') {
+            return $patientAudience === 'faculty';
+        }
+
+        if ($audience === 'student') {
+            return $patientAudience === 'student';
+        }
+
+        return true;
+    }
+
+    private function resolveDailyTreatmentTemplateAudience(
+        DocumentTemplate $template
+    ): string {
+        $code = strtoupper(trim((string) ($template->code ?? '')));
+
+        if ($code === 'DTR-FACULTY') {
+            return 'faculty';
+        }
+
+        if ($code === 'DTR-DEFAULT') {
+            return 'student';
+        }
+
+        $haystack = strtolower(trim(implode(' ', array_filter([
+            $template->name,
+            $template->notes,
+        ]))));
+
+        if (
+            str_contains($haystack, 'faculty') ||
+            str_contains($haystack, 'administrative')
+        ) {
+            return 'faculty';
+        }
+
+        if (
+            str_contains($haystack, 'student') ||
+            str_contains($haystack, 'students')
+        ) {
+            return 'student';
+        }
+
+        return 'all';
+    }
+
+    private function resolveDailyTreatmentPatientAudience(
+        $patient
+    ): string {
+        if (! $patient) {
+            return 'unknown';
+        }
+
+        if (filled($patient->faculty_code)) {
+            return 'faculty';
+        }
+
+        if (
+            filled($patient->course_code) ||
+            filled($patient->course_name) ||
+            filled($patient->student_no)
+        ) {
+            return 'student';
+        }
+
+        return 'administrative';
     }
 
     public function downloadDentalCasesReport(Request $request)
@@ -2876,16 +3064,16 @@ class DentistReportController extends Controller
             return '—';
         }
 
+        if (filled($patient->faculty_code)) {
+            return trim((string) $patient->faculty_code);
+        }
+
         if (filled($patient->course_code)) {
             return trim((string) $patient->course_code);
         }
 
         if (filled($patient->course_name)) {
             return trim((string) $patient->course_name);
-        }
-
-        if (filled($patient->faculty_code)) {
-            return trim((string) $patient->faculty_code);
         }
 
         return '—';
@@ -2897,12 +3085,12 @@ class DentistReportController extends Controller
             return '';
         }
 
-        if (filled($patient->course_code) || filled($patient->course_name)) {
-            return 'Student';
-        }
-
         if (filled($patient->faculty_code)) {
             return 'Faculty';
+        }
+
+        if (filled($patient->course_code) || filled($patient->course_name)) {
+            return 'Student';
         }
 
         return '';
@@ -3094,14 +3282,14 @@ class DentistReportController extends Controller
             }
 
 
-            if (
+            if (filled($patient->faculty_code)) {
+                $officeType = 'faculty';
+            } elseif (
                 filled($patient->student_no) ||
                 filled($patient->course_code) ||
                 filled($patient->course_name)
             ) {
                 $officeType = 'student';
-            } elseif (filled($patient->faculty_code)) {
-                $officeType = 'faculty';
             } else {
                 $patientType = strtolower(trim((string) (
                     $patient->patient_type
@@ -3567,8 +3755,9 @@ class DentistReportController extends Controller
 
             $procedure = $appointment->procedure;
             $visitType = strtolower(trim((string) ($appointment->visit_type ?? $appointment->concern ?? '')));
+            $isWalkIn = (bool) ($appointment->is_walk_in ?? false);
 
-            $isEmergency = str_contains($visitType, 'emergency');
+            $isEmergency = $isWalkIn || str_contains($visitType, 'emergency');
             $isNonEmergency = ! $isEmergency;
 
             $timeProcessed = $procedure?->procedure_started_at
@@ -3811,36 +4000,125 @@ class DentistReportController extends Controller
     {
         $pdf->SetTextColor(0, 0, 0);
 
-        $startY = 211.0;
-        $rowHeight = 10.2;
         $isStudentTemplate = $templateCode === 'DTR-DEFAULT';
 
-        $columnLayout = $isStudentTemplate
+        $layout = $isStudentTemplate
             ? [
-                'requested' => ['x' => 118, 'width' => 62],
-                'patient' => ['x' => 199, 'width' => 96],
-                'contact' => ['x' => 299, 'width' => 102],
-                'office' => ['x' => 370, 'width' => 48],
-                'gender' => ['x' => 409, 'width' => 36],
-                'treatment' => ['x' => 467, 'width' => 72],
-                'processed' => ['x' => 534, 'width' => 64],
-                'minutes' => ['x' => 604, 'width' => 62],
-                'signature' => ['x' => 692, 'width' => 48, 'height' => 6.4],
+                'startY' => 183.0,
+                'rowHeight' => 18.35,
+                'textHeight' => 12.0,
+                'fontSize' => 5.2,
+
+                'columnLayout' => [
+                    'requested' => [
+                        'x' => 96.5,
+                        'width' => 70,
+                    ],
+
+                    'patient' => [
+                        'x' => 181.0,
+                        'width' => 88,
+                    ],
+
+                    'contact' => [
+                        'x' => 283.5,
+                        'width' => 104,
+                    ],
+
+                    'office' => [
+                        'x' => 365.0,
+                        'width' => 45,
+                    ],
+
+                    'gender' => [
+                        'x' => 409.0,
+                        'width' => 31,
+                    ],
+
+                    'treatment' => [
+                        'x' => 469.3,
+                        'width' => 78,
+                    ],
+
+                    'processed' => [
+                        'x' => 546.7,
+                        'width' => 65,
+                    ],
+
+                    'minutes' => [
+                        'x' => 615.5,
+                        'width' => 58,
+                    ],
+
+                    'signature' => [
+                        'x' => 689.2,
+                        'width' => 46,
+                        'height' => 10.5,
+                    ],
+                ],
             ]
             : [
-                'requested' => ['x' => 118, 'width' => 62],
-                'patient' => ['x' => 199, 'width' => 96],
-                'contact' => ['x' => 299, 'width' => 102],
-                'office' => ['x' => 370, 'width' => 48],
-                'gender' => ['x' => 411, 'width' => 38],
-                'treatment' => ['x' => 469, 'width' => 76],
-                'processed' => ['x' => 539, 'width' => 70],
-                'minutes' => ['x' => 613, 'width' => 76],
-                'signature' => ['x' => 704, 'width' => 76, 'height' => 8.0],
+                'startY' => 183.0,
+                'rowHeight' => 18.35,
+                'textHeight' => 12.0,
+                'fontSize' => 5.2,
+
+                'columnLayout' => [
+                    'requested' => [
+                        'x' => 96.5,
+                        'width' => 70,
+                    ],
+
+                    'patient' => [
+                        'x' => 181.0,
+                        'width' => 88,
+                    ],
+
+                    'contact' => [
+                        'x' => 283.5,
+                        'width' => 104,
+                    ],
+
+                    'office' => [
+                        'x' => 365.0,
+                        'width' => 45,
+                    ],
+
+                    'gender' => [
+                        'x' => 409.0,
+                        'width' => 31,
+                    ],
+
+                    'treatment' => [
+                        'x' => 469.3,
+                        'width' => 78,
+                    ],
+
+                    'processed' => [
+                        'x' => 546.7,
+                        'width' => 65,
+                    ],
+
+                    'minutes' => [
+                        'x' => 615.5,
+                        'width' => 58,
+                    ],
+
+                    'signature' => [
+                        'x' => 689.2,
+                        'width' => 46,
+                        'height' => 10.5,
+                    ],
+                ],
             ];
 
+        $startY = $layout['startY'];
+        $rowHeight = $layout['rowHeight'];
+        $textHeight = $layout['textHeight'];
+        $columnLayout = $layout['columnLayout'];
+
         foreach ($records as $index => $appointment) {
-            $y = $startY + ($index * $rowHeight);
+            $y = $startY + ($rowHeight / 2) + ($index * $rowHeight);
 
             $patient = $appointment->patient;
 
@@ -3862,10 +4140,13 @@ class DentistReportController extends Controller
 
             $emailContact = $this->buildPdfContactBlock($email, $contact);
 
-            $office = '';
+            $office =
+                $this->dailyTreatmentOfficeDisplay(
+                    $patient
+                );
 
-            if ($templateCode !== 'DTR-DEFAULT') {
-                $office = trim((string) ($patient->faculty_code ?? ''));
+            if ($office === '—') {
+                $office = '';
             }
 
             $demographics = $this->resolvePatientDemographics($patient);
@@ -3895,16 +4176,118 @@ class DentistReportController extends Controller
 
             $signaturePath = $this->resolveStoredSignaturePath($patient?->medicalHistory?->patient_signature);
 
-            $pdf->SetFont('Helvetica', '', 4.0);
+            $pdf->SetFont('Helvetica', '', $layout['fontSize']);
 
-            $this->drawPdfWrappedCell($pdf, $columnLayout['requested']['x'], $y, $requestedDateTime, $columnLayout['requested']['width'], 9.2, 'C', 1);
-            $this->drawPdfWrappedCell($pdf, $columnLayout['patient']['x'], $y, $patientName, $columnLayout['patient']['width'], 9.2, 'C', 1);
-            $this->drawPdfWrappedCell($pdf, $columnLayout['contact']['x'], $y, $emailContact, $columnLayout['contact']['width'], 9.2, 'C', 1);
-            $this->drawPdfWrappedCell($pdf, $columnLayout['office']['x'], $y, $office, $columnLayout['office']['width'], 9.2, 'C', 1);
-            $this->drawPdfWrappedCell($pdf, $columnLayout['gender']['x'], $y, $gender, $columnLayout['gender']['width'], 9.2, 'C', 1);
-            $this->drawPdfWrappedCell($pdf, $columnLayout['treatment']['x'], $y, $treatmentDone, $columnLayout['treatment']['width'], 9.2, 'C', 1);
-            $this->drawPdfWrappedCell($pdf, $columnLayout['processed']['x'], $y, $processedDateTime, $columnLayout['processed']['width'], 9.2, 'C', 1);
-            $this->drawPdfWrappedCell($pdf, $columnLayout['minutes']['x'], $y, $minutesProcessed, $columnLayout['minutes']['width'], 9.2, 'C', 1);
+            $this->drawPdfCellAutoFont(
+                $pdf,
+                $columnLayout['requested']['x'],
+                $y,
+                $requestedDateTime,
+                $columnLayout['requested']['width'],
+                $textHeight,
+                'C',
+                'Helvetica',
+                '',
+                5.2,
+                4.3
+            );
+
+            $this->drawPdfCellAutoFont(
+                $pdf,
+                $columnLayout['patient']['x'],
+                $y,
+                $patientName,
+                $columnLayout['patient']['width'],
+                $textHeight,
+                'C',
+                'Helvetica',
+                '',
+                5.3,
+                4.0
+            );
+
+            $this->drawPdfCellAutoFont(
+                $pdf,
+                $columnLayout['contact']['x'],
+                $y,
+                $emailContact,
+                $columnLayout['contact']['width'],
+                $textHeight,
+                'C',
+                'Helvetica',
+                '',
+                5.0,
+                3.7
+            );
+
+            $this->drawPdfCellAutoFont(
+                $pdf,
+                $columnLayout['office']['x'],
+                $y,
+                $office,
+                $columnLayout['office']['width'],
+                $textHeight,
+                'C',
+                'Helvetica',
+                '',
+                5.0,
+                3.5
+            );
+
+            $this->drawPdfCellAutoFont(
+                $pdf,
+                $columnLayout['gender']['x'],
+                $y,
+                $gender,
+                $columnLayout['gender']['width'],
+                $textHeight,
+                'C',
+                'Helvetica',
+                '',
+                5.2,
+                4.0
+            );
+
+            $this->drawPdfCellAutoFont(
+                $pdf,
+                $columnLayout['treatment']['x'],
+                $y,
+                $treatmentDone,
+                $columnLayout['treatment']['width'],
+                $textHeight,
+                'C',
+                'Helvetica',
+                '',
+                5.3,
+                4.0
+            );
+            $this->drawPdfCellAutoFont(
+                $pdf,
+                $columnLayout['processed']['x'],
+                $y,
+                $processedDateTime,
+                $columnLayout['processed']['width'],
+                $textHeight,
+                'C',
+                'Helvetica',
+                '',
+                5.0,
+                4.0
+            );
+
+            $this->drawPdfCellAutoFont(
+                $pdf,
+                $columnLayout['minutes']['x'],
+                $y,
+                $minutesProcessed,
+                $columnLayout['minutes']['width'],
+                $textHeight,
+                'C',
+                'Helvetica',
+                '',
+                5.3,
+                4.2
+            );
 
             if ($signaturePath) {
                 $this->drawPdfImageInBox(

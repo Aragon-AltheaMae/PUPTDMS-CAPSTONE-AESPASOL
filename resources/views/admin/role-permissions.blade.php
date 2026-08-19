@@ -500,7 +500,7 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
         <form id="createRoleForm" action="{{ route('admin.role_permissions.store_role') }}" method="POST"
             class="modal-card-form" data-global-validation data-form-validation-rule="createRole" data-discard-form
             data-discard-title="Discard new role?" data-discard-subtitle="You have unsaved role information."
-            data-discard-message="Closing this modal will remove the role and user information you entered. Do you want to discard these changes?"
+            data-discard-message="Closing this modal will remove the role information you entered. Do you want to discard these changes?"
             novalidate>
 
             @csrf
@@ -539,36 +539,6 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                         </div>
                     </div>
 
-                    <div class="global-form-group" data-global-field>
-                        <label class="global-form-label" for="newRoleUserName">
-                            User Name
-                            <span class="required-mark">*</span>
-                        </label>
-
-                        <div class="global-control-wrap">
-                            <i class="fa-solid fa-user global-control-icon"></i>
-
-                            <input type="text" id="newRoleUserName" name="user_name"
-                                class="form-input-custom global-control-with-icon" data-field-label="User Name"
-                                data-required-message="Please enter the user's name." required autocomplete="off">
-                        </div>
-                    </div>
-
-                    <div class="global-form-group" data-global-field>
-                        <label class="global-form-label" for="newRoleUserEmail">
-                            User Email
-                            <span class="required-mark">*</span>
-                        </label>
-
-                        <div class="global-control-wrap">
-                            <i class="fa-solid fa-envelope global-control-icon"></i>
-
-                            <input type="email" id="newRoleUserEmail" name="user_email"
-                                class="form-input-custom global-control-with-icon" data-field-label="User Email"
-                                data-required-message="Please enter the user's email."
-                                data-type-message="Please enter a valid email address." required autocomplete="off">
-                        </div>
-                    </div>
                 </div>
             </div>
 

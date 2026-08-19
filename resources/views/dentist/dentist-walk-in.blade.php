@@ -3822,6 +3822,28 @@ ${summaryCard(
         }
     );
 
+    function clearModalStateBeforeRedirect() {
+        document.body.classList.remove(
+            'modal-lock'
+        );
+
+        document.querySelectorAll(
+            '.ui-modal.open, .ui-modal.closing, .modal-overlay.open, .modal-overlay.closing'
+        ).forEach(
+            modalEl => {
+                modalEl.classList.remove(
+                    'open',
+                    'closing'
+                );
+
+                modalEl.setAttribute(
+                    'aria-hidden',
+                    'true'
+                );
+            }
+        );
+    }
+
     okBtn?.addEventListener(
         'click',
         () => {
@@ -3836,8 +3858,11 @@ ${summaryCard(
                 'confirmModal'
             );
 
-            window.location.href =
-                startUrl;
+            clearModalStateBeforeRedirect();
+
+            window.location.assign(
+                startUrl
+            );
         }
     );
 
