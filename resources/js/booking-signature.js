@@ -318,19 +318,22 @@ function createBookingSignature(root) {
             declinedMessage;
 
         updateSignatureUploadTitle();
-        sigResultBox?.classList.add(
+        sigResultBox?.classList.remove(
             'hidden'
         );
 
         if (sigName) {
             sigName.textContent = '';
-            sigName.classList.add('hidden');
+            sigName.classList.add(
+                'hidden'
+            );
         }
 
         if (sigError) {
-            sigError.innerHTML = '';
+            sigError.textContent =
+                reason;
 
-            sigError.classList.add(
+            sigError.classList.remove(
                 'hidden'
             );
 
@@ -340,6 +343,22 @@ function createBookingSignature(root) {
                 'signature-status-neutral',
                 'text-emerald-700',
                 'text-red-600'
+            );
+
+            sigError.classList.add(
+                'signature-status-error'
+            );
+
+            sigError.style.setProperty(
+                'color',
+                '#b91c1c',
+                'important'
+            );
+
+            sigError.style.setProperty(
+                'font-weight',
+                '700',
+                'important'
             );
         }
 
