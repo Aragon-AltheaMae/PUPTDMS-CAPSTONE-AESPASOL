@@ -113,10 +113,7 @@ class DocumentRequestController extends Controller
             ?: session('role')
             ?: optional(optional(Auth::user())->role)->slug;
 
-        abort_unless(
-            $activeRole === 'dentist',
-            403
-        );
+        abort_unless(optional(Auth::user())->canAccessClinicalArea($activeRole), 403);
 
         $search = trim(
             (string) $request->get('search', '')
@@ -281,10 +278,7 @@ class DocumentRequestController extends Controller
             ?: session('role')
             ?: optional(optional(Auth::user())->role)->slug;
 
-        abort_unless(
-            $activeRole === 'dentist',
-            403
-        );
+        abort_unless(optional(Auth::user())->canAccessClinicalArea($activeRole), 403);
 
         $requests = $this
             ->buildDocumentRequestQuery($request)
@@ -320,7 +314,7 @@ class DocumentRequestController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -386,7 +380,7 @@ class DocumentRequestController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 

@@ -50,7 +50,7 @@ class DentistReportController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return redirect('/login');
         }
 
@@ -247,7 +247,7 @@ class DentistReportController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return redirect('/login');
         }
 
@@ -331,7 +331,7 @@ class DentistReportController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -360,7 +360,7 @@ class DentistReportController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -1169,6 +1169,30 @@ class DentistReportController extends Controller
     ): string {
         if (! $patient) {
             return 'unknown';
+        }
+
+        $patientType = strtolower(trim((string) (
+            $patient->patient_type
+            ?? $patient->type
+            ?? ''
+        )));
+
+        if (
+            str_contains($patientType, 'admin') ||
+            str_contains($patientType, 'administrative')
+        ) {
+            return 'administrative';
+        }
+
+        if (str_contains($patientType, 'faculty')) {
+            return 'faculty';
+        }
+
+        if (
+            str_contains($patientType, 'student') ||
+            str_contains($patientType, 'guest')
+        ) {
+            return 'student';
         }
 
         if (filled($patient->faculty_code)) {
@@ -2780,7 +2804,7 @@ class DentistReportController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return redirect('/login');
         }
 
@@ -2812,7 +2836,7 @@ class DentistReportController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -2892,7 +2916,7 @@ class DentistReportController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -3064,6 +3088,32 @@ class DentistReportController extends Controller
             return '—';
         }
 
+        $patientType = strtolower(trim((string) (
+            $patient->patient_type
+            ?? $patient->type
+            ?? ''
+        )));
+
+        if (
+            str_contains($patientType, 'admin') ||
+            str_contains($patientType, 'administrative')
+        ) {
+            return trim((string) (
+                $patient->course_name
+                ?? $patient->program_code
+                ?? $patient->faculty_code
+                ?? 'Administrative'
+            )) ?: 'Administrative';
+        }
+
+        if (str_contains($patientType, 'faculty')) {
+            return trim((string) (
+                $patient->faculty_code
+                ?? $patient->course_name
+                ?? 'Faculty'
+            )) ?: 'Faculty';
+        }
+
         if (filled($patient->faculty_code)) {
             return trim((string) $patient->faculty_code);
         }
@@ -3083,6 +3133,30 @@ class DentistReportController extends Controller
     {
         if (!$patient) {
             return '';
+        }
+
+        $patientType = strtolower(trim((string) (
+            $patient->patient_type
+            ?? $patient->type
+            ?? ''
+        )));
+
+        if (
+            str_contains($patientType, 'admin') ||
+            str_contains($patientType, 'administrative')
+        ) {
+            return 'Administrative';
+        }
+
+        if (str_contains($patientType, 'faculty')) {
+            return 'Faculty';
+        }
+
+        if (
+            str_contains($patientType, 'student') ||
+            str_contains($patientType, 'guest')
+        ) {
+            return 'Student';
         }
 
         if (filled($patient->faculty_code)) {

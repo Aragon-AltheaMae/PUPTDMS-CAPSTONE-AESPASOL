@@ -246,51 +246,51 @@ class SystemLogController extends Controller
 
     public function export(Request $request)
     {
-        if (!session('admin_logged_in')) {
-            return redirect('/admin/login');
-        }
+        @set_time_limit(120);
+        @ini_set('max_execution_time', '120');
+        @ini_set('memory_limit', '512M');
 
-        $status = $this->normalizeStatus($request->input('status', 'archived'));
-        $request->merge(['status' => $status]);
+        $validated = $request->validate([
+            'role' => ['nullable', 'string'],
+            'search' => ['nullable', 'string'],
+            'status' => ['nullable', 'string'],
+            'sort' => ['nullable', 'string'],
+            'date_from' => ['nullable', 'date'],
+            'date_to' => ['nullable', 'date', 'after_or_equal:date_from'],
+            'action_type' => ['nullable', 'string'],
+            'module' => ['nullable', 'string'],
+        ]);
 
-        $perPageInput =
-            (int) $request->input(
-                'per_page',
-                10
-            );
-
-        $perPage = in_array(
-            $perPageInput,
-            [10, 20, 50, 100],
-            true
-        )
-            ? $perPageInput
-            : 10;
-
-        $page = max(
-            1,
-            (int) $request->input(
-                'page',
-                1
-            )
+        $status = $this->normalizeStatus(
+            $request->input('status', 'active')
         );
+        $request->merge(['status' => $status]);
 
         $logs =
             $this
             ->buildFilteredQuery(
                 $request
             )
+            ->select([
+                'id',
+                'actor_role',
+                'actor_identifier',
+                'actor_name',
+                'action',
+                'module',
+                'description',
+                'is_archived',
+                'archived_at',
+                'created_at',
+            ])
             ->orderBy(
                 'created_at',
                 $request->input('sort') === 'asc'
                     ? 'asc'
                     : 'desc'
             )
-            ->forPage(
-                $page,
-                $perPage
-            )
             ->get();
+
 
         if ($logs->isEmpty()) {
             if ($request->ajax()) {
@@ -310,11 +310,11 @@ class SystemLogController extends Controller
         AuditLogger::log(
             'export_pdf',
             'system_logs',
-            'Admin exported page ' .
-                $page .
-                ' of the current system log view (' .
+            'Admin exported ' .
                 $logs->count() .
-                ' entries) as PDF.'
+                ' filtered system log entr' .
+                ($logs->count() === 1 ? 'y' : 'ies') .
+                ' as PDF.'
         );
 
         $pdf = Pdf::loadView('admin.system-logs-pdf', [
@@ -328,9 +328,6 @@ class SystemLogController extends Controller
                 'date_to' => $request->input('date_to'),
                 'action_type' => $request->input('action_type'),
                 'module' => $request->input('module'),
-
-                'page' => $page,
-                'per_page' => $perPage,
             ],
         ])->setPaper('a4', 'landscape');
 

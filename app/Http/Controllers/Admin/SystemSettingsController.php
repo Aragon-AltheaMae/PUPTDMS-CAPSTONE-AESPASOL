@@ -83,10 +83,6 @@ class SystemSettingsController extends Controller
 
     public function index()
     {
-        if (!session('admin_logged_in')) {
-            return redirect('/admin/login');
-        }
-
         $settings = SystemSetting::query()->get()->keyBy('key');
         $notifications = collect([]);
 
@@ -96,15 +92,16 @@ class SystemSettingsController extends Controller
             'Admin viewed the system settings page'
         );
 
-        return view('admin.system-settings', compact('settings', 'notifications'));
+        return view('admin.system-settings', [
+            'settings' => $settings,
+            'notifications' => $notifications,
+            'layoutRole' => $this->resolveLayoutRole(),
+            'updateRoute' => $this->routeName('update'),
+        ]);
     }
 
     public function update(Request $request)
     {
-        if (!session('admin_logged_in')) {
-            return redirect('/admin/login');
-        }
-
         $validated = $request->validate($this->rules(), $this->messages());
 
         foreach (self::ALLOWED_GROUPS as $group => $keys) {
@@ -122,8 +119,28 @@ class SystemSettingsController extends Controller
         );
 
         return redirect()
-            ->route('admin.system_settings')
+            ->route($this->routeName('index'))
             ->with('success', 'Settings saved successfully.');
+    }
+
+    private function resolveLayoutRole(): string
+    {
+        return request()->routeIs('dentist.system_settings*') ? 'dentist' : 'admin';
+    }
+
+    private function routeName(string $action): string
+    {
+        if (request()->routeIs('dentist.system_settings*')) {
+            return match ($action) {
+                'index' => 'dentist.system_settings',
+                'update' => 'dentist.system_settings.update',
+            };
+        }
+
+        return match ($action) {
+            'index' => 'admin.system_settings',
+            'update' => 'admin.system_settings.update',
+        };
     }
 
     private function resolveValue(Request $request, array $validated, string $key): string
