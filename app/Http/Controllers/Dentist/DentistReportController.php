@@ -1118,8 +1118,8 @@ class DentistReportController extends Controller
                 $appointment->patient
             );
 
-        if ($audience === 'faculty') {
-            return $patientAudience === 'faculty';
+        if ($audience === 'faculty_admin') {
+            return in_array($patientAudience, ['faculty', 'administrative'], true);
         }
 
         if ($audience === 'student') {
@@ -1135,7 +1135,7 @@ class DentistReportController extends Controller
         $code = strtoupper(trim((string) ($template->code ?? '')));
 
         if ($code === 'DTR-FACULTY') {
-            return 'faculty';
+            return 'faculty_admin';
         }
 
         if ($code === 'DTR-DEFAULT') {
@@ -1151,7 +1151,7 @@ class DentistReportController extends Controller
             str_contains($haystack, 'faculty') ||
             str_contains($haystack, 'administrative')
         ) {
-            return 'faculty';
+            return 'faculty_admin';
         }
 
         if (
