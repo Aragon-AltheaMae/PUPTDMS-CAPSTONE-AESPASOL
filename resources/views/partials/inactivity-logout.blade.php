@@ -1,5 +1,5 @@
 @php
-    $idleTimeoutSeconds = max((int) env('SESSION_IDLE_TIMEOUT_SECONDS', 600), 60);
+    $idleTimeoutSeconds = max((int) config('session.idle_timeout_seconds', 600), 60);
 @endphp
 
 <script>
