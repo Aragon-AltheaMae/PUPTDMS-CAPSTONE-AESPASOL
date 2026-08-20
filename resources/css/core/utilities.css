@@ -2609,7 +2609,9 @@
     font-size: .72rem;
     font-weight: 900;
     line-height: 1;
-    border: 1px solid transparent;
+    border: 1px solid #E5E7EB;
+    background: #F8FAFC;
+    color: #475569;
 }
 
 .badge-role.role-patient,
@@ -2691,4 +2693,11 @@
     background: rgba(255, 255, 255, .055);
     border-color: rgba(255, 255, 255, .085);
     color: #9CA3AF;
+}
+
+[data-theme="dark"] .badge-role,
+.dark .badge-role {
+    background: rgba(255, 255, 255, .055);
+    border-color: rgba(255, 255, 255, .085);
+    color: #CBD5E1;
 }

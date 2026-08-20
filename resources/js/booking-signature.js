@@ -365,7 +365,7 @@ function createBookingSignature(root) {
             declinedMessage;
 
         updateSignatureUploadTitle();
-        sigResultBox?.classList.remove(
+        sigResultBox?.classList.add(
             'hidden'
         );
 
@@ -409,6 +409,12 @@ function createBookingSignature(root) {
             );
         }
 
+        window.showGlobalGroupError?.(
+            root,
+            'patient_signature',
+            reason
+        );
+
         if (sigInput) {
             sigInput.value = '';
         }
@@ -417,11 +423,6 @@ function createBookingSignature(root) {
             signatureSourceInput.value = '';
         }
 
-        window.showGlobalGroupError?.(
-            root,
-            'patient_signature',
-            reason
-        );
     }
 
     function isDrawnSignatureFile(
