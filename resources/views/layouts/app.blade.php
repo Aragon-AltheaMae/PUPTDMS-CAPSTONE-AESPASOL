@@ -250,7 +250,6 @@
     </div>
 
     @include('partials.terms-modal')
-    @include('partials.inactivity-logout')
 
     @if ($isDentist && View::hasSection('usesAppointmentCalendar'))
         @include('components.appointment-calendar-script', [

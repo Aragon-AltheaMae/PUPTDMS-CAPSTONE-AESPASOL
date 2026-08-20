@@ -2834,6 +2834,10 @@ function initSessionTimeoutModal() {
         modal.dataset.sessionRedirectUrl ||
         '/';
 
+    const sharedActivityKey =
+        modal.dataset.sessionActivityKey ||
+        '';
+
     const activitySyncInterval = 60000;
 
     let idleTimer = null;
@@ -2847,6 +2851,57 @@ function initSessionTimeoutModal() {
     let lastActivityAt = Date.now();
     let lastHandledActivityAt = 0;
     let lastServerSyncAt = 0;
+    let lastSharedActivityWriteAt = 0;
+
+    const readSharedActivity = () => {
+        if (!sharedActivityKey) return 0;
+
+        try {
+            const timestamp = Number(
+                window.localStorage.getItem(
+                    sharedActivityKey
+                )
+            );
+
+            if (
+                !Number.isFinite(timestamp) ||
+                timestamp <= 0 ||
+                timestamp > Date.now() + 5000
+            ) {
+                return 0;
+            }
+
+            return timestamp;
+        } catch (_) {
+            return 0;
+        }
+    };
+
+    const writeSharedActivity = timestamp => {
+        if (
+            !sharedActivityKey ||
+            timestamp - lastSharedActivityWriteAt < 1000
+        ) {
+            return;
+        }
+
+        lastSharedActivityWriteAt = timestamp;
+
+        try {
+            window.localStorage.setItem(
+                sharedActivityKey,
+                String(timestamp)
+            );
+        } catch (_) {
+        }
+    };
+
+    lastActivityAt = Math.max(
+        lastActivityAt,
+        readSharedActivity()
+    );
+
+    writeSharedActivity(lastActivityAt);
 
     const requestHeaders = () => ({
         'Accept': 'application/json',
@@ -2982,6 +3037,7 @@ function initSessionTimeoutModal() {
 
         lastHandledActivityAt = now;
         lastActivityAt = now;
+        writeSharedActivity(now);
 
         scheduleIdleTimeout();
 
@@ -3010,9 +3066,31 @@ function initSessionTimeoutModal() {
         );
     });
 
+    const checkIdleState = () => {
+        if (sessionExpired) return;
+
+        lastActivityAt = Math.max(
+            lastActivityAt,
+            readSharedActivity()
+        );
+
+        const idleDuration =
+            Date.now() - lastActivityAt;
+
+        if (
+            idleDuration >=
+            timeoutMilliseconds
+        ) {
+            showSessionTimeoutModal();
+            return;
+        }
+
+        scheduleIdleTimeout();
+    };
+
     window.addEventListener(
         'focus',
-        registerUserActivity
+        checkIdleState
     );
 
     document.addEventListener(
@@ -3026,18 +3104,33 @@ function initSessionTimeoutModal() {
                 return;
             }
 
-            const idleDuration =
-                Date.now() - lastActivityAt;
+            checkIdleState();
+        }
+    );
 
+    window.addEventListener(
+        'storage',
+        event => {
             if (
-                idleDuration >=
-                timeoutMilliseconds
+                sessionExpired ||
+                !sharedActivityKey ||
+                event.key !== sharedActivityKey
             ) {
-                showSessionTimeoutModal();
                 return;
             }
 
-            registerUserActivity();
+            const timestamp = Number(event.newValue);
+
+            if (
+                !Number.isFinite(timestamp) ||
+                timestamp <= lastActivityAt ||
+                timestamp > Date.now() + 5000
+            ) {
+                return;
+            }
+
+            lastActivityAt = timestamp;
+            scheduleIdleTimeout();
         }
     );
 
