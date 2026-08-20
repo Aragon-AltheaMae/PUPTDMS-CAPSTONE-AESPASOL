@@ -261,7 +261,8 @@
                 source?.followUp ||
                 null,
 
-            odontogramData: source?.odontogram_data ||
+            odontogramData: source?.odontogram ||
+                source?.odontogram_data ||
                 source?.odontogramData || []
         };
     }

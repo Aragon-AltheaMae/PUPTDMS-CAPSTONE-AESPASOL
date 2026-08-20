@@ -216,11 +216,31 @@ class ClinicScheduleController extends Controller
             ]);
         }
 
+        $remaining =
+            max(
+                0,
+                (int) $schedule->max_slots - $totalBooked
+            );
+
+        $slots =
+            collect(
+                $schedule->availableSlots(
+                    $iso,
+                    $bookedSlotCounts
+                )
+            )
+            ->filter(
+                fn($slot) => ($slot['available'] ?? false) === true
+            )
+            ->take($remaining)
+            ->values()
+            ->all();
+
         return response()->json([
-            'slots'      => $schedule->availableSlots($iso, $bookedSlotCounts),
-            'max_slots'  => $schedule->max_slots,
+            'slots'      => $slots,
+            'max_slots'  => (int) $schedule->max_slots,
             'booked'     => $totalBooked,
-            'remaining'  => max(0, $schedule->max_slots - $totalBooked),
+            'remaining'  => $remaining,
             'open_time'  => $schedule->open_time,
             'close_time' => $schedule->close_time,
             'break_time' => $schedule->break_time,

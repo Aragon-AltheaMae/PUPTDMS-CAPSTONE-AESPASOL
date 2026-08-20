@@ -353,7 +353,7 @@ function buildFlatpickrHeader(instance) {
             ? instance.config.maxDate.getFullYear()
             : instance.currentYear + GLOBAL_CALENDAR_FUTURE_YEARS;
 
-    for (let year = minimumYear; year <= maximumYear; year++) {
+    for (let year = maximumYear; year >= minimumYear; year--) {
         const option = document.createElement('option');
 
         option.value = String(year);
@@ -6940,6 +6940,22 @@ function initCustomSelects(root = document) {
             if (willOpen) {
                 positionCustomSelectMenu(wrapper);
                 wrapper.classList.add('is-open');
+
+                if (select.classList.contains('custom-flatpickr-year')) {
+                    requestAnimationFrame(() => {
+                        const activeOption =
+                            wrapper.querySelector('.custom-select-option.is-active');
+
+                        activeOption?.scrollIntoView({
+                            block: 'center',
+                            inline: 'nearest'
+                        });
+
+                        activeOption?.focus({
+                            preventScroll: true
+                        });
+                    });
+                }
             } else {
                 wrapper.classList.remove('is-open', 'drop-up');
             }

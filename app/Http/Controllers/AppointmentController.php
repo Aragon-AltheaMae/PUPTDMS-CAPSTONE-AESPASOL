@@ -33,6 +33,7 @@ use App\Notifications\SignatureReuploadRequiredNotification;
 use App\Services\SignatureAiVerifier;
 use App\Helpers\BookingQuestions;
 use App\Models\AppointmentDraft;
+use App\Models\PatientOdontogram;
 
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
@@ -126,33 +127,13 @@ class AppointmentController extends Controller
 
         $philippineHolidays = PhilippineHolidays::range(1, 3);
 
-        $odontogramTeeth = \App\Models\Tooth::with('surfaces.legends')
-            ->where('patient_id', $patient->id)
-            ->get()
-            ->map(function ($tooth) {
-                $legends = $tooth->surfaces
-                    ->flatMap(fn($surface) => $surface->legends)
-                    ->unique('id')
-                    ->values();
-
-                return [
-                    'tooth' => $tooth->tooth_number,
-                    'legends' => $legends->map(fn($legend) => [
-                        'code' => $legend->code,
-                        'description' => $legend->description,
-                        'category' => $legend->category,
-                    ])->values(),
-                    'surfaces' => $tooth->surfaces->map(fn($surface) => [
-                        'surface_number' => $surface->surface_number,
-                        'legends' => $surface->legends->map(fn($legend) => [
-                            'code' => $legend->code,
-                            'description' => $legend->description,
-                            'category' => $legend->category,
-                        ])->values(),
-                    ])->values(),
-                ];
-            })
-            ->values();
+        $odontogramTeeth =
+            PatientOdontogram::where(
+                'patient_id',
+                $patient->id
+            )
+            ->value('odontogram_data')
+            ?? [];
 
         $notifications = [];
 

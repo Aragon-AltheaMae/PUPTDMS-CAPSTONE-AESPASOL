@@ -265,7 +265,6 @@
     --sidebar-flyout-text: var(--text-2);
     --sidebar-flyout-muted: var(--text-3);
 
-    /* Mobile drawer */
     --drawer-section-text: var(--crimson);
     --drawer-link-text: var(--sidebar-link-text);
 
@@ -278,7 +277,6 @@
     --drawer-hover-icon-border: rgba(139, 0, 0, .30);
     --drawer-hover-icon-color: var(--crimson);
 
-    /* Logout */
     --sidebar-logout-bg-start: #fff7f7;
     --sidebar-logout-bg-end: #ffffff;
     --sidebar-logout-border: rgba(220, 38, 38, .14);
@@ -297,6 +295,256 @@
     --danger-soft-bg: #fdf5f5;
     --danger-soft-border: #fce8e8;
     --danger-soft-hover: #fce8e8;
+    --alpha-amber-300-48: rgba(252, 211, 77, .48);
+    --alpha-amber-400-28: rgba(251, 191, 36, .28);
+    --alpha-amber-400-34: rgba(251, 191, 36, .34);
+    --alpha-amber-500-14: rgba(245, 158, 11, .14);
+    --alpha-amber-600-22: rgba(217, 119, 6, .22);
+    --alpha-amber-600-34: rgba(217, 119, 6, .34);
+    --alpha-black-10: rgba(0, 0, 0, .10);
+    --alpha-black-15: rgba(0, 0, 0, .15);
+    --alpha-black-16: rgba(0, 0, 0, .16);
+    --alpha-black-20: rgba(0, 0, 0, .20);
+    --alpha-black-22: rgba(0, 0, 0, .22);
+    --alpha-black-28: rgba(0, 0, 0, .28);
+    --alpha-black-30: rgba(0, 0, 0, .30);
+    --alpha-black-34: rgba(0, 0, 0, 0.34);
+    --alpha-black-42: rgba(0, 0, 0, .42);
+    --alpha-black-8: rgba(0, 0, 0, .08);
+    --alpha-blue-100-14: rgba(219, 234, 254, .14);
+    --alpha-blue-300-28: rgba(147, 197, 253, .28);
+    --alpha-blue-300-36: rgba(147, 197, 253, .36);
+    --alpha-blue-300-48: rgba(147, 197, 253, .48);
+    --alpha-blue-400-24: rgba(96, 165, 250, .24);
+    --alpha-blue-400-28: rgba(96, 165, 250, .28);
+    --alpha-blue-600-14: rgba(37, 99, 235, .14);
+    --alpha-blue-600-16: rgba(37, 99, 235, .16);
+    --alpha-blue-600-22: rgba(37, 99, 235, .22);
+    --alpha-blue-600-26: rgba(37, 99, 235, .26);
+    --alpha-blue-600-34: rgba(37, 99, 235, .34);
+    --alpha-crimson-10: rgba(139, 0, 0, .10);
+    --alpha-crimson-12: rgba(139, 0, 0, .12);
+    --alpha-crimson-14: rgba(139, 0, 0, .14);
+    --alpha-crimson-16: rgba(139, 0, 0, .16);
+    --alpha-crimson-18: rgba(139, 0, 0, .18);
+    --alpha-crimson-20: rgba(139, 0, 0, .20);
+    --alpha-crimson-22: rgba(139, 0, 0, .22);
+    --alpha-crimson-24: rgba(139, 0, 0, .24);
+    --alpha-crimson-25: rgba(139, 0, 0, 0.25);
+    --alpha-crimson-28: rgba(139, 0, 0, 0.28);
+    --alpha-crimson-30: rgba(139, 0, 0, .3);
+    --alpha-crimson-35: rgba(139, 0, 0, 0.35);
+    --alpha-crimson-4_5: rgba(139, 0, 0, .045);
+    --alpha-crimson-70: rgba(139, 0, 0, .70);
+    --alpha-crimson-8: rgba(139, 0, 0, 0.08);
+    --alpha-emerald-300-28: rgba(110, 231, 183, .28);
+    --alpha-emerald-300-48: rgba(110, 231, 183, .48);
+    --alpha-emerald-400-34: rgba(52, 211, 153, .34);
+    --alpha-emerald-600-22: rgba(5, 150, 105, .22);
+    --alpha-emerald-600-34: rgba(5, 150, 105, .34);
+    --alpha-gray-200-95: rgba(229, 231, 235, 0.95);
+    --alpha-green-100-14: rgba(209, 250, 229, .14);
+    --alpha-green-600-22: rgba(22, 163, 74, .22);
+    --alpha-red-100-14: rgba(254, 226, 226, .14);
+    --alpha-red-300-16: rgba(252, 165, 165, .16);
+    --alpha-red-300-18: rgba(252, 165, 165, .18);
+    --alpha-red-300-20: rgba(252, 165, 165, .20);
+    --alpha-red-300-24: rgba(252, 165, 165, .24);
+    --alpha-red-300-26: rgba(252, 165, 165, .26);
+    --alpha-red-300-28: rgba(252, 165, 165, .28);
+    --alpha-red-300-36: rgba(252, 165, 165, .36);
+    --alpha-red-300-48: rgba(252, 165, 165, .48);
+    --alpha-red-300-8: rgba(252, 165, 165, .08);
+    --alpha-red-400-24: rgba(248, 113, 113, .24);
+    --alpha-red-400-34: rgba(248, 113, 113, .34);
+    --alpha-red-600-10: rgba(220, 38, 38, .1);
+    --alpha-red-600-14: rgba(220, 38, 38, .14);
+    --alpha-red-600-16: rgba(220, 38, 38, .16);
+    --alpha-red-600-22: rgba(220, 38, 38, .22);
+    --alpha-red-600-26: rgba(220, 38, 38, .26);
+    --alpha-red-600-34: rgba(220, 38, 38, .34);
+    --alpha-slate-900-22: rgba(15, 23, 42, .22);
+    --alpha-slate-900-6: rgba(15, 23, 42, .06);
+    --alpha-violet-300-28: rgba(196, 181, 253, .28);
+    --alpha-violet-300-48: rgba(196, 181, 253, .48);
+    --alpha-violet-400-34: rgba(167, 139, 250, .34);
+    --alpha-violet-600-16: rgba(124, 58, 237, .16);
+    --alpha-violet-600-22: rgba(124, 58, 237, .22);
+    --alpha-violet-600-34: rgba(124, 58, 237, .34);
+    --alpha-white-10: rgba(255, 255, 255, .10);
+    --alpha-white-12: rgba(255, 255, 255, .12);
+    --alpha-white-13: rgba(255, 255, 255, .13);
+    --alpha-white-14: rgba(255, 255, 255, .14);
+    --alpha-white-15: rgba(255, 255, 255, .15);
+    --alpha-white-16: rgba(255, 255, 255, .16);
+    --alpha-white-18: rgba(255, 255, 255, .18);
+    --alpha-white-25: rgba(255, 255, 255, .25);
+    --alpha-white-30: rgba(255, 255, 255, .30);
+    --alpha-white-34: rgba(255, 255, 255, .34);
+    --alpha-white-40: rgba(255, 255, 255, .40);
+    --alpha-white-5: rgba(255, 255, 255, .05);
+    --alpha-white-5_5: rgba(255, 255, 255, .055);
+    --alpha-white-6: rgba(255, 255, 255, .06);
+    --alpha-white-60: rgba(255, 255, 255, .6);
+    --alpha-white-68: rgba(255, 255, 255, 0.68);
+    --alpha-white-72: rgba(255, 255, 255, .72);
+    --alpha-white-8: rgba(255, 255, 255, .08);
+    --alpha-white-8_5: rgba(255, 255, 255, .085);
+    --alpha-white-9: rgba(255, 255, 255, .09);
+    --amber-100: #FEF3C7;
+    --amber-200: #FDE68A;
+    --amber-300: #FCD34D;
+    --amber-400: #FBBF24;
+    --amber-600: #D97706;
+    --amber-700: #B45309;
+    --amber-800: #92400E;
+    --blue-100: #DBEAFE;
+    --blue-200: #BFDBFE;
+    --blue-300: #93C5FD;
+    --blue-400: #60A5FA;
+    --blue-50: #EFF6FF;
+    --blue-600: #2563EB;
+    --blue-700: #1D4ED8;
+    --color-white: #ffffff;
+    --crimson-deep: #660000;
+    --crimson-deeper: #5a0000;
+    --crimson-deeper-alt: #5F0000;
+    --crimson-hover: #760000;
+    --crimson-shimmer-dark: #4D0000;
+    --crimson-shimmer-mid: #7A0000;
+    --emerald-200: #A7F3D0;
+    --emerald-300: #6EE7B7;
+    --emerald-400: #34D399;
+    --emerald-600: #059669;
+    --emerald-700: #047857;
+    --emerald-800: #065F46;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-300: #D1D5DB;
+    --gray-300-alpha: #d1d5db8d;
+    --gray-400: #9CA3AF;
+    --gray-600: #4B5563;
+    --gray-700: #374151;
+    --gray-800: #1F2937;
+    --green-100: #D1FAE5;
+    --green-200: #BBF7D0;
+    --green-50: #F0FDF4;
+    --green-600: #16A34A;
+    --green-700: #15803D;
+    --neutral-warm-100: #f0eaea;
+    --neutral-warm-200: #E8E4DE;
+    --neutral-warm-50: #F5F2EE;
+    --neutral-warm-500: #9A9490;
+    --orange-50: #FFF7ED;
+    --orange-700: #E65100;
+    --purple-100: #F3E8FF;
+    --purple-200: #E9D5FF;
+    --red-100: #FEE2E2;
+    --red-200: #fecaca;
+    --red-300: #FCA5A5;
+    --red-400: #F87171;
+    --red-50: #fef2f2;
+    --red-600: #DC2626;
+    --red-700: #B91C1C;
+    --rose-white: #fff5f5;
+    --slate-300: #CBD5E1;
+    --slate-50: #F8FAFC;
+    --slate-500: #64748B;
+    --slate-600: #475569;
+    --utility-color-01: #E2E8F0;
+    --validation-red: #C0392B;
+    --violet-100: #EDE9FE;
+    --violet-200: #DDD6FE;
+    --violet-300: #C4B5FD;
+    --violet-50: #F5F3FF;
+    --violet-600: #7C3AED;
+    --violet-700: #6D28D9;
+    --status-pending-hover-bg: #D97706;
+    --status-pending-hover-border: #D97706;
+
+    --calendar-appointment-bg: var(--status-all-solid);
+    --calendar-appointment-soft: var(--status-all-bg);
+    --calendar-appointment-text: var(--status-all-text);
+    --calendar-appointment-border: var(--status-all-border);
+
+    --calendar-completed-bg: var(--status-completed-solid);
+    --calendar-completed-soft: var(--status-completed-bg);
+    --calendar-completed-text: var(--status-completed-text);
+    --calendar-completed-border: var(--status-completed-border);
+
+    --calendar-full-bg: var(--status-cancelled-solid);
+    --calendar-full-soft: var(--status-cancelled-bg);
+    --calendar-full-text: var(--status-cancelled-text);
+    --calendar-full-border: var(--status-cancelled-border);
+
+    --calendar-holiday-bg: var(--status-pending-solid);
+    --calendar-holiday-soft: var(--status-pending-bg);
+    --calendar-holiday-text: var(--status-pending-text);
+    --calendar-holiday-border: var(--status-pending-border);
+
+    --calendar-closed-bg: var(--status-default-solid);
+    --calendar-closed-soft: var(--status-default-bg);
+    --calendar-closed-text: var(--status-default-text);
+    --calendar-closed-border: var(--status-default-border);
+
+    --calendar-today-bg: var(--crimson);
+    --calendar-today-bg-hover: var(--crimson-dark);
+    --calendar-today-text: var(--text-on-brand);
+
+    --calendar-tooltip-text: var(--text-on-brand);
+    --calendar-badge-border: var(--color-white);
+    --calendar-tooltip-neutral: var(--gray-800);
+
+    --calendar-shell-bg: var(--card);
+    --calendar-shell-border: var(--gray-200);
+    --calendar-shell-shadow: var(--alpha-slate-900-6);
+
+    --calendar-cell-bg: var(--alpha-white-72);
+    --calendar-cell-border: var(--alpha-gray-200-95);
+    --calendar-cell-text: var(--gray-600);
+    --calendar-cell-shadow: var(--alpha-slate-900-6);
+    --calendar-cell-inset: var(--alpha-white-72);
+
+    --calendar-cell-hover-bg: var(--alpha-crimson-8);
+    --calendar-cell-hover-border: var(--alpha-crimson-25);
+    --calendar-cell-hover-text: var(--crimson);
+
+    --calendar-selected-text: var(--text-on-brand);
+    --calendar-selected-shadow: var(--alpha-crimson-28);
+
+    --calendar-month-text: var(--crimson-deep);
+    --calendar-day-text: var(--text-3);
+    --calendar-weekend-text: var(--alpha-crimson-70);
+
+    --calendar-divider: var(--gray-200);
+
+    --calendar-nav-bg-hover: var(--crimson-mid);
+    --calendar-nav-border: var(--neutral-warm-200);
+    --calendar-nav-text: var(--crimson);
+
+    --calendar-panel-bg-start: var(--card);
+    --calendar-panel-bg-end: var(--crimson-light);
+    --calendar-panel-border: var(--gray-200);
+
+    --calendar-muted-text: var(--gray-400);
+    --calendar-body-text: var(--gray-600);
+    --calendar-heading-text: var(--page-text);
+
+    --calendar-slot-bg: var(--surface);
+    --calendar-slot-border: var(--gray-200);
+    --calendar-slot-text: var(--text-1);
+    --calendar-slot-disabled-text: var(--neutral-warm-500);
+
+    --calendar-focus-ring: var(--alpha-crimson-20);
+
+    --calendar-past-bg: var(--neutral-warm-50);
+    --calendar-past-text: var(--neutral-warm-500);
+    --calendar-past-border: var(--neutral-warm-200);
+
+    --calendar-closed-stripe-a: var(--neutral-warm-50);
+    --calendar-closed-stripe-b: var(--neutral-warm-200);
+    --calendar-closed-text: var(--neutral-warm-500);
+    --calendar-closed-border: var(--gray-300);
 }
 
 [data-theme="dark"],
@@ -515,7 +763,6 @@
     --sidebar-flyout-text: #d1d5db;
     --sidebar-flyout-muted: #c4c2c2;
 
-    /* Mobile drawer */
     --drawer-section-text: #fdc8c8;
     --drawer-link-text: #d1d5db;
 
@@ -528,7 +775,6 @@
     --drawer-hover-icon-border: rgba(252, 165, 165, .32);
     --drawer-hover-icon-color: #ffffff;
 
-    /* Logout */
     --sidebar-logout-bg-start: rgba(127, 29, 29, .22);
     --sidebar-logout-bg-end: rgba(69, 10, 10, .20);
     --sidebar-logout-border: rgba(248, 113, 113, .22);
@@ -547,6 +793,58 @@
     --danger-soft-bg: rgba(139, 0, 0, .18);
     --danger-soft-border: rgba(248, 113, 113, .25);
     --danger-soft-hover: rgba(139, 0, 0, .32);
+    --status-pending-hover-bg: rgba(217, 119, 6, 0.34);
+    --status-pending-hover-border: rgba(252, 211, 77, 0.48);
+
+    --calendar-shell-bg: var(--card);
+    --calendar-shell-border: var(--border);
+    --calendar-shell-shadow: var(--alpha-black-34);
+
+    --calendar-cell-bg: var(--alpha-white-5_5);
+    --calendar-cell-border: var(--alpha-white-9);
+    --calendar-cell-text: var(--gray-300);
+    --calendar-cell-shadow: var(--alpha-black-18);
+    --calendar-cell-inset: var(--alpha-white-5_5);
+
+    --calendar-cell-hover-bg: var(--alpha-crimson-16);
+    --calendar-cell-hover-border: var(--alpha-red-300-28);
+    --calendar-cell-hover-text: var(--red-200);
+
+    --calendar-selected-text: var(--red-200);
+    --calendar-selected-shadow: var(--alpha-crimson-16);
+
+    --calendar-month-text: var(--text-1);
+    --calendar-day-text: var(--gray-400);
+    --calendar-weekend-text: var(--red-300);
+
+    --calendar-divider: var(--alpha-white-9);
+
+    --calendar-nav-bg-hover: var(--alpha-crimson-18);
+    --calendar-nav-border: var(--alpha-white-10);
+    --calendar-nav-text: var(--red-300);
+
+    --calendar-panel-bg-start: var(--alpha-white-5_5);
+    --calendar-panel-bg-end: var(--alpha-white-5);
+    --calendar-panel-border: var(--alpha-white-10);
+
+    --calendar-muted-text: var(--gray-300);
+    --calendar-body-text: var(--gray-300);
+    --calendar-heading-text: var(--text-1);
+
+    --calendar-slot-bg: var(--alpha-white-5);
+    --calendar-slot-border: var(--alpha-white-10);
+    --calendar-slot-text: var(--gray-300);
+
+    --calendar-focus-ring: var(--alpha-crimson-20);
+
+    --calendar-past-bg: var(--surface);
+    --calendar-past-text: var(--text-3);
+    --calendar-past-border: var(--border);
+
+    --calendar-closed-stripe-a: var(--surface);
+    --calendar-closed-stripe-b: var(--card);
+    --calendar-closed-text: var(--text-3);
+    --calendar-closed-border: var(--border);
 }
 
 @media (max-width: 1199px) {
