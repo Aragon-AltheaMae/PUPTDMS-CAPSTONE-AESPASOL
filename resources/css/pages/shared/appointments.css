@@ -2343,7 +2343,8 @@
 }
 
 #mainContent.shared-appointments-page .appt-month-group[open]:not(.is-closing) .appt-month-body {
-    animation: appointmentAccordionExpand .28s cubic-bezier(.22, 1, .36, 1) both;
+    animation: appointmentAccordionExpand .28s cubic-bezier(.22, 1, .36, 1);
+    max-height: none !important;
 }
 
 #mainContent.shared-appointments-page .appt-month-group.is-closing .appt-month-body {
