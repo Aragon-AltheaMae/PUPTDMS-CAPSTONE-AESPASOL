@@ -46,6 +46,16 @@
                 </div>
             </div>
 
+            @php
+                $screenTreatmentsRecorded =
+                    data_get($aiReport, 'print_metrics.treatments_recorded') ??
+                    data_get($aiReport, 'metrics.treatments_recorded') ??
+                    data_get($aiReport, 'treatments.total_treatments', '—');
+                $screenTreatmentBreakdown = collect(
+                    data_get($aiReport, 'print_metrics.treatment_breakdown', data_get($aiReport, 'treatments.breakdown', [])),
+                );
+            @endphp
+
             <section id="aiReportScreenArea" class="air-screen">
 
                 <div class="air-status-strip">
@@ -142,6 +152,31 @@
                             </div>
                         </div>
                         <div class="card-body">
+                            <table class="air-report-metrics-table">
+                                <thead>
+                                    <tr>
+                                        <th>Treatment metric</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Treatments recorded</td>
+                                        <td>{{ $screenTreatmentsRecorded }}</td>
+                                    </tr>
+                                    @foreach ($screenTreatmentBreakdown as $case)
+                                        <tr>
+                                            <td>{{ data_get($case, 'name', 'Other') }}</td>
+                                            <td>{{ data_get($case, 'count', 0) }} /
+                                                {{ rtrim(rtrim(number_format((float) data_get($case, 'pct', 0), 1), '0'), '.') }}%</td>
+                                        </tr>
+                                    @endforeach
+                                    <tr>
+                                        <td>Period covered</td>
+                                        <td>{{ $aiReport['period'] }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                             <div class="air-findings-list">
                                 @foreach ($aiReport['treatment_analysis'] as $item)
                                     <div class="air-finding-item">
@@ -343,10 +378,9 @@
                         ? '0'
                         : '—',
                 ));
-        $dominantTreatment =
-            data_get($aiReport, 'print_metrics.dominant_treatment') ??
-            (data_get($aiReport, 'metrics.dominant_treatment') ??
-                (data_get($aiReport, 'top_treatment') ?? 'None identified'));
+        $treatmentBreakdown = collect(
+            data_get($aiReport, 'print_metrics.treatment_breakdown', data_get($aiReport, 'treatments.breakdown', [])),
+        );
         $lowStockCount =
             data_get($aiReport, 'print_metrics.low_stock_count') ??
             (data_get($aiReport, 'metrics.low_stock_count') ??
@@ -502,10 +536,13 @@
                             <td>Treatments recorded</td>
                             <td>{{ $treatmentsRecorded }}</td>
                         </tr>
-                        <tr>
-                            <td>Dominant treatment category</td>
-                            <td>{{ $dominantTreatment }}</td>
-                        </tr>
+                        @foreach ($treatmentBreakdown as $case)
+                            <tr>
+                                <td>{{ data_get($case, 'name', 'Other') }}</td>
+                                <td>{{ data_get($case, 'count', 0) }} /
+                                    {{ rtrim(rtrim(number_format((float) data_get($case, 'pct', 0), 1), '0'), '.') }}%</td>
+                            </tr>
+                        @endforeach
                         <tr>
                             <td>Period covered</td>
                             <td>{{ $aiReport['period'] }}</td>
@@ -827,10 +864,13 @@
                                                 <td>Treatments recorded</td>
                                                 <td>{{ $treatmentsRecorded }}</td>
                                             </tr>
-                                            <tr>
-                                                <td>Dominant treatment category</td>
-                                                <td>{{ $dominantTreatment }}</td>
-                                            </tr>
+                                            @foreach ($treatmentBreakdown as $case)
+                                                <tr>
+                                                    <td>{{ data_get($case, 'name', 'Other') }}</td>
+                                                    <td>{{ data_get($case, 'count', 0) }} /
+                                                        {{ rtrim(rtrim(number_format((float) data_get($case, 'pct', 0), 1), '0'), '.') }}%</td>
+                                                </tr>
+                                            @endforeach
                                             <tr>
                                                 <td>Period covered</td>
                                                 <td>{{ $aiReport['period'] }}</td>

@@ -954,21 +954,21 @@
 }
 
 .signature-success-icon {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 1rem;
+    height: 1rem;
 
     display: inline-flex;
     align-items: center;
     justify-content: center;
 
-    flex: 0 0 1.25rem;
+    flex: 0 0 1rem;
 
     border-radius: 50%;
 
     background: #15803d;
     color: #ffffff;
 
-    font-size: 0.7rem;
+    font-size: 0.55rem;
     line-height: 1;
 }
 
@@ -1018,6 +1018,7 @@
     flex: 0 0 auto;
     color: currentColor;
 }
+
 
 .signature-result-message.is-success {
     --status-bg:

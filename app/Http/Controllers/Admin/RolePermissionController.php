@@ -10,6 +10,58 @@ use App\Helpers\AuditLogger;
 
 class RolePermissionController extends Controller
 {
+    private const DEFAULT_ROLE_PERMISSIONS = [
+        'admin' => [
+            'access_super_admin_dashboard',
+            'receive_notifications',
+            'manage_system_settings',
+            'manage_audit_trail',
+            'manage_user_accounts',
+            'manage_user_roles',
+            'manage_dentist_accounts',
+            'manage_super_admin_accounts',
+            'view_dentist_transitions',
+            'create_dentist_transitions',
+            'update_dentist_transitions',
+            'assign_dentist_successors',
+            'finalize_dentist_transitions',
+            'cancel_dentist_transitions',
+            'extend_dentist_access',
+            'view_dentist_transition_audit_logs',
+            'manage_document_templates',
+            'manage_reports',
+            'manage_inventory',
+            'manage_patient_profiles',
+            'manage_dental_records',
+            'manage_appointments',
+            'manage_document_requests',
+            'set_academic_year',
+            'set_archive_records',
+            'set_report_periods',
+            'set_required_fields',
+            'set_appointment_limit',
+            'set_notification_rules',
+            'set_export_file_type',
+        ],
+        'dentist' => [
+            'access_dentist_dashboard',
+            'manage_patient_profiles',
+            'manage_appointments',
+            'manage_document_requests',
+            'manage_inventory',
+            'manage_reports',
+        ],
+        'patient' => [
+            'access_patient_dashboard',
+            'receive_notifications',
+            'book_appointments',
+            'view_own_appointments',
+            'view_own_profile',
+            'view_own_records',
+            'request_documents',
+        ],
+    ];
+
     public function index(Request $request)
     {
         $this->seedDefaultsIfEmpty();
@@ -46,54 +98,9 @@ class RolePermissionController extends Controller
 
     private function applyDefaults(Role $role, string $slug): void
     {
-        $map = [
-            'admin' => [
-                'access_super_admin_dashboard',
-                'access_patient_dashboard',
-                'receive_notifications',
-                'manage_user_accounts',
-                'manage_user_roles',
-                'manage_dentist_accounts',
-                'manage_super_admin_accounts',
-                'manage_system_settings',
-                'manage_audit_trail',
-                'manage_document_templates',
-                'manage_reports',
-                'manage_patient_profiles',
-                'manage_appointments',
-                'manage_dental_records',
-                'set_academic_year',
-                'set_archive_records',
-                'set_report_periods',
-                'set_required_fields',
-                'set_appointment_limit',
-                'set_notification_rules',
-                'set_export_file_type',
-            ],
-            'dentist' => [
-                'access_dentist_dashboard',
-                'receive_notifications',
-                'manage_dental_records',
-                'manage_appointments',
-                'manage_patient_profiles',
-                'manage_inventory',
-                'manage_reports',
-                'manage_document_requests',
-            ],
-            'patient' => [
-                'access_patient_dashboard',
-                'receive_notifications',
-                'book_appointments',
-                'view_own_appointments',
-                'view_own_profile',
-                'view_own_records',
-                'request_documents',
-            ],
-        ];
+        if (!isset(self::DEFAULT_ROLE_PERMISSIONS[$slug])) return;
 
-        if (!isset($map[$slug])) return;
-
-        $ids = Permission::whereIn('slug', $map[$slug])->pluck('id');
+        $ids = Permission::whereIn('slug', self::DEFAULT_ROLE_PERMISSIONS[$slug])->pluck('id');
         $role->permissions()->sync($ids);
     }
 
@@ -158,59 +165,12 @@ class RolePermissionController extends Controller
 
     public function reset()
     {
-        $admin = Role::where('slug', 'admin')->firstOrFail();
-        $dentist    = Role::where('slug', 'dentist')->firstOrFail();
-        $patient    = Role::where('slug', 'patient')->firstOrFail();
+        foreach (self::DEFAULT_ROLE_PERMISSIONS as $slug => $permissionSlugs) {
+            $role = Role::where('slug', $slug)->firstOrFail();
+            $permissionIds = Permission::whereIn('slug', $permissionSlugs)->pluck('id');
 
-        $superAdminPermissions = Permission::whereIn('slug', [
-            'access_super_admin_dashboard',
-            'access_dentist_dashboard',
-            'access_patient_dashboard',
-            'receive_notifications',
-            'manage_system_settings',
-            'manage_audit_trail',
-            'manage_user_accounts',
-            'manage_user_roles',
-            'manage_dentist_accounts',
-            'manage_super_admin_accounts',
-            'manage_document_templates',
-            'manage_reports',
-            'manage_patient_profiles',
-            'manage_appointments',
-            'manage_inventory',
-            'set_academic_year',
-            'set_archive_records',
-            'set_report_periods',
-            'set_required_fields',
-            'set_appointment_limit',
-            'set_notification_rules',
-            'set_export_file_type',
-        ])->pluck('id');
-
-        $dentistPermissions = Permission::whereIn('slug', [
-            'access_dentist_dashboard',
-            'receive_notifications',
-            'manage_dental_records',
-            'manage_appointments',
-            'manage_patient_profiles',
-            'manage_inventory',
-            'manage_reports',
-            'manage_document_requests',
-        ])->pluck('id');
-
-        $patientPermissions = Permission::whereIn('slug', [
-            'access_patient_dashboard',
-            'receive_notifications',
-            'book_appointments',
-            'view_own_appointments',
-            'view_own_profile',
-            'view_own_records',
-            'request_documents',
-        ])->pluck('id');
-
-        $admin->permissions()->sync($superAdminPermissions);
-        $dentist->permissions()->sync($dentistPermissions);
-        $patient->permissions()->sync($patientPermissions);
+            $role->permissions()->sync($permissionIds);
+        }
 
         AuditLogger::log
             ('update', 

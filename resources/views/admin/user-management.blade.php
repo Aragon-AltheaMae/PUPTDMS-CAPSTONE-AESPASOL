@@ -2029,6 +2029,11 @@ $inactiveCount = $inactiveCount ?? 0;
             ''
         ).trim().toLowerCase();
 
+        const derivedSlug = rawName
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+
         const invalidValues = [
             '',
             '-',
@@ -2045,7 +2050,7 @@ $inactiveCount = $inactiveCount ?? 0;
 
         return {
             label: hasNoRole ? 'Patient' : rawName,
-            slug: hasNoRole ? 'none' : rawSlug || 'none'
+            slug: hasNoRole ? 'none' : rawSlug || derivedSlug || 'none'
         };
     }
 
