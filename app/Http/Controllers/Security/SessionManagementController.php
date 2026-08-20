@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Security;
 
+use App\Helpers\AuditLogger;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\ConcurrentSessionService;
@@ -72,7 +73,8 @@ class SessionManagementController extends Controller
         $this->logoutCurrentSession(
             $request,
             $request->user(),
-            false
+            false,
+            'idle'
         );
 
         return response()->json([
@@ -122,7 +124,7 @@ class SessionManagementController extends Controller
 
     public function destroyCurrent(Request $request): RedirectResponse
     {
-        $this->logoutCurrentSession($request, $request->user(), false);
+        $this->logoutCurrentSession($request, $request->user(), false, 'manual');
 
         return redirect()->route('login', [
             'logged_out' => 1,
@@ -137,7 +139,7 @@ class SessionManagementController extends Controller
         abort_unless($user, 401);
 
         $this->concurrentSessionService->revokeAllSessions($user, null, 'user_requested_global_logout');
-        $this->logoutCurrentSession($request, $user, true);
+        $this->logoutCurrentSession($request, $user, true, 'manual');
 
         return redirect()->route('login', [
             'logged_out' => 1,
@@ -150,13 +152,28 @@ class SessionManagementController extends Controller
         return $role === 'super_admin' ? 'admin' : ($role !== '' ? $role : 'patient');
     }
 
-    private function logoutCurrentSession(Request $request, ?User $user, bool $alreadyRevokedAll): void
+    private function logoutCurrentSession(
+        Request $request,
+        ?User $user,
+        bool $alreadyRevokedAll,
+        string $reason
+    ): void
     {
         if ($user && !$alreadyRevokedAll) {
             $this->concurrentSessionService->revokeAllSessions(
                 $user,
                 $request->session()->getId(),
                 'user_requested_current_session_logout'
+            );
+        }
+
+        if ($user) {
+            AuditLogger::log(
+                'logout',
+                'authentication',
+                $reason === 'idle'
+                    ? 'User was signed out due to inactivity.'
+                    : 'User signed out from session management.'
             );
         }
 
