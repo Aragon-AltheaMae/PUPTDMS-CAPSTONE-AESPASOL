@@ -33,6 +33,7 @@ use App\Notifications\SignatureReuploadRequiredNotification;
 use App\Services\SignatureAiVerifier;
 use App\Helpers\BookingQuestions;
 use App\Models\AppointmentDraft;
+use App\Models\PatientOdontogram;
 
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
@@ -57,13 +58,23 @@ class AppointmentController extends Controller
         $today = $now->toDateString();
         $nowTime = $now->format('H:i:s');
 
-        $appointments = Appointment::with(['dentist.role'])
+        $appointments = Appointment::with([
+            'dentist.role',
+            'originalDentist.role',
+            'procedure',
+            'followUpAppointments',
+        ])
             ->where('patient_id', $patientId)
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        $futureVisits = Appointment::with(['dentist.role'])
+        $futureVisits = Appointment::with([
+            'dentist.role',
+            'originalDentist.role',
+            'procedure',
+            'followUpAppointments',
+        ])
             ->where('patient_id', $patientId)
             ->whereIn('status', ['upcoming', 'rescheduled'])
             ->where(function ($q) use ($today, $nowTime) {
@@ -77,7 +88,12 @@ class AppointmentController extends Controller
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        $pastVisits = Appointment::with(['dentist.role'])
+        $pastVisits = Appointment::with([
+            'dentist.role',
+            'originalDentist.role',
+            'procedure',
+            'followUpAppointments',
+        ])
             ->where('patient_id', $patientId)
             ->where(function ($q) use ($today, $nowTime) {
                 $q->whereIn('status', ['completed', 'cancelled'])
@@ -111,33 +127,13 @@ class AppointmentController extends Controller
 
         $philippineHolidays = PhilippineHolidays::range(1, 3);
 
-        $odontogramTeeth = \App\Models\Tooth::with('surfaces.legends')
-            ->where('patient_id', $patient->id)
-            ->get()
-            ->map(function ($tooth) {
-                $legends = $tooth->surfaces
-                    ->flatMap(fn($surface) => $surface->legends)
-                    ->unique('id')
-                    ->values();
-
-                return [
-                    'tooth' => $tooth->tooth_number,
-                    'legends' => $legends->map(fn($legend) => [
-                        'code' => $legend->code,
-                        'description' => $legend->description,
-                        'category' => $legend->category,
-                    ])->values(),
-                    'surfaces' => $tooth->surfaces->map(fn($surface) => [
-                        'surface_number' => $surface->surface_number,
-                        'legends' => $surface->legends->map(fn($legend) => [
-                            'code' => $legend->code,
-                            'description' => $legend->description,
-                            'category' => $legend->category,
-                        ])->values(),
-                    ])->values(),
-                ];
-            })
-            ->values();
+        $odontogramTeeth =
+            PatientOdontogram::where(
+                'patient_id',
+                $patient->id
+            )
+            ->value('odontogram_data')
+            ?? [];
 
         $notifications = [];
 
@@ -301,12 +297,10 @@ class AppointmentController extends Controller
             : [];
 
         $hasExistingDentalHistory =
-            $patient->dentalHistory !== null &&
-            $patient->dentalHistoryAnswers->isNotEmpty();
+            $this->hasExistingDentalHistoryRecord($patient);
 
         $hasExistingMedicalHistory =
-            $patient->medicalHistory !== null &&
-            $patient->medicalHistory->answers->isNotEmpty();
+            $this->hasExistingMedicalHistoryRecord($patient);
 
         $hasExistingBookingInformation =
             $hasExistingDentalHistory &&
@@ -425,6 +419,51 @@ class AppointmentController extends Controller
             'hasExistingBookingInformation',
             'hasReusableSignature'
         ));
+    }
+
+    private function hasExistingDentalHistoryRecord(Patient $patient): bool
+    {
+        if ($patient->dentalHistoryAnswers->isNotEmpty()) {
+            return true;
+        }
+
+        if (filled($patient->dentalHistoryConcerns?->additional_concerns)) {
+            return true;
+        }
+
+        if (
+            filled($patient->dentalHistory?->last_dental_visit) ||
+            filled($patient->dentalHistory?->previous_dentist) ||
+            filled($patient->dentalHistoryDates?->extraction_date) ||
+            filled($patient->dentalHistoryDates?->dentures_date) ||
+            filled($patient->dentalHistoryDates?->ortho_date)
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function hasExistingMedicalHistoryRecord(Patient $patient): bool
+    {
+        if ($patient->medicalHistory?->answers->isNotEmpty()) {
+            return true;
+        }
+
+        if ($patient->medicalHistory?->diseaseAnswers->isNotEmpty()) {
+            return true;
+        }
+
+        if (
+            filled($patient->medicalHistory?->emergency_person) ||
+            filled($patient->medicalHistory?->emergency_number) ||
+            filled($patient->medicalHistory?->emergency_relation) ||
+            filled($patient->medicalHistory?->patient_signature)
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     public function getDraft()
@@ -610,9 +649,9 @@ class AppointmentController extends Controller
                 $hasReusableSignature ? 'nullable' : 'required',
                 'file',
                 'mimes:jpg,jpeg,png',
-                'max:25600', // 25 MB
+                'max:25600',
             ],
-            'signature_source' => 'nullable|in:drawn',
+            'signature_source' => 'nullable|in:drawn,upload',
 
             'diseases'   => 'array',
             'diseases.*' => 'string|exists:diseases,code',
@@ -780,7 +819,6 @@ class AppointmentController extends Controller
                 );
 
                 if (!($aiResult['accepted'] ?? false)) {
-
                     $reason =
                         $aiResult['reason']
                         ?? 'The uploaded image did not pass signature validation.';
@@ -789,10 +827,6 @@ class AppointmentController extends Controller
                         $aiResult['detected_type']
                         ?? 'unknown';
 
-                    $confidence =
-                        $aiResult['confidence']
-                        ?? 0;
-
                     return redirect()
                         ->back()
                         ->withInput()
@@ -800,8 +834,7 @@ class AppointmentController extends Controller
                             'patient_signature' =>
                             'Signature could not be processed. Please try again. ' .
                                 'Reason: ' . $reason .
-                                ' Detected: ' . $detectedType .
-                                ' Confidence: ' . $confidence,
+                                ' Detected: ' . $detectedType,
                         ]);
                 }
             } else {

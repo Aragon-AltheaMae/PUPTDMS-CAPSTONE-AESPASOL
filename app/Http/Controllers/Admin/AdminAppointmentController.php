@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
@@ -12,7 +13,11 @@ class AdminAppointmentController extends Controller
     {
         $today = Carbon::today()->toDateString();
 
-        $appointments = Appointment::with(['patient'])
+        $appointments = Appointment::with([
+            'patient',
+            'procedure',
+            'followUpAppointments',
+        ])
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
             ->get();

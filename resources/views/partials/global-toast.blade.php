@@ -2,7 +2,7 @@
 
 @php
     $flashToasts = [];
-    $idleTimeoutSeconds = max(60, (int) env('SESSION_IDLE_TIMEOUT_SECONDS', 600));
+    $idleTimeoutSeconds = max(60, (int) config('session.idle_timeout_seconds', 600));
 
     $idleTimeoutMinutes = max(1, (int) ceil($idleTimeoutSeconds / 60));
 
@@ -53,6 +53,7 @@
         data-session-timeout-seconds="{{ $idleTimeoutSeconds }}"
         data-session-activity-url="{{ route('session.activity') }}"
         data-session-expire-url="{{ route('session.expire') }}" data-session-redirect-url="{{ url('/') }}"
+        data-session-activity-key="session:last-activity:{{ auth()->id() }}"
         aria-hidden="true">
         <div class="ui-modal-card session-timeout-card" role="alertdialog" aria-modal="true"
             aria-labelledby="sessionTimeoutTitle" aria-describedby="sessionTimeoutDescription">

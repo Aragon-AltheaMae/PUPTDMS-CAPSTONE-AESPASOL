@@ -14,11 +14,54 @@ $homeRecords = ($records ?? collect())
 return in_array(strtolower($r->status ?? ''), ['completed', 'cancelled']);
 })
 ->map(function ($r) {
+$followUp =
+$r->followUpAppointments
+?->sortBy(function ($followUpAppt) {
+return sprintf(
+'%s %s',
+$followUpAppt->appointment_date ?? '',
+$followUpAppt->appointment_time ?? ''
+);
+})
+?->first();
 return [
+'id' => $r->id,
 'service' => $r->service_type,
 'date' => $r->appointment_date ? \Carbon\Carbon::parse($r->appointment_date)->format('F d, Y') : '',
 'time' => $r->appointment_time ?? '',
 'status' => strtolower($r->status ?? ''),
+'dentist_name' =>
+$r->dentist_name
+?? optional($r->dentist)->name
+?? optional($r->originalDentist)->name
+?? 'Not assigned',
+'follow_up' => $followUp
+? [
+'date' => $followUp->appointment_date
+? \Carbon\Carbon::parse(
+$followUp->appointment_date
+)->format('F d, Y')
+: null,
+
+'time' => $followUp->appointment_time
+? \Carbon\Carbon::parse(
+$followUp->appointment_time
+)->format('g:i A')
+: null,
+
+'service' =>
+$followUp->service_type
+?? 'Follow-up',
+
+'status' =>
+$followUp->status
+?? 'upcoming',
+
+'reason' =>
+$followUp->follow_up_reason
+?? null,
+]
+: null,
 'duration' => $r->procedure?->procedure_duration_seconds
 ? \Carbon\CarbonInterval::seconds((int) $r->procedure->procedure_duration_seconds)
 ->cascade()
@@ -30,6 +73,7 @@ return [
 'oral' => $r->procedure?->oral_examination ?? '',
 'diagnosis' => $r->procedure?->diagnosis ?? '',
 'prescription' => $r->procedure?->prescriptions ?? '',
+'odontogram' => $r->procedure?->odontogram_data ?? [],
 ];
 })
 ->values();
@@ -263,8 +307,8 @@ $birthdateDisplay = 'N/A';
             </div>
         </div>
 
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start dashboard-grid-tight">
-            <div class="xl:col-span-4 self-start">
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-stretch dashboard-grid-tight patient-calendar-row">
+            <div class="xl:col-span-4">
                 <div id="profileSkeletonContainer"
                     class="dashboard-glass rounded-[1rem] overflow-hidden skeleton-section skeleton-shell skeleton-fade-swap mt-3">
                     <div>
@@ -312,9 +356,10 @@ $birthdateDisplay = 'N/A';
             </div>
         </div>
 
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start dashboard-grid-tight mt-5">
-            <div class="xl:col-span-5">
-                <div id="requestDocsContainer">
+        <div
+            class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-stretch dashboard-grid-tight dashboard-services-row mt-6">
+            <div class="xl:col-span-5 flex">
+                <div id="requestDocsContainer" class="w-full h-full">
                     <div
                         class="dashboard-glass rounded-[1rem] overflow-hidden h-full skeleton-shell skeleton-fade-swap">
                         <div class="p-4 sm:p-5">
@@ -337,8 +382,8 @@ $birthdateDisplay = 'N/A';
                 </div>
             </div>
 
-            <div class="xl:col-span-7">
-                <div id="dentalOverviewContainer" class="h-full skeleton-fade-swap">
+            <div class="xl:col-span-7 flex">
+                <div id="dentalOverviewContainer" class="w-full h-full skeleton-fade-swap">
                     <div class="dashboard-glass skeleton-shell rounded-[1rem] overflow-hidden h-full">
                         <div class="px-5 sm:px-6 py-4 border-b border-gray-100 dark:border-white/10">
                             <div class="flex items-start justify-between gap-4">
@@ -397,6 +442,34 @@ $birthdateDisplay = 'N/A';
         </div>
 </main>
 
+<template id="dashboardRecordCardsTemplate">
+    <div class="space-y-3">
+
+        @foreach (
+        collect($homeRecords ?? [])
+        ->take(3)
+        as $index => $record
+        )
+
+        <x-appointment-record-card :appointment="$record" variant="past" :show-details="true" :show-countdown="false"
+            :show-time-range="false" :compact="true" :animation-delay="$index * 0.08" />
+
+        @endforeach
+
+        <div class="pt-2">
+            <a href="{{ route('patient.record') }}" class="ui-btn ui-btn-primary w-full">
+                <i class="fa-solid fa-folder-open"></i>
+
+                <span>
+                    View All Records
+                </span>
+
+                <i class="fa-solid fa-arrow-right text-[11px]"></i>
+            </a>
+        </div>
+
+    </div>
+</template>
 @if (session('appointment_confirmation'))
 @php
 $appointmentConfirmation = session('appointment_confirmation');
@@ -686,6 +759,11 @@ $appointmentConfirmation = session('appointment_confirmation');
 
     var UPCOMING_DATA = @json($upcomingJs);
     var PATIENT_NAME = "{{ urlencode($patient->name ?? 'Guest') }}";
+
+    var PROFILE_COMPLETION = {{ $profileCompletionPercent }};
+    var TOTAL_VISITS = {{ $recordCount }};
+    var LAST_VISIT = @json($latestRecordDate ?? 'No record yet');
+    var NEXT_VISIT = @json($nextVisitText);
 
     var PROFILE_DATA = {
         name: "{{ ucwords(strtolower($patient->name ?? 'Guest')) }}",
@@ -1010,9 +1088,9 @@ $appointmentConfirmation = session('appointment_confirmation');
 
         if (d.exists) {
             const statusClass =
-                d.isRescheduled
-                    ? 'status-rescheduled'
-                    : 'status-upcoming';
+                d.isRescheduled ?
+                    'status-rescheduled' :
+                    'status-upcoming';
 
             window.swapSkeletonContent(
                 'upcomingAppointmentWrapper',
@@ -1139,9 +1217,9 @@ $appointmentConfirmation = session('appointment_confirmation');
         window.swapSkeletonContent(
             'upcomingAppointmentWrapper',
 
-            '<section class="card">' +
+            '<section class="card dashboard-upcoming-empty">' +
 
-            '<div class="card-header">' +
+            '<div class="card-header dashboard-upcoming-empty-header">' +
 
             '<div class="card-header-left">' +
 
@@ -1163,13 +1241,9 @@ $appointmentConfirmation = session('appointment_confirmation');
 
             '</div>' +
 
-            '</div>' +
-
-            '<div class="card-body">' +
-
             '<button type="button" ' +
             'onclick="scrollToCalendar(event)" ' +
-            'class="ui-btn ui-btn-primary ui-btn-block">' +
+            'class="ui-btn ui-btn-primary dashboard-availability-btn">' +
 
             '<i class="fa-solid fa-calendar-days"></i>' +
             '<span>Check Available Dates</span>' +
@@ -1293,11 +1367,25 @@ $appointmentConfirmation = session('appointment_confirmation');
         window.swapSkeletonContent(
             'profileSkeletonContainer',
 
-            '<div class="dashboard-card-polished dashboard-glass patient-profile-card">' +
+            '<div class="dashboard-card-polished dashboard-glass patient-profile-card patient-profile-card-compact">' +
 
-            '<div class="patient-profile-cover"></div>' +
+            '<div class="patient-profile-topbar">' +
 
-            '<div class="patient-profile-header">' +
+            '<div class="patient-profile-topbar-copy">' +
+            '<span class="patient-profile-eyebrow">' +
+            '<i class="fa-solid fa-user"></i>' +
+            '<span>Patient Profile</span>' +
+            '</span>' +
+            '<span class="patient-profile-topbar-label">' +
+            'Personal information' +
+            '</span>' +
+            '</div>' +
+
+            globalToggle +
+
+            '</div>' +
+
+            '<div class="patient-profile-identity">' +
 
             '<div class="patient-profile-avatar">' +
             (
@@ -1310,12 +1398,11 @@ $appointmentConfirmation = session('appointment_confirmation');
             ) +
             '</div>' +
 
-            '<div class="patient-profile-name-row">' +
+            '<div class="patient-profile-identity-copy">' +
+
             '<h2 class="patient-profile-name">' +
             window.escapeHtml(pData.name) +
             '</h2>' +
-            globalToggle +
-            '</div>' +
 
             '<div class="patient-profile-badges">' +
             roleBadge +
@@ -1324,6 +1411,9 @@ $appointmentConfirmation = session('appointment_confirmation');
             '<span class="status-dot"></span>' +
             '<span>Profile Active</span>' +
             '</span>' +
+
+            '</div>' +
+
             '</div>' +
 
             '</div>' +
@@ -1332,40 +1422,62 @@ $appointmentConfirmation = session('appointment_confirmation');
 
             '<div class="patient-profile-details">' +
 
-            '<div class="patient-profile-row">' +
-            '<span class="patient-profile-label">' +
+            '<div class="patient-profile-summary-grid">' +
+
+            '<div class="patient-profile-summary-card">' +
+
+            '<span class="patient-profile-summary-icon">' +
             '<i class="fa-solid fa-cake-candles"></i>' +
-            '<span>Age / Date of Birth</span>' +
             '</span>' +
 
-            '<span class="patient-profile-value">' +
+            '<div class="patient-profile-summary-copy">' +
+
+            '<span class="patient-profile-summary-label">' +
+            'Age' +
+            '</span>' +
+
+            '<strong class="patient-profile-summary-value">' +
             window.escapeHtml(
                 pData.age ?
                     pData.age + ' yrs' :
                     'N/A'
             ) +
+            '</strong>' +
 
             '<small>' +
             window.escapeHtml(pData.birthdate) +
             '</small>' +
 
-            '</span>' +
             '</div>' +
 
-            '<div class="patient-profile-row">' +
-            '<span class="patient-profile-label">' +
+            '</div>' +
+
+            '<div class="patient-profile-summary-card">' +
+
+            '<span class="patient-profile-summary-icon">' +
             '<i class="fa-solid fa-venus-mars"></i>' +
-            '<span>Gender</span>' +
             '</span>' +
 
-            '<span class="patient-profile-value">' +
-            window.escapeHtml(pData.gender) +
+            '<div class="patient-profile-summary-copy">' +
+
+            '<span class="patient-profile-summary-label">' +
+            'Gender' +
             '</span>' +
+
+            '<strong class="patient-profile-summary-value">' +
+            window.escapeHtml(pData.gender) +
+            '</strong>' +
+
+            '</div>' +
+
+            '</div>' +
+
             '</div>' +
 
             identityRow +
 
             '<div class="patient-profile-row">' +
+
             '<span class="patient-profile-label">' +
             '<i class="fa-solid fa-phone"></i>' +
             '<span>Contact</span>' +
@@ -1374,9 +1486,11 @@ $appointmentConfirmation = session('appointment_confirmation');
             '<span id="maskedContactValue" data-masked="true" class="patient-profile-value">' +
             window.escapeHtml(maskedContact) +
             '</span>' +
+
             '</div>' +
 
             '<div class="patient-profile-row">' +
+
             '<span class="patient-profile-label">' +
             '<i class="fa-solid fa-envelope"></i>' +
             '<span>Email</span>' +
@@ -1385,6 +1499,77 @@ $appointmentConfirmation = session('appointment_confirmation');
             '<span id="maskedEmailValue" data-masked="true" class="patient-profile-value">' +
             window.escapeHtml(maskedEmail) +
             '</span>' +
+
+            '</div>' +
+
+            '</div>' +
+
+            '<div class="patient-profile-section">' +
+
+            '<div class="patient-profile-section-heading">' +
+
+            '<div class="patient-profile-section-title">' +
+            '<i class="fa-solid fa-user-check"></i>' +
+            '<span>Profile Completion</span>' +
+            '</div>' +
+
+            '<strong class="patient-profile-section-percentage">' +
+            window.escapeHtml(String(PROFILE_COMPLETION)) +
+            '%' +
+            '</strong>' +
+
+            '</div>' +
+
+            '<div class="patient-profile-progress">' +
+            '<span style="width:' +
+            Math.max(0, Math.min(100, Number(PROFILE_COMPLETION) || 0)) +
+            '%"></span>' +
+            '</div>' +
+
+            '<p class="patient-profile-section-note">' +
+            'Keep your information updated for smoother appointments.' +
+            '</p>' +
+
+            '</div>' +
+
+            '<div class="patient-profile-section patient-profile-activity">' +
+
+            '<div class="patient-profile-section-title">' +
+            '<i class="fa-solid fa-tooth"></i>' +
+            '<span>Dental Activity</span>' +
+            '</div>' +
+
+            '<div class="patient-profile-activity-grid">' +
+
+            '<div class="patient-profile-activity-item">' +
+            '<span>Total Visits</span>' +
+            '<strong>' +
+            window.escapeHtml(String(TOTAL_VISITS)) +
+            '</strong>' +
+            '</div>' +
+
+            '<div class="patient-profile-activity-item">' +
+            '<span>Last Visit</span>' +
+            '<strong>' +
+            window.escapeHtml(LAST_VISIT) +
+            '</strong>' +
+            '</div>' +
+
+            '</div>' +
+
+            '<div class="patient-profile-next-visit">' +
+
+            '<div>' +
+            '<span>Next Visit</span>' +
+            '<strong>' +
+            window.escapeHtml(NEXT_VISIT) +
+            '</strong>' +
+            '</div>' +
+
+            '<span class="patient-profile-next-visit-icon">' +
+            '<i class="fa-regular fa-calendar"></i>' +
+            '</span>' +
+
             '</div>' +
 
             '</div>' +
@@ -1416,117 +1601,154 @@ $appointmentConfirmation = session('appointment_confirmation');
 
         window.swapSkeletonContent(
             'requestDocsContainer',
-            '<div class="dashboard-card-polished request-doc-section">' +
 
-            '<div class="request-doc-section-header">' +
-            '<div class="flex items-start justify-between gap-4">' +
+            '<section class="card dashboard-service-card">' +
+
+            '<div class="card-header">' +
+
+            '<div class="card-header-left">' +
+
+            '<span class="card-header-icon">' +
+            '<i class="fa-solid fa-folder-open"></i>' +
+            '</span>' +
 
             '<div class="min-w-0">' +
-            '<div class="request-doc-eyebrow">' +
-            '<i class="fa-solid fa-file-lines"></i>' +
-            '<span>Patient Services</span>' +
-            '</div>' +
 
-            '<h2 class="request-doc-section-title">' +
+            '<h2 class="card-title">' +
             'Request Documents' +
             '</h2>' +
+
+            '<p class="card-subtitle">' +
+            'Choose a clinic document to request.' +
+            '</p>' +
+
             '</div>' +
 
-            '<div class="hidden sm:flex glass-icon-red request-doc-section-icon">' +
-            '<i class="fa-solid fa-folder-open"></i>' +
             '</div>' +
 
-            '</div>' +
+            '<span class="card-header-badge">' +
+            '2 Services' +
+            '</span>' +
+
             '</div>' +
 
-            '<div class="request-doc-section-body">' +
-            '<div class="space-y-3">' +
+            '<div class="card-body dashboard-service-body">' +
+
+            '<div class="quick-actions-list dashboard-document-actions">' +
+
 
             '<button type="button" ' +
             'data-doc-open="dentalHealthRecordModal" ' +
-            'class="request-doc-card request-doc-card-primary">' +
+            'class="quick-action quick-action-card dashboard-document-action">' +
 
-            '<div class="flex items-start gap-3">' +
-
-            '<div class="icon-box request-doc-icon">' +
+            '<span class="quick-action-icon">' +
             '<i class="fa-solid fa-file-medical"></i>' +
-            '</div>' +
-
-            '<div class="min-w-0 flex-1">' +
-
-            '<div class="flex flex-wrap items-center gap-2">' +
-            '<h3 class="request-doc-title">' +
-            'Dental Health Record' +
-            '</h3>' +
-
-            '<span class="request-doc-badge request-doc-badge-primary">' +
-            'Most Requested' +
             '</span>' +
-            '</div>' +
 
-            '<p class="request-doc-description">' +
-            'Request a copy of your dental history, diagnosis notes, treatment details, and related medical information.' +
-            '</p>' +
+            '<span class="quick-action-copy">' +
 
-            '<div class="request-doc-meta">' +
-            '<span class="request-doc-meta-pill">All Records</span>' +
-            '<span class="request-doc-meta-pill">Medical</span>' +
-            '<span class="request-doc-meta-pill">Diagnosis</span>' +
-            '</div>' +
+            '<span class="dashboard-document-title-row">' +
 
-            '</div>' +
+            '<span class="quick-action-title">' +
+            'Dental Health Record' +
+            '</span>' +
 
-            '<div class="request-doc-arrow">' +
-            '<i class="doc-arrow fa-solid fa-arrow-up-right-from-square"></i>' +
-            '</div>' +
+            '<span class="status-pill status-cancelled">' +
+            '<span>Most Requested</span>' +
+            '</span>' +
 
-            '</div>' +
+            '</span>' +
+
+            '<span class="quick-action-sub">' +
+            'Your dental history, diagnoses, treatments, and related medical information.' +
+            '</span>' +
+
+            '<span class="dashboard-document-meta">' +
+
+            '<span class="status-pill status-default">' +
+            '<span class="status-dot"></span>' +
+            '<span>Dental Records</span>' +
+            '</span>' +
+
+            '<span class="status-pill status-default">' +
+            '<span class="status-dot"></span>' +
+            '<span>Medical</span>' +
+            '</span>' +
+
+            '<span class="status-pill status-default">' +
+            '<span class="status-dot"></span>' +
+            '<span>Diagnosis</span>' +
+            '</span>' +
+
+            '</span>' +
+
+            '</span>' +
+
+            '<span class="quick-action-arrow">' +
+            '<i class="fa-solid fa-chevron-right"></i>' +
+            '</span>' +
+
+            '<i class="fa-solid fa-file-medical quick-action-bg-icon"></i>' +
+
             '</button>' +
+
 
             '<button type="button" ' +
             'data-doc-open="dentalClearanceModal" ' +
-            'class="request-doc-card request-doc-card-warning">' +
+            'class="quick-action quick-action-card dashboard-document-action">' +
 
-            '<div class="flex items-start gap-3">' +
-
-            '<div class="icon-box request-doc-icon">' +
+            '<span class="quick-action-icon dashboard-document-icon-warning">' +
             '<i class="fa-solid fa-file-circle-check"></i>' +
-            '</div>' +
-
-            '<div class="min-w-0 flex-1">' +
-
-            '<div class="flex flex-wrap items-center gap-2">' +
-            '<h3 class="request-doc-title">' +
-            'Dental Clearance' +
-            '</h3>' +
-
-            '<span class="request-doc-badge request-doc-badge-warning">' +
-            'School / Requirement' +
             '</span>' +
-            '</div>' +
 
-            '<p class="request-doc-description">' +
-            'Request a dental clearance for school submission, annual compliance, or other official requirements.' +
-            '</p>' +
+            '<span class="quick-action-copy">' +
 
-            '<div class="request-doc-meta">' +
-            '<span class="request-doc-meta-pill">Standard</span>' +
-            '<span class="request-doc-meta-pill">Annual</span>' +
-            '</div>' +
+            '<span class="dashboard-document-title-row">' +
 
-            '</div>' +
+            '<span class="quick-action-title">' +
+            'Dental Clearance' +
+            '</span>' +
 
-            '<div class="request-doc-arrow">' +
-            '<i class="doc-arrow fa-solid fa-arrow-up-right-from-square"></i>' +
-            '</div>' +
+            '<span class="status-pill status-upcoming">' +
+            '<span>School Requirement</span>' +
+            '</span>' +
 
-            '</div>' +
+            '</span>' +
+
+            '<span class="quick-action-sub">' +
+            'For school submission, annual compliance, and other official requirements.' +
+            '</span>' +
+
+            '<span class="dashboard-document-meta">' +
+
+            '<span class="status-pill status-default">' +
+            '<span class="status-dot"></span>' +
+            '<span>Clearance</span>' +
+            '</span>' +
+
+            '<span class="status-pill status-default">' +
+            '<span class="status-dot"></span>' +
+            '<span>Official Copy</span>' +
+            '</span>' +
+
+            '</span>' +
+
+            '</span>' +
+
+            '<span class="quick-action-arrow">' +
+            '<i class="fa-solid fa-chevron-right"></i>' +
+            '</span>' +
+
+            '<i class="fa-solid fa-file-circle-check quick-action-bg-icon"></i>' +
+
             '</button>' +
 
-            '</div>' +
+
             '</div>' +
 
-            '</div>'
+            '</div>' +
+
+            '</section>'
         );
     }
 
@@ -1570,32 +1792,37 @@ $appointmentConfirmation = session('appointment_confirmation');
             window.swapSkeletonContent(
                 'dentalOverviewContainer',
 
-                '<div class="dashboard-card-polished dental-summary-section">' +
+                '<section class="card dashboard-service-card dental-summary-section">' +
 
-                '<div class="dental-summary-header">' +
+                '<div class="card-header">' +
 
-                '<div class="flex items-start justify-between gap-4">' +
+                '<div class="card-header-left">' +
+
+                '<span class="card-header-icon">' +
+                '<i class="fa-solid fa-chart-line"></i>' +
+                '</span>' +
 
                 '<div class="min-w-0">' +
-                '<div class="dental-summary-eyebrow">' +
-                '<i class="fa-solid fa-tooth"></i>' +
-                '<span>Patient Dental Summary</span>' +
-                '</div>' +
 
-                '<h2 class="dental-summary-title">' +
+                '<h2 class="card-title">' +
                 'Dental Overview' +
                 '</h2>' +
 
-                '<p class="dental-summary-subtitle">' +
-                'Quick summary of your visits, treatments, and latest dental activity.' +
+                '<p class="card-subtitle">' +
+                'Quick summary of your visits and dental activity.' +
                 '</p>' +
-                '</div>' +
 
-                '<div class="hidden sm:flex glass-icon-red dental-summary-header-icon">' +
-                '<i class="fa-solid fa-chart-line"></i>' +
                 '</div>' +
 
                 '</div>' +
+
+                '<span class="card-header-badge">' +
+                'Patient Summary' +
+                '</span>' +
+
+                '</div>' +
+
+                '<div class="dental-summary-overview">' +
 
                 '<div class="dental-summary-stats">' +
 
@@ -1622,25 +1849,21 @@ $appointmentConfirmation = session('appointment_confirmation');
 
                 '</div>' +
 
-                '<div class="dental-summary-body dental-summary-empty-body">' +
+                '<div class="dental-summary-body">' +
 
-                '<div class="dental-summary-empty">' +
+                '<div class="empty-state empty-state-compact">' +
 
-                '<div class="dental-summary-empty-icon">' +
+                '<div class="empty-state-icon">' +
                 '<i class="fa-solid fa-tooth"></i>' +
                 '</div>' +
 
-                '<h3>No dental activity yet</h3>' +
+                '<h3 class="empty-state-title">' +
+                'No dental activity yet' +
+                '</h3>' +
 
-                '<p>' +
-                'Your latest treatment summary, completed visits, and diagnosis highlights will appear here after your first finished appointment.' +
+                '<p class="empty-state-sub">' +
+                'Your completed visits and latest dental treatment activity will appear here after your first finished appointment.' +
                 '</p>' +
-
-                '<div class="dental-summary-empty-tags">' +
-                '<span>Visit history</span>' +
-                '<span>Treatments</span>' +
-                '<span>Diagnosis summary</span>' +
-                '</div>' +
 
                 '<a href="' + ROUTE_BOOK + '" class="ui-btn ui-btn-primary">' +
                 '<i class="fa-solid fa-calendar-plus"></i>' +
@@ -1650,7 +1873,7 @@ $appointmentConfirmation = session('appointment_confirmation');
                 '</div>' +
                 '</div>' +
 
-                '</div>'
+                '</section>'
             );
             if (viewAll) viewAll.classList.add("hidden");
             return;
@@ -1658,122 +1881,50 @@ $appointmentConfirmation = session('appointment_confirmation');
 
         if (viewAll) viewAll.classList.remove("hidden");
 
-        var html = '<div class="space-y-3">';
-        HOME_RECORDS.slice(0, 3).forEach(function (r, idx) {
-            var encoded = encodeURIComponent(JSON.stringify(r));
-            var dispTime = formatTime(r.time);
-            var dispDate = r.date;
+        const recordsTemplate =
+            document.getElementById(
+                'dashboardRecordCardsTemplate'
+            );
 
-            html +=
-                '<article class="dental-record-card ' +
-                (idx === 0 ? 'is-latest' : '') +
-                '">' +
-
-                '<div class="dental-record-main">' +
-
-                '<div class="dental-record-icon">' +
-                '<i class="fa-solid fa-tooth"></i>' +
-                '</div>' +
-
-                '<div class="dental-record-copy">' +
-
-                '<div class="dental-record-title-row">' +
-
-                '<h3 class="dental-record-title">' +
-                window.escapeHtml(r.service) +
-                '</h3>' +
-
-                '<span class="status-pill ' +
-                (
-                    (r.status || '').toLowerCase() === 'completed' ?
-                        'status-completed' :
-                        'status-cancelled'
-                ) +
-                '">' +
-
-                '<span class="status-dot"></span>' +
-
-                window.escapeHtml(
-                    (r.status || '').toLowerCase() === 'completed' ?
-                        'Completed' :
-                        'Cancelled'
-                ) +
-
-                '</span>' +
-
-                '</div>' +
-
-                '<div class="dental-record-meta">' +
-
-                '<span>' +
-                '<i class="fa-regular fa-calendar"></i>' +
-                window.escapeHtml(dispDate) +
-                '</span>' +
-
-                '<span>' +
-                '<i class="fa-regular fa-clock"></i>' +
-                window.escapeHtml(dispTime) +
-                '</span>' +
-
-                '</div>' +
-
-                '</div>' +
-                '</div>' +
-
-                '<button type="button" ' +
-                'class="ui-btn ui-btn-secondary ui-btn-sm dental-record-action" ' +
-                'onclick="openDashboardRecordModal(\'' + encoded + '\')">' +
-
-                '<i class="fa-solid fa-eye"></i>' +
-                '<span>View Details</span>' +
-
-                '</button>' +
-
-                '</article>';
-        });
-
-        html +=
-            '<div class="pt-2">' +
-            '<a href="' + ROUTE_RECORD +
-            '" class="ui-btn ui-btn-primary w-full">' +
-            '<i class="fa-solid fa-folder-open"></i>' +
-            '<span>View All Records</span>' +
-            '<i class="fa-solid fa-arrow-right text-[11px]"></i>' +
-            '</a>' +
-            '</div>' +
-            '</div>';
+        const html =
+            recordsTemplate
+                ? recordsTemplate.innerHTML
+                : '';
 
         window.swapSkeletonContent(
             'dentalOverviewContainer',
 
-            '<div class="dashboard-card-polished dental-summary-section">' +
+            '<section class="card dashboard-service-card dental-summary-section">' +
 
-            '<div class="dental-summary-header">' +
+            '<div class="card-header">' +
 
-            '<div class="flex items-start justify-between gap-4">' +
+            '<div class="card-header-left">' +
+
+            '<span class="card-header-icon">' +
+            '<i class="fa-solid fa-chart-line"></i>' +
+            '</span>' +
 
             '<div class="min-w-0">' +
 
-            '<div class="dental-summary-eyebrow">' +
-            '<i class="fa-solid fa-tooth"></i>' +
-            '<span>Patient Dental Summary</span>' +
-            '</div>' +
-
-            '<h2 class="dental-summary-title">' +
+            '<h2 class="card-title">' +
             'Dental Overview' +
             '</h2>' +
 
-            '<p class="dental-summary-subtitle">' +
-            'Latest 3 records from your dental activity.' +
+            '<p class="card-subtitle">' +
+            'Latest records from your dental activity.' +
             '</p>' +
 
             '</div>' +
 
-            '<div class="hidden sm:flex glass-icon-red dental-summary-header-icon">' +
-            '<i class="fa-solid fa-chart-line"></i>' +
             '</div>' +
 
+            '<span class="card-header-badge">' +
+            'Patient Summary' +
+            '</span>' +
+
             '</div>' +
+
+            '<div class="dental-summary-overview">' +
 
             '<div class="dental-summary-stats">' +
 
@@ -1806,7 +1957,7 @@ $appointmentConfirmation = session('appointment_confirmation');
             html +
             '</div>' +
 
-            '</div>'
+            '</section>'
         );
     }
 

@@ -19,8 +19,8 @@ class EnsureSessionActivity
 
         $timeoutSeconds = max(
             0,
-            (int) env(
-                'SESSION_IDLE_TIMEOUT_SECONDS',
+            (int) config(
+                'session.idle_timeout_seconds',
                 600
             )
         );
@@ -106,38 +106,20 @@ class EnsureSessionActivity
                 ], 401);
             }
 
-            if ($alreadyLocked || $hasTimedOut) {
-
-                $request->session()->put(
-                    'session_idle_locked',
+            if ($request->isMethod('GET')) {
+                $request->attributes->set(
+                    'session_idle_expired',
                     true
                 );
 
-                if (
-                    $request->expectsJson() ||
-                    $request->ajax()
-                ) {
-                    return response()->json([
-                        'expired' => true,
-                        'message' =>
-                        'Your session has expired due to inactivity.',
-                    ], 401);
-                }
-
-                if ($request->isMethod('GET')) {
-
-                    $request->attributes->set(
-                        'session_idle_expired',
-                        true
-                    );
-
-                    return $next($request);
-                }
-
-                return response()->json([
-                    'expired' => true,
-                ], 401);
+                return $next($request);
             }
+
+            return response()->json([
+                'expired' => true,
+                'message' =>
+                'Your session has expired due to inactivity.',
+            ], 401);
         }
 
         return $next($request);

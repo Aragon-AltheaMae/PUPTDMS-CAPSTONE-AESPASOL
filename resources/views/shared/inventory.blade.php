@@ -435,19 +435,9 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                         Unit <span class="required-mark">*</span>
                     </label>
 
-                    <select id="addUnit" name="unit" class="js-custom-select" data-placeholder="Select unit"
-                        data-field-label="Unit" data-required-message="Please select a unit." required>
-
-                        <option value="">Select unit</option>
-                        <option value="Box">Box</option>
-                        <option value="Pack">Pack</option>
-                        <option value="Bottle">Bottle</option>
-                        <option value="Piece">Piece</option>
-                        <option value="Set">Set</option>
-                        <option value="Tube">Tube</option>
-                        <option value="Vial">Vial</option>
-                        <option value="Roll">Roll</option>
-                    </select>
+                    <input id="addUnit" name="unit" type="text" class="form-input-custom"
+                        placeholder="e.g. Box, Piece, Bottle" maxlength="50" data-field-label="Unit"
+                        data-required-message="Please enter a unit." required>
                 </div>
 
                 <div class="inventory-field inventory-field-full" data-global-field>
@@ -663,19 +653,9 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                         Unit <span class="required-mark">*</span>
                     </label>
 
-                    <select id="editUnit" name="unit" class="js-custom-select" data-placeholder="Select unit"
-                        data-field-label="Unit" data-required-message="Please select a unit." required>
-
-                        <option value="">Select unit</option>
-                        <option value="Box">Box</option>
-                        <option value="Pack">Pack</option>
-                        <option value="Bottle">Bottle</option>
-                        <option value="Piece">Piece</option>
-                        <option value="Set">Set</option>
-                        <option value="Tube">Tube</option>
-                        <option value="Vial">Vial</option>
-                        <option value="Roll">Roll</option>
-                    </select>
+                    <input id="editUnit" name="unit" type="text" class="form-input-custom"
+                        placeholder="e.g. Box, Piece, Bottle" maxlength="50" data-field-label="Unit"
+                        data-required-message="Please enter a unit." required>
                 </div>
 
                 <div class="inventory-field inventory-field-full" data-global-field>
@@ -922,7 +902,7 @@ $inventoryDestroyUrlTemplate = route($inventoryRouteNames['destroy'], ['inventor
 
     document.addEventListener(
         'DOMContentLoaded',
-        function () {
+        async function () {
             bindInventoryGlobalViewToggle();
 
             applyDashboardStockFilterFromQuery();
@@ -953,6 +933,8 @@ $inventoryDestroyUrlTemplate = route($inventoryRouteNames['destroy'], ['inventor
 
                 window.initGlobalPageSizeSelects?.();
             }
+
+            await loadInventory();
         }
     );
 
@@ -977,8 +959,6 @@ $inventoryDestroyUrlTemplate = route($inventoryRouteNames['destroy'], ['inventor
             initInventoryRefreshWatcher();
         }
     }
-
-    loadInventory();
 
     window.addEventListener('resize', function () {
         renderTable();
@@ -1129,13 +1109,27 @@ $inventoryDestroyUrlTemplate = route($inventoryRouteNames['destroy'], ['inventor
         resetAddForm();
 
         const modal =
-            document.getElementById('addModal');
+            document.getElementById(
+                'addModal'
+            );
 
-        window.initCustomSelects?.(modal);
+        window.initCustomSelects?.(
+            modal
+        );
 
-        modal?.querySelectorAll('.custom-select')
+        modal
+            ?.querySelectorAll(
+                '.custom-select'
+            )
             .forEach(function (wrapper) {
-                window.syncCustomSelect?.(wrapper);
+                wrapper.classList.remove(
+                    'is-invalid',
+                    'is-valid'
+                );
+
+                window.syncCustomSelect?.(
+                    wrapper
+                );
             });
 
         window.openModal?.(
@@ -1144,6 +1138,17 @@ $inventoryDestroyUrlTemplate = route($inventoryRouteNames['destroy'], ['inventor
 
         window.initGlobalVoiceInputs?.(
             modal
+        );
+
+        document.dispatchEvent(
+            new CustomEvent(
+                'voice:refresh',
+                {
+                    detail: {
+                        root: modal
+                    }
+                }
+            )
         );
     }
 
@@ -1930,7 +1935,39 @@ aria-label="Delete inventory item"
             },
         });
 
+        [
+            document.getElementById('inventoryPaginationTopBar'),
+            document.getElementById('inventoryPaginationBottomBar'),
+        ].forEach(function (bar) {
+            if (bar) {
+                bar.hidden = true;
+                bar.style.setProperty(
+                    'display',
+                    'none',
+                    'important'
+                );
+            }
+        });
+
+        [
+            document.getElementById('inventoryPaginationTopBar'),
+            document.getElementById('inventoryPaginationBottomBar'),
+        ].forEach(function (bar) {
+            if (bar) {
+                bar.hidden = false;
+                bar.style.removeProperty('display');
+            }
+        });
+        
         if (!data.length) {
+            if (!window.EmptyState) {
+                requestAnimationFrame(() => {
+                    renderTable();
+                });
+
+                return;
+            }
+
             if (tableWrapper) {
                 tableWrapper.hidden = true;
                 tableWrapper.style.setProperty(
@@ -2288,19 +2325,33 @@ aria-label="Delete inventory item"
         if (addCategory) {
             addCategory.value = '';
 
-            addCategory.dispatchEvent(
-                new Event(
-                    'change',
-                    {
-                        bubbles: true
-                    }
-                )
+            addCategory.classList.remove(
+                'is-invalid',
+                'is-valid'
+            );
+
+            addCategory.removeAttribute(
+                'aria-invalid'
+            );
+
+            addCategory.removeAttribute(
+                'aria-describedby'
+            );
+
+            addCategory.setCustomValidity('');
+
+            const categoryWrapper =
+                addCategory.closest(
+                    '.custom-select'
+                );
+
+            categoryWrapper?.classList.remove(
+                'is-invalid',
+                'is-valid'
             );
 
             window.syncCustomSelect?.(
-                addCategory.closest(
-                    '.custom-select'
-                )
+                categoryWrapper
             );
         }
 
@@ -2311,9 +2362,7 @@ aria-label="Delete inventory item"
             'addUnit'
         ].forEach(function (id) {
             const field =
-                document.getElementById(
-                    id
-                );
+                document.getElementById(id);
 
             if (!field) {
                 return;
@@ -2321,14 +2370,20 @@ aria-label="Delete inventory item"
 
             field.value = '';
 
-            field.dispatchEvent(
-                new Event(
-                    'change',
-                    {
-                        bubbles: true
-                    }
-                )
+            field.classList.remove(
+                'is-invalid',
+                'is-valid'
             );
+
+            field.removeAttribute(
+                'aria-invalid'
+            );
+
+            field.removeAttribute(
+                'aria-describedby'
+            );
+
+            field.setCustomValidity('');
         });
 
         const addQty =
@@ -2379,10 +2434,34 @@ aria-label="Delete inventory item"
 
         form
             ?.querySelectorAll(
+                '.custom-select'
+            )
+            .forEach(function (wrapper) {
+                wrapper.classList.remove(
+                    'is-invalid',
+                    'is-valid'
+                );
+
+                window.syncCustomSelect?.(
+                    wrapper
+                );
+            });
+
+        form
+            ?.querySelectorAll(
                 '.global-field-error'
             )
             .forEach(function (error) {
-                error.remove();
+                error.classList.remove(
+                    'show'
+                );
+
+                error.textContent = '';
+
+                error.setAttribute(
+                    'aria-hidden',
+                    'true'
+                );
             });
 
         document
@@ -2552,13 +2631,8 @@ aria-label="Delete inventory item"
             document.getElementById('editUnit');
 
         if (editUnit) {
-            editUnit.value = item.unit || '';
-
-            editUnit.dispatchEvent(
-                new Event('change', {
-                    bubbles: true
-                })
-            );
+            editUnit.value =
+                item.unit || '';
         }
 
         document.getElementById('editStock').value =
@@ -2621,6 +2695,26 @@ aria-label="Delete inventory item"
 
         computeEditBalance();
         window.openModal?.('editModal');
+
+        const editModal =
+            document.getElementById(
+                'editModal'
+            );
+
+        window.initGlobalVoiceInputs?.(
+            editModal
+        );
+
+        document.dispatchEvent(
+            new CustomEvent(
+                'voice:refresh',
+                {
+                    detail: {
+                        root: editModal
+                    }
+                }
+            )
+        );
     }
 
     async function saveEdit() {

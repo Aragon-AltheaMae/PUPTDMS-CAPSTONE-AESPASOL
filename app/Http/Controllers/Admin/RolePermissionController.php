@@ -5,15 +5,63 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\Models\Role;
-use App\Models\User;
 use Illuminate\Http\Request;
 use App\Helpers\AuditLogger;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 class RolePermissionController extends Controller
 {
+    private const DEFAULT_ROLE_PERMISSIONS = [
+        'admin' => [
+            'access_super_admin_dashboard',
+            'receive_notifications',
+            'manage_system_settings',
+            'manage_audit_trail',
+            'manage_user_accounts',
+            'manage_user_roles',
+            'manage_dentist_accounts',
+            'manage_super_admin_accounts',
+            'view_dentist_transitions',
+            'create_dentist_transitions',
+            'update_dentist_transitions',
+            'assign_dentist_successors',
+            'finalize_dentist_transitions',
+            'cancel_dentist_transitions',
+            'extend_dentist_access',
+            'view_dentist_transition_audit_logs',
+            'manage_document_templates',
+            'manage_reports',
+            'manage_inventory',
+            'manage_patient_profiles',
+            'manage_dental_records',
+            'manage_appointments',
+            'manage_document_requests',
+            'set_academic_year',
+            'set_archive_records',
+            'set_report_periods',
+            'set_required_fields',
+            'set_appointment_limit',
+            'set_notification_rules',
+            'set_export_file_type',
+        ],
+        'dentist' => [
+            'access_dentist_dashboard',
+            'manage_patient_profiles',
+            'manage_appointments',
+            'manage_document_requests',
+            'manage_inventory',
+            'manage_reports',
+        ],
+        'patient' => [
+            'access_patient_dashboard',
+            'receive_notifications',
+            'book_appointments',
+            'view_own_appointments',
+            'view_own_profile',
+            'view_own_records',
+            'request_documents',
+        ],
+    ];
+
     public function index(Request $request)
     {
         $this->seedDefaultsIfEmpty();
@@ -50,54 +98,9 @@ class RolePermissionController extends Controller
 
     private function applyDefaults(Role $role, string $slug): void
     {
-        $map = [
-            'admin' => [
-                'access_super_admin_dashboard',
-                'access_patient_dashboard',
-                'receive_notifications',
-                'manage_user_accounts',
-                'manage_user_roles',
-                'manage_dentist_accounts',
-                'manage_super_admin_accounts',
-                'manage_system_settings',
-                'manage_audit_trail',
-                'manage_document_templates',
-                'manage_reports',
-                'manage_patient_profiles',
-                'manage_appointments',
-                'manage_dental_records',
-                'set_academic_year',
-                'set_archive_records',
-                'set_report_periods',
-                'set_required_fields',
-                'set_appointment_limit',
-                'set_notification_rules',
-                'set_export_file_type',
-            ],
-            'dentist' => [
-                'access_dentist_dashboard',
-                'receive_notifications',
-                'manage_dental_records',
-                'manage_appointments',
-                'manage_patient_profiles',
-                'manage_inventory',
-                'manage_reports',
-                'manage_document_requests',
-            ],
-            'patient' => [
-                'access_patient_dashboard',
-                'receive_notifications',
-                'book_appointments',
-                'view_own_appointments',
-                'view_own_profile',
-                'view_own_records',
-                'request_documents',
-            ],
-        ];
+        if (!isset(self::DEFAULT_ROLE_PERMISSIONS[$slug])) return;
 
-        if (!isset($map[$slug])) return;
-
-        $ids = Permission::whereIn('slug', $map[$slug])->pluck('id');
+        $ids = Permission::whereIn('slug', self::DEFAULT_ROLE_PERMISSIONS[$slug])->pluck('id');
         $role->permissions()->sync($ids);
     }
 
@@ -162,59 +165,12 @@ class RolePermissionController extends Controller
 
     public function reset()
     {
-        $admin = Role::where('slug', 'admin')->firstOrFail();
-        $dentist    = Role::where('slug', 'dentist')->firstOrFail();
-        $patient    = Role::where('slug', 'patient')->firstOrFail();
+        foreach (self::DEFAULT_ROLE_PERMISSIONS as $slug => $permissionSlugs) {
+            $role = Role::where('slug', $slug)->firstOrFail();
+            $permissionIds = Permission::whereIn('slug', $permissionSlugs)->pluck('id');
 
-        $superAdminPermissions = Permission::whereIn('slug', [
-            'access_super_admin_dashboard',
-            'access_dentist_dashboard',
-            'access_patient_dashboard',
-            'receive_notifications',
-            'manage_system_settings',
-            'manage_audit_trail',
-            'manage_user_accounts',
-            'manage_user_roles',
-            'manage_dentist_accounts',
-            'manage_super_admin_accounts',
-            'manage_document_templates',
-            'manage_reports',
-            'manage_patient_profiles',
-            'manage_appointments',
-            'manage_inventory',
-            'set_academic_year',
-            'set_archive_records',
-            'set_report_periods',
-            'set_required_fields',
-            'set_appointment_limit',
-            'set_notification_rules',
-            'set_export_file_type',
-        ])->pluck('id');
-
-        $dentistPermissions = Permission::whereIn('slug', [
-            'access_dentist_dashboard',
-            'receive_notifications',
-            'manage_dental_records',
-            'manage_appointments',
-            'manage_patient_profiles',
-            'manage_inventory',
-            'manage_reports',
-            'manage_document_requests',
-        ])->pluck('id');
-
-        $patientPermissions = Permission::whereIn('slug', [
-            'access_patient_dashboard',
-            'receive_notifications',
-            'book_appointments',
-            'view_own_appointments',
-            'view_own_profile',
-            'view_own_records',
-            'request_documents',
-        ])->pluck('id');
-
-        $admin->permissions()->sync($superAdminPermissions);
-        $dentist->permissions()->sync($dentistPermissions);
-        $patient->permissions()->sync($patientPermissions);
+            $role->permissions()->sync($permissionIds);
+        }
 
         AuditLogger::log
             ('update', 
@@ -242,55 +198,24 @@ class RolePermissionController extends Controller
                 'unique:roles,slug',
                 'regex:/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/'
             ],
-            'user_name' => ['nullable', 'required_with:user_email', 'string', 'max:255'],
-            'user_email' => ['nullable', 'required_with:user_name', 'email', 'max:255', 'unique:users,email', 'unique:patients,email'],
         ], [
             'name.unique' => 'A role with this name already exists.',
             'slug.unique' => 'A role with this slug already exists.',
             'slug.regex'  => 'Slug may only contain lowercase letters, numbers, hyphens, and underscores.',
-            'user_name.required_with' => 'Please enter the user name when adding a user email.',
-            'user_email.required_with' => 'Please enter the user email when adding a user name.',
-            'user_email.unique' => 'A user with this email already exists.',
         ]);
 
-        [$role, $user] = DB::transaction(function () use ($request) {
-            $role = Role::create([
-                'name' => $request->name,
-                'slug' => $request->slug,
-            ]);
+        $role = Role::create([
+            'name' => $request->name,
+            'slug' => $request->slug,
+        ]);
 
-            $user = null;
-
-            if ($request->filled('user_name') && $request->filled('user_email')) {
-                $user = User::create([
-                    'name' => $request->user_name,
-                    'email' => $request->user_email,
-                    'password' => Hash::make(Str::random(16)),
-                    'role_id' => $role->id,
-                    'status' => 'active',
-                ]);
-            }
-
-            return [$role, $user];
-        });
-
-        $message = $user
-            ? "Role \"{$role->name}\" and user \"{$user->name}\" created successfully. The user is now visible in User Management."
-            : "Role \"{$role->name}\" created successfully. You can now assign permissions and use it in User Management.";
+        $message = "Role \"{$role->name}\" created successfully. You can now assign permissions and use it in User Management.";
 
         AuditLogger::log(
             'create',
             'roles_permissions',
             "Admin created role ID {$role->id} ({$role->name})"
         );
-
-        if ($user) {
-            AuditLogger::log(
-                'create',
-                'user',
-                "Created user #{$user->id} ({$user->email}) for role ID {$role->id}"
-            );
-        }
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
@@ -301,12 +226,6 @@ class RolePermissionController extends Controller
                     'name' => $role->name,
                     'slug' => $role->slug,
                 ],
-                'user' => $user ? [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'role_id' => $user->role_id,
-                ] : null,
                 'user_management_url' => route('admin.user_management'),
             ], 201);
         }

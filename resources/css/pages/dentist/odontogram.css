@@ -1,34 +1,3 @@
-.glass-panel {
-    background: #ffffff;
-    border-radius: 20px;
-    border: 1px solid #E5E7EB;
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
-}
-
-.soft-card {
-    background: linear-gradient(180deg, #ffffff 0%, #fcfcfd 100%);
-    border: 1px solid #ECEEF2;
-    border-radius: 18px;
-}
-
-.view-toggle-btn {
-    width: 46px;
-    min-width: 46px;
-    height: 46px;
-    min-height: 46px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    border: 1px solid #E5E7EB;
-    border-radius: 16px;
-    background: #ffffff;
-    color: #4B5563;
-    transition: all 0.2s ease;
-}
-
-.toolbar-soft-btn span,
-.view-toggle-btn span,
 .toolbar-label {
     display: none;
 }
@@ -38,54 +7,129 @@
     flex-wrap: nowrap;
 }
 
-.odontogram-toolbar {
-    align-items: center;
-}
-
 .toolbar-group {
     gap: 0;
 }
 
-.view-toggle-btn:hover {
-    border-color: #FCA5A5;
-    background: #FEF2F2;
-    color: #8B0000;
-}
-
-.view-toggle-btn.active {
-    background: #8B0000;
-    color: #ffffff;
-    border-color: #8B0000;
-    box-shadow: 0 10px 18px rgba(139, 0, 0, 0.15);
-}
-
 .legend-btn {
-    border: 1px solid #E5E7EB;
-    border-radius: 14px;
-    padding: 12px;
-    font-size: 13px;
-    color: #333333;
-    background: #ffffff;
-    transition: all 0.2s ease;
+    width: 100%;
     display: flex;
     align-items: center;
     gap: 10px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--card);
+    color: var(--text-1);
+    font-size: 13px;
     text-align: left;
-    width: 100%;
+    transition:
+        background-color .18s ease,
+        border-color .18s ease,
+        color .18s ease,
+        transform .18s ease;
+}
+
+.odontogram-legend-panel .legend-btn {
+    min-width: 0;
+    min-height: 38px;
+    display: grid;
+    grid-template-columns: 8px 14px minmax(0, 1fr);
+    align-items: center;
+    gap: .35rem;
+    padding: .4rem .45rem;
+    border-radius: 9px;
+    font-size: .66rem;
+}
+
+.odontogram-legend-panel .legend-color-dot {
+    width: 8px;
+    min-width: 8px;
+    height: 8px;
+}
+
+.odontogram-legend-panel .legend-btn>i {
+    width: 14px !important;
+    font-size: .62rem;
+    color: var(--crimson);
+    text-align: center;
+}
+
+.odontogram-legend-panel .legend-btn .legend-code {
+    margin-bottom: 1px;
+
+    font-size: .58rem;
+    line-height: 1;
+}
+
+.odontogram-legend-panel .legend-btn .legend-label {
+    display: block;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    color: var(--text-2);
+    font-size: .64rem;
+    font-weight: 650;
+    line-height: 1.25;
+}
+
+.odontogram-target-row,
+.odontogram-treatment-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+}
+
+.odontogram-treatment-row {
+    margin-top: .5rem;
+
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: .65rem;
+}
+
+.odontogram-treatment-row>.global-form-label {
+    margin: 0;
+    align-self: center;
+}
+
+.odontogram-treatment-row #selectedToothLegendList {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.odontogram-treatment-row .odontogram-preview-marking {
+    margin: 0;
+    max-width: 100%;
+}
+
+.odontogram-treatment-row .odontogram-preview-marking>span:last-child {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.odontogram-legend-target {
+    margin-top: .5rem;
+    padding: .55rem;
 }
 
 .legend-btn:hover {
-    background: #FEF2F2;
-    border-color: #FCA5A5;
+    background: var(--crimson-light);
+    border-color: var(--crimson-mid);
     transform: translateY(-1px);
 }
 
 .legend-btn.active {
-    background-color: #FEE2E2;
-    border: 1px solid #8B0000;
-    color: #8B0000;
+    background: var(--crimson-light);
+    border-color: var(--crimson);
+    color: var(--crimson);
     font-weight: 700;
-    box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.08);
+    box-shadow: 0 0 0 3px var(--alpha-crimson-8);
 }
 
 .legend-color-dot {
@@ -101,90 +145,50 @@
     height: 8px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #D1D5DB;
-    border-radius: 999px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.treatment-chip {
-    border: 1px solid #FCA5A5;
-    background: #FFF1F2;
-    color: #8B0000;
-    border-radius: 999px;
-    padding: 6px 12px;
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 1;
-}
-
-.selected-tooth-card {
-    background: linear-gradient(135deg, #FFF7F7 0%, #FFFDFD 100%);
-    border: 1px solid #FECACA;
-}
-
 .legend-status-note {
     background: #FFF7ED;
     border: 1px solid #FED7AA;
     color: #9A3412;
 }
 
-.historical-intro-card {
-    background: linear-gradient(135deg, #fff7f7 0%, #fffdfd 100%);
-    border: 1px solid #fecaca;
-    border-radius: 16px;
-    padding: 12px 14px;
-    color: #7f1d1d;
-    font-size: 13px;
-    line-height: 1.6;
-    font-weight: 600;
+.empty-state-compact .empty-state {
+    min-height: 0 !important;
+    padding: .75rem !important;
+    gap: .35rem !important;
 }
 
-.historical-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+.empty-state-compact .empty-state-icon {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+
+    margin-bottom: .15rem !important;
+
+    font-size: .72rem !important;
 }
 
-.historical-field {
-    min-height: 48px;
+.empty-state-compact .empty-state-title {
+    margin: 0 !important;
+
+    font-size: .72rem !important;
+    line-height: 1.2 !important;
 }
 
-.historical-help-text {
-    margin-top: 6px;
-    color: #6b7280;
-    font-size: 12px;
-    line-height: 1.4;
+.empty-state-compact .empty-state-sub {
+    margin: 0 !important;
+
+    font-size: .62rem !important;
+    line-height: 1.3 !important;
 }
 
-.historical-summary-card {
-    border: 1px solid #e7ddd8;
-    background: #fff;
-    border-radius: 16px;
-    padding: 0.9rem 1rem;
-    color: #2b221d;
-    font-size: 0.92rem;
-    font-weight: 700;
-}
+.empty-state-compact .empty-state-btn {
+    min-height: 30px !important;
 
-.primary-action-btn {
-    background: #8B0000;
-    color: #ffffff;
-    transition: all 0.2s ease;
-}
+    margin-top: .25rem !important;
+    padding: 0 .75rem !important;
 
-.primary-action-btn:hover {
-    background: #660000;
-}
-
-.primary-action-btn:disabled {
-    background: #D1D5DB;
-    color: #6B7280;
-    cursor: not-allowed;
-    box-shadow: none;
+    font-size: .62rem !important;
 }
 
 .tooth-tooltip {
@@ -239,62 +243,10 @@
 }
 
 .left-view-shell {
-    min-height: auto;
-    display: flex;
-    flex-direction: column;
-}
-
-.odontogram-right-shell {
-    position: relative;
-    top: auto;
-    height: auto;
     display: flex;
     flex-direction: column;
     min-height: 0;
-}
-
-.odontogram-right-top {
-    flex-shrink: 0;
-}
-
-.odontogram-right-scroll {
-    overflow: visible;
-    flex: unset;
-    padding-right: 0;
-}
-
-.odontogram-right-bottom {
-    flex-shrink: 0;
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #F3F4F6;
-    background: #ffffff;
-}
-
-.legend-drawer-open {
-    overflow: hidden;
-}
-
-@media (max-width: 640px) {
-    .historical-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-.legend-drawer-header {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-}
-
-#legendDrawer {
-    top: 72px;
-    height: calc(100dvh - 72px);
-    transform: translateX(100%);
-}
-
-#legendDrawer.open {
-    transform: translateX(0);
+    height: auto;
 }
 
 .legend-category-block {
@@ -308,10 +260,24 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 14px 16px;
-    background: #FAFAFA;
-    border-bottom: 1px solid #F3F4F6;
+
+    gap: .45rem;
+    padding: .45rem .55rem;
+
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+}
+
+.odontogram-arch-spacer {
+    width: 1.25rem;
+    min-width: 1.25rem;
+}
+
+@media (max-width: 767px) {
+    .odontogram-arch-spacer {
+        width: .75rem;
+        min-width: .75rem;
+    }
 }
 
 .legend-category-title {
@@ -320,46 +286,61 @@
     gap: 10px;
 }
 
-#legendDrawerBackdrop {
-    top: 72px;
-    height: calc(100dvh - 72px);
-    display: none;
-}
-
-#legendDrawerBackdrop.show {
-    display: block;
-}
-
 .legend-category-icon {
-    width: 34px;
-    height: 34px;
-    border-radius: 12px;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+
+    border-radius: 8px;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #FEF2F2;
-    color: #8B0000;
-    flex-shrink: 0;
+
+    background: var(--crimson-light);
+    color: var(--crimson);
+
+    font-size: .65rem;
+}
+
+.odontogram-legend-category-name {
+    margin: 0;
+
+    color: var(--text-1);
+
+    font-size: .66rem;
+    font-weight: 850;
+    line-height: 1.15;
+}
+
+.odontogram-legend-list {
+    display: flex;
+    flex-direction: column;
+    gap: .45rem;
 }
 
 .legend-category-body {
-    padding: 14px;
     display: grid;
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: .35rem;
+    padding: .45rem;
+}
+
+@container (min-width: 520px) {
+    .legend-category-body {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
 }
 
 .legend-category-count {
-    font-size: 11px;
-    font-weight: 700;
-    color: #6B7280;
-    background: #F3F4F6;
+    padding: .2rem .4rem;
     border-radius: 999px;
-    padding: 5px 10px;
-}
-
-.legend-btn {
-    border-radius: 16px;
+    background: var(--surface);
+    color: var(--text-3);
+    font-size: .56rem;
+    font-weight: 800;
+    line-height: 1;
 }
 
 .legend-btn .legend-meta {
@@ -396,9 +377,16 @@
 
 .mode-panel.active {
     display: flex;
-    flex: 1;
     flex-direction: column;
     min-height: 0;
+}
+
+#odontogram2DPanel.mode-panel.active {
+    flex: 0 0 auto;
+}
+
+#odontogram3DPanel.mode-panel.active {
+    flex: 1 1 auto;
 }
 
 #odontogram2DPanel,
@@ -408,6 +396,7 @@
 }
 
 #canvas-container {
+    position: relative;
     flex: 1;
     min-height: 520px;
 }
@@ -480,7 +469,7 @@
     flex-direction: column;
     gap: 14px;
     margin: 0 auto;
-    padding-bottom: 10px;
+    padding: .35rem 0;
 }
 
 .odontogram-row {
@@ -619,22 +608,10 @@
         height: 420px;
     }
 
-    .odontogram-left-panel,
-    .odontogram-right-shell {
+    .odontogram-left-panel {
         position: static;
         top: auto;
         height: auto;
-    }
-
-    .odontogram-right-scroll {
-        overflow-y: visible;
-        padding-right: 0;
-        margin-top: 1rem;
-        max-height: none;
-    }
-
-    .odontogram-right-bottom {
-        margin-top: 1rem;
     }
 
     .left-view-shell {
@@ -648,7 +625,7 @@
         border-radius: 16px !important;
     }
 
-    #surfacePicker3D > .rounded-2xl.bg-gray-50 {
+    #surfacePicker3D>.rounded-2xl.bg-gray-50 {
         padding: 0.7rem !important;
         border-radius: 14px !important;
     }
@@ -720,7 +697,7 @@
         box-sizing: border-box;
     }
 
-    #surfacePicker3D > div:first-child {
+    #surfacePicker3D>div:first-child {
         gap: 0.45rem !important;
     }
 
@@ -759,7 +736,7 @@
         font-size: 0.68rem !important;
     }
 
-    #surfacePicker3D > .rounded-2xl.bg-gray-50 {
+    #surfacePicker3D>.rounded-2xl.bg-gray-50 {
         margin-top: 0.5rem !important;
         padding: 0.5rem !important;
         border-radius: 11px !important;
@@ -774,12 +751,12 @@
         line-height: 1 !important;
     }
 
-    #surfacePicker3D > div:last-child {
+    #surfacePicker3D>div:last-child {
         margin-top: 0.45rem !important;
         gap: 0.4rem !important;
     }
 
-    #surfacePicker3D > div:last-child p {
+    #surfacePicker3D>div:last-child p {
         font-size: 0.54rem !important;
         line-height: 1.25 !important;
     }
@@ -814,6 +791,19 @@
 
 }
 
+.odontogram-surface-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .75rem;
+}
+
+.odontogram-surface-picker-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+}
+
 .odontogram-hero {
     display: flex;
     flex-direction: column;
@@ -822,112 +812,13 @@
 
 .odontogram-hero-main {
     display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(320px, 1fr);
+    grid-template-columns: 1fr;
     gap: 1rem;
-    align-items: stretch;
 }
 
-.odontogram-hero-left {
-    display: flex;
-    gap: 1rem;
-    align-items: stretch;
+.odontogram-hero-copy {
+    flex: 1 1 auto;
     min-width: 0;
-    flex-wrap: wrap;
-}
-
-.hero-danger-btn {
-    position: absolute;
-    top: 18px;
-    left: 18px;
-    z-index: 5;
-
-    width: 42px;
-    height: 42px;
-    padding: 0;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.96);
-    border: 1px solid #e5e7eb;
-    color: #8b0000;
-    text-decoration: none;
-    overflow: visible;
-    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
-    backdrop-filter: blur(6px);
-    transition: all 0.2s ease;
-}
-
-.hero-danger-btn span {
-    display: none;
-}
-
-
-.hero-danger-btn::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    top: 50%;
-    left: calc(100% + 10px);
-    transform: translateY(-50%) translateX(-4px);
-    background: rgba(17, 24, 39, 0.96);
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    line-height: 1;
-    white-space: nowrap;
-    padding: 8px 10px;
-    border-radius: 10px;
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: all 0.18s ease;
-}
-
-.hero-danger-btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: calc(100% + 4px);
-    width: 8px;
-    height: 8px;
-    background: rgba(17, 24, 39, 0.96);
-    transform: translateY(-50%) rotate(45deg);
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.18s ease;
-}
-
-.hero-danger-btn:hover::after,
-.hero-danger-btn:hover::before,
-.hero-danger-btn:focus-visible::after,
-.hero-danger-btn:focus-visible::before {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(-50%) translateX(0);
-}
-
-@media (max-width: 768px) {
-
-    .hero-danger-btn::after,
-    .hero-danger-btn::before {
-        display: none;
-    }
-}
-
-.hero-danger-btn:hover {
-    transform: translateY(-1px) scale(1.03);
-    background: #fff1f2;
-    border-color: #fca5a5;
-    color: #7f1d1d;
-    box-shadow: 0 14px 28px rgba(139, 0, 0, 0.14);
-}
-
-.hero-danger-btn:active {
-    transform: scale(0.98);
 }
 
 .hero-patient-card {
@@ -935,7 +826,6 @@
     border-radius: 20px;
 }
 
-.hero-title-card,
 .hero-patient-card {
     background: linear-gradient(180deg, #ffffff 0%, #fcfcfd 100%);
     border: 1px solid #e5e7eb;
@@ -943,54 +833,76 @@
     box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
 }
 
-.hero-title-card {
-    position: relative;
-    padding: 1.4rem 1.6rem 1.4rem 4.8rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex: 1 1 420px;
-    min-width: 0;
+.hero-title-card>#cancelProcedureBtn {
+    flex: 0 0 auto;
+    margin-left: auto;
+}
+
+.hero-title-card>#cancelProcedureBtn {
+    flex: 0 0 auto;
 }
 
 .hero-title-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 16px;
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+
+    border-radius: 13px;
+
     background: linear-gradient(135deg, #8b0000 0%, #b91c1c 100%);
     color: #fff;
+
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem;
-    box-shadow: 0 10px 20px rgba(139, 0, 0, 0.18);
+
+    font-size: .95rem;
+
+    box-shadow: 0 8px 18px rgba(139, 0, 0, .16);
+
     flex-shrink: 0;
 }
 
 .hero-eyebrow {
-    font-size: 11px;
+    margin-bottom: .15rem;
+
+    color: var(--text-3);
+
+    font-size: .58rem;
     font-weight: 800;
+
     text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: #9ca3af;
-    margin-bottom: 4px;
+    letter-spacing: .1em;
 }
 
 #mainContent.odontogram-page .hero-title {
-    font-size: 2rem;
-    line-height: 1;
-    font-weight: 900;
-    color: #8b0000;
-    -webkit-text-fill-color: #8b0000;
+    margin: 0 0 .2rem;
+
+    color: var(--crimson);
+    -webkit-text-fill-color: var(--crimson);
+
     background: none;
-    margin: 0 0 0.35rem;
+
+    font-size: 1.35rem;
+    line-height: 1.1;
+    font-weight: 900;
+
+    white-space: nowrap;
+}
+
+.hero-title-card>#cancelProcedureBtn {
+    flex: 0 0 auto;
+    margin-left: auto;
 }
 
 .hero-subtitle {
     margin: 0;
-    color: #6b7280;
-    font-size: 1.05rem;
+
+    color: var(--text-2);
+
+    font-size: .78rem;
     font-weight: 600;
+    line-height: 1.3;
 }
 
 .hero-patient-label {
@@ -1079,45 +991,12 @@
     gap: 0.6rem;
 }
 
-.toolbar-soft-btn {
-    width: 46px;
-    min-width: 46px;
-    height: 46px;
-    min-height: 46px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    border-radius: 16px;
-    border: 1px solid #e5e7eb;
-    background: #fff;
-    color: #374151;
-    font-size: 15px;
-    font-weight: 800;
-    transition: all 0.2s ease;
-}
-
-.toolbar-soft-btn:hover:not(:disabled) {
-    background: #fff7f7;
-    border-color: #fecaca;
-    color: #8b0000;
-}
-
-.toolbar-soft-btn:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-}
-
 .odontogram-toolbar {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: flex-end;
     gap: 1rem;
-    background: linear-gradient(180deg, #ffffff 0%, #fcfcfd 100%);
-    border: 1px solid #e5e7eb;
-    border-radius: 22px;
-    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.04);
     padding: 1rem 1.2rem;
     position: relative;
     transition:
@@ -1174,131 +1053,91 @@
         align-items: center;
         gap: 0.35rem;
     }
-
-    .toolbar-soft-btn,
-    .view-toggle-btn {
-        width: 34px;
-        min-width: 34px;
-        height: 34px;
-        min-height: 34px;
-        padding: 0;
-
-        border-radius: 11px;
-        font-size: 0.75rem;
-        flex: 0 0 34px;
-    }
 }
 
-    .right-panel-sections {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
+.right-panel-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
 
-    .right-section-card {
-        border: 1px solid #eceef2;
-        border-radius: 20px;
-        background: linear-gradient(180deg, #ffffff 0%, #fcfcfd 100%);
-        overflow: hidden;
-    }
+.right-section-card {
+    border: 1px solid #eceef2;
+    border-radius: 20px;
+    background: linear-gradient(180deg, #ffffff 0%, #fcfcfd 100%);
+    overflow: hidden;
+}
 
-    .right-section-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: clamp(0.5rem, 1.5vw, 1rem);
-        padding: clamp(0.75rem, 1.5vw, 1rem);
-        border-bottom: 1px solid #f3f4f6;
-    }
+.right-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(0.5rem, 1.5vw, 1rem);
+    padding: clamp(0.75rem, 1.5vw, 1rem);
+    border-bottom: 1px solid #f3f4f6;
+}
 
-    .right-section-head > div:first-child {
-        flex: 1 1 auto;
-        min-width: 0;
-    }
+.right-section-head>div:first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+}
 
-    .right-section-head > button,
-    .right-section-head > a {
-        flex: 0 0 auto;
-        width: auto !important;
-        min-width: 0 !important;
-        min-height: 38px !important;
-        height: auto !important;
+.right-section-head>button,
+.right-section-head>a {
+    flex: 0 0 auto;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 38px !important;
+    height: auto !important;
 
-        padding: 0.5rem 0.7rem !important;
-        border-radius: 11px !important;
+    padding: 0.5rem 0.7rem !important;
+    border-radius: 11px !important;
 
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 0.4rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.4rem !important;
 
-        font-size: 0.75rem !important;
-        line-height: 1 !important;
-        text-align: center !important;
-        white-space: nowrap !important;
-    }
+    font-size: 0.75rem !important;
+    line-height: 1 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+}
 
-    .right-section-head > button i,
-    .right-section-head > a i {
-        flex: 0 0 auto;
-        margin: 0 !important;
-        font-size: 0.72rem !important;
-    }
+.right-section-head>button i,
+.right-section-head>a i {
+    flex: 0 0 auto;
+    margin: 0 !important;
+    font-size: 0.72rem !important;
+}
 
-    .right-section-body {
-        padding: 1rem;
-    }
+.right-section-body {
+    padding: 1rem;
+}
 
-    .right-section-eyebrow {
-        font-size: 11px;
-        font-weight: 900;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: #9ca3af;
-        margin-bottom: 4px;
-    }
+.right-section-eyebrow {
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin-bottom: 4px;
+}
 
-    .right-section-title {
-        margin: 0;
-        font-size: 1rem;
-        font-weight: 800;
-        color: #111827;
-    }
+.right-section-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #111827;
+}
 
-@media (max-width: 1200px) {
-    .odontogram-hero-main {
-        grid-template-columns: 1fr;
-    }
-
-    .hero-patient-card {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
+@media (max-width: 1350px) {
     .hero-procedure-meta {
         width: 100%;
     }
 }
 
 @media (max-width: 768px) {
-    .odontogram-hero-left {
-        flex-direction: column;
-    }
-
-    .hero-danger-btn {
-        top: 8px;
-        left: 8px;
-
-        width: 28px;
-        min-width: 28px;
-        height: 28px;
-        min-height: 28px;
-        padding: 0;
-
-        font-size: 0.7rem;
-        box-shadow: none;
-        backdrop-filter: none;
-    }
 
     .hero-title-card {
         flex: 0 0 auto;
@@ -1324,7 +1163,7 @@
         box-shadow: none;
     }
 
-    .hero-title-card > div:last-child {
+    .hero-title-card>div:last-child {
         min-width: 0;
     }
 
@@ -1380,8 +1219,8 @@
         line-height: 1.15;
     }
 
-    .right-section-head > button,
-    .right-section-head > a {
+    .right-section-head>button,
+    .right-section-head>a {
         min-height: 34px !important;
         padding: 0.4rem 0.55rem !important;
         border-radius: 9px !important;
@@ -1389,8 +1228,8 @@
         font-size: 0.64rem !important;
     }
 
-    .right-section-head > button i,
-    .right-section-head > a i {
+    .right-section-head>button i,
+    .right-section-head>a i {
         font-size: 0.65rem !important;
     }
 }
@@ -1408,10 +1247,53 @@
 body.layout-no-sidebar #mainContent.odontogram-page {
     width: 100%;
     min-width: 0;
-    box-sizing: border-box;
 
-    padding-left: clamp(16px, 2vw, 32px);
-    padding-right: clamp(16px, 2vw, 32px);
+    padding: 0;
+
+    box-sizing: border-box;
+}
+
+.odontogram-legend-resizer {
+    position: sticky;
+    top: var(--header-h);
+
+    width: 6px;
+    height: calc(100dvh - var(--header-h));
+
+    align-self: start;
+
+    cursor: col-resize;
+
+    background: transparent;
+
+    z-index: 25;
+
+    touch-action: none;
+}
+
+.odontogram-legend-resizer::before {
+    content: '';
+
+    position: absolute;
+    inset-block: 0;
+
+    left: 50%;
+
+    width: 1px;
+
+    transform: translateX(-50%);
+
+    background: var(--border);
+
+    transition:
+        width .15s ease,
+        background-color .15s ease;
+}
+
+.odontogram-legend-resizer:hover::before,
+.odontogram-legend-resizer.is-resizing::before {
+    width: 3px;
+    background: var(--crimson);
 }
 
 .odontogram-page {
@@ -1452,13 +1334,11 @@ body.layout-no-sidebar #mainContent.odontogram-page {
     color: var(--odo-text) !important;
 }
 
-[data-theme="dark"] #mainContent.odontogram-page .glass-panel,
 [data-theme="dark"] #mainContent.odontogram-page .soft-card,
 [data-theme="dark"] #mainContent.odontogram-page .hero-title-card,
 [data-theme="dark"] #mainContent.odontogram-page .hero-patient-card,
 [data-theme="dark"] #mainContent.odontogram-page .odontogram-toolbar,
 [data-theme="dark"] #mainContent.odontogram-page .right-section-card,
-.dark #mainContent.odontogram-page .glass-panel,
 .dark #mainContent.odontogram-page .soft-card,
 .dark #mainContent.odontogram-page .hero-title-card,
 .dark #mainContent.odontogram-page .hero-patient-card,
@@ -1471,20 +1351,6 @@ body.layout-no-sidebar #mainContent.odontogram-page {
     box-shadow: var(--odo-shadow) !important;
     backdrop-filter: blur(16px) saturate(140%) !important;
     -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page .selected-tooth-card,
-.dark #mainContent.odontogram-page .selected-tooth-card {
-    background:
-        radial-gradient(circle at top left, rgba(139, 0, 0, 0.16), transparent 38%),
-        linear-gradient(145deg, rgba(13, 17, 23, 0.86), rgba(22, 27, 34, 0.76)) !important;
-    border-color: rgba(252, 165, 165, 0.20) !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page .odontogram-right-bottom,
-.dark #mainContent.odontogram-page .odontogram-right-bottom {
-    background: transparent !important;
-    border-top-color: var(--odo-border) !important;
 }
 
 [data-theme="dark"] #mainContent.odontogram-page .hero-title,
@@ -1560,55 +1426,6 @@ body.layout-no-sidebar #mainContent.odontogram-page {
     border-color: var(--odo-border) !important;
 }
 
-[data-theme="dark"] #mainContent.odontogram-page .hero-danger-btn,
-.dark #mainContent.odontogram-page .hero-danger-btn {
-    background: rgba(13, 17, 23, 0.78) !important;
-    border-color: rgba(252, 165, 165, 0.22) !important;
-    color: #FCA5A5 !important;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.32) !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page .hero-danger-btn:hover,
-.dark #mainContent.odontogram-page .hero-danger-btn:hover {
-    background: rgba(139, 0, 0, 0.28) !important;
-    border-color: rgba(252, 165, 165, 0.36) !important;
-    color: #FFFFFF !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page .toolbar-soft-btn,
-[data-theme="dark"] #mainContent.odontogram-page .view-toggle-btn,
-.dark #mainContent.odontogram-page .toolbar-soft-btn,
-.dark #mainContent.odontogram-page .view-toggle-btn {
-    background: rgba(248, 250, 252, 0.08) !important;
-    border-color: rgba(203, 213, 225, 0.20) !important;
-    color: #CBD5E1 !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page .toolbar-soft-btn:hover:not(:disabled),
-[data-theme="dark"] #mainContent.odontogram-page .view-toggle-btn:hover,
-.dark #mainContent.odontogram-page .toolbar-soft-btn:hover:not(:disabled),
-.dark #mainContent.odontogram-page .view-toggle-btn:hover {
-    background: rgba(139, 0, 0, 0.24) !important;
-    border-color: rgba(252, 165, 165, 0.30) !important;
-    color: #FFFFFF !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page .toolbar-soft-btn:disabled,
-.dark #mainContent.odontogram-page .toolbar-soft-btn:disabled {
-    background: rgba(148, 163, 184, 0.10) !important;
-    border-color: rgba(148, 163, 184, 0.16) !important;
-    color: #64748B !important;
-    opacity: 1 !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page .view-toggle-btn.active,
-.dark #mainContent.odontogram-page .view-toggle-btn.active {
-    background: linear-gradient(135deg, #8B0000, #B91C1C) !important;
-    border-color: rgba(252, 165, 165, 0.35) !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 10px 24px rgba(139, 0, 0, 0.35) !important;
-}
-
 [data-theme="dark"] #mainContent.odontogram-page #selectedViewBadge,
 .dark #mainContent.odontogram-page #selectedViewBadge {
     background: rgba(139, 0, 0, 0.20) !important;
@@ -1628,66 +1445,6 @@ body.layout-no-sidebar #mainContent.odontogram-page {
     background: rgba(234, 88, 12, 0.14) !important;
     border-color: rgba(253, 186, 116, 0.22) !important;
     color: #FDBA74 !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page .treatment-chip,
-.dark #mainContent.odontogram-page .treatment-chip {
-    background: rgba(139, 0, 0, 0.18) !important;
-    color: #FCA5A5 !important;
-    border-color: rgba(252, 165, 165, 0.26) !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page .primary-action-btn,
-.dark #mainContent.odontogram-page .primary-action-btn {
-    background: linear-gradient(135deg, #8B0000, #B91C1C) !important;
-    color: #FFFFFF !important;
-    border-color: rgba(252, 165, 165, 0.30) !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page .primary-action-btn:disabled,
-.dark #mainContent.odontogram-page .primary-action-btn:disabled {
-    background: rgba(148, 163, 184, 0.12) !important;
-    color: #64748B !important;
-    border-color: rgba(148, 163, 184, 0.18) !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page #clearCurrentToothBtn,
-.dark #mainContent.odontogram-page #clearCurrentToothBtn {
-    background: rgba(248, 250, 252, 0.08) !important;
-    color: #CBD5E1 !important;
-    border: 1px solid rgba(203, 213, 225, 0.18) !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page #clearCurrentToothBtn:hover:not(:disabled),
-.dark #mainContent.odontogram-page #clearCurrentToothBtn:hover:not(:disabled) {
-    background: rgba(248, 250, 252, 0.14) !important;
-    color: #FFFFFF !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page #followUpBtn,
-.dark #mainContent.odontogram-page #followUpBtn {
-    background: rgba(250, 204, 21, 0.13) !important;
-    border-color: rgba(250, 204, 21, 0.24) !important;
-    color: #FDE047 !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page #finishProcedureBtn,
-.dark #mainContent.odontogram-page #finishProcedureBtn {
-    background: linear-gradient(135deg, #8B0000, #B91C1C) !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 10px 24px rgba(139, 0, 0, 0.35) !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page textarea,
-.dark #mainContent.odontogram-page textarea {
-    background: rgba(13, 17, 23, 0.72) !important;
-    border-color: rgba(255, 255, 255, 0.12) !important;
-    color: #E5E7EB !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page textarea::placeholder,
-.dark #mainContent.odontogram-page textarea::placeholder {
-    color: #64748B !important;
 }
 
 [data-theme="dark"] #mainContent.odontogram-page .tooth-number,
@@ -1748,12 +1505,6 @@ body.layout-no-sidebar #mainContent.odontogram-page {
     stroke: #FCA5A5;
 }
 
-[data-theme="dark"] #mainContent.odontogram-page #canvas-container,
-.dark #mainContent.odontogram-page #canvas-container {
-    background: #0D1117 !important;
-    border-radius: 16px;
-}
-
 [data-theme="dark"] #mainContent.odontogram-page .three-mouse-guide-item,
 .dark #mainContent.odontogram-page .three-mouse-guide-item {
     background: rgba(17, 24, 39, 0.88);
@@ -1789,12 +1540,6 @@ body.layout-no-sidebar #mainContent.odontogram-page {
     border-left-color: rgba(255, 255, 255, 0.10) !important;
 }
 
-[data-theme="dark"] body:has(#mainContent.odontogram-page) .legend-drawer-header,
-.dark body:has(#mainContent.odontogram-page) .legend-drawer-header {
-    background: rgba(13, 17, 23, 0.96) !important;
-    border-bottom-color: rgba(255, 255, 255, 0.10) !important;
-}
-
 [data-theme="dark"] body:has(#mainContent.odontogram-page) #legendDrawer h3,
 .dark body:has(#mainContent.odontogram-page) #legendDrawer h3 {
     color: #FCA5A5 !important;
@@ -1805,18 +1550,6 @@ body.layout-no-sidebar #mainContent.odontogram-page {
 .dark body:has(#mainContent.odontogram-page) #legendDrawer .text-gray-500,
 .dark body:has(#mainContent.odontogram-page) #legendDrawer .text-gray-400 {
     color: #94A3B8 !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.odontogram-page) #legendSearchInput,
-.dark body:has(#mainContent.odontogram-page) #legendSearchInput {
-    background: rgba(13, 17, 23, 0.72) !important;
-    border-color: rgba(255, 255, 255, 0.12) !important;
-    color: #E5E7EB !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.odontogram-page) #legendSearchInput::placeholder,
-.dark body:has(#mainContent.odontogram-page) #legendSearchInput::placeholder {
-    color: #64748B !important;
 }
 
 [data-theme="dark"] body:has(#mainContent.odontogram-page) .legend-category-block,
@@ -1888,18 +1621,6 @@ body.layout-no-sidebar #mainContent.odontogram-page {
     color: #FCA5A5 !important;
 }
 
-[data-theme="dark"] body:has(#mainContent.odontogram-page) #legendEmptyState,
-.dark body:has(#mainContent.odontogram-page) #legendEmptyState {
-    background: rgba(13, 17, 23, 0.76) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-}
-
-[data-theme="dark"] body:has(#mainContent.odontogram-page) #legendDrawerBackdrop.show,
-.dark body:has(#mainContent.odontogram-page) #legendDrawerBackdrop.show {
-    background: rgba(0, 0, 0, 0.56) !important;
-    backdrop-filter: blur(3px);
-}
-
 [data-theme="dark"] body:has(#mainContent.odontogram-page) #resetTreatmentModal .relative,
 [data-theme="dark"] body:has(#mainContent.odontogram-page) #cancelProcedureModal .relative,
 .dark body:has(#mainContent.odontogram-page) #resetTreatmentModal .relative,
@@ -1934,30 +1655,6 @@ body.layout-no-sidebar #mainContent.odontogram-page {
     border: 1px solid rgba(203, 213, 225, 0.18) !important;
 }
 
-[data-theme="dark"] #mainContent.odontogram-page .custom-scrollbar::-webkit-scrollbar-thumb,
-.dark #mainContent.odontogram-page .custom-scrollbar::-webkit-scrollbar-thumb,
-[data-theme="dark"] body:has(#mainContent.odontogram-page) .custom-scrollbar::-webkit-scrollbar-thumb,
-.dark body:has(#mainContent.odontogram-page) .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.32) !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page .soft-card,
-[data-theme="dark"] #mainContent.odontogram-page .selected-tooth-card,
-[data-theme="dark"] #legendDrawer .soft-card,
-.dark #mainContent.odontogram-page .soft-card,
-.dark #mainContent.odontogram-page .selected-tooth-card,
-.dark #legendDrawer .soft-card {
-    background:
-        radial-gradient(circle at top left, rgba(139, 0, 0, 0.12), transparent 34%),
-        linear-gradient(145deg, rgba(13, 17, 23, 0.88), rgba(22, 27, 34, 0.78)) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-    box-shadow:
-        0 18px 38px rgba(0, 0, 0, 0.30),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
-    backdrop-filter: blur(14px) saturate(140%);
-    -webkit-backdrop-filter: blur(14px) saturate(140%);
-}
-
 [data-theme="dark"] #mainContent.odontogram-page #selectedToothDisplay,
 [data-theme="dark"] #legendDrawer #drawerSelectedLegendPreview,
 [data-theme="dark"] #mainContent.odontogram-page #selectedLegendPreview,
@@ -1967,20 +1664,6 @@ body.layout-no-sidebar #mainContent.odontogram-page {
     background: rgba(255, 255, 255, 0.04) !important;
     border-color: rgba(252, 165, 165, 0.16) !important;
     color: #FCA5A5 !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page .selected-tooth-card .text-gray-500,
-[data-theme="dark"] #legendDrawer .soft-card .text-gray-500,
-.dark #mainContent.odontogram-page .selected-tooth-card .text-gray-500,
-.dark #legendDrawer .soft-card .text-gray-500 {
-    color: #94A3B8 !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page .selected-tooth-card,
-[data-theme="dark"] #legendDrawer .soft-card,
-.dark #mainContent.odontogram-page .selected-tooth-card,
-.dark #legendDrawer .soft-card {
-    color: #E5E7EB !important;
 }
 
 [data-theme="dark"] #mainContent.odontogram-page .legend-color-dot,
@@ -2026,6 +1709,7 @@ body.layout-no-sidebar #mainContent.odontogram-page {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
     .procedure-confirm-modal,
     .procedure-confirm-backdrop,
     .procedure-confirm-card {
@@ -2033,587 +1717,15 @@ body.layout-no-sidebar #mainContent.odontogram-page {
     }
 }
 
-#followUpModal {
-    align-items: center;
-    padding: 1rem;
-}
-
-#followUpModal .follow-up-modal-panel {
-    width: min(100%, 980px);
-    max-height: min(92vh, 760px);
-}
-
-#followUpModal .follow-up-modal-body {
-    max-height: calc(min(92vh, 760px) - 84px);
-    padding: 1rem 1.25rem !important;
-}
-
-#followUpModal .follow-up-modal-body>.bg-white:first-child {
-    padding: .85rem 1rem !important;
-    margin-bottom: .85rem !important;
-    border-radius: 1rem !important;
-}
-
-#followUpModal .section-label {
-    margin-bottom: .55rem !important;
-    font-size: .72rem !important;
-    line-height: 1.1 !important;
-}
-
-#followUpModal .two-col {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1.15fr) minmax(250px, .85fr) !important;
-    gap: 1rem !important;
-    align-items: start !important;
-}
-
-#followUpModal .follow-up-cal-wrap,
-#followUpModal .follow-up-slots-wrap {
-    min-width: 0 !important;
-    padding: .85rem !important;
-    border-radius: 1rem !important;
-}
-
-#followUpCalendarWrap {
-    transform: scale(.88);
-    transform-origin: top center;
-    width: 113.65%;
-    margin-left: -6.8%;
-    margin-bottom: -3.75rem;
-}
-
-#followUpCalendarWrap button {
-    min-height: 34px !important;
-}
-
-#followUpCalendarWrap [id="followUpCalGrid"],
-#followUpCalendarWrap .cal-grid,
-#followUpCalendarWrap .calendar-grid {
-    row-gap: .35rem !important;
-    column-gap: .35rem !important;
-}
-
-#followUpModal .slots-placeholder {
-    min-height: 135px !important;
-    padding: 1rem !important;
-    font-size: .9rem !important;
-    border-radius: 1rem !important;
-}
-
-#followUpModal .slots-grid {
-    max-height: 260px;
-    overflow-y: auto;
-    padding-right: .25rem;
-}
-
-#followUpModal .reason-textarea {
-    min-height: 72px !important;
-    padding: .85rem 1rem !important;
-    border-radius: 1rem !important;
-}
-
-#followUpModal .btn-row {
-    position: sticky;
-    bottom: -1rem;
-    z-index: 5;
-    display: flex !important;
-    justify-content: flex-end !important;
-    align-items: center !important;
-    gap: .75rem !important;
-    margin: 1rem -1.25rem -1rem !important;
-    padding: .9rem 1.25rem 1rem !important;
-    border-top: 1px solid #e5e7eb;
-    background: linear-gradient(180deg, rgba(249, 250, 251, .92), #ffffff);
-    box-shadow: 0 -10px 24px rgba(15, 23, 42, .06);
-}
-
-#followUpModal .btn {
-    min-height: 44px !important;
-    padding: .72rem 1.1rem !important;
-    border-radius: 1rem !important;
-    font-weight: 800 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: .5rem !important;
-    transition: all .2s ease !important;
-}
-
-#followUpModal .btn-cancel {
-    background: #f3f4f6 !important;
-    color: #374151 !important;
-    border: 1px solid #d1d5db !important;
-}
-
-#followUpModal .btn-cancel:hover {
-    background: #fee2e2 !important;
-    color: #991b1b !important;
-    border-color: #fecaca !important;
-}
-
-#followUpModal .follow-up-confirm-btn {
-    background: #8B0000 !important;
-    color: #ffffff !important;
-    border: 1px solid #8B0000 !important;
-    box-shadow: 0 10px 22px rgba(139, 0, 0, .20) !important;
-}
-
-#followUpModal .follow-up-confirm-btn:hover {
-    background: #660000 !important;
-    border-color: #660000 !important;
-    transform: translateY(-1px);
-    box-shadow: 0 14px 28px rgba(139, 0, 0, .26) !important;
-}
-
-
-
-/* Follow-up form alignment fixes */
-#followUpModal .two-col {
-    grid-template-columns: minmax(0, 1.06fr) minmax(285px, .94fr) !important;
-    gap: 1.15rem !important;
-    align-items: start !important;
-    margin-bottom: 1rem !important;
-}
-
-#followUpModal .follow-up-cal-wrap,
-#followUpModal .follow-up-slots-wrap {
-    background: #ffffff !important;
-    border: 1px solid #e5e7eb !important;
-    box-shadow: 0 10px 26px rgba(15, 23, 42, .05) !important;
-}
-
-#followUpModal .follow-up-cal-wrap {
-    align-self: start !important;
-    height: fit-content !important;
-    padding-bottom: 1.25rem !important;
-}
-
-#followUpModal .follow-up-slots-wrap {
-    align-self: start !important;
-    min-height: 374px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important;
-}
-
-#followUpModal .follow-up-slots-wrap>.section-label {
-    margin-top: .05rem !important;
-    margin-bottom: .75rem !important;
-}
-
-#followUpModal .slots-date-pill {
-    margin-bottom: .75rem !important;
-}
-
-#followUpModal .slots-placeholder {
-    flex: 1 1 auto !important;
-    width: 100% !important;
-    min-height: 230px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-align: center !important;
-    gap: .55rem !important;
-    background: #ffffff !important;
-    border: 1px dashed #d1d5db !important;
-    color: #6b7280 !important;
-}
-
-#followUpModal .slots-placeholder.follow-up-empty-slot-placeholder {
-    min-height: 258px !important;
-    padding: 2.2rem 1.5rem !important;
-    flex-direction: column !important;
-    gap: .45rem !important;
-    border: 1px dashed #f0cfc8 !important;
-    border-radius: 1.15rem !important;
-    background: #fffafa !important;
-    color: #8a817c !important;
-}
-
-#followUpModal .follow-up-empty-icon {
-    width: 3.25rem !important;
-    height: 3.25rem !important;
-    margin-bottom: .45rem !important;
-    border-radius: 999px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background: #fde9e9 !important;
-    color: #8B0000 !important;
-}
-
-#followUpModal .follow-up-empty-icon i {
-    font-size: 1.15rem !important;
-    color: #8B0000 !important;
-}
-
-#followUpModal .slots-placeholder.follow-up-empty-slot-placeholder h4 {
-    margin: 0 !important;
-    color: #5f5753 !important;
-    font-size: .98rem !important;
-    font-weight: 900 !important;
-    line-height: 1.2 !important;
-}
-
-#followUpModal .slots-placeholder.follow-up-empty-slot-placeholder p {
-    margin: 0 !important;
-    color: #9b918c !important;
-    font-size: .86rem !important;
-    font-weight: 500 !important;
-    line-height: 1.35 !important;
-}
-
-
-/* When slots are loaded, the empty-state card must disappear completely. */
-#followUpModal #followUpSlotPlaceholder.hidden,
-#followUpModal .slots-placeholder.follow-up-empty-slot-placeholder.hidden {
-    display: none !important;
-}
-
-#followUpModal #followUpSlotContainer {
-    flex: 1 1 auto !important;
-    width: 100% !important;
-}
-
-#followUpModal .reason-wrap {
-    width: 100% !important;
-    margin-top: .65rem !important;
-    margin-bottom: 1rem !important;
-    padding: .85rem !important;
-    border-radius: 1.15rem !important;
-    background: #ffffff !important;
-    border: 1px solid #e5e7eb !important;
-    box-shadow: 0 10px 26px rgba(15, 23, 42, .05) !important;
-    transition: border-color .2s ease, box-shadow .2s ease !important;
-}
-
-#followUpModal .reason-wrap:focus-within {
-    border-color: #8B0000 !important;
-    box-shadow: 0 0 0 4px rgba(139, 0, 0, .08), 0 10px 26px rgba(15, 23, 42, .05) !important;
-}
-
-#followUpModal .reason-textarea {
-    width: 100% !important;
-    min-height: 88px !important;
-    padding: .75rem .85rem !important;
-    background: #f9fafb !important;
-    border: 1px solid #eef0f3 !important;
-    border-radius: .9rem !important;
-    color: #374151 !important;
-    line-height: 1.45 !important;
-    box-shadow: none !important;
-    outline: none !important;
-}
-
-#followUpModal .reason-textarea:focus {
-    background: #ffffff !important;
-    border-color: #8B0000 !important;
-    box-shadow: none !important;
-    outline: none !important;
-}
-
-
-
-/* Follow-up time slot picker: matches the large appointment slot style. */
-#followUpModal .follow-up-slot-title {
-    margin-bottom: .35rem !important;
-    color: #8B0000 !important;
-    letter-spacing: .32em !important;
-    font-weight: 900 !important;
-}
-
-#followUpModal .follow-up-slot-helper {
-    margin: 0 0 1.05rem !important;
-    color: #8a817c !important;
-    font-size: .92rem !important;
-    line-height: 1.35 !important;
-}
-
-/* Hide the red selected-date pill while no date is selected. */
-#followUpModal #followUpDatePill {
-    display: none !important;
-    align-items: center !important;
-    gap: .55rem !important;
-    width: 100% !important;
-    margin: 0 0 1.15rem !important;
-    padding: .95rem 1.15rem !important;
-    border-radius: 1.15rem !important;
-    background: #8B0000 !important;
-    color: #ffffff !important;
-    font-weight: 900 !important;
-    font-size: 1rem !important;
-    box-shadow: 0 12px 24px rgba(139, 0, 0, .24) !important;
-}
-
-#followUpModal #followUpDatePill.show:not(:empty) {
-    display: flex !important;
-}
-
-#followUpModal #followUpDatePill i {
-    color: #ffffff !important;
-    font-size: .95rem !important;
-}
-
-#followUpModal #followUpDatePill span {
-    color: #86efac !important;
-    opacity: 1 !important;
-    font-size: .86rem !important;
-    font-weight: 900 !important;
-}
-
-#followUpModal #followUpSlotGrid.slot-grid-ui,
-#followUpModal #followUpSlotGrid.slots-grid {
-    display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: .85rem 1rem !important;
-    max-height: 310px !important;
-    overflow-y: auto !important;
-    padding: .05rem .2rem .15rem 0 !important;
-}
-
-#followUpModal #followUpSlotGrid .slot-chip {
-    min-height: 58px !important;
-    width: 100% !important;
-    padding: .85rem 1rem !important;
-    border-radius: 1.05rem !important;
-    border: 1px solid #ead7d1 !important;
-    background: #ffffff !important;
-    color: #2f3033 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: .65rem !important;
-    font-size: 1rem !important;
-    font-weight: 900 !important;
-    line-height: 1 !important;
-    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease, color .18s ease !important;
-}
-
-#followUpModal #followUpSlotGrid .slot-chip:not(.disabled):hover {
-    transform: translateY(-1px) !important;
-    border-color: #8B0000 !important;
-    color: #8B0000 !important;
-    box-shadow: 0 10px 22px rgba(139, 0, 0, .10) !important;
-}
-
-#followUpModal #followUpSlotGrid .slot-chip i {
-    color: #c34b4b !important;
-    font-size: .95rem !important;
-    opacity: 1 !important;
-}
-
-#followUpModal #followUpSlotGrid .slot-chip.selected,
-#followUpModal #followUpSlotGrid .slot-chip.bg-\[\#8B0000\] {
-    background: #8B0000 !important;
-    border-color: #8B0000 !important;
-    color: #ffffff !important;
-    box-shadow: 0 16px 28px rgba(139, 0, 0, .20) !important;
-}
-
-#followUpModal #followUpSlotGrid .slot-chip.selected i,
-#followUpModal #followUpSlotGrid .slot-chip.bg-\[\#8B0000\] i {
-    color: #ffffff !important;
-}
-
-#followUpModal #followUpSlotGrid .slot-chip.disabled {
-    border-color: #e5e7eb !important;
-    background: #f3f4f6 !important;
-    color: #9ca3af !important;
-    cursor: not-allowed !important;
-    opacity: .68 !important;
-}
-
-#followUpModal .follow-up-clear-time-btn {
-    width: 100% !important;
-    min-height: 42px !important;
-    margin-top: .85rem !important;
-    border-radius: .9rem !important;
-    border: 1px solid #efcaca !important;
-    background: #ffffff !important;
-    color: #8B0000 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: .55rem !important;
-    font-size: .88rem !important;
-    font-weight: 900 !important;
-    transition: all .18s ease !important;
-}
-
-#followUpModal .follow-up-clear-time-btn:hover {
-    background: #fff1f1 !important;
-    border-color: #8B0000 !important;
-}
-
-#followUpModal .follow-up-clear-time-btn.hidden {
-    display: none !important;
-}
-
-#followUpModal .follow-up-selected-time-pill {
-    width: 100% !important;
-    margin-top: .7rem !important;
-    padding: .9rem 1rem !important;
-    border-radius: 1rem !important;
-    border: 1px solid #efcaca !important;
-    background: #fff7f7 !important;
-    color: #8B0000 !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: .7rem !important;
-    font-size: .95rem !important;
-    font-weight: 900 !important;
-    box-shadow: 0 8px 18px rgba(139, 0, 0, .08) !important;
-}
-
-#followUpModal .follow-up-selected-time-pill.hidden {
-    display: none !important;
-}
-
-#followUpModal .follow-up-selected-time-pill i {
-    color: #8B0000 !important;
-}
-
-
-
-/* FINAL FOLLOW-UP SLOT STATE FIX
-           - no red date bar before selecting a date
-           - hide Choose-a-date placeholder once a date/slots are loaded
-           - keep the Book Appointment style scoped only inside the follow-up modal */
-#followUpModal #followUpDatePill.hidden,
-#followUpModal #followUpDatePill:empty {
-    display: none !important;
-    height: 0 !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    box-shadow: none !important;
-}
-
-#followUpModal #followUpDatePill:not(.hidden):not(:empty),
-#followUpModal #followUpDatePill.show:not(:empty) {
-    display: flex !important;
-    align-items: center !important;
-}
-
-#followUpModal #followUpSlotPlaceholder.hidden,
-#followUpModal .follow-up-slots-wrap.has-date #followUpSlotPlaceholder,
-#followUpModal .follow-up-slots-wrap.has-slots #followUpSlotPlaceholder {
-    display: none !important;
-    height: 0 !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-}
-
-#followUpModal .follow-up-slots-wrap.is-empty #followUpSlotPlaceholder:not(.hidden) {
-    display: flex !important;
-    height: 258px !important;
-    min-height: 258px !important;
-    margin-top: 0 !important;
-    padding: 2.2rem 1.5rem !important;
-    overflow: visible !important;
-}
-
-#followUpModal .follow-up-slots-wrap.is-empty #followUpSlotContainer,
-#followUpModal .follow-up-slots-wrap.is-empty #followUpSelectedTimePill,
-#followUpModal .follow-up-slots-wrap.is-empty #followUpClearTimeBtn {
-    display: none !important;
-}
-
-#followUpModal .follow-up-slots-wrap.has-date #followUpSlotContainer:not(.hidden),
-#followUpModal .follow-up-slots-wrap.has-slots #followUpSlotContainer:not(.hidden) {
-    display: block !important;
-}
-
-@media (max-width: 900px) {
-    #followUpModal {
-        align-items: flex-end;
-        padding: 0;
-    }
-
-    #followUpModal .follow-up-modal-panel {
-        width: 100%;
-        max-height: 92vh;
-    }
-
-    #followUpModal .follow-up-modal-body {
-        max-height: calc(92vh - 84px);
-        padding: .9rem !important;
-    }
-
-    #followUpModal .two-col {
-        grid-template-columns: 1fr !important;
-        gap: .85rem !important;
-    }
-
-    #followUpCalendarWrap {
-        transform: none;
-        width: 100%;
-        margin-left: 0;
-        margin-bottom: 0;
-    }
-
-
-
-    #followUpModal .follow-up-slots-wrap {
-        min-height: auto !important;
-    }
-
-    #followUpModal .slots-placeholder {
-        min-height: 125px !important;
-    }
-
-    #followUpModal .slots-placeholder.follow-up-empty-slot-placeholder {
-        min-height: 190px !important;
-        padding: 1.6rem 1rem !important;
-    }
-
-    #followUpModal .reason-wrap {
-        padding: .7rem !important;
-        border-radius: 1rem !important;
-    }
-
-    #followUpModal .btn-row {
-        flex-direction: column-reverse !important;
-        align-items: stretch !important;
-        margin-left: -.9rem !important;
-        margin-right: -.9rem !important;
-        padding: .85rem .9rem 1rem !important;
-    }
-
-    #followUpModal .btn {
-        width: 100% !important;
-    }
-
-    #followUpModal #followUpSlotGrid.slot-grid-ui,
-    #followUpModal #followUpSlotGrid.slots-grid {
-        grid-template-columns: 1fr !important;
-        max-height: 280px !important;
-    }
-
-    #followUpModal #followUpDatePill,
-    #followUpModal #followUpDatePill.show {
-        padding: .85rem 1rem !important;
-        font-size: .92rem !important;
-    }
-}
-
-
 [data-theme="dark"] #mainContent.odontogram-page #surfacePicker3D,
 .dark #mainContent.odontogram-page #surfacePicker3D {
     background:
-        radial-gradient(
-            circle at top left,
+        radial-gradient(circle at top left,
             rgba(139, 0, 0, 0.22),
-            transparent 42%
-        ),
-        linear-gradient(
-            145deg,
+            transparent 42%),
+        linear-gradient(145deg,
             rgba(13, 17, 23, 0.97),
-            rgba(22, 27, 34, 0.95)
-        ) !important;
+            rgba(22, 27, 34, 0.95)) !important;
 
     border-color: rgba(255, 255, 255, 0.12) !important;
     color: #f8fafc !important;
@@ -2626,36 +1738,25 @@ body.layout-no-sidebar #mainContent.odontogram-page {
     -webkit-backdrop-filter: blur(18px) saturate(145%) !important;
 }
 
-
-[data-theme="dark"] #mainContent.odontogram-page
-#surfacePicker3D .text-gray-400,
-.dark #mainContent.odontogram-page
-#surfacePicker3D .text-gray-400 {
+[data-theme="dark"] #mainContent.odontogram-page #surfacePicker3D .text-gray-400,
+.dark #mainContent.odontogram-page #surfacePicker3D .text-gray-400 {
     color: #94a3b8 !important;
 }
 
-[data-theme="dark"] #mainContent.odontogram-page
-#surfacePickerToothLabel,
-.dark #mainContent.odontogram-page
-#surfacePickerToothLabel {
+[data-theme="dark"] #mainContent.odontogram-page #surfacePickerToothLabel,
+.dark #mainContent.odontogram-page #surfacePickerToothLabel {
     color: #fca5a5 !important;
 }
 
-[data-theme="dark"] #mainContent.odontogram-page
-#surfacePickerHelperText,
-[data-theme="dark"] #mainContent.odontogram-page
-#surfacePicker3D .text-gray-500,
-.dark #mainContent.odontogram-page
-#surfacePickerHelperText,
-.dark #mainContent.odontogram-page
-#surfacePicker3D .text-gray-500 {
+[data-theme="dark"] #mainContent.odontogram-page #surfacePickerHelperText,
+[data-theme="dark"] #mainContent.odontogram-page #surfacePicker3D .text-gray-500,
+.dark #mainContent.odontogram-page #surfacePickerHelperText,
+.dark #mainContent.odontogram-page #surfacePicker3D .text-gray-500 {
     color: #cbd5e1 !important;
 }
 
-[data-theme="dark"] #mainContent.odontogram-page
-#surfacePicker3D .bg-red-50,
-.dark #mainContent.odontogram-page
-#surfacePicker3D .bg-red-50 {
+[data-theme="dark"] #mainContent.odontogram-page #surfacePicker3D .bg-red-50,
+.dark #mainContent.odontogram-page #surfacePicker3D .bg-red-50 {
     background: rgba(139, 0, 0, 0.28) !important;
     color: #fca5a5 !important;
     border: 1px solid rgba(252, 165, 165, 0.18) !important;
@@ -2665,10 +1766,8 @@ body.layout-no-sidebar #mainContent.odontogram-page {
         0 8px 18px rgba(0, 0, 0, 0.20) !important;
 }
 
-[data-theme="dark"] #mainContent.odontogram-page
-#close3DSurfacePickerBtn,
-.dark #mainContent.odontogram-page
-#close3DSurfacePickerBtn {
+[data-theme="dark"] #mainContent.odontogram-page #close3DSurfacePickerBtn,
+.dark #mainContent.odontogram-page #close3DSurfacePickerBtn {
     background: rgba(148, 163, 184, 0.16) !important;
     border: 1px solid rgba(203, 213, 225, 0.18) !important;
     color: #cbd5e1 !important;
@@ -2678,25 +1777,19 @@ body.layout-no-sidebar #mainContent.odontogram-page {
         0 8px 18px rgba(0, 0, 0, 0.18) !important;
 }
 
-[data-theme="dark"] #mainContent.odontogram-page
-#close3DSurfacePickerBtn:hover,
-.dark #mainContent.odontogram-page
-#close3DSurfacePickerBtn:hover {
+[data-theme="dark"] #mainContent.odontogram-page #close3DSurfacePickerBtn:hover,
+.dark #mainContent.odontogram-page #close3DSurfacePickerBtn:hover {
     background: rgba(239, 68, 68, 0.22) !important;
     border-color: rgba(252, 165, 165, 0.32) !important;
     color: #ffffff !important;
 }
 
-[data-theme="dark"] #mainContent.odontogram-page
-#surfacePicker3D > .rounded-2xl.bg-gray-50,
-.dark #mainContent.odontogram-page
-#surfacePicker3D > .rounded-2xl.bg-gray-50 {
+[data-theme="dark"] #mainContent.odontogram-page #surfacePicker3D>.rounded-2xl.bg-gray-50,
+.dark #mainContent.odontogram-page #surfacePicker3D>.rounded-2xl.bg-gray-50 {
     background:
-        linear-gradient(
-            145deg,
+        linear-gradient(145deg,
             rgba(31, 41, 55, 0.90),
-            rgba(17, 24, 39, 0.88)
-        ) !important;
+            rgba(17, 24, 39, 0.88)) !important;
 
     border-color: rgba(255, 255, 255, 0.10) !important;
 
@@ -2705,16 +1798,12 @@ body.layout-no-sidebar #mainContent.odontogram-page {
         0 12px 26px rgba(0, 0, 0, 0.24) !important;
 }
 
-[data-theme="dark"] #mainContent.odontogram-page
-#surfacePicker3D .surface-picker-btn,
-.dark #mainContent.odontogram-page
-#surfacePicker3D .surface-picker-btn {
+[data-theme="dark"] #mainContent.odontogram-page #surfacePicker3D .surface-picker-btn,
+.dark #mainContent.odontogram-page #surfacePicker3D .surface-picker-btn {
     background:
-        linear-gradient(
-            145deg,
+        linear-gradient(145deg,
             rgba(31, 41, 55, 0.96),
-            rgba(17, 24, 39, 0.96)
-        ) !important;
+            rgba(17, 24, 39, 0.96)) !important;
 
     border-color: rgba(203, 213, 225, 0.18) !important;
     color: #e5e7eb !important;
@@ -2724,10 +1813,8 @@ body.layout-no-sidebar #mainContent.odontogram-page {
         0 8px 18px rgba(0, 0, 0, 0.20) !important;
 }
 
-[data-theme="dark"] #mainContent.odontogram-page
-#surfacePicker3D .surface-picker-btn:hover:not(:disabled),
-.dark #mainContent.odontogram-page
-#surfacePicker3D .surface-picker-btn:hover:not(:disabled) {
+[data-theme="dark"] #mainContent.odontogram-page #surfacePicker3D .surface-picker-btn:hover:not(:disabled),
+.dark #mainContent.odontogram-page #surfacePicker3D .surface-picker-btn:hover:not(:disabled) {
     background: rgba(139, 0, 0, 0.28) !important;
     border-color: rgba(252, 165, 165, 0.38) !important;
     color: #ffffff !important;
@@ -2739,39 +1826,16 @@ body.layout-no-sidebar #mainContent.odontogram-page {
     transform: translateY(-1px);
 }
 
-[data-theme="dark"] #mainContent.odontogram-page
-#surfacePicker3D .surface-picker-btn.bg-red-600,
-.dark #mainContent.odontogram-page
-#surfacePicker3D .surface-picker-btn.bg-red-600 {
-    background:
-        linear-gradient(
-            135deg,
-            #8b0000,
-            #b91c1c
-        ) !important;
-
-    border-color: rgba(252, 165, 165, 0.72) !important;
-    color: #ffffff !important;
-
-    box-shadow:
-        0 0 0 3px rgba(252, 165, 165, 0.14),
-        0 14px 28px rgba(139, 0, 0, 0.38) !important;
-}
-
-[data-theme="dark"] #mainContent.odontogram-page
-#surfacePicker3D .surface-picker-btn:disabled,
-.dark #mainContent.odontogram-page
-#surfacePicker3D .surface-picker-btn:disabled {
+[data-theme="dark"] #mainContent.odontogram-page #surfacePicker3D .surface-picker-btn:disabled,
+.dark #mainContent.odontogram-page #surfacePicker3D .surface-picker-btn:disabled {
     background: rgba(30, 41, 59, 0.55) !important;
     border-color: rgba(148, 163, 184, 0.12) !important;
     color: #64748b !important;
     box-shadow: none !important;
 }
 
-[data-theme="dark"] #mainContent.odontogram-page
-#reset3DViewBtn,
-.dark #mainContent.odontogram-page
-#reset3DViewBtn {
+[data-theme="dark"] #mainContent.odontogram-page #reset3DViewBtn,
+.dark #mainContent.odontogram-page #reset3DViewBtn {
     background: rgba(148, 163, 184, 0.14) !important;
     border: 1px solid rgba(203, 213, 225, 0.18) !important;
     color: #e2e8f0 !important;
@@ -2781,11 +1845,962 @@ body.layout-no-sidebar #mainContent.odontogram-page {
         0 8px 18px rgba(0, 0, 0, 0.18) !important;
 }
 
-[data-theme="dark"] #mainContent.odontogram-page
-#reset3DViewBtn:hover,
-.dark #mainContent.odontogram-page
-#reset3DViewBtn:hover {
+[data-theme="dark"] #mainContent.odontogram-page #reset3DViewBtn:hover,
+.dark #mainContent.odontogram-page #reset3DViewBtn:hover {
     background: rgba(139, 0, 0, 0.25) !important;
     border-color: rgba(252, 165, 165, 0.30) !important;
     color: #ffffff !important;
+}
+
+.odontogram-page {
+    color: var(--text-1);
+}
+
+.odontogram-page .card,
+.odontogram-page .section-card,
+.odontogram-page .section-block {
+    background: var(--card);
+    border-color: var(--border);
+    color: var(--text-1);
+}
+
+.odontogram-page .card {
+    animation: none;
+}
+
+.odontogram-left-panel {
+    overflow: visible;
+    box-shadow: none;
+}
+
+.odontogram-left-panel>.card-body {
+    padding: 1rem;
+}
+
+.odontogram-patient-card {
+    display: grid;
+    grid-template-columns: minmax(260px, 1.3fr) minmax(0, 2fr);
+    gap: .75rem;
+    width: 100%;
+    padding: .75rem;
+}
+
+.odontogram-patient-main {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+    padding: .75rem;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+}
+
+.odontogram-patient-copy {
+    min-width: 0;
+}
+
+.odontogram-patient-eyebrow,
+.odontogram-appointment-meta-label {
+    display: block;
+    color: var(--text-3);
+    font-size: .62rem;
+    font-weight: 850;
+    line-height: 1.25;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.odontogram-appointment-meta-item>div {
+    min-width: 0;
+}
+
+.odontogram-patient-name {
+    margin-top: .2rem;
+    color: var(--text-1);
+    font-size: 1rem;
+    font-weight: 900;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+}
+
+.odontogram-patient-service {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    margin-top: .4rem;
+    color: var(--crimson);
+    font-size: .74rem;
+    font-weight: 800;
+}
+
+.odontogram-patient-service i {
+    color: currentColor;
+}
+
+.odontogram-appointment-meta {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .65rem;
+}
+
+.odontogram-appointment-meta-item {
+    min-width: 0;
+    min-height: 68px;
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+    padding: .72rem .8rem;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--card);
+    overflow: hidden;
+}
+
+.odontogram-appointment-meta-icon {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: var(--crimson-light);
+    color: var(--crimson);
+}
+
+.odontogram-appointment-meta-icon i {
+    color: currentColor;
+    font-size: 12px;
+}
+
+.odontogram-appointment-meta-value {
+    display: block;
+    margin-top: .25rem;
+    color: var(--text-1);
+    font-size: .76rem;
+    font-weight: 850;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+}
+
+.odontogram-selected-card {
+    margin: 0;
+    border-color: var(--border);
+    background: var(--card);
+    box-shadow: none;
+}
+
+.odontogram-selected-card .section-card-body {
+    padding: 1rem;
+}
+
+.odontogram-selected-display {
+    width: 100%;
+
+    padding: .4rem .5rem;
+
+    border: 1px solid var(--crimson-mid);
+    border-radius: 9px;
+
+    background: var(--card);
+    color: var(--crimson);
+
+    font-size: .68rem;
+    font-weight: 850;
+    line-height: 1.15;
+}
+
+.odontogram-loading-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .75rem;
+    border-radius: 14px;
+    background: var(--card);
+    color: var(--text-2);
+    transition: opacity .5s ease;
+}
+
+.odontogram-loading-overlay>i {
+    color: var(--crimson);
+    font-size: 2rem;
+}
+
+.odontogram-loading-overlay>p {
+    margin: 0;
+    color: var(--text-2);
+    font-size: .78rem;
+    font-weight: 700;
+}
+
+.odontogram-surface-picker {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 20;
+    width: 320px;
+    max-width: calc(100% - 2rem);
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: color-mix(in srgb, var(--card) 96%, transparent);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, .14);
+    backdrop-filter: blur(12px);
+}
+
+.odontogram-surface-grid-shell {
+    margin-bottom: .75rem;
+    padding: .75rem;
+}
+
+.surface-picker-btn {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .55rem .7rem;
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    background: var(--card);
+    color: var(--text-2);
+    font-size: .72rem;
+    font-weight: 850;
+    cursor: pointer;
+    transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
+}
+
+.surface-picker-btn-center {
+    min-height: 48px;
+    border-radius: 999px;
+}
+
+.surface-picker-btn:hover:not(:disabled) {
+    background: var(--crimson-light);
+    border-color: var(--crimson-mid);
+    color: var(--crimson);
+}
+
+.surface-picker-btn.active {
+    background: var(--crimson);
+    border-color: var(--crimson);
+    color: var(--text-on-brand);
+}
+
+.odontogram-label-optional {
+    color: var(--text-3);
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.right-section-body .global-form-group:last-child {
+    margin-bottom: 0;
+}
+
+.right-section-body .global-form-textarea {
+    min-height: 130px;
+}
+
+.legend-drawer-header {
+    position: static;
+    z-index: 2;
+    padding: .75rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+}
+
+.legend-drawer-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 1rem 1.1rem;
+}
+
+.legend-drawer-title-icon {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+
+    display: inline-grid;
+    place-items: center;
+
+    border: 1px solid var(--crimson-mid);
+    border-radius: 9px;
+
+    background: var(--crimson-light);
+    color: var(--crimson);
+
+    font-size: .72rem;
+}
+
+.odontogram-legend-search-wrap {
+    margin-top: .55rem;
+}
+
+.odontogram-legend-options-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    margin-top: .75rem;
+}
+
+.odontogram-legend-options-head .global-form-label,
+.odontogram-legend-options-head .ui-muted-text {
+    margin: 0;
+}
+
+.existing-appointment-body {
+    display: grid;
+    gap: 1rem;
+}
+
+.legend-drawer-title {
+    margin: 0;
+    color: var(--crimson);
+    font-size: 1rem;
+    font-weight: 900;
+    line-height: 1.2;
+}
+
+.legend-drawer-subtitle {
+    margin: .15rem 0 0;
+    color: var(--text-3);
+    font-size: .72rem;
+    line-height: 1.35;
+}
+
+[data-theme="dark"] #mainContent.odontogram-page .odontogram-patient-card,
+[data-theme="dark"] #mainContent.odontogram-page .odontogram-appointment-meta-item,
+[data-theme="dark"] #mainContent.odontogram-page .odontogram-selected-card,
+[data-theme="dark"] #mainContent.odontogram-page .odontogram-selected-display,
+.dark #mainContent.odontogram-page .odontogram-patient-card,
+.dark #mainContent.odontogram-page .odontogram-appointment-meta-item,
+.dark #mainContent.odontogram-page .odontogram-selected-card,
+.dark #mainContent.odontogram-page .odontogram-selected-display {
+    background: var(--card);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] #mainContent.odontogram-page .odontogram-patient-main,
+.dark #mainContent.odontogram-page .odontogram-patient-main {
+    background: var(--surface);
+}
+
+[data-theme="dark"] #mainContent.odontogram-page .odontogram-patient-name,
+[data-theme="dark"] #mainContent.odontogram-page .odontogram-appointment-meta-value,
+.dark #mainContent.odontogram-page .odontogram-patient-name,
+.dark #mainContent.odontogram-page .odontogram-appointment-meta-value {
+    color: var(--text-1);
+}
+
+[data-theme="dark"] #mainContent.odontogram-page .odontogram-patient-service,
+[data-theme="dark"] #mainContent.odontogram-page .odontogram-selected-display,
+.dark #mainContent.odontogram-page .odontogram-patient-service,
+.dark #mainContent.odontogram-page .odontogram-selected-display {
+    color: #FCA5A5;
+}
+
+[data-theme="dark"] #mainContent.odontogram-page .odontogram-surface-picker,
+.dark #mainContent.odontogram-page .odontogram-surface-picker {
+    background: color-mix(in srgb, var(--card) 96%, transparent) !important;
+    border-color: var(--border) !important;
+}
+
+[data-theme="dark"] #mainContent.odontogram-page .surface-picker-btn,
+.dark #mainContent.odontogram-page .surface-picker-btn {
+    background: var(--card) !important;
+    border-color: var(--border) !important;
+    color: var(--text-2) !important;
+}
+
+[data-theme="dark"] #mainContent.odontogram-page .surface-picker-btn:hover:not(:disabled),
+.dark #mainContent.odontogram-page .surface-picker-btn:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--card) 85%, var(--crimson) 15%) !important;
+    border-color: rgba(252, 165, 165, .28) !important;
+    color: #FCA5A5 !important;
+}
+
+[data-theme="dark"] body:has(#mainContent.odontogram-page) .legend-drawer-header,
+.dark body:has(#mainContent.odontogram-page) .legend-drawer-header {
+    background: var(--card) !important;
+    border-color: var(--border) !important;
+}
+
+[data-theme="dark"] body:has(#mainContent.odontogram-page) .legend-drawer-title,
+.dark body:has(#mainContent.odontogram-page) .legend-drawer-title {
+    color: #FCA5A5 !important;
+}
+
+@media (max-width: 900px) {
+
+    .odontogram-dock-layout {
+        display: block;
+    }
+
+    .odontogram-dock-main {
+        padding:
+            calc(var(--header-h) + 1rem) clamp(12px, 2vw, 20px) 1rem;
+    }
+
+    .odontogram-legend-resizer {
+        display: none;
+    }
+
+    .odontogram-legend-panel {
+        position: static;
+
+        width: 100%;
+        height: auto;
+
+        border-top: 1px solid var(--border);
+        border-left: 0;
+
+        box-shadow: none;
+    }
+
+    .odontogram-legend-panel .legend-drawer-body {
+        overflow: visible;
+    }
+
+    .odontogram-patient-card {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 767px) {
+    .odontogram-appointment-meta {
+        grid-template-columns: 1fr;
+    }
+
+    .odontogram-patient-main {
+        align-items: flex-start;
+    }
+
+    .odontogram-surface-picker {
+        right: .75rem;
+        bottom: .75rem;
+        width: min(290px, calc(100% - 1.5rem));
+        max-height: calc(100dvh - 100px);
+        overflow-y: auto;
+    }
+
+    .legend-drawer-header,
+    .legend-drawer-body {
+        padding-left: .85rem;
+        padding-right: .85rem;
+    }
+
+    .right-section-body .global-form-textarea {
+        min-height: 110px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .odontogram-surface-picker,
+    .surface-picker-btn {
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+    }
+}
+
+.odontogram-page .hero-title-card,
+.odontogram-page .odontogram-toolbar,
+.odontogram-page .right-section-card,
+.odontogram-page .legend-category-block {
+    background: var(--card);
+    border-color: var(--border);
+    box-shadow: none;
+}
+
+.odontogram-page .right-section-head,
+.odontogram-page .legend-category-head {
+    background: var(--surface);
+    border-color: var(--border);
+}
+
+.odontogram-page .hero-eyebrow,
+.odontogram-page .toolbar-label,
+.odontogram-page .right-section-eyebrow,
+.odontogram-page .legend-category-count {
+    color: var(--text-3);
+}
+
+.odontogram-page .hero-subtitle,
+.odontogram-page .right-section-title,
+.odontogram-page .legend-btn .legend-label {
+    color: var(--text-2);
+}
+
+#mainContent.odontogram-page .hero-title,
+.odontogram-page .legend-btn .legend-code,
+.odontogram-page .right-section-eyebrow {
+    color: var(--crimson);
+    -webkit-text-fill-color: currentColor;
+}
+
+.odontogram-page .legend-btn {
+    border-color: var(--border);
+    background: var(--card);
+    color: var(--text-2);
+    box-shadow: none;
+}
+
+.odontogram-page .legend-btn:hover {
+    border-color: var(--crimson-mid);
+    background: var(--crimson-light);
+    color: var(--crimson);
+    box-shadow: none;
+}
+
+.odontogram-page .legend-btn.active {
+    border-color: var(--crimson);
+    background: var(--crimson-light);
+    color: var(--crimson);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--crimson) 8%, transparent);
+}
+
+.odontogram-page .legend-category-icon {
+    background: var(--crimson-light);
+    color: var(--crimson);
+}
+
+.odontogram-page .legend-category-count {
+    background: var(--surface);
+}
+
+.odontogram-page .existing-appointment-intro-card,
+.odontogram-page .existing-appointment-summary-card {
+    border-color: var(--border);
+    background: var(--card);
+    color: var(--text-2);
+    box-shadow: none;
+}
+
+[data-theme="dark"] #mainContent.odontogram-page .hero-title-card,
+[data-theme="dark"] #mainContent.odontogram-page .odontogram-toolbar,
+[data-theme="dark"] #mainContent.odontogram-page .right-section-card,
+[data-theme="dark"] #mainContent.odontogram-page .legend-category-block,
+.dark #mainContent.odontogram-page .hero-title-card,
+.dark #mainContent.odontogram-page .odontogram-toolbar,
+.dark #mainContent.odontogram-page .right-section-card,
+.dark #mainContent.odontogram-page .legend-category-block {
+    background: var(--card) !important;
+    border-color: var(--border) !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+}
+
+[data-theme="dark"] #mainContent.odontogram-page .right-section-head,
+[data-theme="dark"] #mainContent.odontogram-page .legend-category-head,
+.dark #mainContent.odontogram-page .right-section-head,
+.dark #mainContent.odontogram-page .legend-category-head {
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+}
+
+#odontogramToolbar {
+    min-height: 0;
+    padding: .65rem .8rem;
+    align-items: center;
+    overflow: visible;
+}
+
+#odontogramToolbar .toolbar-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: .55rem;
+}
+
+#odontogramToolbar .toolbar-label {
+    display: none;
+}
+
+#odontogramToolbar .toolbar-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: .5rem;
+}
+
+#odontogramToolbar .toolbar-group-tools {
+    margin-right: auto;
+}
+
+#odontogramToolbar .toolbar-group-view {
+    margin-left: auto;
+}
+
+@media (max-width: 767px) {
+    #odontogramToolbar {
+        min-height: 54px;
+        padding: .55rem .65rem;
+    }
+}
+
+#resetTreatmentModal,
+#cancelProcedureModal,
+#finishProcedureModal {
+    z-index: 1500 !important;
+}
+
+#resetTreatmentModal .global-confirm-alert,
+#cancelProcedureModal .global-confirm-alert,
+#finishProcedureModal .global-confirm-alert {
+    margin: 0;
+}
+
+#finishProcedureModal .modal-ft.hidden {
+    display: none !important;
+}
+
+#finishProcedureModal .modal-ft:not(.hidden) {
+    display: flex;
+}
+
+.procedure-confirm-modal,
+.procedure-confirm-card,
+.procedure-confirm-backdrop {
+    all: unset;
+}
+
+.odontogram-workspace-grid {
+    display: block;
+
+    width: 100%;
+    min-width: 0;
+}
+
+.odontogram-dock-layout {
+    --legend-panel-width: 390px;
+    --legend-panel-min: 320px;
+    --legend-panel-max: 560px;
+    --legend-resizer-width: 6px;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr) var(--legend-resizer-width) var(--legend-panel-width);
+
+    width: 100%;
+    min-width: 0;
+
+    align-items: start;
+}
+
+.odontogram-dock-main {
+    min-width: 0;
+
+    padding:
+        calc(var(--header-h) + 1.5rem) clamp(16px, 2vw, 32px) 1.5rem;
+}
+
+.odontogram-workspace-full {
+    grid-column: 1 / -1;
+}
+
+.odontogram-left-panel {
+    width: 100%;
+    min-width: 0;
+}
+
+.odontogram-legend-panel {
+    position: sticky;
+    top: var(--header-h);
+    width: 100%;
+    min-width: 0;
+    height: calc(100dvh - var(--header-h));
+    display: flex;
+    flex-direction: column;
+    align-self: start;
+    border: 0;
+    border-left: 1px solid var(--border);
+    border-radius: 0;
+    background: var(--card);
+    overflow: hidden;
+    container-type: inline-size;
+    box-shadow:
+        -10px 0 28px rgba(15, 23, 42, .04);
+}
+
+.odontogram-guide-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+
+    margin-bottom: .75rem;
+    padding: .55rem .65rem;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.odontogram-legend-panel .legend-drawer-header {
+    position: static;
+    flex: 0 0 auto;
+}
+
+body.odontogram-resizing,
+body.odontogram-resizing * {
+    cursor: col-resize !important;
+    user-select: none !important;
+}
+
+.odontogram-legend-panel .legend-drawer-body {
+    flex: 1 1 auto;
+    min-height: 0;
+
+    padding: .55rem .65rem .65rem;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.legend-drawer-heading {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    min-width: 0;
+}
+
+.legend-drawer-copy {
+    min-width: 0;
+}
+
+.odontogram-clinical-section {
+    margin: 0 1rem 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.odontogram-clinical-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    margin-bottom: .85rem;
+}
+
+.odontogram-clinical-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: .85rem;
+}
+
+.odontogram-clinical-grid .global-form-group {
+    margin-bottom: 0;
+}
+
+.odontogram-clinical-grid .global-form-textarea {
+    min-height: 105px;
+}
+
+.odontogram-prescription-field {
+    grid-column: 1 / -1;
+}
+
+.odontogram-prescription-field .global-form-textarea {
+    min-height: 82px;
+}
+
+@media (max-width: 767px) {
+    .odontogram-clinical-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .odontogram-prescription-field {
+        grid-column: auto;
+    }
+}
+
+.odontogram-legend-target {
+    margin-top: .5rem;
+    padding: .5rem;
+}
+
+.odontogram-selected-name {
+    margin-top: .3rem;
+
+    color: var(--text-1);
+
+    font-size: .64rem;
+    font-weight: 800;
+    line-height: 1.15;
+}
+
+.odontogram-current-treatment {
+    margin-top: .4rem;
+}
+
+.odontogram-current-treatment .global-form-label {
+    margin-bottom: .15rem;
+    font-size: .54rem;
+}
+
+.odontogram-legend-status-note {
+    margin-top: .35rem;
+    padding: .38rem .48rem;
+
+    border-radius: 8px;
+
+    font-size: .58rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.odontogram-target-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: .35rem;
+    margin-top: .4rem;
+}
+
+.odontogram-target-actions .ui-btn {
+    min-height: 32px;
+    height: 32px;
+
+    padding: .3rem .4rem;
+
+    border-radius: 9px;
+
+    font-size: .61rem;
+}
+
+.odontogram-target-actions .ui-btn i {
+    font-size: .68rem;
+}
+
+@media (max-width: 420px) {
+    .odontogram-target-actions {
+        grid-template-columns: 1fr;
+    }
+}
+
+[data-theme="dark"] .odontogram-legend-target,
+.dark .odontogram-legend-target {
+    background: var(--surface);
+    border-color: var(--border);
+}
+
+.odontogram-procedure-actions {
+    grid-column: 1 / -1;
+
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: .65rem;
+
+    margin-top: .15rem;
+    padding-top: 1rem;
+
+    border-top: 1px solid var(--border);
+}
+
+.odontogram-procedure-actions .ui-btn {
+    min-width: 190px;
+}
+
+@media (max-width: 640px) {
+    .odontogram-procedure-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .odontogram-procedure-actions .ui-btn {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .odontogram-guide-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+#mainContent.odontogram-page .hero-title-card {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+
+    gap: .85rem;
+    padding: .85rem 1rem;
+}
+
+#mainContent.odontogram-page .hero-title-icon {
+    grid-column: 1;
+    flex: none;
+}
+
+#mainContent.odontogram-page .odontogram-hero-copy {
+    grid-column: 2;
+
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#mainContent.odontogram-page #cancelProcedureBtn {
+    grid-column: 3;
+
+    width: auto;
+    margin: 0;
+
+    justify-self: end;
+    align-self: center;
+
+    white-space: nowrap;
+}
+
+#mainContent.odontogram-page #odontogramToolbar {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: .75rem;
+    padding: .65rem .8rem;
+}
+
+#mainContent.odontogram-page #odontogramToolbar .toolbar-group {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: row;
+
+    align-items: center;
+
+    margin: 0;
+    gap: .45rem;
+}
+
+#mainContent.odontogram-page #odontogramToolbar .toolbar-actions {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+
+    align-items: center;
+
+    gap: .4rem;
 }

@@ -2,7 +2,7 @@
     function makeCalendarDot(colorClass, text = '') {
         const sizeClass = text ? 'min-w-[16px] h-4 px-1 text-[9px] font-bold' : 'w-4 h-4 text-[9px]';
         return `
-            <span class="absolute -top-1 -right-1 ${sizeClass} rounded-full ${colorClass} text-white leading-none flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-white">
+            <span class="calendar-badge absolute -top-1 -right-1 ${sizeClass} rounded-full ${colorClass} leading-none flex items-center justify-center border">
                 ${text}
             </span>
         `;
@@ -10,8 +10,8 @@
 
     function makeHolidayStar() {
         return `
-        <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-yellow-400 text-[10px] leading-none
-            flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-white">
+        <span class="calendar-badge calendar-badge-holiday absolute -top-1 -right-1 w-4 h-4 rounded-full text-[10px] leading-none
+    flex items-center justify-center border">
             <i class="fa-solid fa-star text-[8px]"></i>
         </span>
     `;
@@ -19,8 +19,8 @@
 
     function makeClinicClosedBadge() {
         return `
-            <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-gray-500 text-[10px] leading-none
-                flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-white">
+            <span class="calendar-badge calendar-badge-closed absolute -top-1 -right-1 w-4 h-4 rounded-full text-[10px] leading-none
+                flex items-center justify-center border">
                 <i class="fa-solid fa-minus text-[8px]"></i>
             </span>
         `;
@@ -37,11 +37,15 @@
     `;
     }
 
-    function makeMyAppointmentBadge() {
+    function makeMyAppointmentBadge(isFollowUp = false) {
+        const iconClass = isFollowUp ?
+            'fa-solid fa-calendar-plus' :
+            'fa-regular fa-calendar-check';
+
         return `
-        <span class="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-blue-600 text-[9px] leading-none
-            flex items-center justify-center text-white shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-white">
-            <i class="fa-regular fa-calendar-check text-[8px]"></i>
+        <span class="calendar-badge calendar-badge-appointment absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full text-[9px] leading-none
+    flex items-center justify-center border">
+            <i class="${iconClass} text-[8px]"></i>
         </span>
     `;
     }
@@ -102,8 +106,14 @@
         window.createCalendarSource(calendarConfig) :
         null;
 
-    window.__appCalendarSources = window.__appCalendarSources || {};
-    window.__appCalendarSources[calendarConfig.dateInputId] = sharedCalendarSource;
+    window.__appCalendarSources =
+        window.__appCalendarSources || {};
+
+    if (calendarConfig.dateInputId) {
+        window.__appCalendarSources[
+            calendarConfig.dateInputId
+        ] = sharedCalendarSource;
+    }
 
     const todayDate = new Date();
     todayDate.setHours(0, 0, 0, 0);
@@ -287,36 +297,25 @@
     }
 
     const CALENDAR_THEME = {
-        colors: {
-            textMuted: "text-[#9e9690]",
-            borderSoft: "border-[#f0ebe6]",
-            navText: "text-[#8B0000]",
-            monthText: "text-[#660000]",
-        },
-
         statuses: {
             myAppointment: {
                 key: "myAppointment",
                 label: "My Appointment",
-                dotClass: "bg-blue-600",
-                tooltipBg: "bg-blue-600",
-                tooltipArrow: "after:border-t-blue-600",
-                cellBg: "bg-blue-50",
-                cellText: "text-blue-700",
+                dotClass: "calendar-badge-appointment",
+                tooltipClass: "calendar-tooltip-appointment",
                 legendIcon: `
         <span class="cal-pill cal-pill-blue">
             <i class="fa-regular fa-calendar-check text-[10px]"></i>
             My Appointment
         </span>
     `,
-                badge: () => makeMyAppointmentBadge(),
+                badge: (isFollowUp = false) =>
+                    makeMyAppointmentBadge(isFollowUp),
             },
             completedAppointment: {
                 key: "completedAppointment",
                 label: "Completed Visit",
-
-                tooltipBg: "bg-emerald-600",
-                tooltipArrow: "after:border-t-emerald-600",
+                tooltipClass: "calendar-tooltip-completed",
 
                 legendIcon: `
         <span class="cal-pill cal-pill-green">
@@ -330,11 +329,8 @@
             today: {
                 key: "today",
                 label: "Today",
-                dotClass: "bg-[#8B0000]",
-                tooltipBg: "bg-[#8B0000]",
-                tooltipArrow: "after:border-t-[#8B0000]",
-                cellBg: "bg-[#8B0000]",
-                cellText: "text-white",
+                dotClass: "calendar-badge-today",
+                tooltipClass: "calendar-tooltip-today",
                 legendIcon: `
                      <span class="cal-pill cal-pill-maroon">
                         <i class="fa-solid fa-calendar-day text-[10px]"></i>
@@ -345,11 +341,8 @@
             hasPatients: {
                 key: "hasPatients",
                 label: "Has Patients",
-                dotClass: "bg-emerald-600",
-                tooltipBg: "bg-emerald-600",
-                tooltipArrow: "after:border-t-emerald-600",
-                cellBg: "bg-emerald-50",
-                cellText: "text-emerald-700",
+                dotClass: "calendar-badge-completed",
+                tooltipClass: "calendar-tooltip-completed",
                 legendIcon: `
                     <span class="cal-pill cal-pill-green">
                         <i class="fa-solid fa-user-check text-[10px]"></i>
@@ -360,11 +353,8 @@
             fullyBooked: {
                 key: "fullyBooked",
                 label: "Fully Booked",
-                dotClass: "bg-red-600",
-                tooltipBg: "bg-red-500",
-                tooltipArrow: "after:border-t-red-500",
-                cellBg: "bg-red-50",
-                cellText: "text-red-700",
+                dotClass: "calendar-badge-full",
+                tooltipClass: "calendar-tooltip-full",
                 legendIcon: `
                     <span class="cal-pill cal-pill-red">
                         <i class="fa-solid fa-ban text-[10px]"></i>
@@ -375,10 +365,7 @@
             holiday: {
                 key: "holiday",
                 label: "Holiday",
-                tooltipBg: "bg-yellow-500",
-                tooltipArrow: "after:border-t-yellow-500",
-                cellBg: "bg-yellow-50",
-                cellText: "text-yellow-700",
+                tooltipClass: "calendar-tooltip-holiday",
                 legendIcon: `
                     <span class="cal-pill cal-pill-yellow">
                         <i class="fa-solid fa-star text-[10px]"></i>
@@ -390,11 +377,8 @@
             clinicClosed: {
                 key: "clinicClosed",
                 label: "Clinic Closed",
-                dotClass: "bg-gray-500",
-                tooltipBg: "bg-gray-600",
-                tooltipArrow: "after:border-t-gray-600",
-                cellBg: "skeleton-line",
-                cellText: "text-gray-500",
+                dotClass: "calendar-badge-closed",
+                tooltipClass: "calendar-tooltip-closed",
                 legendIcon: `
                     <span class="cal-pill cal-pill-gray">
                         <i class="fa-solid fa-circle-minus text-[10px]"></i>
@@ -406,18 +390,16 @@
             todayNotAvailable: {
                 key: "todayNotAvailable",
                 label: "Today not available",
-                dotClass: "bg-gray-500",
-                tooltipBg: "bg-gray-600",
-                tooltipArrow: "after:border-t-gray-600",
-                cellBg: "skeleton-line",
-                cellText: "text-gray-500",
+                dotClass: "calendar-badge-closed",
+                tooltipClass: "calendar-tooltip-neutral",
+
                 legendIcon: `
-                    <span class="cal-pill cal-pill-gray">
-                        <i class="fa-solid fa-circle-minus text-[10px]"></i>
-                        Today not available
-                    </span>
-                `,
-            }
+        <span class="cal-pill cal-pill-gray">
+            <i class="fa-solid fa-circle-minus text-[10px]"></i>
+            Today not available
+        </span>
+    `,
+            },
         }
     };
 
@@ -565,11 +547,17 @@
         let badgeHtml = "";
         let tooltipHtml = "";
         let tooltip = "";
-        let tooltipBg = "bg-[#1a1410]";
-        let tooltipArrow = "after:border-t-[#1a1410]";
+        let tooltipClass = "calendar-tooltip-neutral";
 
         if (variant !== 'dentist') {
             if (
+                state.myAppointment &&
+                state.isSelected
+            ) {
+                cellClass += " selected";
+            } else if (state.myAppointment) {
+                cellClass += " my-appointment";
+            } else if (
                 state.isSelected &&
                 state.hasCompletedAppointment
             ) {
@@ -654,16 +642,35 @@
             } else if (!allowAllDates && state.isFull) {
                 cellClass += " full disabled";
             } else if (!allowAllDates && (state.isClosed || state.isPastOrToday)) {
-                cellClass += ` disabled ${CALENDAR_THEME.statuses.clinicClosed.cellText}`;
+                cellClass += " clinic-closed disabled";
             }
         }
 
         if (state.myAppointment && !state.isBookingMode) {
-            badgeHtml += CALENDAR_THEME.statuses.myAppointment.badge();
-            tooltip = `<i class="fa-regular fa-calendar-check mr-1 text-blue-200"></i>${state.myAppointment}`;
-            tooltipBg = CALENDAR_THEME.statuses.myAppointment.tooltipBg;
-            tooltipArrow = CALENDAR_THEME.statuses.myAppointment.tooltipArrow;
+            badgeHtml += CALENDAR_THEME.statuses.myAppointment.badge(
+                String(state.myAppointment)
+                .toLowerCase()
+                .includes('follow-up')
+            );
+
+            const isFollowUp =
+                String(state.myAppointment)
+                .toLowerCase()
+                .includes('follow-up');
+
+            const appointmentIcon = isFollowUp ?
+                'fa-solid fa-calendar-plus' :
+                'fa-regular fa-calendar-check';
+
+            tooltip = `
+    <i class="${appointmentIcon} mr-1"></i>
+    ${state.myAppointment}
+`;
+
+            tooltipClass =
+                CALENDAR_THEME.statuses.myAppointment.tooltipClass;
         }
+
         if (
             state.hasCompletedAppointment &&
             calendarConfig.mode === 'patient-dashboard'
@@ -671,40 +678,40 @@
             badgeHtml +=
                 CALENDAR_THEME.statuses.completedAppointment.badge();
 
-            const firstVisit =
-                state.completedAppointments[0];
+            if (!state.myAppointment) {
+                const firstVisit =
+                    state.completedAppointments[0];
 
-            tooltip = `
-        <i class="fa-solid fa-circle-check mr-1"></i>
-        Completed: ${firstVisit?.service || 'Dental Visit'}
-    `;
+                tooltip = `
+            <i class="fa-solid fa-circle-check mr-1"></i>
+            Completed: ${firstVisit?.service || 'Dental Visit'}
+        `;
 
-            tooltipBg =
-                CALENDAR_THEME.statuses.completedAppointment.tooltipBg;
-
-            tooltipArrow =
-                CALENDAR_THEME.statuses.completedAppointment.tooltipArrow;
+                tooltipClass =
+                    CALENDAR_THEME.statuses.completedAppointment.tooltipClass;
+            }
         }
 
         if (state.isHoliday && !allowAllDates) {
             badgeHtml += CALENDAR_THEME.statuses.holiday.badge();
             if (!tooltip) {
                 tooltip = `<i class="fa-solid fa-star mr-1 text-white"></i>${state.holidayName}`;
-                tooltipBg = CALENDAR_THEME.statuses.holiday.tooltipBg;
-                tooltipArrow = CALENDAR_THEME.statuses.holiday.tooltipArrow;
+                tooltipClass =
+                    CALENDAR_THEME.statuses.holiday.tooltipClass;
             }
         } else if (
             !ignoreAvailabilityRestrictions &&
             state.isFull
         ) {
             if (!state.myAppointment && !state.isClosed) {
-                badgeHtml += makeCalendarDot(CALENDAR_THEME.statuses.fullyBooked.dotClass, state.count > 0 ? String(
-                    state.count) : '');
+                badgeHtml += makeCalendarDot(
+                    CALENDAR_THEME.statuses.fullyBooked.dotClass
+                );
             }
             if (!tooltip) {
                 tooltip = state.isBookingMode ? "Full Slot" : "Fully Booked";
-                tooltipBg = CALENDAR_THEME.statuses.fullyBooked.tooltipBg;
-                tooltipArrow = CALENDAR_THEME.statuses.fullyBooked.tooltipArrow;
+                tooltipClass =
+                    CALENDAR_THEME.statuses.fullyBooked.tooltipClass;
             }
         } else if (
             !ignoreAvailabilityRestrictions &&
@@ -720,8 +727,8 @@
             <i class="fa-solid fa-circle-minus mr-1"></i>
             Clinic Closed
         `;
-                tooltipBg = CALENDAR_THEME.statuses.clinicClosed.tooltipBg;
-                tooltipArrow = CALENDAR_THEME.statuses.clinicClosed.tooltipArrow;
+                tooltipClass =
+                    CALENDAR_THEME.statuses.clinicClosed.tooltipClass;
             }
         } else if (
             !ignoreAvailabilityRestrictions &&
@@ -733,8 +740,7 @@
             <i class="fa-solid fa-clock-rotate-left mr-1"></i>
             Past date
         `;
-                tooltipBg = "bg-gray-500";
-                tooltipArrow = "after:border-t-gray-500";
+                tooltipClass = "calendar-tooltip-neutral";
             }
         } else if (variant === 'dentist' && state.hasPatients && !state.isPast && !state.isHoliday) {
             badgeHtml += makeCalendarDot(
@@ -742,16 +748,17 @@
                 .dotClass,
                 state.count > 0 ? String(state.count) : ''
             );
-            cellClass +=
-                ` ${CALENDAR_THEME.statuses.hasPatients.cellBg} ${CALENDAR_THEME.statuses.hasPatients.cellText} font-bold`;
+            cellClass += " has-patients font-bold";
             if (!tooltip) {
                 tooltip = `${state.count} Appointment${state.count > 1 ? 's' : ''}`;
-                tooltipBg = CALENDAR_THEME.statuses.hasPatients.tooltipBg;
-                tooltipArrow = CALENDAR_THEME.statuses.hasPatients.tooltipArrow;
+
+                tooltipClass =
+                    CALENDAR_THEME.statuses.hasPatients.tooltipClass;
             }
         }
 
         if (
+            !state.myAppointment &&
             allowAllDatesExceptHolidays &&
             disableWeekends &&
             state.isWeekend
@@ -761,15 +768,14 @@
         Clinic closed on weekends
     `;
 
-            tooltipBg =
-                "bg-gray-600";
+            tooltipClass =
+                "calendar-tooltip-neutral";
 
-            tooltipArrow =
-                "after:border-t-gray-600";
         } else if (
             state.isHoliday &&
             !allowAllDates
         ) {} else if (
+            !state.myAppointment &&
             !ignoreAvailabilityRestrictions &&
             state.isToday &&
             calendarConfig.disallowToday
@@ -778,9 +784,12 @@
         <i class="fa-solid fa-calendar-day mr-1"></i>
         Same-day booking is not allowed
     `;
-            tooltipBg = "bg-gray-600";
-            tooltipArrow = "after:border-t-gray-600";
+
+            tooltipClass =
+                "calendar-tooltip-neutral";
+
         } else if (
+            !state.myAppointment &&
             !ignoreAvailabilityRestrictions &&
             state.isPast &&
             !state.hasCompletedAppointment
@@ -789,9 +798,12 @@
         <i class="fa-solid fa-clock-rotate-left mr-1"></i>
         Past date — booking not allowed
     `;
-            tooltipBg = "bg-gray-500";
-            tooltipArrow = "after:border-t-gray-500";
+
+            tooltipClass =
+                "calendar-tooltip-neutral";
+
         } else if (
+            !state.myAppointment &&
             !ignoreAvailabilityRestrictions &&
             state.isClosed
         ) {
@@ -799,15 +811,25 @@
         <i class="fa-solid fa-circle-minus mr-1"></i>
         Clinic closed on this date
     `;
-            tooltipBg = "bg-gray-600";
-            tooltipArrow = "after:border-t-gray-600";
-        } else if (state.isToday && !tooltip && !state.myAppointment) {
+
+            tooltipClass =
+                "calendar-tooltip-neutral";
+
+        } else if (
+            state.isToday &&
+            !tooltip &&
+            !state.myAppointment
+        ) {
             tooltip = `
-        <i class="fa-solid fa-calendar-day mr-1 text-white/90"></i>
+        <i class="fa-solid fa-calendar-day mr-1"></i>
         Today
     `;
-            tooltipBg = CALENDAR_THEME.statuses.today.tooltipBg;
-            tooltipArrow = CALENDAR_THEME.statuses.today.tooltipArrow;
+
+            tooltipClass =
+                CALENDAR_THEME
+                .statuses
+                .today
+                .tooltipClass;
         }
 
         if (tooltip) {
@@ -815,13 +837,13 @@
             const tooltipSide = day >= 5 ? "tooltip-left" : day <= 1 ? "tooltip-right" : "tooltip-center";
 
             tooltipHtml = `
-        <div class="day-smart-tooltip ${tooltipSide} absolute bottom-[calc(100%+10px)] z-[9999] pointer-events-none">
-            <div class="${tooltipBg} relative text-white text-[0.65rem] font-bold px-3 py-2 rounded-lg whitespace-nowrap shadow-xl
-                after:content-[''] after:absolute after:top-full after:border-4 after:border-transparent ${tooltipArrow}">
-                ${tooltip}
-            </div>
+    <div class="day-smart-tooltip ${tooltipSide} absolute bottom-[calc(100%+10px)] z-[9999] pointer-events-none">
+        <div class="calendar-tooltip ${tooltipClass} relative text-[0.65rem] font-bold px-3 py-2 rounded-lg whitespace-nowrap shadow-xl
+            after:content-[''] after:absolute after:top-full after:border-4 after:border-transparent">
+            ${tooltip}
         </div>
-    `;
+    </div>
+`;
         }
 
         return {
@@ -1436,7 +1458,7 @@
                     ${MONTHS[month]}
                 </p>
 
-                <p class="text-[0.65rem] text-[#9e9690] font-semibold tracking-widest">
+                <p class="calendar-year-label text-[0.65rem] font-semibold tracking-widest">
                     ${year}
                 </p>
             </div>
@@ -1446,7 +1468,7 @@
             <div class="calendar-main-header">
                 <button
                     type="button"
-                    class="cal-nav-btn w-8 h-8 rounded-full border border-[#e8e2dd] flex items-center justify-center text-[#8B0000] text-xs ${prevDisabled ? 'opacity-40 cursor-not-allowed' : ''}"
+                    class="cal-nav-btn w-8 h-8 rounded-full border flex items-center justify-center text-xs ${prevDisabled ? 'opacity-40 cursor-not-allowed' : ''}"
                     ${prevDisabled ? 'disabled' : 'onclick="changeMonth(-1)"'}
                     aria-label="Previous month"
                 >
@@ -1457,7 +1479,7 @@
 
                 <button
                     type="button"
-                    class="cal-nav-btn w-8 h-8 rounded-full border border-[#e8e2dd] flex items-center justify-center text-[#8B0000] text-xs ${nextDisabled ? 'opacity-40 cursor-not-allowed' : ''}"
+                    class="cal-nav-btn w-8 h-8 rounded-full border flex items-center justify-center text-xs ${nextDisabled ? 'opacity-40 cursor-not-allowed' : ''}"
                     ${nextDisabled ? 'disabled' : 'onclick="changeMonth(1)"'}
                     aria-label="Next month"
                 >
@@ -1467,7 +1489,7 @@
 
             ${dashboardToolbar}
 
-            <hr class="border-[#f0ebe6] mb-3">
+            <hr class="calendar-divider mb-3">
 
             <div
                 class="cal-grid"
@@ -1532,8 +1554,11 @@
         const isInitialAnimatedRender = !hasCalendarRenderedOnce &&
             calendarConfig.mode !== 'booking';
 
-        if (isInitialAnimatedRender) {
-            swapSkeletonContent(
+        if (
+            isInitialAnimatedRender &&
+            typeof window.swapSkeletonContent === 'function'
+        ) {
+            window.swapSkeletonContent(
                 calendarConfig.calendarContainerId,
                 markup
             );
@@ -1562,12 +1587,40 @@
 
             calendarContainer
                 ?.querySelectorAll(
-                    '.custom-select'
+                    '.calendar-split-picker .custom-select'
                 )
                 .forEach(wrapper => {
                     window.syncCustomSelect?.(
                         wrapper
                     );
+
+                    const button =
+                        wrapper.querySelector(
+                            '.custom-select-button'
+                        );
+
+                    if (
+                        button &&
+                        !button.querySelector(
+                            '.calendar-picker-icon'
+                        )
+                    ) {
+                        const iconWrap =
+                            document.createElement('span');
+
+                        iconWrap.className =
+                            'calendar-picker-icon';
+
+                        iconWrap.setAttribute(
+                            'aria-hidden',
+                            'true'
+                        );
+
+                        iconWrap.innerHTML =
+                            '<i class="fa-solid fa-calendar-days"></i>';
+
+                        button.prepend(iconWrap);
+                    }
                 });
 
             bindCalendarClicks(
@@ -1614,7 +1667,9 @@
             const isCompletedAppointment =
                 state?.hasCompletedAppointment === true;
 
-            const isInteractive = !isDisabled || isCompletedAppointment;
+            const isInteractive = !isDisabled ||
+                Boolean(state?.myAppointment) ||
+                isCompletedAppointment;
 
             el.setAttribute(
                 'tabindex',
@@ -1632,6 +1687,19 @@
             );
 
             const activateDate = () => {
+                if (state?.myAppointment) {
+                    selectedDate = state.iso;
+                    focusedDateIso = state.iso;
+
+                    renderCalendar();
+
+                    if (calendarConfig.mode === 'patient-dashboard') {
+                        selectDate(state.iso);
+                    }
+
+                    return;
+                }
+
                 if (isCompletedAppointment) {
                     selectedDate = state.iso;
                     focusedDateIso = state.iso;
@@ -1862,6 +1930,71 @@
         );
     }
 
+    function scrollSelectedCalendarDetailsIntoView() {
+        if (
+            calendarConfig.mode !==
+            'patient-dashboard'
+        ) {
+            return;
+        }
+
+        requestAnimationFrame(() => {
+            const container =
+                document.getElementById(
+                    calendarConfig.calendarContainerId
+                );
+
+            const panel =
+                getDashboardAvailabilityPanel();
+
+            if (!container || !panel) {
+                return;
+            }
+
+            const isStackedLayout =
+                window.matchMedia(
+                    '(max-width: 1100px)'
+                ).matches;
+
+            if (!isStackedLayout) {
+                return;
+            }
+
+            const legend =
+                container.querySelector(
+                    '.cal-legend'
+                );
+
+            const target =
+                legend || panel;
+
+            const header =
+                document.querySelector(
+                    '.main-header, header'
+                );
+
+            const headerHeight =
+                header?.getBoundingClientRect()
+                .height || 0;
+
+            const extraOffset =
+                window.innerWidth <= 640 ?
+                10 :
+                18;
+
+            const targetTop =
+                target.getBoundingClientRect().top +
+                window.scrollY -
+                headerHeight -
+                extraOffset;
+
+            window.scrollTo({
+                top: Math.max(0, targetTop),
+                behavior: 'smooth'
+            });
+        });
+    }
+
     function renderCompletedAppointmentPanel(state) {
         const panel = getDashboardAvailabilityPanel();
 
@@ -1976,6 +2109,8 @@
             </div>
         </div>
     `;
+
+        scrollSelectedCalendarDetailsIntoView();
     }
 
     function escapeCalendarText(value) {
@@ -2076,6 +2211,8 @@
         </div>
     `;
 
+            scrollSelectedCalendarDetailsIntoView();
+
             return;
         }
 
@@ -2137,6 +2274,8 @@
                 </div>
             </div>
         `;
+
+        scrollSelectedCalendarDetailsIntoView();
     }
 
     function renderSlots(payload, iso) {
@@ -2181,17 +2320,32 @@
                 banner.style.display = "none";
                 banner.innerHTML = "";
             } else {
-                const slotColor = remaining <= 2 ? "rgba(255,220,100,0.9)" : "rgba(160,255,180,0.9)";
-                banner.innerHTML =
-                    `<i class="fa-regular fa-calendar mr-2"></i>${MONTHS[parseInt(m) - 1]} ${parseInt(d)}, ${y}<span style="margin-left:8px; font-size:0.75rem; color:${slotColor};">(${remaining}/${maxSlots} slots left)</span>`;
+                const slotAvailabilityClass =
+                    remaining <= 2 ?
+                    "slot-availability-low" :
+                    "slot-availability-good";
+                banner.innerHTML = `
+                    <i class="fa-regular fa-calendar mr-2"></i>
+                    ${MONTHS[parseInt(m) - 1]} ${parseInt(d)}, ${y}
+
+                    <span class="slot-availability-count ${slotAvailabilityClass}">
+                        (${remaining}/${maxSlots} slots left)
+                    </span>
+                `;
                 banner.classList.remove("hidden");
                 banner.style.display = "block";
             }
         }
 
         if (pill) {
-            pill.innerHTML =
-                `<i class="fa-regular fa-calendar mr-1"></i>${MONTHS[parseInt(m) - 1]} ${parseInt(d)}, ${y}<span style="margin-left:.5rem;opacity:.8;">${remaining}/${maxSlots} slots left</span>`;
+            pill.innerHTML = `
+                <i class="fa-regular fa-calendar mr-1"></i>
+                ${MONTHS[parseInt(m) - 1]} ${parseInt(d)}, ${y}
+
+                <span class="slot-pill-availability">
+                    ${remaining}/${maxSlots} slots left
+                </span>
+            `;
             pill.classList.add("show");
         }
 
@@ -2208,7 +2362,7 @@
         if (!slots.length) {
             if (slotGrid) {
                 slotGrid.innerHTML =
-                    `<div class="text-sm text-[#9e9690] italic py-4 text-center w-full">${payload?.message || 'No available slots for this date.'}</div>`;
+                    `<div class="slot-empty-message text-sm italic py-4 text-center w-full">${payload?.message || 'No available slots for this date.'}</div>`;
             }
             if (slotPlaceholder && calendarConfig.renderStyle === 'dentist') {
                 slotPlaceholder.style.display = "flex";
@@ -2232,25 +2386,34 @@
 
             const chip = document.createElement("div");
 
-            if (calendarConfig.renderStyle === 'dentist') {
+            if (
+                calendarConfig.renderStyle ===
+                'dentist'
+            ) {
                 chip.className =
                     "slot-chip flex items-center justify-center gap-2 rounded-2xl border font-bold text-[0.98rem] " +
-                    (disabled ?
-                        "disabled border-[#e8dfdb] bg-[#f8f5f4] text-[#8f8580] line-through opacity-60 cursor-not-allowed pointer-events-none" :
-                        "border-[#e7d8d2] bg-white text-[#2f2f2f] cursor-pointer");
+                    (
+                        disabled ?
+                        "disabled line-through opacity-60 cursor-not-allowed pointer-events-none" :
+                        "cursor-pointer"
+                    );
 
-                chip.innerHTML = disabled ?
+                chip.innerHTML =
+                    disabled ?
                     `<i class="fa-solid fa-ban text-[0.9rem]"></i><span>${timeValue}</span>` :
                     `<i class="fa-regular fa-clock text-[0.9rem]"></i><span>${timeValue}</span>`;
             } else {
                 chip.className =
-                    "slot-chip flex items-center gap-2.5 px-4 py-2.5 rounded-xl border font-semibold text-sm cursor-pointer " +
-                    (disabled ?
-                        "border-[#e8e2dd] text-[#c4bfba] line-through opacity-60 cursor-not-allowed" :
-                        "border-[#e8e2dd] bg-[#fafaf8] text-[#1a1410] hover:border-[#8B0000] hover:bg-[#fff5f5] hover:text-[#8B0000]"
+                    "slot-chip flex items-center gap-2.5 px-4 py-2.5 rounded-xl border font-semibold text-sm " +
+                    (
+                        disabled ?
+                        "disabled line-through opacity-60 cursor-not-allowed" :
+                        "cursor-pointer"
                     );
-                chip.innerHTML = disabled ?
-                    `<i class="text-xs opacity-70 fa-solid fa-ban"></i><span>${timeValue} </span>` :
+
+                chip.innerHTML =
+                    disabled ?
+                    `<i class="text-xs opacity-70 fa-solid fa-ban"></i><span>${timeValue}</span>` :
                     `<i class="text-xs opacity-70 fa-regular fa-clock"></i><span>${timeValue}</span>`;
             }
 
@@ -2294,14 +2457,10 @@
                     if (dateError) dateError.style.display = "none";
                     if (slotsWrap) slotsWrap.classList.remove("error");
 
-                    // click ulit sa same selected time = unselect
                     if (selectedTime === timeValue) {
                         chip.classList.remove(
-                            "selected", "bg-[#8B0000]", "text-white",
-                            "border-[#8B0000]", "shadow-[0_2px_12px_rgba(139,0,0,0.25)]"
+                            "selected"
                         );
-
-                        chip.classList.add("border-[#e8e2dd]", "bg-[#fafaf8]", "text-[#1a1410]");
                         chip.setAttribute("aria-pressed", "false");
 
                         selectedTime = null;
@@ -2329,21 +2488,29 @@
                         return;
                     }
 
-                    slotGrid.querySelectorAll(".slot-chip").forEach(c => {
-                        c.classList.remove(
-                            "selected", "bg-[#8B0000]", "text-white",
-                            "border-[#8B0000]", "shadow-[0_2px_12px_rgba(139,0,0,0.25)]"
-                        );
-                        c.classList.add("border-[#e8e2dd]", "bg-[#fafaf8]", "text-[#1a1410]");
-                        c.setAttribute("aria-pressed", "false");
-                    });
+                    slotGrid
+                        .querySelectorAll(
+                            ".slot-chip"
+                        )
+                        .forEach(c => {
+                            c.classList.remove(
+                                "selected"
+                            );
 
-                    chip.classList.add("selected", "bg-[#8B0000]", "text-white", "border-[#8B0000]");
-                    chip.classList.remove(
-                        "border-[#e8e2dd]", "border-[#e7d8d2]", "bg-[#fafaf8]",
-                        "bg-white", "text-[#1a1410]", "text-[#2f2f2f]"
+                            c.setAttribute(
+                                "aria-pressed",
+                                "false"
+                            );
+                        });
+
+                    chip.classList.add(
+                        "selected"
                     );
-                    chip.setAttribute("aria-pressed", "true");
+
+                    chip.setAttribute(
+                        "aria-pressed",
+                        "true"
+                    );
 
                     selectedTime = timeValue;
                     if (timeInput) {
@@ -2377,10 +2544,18 @@
     let currentYear = new Date().getFullYear();
     let currentMonth = new Date().getMonth();
 
-    window.changeMonth = function(dir) {
+    let calendarMonthAnimating = false;
+
+    window.changeMonth = async function(dir) {
+        if (calendarMonthAnimating) {
+            return;
+        }
+
+        const direction = Number(dir);
+
         const candidate = new Date(
             currentYear,
-            currentMonth + Number(dir),
+            currentMonth + direction,
             1
         );
 
@@ -2389,19 +2564,96 @@
             maximum
         } = getMonthBounds();
 
-        if (candidate < minimum || candidate > maximum) {
+        if (
+            candidate < minimum ||
+            candidate > maximum
+        ) {
             return;
         }
+
+        calendarMonthAnimating = true;
 
         clearTimeout(dashboardLoadingTimer);
         dashboardLoadingTimer = null;
 
-        currentYear = candidate.getFullYear();
-        currentMonth = candidate.getMonth();
+        const container =
+            document.getElementById(
+                calendarConfig.calendarContainerId
+            );
+
+        const currentPanel =
+            container?.querySelector(
+                '.dashboard-calendar-main'
+            ) ||
+            container?.querySelector(
+                '.cal-shell'
+            );
+
+        if (currentPanel) {
+            const outgoingClass =
+                direction > 0 ?
+                'global-carousel-out-left' :
+                'global-carousel-out-right';
+
+            currentPanel.classList.add(
+                outgoingClass
+            );
+
+            await new Promise(resolve => {
+                window.setTimeout(
+                    resolve,
+                    180
+                );
+            });
+        }
+
+        currentYear =
+            candidate.getFullYear();
+
+        currentMonth =
+            candidate.getMonth();
+
         selectedDate = null;
         focusedDateIso = null;
 
         renderCalendar();
+
+        requestAnimationFrame(() => {
+            const nextContainer =
+                document.getElementById(
+                    calendarConfig.calendarContainerId
+                );
+
+            const nextPanel =
+                nextContainer?.querySelector(
+                    '.dashboard-calendar-main'
+                ) ||
+                nextContainer?.querySelector(
+                    '.cal-shell'
+                );
+
+            if (!nextPanel) {
+                calendarMonthAnimating = false;
+                return;
+            }
+
+            const incomingClass =
+                direction > 0 ?
+                'global-carousel-in-right' :
+                'global-carousel-in-left';
+
+            nextPanel.classList.add(
+                incomingClass
+            );
+
+            window.setTimeout(() => {
+                nextPanel.classList.remove(
+                    incomingClass
+                );
+
+                calendarMonthAnimating = false;
+            }, 300);
+        });
     };
 
     document.addEventListener("DOMContentLoaded", function() {

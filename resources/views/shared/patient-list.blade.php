@@ -322,6 +322,7 @@ $notifCount = $notifications->count();
 
                         $patient = $appt->patient;
                         $isWalkInAppointment = (bool) ($appt->is_walk_in ?? false);
+                        $isFollowUpAppointment = (bool) ($appt->is_follow_up ?? false);
                         $patientId = $patient?->id ?? $appt->patient_id;
                         $patientName = $patient?->name ?? 'Unknown Patient';
                         $patientStudentNo = filled($patient?->student_no)
@@ -455,10 +456,18 @@ $notifCount = $notifications->count();
                                                 </h3>
 
                                                 @if ($isWalkInAppointment)
-                                                <span class="ui-action-btn ui-action-neutral ui-action-indicator"
-                                                    data-tooltip="Walk-in appointment" data-tooltip-tone="neutral"
-                                                    aria-label="Walk-in appointment" tabindex="0">
+                                                <span class="appt-type-icon" data-tooltip="Walk-in appointment"
+                                                    data-tooltip-tone="neutral" aria-label="Walk-in appointment"
+                                                    tabindex="0">
                                                     <i class="fa-solid fa-person-walking"></i>
+                                                </span>
+                                                @endif
+
+                                                @if ($isFollowUpAppointment)
+                                                <span class="appt-type-icon" data-tooltip="Follow-up appointment"
+                                                    data-tooltip-tone="neutral" aria-label="Follow-up appointment"
+                                                    tabindex="0">
+                                                    <i class="fa-solid fa-calendar-plus"></i>
                                                 </span>
                                                 @endif
 
@@ -554,10 +563,18 @@ $notifCount = $notifications->count();
                                                     </h3>
 
                                                     @if ($isWalkInAppointment)
-                                                    <span class="ui-action-btn ui-action-neutral ui-action-indicator"
-                                                        data-tooltip="Walk-in appointment" data-tooltip-tone="neutral"
-                                                        aria-label="Walk-in appointment" tabindex="0">
+                                                    <span class="appt-type-icon" data-tooltip="Walk-in appointment"
+                                                        data-tooltip-tone="neutral" aria-label="Walk-in appointment"
+                                                        tabindex="0">
                                                         <i class="fa-solid fa-person-walking"></i>
+                                                    </span>
+                                                    @endif
+
+                                                    @if ($isFollowUpAppointment)
+                                                    <span class="appt-type-icon" data-tooltip="Follow-up appointment"
+                                                        data-tooltip-tone="neutral" aria-label="Follow-up appointment"
+                                                        tabindex="0">
+                                                        <i class="fa-solid fa-calendar-plus"></i>
                                                     </span>
                                                     @endif
 

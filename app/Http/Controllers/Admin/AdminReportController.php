@@ -335,9 +335,29 @@ class AdminReportController extends Controller
             ->whereYear('appointment_date', $now->year)
             ->count();
 
+        $breakdown = DB::table('appointments')
+            ->select('service_type', DB::raw('COUNT(*) as total'))
+            ->where('status', 'completed')
+            ->whereMonth('appointment_date', $now->month)
+            ->whereYear('appointment_date', $now->year)
+            ->groupBy('service_type')
+            ->orderByDesc('total')
+            ->get()
+            ->map(function ($item) use ($totalTreatments) {
+                return [
+                    'name' => ucfirst($item->service_type ?? 'Other'),
+                    'count' => (int) $item->total,
+                    'pct' => $totalTreatments > 0 ? round((((int) $item->total / $totalTreatments) * 100), 1) : 0,
+                ];
+            });
+
         $topTreatmentName = $topTreatment && $topTreatment->service_type
             ? ucfirst($topTreatment->service_type)
             : 'No dominant treatment yet';
+        $topTreatmentCount = $topTreatment ? (int) $topTreatment->total : 0;
+        $topTreatmentRate = $totalTreatments > 0
+            ? round(($topTreatmentCount / $totalTreatments) * 100, 1)
+            : 0;
 
         // ---------------------------
         // INVENTORY ANALYSIS
@@ -468,6 +488,9 @@ class AdminReportController extends Controller
             'treatments' => [
                 'total_treatments' => $totalTreatments,
                 'top_treatment' => $topTreatmentName,
+                'top_treatment_count' => $topTreatmentCount,
+                'top_treatment_rate' => $topTreatmentRate,
+                'breakdown' => $breakdown->values()->all(),
             ],
 
             'inventory' => [
@@ -584,6 +607,9 @@ class AdminReportController extends Controller
                 'cancellation_rate' => $cancelledRate,
                 'treatments_recorded' => $totalTreatments,
                 'dominant_treatment' => $topTreatmentName,
+                'dominant_treatment_count' => $topTreatmentCount,
+                'dominant_treatment_rate' => $topTreatmentRate,
+                'treatment_breakdown' => $breakdown->values()->all(),
                 'low_stock_count' => $lowStockCount,
                 'critical_stock_count' => $criticalStockCount,
 

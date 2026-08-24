@@ -104,6 +104,31 @@ Route::get('/', fn() => redirect('/login'));
 Route::view('/login', 'auth.login')->name('login');
 Route::get('/backup-login', [BackupLoginController::class, 'show'])->name('backup.login');
 
+Route::get('/dashboard', function () {
+    if (! Auth::check()) {
+        return redirect()->route('login');
+    }
+
+    $impersonatedRole = session('impersonated_role');
+
+    if ($impersonatedRole === 'patient') {
+        return redirect()->route('patient.dashboard');
+    }
+
+    if ($impersonatedRole === 'dentist') {
+        return redirect()->route('dentist.dentist.dashboard');
+    }
+
+    $role = strtolower((string) optional(Auth::user()->role)->slug);
+
+    return match ($role) {
+        'admin', 'super_admin' => redirect()->route('admin.admin.dashboard'),
+        'dentist', 'dentist_role' => redirect()->route('dentist.dentist.dashboard'),
+        'patient', 'patient_role' => redirect()->route('patient.dashboard'),
+        default => redirect()->route('login'),
+    };
+})->name('dashboard');
+
 // Patient Register
 Route::get('/register', function () {
     return view('auth.register');
@@ -801,7 +826,7 @@ Route::prefix('patient')->middleware(['role:patient'])->group(function () {
         ->middleware('permission:book_appointments')
         ->name('book.appointment.store');
 
-            Route::get('/book-appointment/draft', [AppointmentController::class, 'getDraft'])
+    Route::get('/book-appointment/draft', [AppointmentController::class, 'getDraft'])
         ->middleware('permission:book_appointments')
         ->name('book.appointment.draft.show');
 
@@ -844,7 +869,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
+Route::prefix('dentist')->middleware(['auth'])->group(function () {
     Route::post('/patients/{patient}/signature/invalid', [AppointmentController::class, 'markSignatureInvalid'])
         ->middleware('permission:manage_patient_profiles')
         ->name('dentist.patient.signature.invalid');
@@ -1002,7 +1027,10 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
             'gadMale',
             'clinicStatus'
         ));
-    })->middleware('permission:access_dentist_dashboard')->name('dentist.dentist.dashboard');
+    });
+    Route::get('/dashboard', [DentistDashboardController::class, 'index'])
+        ->middleware('permission:access_dentist_dashboard')
+        ->name('dentist.dentist.dashboard');
 
     // Appointments
     Route::get('/appointments', [DentistAppointmentController::class, 'index'])
@@ -1022,7 +1050,7 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         ->name('dentist.dentist.appointments.follow-up.store');
 
     Route::get('/dentist/appointment-slots', [AppointmentController::class, 'slotsForDate'])
-        ->middleware(['role:dentist'])
+        ->middleware('permission:manage_appointments')
         ->name('dentist.appointment.slots');
 
     Route::post('/appointments/{id}/cancel', [DentistAppointmentController::class, 'cancel'])
@@ -1140,6 +1168,10 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         ->middleware('permission:manage_reports')
         ->name('dentist.dentist.report.dental-services');
 
+    Route::get('/report/dental-services/data', [\App\Http\Controllers\Dentist\DentalServicesRecordController::class, 'data'])
+        ->middleware('permission:manage_reports')
+        ->name('dentist.dentist.report.dental-services.data');
+
     Route::get('/report/daily-treatment-record/list', [\App\Http\Controllers\Dentist\DentistReportController::class, 'dailyTreatmentRecordList'])
         ->middleware('permission:manage_reports')
         ->name('dentist.dentist.reports.daily-treatment-record.list');
@@ -1222,6 +1254,20 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
         ->middleware('permission:manage_appointments')
         ->name('dentist.odontogram.existing-appointment.intake.store');
 
+    Route::patch(
+        '/odontogram/patient/{patient}/existing-appointment/history/autosave',
+        [
+            OdontogramController::class,
+            'autosaveExistingAppointmentHistory',
+        ]
+    )
+        ->middleware(
+            'permission:manage_appointments'
+        )
+        ->name(
+            'dentist.odontogram.existing-appointment.history.autosave'
+        );
+
     Route::get('/odontogram/existing-appointment/slots', [OdontogramController::class, 'existingAppointmentSlotsForDate'])
         ->middleware('permission:manage_appointments')
         ->name('dentist.odontogram.existing-appointment.slots');
@@ -1259,18 +1305,105 @@ Route::prefix('dentist')->middleware(['role:dentist'])->group(function () {
     Route::post('/dentist/clinic-status', [DentistDashboardController::class, 'updateClinicStatus'])
         ->name('dentist.clinic-status.update');
 
+    Route::get('/system-settings', [SystemSettingsController::class, 'index'])
+        ->middleware('permission:manage_system_settings')
+        ->name('dentist.system_settings');
+
+    Route::post('/system-settings', [SystemSettingsController::class, 'update'])
+        ->middleware('permission:manage_system_settings')
+        ->name('dentist.system_settings.update');
+
+    Route::get('/user-management', [UserManagementController::class, 'index'])
+        ->name('dentist.user_management');
+
+    Route::post('/user-management', [UserManagementController::class, 'store'])
+        ->name('dentist.user_management.store');
+
+    Route::put('/user-management/{user}', [UserManagementController::class, 'update'])
+        ->name('dentist.user_management.update');
+
+    Route::post('/user-management/{user}/reset-password', [UserManagementController::class, 'resetPassword'])
+        ->name('dentist.user_management.reset_password');
+
+    Route::post('/user-management/{user}/toggle-status', [UserManagementController::class, 'toggleStatus'])
+        ->name('dentist.user_management.toggle_status');
+
+    Route::get('/dental-records', [DentalRecordController::class, 'index'])
+        ->middleware('permission:manage_dental_records')
+        ->name('dentist.dental-records.index');
+
+    Route::get('/dental-records/{id}', function ($id) {
+        return redirect()->route('dentist.dental-records.index');
+    })->middleware('permission:manage_dental_records')->name('dentist.dental-records.show');
+
+    Route::get('/document-template', [DocumentTemplateController::class, 'index'])
+        ->middleware('permission:manage_document_templates')
+        ->name('dentist.document-template');
+
+    Route::get('/document-template/{id}', [DocumentTemplateController::class, 'show'])
+        ->middleware('permission:manage_document_templates')
+        ->name('dentist.document-template.show');
+
+    Route::patch('/document-template/{id}/archive', [DocumentTemplateController::class, 'archive'])
+        ->middleware('permission:manage_document_templates')
+        ->name('dentist.document-template.archive');
+
+    Route::patch('/document-template/{id}/activate', [DocumentTemplateController::class, 'activate'])
+        ->middleware('permission:manage_document_templates')
+        ->name('dentist.document-template.activate');
+
+    Route::patch('/document-template/{id}/default', [DocumentTemplateController::class, 'setDefault'])
+        ->middleware('permission:manage_document_templates')
+        ->name('dentist.document-template.default');
+
     // Dentist Continuity Transitions
-    Route::get('/transitions', [\App\Http\Controllers\Dentist\DentistTransitionController::class, 'index'])
+    Route::get('/transitions', [DentistTransitionController::class, 'index'])
+        ->middleware('permission:view_dentist_transitions')
         ->name('dentist.dentist.transitions.index');
 
-    Route::get('/transitions/{transition}', [\App\Http\Controllers\Dentist\DentistTransitionController::class, 'show'])
+    Route::get('/transitions/create', [DentistTransitionController::class, 'create'])
+        ->middleware('permission:create_dentist_transitions')
+        ->name('dentist.dentist.transitions.create');
+
+    Route::post('/transitions', [DentistTransitionController::class, 'store'])
+        ->middleware('permission:create_dentist_transitions')
+        ->name('dentist.dentist.transitions.store');
+
+    Route::get('/transitions/{transition}', [DentistTransitionController::class, 'show'])
+        ->middleware('permission:view_dentist_transitions')
         ->name('dentist.dentist.transitions.show');
 
-    Route::put('/transitions/{transition}/assignments', [\App\Http\Controllers\Dentist\DentistTransitionController::class, 'assignments'])
+    Route::get('/transitions/{transition}/edit', [DentistTransitionController::class, 'edit'])
+        ->middleware('permission:update_dentist_transitions')
+        ->name('dentist.dentist.transitions.edit');
+
+    Route::put('/transitions/{transition}', [DentistTransitionController::class, 'update'])
+        ->middleware('permission:update_dentist_transitions')
+        ->name('dentist.dentist.transitions.update');
+
+    Route::post('/transitions/{transition}/generate-items', [DentistTransitionController::class, 'generateItems'])
+        ->middleware('permission:update_dentist_transitions')
+        ->name('dentist.dentist.transitions.generate-items');
+
+    Route::put('/transitions/{transition}/assignments', [DentistTransitionController::class, 'assignments'])
+        ->middleware('permission:assign_dentist_successors')
         ->name('dentist.dentist.transitions.assignments');
 
-    Route::put('/transitions/{transition}/checklist', [\App\Http\Controllers\Dentist\DentistTransitionController::class, 'checklist'])
+    Route::put('/transitions/{transition}/checklist', [DentistTransitionController::class, 'checklist'])
+        ->middleware('permission:update_dentist_transitions')
         ->name('dentist.dentist.transitions.checklist');
+
+    Route::post('/transitions/{transition}/finalize', [DentistTransitionController::class, 'finalize'])
+        ->middleware('permission:finalize_dentist_transitions')
+        ->name('dentist.dentist.transitions.finalize');
+
+    Route::post('/transitions/{transition}/cancel', [DentistTransitionController::class, 'cancel'])
+        ->middleware('permission:cancel_dentist_transitions')
+        ->name('dentist.dentist.transitions.cancel');
+
+    Route::post('/transitions/{transition}/extend-access', [DentistTransitionController::class, 'extendAccess'])
+        ->middleware('permission:extend_dentist_access')
+        ->name('dentist.dentist.transitions.extend-access');
 });
 
 /*

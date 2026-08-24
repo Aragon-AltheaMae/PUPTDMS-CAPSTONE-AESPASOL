@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('layout-role', 'admin')
+@section('layout-role', $layoutRole ?? 'admin')
 
 @section('title', 'Document Templates')
 
@@ -136,8 +136,8 @@
                     data-name="{{ strtolower((string) $tpl->name) }}"
                     data-type="{{ strtolower((string) $tpl->document_type) }}" data-category="{{ $category }}"
                     data-status="{{ $tpl->status }}" data-template-name="{{ e($tpl->name) }}"
-                    data-archive-url="{{ route('admin.document-template.archive', $tpl->id) }}"
-                    data-activate-url="{{ route('admin.document-template.activate', $tpl->id) }}" tabindex="0"
+                    data-archive-url="{{ route(($routeNames['archive'] ?? 'admin.document-template.archive'), $tpl->id) }}"
+                    data-activate-url="{{ route(($routeNames['activate'] ?? 'admin.document-template.activate'), $tpl->id) }}" tabindex="0"
                     role="button" aria-label="Preview {{ $tpl->name }}" onclick="openTemplatePreview({{ $tpl->id }})">
                     <div class="template-card-top">
                         <div class="template-top-row">

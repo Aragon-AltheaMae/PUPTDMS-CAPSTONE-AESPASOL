@@ -1,13 +1,3 @@
-#statusBtn.ui-btn {
-    min-width: 108px;
-    border-radius: 999px;
-}
-
-.day-hover-card.card {
-    padding: 0;
-    overflow: visible;
-}
-
 .day-hover-card .card-header {
     position: relative;
     border-radius: 16px 16px 0 0;
@@ -17,12 +7,6 @@
     padding: .75rem;
 }
 
-.scheduled-hover-patient-card.card {
-    padding: .75rem;
-    animation: none;
-    overflow: visible;
-}
-
 .inventory-dashboard-card.card {
     display: flex;
     flex-direction: column;
@@ -30,18 +14,13 @@
 }
 
 .inventory-dashboard-card .card-body {
-    padding: 0;
+    flex: 1;
+    min-height: 0;
 }
 
 .inventory-dashboard-table-scroll {
     max-height: 180px;
     overflow-y: auto;
-    background: var(--table-surface-soft);
-}
-
-.inventory-dashboard-empty.empty-state {
-    min-height: 155px;
-    padding: 1.5rem 1rem;
 }
 
 .inventory-dashboard-card .card-header {
@@ -82,32 +61,6 @@
     white-space: nowrap;
 }
 
-.inventory-dashboard-empty.empty-state {
-    min-height: 155px;
-    padding: 1.5rem 1rem;
-}
-
-.inventory-dashboard-empty .inventory-empty-icon {
-    width: 58px !important;
-    height: 58px !important;
-    margin-bottom: 12px !important;
-    border-radius: 18px !important;
-}
-
-.inventory-dashboard-empty .inventory-empty-icon i {
-    font-size: 25px;
-}
-
-.inventory-dashboard-empty .empty-state-title {
-    font-size: .82rem;
-}
-
-.inventory-dashboard-empty .empty-state-sub {
-    max-width: 300px;
-    margin-top: 6px;
-    font-size: .7rem;
-}
-
 .dentist-dashboard-page>.w-full,
 .row2-grid,
 .row3-grid,
@@ -115,11 +68,6 @@
 .dashboard-side-stack {
     width: 100%;
     min-width: 0;
-}
-
-.dashboard-kpi-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    margin-bottom: 1.25rem;
 }
 
 .dashboard-kpi-breakdown,
@@ -145,6 +93,14 @@
     gap: .65rem;
 }
 
+.clinic-change-btn-mobile {
+    display: none;
+}
+
+.clinic-change-btn-desktop {
+    display: inline-flex;
+}
+
 .row2-grid,
 .row3-grid {
     display: grid;
@@ -167,20 +123,21 @@
     z-index: 1;
 }
 
-.dashboard-side-stack,
-.inventory-grid {
+.dashboard-side-stack {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
 
-#upcomingAppointmentsContainer,
-.upcoming-card {
+#upcomingAppointmentsContainer {
     height: 100%;
 }
 
 .upcoming-card {
+    height: 100%;
     min-height: 420px;
+    display: flex;
+    flex-direction: column;
 }
 
 .upcoming-card-body {
@@ -197,42 +154,72 @@
     border-top: 1px solid var(--border, #ede8e4);
 }
 
-#dentistCalendarContainer,
+#dentistCalendarContainer {
+    position: relative;
+    z-index: 10;
+    height: 100%;
+    min-height: 0;
+}
+
 #dentistCalendarContainer .cal-shell {
     position: relative;
+    height: 100%;
+    min-height: 420px;
+    margin-top: 0;
     overflow: visible;
 }
 
-#dentistCalendarContainer {
-    z-index: 10;
+.dashboard-side-stack,
+#upcomingAppointmentsContainer {
+    height: 100%;
+    min-height: 0;
 }
 
-.day-hover-card {
+.day-hover-card.card {
     position: absolute;
     z-index: 120;
 
-    padding: .75rem;
+    width: min(400px, calc(100vw - 32px));
+    padding: 0;
 
-    border: 1px solid var(--border, #ede8e4);
-    border-radius: 1rem;
-
-    background: var(--card, #fff);
-
-    box-shadow:
-        0 18px 40px rgba(15, 23, 42, .18);
+    overflow: visible;
 
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
 
-    will-change:
-        opacity,
-        transform;
+    transform-origin: center;
+
+    box-shadow:
+        0 18px 42px rgba(15, 23, 42, .16);
 
     transition:
-        opacity .18s ease,
-        transform .22s cubic-bezier(.22, 1, .36, 1),
-        visibility 0s linear .22s;
+        opacity .16s ease,
+        transform .2s cubic-bezier(.22, 1, .36, 1),
+        visibility 0s linear .2s;
+}
+
+.day-hover-card .card-header {
+    padding: .72rem .85rem;
+}
+
+.day-hover-card .card-body {
+    padding: .55rem;
+}
+
+.day-hover-bridge {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 12px;
+}
+
+.day-hover-card.hover-bottom .day-hover-bridge {
+    top: -12px;
+}
+
+.day-hover-card.hover-top .day-hover-bridge {
+    bottom: -12px;
 }
 
 .day-hover-card.hover-align-center {
@@ -244,14 +231,14 @@
     top: calc(100% + 8px);
 
     transform:
-        translateX(-50%) translateY(8px);
+        translateX(-50%) translateY(6px) scale(.985);
 }
 
 .day-hover-card.hover-align-center.hover-top {
     bottom: calc(100% + 8px);
 
     transform:
-        translateX(-50%) translateY(-8px);
+        translateX(-50%) translateY(-6px) scale(.985);
 }
 
 .day-hover-card.hover-align-right {
@@ -261,12 +248,16 @@
 
 .day-hover-card.hover-align-right.hover-bottom {
     top: calc(100% + 8px);
-    transform: translateY(8px);
+
+    transform:
+        translateY(6px) scale(.985);
 }
 
 .day-hover-card.hover-align-right.hover-top {
     bottom: calc(100% + 8px);
-    transform: translateY(-8px);
+
+    transform:
+        translateY(-6px) scale(.985);
 }
 
 .day-hover-card.hover-align-left {
@@ -276,12 +267,16 @@
 
 .day-hover-card.hover-align-left.hover-bottom {
     top: calc(100% + 8px);
-    transform: translateY(8px);
+
+    transform:
+        translateY(6px) scale(.985);
 }
 
 .day-hover-card.hover-align-left.hover-top {
     bottom: calc(100% + 8px);
-    transform: translateY(-8px);
+
+    transform:
+        translateY(-6px) scale(.985);
 }
 
 .cal-cell-wrap:hover>.day-hover-card,
@@ -291,28 +286,164 @@
     pointer-events: auto;
 
     transition:
-        opacity .18s ease,
-        transform .22s cubic-bezier(.22, 1, .36, 1),
-        visibility 0s linear 0s;
+        opacity .16s ease,
+        transform .2s cubic-bezier(.22, 1, .36, 1),
+        visibility 0s;
 }
 
 .cal-cell-wrap:hover>.day-hover-card.hover-align-center,
 .day-hover-card.hover-align-center:hover {
     transform:
-        translateX(-50%) translateY(0);
+        translateX(-50%) translateY(0) scale(1);
 }
 
 .cal-cell-wrap:hover>.day-hover-card.hover-align-left,
 .cal-cell-wrap:hover>.day-hover-card.hover-align-right,
 .day-hover-card.hover-align-left:hover,
 .day-hover-card.hover-align-right:hover {
-    transform: translateY(0);
+    transform:
+        translateY(0) scale(1);
+}
+
+.scheduled-hover-list {
+    display: grid;
+    gap: .45rem;
+}
+
+.scheduled-hover-patient-card.global-record-card {
+    border-radius: 13px;
+}
+
+.scheduled-hover-patient-card.global-record-card::before {
+    top: 6px;
+    bottom: 6px;
+    width: 3px;
+}
+
+.scheduled-hover-patient-body.global-record-card-body {
+    display: grid;
+    grid-template-columns:
+        auto minmax(0, 1fr) auto;
+
+    align-items: center;
+
+    gap: .6rem;
+
+    padding:
+        .62rem .65rem .62rem .78rem;
+}
+
+.scheduled-hover-patient-info {
+    min-width: 0;
+}
+
+.scheduled-hover-patient-name-row {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    min-width: 0;
+}
+
+.scheduled-hover-patient-name-row .global-record-name {
+    min-width: 0;
+    flex: 1;
+}
+
+.scheduled-hover-patient-card .global-record-subline {
+    margin-top: .2rem;
+    gap: .3rem;
+
+    color: var(--text-3);
+
+    font-size: .67rem;
+    font-weight: 700;
+
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+
+    min-width: 0;
+    white-space: nowrap;
+}
+
+.scheduled-hover-patient-card .global-record-subline>span {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+.scheduled-hover-actions {
+    flex-wrap: nowrap;
+    gap: .3rem;
+}
+
+.scheduled-modal-list {
+    display: grid;
+    gap: .55rem;
+}
+
+.scheduled-modal-patient-card {
+    border-radius: 14px;
+}
+
+.scheduled-modal-patient-card::before {
+    top: 6px;
+    bottom: 6px;
+    width: 3px;
+}
+
+.scheduled-modal-patient-body {
+    display: grid;
+    grid-template-columns:
+        auto minmax(0, 1fr) auto;
+
+    align-items: center;
+    gap: .65rem;
+
+    padding:
+        .7rem .75rem .7rem .85rem;
+}
+
+.scheduled-modal-patient-info {
+    min-width: 0;
+}
+
+.scheduled-modal-name-row {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+
+    min-width: 0;
+}
+
+.scheduled-modal-name-row .global-record-name {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.scheduled-modal-meta {
+    margin-top: .22rem;
+
+    flex-wrap: nowrap;
+    gap: .3rem;
+
+    color: var(--text-3);
+
+    font-size: .69rem;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+.scheduled-modal-meta>span {
+    white-space: nowrap;
+}
+
+.scheduled-modal-actions {
+    flex-wrap: nowrap;
+    gap: .35rem;
 }
 
 @media (max-width: 1023px) {
-    .dashboard-kpi-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
 
     .row2-grid,
     .row3-grid {
@@ -326,12 +457,6 @@
 
     .upcoming-card {
         min-height: 340px;
-    }
-}
-
-@media (max-width: 520px) {
-    .dashboard-kpi-grid {
-        grid-template-columns: 1fr;
     }
 }
 
@@ -422,44 +547,9 @@
     width: 100%;
 }
 
-
-
-
-
-
-
-
-
-#scheduledTodayContainer>.card,
-
-
-#gadAnalyticsContainer,
-#gadAnalyticsContainer>div,
-.row3-grid>.flex {
-    height: auto;
-}
-
-#gadAnalyticsContainer>div {
-    min-height: 420px;
-}
-
-.row3-grid>.flex>div {
-    flex: initial;
-}
-
 #medicalSuppliesContainer>div,
 #medicineSuppliesContainer>div {
     height: auto;
-}
-
-.inventory-grid {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: 0.75rem !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    overflow: visible !important;
 }
 
 @media (min-width: 1024px) {
@@ -474,40 +564,45 @@
 
     .row3-grid {
         display: grid;
-        grid-template-columns: minmax(0, 7fr) minmax(360px, 5fr);
+
+        grid-template-columns:
+            minmax(0, 7fr) minmax(360px, 5fr);
+
         gap: 1.25rem;
-        align-items: start;
+
+        align-items: stretch;
+
         margin-top: 1rem;
     }
 
     .row3-grid>.inventory-grid {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 1rem !important;
-        height: auto !important;
-        min-width: 0 !important;
-        width: 100% !important;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows:
+            repeat(2, minmax(0, 1fr));
+        grid-auto-flow: row;
     }
 
-    .row3-grid>.inventory-grid>#medicalSuppliesContainer,
-    .row3-grid>.inventory-grid>#medicineSuppliesContainer {
-        width: 100% !important;
-        min-width: 0 !important;
-        flex: 0 0 auto !important;
+    .dashboard-lower-stack,
+    .inventory-grid {
+        height: 100%;
     }
 
-    #medicalSuppliesContainer {
-        order: 1 !important;
-    }
-
+    #gadAnalyticsContainer,
+    #todayTreatmentProgressContainer,
+    #medicalSuppliesContainer,
     #medicineSuppliesContainer {
-        order: 2 !important;
+        display: flex;
+        min-width: 0;
+        min-height: 0;
     }
 
-    #medicalSuppliesContainer>div,
-    #medicineSuppliesContainer>div {
-        height: auto;
-        min-height: 220px;
+    #gadAnalyticsContainer>.card,
+    #todayTreatmentProgressContainer>.card,
+    #medicalSuppliesContainer>.card,
+    #medicineSuppliesContainer>.card {
+        width: 100%;
+        height: 100%;
+        min-height: 0;
     }
 }
 
@@ -522,20 +617,6 @@
 #upcomingAppointmentsContainer {
     height: 100%;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 @media (max-width: 1023px) {
     .dentist-dashboard-page {
@@ -615,12 +696,6 @@
         gap: .35rem;
     }
 
-    .upcoming-date-nav-btn {
-        width: 32px;
-        height: 32px;
-        min-width: 32px;
-    }
-
     .upcoming-date-strip {
         grid-template-columns:
             repeat(7, minmax(0, 1fr));
@@ -633,24 +708,13 @@
         padding: .5rem .2rem;
     }
 
-    #gadAnalyticsContainer,
-    #gadAnalyticsContainer>div,
     #medicalSuppliesContainer>div,
     #medicineSuppliesContainer>div {
         height: auto !important;
     }
 
-    #gadAnalyticsContainer>div,
-    .gad-analytics-card {
-        min-height: 360px !important;
-    }
-
     .gad-chart-shell {
         min-height: 230px !important;
-    }
-
-    .gad-empty-panel {
-        padding: 1rem !important;
     }
 
     .inventory-grid {
@@ -676,25 +740,6 @@
     .inventory-grid>#medicineSuppliesContainer {
         order: 2 !important;
     }
-
-    .dashboard-quick-actions {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    }
-
-    .inventory-scroll-wrap {
-        position: relative;
-    }
-
-    .inventory-scroll-wrap::after {
-        content: '';
-        position: sticky;
-        bottom: 0;
-        display: block;
-        height: 24px;
-        background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, .9));
-        pointer-events: none;
-        margin-top: -24px;
-    }
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
@@ -711,23 +756,6 @@
     .row3-grid {
         margin-top: 0 !important;
     }
-}
-
-[data-theme="dark"] .inventory-scroll-wrap::after,
-.dark .inventory-scroll-wrap::after {
-    background: linear-gradient(to bottom, transparent, rgba(13, 17, 23, .9));
-}
-
-.upcoming-card {
-    background: #fff;
-    border: 1px solid #f3e3e3;
-    border-radius: 1.25rem;
-    box-shadow: 0 10px 26px rgba(139, 0, 0, 0.07);
-    overflow: hidden;
-    height: 100%;
-    min-height: 420px;
-    display: flex;
-    flex-direction: column;
 }
 
 .upcoming-date-navigation {
@@ -754,44 +782,6 @@
     overflow: visible;
 }
 
-.upcoming-date-nav-btn {
-    width: 34px;
-    height: 34px;
-    min-width: 34px;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    border: 1px solid #f1d9d9;
-    border-radius: 999px;
-
-    background: #ffffff;
-    color: #8B0000;
-
-    font-size: .7rem;
-
-    cursor: pointer;
-
-    transition:
-        background-color .18s ease,
-        border-color .18s ease,
-        color .18s ease,
-        transform .18s ease,
-        box-shadow .18s ease;
-}
-
-.upcoming-date-nav-btn:hover {
-    background: #8B0000;
-    border-color: #8B0000;
-    color: #ffffff;
-
-    transform: translateY(-1px);
-
-    box-shadow:
-        0 7px 16px rgba(139, 0, 0, .18);
-}
-
 .upcoming-range-label {
     margin-top: .15rem;
     color: #9ca3af;
@@ -804,75 +794,82 @@
     z-index: 2;
 }
 
-.upcoming-card .dashboard-side-card-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
 .upcoming-list-area {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-}
-
-.upcoming-list-area>.upcoming-empty-state {
-    flex: 1;
-    min-height: 100%;
-    width: 100%;
 }
 
 .upcoming-date-btn {
     min-width: 0;
+    position: relative;
+    overflow: visible;
+
+    padding: .55rem .4rem;
+
+    border: 1px solid var(--border);
     border-radius: 1rem;
-    border: 1px solid #f1d9d9;
-    background: #fff8f8;
-    padding: 0.55rem 0.4rem;
+
+    background: var(--surface);
+    color: var(--text-2);
+
     text-align: center;
-    transition: all .18s ease;
-    position: relative !important;
-    overflow: visible !important;
+
+    transition:
+        background-color .18s ease,
+        border-color .18s ease,
+        color .18s ease,
+        transform .18s ease;
 }
 
 .upcoming-date-btn.has-appointments {
-    border-color: var(--status-upcoming-border, #bfdbfe) !important;
-    background: var(--status-upcoming-bg, #eff6ff) !important;
-    color: var(--status-upcoming-text, #1d4ed8) !important;
+    background: var(--status-upcoming-bg) !important;
+    border-color: var(--status-upcoming-border) !important;
+    color: var(--status-upcoming-text) !important;
 }
 
 .upcoming-date-badge {
-    position: absolute !important;
-    top: -7px !important;
-    right: -7px !important;
-    min-width: 18px !important;
-    height: 18px !important;
-    padding: 0 5px !important;
-    border-radius: 999px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background: var(--status-upcoming-solid, #2563eb) !important;
-    color: #ffffff !important;
-    border: 2px solid #ffffff !important;
-    font-size: 0.58rem !important;
-    font-weight: 900 !important;
-    line-height: 1 !important;
-    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.24) !important;
+    position: absolute;
+    top: -7px;
+    right: -7px;
+
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 2px solid var(--card);
+    border-radius: 999px;
+
+    background: var(--status-upcoming-solid);
+    color: var(--text-on-brand);
+
+    font-size: .58rem;
+    font-weight: 900;
+    line-height: 1;
 }
 
 .upcoming-date-btn.active .upcoming-date-badge {
-    background: #ffffff !important;
-    color: #8B0000 !important;
-    border-color: rgba(255, 255, 255, 0.9) !important;
+    background: var(--card) !important;
+    color: var(--status-today-solid) !important;
+    border-color: var(--status-today-solid) !important;
 }
 
 .upcoming-date-btn.active {
-    background: #8B0000;
-    color: white;
-    border-color: #8B0000;
-    box-shadow: 0 8px 18px rgba(139, 0, 0, .25);
+    background: var(--status-solid, var(--status-today-solid)) !important;
+    color: #ffffff !important;
+    border-color: var(--status-solid, var(--status-today-solid)) !important;
+
+    box-shadow:
+        0 8px 18px color-mix(in srgb,
+            var(--status-solid, var(--status-today-solid)) 26%,
+            transparent) !important;
+
+    position: relative;
+    z-index: 2;
 }
 
 .upcoming-item {
@@ -883,108 +880,14 @@
     padding: 0.85rem 0.5rem;
 }
 
-.upcoming-status-line {
-    width: 4px;
-    border-radius: 999px;
-    flex-shrink: 0;
-}
-
-.upcoming-status-confirmed {
-    background: #22c55e;
-}
-
-.upcoming-status-pending {
-    background: #eab308;
-}
-
-.upcoming-status-cancelled {
-    background: #ef4444;
-}
-
-.upcoming-status-default {
-    background: #8B0000;
-}
-
-.avatar-cancelled {
-    border-color: #ef4444;
-}
-
-.upcoming-time-dot {
-    position: relative !important;
-    width: 18px !important;
-    height: 18px !important;
-    min-width: 18px !important;
-    border-radius: 999px !important;
-    background: #ffffff !important;
-    border: 3px solid var(--status-upcoming-solid, #2563eb) !important;
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10) !important;
-    flex-shrink: 0 !important;
-}
-
-.upcoming-time-dot::after {
-    content: '' !important;
-    position: absolute !important;
-    inset: 50% auto auto 50% !important;
-    width: 6px !important;
-    height: 6px !important;
-    border-radius: 999px !important;
-    transform: translate(-50%, -50%) !important;
-    background: var(--status-upcoming-solid, #2563eb) !important;
-}
-
-.upcoming-time-dot.upcoming-status-upcoming {
-    border-color: var(--status-upcoming-solid, #2563eb) !important;
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10) !important;
-}
-
-.upcoming-time-dot.upcoming-status-upcoming::after {
-    background: var(--status-upcoming-solid, #2563eb) !important;
-}
-
-.upcoming-time-dot.upcoming-status-rescheduled {
-    border-color: var(--status-rescheduled-solid, #f59e0b) !important;
-    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.12) !important;
-}
-
-.upcoming-time-dot.upcoming-status-rescheduled::after {
-    background: var(--status-rescheduled-solid, #f59e0b) !important;
-}
-
-.upcoming-time-dot.upcoming-status-completed {
-    border-color: var(--status-completed-solid, #16a34a) !important;
-    box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.12) !important;
-}
-
-.upcoming-time-dot.upcoming-status-completed::after {
-    background: var(--status-completed-solid, #16a34a) !important;
-}
-
-.upcoming-time-dot.upcoming-status-cancelled {
-    border-color: var(--status-cancelled-solid, #dc2626) !important;
-    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.12) !important;
-}
-
-.upcoming-time-dot.upcoming-status-cancelled::after {
-    background: var(--status-cancelled-solid, #dc2626) !important;
-}
-
-.avatar-upcoming {
-    border-color: var(--status-upcoming-solid, #2563eb) !important;
-}
-
-.avatar-rescheduled {
-    border-color: var(--status-rescheduled-solid, #f59e0b) !important;
-}
-
-.avatar-completed {
-    border-color: var(--status-completed-solid, #16a34a) !important;
-}
-
-.avatar-cancelled {
-    border-color: var(--status-cancelled-solid, #dc2626) !important;
-}
-
 @media (max-width: 767px) {
+    .clinic-change-btn-desktop {
+        display: none !important;
+    }
+
+    .clinic-change-btn-mobile {
+        display: inline-flex !important;
+    }
 
     .row2-grid {
         grid-template-columns: 1fr !important;
@@ -1015,7 +918,6 @@
         box-sizing: border-box !important;
     }
 
-    #gadAnalyticsContainer>div,
     #medicalSuppliesContainer>div,
     #medicineSuppliesContainer>div {
         width: 100% !important;
@@ -1055,124 +957,6 @@
         padding: 0.72rem 0.78rem !important;
         border-radius: 15px !important;
         overflow: hidden !important;
-    }
-
-    #medicalSuppliesContainer .relative.z-10.flex.items-center.justify-between.mb-4,
-    #medicineSuppliesContainer .relative.z-10.flex.items-center.justify-between.mb-4 {
-        display: grid !important;
-        grid-template-columns: minmax(0, 1fr) auto !important;
-        align-items: center !important;
-        gap: 0.42rem !important;
-        margin-bottom: 0.55rem !important;
-        min-width: 0 !important;
-    }
-
-    #medicalSuppliesContainer .relative.z-10.flex.items-center.justify-between.mb-4>.flex,
-    #medicineSuppliesContainer .relative.z-10.flex.items-center.justify-between.mb-4>.flex {
-        min-width: 0 !important;
-        gap: 0.42rem !important;
-    }
-
-    #medicalSuppliesContainer .w-9.h-9,
-    #medicineSuppliesContainer .w-9.h-9 {
-        width: 28px !important;
-        height: 28px !important;
-        min-width: 28px !important;
-        border-radius: 10px !important;
-    }
-
-    #medicalSuppliesContainer .w-9.h-9 i,
-    #medicineSuppliesContainer .w-9.h-9 i {
-        font-size: 0.68rem !important;
-    }
-
-    #medicalSuppliesContainer h3,
-    #medicineSuppliesContainer h3 {
-        font-size: clamp(0.72rem, 3.8vw, 0.84rem) !important;
-        line-height: 1 !important;
-        letter-spacing: -0.065em !important;
-        white-space: nowrap !important;
-        word-break: keep-all !important;
-        overflow-wrap: normal !important;
-    }
-
-    #medicalSuppliesContainer h3+p,
-    #medicineSuppliesContainer h3+p {
-        font-size: 0.5rem !important;
-        line-height: 1 !important;
-        letter-spacing: 0.075em !important;
-        margin-top: 0.15rem !important;
-        white-space: nowrap !important;
-    }
-
-    #medicalSuppliesContainer a,
-    #medicineSuppliesContainer a {
-        flex: 0 0 auto !important;
-        width: auto !important;
-        min-width: 62px !important;
-        height: 30px !important;
-        padding: 0 0.42rem !important;
-        border-radius: 999px !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 0.25rem !important;
-        white-space: nowrap !important;
-        word-break: keep-all !important;
-        overflow-wrap: normal !important;
-        line-height: 1 !important;
-        font-size: 0.58rem !important;
-    }
-
-    #medicalSuppliesContainer a span,
-    #medicineSuppliesContainer a span {
-        white-space: nowrap !important;
-    }
-
-    #medicalSuppliesContainer a i,
-    #medicineSuppliesContainer a i {
-        flex-shrink: 0 !important;
-        font-size: 0.58rem !important;
-    }
-
-    #medicalSuppliesContainer .border-dashed,
-    #medicineSuppliesContainer .border-dashed {
-        min-height: 72px !important;
-        padding: 0.62rem !important;
-        border-radius: 13px !important;
-    }
-
-    #medicalSuppliesContainer .border-dashed i,
-    #medicineSuppliesContainer .border-dashed i {
-        font-size: 1.25rem !important;
-        margin-bottom: 0.32rem !important;
-    }
-
-    #medicalSuppliesContainer .border-dashed p,
-    #medicineSuppliesContainer .border-dashed p {
-        font-size: 0.64rem !important;
-        line-height: 1.15 !important;
-        white-space: normal !important;
-    }
-
-    #medicalSuppliesContainer .relative.z-10.overflow-y-auto,
-    #medicineSuppliesContainer .relative.z-10.overflow-y-auto {
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
-        overflow-x: hidden !important;
-        overflow-y: auto !important;
-        padding-right: 0 !important;
-    }
-
-    #medicalSuppliesContainer .relative.z-10.overflow-y-auto::after,
-    #medicineSuppliesContainer .relative.z-10.overflow-y-auto::after {
-        display: none !important;
-    }
-
-    #medicalSuppliesContainer .inventory-scroll-wrap::after,
-    #medicineSuppliesContainer .inventory-scroll-wrap::after {
-        display: none !important;
     }
 
     #medicalSuppliesContainer table,
@@ -1231,26 +1015,55 @@
         width: 30% !important;
         text-align: center !important;
     }
-}
 
-[data-theme="dark"] #mainContent .upcoming-date-nav-btn,
-.dark #mainContent .upcoming-date-nav-btn {
-    background: rgba(255, 255, 255, .04);
-    border-color: rgba(255, 255, 255, .12);
-    color: #FCA5A5;
-}
+    .dashboard-clinic-status-card {
+        position: relative;
+    }
 
-[data-theme="dark"] #mainContent .upcoming-date-nav-btn:hover,
-.dark #mainContent .upcoming-date-nav-btn:hover {
-    background:
-        linear-gradient(135deg,
-            #B91C1C,
-            #7F1D1D);
+    .dashboard-clinic-status-card .stat-card-info {
+        padding-right: 0 !important;
+    }
 
-    border-color:
-        rgba(252, 165, 165, .35);
+    .dashboard-clinic-status-card .dashboard-kpi-actions {
+        display: flex !important;
+        flex-direction: column !important;
+        align-self: stretch !important;
+        justify-content: space-between !important;
 
-    color: #ffffff;
+        gap: 0.35rem !important;
+
+        flex: 0 0 auto !important;
+    }
+
+    .dashboard-clinic-status-card .dashboard-live-clock {
+        display: inline-flex !important;
+        align-items: baseline !important;
+        flex-wrap: nowrap !important;
+
+        gap: 0.22rem !important;
+
+        white-space: nowrap !important;
+        margin-top: 0.15rem !important;
+    }
+
+    .dashboard-clinic-status-card #kpi-clock-hhmm {
+        font-size: 0.62rem !important;
+        line-height: 1 !important;
+        white-space: nowrap !important;
+    }
+
+    .dashboard-clinic-status-card #kpi-clock-ampm {
+        font-size: 0.48rem !important;
+        line-height: 1 !important;
+        white-space: nowrap !important;
+    }
+
+    .dashboard-clinic-status-card .dashboard-live-dot {
+        width: 5px !important;
+        height: 5px !important;
+        min-width: 5px !important;
+        min-height: 5px !important;
+    }
 }
 
 [data-theme="dark"] #mainContent .upcoming-range-label,
@@ -1258,325 +1071,232 @@
     color: #8B949E;
 }
 
-[data-theme="dark"] #mainContent .upcoming-card,
-[data-theme="dark"] #mainContent .dashboard-side-card,
-[data-theme="dark"] #mainContent #gadAnalyticsContainer>div,
-[data-theme="dark"] #mainContent #scheduledTodayContainer .card,
-.dark #mainContent .upcoming-card,
-.dark #mainContent .dashboard-side-card,
-.dark #mainContent #gadAnalyticsContainer>div,
-.dark #mainContent #scheduledTodayContainer .card {
-    background:
-        radial-gradient(circle at top left,
-            rgba(139, 0, 0, 0.18),
-            transparent 36%),
-        linear-gradient(145deg,
-            rgba(13, 17, 23, 0.78),
-            rgba(22, 27, 34, 0.66)) !important;
-
-    border:
-        1px solid var(--border-dark,
-            rgba(255, 255, 255, 0.10)) !important;
-
-    box-shadow:
-        0 18px 38px rgba(0, 0, 0, 0.35),
-        inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
-}
-
-[data-theme="dark"] #mainContent .dashboard-side-card-head,
-.dark #mainContent .dashboard-side-card-head {
-    background: linear-gradient(180deg, rgba(139, 0, 0, 0.16), rgba(22, 27, 34, 0.18)) !important;
-    border-bottom: 1px solid var(--border-dark, rgba(255, 255, 255, 0.10)) !important;
-    backdrop-filter: blur(14px) !important;
-    -webkit-backdrop-filter: blur(14px) !important;
-}
-
-[data-theme="dark"] #mainContent .dashboard-side-card-title,
-[data-theme="dark"] #mainContent .dashboard-quick-btn,
-.dark #mainContent .dashboard-side-card-title,
-.dark #mainContent .dashboard-quick-btn {
-    color: #FCA5A5 !important;
-}
-
-[data-theme="dark"] #mainContent .upcoming-date-btn,
-[data-theme="dark"] #mainContent .dashboard-quick-btn,
-.dark #mainContent .upcoming-date-btn,
-.dark #mainContent .dashboard-quick-btn {
-    background: rgba(22, 27, 34, 0.48) !important;
-    border-color:
-        var(--border-dark,
-            rgba(255, 255, 255, 0.10)) !important;
-    color:
-        var(--text-secondary,
-            #C9D1D9) !important;
-}
-
 [data-theme="dark"] #mainContent .upcoming-date-btn.active,
 .dark #mainContent .upcoming-date-btn.active {
-    background: linear-gradient(135deg, #8B0000, #B91C1C) !important;
-    color: #FFFFFF !important;
-    border-color: rgba(252, 165, 165, 0.46) !important;
-    box-shadow: 0 10px 24px rgba(139, 0, 0, 0.35) !important;
-}
-
-[data-theme="dark"] #mainContent .upcoming-time-dot,
-.dark #mainContent .upcoming-time-dot {
-    background: rgba(139, 0, 0, 0.28) !important;
-    color: #FCA5A5 !important;
-    border-color: rgba(252, 165, 165, 0.42) !important;
-}
-
-[data-theme="dark"] #mainContent .upcoming-empty-state i,
-.dark #mainContent .upcoming-empty-state i {
-    color: rgba(252, 165, 165, 0.58) !important;
-}
-
-[data-theme="dark"] #mainContent .day-hover-card,
-.dark #mainContent .day-hover-card {
-    background: rgba(13, 17, 23, 0.92) !important;
-    border-color: var(--border-dark, rgba(255, 255, 255, 0.10)) !important;
-    color: var(--text-primary, #F8FAFC) !important;
-    box-shadow: 0 22px 50px rgba(0, 0, 0, 0.55) !important;
-    backdrop-filter: blur(18px) saturate(145%) !important;
-    -webkit-backdrop-filter: blur(18px) saturate(145%) !important;
-}
-
-.gad-analytics-card {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    min-height: 420px;
-    border-radius: 28px;
-    border: 1px solid rgba(139, 0, 0, 0.10);
     background:
-        radial-gradient(circle at 12% 8%, rgba(139, 0, 0, 0.14), transparent 28%),
-        radial-gradient(circle at 88% 18%, rgba(255, 215, 0, 0.12), transparent 24%),
-        linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 248, 248, 0.94));
-    box-shadow: 0 18px 45px rgba(139, 0, 0, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.75);
-}
-
-.gad-analytics-card::before,
-.gad-analytics-card::after {
-    content: '';
-    position: absolute;
-    border-radius: 999px;
-    pointer-events: none;
-    z-index: -1;
-}
-
-.gad-analytics-card::before {
-    width: 220px;
-    height: 220px;
-    right: -95px;
-    top: -90px;
-    background: rgba(139, 0, 0, 0.10);
-}
-
-.gad-analytics-card::after {
-    width: 170px;
-    height: 170px;
-    left: -75px;
-    bottom: -80px;
-    background: rgba(255, 215, 0, 0.12);
-}
-
-.gad-header-badge {
-    width: 44px;
-    height: 44px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #8B0000;
-    background: linear-gradient(135deg, #fff3f3, #ffe8e8);
-    border: 1px solid #f4caca;
-    box-shadow: 0 10px 20px rgba(139, 0, 0, 0.10);
-}
-
-.gad-metric-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    border-radius: 999px;
-    padding: 0.48rem 0.72rem;
-    font-size: 0.72rem;
-    font-weight: 800;
-    border: 1px solid rgba(139, 0, 0, 0.10);
-    background: rgba(255, 255, 255, 0.72);
-    color: #7a0000;
-    box-shadow: 0 8px 18px rgba(139, 0, 0, 0.06);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-}
-
-.gad-empty-panel {
-    width: min(100%, 620px);
-    border-radius: 26px;
-    border: 1px dashed rgba(139, 0, 0, 0.20);
-    background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.80), rgba(255, 244, 244, 0.70));
-    padding: 1.35rem;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
-}
-
-.gad-empty-icon-wrap {
-    position: relative;
-    width: 94px;
-    height: 94px;
-    margin: 0 auto 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 28px;
-    color: #8B0000;
-    background: linear-gradient(135deg, #fff6f6, #ffe8e8);
-    border: 1px solid #f3c9c9;
-    box-shadow: 0 18px 34px rgba(139, 0, 0, 0.12);
-}
-
-.gad-empty-actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.65rem;
-    margin-top: 1rem;
-}
-
-.gad-empty-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.55rem 0.75rem;
-    border-radius: 999px;
-    background: #fff;
-    border: 1px solid #f0d5d5;
-    color: #8B0000;
-    font-size: 0.72rem;
-    font-weight: 800;
+        var(--status-solid, var(--status-today-solid)) !important;
+    color: #ffffff !important;
+    border-color:
+        color-mix(in srgb,
+            var(--status-solid, var(--status-today-solid)) 70%,
+            #ffffff) !important;
 }
 
 .gad-chart-shell {
-    min-height: 250px;
-    border-radius: 24px;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.62);
-    border: 1px solid rgba(139, 0, 0, 0.08);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
 }
 
-[data-theme="dark"] #mainContent .gad-analytics-card,
-.dark #mainContent .gad-analytics-card {
-    background:
-        radial-gradient(circle at 12% 8%, rgba(139, 0, 0, 0.24), transparent 30%),
-        radial-gradient(circle at 88% 18%, rgba(252, 165, 165, 0.10), transparent 24%),
-        linear-gradient(145deg, rgba(13, 17, 23, 0.82), rgba(22, 27, 34, 0.70)) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
-    backdrop-filter: blur(18px) saturate(145%) !important;
-    -webkit-backdrop-filter: blur(18px) saturate(145%) !important;
+#gadAnalyticsContainer .card-body {
+    display: flex;
+    align-items: center;
 }
 
-[data-theme="dark"] #mainContent .gad-header-badge,
-.dark #mainContent .gad-header-badge {
+.gad-chart-shell {
+    flex: 1;
+}
+
+.gad-chart-shell canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.gad-chip-female {
+    --status-bg: rgba(236, 72, 153, 0.12);
+    --status-text: #EC4899;
+    --status-border: rgba(236, 72, 153, 0.28);
+    --status-solid: #EC4899;
+}
+
+.gad-chip-male {
+    --status-bg: rgba(96, 165, 250, 0.12);
+    --status-text: #60A5FA;
+    --status-border: rgba(96, 165, 250, 0.28);
+    --status-solid: #60A5FA;
+}
+
+.dashboard-lower-stack,
+.inventory-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: row;
+    gap: 1rem;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+}
+
+.today-progress-card {
+    display: grid;
+    grid-template-rows:
+        auto minmax(0, 1fr);
+
+    height: 100%;
+    min-height: 0;
+}
+
+.today-progress-body {
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    padding: 1rem 1.25rem;
+}
+
+.today-progress-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows:
+        repeat(4, minmax(0, 1fr));
+    gap: .65rem;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+.today-progress-item {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    padding: .75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 14px;
     background:
         linear-gradient(135deg,
-            rgba(255, 245, 245, .96),
-            rgba(255, 228, 228, .88)) !important;
-
-    border: 1px solid rgba(252, 165, 165, .18) !important;
-
-    box-shadow:
-        0 10px 24px rgba(139, 0, 0, .22),
-        0 0 18px rgba(252, 165, 165, .10),
-        inset 0 1px 0 rgba(255, 255, 255, .55);
-
-    color: #8B0000 !important;
+            var(--surface),
+            var(--surface-soft));
 }
 
-[data-theme="dark"] #mainContent .gad-header-badge i,
-.dark #mainContent .gad-header-badge i {
-    color: #8B0000 !important;
-
-    filter:
-        drop-shadow(0 0 6px rgba(139, 0, 0, .22));
+.today-progress-card>.today-progress-body {
+    height: 100%;
+    min-height: 0;
+    align-self: stretch;
 }
 
-[data-theme="dark"] #mainContent .gad-metric-chip:nth-child(1),
-.dark #mainContent .gad-metric-chip:nth-child(1) {
-    color: #E5B5B5 !important;
+.today-progress-icon {
+    position: relative;
+    z-index: 2;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    background: var(--today-progress-icon-bg);
+    border: 1px solid var(--today-progress-icon-border);
+    color: var(--today-progress-icon-color);
 }
 
-[data-theme="dark"] #mainContent .gad-metric-chip:nth-child(2),
-.dark #mainContent .gad-metric-chip:nth-child(2) {
-    color: #89CFF0 !important;
+.today-progress-icon i {
+    font-size: .8rem;
 }
 
-[data-theme="dark"] #mainContent .gad-metric-chip:nth-child(3),
-.dark #mainContent .gad-metric-chip:nth-child(3) {
-    color: #FCA5A5 !important;
+.today-progress-bg-icon {
+    position: absolute;
+    z-index: -1;
+    right: .35rem;
+    bottom: -.65rem;
+    font-size: 4.25rem;
+    color: var(--today-progress-icon-color);
+    opacity: .065;
+    pointer-events: none;
+    transform: rotate(-8deg);
 }
 
-[data-theme="dark"] #mainContent .upcoming-card,
-.dark #mainContent .upcoming-card {
-    background: linear-gradient(145deg, #0D1117, #111827) !important;
-    border-color: rgba(252, 165, 165, 0.18) !important;
+.today-progress-label {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+    min-width: 0;
+    color: var(--text-2);
+    font-size: .8rem;
+    font-weight: 800;
 }
 
-[data-theme="dark"] #mainContent .upcoming-date-btn,
-.dark #mainContent .upcoming-date-btn {
-    background: rgba(255, 255, 255, 0.04) !important;
-    color: #C9D1D9 !important;
-    border-color: rgba(255, 255, 255, 0.12) !important;
+.today-progress-value {
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+    color: var(--text-1);
+    font-size: 1.45rem;
+    font-weight: 900;
 }
 
-[data-theme="dark"] #mainContent .upcoming-date-btn.active,
-.dark #mainContent .upcoming-date-btn.active {
-    background: linear-gradient(135deg, #B91C1C, #7F1D1D) !important;
-    color: #fff !important;
-    border-color: rgba(252, 165, 165, 0.45) !important;
+.today-progress-completed {
+    --today-progress-icon-color:
+        var(--status-completed-solid);
+
+    --today-progress-icon-bg:
+        var(--status-completed-bg);
+
+    --today-progress-icon-border:
+        var(--status-completed-border);
 }
 
-[data-theme="dark"] #mainContent .upcoming-empty-state p,
-.dark #mainContent .upcoming-empty-state p {
-    color: #D1D5DB !important;
+.today-progress-remaining {
+    --today-progress-icon-color:
+        var(--status-pending-solid);
+
+    --today-progress-icon-bg:
+        var(--status-pending-bg);
+
+    --today-progress-icon-border:
+        var(--status-pending-border);
 }
 
-[data-theme="dark"] #mainContent .dashboard-side-card-title,
-.dark #mainContent .dashboard-side-card-title {
-    color: #FCA5A5 !important;
+.today-progress-followup {
+    --today-progress-icon-color:
+        var(--crimson);
+
+    --today-progress-icon-bg:
+        var(--crimson-soft);
+
+    --today-progress-icon-border:
+        var(--border);
 }
 
-[data-theme="dark"] #mainContent .dashboard-side-card-title i,
-[data-theme="dark"] #mainContent .gad-header-badge i,
-[data-theme="dark"] #mainContent .upcoming-empty-state i,
-[data-theme="dark"] #mainContent .status-icon-badge i,
-.dark #mainContent .dashboard-side-card-title i,
-.dark #mainContent .gad-header-badge i,
-.dark #mainContent .upcoming-empty-state i,
-.dark #mainContent .status-icon-badge i {
-    filter:
-        drop-shadow(0 0 6px rgba(252, 165, 165, 0.45)) drop-shadow(0 0 12px rgba(139, 0, 0, 0.35));
+.today-progress-walkin {
+    --today-progress-icon-color:
+        var(--text-2);
 
-    transition:
-        transform 0.25s ease,
-        filter 0.25s ease;
+    --today-progress-icon-bg:
+        var(--surface-soft);
+
+    --today-progress-icon-border:
+        var(--border);
 }
 
-[data-theme="dark"] #mainContent .dashboard-side-card:hover i,
-[data-theme="dark"] #mainContent .gad-header-badge:hover i,
-.dark #mainContent .dashboard-side-card:hover i,
-.dark #mainContent .gad-header-badge:hover i {
-    transform: scale(1.08);
+[data-theme="dark"] .today-progress-bg-icon,
+.dark .today-progress-bg-icon {
+    opacity: .09;
+}
 
-    filter:
-        drop-shadow(0 0 8px rgba(252, 165, 165, 0.65)) drop-shadow(0 0 18px rgba(185, 28, 28, 0.55));
+[data-theme="dark"] .today-progress-item,
+.dark .today-progress-item {
+    background:
+        linear-gradient(135deg,
+            var(--surface),
+            var(--surface-soft));
 }
 
 [data-theme="dark"] #mainContent .w-9.h-9,
-[data-theme="dark"] #mainContent .gad-header-badge,
 [data-theme="dark"] #mainContent .status-icon-badge,
 .dark #mainContent .w-9.h-9,
-.dark #mainContent .gad-header-badge,
 .dark #mainContent .status-icon-badge {
     box-shadow:
         0 0 0 1px rgba(255, 255, 255, 0.04),
@@ -1609,335 +1329,11 @@
     }
 }
 
-.status-change-btn {
-    background: #fff5f5;
-    color: #8B0000;
-    border: 1px solid rgba(139, 0, 0, 0.08);
-}
-
-.status-change-btn:hover {
-    background: #8B0000;
-    color: #fff;
-}
-
-[data-theme="dark"] .status-change-btn,
-.dark .status-change-btn {
-    background: linear-gradient(135deg, #8B0000, #5F0000) !important;
-    color: #ffffff !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-
-    box-shadow:
-        0 8px 18px rgba(139, 0, 0, 0.30),
-        inset 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-
-[data-theme="dark"] .status-change-btn:hover,
-.dark .status-change-btn:hover {
-    background: linear-gradient(135deg, #B91C1C, #7F1D1D) !important;
-
-    box-shadow:
-        0 10px 22px rgba(185, 28, 28, 0.40),
-        0 0 16px rgba(252, 165, 165, 0.18);
-}
-
-[data-theme="dark"] .status-change-btn:hover,
-.dark .status-change-btn:hover {
-    background: linear-gradient(135deg, #B91C1C, #7F1D1D) !important;
-
-    box-shadow:
-        0 10px 22px rgba(185, 28, 28, 0.40),
-        0 0 16px rgba(252, 165, 165, 0.18);
-}
-
-[data-theme="dark"] #mainContent #medicalSuppliesContainer .w-9.h-9,
-.dark #mainContent #medicalSuppliesContainer .w-9.h-9 {
-    background:
-        linear-gradient(135deg,
-            rgba(139, 0, 0, .22),
-            rgba(255, 255, 255, .04)) !important;
-
-    border: 1px solid rgba(252, 165, 165, .18) !important;
-
-    box-shadow:
-        0 0 18px rgba(139, 0, 0, .24),
-        inset 0 1px 0 rgba(255, 255, 255, .06);
-}
-
-[data-theme="dark"] #mainContent #medicalSuppliesContainer .w-9.h-9 i,
-.dark #mainContent #medicalSuppliesContainer .w-9.h-9 i,
-[data-theme="dark"] #mainContent #medicalSuppliesContainer .fa-box-open,
-.dark #mainContent #medicalSuppliesContainer .fa-box-open {
-    color: #FCA5A5 !important;
-}
-
-[data-theme="dark"] #mainContent #medicalSuppliesContainer h3,
-.dark #mainContent #medicalSuppliesContainer h3 {
-    color: #FCA5A5 !important;
-}
-
-[data-theme="dark"] #mainContent #medicalSuppliesContainer a,
-.dark #mainContent #medicalSuppliesContainer a {
-    background:
-        linear-gradient(135deg,
-            #8B0000,
-            #5F0000) !important;
-
-    color: #fff !important;
-
-    border: 1px solid rgba(255, 255, 255, .06);
-
-    box-shadow:
-        0 8px 18px rgba(139, 0, 0, .28),
-        inset 0 1px 0 rgba(255, 255, 255, .08);
-
-    transition: all .22s ease;
-}
-
-[data-theme="dark"] #dayAppointmentsModalBox,
-.dark #dayAppointmentsModalBox {
-    background: #0D1117 !important;
-    color: #F8FAFC !important;
-    border: 1px solid rgba(255, 255, 255, 0.10) !important;
-}
-
-[data-theme="dark"] #dayAppointmentsModalList>div,
-.dark #dayAppointmentsModalList>div {
-    background: rgba(17, 24, 39, 0.88) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
-}
-
-[data-theme="dark"] .scheduled-patient-name,
-.dark .scheduled-patient-name {
-    color: #F8FAFC !important;
-}
-
-[data-theme="dark"] .scheduled-patient-meta,
-.dark .scheduled-patient-meta {
-    color: #C9D1D9 !important;
-}
-
-[data-theme="dark"] .scheduled-patient-service,
-.dark .scheduled-patient-service {
-    color: #D1D5DB !important;
-}
-
-[data-theme="dark"] .scheduled-patient-schedule,
-.dark .scheduled-patient-schedule {
-    color: #FCA5A5 !important;
-}
-
-[data-theme="dark"] #dayAppointmentsModalBox>div:last-child button,
-.dark #dayAppointmentsModalBox>div:last-child button {
-    background: rgba(255, 255, 255, 0.08) !important;
-    color: #E5E7EB !important;
-}
-
 [data-theme="dark"] .upcoming-date-btn.has-appointments,
 .dark .upcoming-date-btn.has-appointments {
-    background: rgba(37, 99, 235, 0.14) !important;
-    border-color: rgba(147, 197, 253, 0.38) !important;
-    color: #BFDBFE !important;
-}
-
-[data-theme="dark"] .upcoming-date-badge,
-.dark .upcoming-date-badge {
-    border-color: #0D1117 !important;
-}
-
-[data-theme="dark"] .upcoming-time-dot,
-.dark .upcoming-time-dot {
-    background: #0D1117 !important;
-}
-
-[data-theme="dark"] #mainContent #medicalSuppliesContainer a:hover,
-.dark #mainContent #medicalSuppliesContainer a:hover {
-    transform: translateY(-2px);
-
-    background:
-        linear-gradient(135deg,
-            #B91C1C,
-            #7F1D1D) !important;
-
-    box-shadow:
-        0 12px 24px rgba(185, 28, 28, .38),
-        0 0 18px rgba(252, 165, 165, .18);
-}
-
-[data-theme="dark"] #mainContent #medicineSuppliesContainer .w-9.h-9,
-.dark #mainContent #medicineSuppliesContainer .w-9.h-9 {
-    background:
-        linear-gradient(135deg,
-            rgba(250, 204, 21, .20),
-            rgba(202, 138, 4, .12)) !important;
-
-    border: 1px solid rgba(250, 204, 21, .28) !important;
-
-    box-shadow:
-        0 0 18px rgba(250, 204, 21, .18),
-        inset 0 1px 0 rgba(255, 255, 255, .06);
-}
-
-[data-theme="dark"] #mainContent #medicineSuppliesContainer .w-9.h-9 i,
-.dark #mainContent #medicineSuppliesContainer .w-9.h-9 i {
-    color: #FACC15 !important;
-
-    filter:
-        drop-shadow(0 0 8px rgba(250, 204, 21, .65)) drop-shadow(0 0 18px rgba(202, 138, 4, .45));
-}
-
-[data-theme="dark"] #mainContent #medicineSuppliesContainer h3,
-.dark #mainContent #medicineSuppliesContainer h3 {
-    color: #FACC15 !important;
-}
-
-[data-theme="dark"] #mainContent #medicineSuppliesContainer a,
-.dark #mainContent #medicineSuppliesContainer a {
-    background:
-        linear-gradient(135deg,
-            #FACC15,
-            #CA8A04) !important;
-
-    color: #111827 !important;
-
-    border: 1px solid rgba(250, 204, 21, .34) !important;
-
-    box-shadow:
-        0 10px 24px rgba(250, 204, 21, .24),
-        0 0 18px rgba(250, 204, 21, .14),
-        inset 0 1px 0 rgba(255, 255, 255, .22);
-
-    transition: all .22s ease;
-}
-
-[data-theme="dark"] #mainContent #medicineSuppliesContainer a:hover,
-.dark #mainContent #medicineSuppliesContainer a:hover {
-    transform: translateY(-2px);
-
-    background:
-        linear-gradient(135deg,
-            #FDE047,
-            #EAB308) !important;
-
-    color: #111827 !important;
-
-    box-shadow:
-        0 14px 28px rgba(250, 204, 21, .30),
-        0 0 22px rgba(250, 204, 21, .20);
-}
-
-#medicineSuppliesContainer h3 {
-    color: #CA8A04 !important;
-}
-
-[data-theme="dark"] #mainContent #medicineSuppliesContainer p,
-.dark #mainContent #medicineSuppliesContainer p {
-    color: var(--text-secondary, #C9D1D9) !important;
-}
-
-.gad-header-badge {
-    background: linear-gradient(135deg, #fff3f3, #ffe8e8) !important;
-    color: #8B0000 !important;
-    border: 1px solid #f4caca !important;
-}
-
-.gad-metric-chip {
-    background: rgba(255, 255, 255, .82) !important;
-    border: 1px solid rgba(139, 0, 0, .10) !important;
-    color: #8B0000 !important;
-}
-
-.gad-empty-panel {
-    background:
-        linear-gradient(135deg, rgba(255, 255, 255, .86), rgba(255, 247, 247, .76)) !important;
-    border: 1px dashed rgba(139, 0, 0, .20) !important;
-    color: #1F2937 !important;
-}
-
-.gad-empty-panel p:first-of-type {
-    color: #1F2937 !important;
-}
-
-.gad-empty-panel p:nth-of-type(2) {
-    color: #667085 !important;
-}
-
-.gad-empty-pill {
-    background: rgba(255, 255, 255, .88) !important;
-    color: #8B0000 !important;
-    border: 1px solid #f0d5d5 !important;
-}
-
-[data-theme="dark"] #mainContent .gad-empty-panel,
-.dark #mainContent .gad-empty-panel {
-    background:
-        radial-gradient(circle at top left, rgba(252, 165, 165, .08), transparent 35%),
-        linear-gradient(145deg, rgba(13, 17, 23, .78), rgba(22, 27, 34, .62)) !important;
-
-    border: 1px dashed rgba(255, 255, 255, .13) !important;
-
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .06),
-        0 18px 36px rgba(0, 0, 0, .20) !important;
-}
-
-[data-theme="dark"] #mainContent .gad-empty-panel p:first-of-type,
-.dark #mainContent .gad-empty-panel p:first-of-type {
-    color: #F8FAFC !important;
-}
-
-[data-theme="dark"] #mainContent .gad-empty-panel p:nth-of-type(2),
-.dark #mainContent .gad-empty-panel p:nth-of-type(2) {
-    color: #C9D1D9 !important;
-}
-
-[data-theme="dark"] #mainContent .gad-empty-icon-wrap,
-.dark #mainContent .gad-empty-icon-wrap {
-    background: rgba(255, 228, 228, 0.293) !important;
-
-    color: #8B0000 !important;
-    border: 1px solid rgba(252, 165, 165, .25) !important;
-
-    box-shadow:
-        0 16px 34px rgba(250, 250, 250, 0.159),
-        0 0 24px rgba(208, 208, 208, 0.14),
-        inset 0 1px 0 rgba(255, 255, 255, .45) !important;
-}
-
-[data-theme="dark"] #mainContent .gad-empty-icon-wrap i,
-.dark #mainContent .gad-empty-icon-wrap i {
-    color: #c6c6c6 !important;
-    filter: drop-shadow(0 0 7px rgba(235, 235, 235, 0.34)) !important;
-}
-
-[data-theme="dark"] #mainContent .gad-empty-pill,
-.dark #mainContent .gad-empty-pill {
-    background: rgba(13, 17, 23, .56) !important;
-    border: 1px solid rgba(255, 255, 255, .12) !important;
-    color: #f5f5f5 !important;
-}
-
-[data-theme="dark"] #mainContent .gad-metric-chip,
-.dark #mainContent .gad-metric-chip {
-    background: rgba(13, 17, 23, .58) !important;
-    border: 1px solid rgba(255, 255, 255, .12) !important;
-    box-shadow:
-        0 10px 22px rgba(0, 0, 0, .22),
-        inset 0 1px 0 rgba(255, 255, 255, .06) !important;
-}
-
-[data-theme="dark"] #mainContent .gad-metric-chip:nth-child(1),
-.dark #mainContent .gad-metric-chip:nth-child(1) {
-    color: #E5B5B5 !important;
-}
-
-[data-theme="dark"] #mainContent .gad-metric-chip:nth-child(2),
-.dark #mainContent .gad-metric-chip:nth-child(2) {
-    color: #89CFF0 !important;
-}
-
-[data-theme="dark"] #mainContent .gad-metric-chip:nth-child(3),
-.dark #mainContent .gad-metric-chip:nth-child(3) {
-    color: #FCA5A5 !important;
+    background: var(--status-upcoming-bg) !important;
+    border-color: var(--status-upcoming-border) !important;
+    color: var(--status-upcoming-text) !important;
 }
 
 [data-theme="dark"] #mainContent #medicalSuppliesContainer .relative.z-10.flex.items-center.justify-between.mb-4 p,
@@ -1953,14 +1349,6 @@
             28px minmax(0, 1fr) 28px;
 
         gap: .25rem;
-    }
-
-    .upcoming-date-nav-btn {
-        width: 28px;
-        height: 28px;
-        min-width: 28px;
-
-        font-size: .62rem;
     }
 
     .upcoming-date-strip {
@@ -2061,19 +1449,6 @@
     .scheduled-patient-actions {
         gap: 0.28rem !important;
         margin-top: 0.54rem !important;
-    }
-
-    .scheduled-action-btn {
-        height: 28px !important;
-        min-height: 28px !important;
-        padding: 0 0.18rem !important;
-        font-size: 0.46rem !important;
-        border-radius: 0.5rem !important;
-        gap: 0.15rem !important;
-    }
-
-    .scheduled-action-btn i {
-        font-size: 0.45rem !important;
     }
 
     .dentist-dashboard-page {
@@ -2188,20 +1563,40 @@
         grid-column: 2 !important;
         grid-row: 1 !important;
 
-        width: 100% !important;
-        max-width: 170px !important;
+        width: auto !important;
+        max-width: none !important;
         min-width: 0 !important;
+
         margin: 0 !important;
 
         justify-self: end !important;
         align-self: center !important;
 
-        display: grid !important;
-        grid-template-columns: 26px minmax(0, 1fr) !important;
+        display: inline-flex !important;
         align-items: center !important;
 
         gap: 4px !important;
         padding: 4px !important;
+    }
+
+    #statusBtn.ui-btn {
+        width: auto !important;
+        min-width: 64px !important;
+        min-height: 30px !important;
+
+        padding: 0 11px !important;
+
+        flex: 0 0 auto !important;
+
+        font-size: 10px !important;
+        gap: 5px !important;
+    }
+
+    #statusBtn .status-dot {
+        width: 5px !important;
+        height: 5px !important;
+        min-width: 5px !important;
+        min-height: 5px !important;
     }
 
     .status-icon-badge {
@@ -2219,85 +1614,10 @@
         white-space: nowrap !important;
     }
 
-    #kpi-clock-hhmm {
-        font-size: 1.05rem !important;
-        line-height: 1 !important;
-    }
-
-    #kpi-clock-ampm {
-        font-size: 7px !important;
-    }
-
-    .status-change-btn {
-        padding: 4px 7px !important;
-        font-size: 8px !important;
-        line-height: 1 !important;
-        white-space: nowrap !important;
-        border-radius: 7px !important;
-        min-width: max-content !important;
-    }
-
-    .dashboard-quick-btn {
-        min-height: 38px !important;
-        padding: 0.55rem 0.65rem !important;
-        font-size: 0.66rem !important;
-        line-height: 1.15 !important;
-        white-space: normal !important;
-        text-align: center !important;
-    }
-
-    .dashboard-quick-btn i {
-        font-size: 0.72rem !important;
-        flex-shrink: 0 !important;
-    }
-
-    #gadAnalyticsContainer>div,
-    .gad-analytics-card {
+    #gadAnalyticsContainer>div {
         min-height: auto !important;
         padding: 0.85rem !important;
         border-radius: 16px !important;
-    }
-
-    .gad-analytics-card .relative.z-10.flex.items-start.justify-between {
-        flex-direction: column !important;
-        gap: 0.65rem !important;
-        margin-bottom: 0.85rem !important;
-    }
-
-    .gad-header-badge {
-        width: 32px !important;
-        height: 32px !important;
-        border-radius: 11px !important;
-    }
-
-    .gad-header-badge i {
-        font-size: 0.78rem !important;
-    }
-
-    .gad-analytics-card h3 {
-        font-size: 0.82rem !important;
-        line-height: 1.1 !important;
-    }
-
-    .gad-analytics-card h3+span {
-        font-size: 7px !important;
-        padding: 2px 6px !important;
-    }
-
-    .gad-analytics-card p.text-sm {
-        font-size: 0.68rem !important;
-        line-height: 1.25 !important;
-    }
-
-    .gad-analytics-card p.text-xs {
-        font-size: 0.6rem !important;
-        line-height: 1.2 !important;
-    }
-
-    .gad-metric-chip {
-        padding: 0.35rem 0.48rem !important;
-        font-size: 0.58rem !important;
-        gap: 0.3rem !important;
     }
 
     .gad-metric-chip .w-2\.5.h-2\.5 {
@@ -2306,137 +1626,8 @@
     }
 
     .gad-chart-shell {
-        min-height: 175px !important;
-        padding: 0.6rem !important;
-        border-radius: 14px !important;
-    }
-
-    #gadChart {
-        min-height: 170px !important;
-        max-height: 190px !important;
-    }
-
-    .gad-empty-panel {
-        padding: 0.75rem !important;
-        border-radius: 15px !important;
-    }
-
-    .gad-empty-icon-wrap {
-        width: 54px !important;
-        height: 54px !important;
-        border-radius: 16px !important;
-        margin-bottom: 0.55rem !important;
-    }
-
-    .gad-empty-icon-wrap i {
-        font-size: 1.55rem !important;
-    }
-
-    .gad-empty-panel p.font-extrabold {
-        font-size: 0.78rem !important;
-    }
-
-    .gad-empty-panel p.text-sm {
-        font-size: 0.65rem !important;
-        line-height: 1.25 !important;
-    }
-
-    .gad-empty-actions {
-        gap: 0.35rem !important;
-        margin-top: 0.7rem !important;
-    }
-
-    .gad-empty-pill {
-        font-size: 0.54rem !important;
-        padding: 0.35rem 0.45rem !important;
-        gap: 0.25rem !important;
-    }
-
-    #statusModal {
-        padding: 1rem !important;
-        align-items: center !important;
-    }
-
-    #statusModalBox {
-        width: min(100%, 310px) !important;
-        max-width: 310px !important;
-        border-radius: 18px !important;
-    }
-
-    #modalBanner {
-        padding: 1rem 1rem 0.85rem !important;
-    }
-
-    #modalIcon {
-        width: 48px !important;
-        height: 48px !important;
-        margin-bottom: 0.65rem !important;
-        font-size: 1.05rem !important;
-    }
-
-    #modalTitle {
-        font-size: 1.05rem !important;
-        line-height: 1.15 !important;
-    }
-
-    #modalSubtitle {
-        font-size: 0.78rem !important;
-        line-height: 1.25 !important;
-        margin-top: 0.3rem !important;
-    }
-
-    #modalBody {
-        font-size: 0.78rem !important;
-        line-height: 1.45 !important;
-    }
-
-    #statusModalBox>div:last-child {
-        padding: 1rem !important;
-    }
-
-    #statusModalBox .flex.gap-3.mt-5 {
-        gap: 0.55rem !important;
-        margin-top: 0.85rem !important;
-    }
-
-    #statusModalBox button {
-        min-height: 40px !important;
-        height: 40px !important;
-        padding: 0 0.75rem !important;
-        border-radius: 12px !important;
-        font-size: 0.82rem !important;
-        line-height: 1 !important;
-    }
-}
-
-@media (max-width: 340px) {
-    #statusModalBox {
-        width: min(100%, 292px) !important;
-        max-width: 292px !important;
-    }
-
-    #modalBanner {
-        padding: 0.9rem 0.9rem 0.75rem !important;
-    }
-
-    #modalIcon {
-        width: 44px !important;
-        height: 44px !important;
-    }
-
-    #modalTitle {
-        font-size: 0.98rem !important;
-    }
-
-    #modalSubtitle,
-    #modalBody {
-        font-size: 0.74rem !important;
-    }
-
-    #statusModalBox button {
-        height: 38px !important;
-        min-height: 38px !important;
-        font-size: 0.78rem !important;
+        height: 220px;
+        min-height: 220px;
     }
 }
 
@@ -2485,14 +1676,45 @@
         padding: 3px !important;
         grid-template-columns: 26px minmax(78px, 1fr) !important;
     }
-
-    .status-change-btn {
-        padding: 4px 6px !important;
-        font-size: 7px !important;
-    }
 }
 
 @media (max-width: 767px) {
+    .scheduled-modal-list {
+        gap: .45rem;
+    }
+
+    .scheduled-modal-patient-body {
+        grid-template-columns:
+            auto minmax(0, 1fr) auto;
+
+        gap: .5rem;
+
+        padding:
+            .62rem .6rem .62rem .72rem;
+    }
+
+    .scheduled-modal-patient-card .patient-avatar {
+        --patient-avatar-size: 32px;
+    }
+
+    .scheduled-modal-name-row .global-record-name {
+        font-size: .76rem;
+    }
+
+    .scheduled-modal-meta {
+        font-size: .61rem;
+        overflow: hidden;
+    }
+
+    .scheduled-modal-meta>span:first-child {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .scheduled-modal-actions {
+        gap: .25rem;
+    }
+
     body.role-dentist #dentistCalendarContainer {
         min-height: auto !important;
         height: auto !important;
@@ -2529,12 +1751,6 @@
     body.role-dentist #dentistCalendarContainer .cal-month-label {
         font-size: 1.05rem !important;
         line-height: 1.1 !important;
-    }
-
-    body.role-dentist #dentistCalendarContainer .cal-nav-btn {
-        width: 34px !important;
-        height: 34px !important;
-        min-width: 34px !important;
     }
 
     body.role-dentist #dentistCalendarContainer .cal-legend {
@@ -2700,59 +1916,6 @@
     width: 100% !important;
 }
 
-.scheduled-action-btn {
-    width: 100%;
-    min-width: 0;
-}
-
-.scheduled-action-btn i {
-    flex-shrink: 0;
-}
-
-.appointment-status-badge {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: max-content !important;
-    max-width: none !important;
-    white-space: nowrap !important;
-    overflow: visible !important;
-    text-overflow: clip !important;
-    border-radius: 999px !important;
-    border: 1px solid var(--status-default-border) !important;
-    background: var(--status-default-bg) !important;
-    color: var(--status-default-text) !important;
-    padding: 0.26rem 0.45rem !important;
-    font-size: 0.52rem !important;
-    font-weight: 800 !important;
-    line-height: 1 !important;
-    text-transform: capitalize !important;
-}
-
-.appointment-status-upcoming {
-    background: var(--status-upcoming-bg) !important;
-    color: var(--status-upcoming-text) !important;
-    border-color: var(--status-upcoming-border) !important;
-}
-
-.appointment-status-rescheduled {
-    background: var(--status-rescheduled-bg) !important;
-    color: var(--status-rescheduled-text) !important;
-    border-color: var(--status-rescheduled-border) !important;
-}
-
-.appointment-status-completed {
-    background: var(--status-completed-bg) !important;
-    color: var(--status-completed-text) !important;
-    border-color: var(--status-completed-border) !important;
-}
-
-.appointment-status-cancelled {
-    background: var(--status-cancelled-bg) !important;
-    color: var(--status-cancelled-text) !important;
-    border-color: var(--status-cancelled-border) !important;
-}
-
 [data-theme="dark"] .sched-patient-name,
 .dark .sched-patient-name {
     color: #F8FAFC !important;
@@ -2785,8 +1948,6 @@ html {
 @media (hover: none),
 (pointer: coarse) {
 
-    .dashboard-quick-btn:hover,
-    .status-change-btn:hover,
     #medicalSuppliesContainer a:hover,
     #medicineSuppliesContainer a:hover {
         transform: none !important;
@@ -2796,7 +1957,6 @@ html {
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
 
     .status-btn-wrap,
-    .gad-metric-chip,
     .gad-chart-shell {
         background: rgba(255, 255, 255, 0.96) !important;
         backdrop-filter: none !important;
@@ -2804,10 +1964,8 @@ html {
     }
 
     [data-theme="dark"] .status-btn-wrap,
-    [data-theme="dark"] .gad-metric-chip,
     [data-theme="dark"] .gad-chart-shell,
     .dark .status-btn-wrap,
-    .dark .gad-metric-chip,
     .dark .gad-chart-shell {
         background: rgba(22, 27, 34, 0.96) !important;
     }

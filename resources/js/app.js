@@ -2,6 +2,7 @@ import './bootstrap';
 import './odontogram-preview';
 import './header';
 import './pagination-bar';
+import './show-more';
 import './profile-avatar';
 import './search-bar';
 import './empty-state';
@@ -353,7 +354,7 @@ function buildFlatpickrHeader(instance) {
             ? instance.config.maxDate.getFullYear()
             : instance.currentYear + GLOBAL_CALENDAR_FUTURE_YEARS;
 
-    for (let year = minimumYear; year <= maximumYear; year++) {
+    for (let year = maximumYear; year >= minimumYear; year--) {
         const option = document.createElement('option');
 
         option.value = String(year);
@@ -524,12 +525,16 @@ function initMonthOnlyFlatpickr(root = document) {
             ? `${rawDefault}-01`
             : rawDefault || new Date();
 
+        const limitToToday =
+            el.hasAttribute('data-month-max-today');
+
         flatpickr(el, {
             dateFormat: 'Y-m',
             altInput: true,
             altFormat: 'F Y',
             altInputClass: 'form-input-custom service-period-input service-period-alt',
             defaultDate,
+            maxDate: limitToToday ? 'today' : undefined,
             allowInput: false,
             clickOpens: true,
             disableMobile: true,
@@ -1584,7 +1589,8 @@ document.addEventListener(
 
         initCharLimitFields(modal);
         initSearchClearButtons(modal);
-        initGlobalVoiceInputs(modal);
+
+        window.initGlobalVoiceInputs?.(modal);
     }
 );
 
@@ -1990,6 +1996,17 @@ function initSidebarScrollMemory() {
 }
 
 function applyGlobalTheme(theme = 'light') {
+
+    const html = document.documentElement;
+
+    html.classList.add('theme-transitioning');
+
+    window.clearTimeout(window.__themeTransitionTimer);
+
+    window.__themeTransitionTimer = window.setTimeout(() => {
+        html.classList.remove('theme-transitioning');
+    }, 320);
+
     const nextTheme =
         theme === 'dark'
             ? 'dark'
@@ -2068,13 +2085,37 @@ function applyGlobalTheme(theme = 'light') {
 
     document
         .querySelectorAll(
-            '#themeIcon'
+            '#themeIcon, [data-global-theme-icon]'
         )
         .forEach(icon => {
-            icon.className =
+            icon.className = isDark
+                ? 'fa-solid fa-sun'
+                : 'fa-solid fa-moon';
+        });
+
+    document
+        .querySelectorAll('[data-global-theme-toggle]')
+        .forEach(button => {
+            button.setAttribute(
+                'aria-label',
                 isDark
-                    ? 'fa-solid fa-moon text-gray-400 text-base'
-                    : 'fa-regular fa-sun text-gray-400 text-base';
+                    ? 'Switch to light mode'
+                    : 'Switch to dark mode'
+            );
+
+            button.setAttribute(
+                'data-tooltip',
+                isDark
+                    ? 'Switch to light mode'
+                    : 'Switch to dark mode'
+            );
+
+            button.setAttribute(
+                'aria-pressed',
+                isDark
+                    ? 'true'
+                    : 'false'
+            );
         });
 
     document
@@ -2159,6 +2200,39 @@ function initGlobalThemeControls(root = document) {
             }));
         });
     });
+
+    scope
+        .querySelectorAll('[data-global-theme-toggle]')
+        .forEach(button => {
+            if (
+                button.dataset.themeInitialized ===
+                'true'
+            ) {
+                return;
+            }
+
+            button.dataset.themeInitialized =
+                'true';
+
+            button.addEventListener(
+                'click',
+                event => {
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    const currentTheme =
+                        document.documentElement
+                            .getAttribute('data-theme') ||
+                        'light';
+
+                    applyGlobalTheme(
+                        currentTheme === 'dark'
+                            ? 'light'
+                            : 'dark'
+                    );
+                }
+            );
+        });
 }
 
 function initSidebarThemeDropdowns() {
@@ -2761,6 +2835,10 @@ function initSessionTimeoutModal() {
         modal.dataset.sessionRedirectUrl ||
         '/';
 
+    const sharedActivityKey =
+        modal.dataset.sessionActivityKey ||
+        '';
+
     const activitySyncInterval = 60000;
 
     let idleTimer = null;
@@ -2774,6 +2852,57 @@ function initSessionTimeoutModal() {
     let lastActivityAt = Date.now();
     let lastHandledActivityAt = 0;
     let lastServerSyncAt = 0;
+    let lastSharedActivityWriteAt = 0;
+
+    const readSharedActivity = () => {
+        if (!sharedActivityKey) return 0;
+
+        try {
+            const timestamp = Number(
+                window.localStorage.getItem(
+                    sharedActivityKey
+                )
+            );
+
+            if (
+                !Number.isFinite(timestamp) ||
+                timestamp <= 0 ||
+                timestamp > Date.now() + 5000
+            ) {
+                return 0;
+            }
+
+            return timestamp;
+        } catch (_) {
+            return 0;
+        }
+    };
+
+    const writeSharedActivity = timestamp => {
+        if (
+            !sharedActivityKey ||
+            timestamp - lastSharedActivityWriteAt < 1000
+        ) {
+            return;
+        }
+
+        lastSharedActivityWriteAt = timestamp;
+
+        try {
+            window.localStorage.setItem(
+                sharedActivityKey,
+                String(timestamp)
+            );
+        } catch (_) {
+        }
+    };
+
+    lastActivityAt = Math.max(
+        lastActivityAt,
+        readSharedActivity()
+    );
+
+    writeSharedActivity(lastActivityAt);
 
     const requestHeaders = () => ({
         'Accept': 'application/json',
@@ -2909,6 +3038,7 @@ function initSessionTimeoutModal() {
 
         lastHandledActivityAt = now;
         lastActivityAt = now;
+        writeSharedActivity(now);
 
         scheduleIdleTimeout();
 
@@ -2937,9 +3067,31 @@ function initSessionTimeoutModal() {
         );
     });
 
+    const checkIdleState = () => {
+        if (sessionExpired) return;
+
+        lastActivityAt = Math.max(
+            lastActivityAt,
+            readSharedActivity()
+        );
+
+        const idleDuration =
+            Date.now() - lastActivityAt;
+
+        if (
+            idleDuration >=
+            timeoutMilliseconds
+        ) {
+            showSessionTimeoutModal();
+            return;
+        }
+
+        scheduleIdleTimeout();
+    };
+
     window.addEventListener(
         'focus',
-        registerUserActivity
+        checkIdleState
     );
 
     document.addEventListener(
@@ -2953,18 +3105,33 @@ function initSessionTimeoutModal() {
                 return;
             }
 
-            const idleDuration =
-                Date.now() - lastActivityAt;
+            checkIdleState();
+        }
+    );
 
+    window.addEventListener(
+        'storage',
+        event => {
             if (
-                idleDuration >=
-                timeoutMilliseconds
+                sessionExpired ||
+                !sharedActivityKey ||
+                event.key !== sharedActivityKey
             ) {
-                showSessionTimeoutModal();
                 return;
             }
 
-            registerUserActivity();
+            const timestamp = Number(event.newValue);
+
+            if (
+                !Number.isFinite(timestamp) ||
+                timestamp <= lastActivityAt ||
+                timestamp > Date.now() + 5000
+            ) {
+                return;
+            }
+
+            lastActivityAt = timestamp;
+            scheduleIdleTimeout();
         }
     );
 
@@ -3206,6 +3373,45 @@ document.addEventListener('click', function (event) {
 
     closeModal(modalId);
 });
+
+document.addEventListener(
+    'click',
+    function (event) {
+        const confirmButton =
+            event.target.closest(
+                '[data-start-modal-confirm]'
+            );
+
+        if (!confirmButton) {
+            return;
+        }
+
+        const modal =
+            confirmButton.closest(
+                '[data-start-procedure-modal]'
+            );
+
+        if (!modal) {
+            return;
+        }
+
+        const startUrl =
+            modal.dataset.startUrl || '';
+
+        if (!startUrl) {
+            console.error(
+                'Start Procedure URL is missing.'
+            );
+
+            return;
+        }
+
+        event.preventDefault();
+
+        window.location.href =
+            startUrl;
+    }
+);
 
 document.addEventListener('keydown', function (event) {
     if (event.key !== 'Escape') return;
@@ -6473,196 +6679,6 @@ window.initGlobalPageSizeSelects = initGlobalPageSizeSelects;
 window.syncGlobalPageSizeSelect = syncGlobalPageSizeSelect;
 window.setGlobalPageSizeValue = setGlobalPageSizeValue;
 
-const activeVoiceControllers = new Map();
-
-function getSpeechRecognitionConstructor() {
-    return window.SpeechRecognition || window.webkitSpeechRecognition || null;
-}
-
-function setVoiceStatus(statusEl, message = '', state = 'default') {
-    if (!statusEl) return;
-
-    statusEl.textContent = message;
-    statusEl.classList.remove('hidden', 'is-listening', 'is-success', 'is-error', 'is-default');
-
-    if (!message) {
-        statusEl.classList.add('hidden');
-        return;
-    }
-
-    statusEl.classList.add(`is-${state}`);
-}
-
-function resolveVoiceTarget(button) {
-    const targetSelector = button.dataset.voiceTarget;
-
-    if (targetSelector) {
-        return document.querySelector(targetSelector);
-    }
-
-    const field = button.closest('[data-voice-field], .voice-search-row, .st-voice-row');
-
-    return field?.querySelector('input:not([type="hidden"]), textarea') || null;
-}
-
-function resolveVoiceStatus(button) {
-    const statusSelector = button.dataset.voiceStatus;
-
-    if (statusSelector) {
-        return document.querySelector(statusSelector);
-    }
-
-    const field = button.closest('[data-voice-field], .voice-search-row, .st-voice-row');
-
-    return field?.querySelector('[data-voice-status]') || null;
-}
-
-function stopActiveVoiceExcept(currentButton = null) {
-    activeVoiceControllers.forEach((controller, button) => {
-        if (button === currentButton) return;
-
-        try {
-            controller.recognition.stop();
-        } catch (_) { }
-
-        button.classList.remove('mic-active');
-        setVoiceStatus(controller.statusEl, '', 'default');
-        activeVoiceControllers.delete(button);
-    });
-}
-
-function initGlobalVoiceInputs(root = document) {
-    const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
-
-    const SpeechRecognition = getSpeechRecognitionConstructor();
-
-    const buttons = scope.querySelectorAll(
-        '.voice-search-mic.external[data-voice-trigger], [data-global-voice-trigger]'
-    );
-
-    buttons.forEach((button) => {
-        if (button.dataset.voiceInitialized === 'true') return;
-
-        button.dataset.voiceInitialized = 'true';
-
-        button.addEventListener('click', () => {
-            const input = resolveVoiceTarget(button);
-            const statusEl = resolveVoiceStatus(button);
-
-            if (!input) {
-                setVoiceStatus(statusEl, 'No input found', 'error');
-                return;
-            }
-
-            if (!SpeechRecognition) {
-                setVoiceStatus(statusEl, 'Voice not supported', 'error');
-                return;
-            }
-
-            if (activeVoiceControllers.has(button)) {
-                const active = activeVoiceControllers.get(button);
-
-                try {
-                    active.recognition.stop();
-                } catch (_) { }
-
-                button.classList.remove('mic-active');
-                setVoiceStatus(statusEl, '', 'default');
-                activeVoiceControllers.delete(button);
-                return;
-            }
-
-            stopActiveVoiceExcept(button);
-
-            const recognition = new SpeechRecognition();
-
-            recognition.lang = input.dataset.voiceLang || button.dataset.voiceLang || 'en-US';
-            recognition.continuous = false;
-            recognition.interimResults = true;
-            recognition.maxAlternatives = 1;
-
-            let finalTranscript = '';
-
-            recognition.onstart = () => {
-                button.classList.add('mic-active');
-                setVoiceStatus(statusEl, 'Listening...', 'listening');
-            };
-
-            recognition.onresult = (event) => {
-                let interimTranscript = '';
-
-                for (let i = event.resultIndex; i < event.results.length; i++) {
-                    const transcript = event.results[i][0]?.transcript?.trim() || '';
-
-                    if (!transcript) continue;
-
-                    if (event.results[i].isFinal) {
-                        finalTranscript += ` ${transcript}`;
-                    } else {
-                        interimTranscript += ` ${transcript}`;
-                    }
-                }
-
-                const spokenText = (finalTranscript || interimTranscript).trim();
-
-                if (!spokenText) return;
-
-                if (input.tagName.toLowerCase() === 'textarea' && input.value.trim()) {
-                    input.value = `${input.value.trim()} ${spokenText}`.trim();
-                } else {
-                    input.value = spokenText;
-                }
-
-                input.dispatchEvent(new Event('input', { bubbles: true }));
-                input.dispatchEvent(new Event('change', { bubbles: true }));
-            };
-
-            recognition.onerror = (event) => {
-                button.classList.remove('mic-active');
-
-                const error = event?.error || 'unknown';
-                const message = error === 'not-allowed'
-                    ? 'Microphone blocked'
-                    : 'Voice input failed';
-
-                setVoiceStatus(statusEl, message, 'error');
-                activeVoiceControllers.delete(button);
-
-                setTimeout(() => {
-                    setVoiceStatus(statusEl, '', 'default');
-                }, 1800);
-            };
-
-            recognition.onend = () => {
-                button.classList.remove('mic-active');
-                activeVoiceControllers.delete(button);
-
-                if (input.value.trim()) {
-                    setVoiceStatus(statusEl, 'Captured', 'success');
-
-                    setTimeout(() => {
-                        setVoiceStatus(statusEl, '', 'default');
-                    }, 1200);
-                } else {
-                    setVoiceStatus(statusEl, '', 'default');
-                }
-            };
-
-            activeVoiceControllers.set(button, {
-                recognition,
-                input,
-                statusEl,
-            });
-
-            recognition.start();
-        });
-    });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    initGlobalVoiceInputs();
-});
-
 document.addEventListener('DOMContentLoaded', () => {
     const openModalSelector = [
         '.modal-overlay.open',
@@ -6692,8 +6708,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     syncModalLock();
 });
-
-window.initGlobalVoiceInputs = initGlobalVoiceInputs;
 
 function closeCustomSelects(except = null) {
     document.querySelectorAll('.custom-select.is-open').forEach(wrapper => {
@@ -7020,6 +7034,22 @@ function initCustomSelects(root = document) {
             if (willOpen) {
                 positionCustomSelectMenu(wrapper);
                 wrapper.classList.add('is-open');
+
+                if (select.classList.contains('custom-flatpickr-year')) {
+                    requestAnimationFrame(() => {
+                        const activeOption =
+                            wrapper.querySelector('.custom-select-option.is-active');
+
+                        activeOption?.scrollIntoView({
+                            block: 'center',
+                            inline: 'nearest'
+                        });
+
+                        activeOption?.focus({
+                            preventScroll: true
+                        });
+                    });
+                }
             } else {
                 wrapper.classList.remove('is-open', 'drop-up');
             }

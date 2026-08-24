@@ -160,6 +160,22 @@
                                             <div class="walkin-two-col">
 
                                                 <div class="global-form-group" data-global-field>
+                                                    <label class="global-form-label" for="guestPatientType">
+                                                        Patient Type
+                                                        <span class="required-mark">*</span>
+                                                    </label>
+
+                                                    <select id="guestPatientType" name="guest_patient_type"
+                                                        class="form-select-custom js-custom-select" disabled required>
+                                                        <option value="">Select patient type</option>
+                                                        <option value="student">Student</option>
+                                                        <option value="faculty">Faculty</option>
+                                                        <option value="administrative">Administrative Personnel
+                                                        </option>
+                                                    </select>
+                                                </div>
+
+                                                <div class="global-form-group" data-global-field>
                                                     <label class="global-form-label" for="guestGender">
                                                         Gender
                                                         <span class="required-mark">*</span>
@@ -172,6 +188,10 @@
                                                         <option value="Female">Female</option>
                                                     </select>
                                                 </div>
+
+                                            </div>
+
+                                            <div class="walkin-two-col">
 
                                                 <div class="global-form-group" data-global-field>
                                                     <label class="global-form-label" for="guestBirthdate">
@@ -187,10 +207,6 @@
                                                         disabled>
                                                 </div>
 
-                                            </div>
-
-                                            <div class="walkin-two-col">
-
                                                 <div class="global-form-group" data-global-field>
                                                     <label class="global-form-label" for="guestProgram">
                                                         Program
@@ -199,16 +215,6 @@
 
                                                     <input type="text" id="guestProgram" name="guest_program"
                                                         class="form-input-custom" placeholder="Enter program" disabled>
-                                                </div>
-
-                                                <div class="global-form-group" data-global-field>
-                                                    <label class="global-form-label" for="guestFaculty">
-                                                        Faculty
-                                                        <span class="field-optional">(Optional)</span>
-                                                    </label>
-
-                                                    <input type="text" id="guestFaculty" name="guest_faculty"
-                                                        class="form-input-custom" placeholder="Enter faculty" disabled>
                                                 </div>
 
                                             </div>
@@ -363,16 +369,14 @@
                         </div>
                     </div>
                 </form>
+                <x-booking.navigation />
             </div>
-
-            <x-booking.navigation />
-
         </div>
     </div>
 </main>
 
 <div id="introBookingModal" class="ui-modal" aria-hidden="true">
-    <div class="ui-modal-card modal-md">
+    <div class="ui-modal-card modal-lg">
         <div class="modal-hd">
             <div class="modal-heading">
                 <div class="modal-icon">
@@ -512,6 +516,7 @@
     let selectedPatientBookingInformation = null;
     let patientHasExistingBookingInformation = false;
     let patientHasReusableSignature = false;
+    let patientExistingSignatureUrl = '';
     let formIsDirty = false;
     let formSubmitting = false;
     let pendingNavigation = null;
@@ -546,6 +551,9 @@
     const guestPhone =
         document.getElementById("guestPhone");
 
+    const guestPatientType =
+        document.getElementById("guestPatientType");
+
     const guestGender =
         document.getElementById("guestGender");
 
@@ -554,9 +562,6 @@
 
     const guestProgram =
         document.getElementById("guestProgram");
-
-    const guestFaculty =
-        document.getElementById("guestFaculty");
 
     const guestYearLevel =
         document.getElementById("guestYearLevel");
@@ -577,10 +582,10 @@
             guestLastName,
             guestEmail,
             guestPhone,
+            guestPatientType,
             guestGender,
             guestBirthdate,
             guestProgram,
-            guestFaculty,
             guestYearLevel,
             guestSection,
         ];
@@ -633,6 +638,10 @@
             guestPhone.required = enabled;
         }
 
+        if (guestPatientType) {
+            guestPatientType.required = enabled;
+        }
+
         if (guestGender) {
             guestGender.required = enabled;
         }
@@ -647,22 +656,29 @@
                 index === 0;
         });
 
-        if (guestGender) {
+        [
+            guestPatientType,
+            guestGender,
+        ].forEach(selectField => {
+            if (!selectField) {
+                return;
+            }
+
             window.initCustomSelects?.(
                 guestPanel
             );
 
-            const genderWrapper =
-                guestGender.closest(
+            const selectWrapper =
+                selectField.closest(
                     ".custom-select"
                 );
 
-            if (genderWrapper) {
+            if (selectWrapper) {
                 window.syncCustomSelect?.(
-                    genderWrapper
+                    selectWrapper
                 );
             }
-        }
+        });
 
         if (
             guestBirthdate?._flatpickr
@@ -677,10 +693,10 @@
         guestLastName,
         guestEmail,
         guestPhone,
+        guestPatientType,
         guestGender,
         guestBirthdate,
         guestProgram,
-        guestFaculty,
         guestYearLevel,
         guestSection,
     ].forEach(input => {
@@ -828,6 +844,14 @@
         patientHasReusableSignature =
             false;
 
+        patientExistingSignatureUrl = '';
+        window.BookingSignature
+            ?.get(document)
+            ?.setExistingSignature({
+                reusable: false,
+                url: '',
+            });
+
         updateWomenSection(null);
 
         if (selectedPatientId) {
@@ -897,8 +921,8 @@
             "click",
             () => {
                 clearSelectedPatientUI({
-                    clearSearch: true,
-                    reloadPatients: true,
+                    clearSearch: false,
+                    reloadPatients: false,
                 });
 
                 patientSearch?.focus();
@@ -936,10 +960,10 @@
                 guestLastName,
                 guestEmail,
                 guestPhone,
+                guestPatientType,
                 guestGender,
                 guestBirthdate,
                 guestProgram,
-                guestFaculty,
                 guestYearLevel,
                 guestSection,
             ].forEach(input => {
@@ -951,6 +975,19 @@
             guestPwdRadios.forEach(radio => {
                 radio.checked = false;
             });
+
+            if (guestPatientType) {
+                const guestPatientTypeWrapper =
+                    guestPatientType.closest(
+                        ".custom-select"
+                    );
+
+                if (guestPatientTypeWrapper) {
+                    window.syncCustomSelect?.(
+                        guestPatientTypeWrapper
+                    );
+                }
+            }
         }
     }
 
@@ -1187,6 +1224,17 @@
                     data.has_reusable_signature
                 );
 
+            patientExistingSignatureUrl =
+                data.existing_signature_url || '';
+
+            window.BookingSignature
+                ?.get(document)
+                ?.setExistingSignature({
+                    reusable: patientHasReusableSignature,
+
+                    url: patientExistingSignatureUrl,
+                });
+
             applyExistingPatientBookingInformation(
                 data
             );
@@ -1207,10 +1255,12 @@
             patientHasReusableSignature =
                 false;
 
-            showMiniTab(
-                error.message ||
-                "Unable to load saved patient information."
-            );
+            window.showToast?.({
+                type: 'error',
+                title: 'Unable to Load Information',
+                message: error.message ||
+                    'Unable to load saved patient information.',
+            });
 
             return null;
         }
@@ -1251,7 +1301,6 @@
             guestGender,
             guestBirthdate,
             guestProgram,
-            guestFaculty,
             guestYearLevel,
             guestSection,
         ].forEach(input => {
@@ -1287,9 +1336,11 @@
         if (
             patientHasExistingBookingInformation
         ) {
-            showMiniTab(
-                "Existing patient information loaded. The saved dental and medical history will be reused."
-            );
+            window.showToast?.({
+                type: 'success',
+                title: 'Patient Information Loaded',
+                message: 'The saved dental and medical history will be reused.',
+            });
         }
 
     }
@@ -1326,9 +1377,6 @@
 
         const program =
             guestProgram?.value?.trim() || "";
-
-        const faculty =
-            guestFaculty?.value?.trim() || "";
 
         const yearLevel =
             guestYearLevel?.value?.trim() || "";
@@ -1389,6 +1437,18 @@
             return false;
         }
 
+        if (!guestPatientType?.value) {
+            window.validateFormInputField?.(
+                guestPatientType
+            );
+
+            window.focusGlobalInvalidField?.(
+                guestPatientType
+            );
+
+            return false;
+        }
+
         if (!gender) {
             window.validateFormInputField?.(
                 guestGender
@@ -1414,11 +1474,20 @@
         }
 
         if (pwdValue === undefined) {
-            showMiniTab(
-                "Please indicate whether the patient is PWD."
-            );
+            const firstPwdRadio =
+                guestPwdRadios[0];
 
-            guestPwdRadios[0]?.focus();
+            if (firstPwdRadio) {
+                firstPwdRadio.required = true;
+
+                window.validateFormInputField?.(
+                    firstPwdRadio
+                );
+
+                window.focusGlobalInvalidField?.(
+                    firstPwdRadio
+                );
+            }
 
             return false;
         }
@@ -1440,12 +1509,28 @@
         );
 
         window.clearFormInputValidation?.(
+            guestPatientType
+        );
+
+        window.clearFormInputValidation?.(
             guestGender
         );
 
         window.clearFormInputValidation?.(
             guestBirthdate
         );
+
+        const patientType =
+            guestPatientType?.value || "";
+
+        const patientTypeLabel =
+            patientType === "student" ?
+                "Student" :
+                patientType === "faculty" ?
+                    "Faculty" :
+                    patientType === "administrative" ?
+                        "Administrative Personnel" :
+                        "Guest Patient";
 
         selectedWalkInPatient = {
             id: null,
@@ -1456,15 +1541,15 @@
             phone,
             gender,
             birthdate,
+            patient_type: patientType,
 
             program,
-            faculty_code: faculty,
             year_level: yearLevel,
             section,
 
             is_pwd: pwdValue === "1",
 
-            type: "Guest Patient",
+            type: patientTypeLabel,
         };
 
         updateWomenSection(
@@ -1486,7 +1571,7 @@
 
         if (selectedPatientMeta) {
             const metaParts = [
-                "Guest Patient",
+                patientTypeLabel,
                 gender,
                 program,
                 email,
@@ -1503,12 +1588,6 @@
             );
 
         markFormDirty();
-
-        if (shouldProceed) {
-            showMiniTab(
-                "Guest patient details saved."
-            );
-        }
 
         return true;
     }
@@ -1547,6 +1626,10 @@
         payload.append("guest_email", guestEmail?.value?.trim() || "");
         payload.append("guest_phone", guestPhone?.value?.trim() || "");
         payload.append(
+            "guest_patient_type",
+            guestPatientType?.value || ""
+        );
+        payload.append(
             "guest_gender",
             guestGender?.value || ""
         );
@@ -1559,11 +1642,6 @@
         payload.append(
             "guest_program",
             guestProgram?.value?.trim() || ""
-        );
-
-        payload.append(
-            "guest_faculty",
-            guestFaculty?.value?.trim() || ""
         );
 
         payload.append(
@@ -1641,11 +1719,20 @@
             }
 
             selectedPatientBox?.removeAttribute("hidden");
-            showMiniTab("Guest account created.");
+            window.showToast?.({
+                type: 'success',
+                title: 'Guest account created',
+                message: 'The guest patient is ready for walk-in intake.',
+            });
             markFormDirty();
             return true;
         } catch (error) {
-            showMiniTab(error.message || "Unable to create guest account. Please try again.");
+            window.showToast?.({
+                type: 'error',
+                title: 'Unable to create guest account',
+                message: error.message ||
+                    'Please try again.',
+            });
             return false;
         } finally {
             if (createGuestBtn) {
@@ -1940,26 +2027,26 @@
         <span class="patient-avatar patient-avatar-md">
     ${avatarUrl
                 ? `
-                                                                                                                                                                                                                                                                                                <img
-                                                                                                                                                                                                                                                                                                    src="${safePatientText(
+                                                                                                                                                                                                                                                                                                        <img
+                                                                                                                                                                                                                                                                                                            src="${safePatientText(
                     avatarUrl
                 )}"
-                                                                                                                                                                                                                                                                                                    alt="${safePatientText(
+                                                                                                                                                                                                                                                                                                            alt="${safePatientText(
                     patientName
                 )}"
-                                                                                                                                                                                                                                                                                                    loading="lazy"
-                                                                                                                                                                                                                                                                                                >
-                                                                                                                                                                                                                                                                                            `
+                                                                                                                                                                                                                                                                                                            loading="lazy"
+                                                                                                                                                                                                                                                                                                        >
+                                                                                                                                                                                                                                                                                                    `
                 : `
-                                                                                                                                                                                                                                                                                                <span>
-                                                                                                                                                                                                                                                                                                    ${safePatientText(
+                                                                                                                                                                                                                                                                                                        <span>
+                                                                                                                                                                                                                                                                                                            ${safePatientText(
                     window.PatientUI
                         ?.getInitials(
                             patientName
                         ) || 'P'
                 )}
-                                                                                                                                                                                                                                                                                                </span>
-                                                                                                                                                                                                                                                                                            `
+                                                                                                                                                                                                                                                                                                        </span>
+                                                                                                                                                                                                                                                                                                    `
             }
 </span>
 
@@ -1979,37 +2066,37 @@
             <span class="patient-card-meta">
                 ${studentNumber
                 ? `
-                                                                                                                                                                                                                                                                                                                <span>
-                                                                                                                                                                                                                                                                                                                    <i class="fa-solid fa-id-card"></i>
-                                                                                                                                                                                                                                                                                                                    ${safePatientText(
+                                                                                                                                                                                                                                                                                                                        <span>
+                                                                                                                                                                                                                                                                                                                            <i class="fa-solid fa-id-card"></i>
+                                                                                                                                                                                                                                                                                                                            ${safePatientText(
                     studentNumber
                 )}
-                                                                                                                                                                                                                                                                                                                </span>
-                                                                                                                                                                                                                                                                                                            `
+                                                                                                                                                                                                                                                                                                                        </span>
+                                                                                                                                                                                                                                                                                                                    `
                 : ''
             }
 
                 ${program
                 ? `
-                                                                                                                                                                                                                                                                                                                <span>
-                                                                                                                                                                                                                                                                                                                    <i class="fa-solid fa-graduation-cap"></i>
-                                                                                                                                                                                                                                                                                                                    ${safePatientText(
+                                                                                                                                                                                                                                                                                                                        <span>
+                                                                                                                                                                                                                                                                                                                            <i class="fa-solid fa-graduation-cap"></i>
+                                                                                                                                                                                                                                                                                                                            ${safePatientText(
                     program
                 )}
-                                                                                                                                                                                                                                                                                                                </span>
-                                                                                                                                                                                                                                                                                                            `
+                                                                                                                                                                                                                                                                                                                        </span>
+                                                                                                                                                                                                                                                                                                                    `
                 : ''
             }
 
                 ${patientEmail
                 ? `
-                                                                                                                                                                                                                                                                                                                <span>
-                                                                                                                                                                                                                                                                                                                    <i class="fa-solid fa-envelope"></i>
-                                                                                                                                                                                                                                                                                                                    ${safePatientText(
+                                                                                                                                                                                                                                                                                                                        <span>
+                                                                                                                                                                                                                                                                                                                            <i class="fa-solid fa-envelope"></i>
+                                                                                                                                                                                                                                                                                                                            ${safePatientText(
                     patientEmail
                 )}
-                                                                                                                                                                                                                                                                                                                </span>
-                                                                                                                                                                                                                                                                                                            `
+                                                                                                                                                                                                                                                                                                                        </span>
+                                                                                                                                                                                                                                                                                                                    `
                 : ''
             }
             </span>
@@ -2106,15 +2193,15 @@
                 });
         }
 
-        function selectThisPatient() {
+        async function selectThisPatient() {
             clearOtherPatientCards();
-
-            selectWalkInPatient(
-                patient
-            );
 
             syncCardSelectionState(
                 true
+            );
+
+            await selectWalkInPatient(
+                patient
             );
         }
 
@@ -2159,11 +2246,23 @@
             togglePatientSelection();
         });
 
-        patientCheckbox?.addEventListener('click', event => {
-            event.stopPropagation();
-            event.preventDefault();
-            togglePatientSelection();
-        });
+        patientCheckbox?.addEventListener(
+            'click',
+            event => {
+                event.stopPropagation();
+            }
+        );
+
+        patientCheckbox?.addEventListener(
+            'change',
+            () => {
+                if (patientCheckbox.checked) {
+                    selectThisPatient();
+                } else {
+                    unselectThisPatient();
+                }
+            }
+        );
         return card;
     }
 
@@ -2367,13 +2466,15 @@
         if (
             !patientResults ||
             patientResults.dataset
-                .initialPatientsLoaded === "true"
+                .initialPatientsLoaded ===
+            "true"
         ) {
             return;
         }
 
         patientResults.dataset
-            .initialPatientsLoaded = "true";
+            .initialPatientsLoaded =
+            "true";
 
         loadPatients("", true);
     }
@@ -2392,6 +2493,12 @@
             );
         };
 
+    let bookingWorkflow = null;
+
+    let step5ConfirmationActive = false;
+
+    let editingHistoryFromReview = null;
+
     const summarySection =
         document.getElementById(
             'summarySection'
@@ -2401,14 +2508,6 @@
         document.getElementById(
             'confirmationSection'
         );
-
-    let bookingWorkflow = null;
-
-    let step5ConfirmationActive =
-        false;
-
-    let editingHistoryFromReview =
-        null;
 
     function showStep5Review() {
         step5ConfirmationActive =
@@ -2426,12 +2525,19 @@
 
         bookingWorkflow
             ?.setNextButton({
-                label: 'Confirm Appointment',
+                label: 'Review & Confirm',
 
-                icon: 'fa-chevron-right',
+                icon: 'fa-arrow-right',
+
+                iconPosition: 'right',
+            });
+
+        summarySection
+            ?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
             });
     }
-
 
     function showStep5Confirmation() {
         step5ConfirmationActive =
@@ -2854,11 +2960,17 @@
                         !finalConfirm ||
                         !finalConfirm.checked
                     ) {
-                        showMiniTab(
-                            'Please confirm before starting the procedure.'
-                        );
+                        if (finalConfirm) {
+                            finalConfirm.required = true;
 
-                        finalConfirm?.focus();
+                            window.validateFormInputField?.(
+                                finalConfirm
+                            );
+
+                            window.focusGlobalInvalidField?.(
+                                finalConfirm
+                            );
+                        }
 
                         return false;
                     }
@@ -2940,13 +3052,6 @@
         updateUI();
     }
 
-    window.addEventListener("beforeunload", (e) => {
-        if (formIsDirty && !formSubmitting) {
-            e.preventDefault();
-            e.returnValue = "";
-        }
-    });
-
     function markFormDirty() {
         formIsDirty = true;
     }
@@ -2962,6 +3067,30 @@
         resetStep5View();
 
         bookingWorkflow.goTo(2);
+    }
+
+    function editSignatureFromReview() {
+        editingHistoryFromReview =
+            'medical';
+
+        resetStep5View();
+
+        bookingWorkflow.goTo(3);
+
+        setTimeout(() => {
+            const signature =
+                window.BookingSignature
+                    ?.get(document);
+
+            signature?.editExisting();
+            signature?.resize();
+
+            signature?.root
+                ?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                });
+        }, 120);
     }
 
     function editMedicalHistoryFromReview() {
@@ -3046,15 +3175,34 @@
         let sigHTML =
             patientHasReusableSignature ?
                 `
-            <div class="booking-summary-saved-info">
-                <p class="font-semibold">
-                    <i class="fa-solid fa-circle-check mr-1"></i>
-                    Existing signature on file
+            <div class="signature-existing-card">
+
+                <div class="signature-existing-header">
+                    <i class="fa-solid fa-circle-check"></i>
+
+                    <div>
+                        <p class="signature-existing-title">
+                            Existing signature on file
+                        </p>
+                    </div>
+                </div>
+
+                ${patientExistingSignatureUrl
+                    ? `
+                                <div class="signature-existing-preview">
+                                    <img
+                                        src="${patientExistingSignatureUrl}"
+                                        alt="Existing signature"
+                                    >
+                                </div>
+                            `
+                    : ''
+                }
+
+                <p class="signature-existing-help">
+                    The patient's previously verified signature will be reused.
                 </p>
 
-                <p class="booking-summary-muted mt-1">
-                    The patient's previously saved signature will be reused.
-                </p>
             </div>
         ` :
                 `
@@ -3180,20 +3328,17 @@
 
             ${editAction
                 ? `
-                            <button
-                                type="button"
-                                class="
-                                    ui-btn
-                                    ui-btn-secondary
-                                    ui-btn-sm
-                                    flex-shrink-0
-                                "
-                                onclick="${editAction}"
-                            >
-                                <i class="fa-solid fa-pen"></i>
-                                <span>Edit</span>
-                            </button>
-                        `
+                                    <button
+                                        type="button"
+                                        class="
+                                            ui-btn
+                                            ui-btn-secondary                                      "
+                                        onclick="${editAction}"
+                                    >
+                                        <i class="fa-solid fa-pen"></i>
+                                        <span>Edit</span>
+                                    </button>
+                                `
                 : ''
             }
 
@@ -3271,10 +3416,10 @@
                 ${diseaseLabels
                     .map(
                         label => `
-                                                                                                                                                                                                                                                                                    <span class="booking-summary-tag">
-                                                                                                                                                                                                                                                                                        ${label}
-                                                                                                                                                                                                                                                                                    </span>
-                                                                                                                                                                                                                                                                                `
+                                                                                                                                                                                                                                                                                            <span class="booking-summary-tag">
+                                                                                                                                                                                                                                                                                                ${label}
+                                                                                                                                                                                                                                                                                            </span>
+                                                                                                                                                                                                                                                                                        `
                     )
                     .join('')}
             </div>
@@ -3365,77 +3510,77 @@
             "N/A";
         const dentalHistoryBody = `
     ${subSection("Basic Info", `
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Last Dental Visit", get("last_dental_visit"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Previous Dentist", get("previous_dentist"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Last Dental Visit", get("last_dental_visit"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Previous Dentist", get("previous_dentist"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    `)}
 
     ${subSection("Dental Symptoms", `
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Bleeding Gums", get("bleeding_gums"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Tooth Pain", get("tooth_pain"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Sores/Lumps", get("sores"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Jaw Injuries", get("injuries"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Bleeding Gums", get("bleeding_gums"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Tooth Pain", get("tooth_pain"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Sores/Lumps", get("sores"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Jaw Injuries", get("injuries"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    `)}
 
     ${subSection("Jaw & Bite Symptoms", `
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Clicking", get("clicking"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Joint Pain", get("joint_pain"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Difficulty Moving", get("difficulty_moving"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Difficulty Chewing", get("difficulty_chewing"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Frequent Headaches", get("jaw_headaches"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Grinding/Clenching", get("clench_grind"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Lips/Cheek Biting", get("biting"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Teeth Loosening", get("teeth_loosening"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Food Caught Between Teeth", get("food_teeth"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Medicine Reaction", get("med_reaction"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Clicking", get("clicking"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Joint Pain", get("joint_pain"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Difficulty Moving", get("difficulty_moving"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Difficulty Chewing", get("difficulty_chewing"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Frequent Headaches", get("jaw_headaches"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Grinding/Clenching", get("clench_grind"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Lips/Cheek Biting", get("biting"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Teeth Loosening", get("teeth_loosening"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Food Caught Between Teeth", get("food_teeth"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Medicine Reaction", get("med_reaction"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    `)}
 
     ${subSection("Dental Procedures", `
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Periodontal Treatment", get("periodontal"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Difficult Extraction", get("difficult_extraction"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Periodontal Treatment", get("periodontal"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Difficult Extraction", get("difficult_extraction"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Dentures", get("dentures"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Dentures", get("dentures"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${row("Orthodontic Treatment", get("ortho_treatment"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${row("Orthodontic Treatment", get("ortho_treatment"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    `)}
 
     ${fullWidthSection("Additional Concerns", `
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
                 ? get("additional_concerns")
                 : '<span class="text-[#9e9690] italic">No additional concerns provided.</span>'}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    `)}
 `;
 
         const medicalHistoryBody = `
     ${subSection("General Health", `
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Good Health", get("good_health"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${row("Good Health", get("good_health"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Had Medical Exam", get("had_medical_exam"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${row("Had Medical Exam", get("had_medical_exam"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Under Treatment", get("under_treatment"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${row("Under Treatment", get("under_treatment"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Hospitalized", get("hospitalized"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                        `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${row("Hospitalized", get("hospitalized"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                `)}
 
     ${subSection("Allergies", `
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Allergy (Medicine)", get("allergy_medicine"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Allergy (Food)", get("allergy_food"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${optionalRow("Allergy (Others)", get("allergy_others"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                        `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${row("Allergy (Medicine)", get("allergy_medicine"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${row("Allergy (Food)", get("allergy_food"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${optionalRow("Allergy (Others)", get("allergy_others"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                `)}
 
     ${subSection("Medications", `
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Medication", get("medication"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                        `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${row("Medication", get("medication"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                `)}
 
     ${isFemaleGender(
             selectedWalkInPatient?.gender
@@ -3443,21 +3588,21 @@
                 ? subSection(
                     "For Women Only",
                     `
-                                                                                                                                                                                                                                                                                                ${row(
+                                                                                                                                                                                                                                                                                                        ${row(
                         "Pregnant",
                         get("pregnant")
                     )}
 
-                                                                                                                                                                                                                                                                                                ${row(
+                                                                                                                                                                                                                                                                                                        ${row(
                         "Nursing",
                         get("nursing")
                     )}
 
-                                                                                                                                                                                                                                                                                                ${row(
+                                                                                                                                                                                                                                                                                                        ${row(
                         "Birth Control Pills",
                         get("birth_control")
                     )}
-                                                                                                                                                                                                                                                                                            `
+                                                                                                                                                                                                                                                                                                    `
                 )
                 : ""}
 
@@ -3467,16 +3612,16 @@
                 )}
 
     ${subSection("Tobacco Use", `
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Tobacco Use", get("tobacco_use"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                        `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${row("Tobacco Use", get("tobacco_use"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                `)}
 
     ${subSection("Do You Suffer From", `
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Headaches", get("headaches"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Earaches", get("earaches"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Neck Aches", get("neck_aches"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                        `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${row("Headaches", get("headaches"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${row("Earaches", get("earaches"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${row("Neck Aches", get("neck_aches"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                `)}
 `;
 
 
@@ -3556,26 +3701,26 @@ ${summaryCard(
             patientInformationBody
         )}
      ${summaryCard("Walk-in Schedule", "fa-clock", `
-                                                                                                                                                                                                                                                                                                                <div class="grid grid-cols-1 gap-y-1">
-                                                                                                                                                                                                                                                                                                                    <p class="booking-summary-row">
+                                                                                                                                                                                                                                                                                                                        <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                                                                                                                                                                                                                            <p class="booking-summary-row">
 
-                                                                                                                                                                                                                                                            <span class="booking-summary-row-label">
-                                                                                                                                                                                                                                                                Date & Time:
-                                                                                                                                                                                                                                                            </span>
+                                                                                                                                                                                                                                                                    <span class="booking-summary-row-label">
+                                                                                                                                                                                                                                                                        Date & Time:
+                                                                                                                                                                                                                                                                    </span>
 
-                                                                                                                                                                                                                                                            <span class="booking-summary-auto-note">
-                                                                                                                                                                                                                                                                Recorded automatically when Start Procedure is clicked.
-                                                                                                                                                                                                                                                            </span>
+                                                                                                                                                                                                                                                                    <span class="booking-summary-auto-note">
+                                                                                                                                                                                                                                                                        Recorded automatically when Start Procedure is clicked.
+                                                                                                                                                                                                                                                                    </span>
 
-                                                                                                                                                                                                                                                        </p>
-                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                            `)}
+                                                                                                                                                                                                                                                                </p>
+                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                    `)}
 
         ${summaryCard("Service", "fa-tooth", `
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="grid grid-cols-1 gap-y-1">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${row("Type", get("service_type"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Type", get("service_type"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    `)}
     </div>
 
     ${summaryCard(
@@ -3598,14 +3743,21 @@ ${summaryCard(
 
     <div class="grid grid-cols-2 gap-4 sm-grid-1col">
         ${summaryCard("Emergency Contact", "fa-phone", `
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="grid grid-cols-1 gap-y-1">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${row("Name", get("emergency_person"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${row("Number", get("emergency_number"))}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ${row("Relation", emergencyRelation)}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            `)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Name", get("emergency_person"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Number", get("emergency_number"))}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ${row("Relation", emergencyRelation)}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    `)}
 
-        ${summaryCard("Signature", "fa-signature", sigHTML)}
+        ${summaryCard(
+            "Signature",
+            "fa-signature",
+            sigHTML,
+            patientHasReusableSignature
+                ? "editSignatureFromReview()"
+                : null
+        )}
     </div>
 `;
 
@@ -3678,6 +3830,46 @@ ${summaryCard(
             });
     }
 
+    function applyWalkInServerValidationErrors(errors = {}) {
+        let firstInvalid = null;
+
+        Object.entries(errors).forEach(
+            ([name, messages]) => {
+                const normalizedName =
+                    name.replace(/\.\d+$/, '[]');
+
+                const field =
+                    appointmentForm?.querySelector(
+                        `[name="${CSS.escape(normalizedName)}"]`
+                    );
+
+                if (!field) {
+                    return;
+                }
+
+                const message =
+                    Array.isArray(messages) ?
+                        messages[0] :
+                        String(messages || '');
+
+                window.showFormInputValidationMessage?.(
+                    field,
+                    message
+                );
+
+                firstInvalid ||= field;
+            }
+        );
+
+        if (firstInvalid) {
+            window.focusGlobalInvalidField?.(
+                firstInvalid
+            );
+        }
+
+        return firstInvalid;
+    }
+
     async function submitWalkInAppointment() {
         if (
             !appointmentForm ||
@@ -3690,11 +3882,18 @@ ${summaryCard(
             !finalConfirm ||
             !finalConfirm.checked
         ) {
-            showMiniTab(
-                "Please confirm before starting the procedure."
-            );
+            if (finalConfirm) {
+                finalConfirm.required = true;
 
-            finalConfirm?.focus();
+                window.validateFormInputField?.(
+                    finalConfirm
+                );
+
+                window.focusGlobalInvalidField?.(
+                    finalConfirm
+                );
+            }
+
             return;
         }
 
@@ -3702,6 +3901,12 @@ ${summaryCard(
         formSubmitting = true;
 
         setFinalSubmitLoading(true);
+
+        const controller = new AbortController();
+
+        const timeoutId = window.setTimeout(() => {
+            controller.abort();
+        }, 30000);
 
         try {
             const response = await fetch(
@@ -3718,7 +3923,13 @@ ${summaryCard(
                 body: new FormData(
                     appointmentForm
                 ),
+
+                signal: controller.signal,
             }
+            );
+
+            window.clearTimeout(
+                timeoutId
             );
 
             const contentType =
@@ -3744,6 +3955,7 @@ ${summaryCard(
                         'Unexpected server response.',
                 };
             }
+
             if (
                 response.status === 401 &&
                 responseData?.expired
@@ -3759,6 +3971,17 @@ ${summaryCard(
                     response.status === 422 &&
                     responseData?.errors
                 ) {
+                    const firstInvalid =
+                        applyWalkInServerValidationErrors(
+                            responseData.errors
+                        );
+
+                    if (firstInvalid) {
+                        throw new Error(
+                            "Please check the highlighted fields."
+                        );
+                    }
+
                     const firstMessage =
                         Object.values(
                             responseData.errors
@@ -3787,20 +4010,133 @@ ${summaryCard(
                     ?.trim() ||
                 "the selected patient";
 
+            const selectedService =
+                appointmentForm
+                    ?.querySelector(
+                        'input[name="service_type"]:checked'
+                    );
+
+            const serviceName =
+                selectedService?.value ||
+                'N/A';
+
+            const appointmentDate =
+                new Intl.DateTimeFormat(
+                    'en-US',
+                    {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                    }
+                ).format(
+                    new Date()
+                );
+
+            const appointmentTime =
+                new Intl.DateTimeFormat(
+                    'en-US',
+                    {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                    }
+                ).format(
+                    new Date()
+                );
+
             if (confirmMessage) {
-                confirmMessage.textContent =
-                    responseData?.message ||
-                    `The walk-in appointment for ${patientName} has been recorded successfully.`;
+                confirmMessage.innerHTML = `
+        <div class="confirmed-modal-schedule-grid">
+
+            <div class="confirmed-modal-schedule-item">
+                <div class="confirmed-modal-schedule-icon">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div>
+                    <span class="confirmed-modal-schedule-label">
+                        Patient
+                    </span>
+
+                    <strong class="confirmed-modal-schedule-value">
+                        ${safePatientText(patientName)}
+                    </strong>
+                </div>
+            </div>
+
+            <div class="confirmed-modal-schedule-item">
+                <div class="confirmed-modal-schedule-icon">
+                    <i class="fa-solid fa-tooth"></i>
+                </div>
+
+                <div>
+                    <span class="confirmed-modal-schedule-label">
+                        Service
+                    </span>
+
+                    <strong class="confirmed-modal-schedule-value">
+                        ${safePatientText(serviceName)}
+                    </strong>
+                </div>
+            </div>
+
+            <div class="confirmed-modal-schedule-item">
+                <div class="confirmed-modal-schedule-icon">
+                    <i class="fa-solid fa-person-walking-arrow-right"></i>
+                </div>
+
+                <div>
+                    <span class="confirmed-modal-schedule-label">
+                        Appointment Type
+                    </span>
+
+                    <strong class="confirmed-modal-schedule-value">
+                        Walk-in
+                    </strong>
+                </div>
+            </div>
+
+            <div class="confirmed-modal-schedule-item">
+                <div class="confirmed-modal-schedule-icon">
+                    <i class="fa-regular fa-clock"></i>
+                </div>
+
+                <div>
+                    <span class="confirmed-modal-schedule-label">
+                        Recorded
+                    </span>
+
+                    <strong class="confirmed-modal-schedule-value">
+                        ${appointmentDate}
+                        ·
+                        ${appointmentTime}
+                    </strong>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="confirmed-modal-schedule-note">
+            <i class="fa-solid fa-circle-info"></i>
+
+            <span>
+                The walk-in intake has been saved.
+                Start the procedure when you are ready.
+            </span>
+        </div>
+    `;
             }
 
             okBtn.dataset.startUrl =
                 responseData?.start_url || '';
 
+            appointmentSubmitRunning = false;
+            formSubmitting = false;
+
+            setFinalSubmitLoading(false);
+
             window.openModal?.(
                 'confirmModal'
             );
-
-            okBtn?.focus();
 
         } catch (error) {
             appointmentSubmitRunning = false;
@@ -3808,10 +4144,22 @@ ${summaryCard(
 
             setFinalSubmitLoading(false);
 
-            showMiniTab(
-                error.message ||
-                "Unable to start the procedure. Please try again."
-            );
+            if (error.name === "AbortError") {
+                window.showToast?.({
+                    type: 'error',
+                    title: 'Request timed out',
+                    message: 'The request took too long to complete. Please try again.',
+                });
+
+                return;
+            }
+
+            window.showToast?.({
+                type: 'error',
+                title: 'Unable to start procedure',
+                message: error.message ||
+                    'Please try again.',
+            });
         }
     }
 
@@ -3823,6 +4171,28 @@ ${summaryCard(
             submitWalkInAppointment();
         }
     );
+
+    function clearModalStateBeforeRedirect() {
+        document.body.classList.remove(
+            'modal-lock'
+        );
+
+        document.querySelectorAll(
+            '.ui-modal.open, .ui-modal.closing, .modal-overlay.open, .modal-overlay.closing'
+        ).forEach(
+            modalEl => {
+                modalEl.classList.remove(
+                    'open',
+                    'closing'
+                );
+
+                modalEl.setAttribute(
+                    'aria-hidden',
+                    'true'
+                );
+            }
+        );
+    }
 
     okBtn?.addEventListener(
         'click',
@@ -3838,8 +4208,11 @@ ${summaryCard(
                 'confirmModal'
             );
 
-            window.location.href =
-                startUrl;
+            clearModalStateBeforeRedirect();
+
+            window.location.assign(
+                startUrl
+            );
         }
     );
 
@@ -3921,7 +4294,6 @@ ${summaryCard(
     }
 
     emergencyNumber?.addEventListener("input", (e) => {
-        const hadNonDigit = /[^\d\s]/.test(e.target.value);
 
         let digits = e.target.value.replace(/\D/g, "");
 
@@ -3933,10 +4305,6 @@ ${summaryCard(
         window.validateFormInputField?.(
             emergencyNumber
         );
-
-        if (hadNonDigit) {
-            showMiniTab("Contact number must contain digits only.");
-        }
 
         markFormDirty();
     });

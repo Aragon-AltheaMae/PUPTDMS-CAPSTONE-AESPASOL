@@ -1,12 +1,21 @@
-* {
-    scrollbar-width: thin;
-    scrollbar-color: #bdbdbd transparent;
-}
-
 *,
 *::before,
 *::after {
     box-sizing: border-box;
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
 }
 
 *::-webkit-scrollbar {
@@ -16,15 +25,6 @@
 
 *::-webkit-scrollbar-track {
     background: transparent;
-}
-
-*::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 10px;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
 }
 
 body.role-patient {
@@ -40,16 +40,26 @@ body.role-dentist {
 
 body.layout-no-sidebar #mainContent,
 body.layout-no-sidebar #siteFooter {
-    margin-left: 0 !important;
     width: 100% !important;
+    max-width: 100% !important;
+
+    margin-left: 0 !important;
+    margin-right: 0 !important;
 }
 
 body.layout-no-sidebar #mainContent {
     padding-left: 0;
 }
 
-body.role-patient.layout-no-sidebar #mainContent {
+body.layout-no-sidebar:has(#sidebar) #mainContent,
+body.role-patient.layout-no-sidebar #mainContent,
+body.role-dentist.layout-no-sidebar #mainContent,
+body.role-admin.layout-no-sidebar #mainContent {
     margin-left: 0 !important;
+    margin-right: 0 !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
 }
 
 body {
@@ -58,17 +68,15 @@ body {
     overflow-x: hidden;
 }
 
-[data-theme="dark"] * {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
-}
-
-[data-theme="dark"] *::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.18);
-}
-
-[data-theme="dark"] *::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.30);
+html,
+body,
+#mainContent,
+#sidebar,
+#siteFooter {
+    transition:
+        background-color .28s ease,
+        color .28s ease,
+        border-color .28s ease;
 }
 
 [data-theme="dark"] body,

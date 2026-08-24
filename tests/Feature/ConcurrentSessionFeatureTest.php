@@ -96,6 +96,31 @@ class ConcurrentSessionFeatureTest extends TestCase
         $this->assertDatabaseMissing('sessions', ['id' => 'dentist-session-2']);
     }
 
+    public function test_idle_expiry_is_recorded_in_recent_session_history(): void
+    {
+        $patient = $this->makeUser('idle-patient@example.com', 'patient');
+
+        $this->actingAs($patient)
+            ->withSession([
+                'role' => 'patient',
+                'patient_id' => $patient->id,
+                'patient_name' => $patient->name,
+                'last_activity_at' => now()->subMinutes(10)->timestamp,
+                'session_idle_locked' => true,
+            ])
+            ->postJson(route('session.expire'))
+            ->assertOk()
+            ->assertJson(['expired' => true]);
+
+        $this->assertDatabaseHas('audit_logs', [
+            'actor_id' => $patient->id,
+            'actor_role' => 'patient',
+            'action' => 'logout',
+            'module' => 'authentication',
+            'description' => 'User was signed out due to inactivity.',
+        ]);
+    }
+
     public function test_session_display_prefers_stored_browser_name_when_available(): void
     {
         $patient = $this->makeUser('brave-user@example.com', 'patient');

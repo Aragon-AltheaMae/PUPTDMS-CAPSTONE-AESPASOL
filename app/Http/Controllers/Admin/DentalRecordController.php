@@ -350,7 +350,9 @@ class DentalRecordController extends Controller
 
                 'html' => view(
                     'admin.dental-records',
-                    $viewData
+                    $viewData + [
+                        'layoutRole' => $this->resolveLayoutRole(),
+                    ]
                 )->render(),
 
                 'pagination' =>
@@ -380,7 +382,14 @@ class DentalRecordController extends Controller
 
         return view(
             'admin.dental-records',
-            $viewData
+            $viewData + [
+                'layoutRole' => $this->resolveLayoutRole(),
+            ]
         );
+    }
+
+    private function resolveLayoutRole(): string
+    {
+        return request()->routeIs('dentist.dental-records*') ? 'dentist' : 'admin';
     }
 }

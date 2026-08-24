@@ -54,7 +54,6 @@
                     <div class="global-form-group" data-global-field>
                         <label for="lastDentalVisit" class="global-form-label">
                             Last Dental Visit
-                            <span class="required-mark">*</span>
                         </label>
 
                         <div class="global-control-wrap">
@@ -63,21 +62,17 @@
                             <input type="text" id="lastDentalVisit" name="last_dental_visit"
                                 value="{{ $lastDentalVisit }}"
                                 class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
-                                placeholder="Select date"
-                                data-required-message="Please select the patient's last dental visit." readonly
-                                required>
+                                placeholder="Select date" readonly>
                         </div>
                     </div>
 
                     <div class="global-form-group" data-global-field>
                         <label for="previous_dentist" class="global-form-label">
                             Previous Dentist
-                            <span class="required-mark">*</span>
                         </label>
 
                         <input type="text" id="previous_dentist" name="previous_dentist" maxlength="50"
-                            value="{{ $previousDentist }}" class="form-input-custom" placeholder="Dr. Name"
-                            data-required-message="Please enter the patient's previous dentist." required>
+                            value="{{ $previousDentist }}" class="form-input-custom" placeholder="Dr. Name">
                     </div>
 
                 </div>

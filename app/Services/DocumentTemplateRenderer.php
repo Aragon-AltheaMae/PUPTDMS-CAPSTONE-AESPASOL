@@ -511,8 +511,12 @@ class DocumentTemplateRenderer
             $context['contact_number_' . $i] = $record?->contact ?? '—';
             $context['time_processed_' . $i] = $record?->time_out?->format('h:i A') ?? '—';
             $context['processing_time_' . $i] = $processingTime;
-            $context['emergency_case_' . $i] = ($record?->visit_type === 'Emergency') ? '✓' : '—';
-            $context['non_emergency_case_' . $i] = ($record?->visit_type === 'Non-Emergency') ? '✓' : '—';
+            $isWalkIn = (bool) ($record?->is_walk_in ?? false);
+            $visitType = trim((string) ($record?->visit_type ?? ''));
+            $isEmergency = $isWalkIn || strcasecmp($visitType, 'Emergency') === 0;
+
+            $context['emergency_case_' . $i] = $isEmergency ? '✓' : '—';
+            $context['non_emergency_case_' . $i] = $isEmergency ? '—' : '✓';
             $context['signature_' . $i] = $record?->has_signature ? '✓' : '—';
         }
 
