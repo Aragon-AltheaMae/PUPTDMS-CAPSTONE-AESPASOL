@@ -94,11 +94,10 @@
             </div>
 
             <div class="row2-grid">
-                {{-- LEFT: Calendar --}}
                 <div class="min-w-0">
                     <div id="dentistCalendarContainer"
                         class="w-full h-full min-h-[420px] skeleton-section skeleton-fade-swap">
-                        <div class="cal-shell skeleton-shell p-5 sm:p-6 h-full border-none shadow-sm">
+                        <div class="cal-shell skeleton-shell p-5 sm:p-6 h-full border-none">
                             <div class="space-y-4">
                                 <div class="flex items-center justify-between gap-3">
                                     <div class="w-8 h-8 rounded-full skeleton-block"></div>
@@ -132,7 +131,7 @@
 
                 <div class="dashboard-side-stack min-w-0">
                     <div id="upcomingAppointmentsContainer" class="skeleton-section skeleton-fade-swap h-full">
-                        <div class="skeleton-shell bg-white rounded-xl p-4 h-full flex flex-col">
+                        <div class="skeleton-shell rounded-xl p-4 h-full flex flex-col">
                             <div class="space-y-3 flex flex-col h-full">
 
                                 <div class="h-5 w-40 skeleton-block rounded"></div>
@@ -162,28 +161,47 @@
 
         <div class="row3-grid">
 
-            <div id="gadAnalyticsContainer" class="skeleton-section skeleton-fade-swap">
-                <div class="skeleton-shell bg-white p-5 rounded-3xl shadow-sm flex flex-col">
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="space-y-2 flex-1">
-                                <div class="h-5 w-32 skeleton-block rounded"></div>
-                                <div class="h-4 w-24 skeleton-line rounded"></div>
-                                <div class="h-3 w-40 skeleton-line rounded"></div>
+            <div class="dashboard-lower-stack">
+
+                <div id="gadAnalyticsContainer" class="skeleton-section skeleton-fade-swap">
+                    <div class="skeleton-shell p-5 rounded-3xl shadow-sm flex flex-col">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="space-y-2 flex-1">
+                                    <div class="h-5 w-32 skeleton-block rounded"></div>
+                                    <div class="h-4 w-24 skeleton-line rounded"></div>
+                                    <div class="h-3 w-40 skeleton-line rounded"></div>
+                                </div>
+                                <div class="flex gap-3">
+                                    <div class="h-6 w-24 skeleton-block rounded"></div>
+                                    <div class="h-6 w-24 skeleton-block rounded"></div>
+                                </div>
                             </div>
-                            <div class="flex gap-3">
-                                <div class="h-6 w-24 skeleton-block rounded"></div>
-                                <div class="h-6 w-24 skeleton-block rounded"></div>
-                            </div>
+                            <div class="h-48 skeleton-block rounded"></div>
                         </div>
-                        <div class="h-48 skeleton-block rounded"></div>
+                    </div>
+                </div>
+
+                <div id="todayTreatmentProgressContainer" class="skeleton-section skeleton-fade-swap">
+                    <div class="skeleton-shell p-5 rounded-3xl">
+                        <div class="space-y-4">
+
+                            <div class="h-5 w-44 skeleton-block rounded"></div>
+                            <div class="h-3 w-56 skeleton-line rounded"></div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                @for ($i = 0; $i < 4; $i++)
+                                    <div class="h-16 skeleton-block rounded-xl"></div>
+                                @endfor
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </div>
-
             <div class="inventory-grid">
                 <div id="medicalSuppliesContainer" class="skeleton-section skeleton-fade-swap">
-                    <div class="skeleton-shell bg-white p-5 rounded-3xl shadow-sm flex flex-col">
+                    <div class="skeleton-shell p-5 rounded-3xl shadow-sm flex flex-col">
                         <div class="space-y-4">
                             <div class="flex items-center justify-between">
                                 <div class="space-y-2 flex-1">
@@ -201,7 +219,7 @@
                 </div>
 
                 <div id="medicineSuppliesContainer" class="skeleton-section skeleton-fade-swap">
-                    <div class="skeleton-shell bg-white p-5 rounded-3xl shadow-sm flex flex-col">
+                    <div class="skeleton-shell p-5 rounded-3xl shadow-sm flex flex-col">
                         <div class="space-y-4">
                             <div class="flex items-center justify-between">
                                 <div class="space-y-2 flex-1">
@@ -341,9 +359,109 @@
 
 @section('scripts')
     <script>
+        function buildUpcomingStatus(appt) {
+            const status =
+                String(
+                    appt?.status || 'upcoming'
+                )
+                .toLowerCase()
+                .trim();
+
+            if (
+                status === 'rescheduled' ||
+                status.includes('resched')
+            ) {
+                return `
+            <span class="status-pill status-rescheduled">
+                <span class="status-dot"></span>
+                Rescheduled
+            </span>
+        `;
+            }
+
+            return `
+        <span class="status-pill status-upcoming">
+            <span class="status-dot"></span>
+            Upcoming
+        </span>
+    `;
+        }
+
+        function buildAppointmentTypeIcons(
+            appt
+        ) {
+            let html = '';
+
+            if (appt?.is_walk_in) {
+                html += `
+            <span
+                class="appt-type-icon"
+                data-tooltip="Walk-in appointment"
+                data-tooltip-tone="neutral"
+                aria-label="Walk-in appointment"
+                tabindex="0"
+            >
+                <i class="fa-solid fa-person-walking"></i>
+            </span>
+        `;
+            }
+
+            if (appt?.is_follow_up) {
+                html += `
+            <span
+                class="appt-type-icon"
+                data-tooltip="Follow-up appointment"
+                data-tooltip-tone="neutral"
+                aria-label="Follow-up appointment"
+                tabindex="0"
+            >
+                <i class="fa-solid fa-calendar-plus"></i>
+            </span>
+        `;
+            }
+
+            return html;
+        }
+
         function buildUpcomingAppointments() {
-            const apptDetails =
+
+            const rawApptDetails =
                 dashboardData.dashboardAppointmentDetails || {};
+
+            const apptDetails =
+                Object.fromEntries(
+                    Object.entries(
+                        rawApptDetails
+                    ).map(
+                        ([date, appointments]) => [
+                            date,
+
+                            (
+                                Array.isArray(
+                                    appointments
+                                ) ?
+                                appointments : []
+                            ).filter(
+                                appointment => {
+                                    const status =
+                                        String(
+                                            appointment?.status ||
+                                            ''
+                                        )
+                                        .toLowerCase()
+                                        .trim();
+
+                                    return [
+                                        'upcoming',
+                                        'rescheduled',
+                                    ].includes(
+                                        status
+                                    );
+                                }
+                            ),
+                        ]
+                    )
+                );
 
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -575,10 +693,10 @@ ${isToday ? 'is-today' : ''}
 ${
 hasAppointments
 ? `
-    <span class="upcoming-date-badge">
-    ${count}
-    </span>
-    `
+                                                                                                                                            <span class="upcoming-date-badge">
+                                                                                                                                            ${count}
+                                                                                                                                            </span>
+                                                                                                                                            `
 : ''
 }
 
@@ -611,8 +729,8 @@ weekday: 'short'
                         return `
 <a
 href="${
-appt.patientProfileUrl ||
-'{{ route('dentist.dentist.appointments') }}'
+    appt.patientProfileUrl ||
+    '{{ route('dentist.dentist.appointments') }}'
 }"
 class="
 upcoming-item
@@ -621,67 +739,85 @@ rounded-xl
 transition
 "
 >
-<span
-class="
-status-dot
-${statusClass(appt.status)}
-"
-aria-hidden="true"
-></span>
 
 ${buildAvatar(
-appt,
-name
+    appt,
+    name
 )}
 
 <div class="flex-1 min-w-0">
-<div
-class="
-flex
-items-center
-justify-between
-gap-2
-"
->
-<p
-class="
-text-sm
-font-bold
-text-gray-800
-truncate
-"
->
-${escHtml(name)}
-</p>
 
-<span
-class="
-text-[11px]
-font-bold
-text-[#8B0000]
-flex-shrink-0
-"
->
-${escHtml(
-appt.time ||
-'—'
-)}
-</span>
+    <div
+        class="
+        flex
+        items-center
+        justify-between
+        gap-2
+        "
+    >
+
+        <div class="appt-patient-name-row min-w-0">
+
+            <p
+                class="
+                text-sm
+                font-bold
+                text-gray-800
+                truncate
+                "
+            >
+                ${escHtml(name)}
+            </p>
+
+            ${buildAppointmentTypeIcons(appt)}
+
+        </div>
+
+        <span
+            class="
+            text-[11px]
+            font-bold
+            text-[#8B0000]
+            flex-shrink-0
+            "
+        >
+            ${escHtml(
+                appt.time ||
+                '—'
+            )}
+        </span>
+
+    </div>
+
+    <div
+        class="
+        flex
+        items-center
+        justify-between
+        gap-2
+        mt-1
+        "
+    >
+
+        <p
+            class="
+            text-xs
+            text-gray-500
+            truncate
+            "
+        >
+            ${escHtml(
+                appt.service ||
+                'General Service'
+            )}
+        </p>
+
+        ${buildUpcomingStatus(appt)}
+
+    </div>
+
 </div>
 
-<p
-class="
-text-xs
-text-gray-500
-truncate
-"
->
-${escHtml(
-appt.service ||
-'General Service'
-)}
-</p>
-</div>
 </a>
 `;
                     })
@@ -779,7 +915,7 @@ Today
 
 <button
 type="button"
-class="upcoming-date-nav-btn"
+class="ui-action-btn ui-action-view"
 onclick="changeUpcomingAppointmentWindow(-7)"
 aria-label="Previous 7 days"
 data-tooltip="Previous 7 days"
@@ -796,7 +932,7 @@ ${dateButtons}
 
 <button
 type="button"
-class="upcoming-date-nav-btn"
+class="ui-action-btn ui-action-view"
 onclick="changeUpcomingAppointmentWindow(7)"
 aria-label="Next 7 days"
 data-tooltip="Next 7 days"
@@ -997,10 +1133,6 @@ View all appointments
         }
 
         const dashboardData = {
-            gadLabels: {!! json_encode($gadLabels) !!},
-            gadFemale: {!! json_encode($gadFemale) !!},
-            gadMale: {!! json_encode($gadMale) !!},
-
             apptCounts: {!! json_encode($calendarAppointmentCounts) !!},
             apptDetails: {!! json_encode($calendarAppointmentDetails) !!},
 
@@ -1031,167 +1163,589 @@ View all appointments
         const TODAY_APPOINTMENTS = {!! json_encode($todayAppointments ?? []) !!};
         const MEDICAL_SUPPLIES = {!! json_encode($medicalSupplies ?? []) !!};
         const MEDICINE_SUPPLIES = {!! json_encode($medicineSupplies ?? []) !!};
+        const DASHBOARD_GAD_URL =
+            "{{ route('dentist.dentist.report.gad-data') }}";
 
-        const GAD_LABELS = dashboardData.gadLabels;
-        const GAD_FEMALE = dashboardData.gadFemale;
-        const GAD_MALE = dashboardData.gadMale;
+        function getDashboardCssVariable(name) {
+            return getComputedStyle(
+                    document.documentElement
+                )
+                .getPropertyValue(name)
+                .trim();
+        }
 
-        function renderGadChart() {
-            const monthLabel = new Date().toLocaleDateString('en-US', {
-                month: 'long',
-                year: 'numeric'
-            });
-            const totalFemale = GAD_FEMALE.reduce((sum, value) => sum + Number(value || 0), 0);
-            const totalMale = GAD_MALE.reduce((sum, value) => sum + Number(value || 0), 0);
-            const totalCases = totalFemale + totalMale;
-            const hasData = [...GAD_FEMALE, ...GAD_MALE].some(v => Number(v || 0) > 0);
+        async function renderGadChart() {
+            const container =
+                document.getElementById(
+                    'gadAnalyticsContainer'
+                );
 
-            const cardHeader = `
-<div class="relative z-10 flex items-start justify-between mb-5 flex-wrap gap-4" >
-<div class="flex items-start gap-3 min-w-0">
-<div class="gad-header-badge flex-shrink-0">
-<i class="fa-solid fa-chart-simple text-base"></i>
-</div>
-<div class="min-w-0">
-<div class="flex items-center gap-2 flex-wrap">
-<h3 class="text-base font-extrabold text-[#8B0000] leading-tight">GAD Analytics</h3>
-<span class="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-full bg-[#8B0000]/10 text-[#8B0000]">${monthLabel}</span>
-</div>
-<p class="text-sm text-gray-600 mt-1">Gender and Development Data</p>
-<p class="text-xs text-gray-400 mt-0.5">Patient cases by category and sex</p>
-</div>
-</div>
-
-<div class="flex items-center justify-end gap-2 flex-wrap">
-<div class="gad-metric-chip">
-<span class="w-2.5 h-2.5 rounded-full bg-[#E5B5B5]"></span>
-Female <span class="font-semibold">${totalFemale}</span>
-</div>
-<div class="gad-metric-chip">
-<span class="w-2.5 h-2.5 rounded-full bg-[#89CFF0]"></span>
-Male <span class="font-semibold">${totalMale}</span>
-</div>
-<div class="gad-metric-chip">
-<i class="fa-solid fa-users text-[11px]"></i>
-Total <span class="font-semibold">${totalCases}</span>
-</div>
-</div>
-</div>
-`;
-
-            if (!hasData) {
-                const html = `
-<div class="card gad-analytics-card p-5 sm:p-6 flex flex-col" >
-${cardHeader}
-<div class="relative z-10 flex-grow flex items-center justify-center w-full min-h-[255px]">
-<div class="gad-empty-panel text-center">
-<div class="gad-empty-icon-wrap">
-<i class="fa-regular fa-clipboard text-5xl"></i>
-</div>
-<p class="font-extrabold text-base text-gray-800 leading-tight">No Treatments Recorded</p>
-<p class="text-sm text-gray-500 max-w-md mx-auto mt-2">
-Completed treatment records for this month will appear here once available.
-</p>
-<div class="gad-empty-actions">
-<span class="gad-empty-pill"><i class="fa-solid fa-chart-column"></i> Category breakdown</span>
-<span class="gad-empty-pill"><i class="fa-solid fa-venus-mars"></i> Sex-disaggregated data</span>
-<span class="gad-empty-pill"><i class="fa-regular fa-calendar"></i> Monthly view</span>
-</div>
-</div>
-</div>
-</div>
-`;
-                swapSkeletonContent('gadAnalyticsContainer', html);
-                return true;
-            }
-
-            const chartHtml = `
-<div class="card gad-analytics-card p-5 sm:p-6 flex flex-col" >
-${cardHeader}
-<div class="gad-chart-shell relative z-10 flex-grow flex items-center justify-center w-full">
-<canvas id="gadChart" style="display:block;width:100%;height:100%;min-height:240px;"></canvas>
-</div>
-</div>
-`;
-
-            swapSkeletonContent('gadAnalyticsContainer', chartHtml);
-
-            if (typeof Chart === 'undefined') {
-                console.warn('Chart.js is not loaded');
+            if (!container) {
                 return false;
             }
 
-            setTimeout(() => {
-                const newCtx = document.getElementById('gadChart');
-                if (newCtx) {
-                    new Chart(newCtx, {
-                        type: 'bar',
-                        data: {
-                            labels: GAD_LABELS,
-                            datasets: [{
-                                    label: 'Female',
-                                    data: GAD_FEMALE,
-                                    backgroundColor: 'rgba(229,181,181,0.88)',
-                                    borderColor: '#E5B5B5',
-                                    borderWidth: 1,
-                                    borderRadius: 10,
-                                    borderSkipped: false
-                                },
-                                {
-                                    label: 'Male',
-                                    data: GAD_MALE,
-                                    backgroundColor: 'rgba(137,207,240,0.88)',
-                                    borderColor: '#89CFF0',
-                                    borderWidth: 1,
-                                    borderRadius: 10,
-                                    borderSkipped: false
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: false
-                                },
-                                tooltip: {
-                                    backgroundColor: 'rgba(13,17,23,0.92)',
-                                    titleColor: '#fff',
-                                    bodyColor: '#fff',
-                                    padding: 12,
-                                    cornerRadius: 12
-                                }
+            const now = new Date();
+
+            const period =
+                now.toLocaleDateString(
+                    'en-US', {
+                        month: 'short',
+                        year: 'numeric'
+                    }
+                );
+
+            try {
+                const response =
+                    await fetch(
+                        `${DASHBOARD_GAD_URL}?period=${encodeURIComponent(period)}`, {
+                            headers: {
+                                Accept: 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
                             },
-                            scales: {
-                                x: {
-                                    grid: {
-                                        display: false
+                            credentials: 'same-origin'
+                        }
+                    );
+
+                if (!response.ok) {
+                    throw new Error(
+                        'Unable to load GAD data.'
+                    );
+                }
+
+                const data =
+                    await response.json();
+
+                const labels =
+                    Array.isArray(data.labels) ?
+                    data.labels : [];
+
+                const female =
+                    Array.isArray(data.female) ?
+                    data.female : [];
+
+                const male =
+                    Array.isArray(data.male) ?
+                    data.male : [];
+
+                const totalFemale =
+                    female.reduce(
+                        (sum, value) =>
+                        sum + Number(value || 0),
+                        0
+                    );
+
+                const totalMale =
+                    male.reduce(
+                        (sum, value) =>
+                        sum + Number(value || 0),
+                        0
+                    );
+
+                const totalCases =
+                    totalFemale + totalMale;
+
+                const monthLabel =
+                    now.toLocaleDateString(
+                        'en-US', {
+                            month: 'long',
+                            year: 'numeric'
+                        }
+                    );
+
+                const headerHtml = `
+<header class="card-header">
+
+    <div class="card-header-left">
+
+        <span class="card-header-icon">
+            <i class="fa-solid fa-chart-simple"></i>
+        </span>
+
+        <div>
+            <h3 class="card-title">
+                GAD Analytics
+            </h3>
+
+            <p class="card-subtitle">
+                Gender-disaggregated clinic records · ${monthLabel}
+            </p>
+        </div>
+
+    </div>
+
+    <div class="gad-summary">
+
+    <span class="status-pill gad-chip-female">
+        Female ${totalFemale}
+    </span>
+
+    <span class="status-pill gad-chip-male">
+        Male ${totalMale}
+    </span>
+
+    <span class="status-pill status-default">
+        Total ${totalCases}
+    </span>
+
+</div>
+
+</header>
+`;
+
+                if (
+                    data.empty ||
+                    totalCases <= 0
+                ) {
+                    const html = `
+<article class="card">
+
+    ${headerHtml}
+
+    <div
+        class="card-body"
+        id="dashboardGadEmptyState"
+    ></div>
+
+</article>
+`;
+
+                    swapSkeletonContent(
+                        'gadAnalyticsContainer',
+                        html
+                    );
+
+                    window.EmptyState?.render({
+                        host: '#dashboardGadEmptyState',
+
+                        title: 'No GAD records found',
+
+                        message: 'No gender-disaggregated clinic records are available for the current month.',
+
+                        icon: 'fa-chart-column',
+
+                        className: 'empty-state-compact'
+                    });
+
+                    return true;
+                }
+
+                const html = `
+<article class="card">
+
+    ${headerHtml}
+
+    <div class="card-body">
+
+        <div class="gad-chart-shell">
+
+            <canvas
+                id="dashboardGadChart"
+                aria-label="Gender-disaggregated clinic records"
+            ></canvas>
+
+        </div>
+
+    </div>
+
+</article>
+`;
+
+                swapSkeletonContent(
+                    'gadAnalyticsContainer',
+                    html
+                );
+
+                if (!window.Chart) {
+                    console.error(
+                        'Dashboard GAD: Chart.js is not available.'
+                    );
+
+                    return false;
+                }
+
+                window.setTimeout(() => {
+
+                    const canvas =
+                        document.getElementById(
+                            'dashboardGadChart'
+                        );
+
+                    if (!canvas) {
+                        console.error(
+                            'Dashboard GAD: canvas was not found after skeleton swap.'
+                        );
+
+                        return;
+                    }
+
+                    const existingChart =
+                        window.Chart.getChart(
+                            canvas
+                        );
+
+                    if (existingChart) {
+                        existingChart.destroy();
+                    }
+
+                    new window.Chart(
+                        canvas, {
+                            type: 'bar',
+
+                            data: {
+                                labels,
+
+                                datasets: [{
+                                        label: 'Female',
+                                        data: female,
+                                        backgroundColor: '#EC4899',
+                                        borderColor: '#EC4899',
+                                        borderRadius: 4
                                     },
-                                    ticks: {
-                                        color: '#6B7280',
-                                        font: {
-                                            weight: '700'
-                                        }
+                                    {
+                                        label: 'Male',
+                                        data: male,
+                                        backgroundColor: '#60A5FA',
+                                        borderColor: '#60A5FA',
+                                        borderRadius: 4
                                     }
-                                },
-                                y: {
-                                    beginAtZero: true,
-                                    grid: {
-                                        color: 'rgba(139,0,0,0.08)'
+                                ]
+                            },
+
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+
+                                indexAxis: 'y',
+
+                                plugins: {
+                                    legend: {
+                                        position: 'top',
+
+                                        labels: {
+                                            font: {
+                                                family: 'Inter',
+                                                size: 11
+                                            },
+
+                                            usePointStyle: true,
+                                            boxWidth: 8,
+
+                                            color: getDashboardCssVariable(
+                                                '--text-2'
+                                            )
+                                        }
                                     },
-                                    ticks: {
-                                        precision: 0,
-                                        color: '#9CA3AF'
+
+                                    tooltip: window
+                                        .getGlobalChartTooltipOptions
+                                        ?.({
+                                            label(context) {
+                                                return `${context.dataset.label}: ${context.parsed.x} cases`;
+                                            }
+                                        }) || {}
+                                },
+
+                                scales: {
+                                    x: {
+                                        beginAtZero: true,
+
+                                        ticks: {
+                                            precision: 0,
+
+                                            color: getDashboardCssVariable(
+                                                '--text-2'
+                                            ),
+
+                                            font: {
+                                                size: 11
+                                            }
+                                        },
+
+                                        grid: {
+                                            borderDash: [4, 4],
+
+                                            color: getDashboardCssVariable(
+                                                '--border'
+                                            )
+                                        },
+
+                                        border: {
+                                            display: false
+                                        },
+
+                                        title: {
+                                            display: true,
+                                            text: 'Number of Cases',
+
+                                            color: getDashboardCssVariable(
+                                                '--text-2'
+                                            ),
+
+                                            font: {
+                                                family: 'Inter',
+                                                size: 10
+                                            }
+                                        }
+                                    },
+
+                                    y: {
+                                        ticks: {
+                                            color: getDashboardCssVariable(
+                                                '--text-2'
+                                            ),
+
+                                            font: {
+                                                size: 11
+                                            }
+                                        },
+
+                                        grid: {
+                                            display: false
+                                        },
+
+                                        border: {
+                                            display: false
+                                        }
                                     }
                                 }
                             }
                         }
-                    });
-                }
-            }, 160);
+                    );
 
-            return true;
+                }, 200);
+
+                return true;
+
+            } catch (error) {
+                console.error(
+                    'Dashboard GAD:',
+                    error
+                );
+
+                const html = `
+<article class="card">
+
+    <div class="card-body">
+
+        <div
+            id="dashboardGadEmptyState"
+        ></div>
+
+    </div>
+
+</article>
+`;
+
+                swapSkeletonContent(
+                    'gadAnalyticsContainer',
+                    html
+                );
+
+                window.EmptyState?.render({
+                    host: '#dashboardGadEmptyState',
+
+                    title: 'Unable to load GAD data',
+
+                    message: 'The GAD analytics could not be loaded right now.',
+
+                    icon: 'fa-chart-column',
+
+                    className: 'empty-state-compact'
+                });
+
+                return false;
+            }
+        }
+
+        function buildTodayTreatmentProgress() {
+            const appointments =
+                Array.isArray(TODAY_APPOINTMENTS) ?
+                TODAY_APPOINTMENTS : [];
+
+            const normalizeStatus = value =>
+                String(value || '')
+                .toLowerCase()
+                .trim();
+
+            const completed =
+                appointments.filter(
+                    appointment =>
+                    normalizeStatus(
+                        appointment.status
+                    ) === 'completed'
+                ).length;
+
+            const remaining =
+                appointments.filter(
+                    appointment => [
+                        'upcoming',
+                        'rescheduled',
+                        'pending',
+                        'confirmed',
+                    ].includes(
+                        normalizeStatus(
+                            appointment.status
+                        )
+                    )
+                ).length;
+
+            const followUps =
+                appointments.filter(
+                    appointment =>
+                    Boolean(
+                        appointment.is_follow_up
+                    )
+                ).length;
+
+            const walkIns =
+                appointments.filter(
+                    appointment =>
+                    Boolean(
+                        appointment.is_walk_in
+                    )
+                ).length;
+
+            const totalActive =
+                completed + remaining;
+
+            const progress =
+                totalActive > 0 ?
+                Math.round(
+                    (
+                        completed /
+                        totalActive
+                    ) * 100
+                ) :
+                0;
+
+            const html = `
+<article class="card today-progress-card">
+
+    <header class="card-header">
+
+        <div class="card-header-left">
+
+            <span class="card-header-icon">
+                <i class="fa-solid fa-stethoscope"></i>
+            </span>
+
+            <div>
+                <h3 class="card-title">
+                    Today's Treatment Progress
+                </h3>
+
+                <p class="card-subtitle">
+                    Current clinic workload and treatment activity
+                </p>
+            </div>
+
+        </div>
+
+        <span class="status-pill status-default">
+            ${progress}% done
+        </span>
+
+    </header>
+
+    <div class="card-body today-progress-body">
+
+    <div class="today-progress-grid">
+
+        <div class="today-progress-item today-progress-completed">
+
+    <i
+        class="fa-solid fa-circle-check today-progress-bg-icon"
+        aria-hidden="true"
+    ></i>
+
+    <div class="today-progress-label">
+        <span class="today-progress-icon">
+            <i class="fa-solid fa-check"></i>
+        </span>
+
+        <span>Completed</span>
+    </div>
+
+    <strong class="today-progress-value">
+        ${completed}
+    </strong>
+
+</div>
+
+<div class="today-progress-item today-progress-remaining">
+
+    <i
+        class="fa-solid fa-clock today-progress-bg-icon"
+        aria-hidden="true"
+    ></i>
+
+    <div class="today-progress-label">
+        <span class="today-progress-icon">
+            <i class="fa-solid fa-clock"></i>
+        </span>
+
+        <span>Remaining</span>
+    </div>
+
+    <strong class="today-progress-value">
+        ${remaining}
+    </strong>
+
+</div>
+
+<div class="today-progress-item today-progress-followup">
+
+    <i
+        class="fa-solid fa-calendar-plus today-progress-bg-icon"
+        aria-hidden="true"
+    ></i>
+
+    <div class="today-progress-label">
+        <span class="today-progress-icon">
+            <i class="fa-solid fa-calendar-plus"></i>
+        </span>
+
+        <span>Follow-ups</span>
+    </div>
+
+    <strong class="today-progress-value">
+        ${followUps}
+    </strong>
+
+</div>
+
+<div class="today-progress-item today-progress-walkin">
+
+    <i
+        class="fa-solid fa-person-walking today-progress-bg-icon"
+        aria-hidden="true"
+    ></i>
+
+    <div class="today-progress-label">
+        <span class="today-progress-icon">
+            <i class="fa-solid fa-person-walking"></i>
+        </span>
+
+        <span>Walk-ins</span>
+    </div>
+
+    <strong class="today-progress-value">
+        ${walkIns}
+    </strong>
+
+</div>
+
+    </div>
+
+</div>
+
+</article>
+`;
+
+            swapSkeletonContent(
+                'todayTreatmentProgressContainer',
+                html
+            );
         }
 
         function buildKpiGrid() {
@@ -1359,18 +1913,33 @@ Medical supply records will appear here once inventory items are available.
             const html = `
 <article class="card inventory-dashboard-card">
 <header class="card-header">
-<div class="flex items-center gap-3">
-<div class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center text-[#8B0000] border border-red-100 flex-shrink-0">
-<i class="fa-solid fa-boxes-stacked text-base"></i>
-</div>
-<div>
-<h3 class="font-extrabold text-[#8B0000] text-sm">Medical Supplies</h3>
-<p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Top Inventory</p>
-</div>
-</div>
-<a href="{{ route('dentist.dentist.inventory') }}" class="ui-btn ui-btn-secondary ui-btn-sm">
-View All <i class="fa-solid fa-arrow-right"></i>
-</a>
+
+    <div class="card-header-left">
+
+        <span class="card-header-icon">
+            <i class="fa-solid fa-boxes-stacked"></i>
+        </span>
+
+        <div>
+            <h3 class="card-title">
+                Medical Supplies
+            </h3>
+
+            <p class="card-subtitle">
+                Top Inventory
+            </p>
+        </div>
+
+    </div>
+
+    <a
+        href="{{ route('dentist.dentist.inventory') }}"
+        class="card-link"
+    >
+        View All
+        <i class="fa-solid fa-arrow-right"></i>
+    </a>
+
 </header>
 <div class="card-body">${tableHtml}</div>
 </article>
@@ -1446,18 +2015,33 @@ Medicine inventory records will appear here once items are available.
             const html = `
 <article class="card inventory-dashboard-card">
 <header class="card-header">
-<div class="flex items-center gap-3">
-<div class="w-9 h-9 rounded-xl bg-yellow-50 flex items-center justify-center text-[#8B0000] border border-yellow-100 flex-shrink-0">
-<i class="fa-solid fa-pills text-base text-yellow-600"></i>
-</div>
-<div>
-<h3 class="font-extrabold text-[#8B0000] text-sm">Medicine Supplies</h3>
-<p class="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">Top Inventory</p>
-</div>
-</div>
-<a href="{{ route('dentist.dentist.inventory') }}" class="ui-btn ui-btn-secondary ui-btn-sm">
-View All <i class="fa-solid fa-arrow-right"></i>
-</a>
+
+    <div class="card-header-left">
+
+        <span class="card-header-icon">
+            <i class="fa-solid fa-pills"></i>
+        </span>
+
+        <div>
+            <h3 class="card-title">
+                Medicine Supplies
+            </h3>
+
+            <p class="card-subtitle">
+                Top Inventory
+            </p>
+        </div>
+
+    </div>
+
+    <a
+        href="{{ route('dentist.dentist.inventory') }}"
+        class="card-link"
+    >
+        View All
+        <i class="fa-solid fa-arrow-right"></i>
+    </a>
+
 </header>
 <div class="card-body">${tableHtml}</div>
 </article>
@@ -1516,7 +2100,11 @@ View All <i class="fa-solid fa-arrow-right"></i>
                 },
                 {
                     label: 'Loading charts and summaries',
-                    tasks: [renderGadChart, buildUpcomingAppointments]
+                    tasks: [
+                        renderGadChart,
+                        buildTodayTreatmentProgress,
+                        buildUpcomingAppointments
+                    ]
                 },
                 {
                     label: 'Loading inventory',
@@ -1549,6 +2137,7 @@ View All <i class="fa-solid fa-arrow-right"></i>
                 }
 
                 renderGadChart();
+                buildTodayTreatmentProgress();
 
                 if (typeof window.setDashboardLoadingStatus === 'function') {
                     window.setDashboardLoadingStatus('Loading inventory', 70);
@@ -1587,15 +2176,6 @@ View All <i class="fa-solid fa-arrow-right"></i>
                 document.getElementById('kpi-clock-ss').textContent = ':' + String(s).padStart(2, '0');
                 document.getElementById('kpi-clock-ampm').textContent = ampm;
 
-                const dayicon = document.getElementById('kpi-clock-dayicon');
-                const bigicon = document.getElementById('kpi-clock-icon');
-                if (dayicon && bigicon) {
-                    dayicon.className = isDaytime ? 'fa-solid fa-sun text-xs flex-shrink-0' :
-                        'fa-solid fa-moon text-xs flex-shrink-0';
-                    dayicon.style.color = isDaytime ? '#fde68a' : '#bfdbfe';
-                    bigicon.className = isDaytime ? 'fa-solid fa-sun text-base' : 'fa-solid fa-moon text-base';
-                    bigicon.style.color = isDaytime ? '#fde68a' : '#bfdbfe';
-                }
             }
             tickClock();
             setInterval(tickClock, 1000);
@@ -1766,23 +2346,23 @@ View All <i class="fa-solid fa-arrow-right"></i>
                         'status-dot status-active';
 
                     if (kpiLabel) {
-                            kpiLabel.textContent = 'Open';
-                        }
+                        kpiLabel.textContent = 'Open';
+                    }
 
-                        if (kpiIcon) {
-                            kpiIcon.className =
-                                'fa-solid fa-door-open';
-                        }
+                    if (kpiIcon) {
+                        kpiIcon.className =
+                            'fa-solid fa-door-open';
+                    }
 
-                        if (statCard) {
-                            statCard.classList.remove(
-                                's-cancelled'
-                            );
+                    if (statCard) {
+                        statCard.classList.remove(
+                            's-cancelled'
+                        );
 
-                            statCard.classList.add(
-                                's-active'
-                            );
-                        }
+                        statCard.classList.add(
+                            's-active'
+                        );
+                    }
                 } else {
                     btn.classList.remove(
                         'ui-btn-success'
@@ -1805,23 +2385,23 @@ View All <i class="fa-solid fa-arrow-right"></i>
                         'status-dot status-cancelled';
 
                     if (kpiLabel) {
-                            kpiLabel.textContent = 'Closed';
-                        }
+                        kpiLabel.textContent = 'Closed';
+                    }
 
-                        if (kpiIcon) {
-                            kpiIcon.className =
-                                'fa-solid fa-door-closed';
-                        }
+                    if (kpiIcon) {
+                        kpiIcon.className =
+                            'fa-solid fa-door-closed';
+                    }
 
-                        if (statCard) {
-                            statCard.classList.remove(
-                                's-active'
-                            );
+                    if (statCard) {
+                        statCard.classList.remove(
+                            's-active'
+                        );
 
-                            statCard.classList.add(
-                                's-cancelled'
-                            );
-                        }
+                        statCard.classList.add(
+                            's-cancelled'
+                        );
+                    }
                 }
 
                 closeStatusModal();
@@ -1983,26 +2563,27 @@ aria-label="View ${escHtml(patientName)} profile"
 <div class="scheduled-hover-patient-name-row">
 
 <p class="global-record-name">
-${escHtml(patientName)}
+    ${escHtml(patientName)}
 </p>
 
-<span
-class="status-dot ${getHoverStatusClass(appt.status)}"
-aria-hidden="true"
-></span>
+${buildAppointmentTypeIcons(appt)}
 
 </div>
 
 <div class="global-record-subline">
-<span>
-${escHtml(service)}
-</span>
 
-<span aria-hidden="true">·</span>
+    <span>
+        ${escHtml(service)}
+    </span>
 
-<span>
-${escHtml(time)}
-</span>
+    <span aria-hidden="true">·</span>
+
+    <span>
+        ${escHtml(time)}
+    </span>
+
+    ${buildUpcomingStatus(appt)}
+
 </div>
 
 </div>
@@ -2022,52 +2603,52 @@ data-tooltip-tone="view"
 ${
 canReschedule
 ? `
-    <button
-    type="button"
-    class="ui-action-btn ui-action-warning"
-    aria-label="Reschedule appointment"
-    data-tooltip="Reschedule appointment"
-    data-tooltip-tone="reschedule"
-    onclick="
-    event.preventDefault();
-    event.stopPropagation();
-    openRescheduleModalFromDay(
-    '${escJs(appt.id)}',
-    '${safeName}',
-    '${safeSchedule}',
-    '${safeService}',
-    '${escJs(appt.rescheduleUrl || '#')}'
-    );
-    "
-    >
-    <i class="fa-solid fa-rotate-right"></i>
-    </button>
-    `
+                                                                                                                                            <button
+                                                                                                                                            type="button"
+                                                                                                                                            class="ui-action-btn ui-action-warning"
+                                                                                                                                            aria-label="Reschedule appointment"
+                                                                                                                                            data-tooltip="Reschedule appointment"
+                                                                                                                                            data-tooltip-tone="reschedule"
+                                                                                                                                            onclick="
+                                                                                                                                            event.preventDefault();
+                                                                                                                                            event.stopPropagation();
+                                                                                                                                            openRescheduleModalFromDay(
+                                                                                                                                            '${escJs(appt.id)}',
+                                                                                                                                            '${safeName}',
+                                                                                                                                            '${safeSchedule}',
+                                                                                                                                            '${safeService}',
+                                                                                                                                            '${escJs(appt.rescheduleUrl || '#')}'
+                                                                                                                                            );
+                                                                                                                                            "
+                                                                                                                                            >
+                                                                                                                                            <i class="fa-solid fa-rotate-right"></i>
+                                                                                                                                            </button>
+                                                                                                                                            `
 : ''
 }
 
 ${
 canCancel
 ? `
-    <button
-    type="button"
-    class="ui-action-btn ui-action-delete"
-    aria-label="Cancel appointment"
-    data-tooltip="Cancel appointment"
-    data-tooltip-tone="cancel"
-    onclick="
-    event.preventDefault();
-    event.stopPropagation();
-    cancelAppointmentFromModal(
-    '${escJs(appt.cancelUrl || '#')}',
-    '${safeName}',
-    '${safeSchedule}'
-    );
-    "
-    >
-    <i class="fa-solid fa-ban"></i>
-    </button>
-    `
+                                                                                                                                            <button
+                                                                                                                                            type="button"
+                                                                                                                                            class="ui-action-btn ui-action-delete"
+                                                                                                                                            aria-label="Cancel appointment"
+                                                                                                                                            data-tooltip="Cancel appointment"
+                                                                                                                                            data-tooltip-tone="cancel"
+                                                                                                                                            onclick="
+                                                                                                                                            event.preventDefault();
+                                                                                                                                            event.stopPropagation();
+                                                                                                                                            cancelAppointmentFromModal(
+                                                                                                                                            '${escJs(appt.cancelUrl || '#')}',
+                                                                                                                                            '${safeName}',
+                                                                                                                                            '${safeSchedule}'
+                                                                                                                                            );
+                                                                                                                                            "
+                                                                                                                                            >
+                                                                                                                                            <i class="fa-solid fa-ban"></i>
+                                                                                                                                            </button>
+                                                                                                                                            `
 : ''
 }
 
@@ -2364,13 +2945,30 @@ ${badgeHtml}
 <div class="card cal-shell flex flex-col justify-between h-full p-5 sm:p-6" >
 <div>
 <div class="flex items-center justify-between mb-5">
-<button onclick="changeDentistMonth(-1)" class="cal-nav-btn w-8 h-8 rounded-full border border-[#e8e2dd] flex items-center justify-center text-[#8B0000] text-xs transition-colors"><i class="fa-solid fa-chevron-left"></i></button>
+<button
+    type="button"
+    onclick="changeDentistMonth(-1)"
+    class="ui-action-btn ui-action-view"
+    aria-label="Previous month"
+    data-tooltip="Previous month"
+    data-tooltip-tone="view"
+>
+    <i class="fa-solid fa-chevron-left"></i>
+</button>
 <div class="text-center">
 <p class="cal-month-label text-base font-extrabold">${monthNames[month]}</p>
 <p class="text-[0.65rem] text-[#9e9690] font-semibold tracking-widest">${year}</p>
 </div>
-<button onclick="changeDentistMonth(1)" class="cal-nav-btn w-8 h-8 rounded-full border border-[#e8e2dd] flex items-center justify-center text-[#8B0000] text-xs transition-colors"><i class="fa-solid fa-chevron-right"></i></button>
-</div>
+<button
+    type="button"
+    onclick="changeDentistMonth(1)"
+    class="ui-action-btn ui-action-view"
+    aria-label="Next month"
+    data-tooltip="Next month"
+    data-tooltip-tone="view"
+>
+    <i class="fa-solid fa-chevron-right"></i>
+</button></div>
 <hr class="border-[#f0ebe6] mb-3">
 <div class="cal-grid">${headerHtml}</div>
 <div class="cal-grid" style="row-gap: 0.5rem;">${cells}</div>
@@ -2591,48 +3189,48 @@ data-tooltip-tone="view"
 ${
 canReschedule
 ? `
-    <button
-    type="button"
-    class="ui-action-btn ui-action-warning"
-    aria-label="Reschedule appointment"
-    data-tooltip="Reschedule appointment"
-    data-tooltip-tone="reschedule"
-    onclick="
-    openRescheduleModalFromDay(
-    '${escJs(appt.id)}',
-    '${safeName}',
-    '${safeSchedule}',
-    '${safeService}',
-    '${escJs(appt.rescheduleUrl || '#')}'
-    )
-    "
-    >
-    <i class="fa-solid fa-rotate-right"></i>
-    </button>
-    `
+                                                                                                                                            <button
+                                                                                                                                            type="button"
+                                                                                                                                            class="ui-action-btn ui-action-warning"
+                                                                                                                                            aria-label="Reschedule appointment"
+                                                                                                                                            data-tooltip="Reschedule appointment"
+                                                                                                                                            data-tooltip-tone="reschedule"
+                                                                                                                                            onclick="
+                                                                                                                                            openRescheduleModalFromDay(
+                                                                                                                                            '${escJs(appt.id)}',
+                                                                                                                                            '${safeName}',
+                                                                                                                                            '${safeSchedule}',
+                                                                                                                                            '${safeService}',
+                                                                                                                                            '${escJs(appt.rescheduleUrl || '#')}'
+                                                                                                                                            )
+                                                                                                                                            "
+                                                                                                                                            >
+                                                                                                                                            <i class="fa-solid fa-rotate-right"></i>
+                                                                                                                                            </button>
+                                                                                                                                            `
 : ''
 }
 
 ${
 canCancel
 ? `
-    <button
-    type="button"
-    class="ui-action-btn ui-action-delete"
-    aria-label="Cancel appointment"
-    data-tooltip="Cancel appointment"
-    data-tooltip-tone="cancel"
-    onclick="
-    cancelAppointmentFromModal(
-    '${escJs(appt.cancelUrl || '#')}',
-    '${safeName}',
-    '${safeSchedule}'
-    )
-    "
-    >
-    <i class="fa-solid fa-ban"></i>
-    </button>
-    `
+                                                                                                                                            <button
+                                                                                                                                            type="button"
+                                                                                                                                            class="ui-action-btn ui-action-delete"
+                                                                                                                                            aria-label="Cancel appointment"
+                                                                                                                                            data-tooltip="Cancel appointment"
+                                                                                                                                            data-tooltip-tone="cancel"
+                                                                                                                                            onclick="
+                                                                                                                                            cancelAppointmentFromModal(
+                                                                                                                                            '${escJs(appt.cancelUrl || '#')}',
+                                                                                                                                            '${safeName}',
+                                                                                                                                            '${safeSchedule}'
+                                                                                                                                            )
+                                                                                                                                            "
+                                                                                                                                            >
+                                                                                                                                            <i class="fa-solid fa-ban"></i>
+                                                                                                                                            </button>
+                                                                                                                                            `
 : ''
 }
 

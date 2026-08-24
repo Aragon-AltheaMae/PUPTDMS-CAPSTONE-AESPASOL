@@ -24,7 +24,8 @@
 
             </div>
 
-            <button type="button" onclick="closeRescheduleModal()" class="modal-x" aria-label="Close reschedule modal">
+            <button type="button" class="modal-x" data-discard-close="rescheduleModal"
+                aria-label="Close reschedule modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -109,8 +110,7 @@
                         <div id="calGridWrapReschedule"></div>
                     </div>
 
-                    <div class="slots-wrap modal-option-panel time-panel" data-global-field>
-
+                    <div class="slots-wrap modal-option-panel appointment-time-panel" data-global-field>
                         <div class="modal-section-heading">
                             <span class="modal-section-icon">
                                 <i class="fa-regular fa-clock"></i>
@@ -121,43 +121,28 @@
                             </div>
                         </div>
 
-                        <div id="dateBanner"
-                            class="
-        hidden
-        rounded-xl
-        px-3
-        py-2
-        text-sm
-        font-semibold
-        text-white
-        mb-3
-        shadow-md
-        date-banner-gradient
-    ">
+                        <div id="dateBanner" class="hidden appointment-slot-date-banner">
                         </div>
 
-                        <div id="slotPlaceholder"
-                            class="slot-placeholder-empty flex flex-col items-center justify-center gap-3 py-8 text-center text-[#9e9690]">
+                        <div id="slotPlaceholder" class="appointment-slot-placeholder">
 
-                            <div
-                                class="empty-icon w-12 h-12 rounded-full bg-[#f9e8e8] flex items-center justify-center text-[#8B0000] text-lg">
+                            <div class="empty-icon">
                                 <i class="fa-regular fa-calendar"></i>
                             </div>
 
-                            <div>
-                                <p class="empty-title text-sm font-semibold text-[#5c5550]">
-                                    Choose a date
-                                </p>
+                            <p class="empty-title">
+                                Choose a date
+                            </p>
 
-                                <p class="empty-subtitle text-xs mt-1">
-                                    Select an available day to see time slots.
-                                </p>
-                            </div>
+                            <p class="empty-subtitle">
+                                Select an available day to see time slots.
+                            </p>
+
                         </div>
 
                         <div id="slotContainer" class="hidden">
 
-                            <div id="slotGrid" class="slot-grid-ui grid grid-cols-2 gap-4">
+                            <div id="slotGrid" class="appointment-slot-grid">
                             </div>
 
                             <button type="button" id="clearSlotSelectionBtn"
@@ -175,30 +160,15 @@
                                 Clear selection
                             </button>
 
-                            <div id="selectedSlotDisplay"
-                                class="
-            hidden
-            rounded-2xl
-            px-4
-            py-3
-            text-sm
-            font-semibold
-            text-[#8B0000]
-            bg-[linear-gradient(135deg,#fff5f5,#fffafa)]
-            border
-            border-[#e8caca]
-            shadow-sm
-        ">
-                                <i
-                                    class="
-                fa-solid
-                fa-circle-check
-                mr-1.5
-            "></i>
+                            <div id="selectedSlotDisplay" class="hidden appointment-selected-slot">
+
+                                <i class="fa-solid fa-circle-check"></i>
 
                                 Selected:
 
-                                <span id="selectedSlotText" class="font-bold"></span>
+                                <span id="selectedSlotText" class="font-bold">
+                                </span>
+
                             </div>
 
                         </div>
@@ -223,16 +193,22 @@
 
                 </div>
 
-                <div class="w-full">
-                    <textarea id="reschedule_reason" name="reschedule_reason" rows="3"
-                        placeholder="e.g. Patient requested a later date…" class="form-input w-full min-h-[112px] resize-none"></textarea>
+                <div class="global-form-group" data-global-field>
+
+                    <textarea id="reschedule_reason" name="reschedule_reason" rows="3" maxlength="1000"
+                        placeholder="e.g. Patient requested a later date…" class="form-input-custom global-form-textarea"
+                        data-field-label="Reason for Rescheduling"></textarea>
+
+                    <div id="rescheduleReasonError" class="global-field-error" data-error-for="reschedule_reason"
+                        aria-hidden="true">
+                    </div>
+
                 </div>
             </div>
 
             <div class="modal-ft modal-sticky-footer">
 
-                <button type="button" id="cancelBtn" class="ui-btn ui-btn-secondary">
-
+                <button type="button" class="ui-btn ui-btn-secondary" data-discard-close="rescheduleModal">
                     <i class="fa-solid fa-xmark"></i>
                     <span>Cancel</span>
                 </button>
@@ -299,18 +275,7 @@
         slotGrid
             ?.querySelectorAll('.slot-chip')
             .forEach(chip => {
-                chip.classList.remove(
-                    'selected',
-                    'bg-[#8B0000]',
-                    'text-white',
-                    'border-[#8B0000]'
-                );
-
-                chip.classList.add(
-                    'border-[#e8e2dd]',
-                    'bg-[#fafaf8]',
-                    'text-[#1a1410]'
-                );
+                chip.classList.remove('selected');
 
                 chip.setAttribute(
                     'aria-pressed',
@@ -321,6 +286,21 @@
     }
 
     function resetRescheduleSlotUi() {
+        const dateInput =
+            document.getElementById(
+                'new_appointment_date'
+            );
+
+        const timeInput =
+            document.getElementById(
+                'new_appointment_time'
+            );
+
+        const dateBanner =
+            document.getElementById(
+                'dateBanner'
+            );
+
         const slotPlaceholder =
             document.getElementById(
                 'slotPlaceholder'
@@ -351,37 +331,88 @@
                 'clearSlotSelectionBtn'
             );
 
-        slotPlaceholder?.classList.remove(
-            'hidden'
-        );
+        if (
+            typeof selectedDate !==
+            'undefined'
+        ) {
+            selectedDate = null;
+        }
 
-        slotContainer?.classList.add(
-            'hidden'
-        );
+        if (
+            typeof selectedTime !==
+            'undefined'
+        ) {
+            selectedTime = null;
+        }
+
+        if (dateInput) {
+            dateInput.value = '';
+        }
+
+        if (timeInput) {
+            timeInput.value = '';
+        }
+
+        if (dateBanner) {
+            dateBanner.replaceChildren();
+            dateBanner.classList.add(
+                'hidden'
+            );
+            dateBanner.style.removeProperty(
+                'display'
+            );
+        }
 
         if (slotGrid) {
-            slotGrid.innerHTML = '';
+            slotGrid.replaceChildren();
             slotGrid.style.removeProperty(
                 'display'
             );
         }
 
+        slotContainer?.classList.add(
+            'hidden'
+        );
+
+        slotContainer?.style.removeProperty(
+            'display'
+        );
+
+        slotPlaceholder?.classList.remove(
+            'hidden'
+        );
+
+        slotPlaceholder?.style.removeProperty(
+            'display'
+        );
+
         selectedSlotDisplay?.classList.add(
             'hidden'
         );
+
+        selectedSlotDisplay
+            ?.style.removeProperty(
+                'display'
+            );
 
         if (selectedSlotText) {
             selectedSlotText.textContent = '';
         }
 
-        clearBtn?.classList.add(
-            'hidden'
-        );
+        if (clearBtn) {
+            clearBtn.classList.add(
+                'hidden'
+            );
 
-        clearBtn?.setAttribute(
-            'aria-hidden',
-            'true'
-        );
+            clearBtn.setAttribute(
+                'aria-hidden',
+                'true'
+            );
+
+            clearBtn.style.removeProperty(
+                'display'
+            );
+        }
     }
 
     function openRescheduleModal(payload = {}) {
@@ -422,20 +453,6 @@
         if (typeof selectedDate !== 'undefined') selectedDate = null;
         if (typeof selectedTime !== 'undefined') selectedTime = null;
 
-        window.clearGlobalGroupError?.(
-            document.querySelector(
-                '#rescheduleModal .cal-wrap'
-            ),
-            'reschedule-date'
-        );
-
-        window.clearGlobalGroupError?.(
-            document.querySelector(
-                '#rescheduleModal .slots-wrap'
-            ),
-            'reschedule-time'
-        );
-
         const calendarGroup =
             document.querySelector(
                 '#rescheduleModal .cal-wrap'
@@ -464,12 +481,9 @@
             submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Confirm Reschedule';
         }
 
-        modal.classList.remove('closing');
-        modal.classList.add('open');
-        modal.setAttribute('aria-hidden', 'false');
-
-        document.documentElement.classList.add('modal-lock');
-        document.body.classList.add('modal-lock');
+        window.openModal?.(
+            'rescheduleModal'
+        );
 
         if (typeof renderCalendarLoading === 'function') {
             renderCalendarLoading();
@@ -483,32 +497,34 @@
 
         if (dateInput) dateInput.value = '';
         if (timeInput) timeInput.value = '';
-
-        requestAnimationFrame(() => {
-            window.DiscardChanges?.captureModal(modal);
-        });
     }
 
     function forceCloseRescheduleModal() {
-        const modal = document.getElementById('rescheduleModal');
+        const modal =
+            document.getElementById(
+                'rescheduleModal'
+            );
 
-        if (!modal || !modal.classList.contains('open')) {
+        if (
+            !modal ||
+            !modal.classList.contains(
+                'open'
+            )
+        ) {
             return;
         }
 
-        modal.classList.remove('open');
-        modal.classList.add('closing');
-        modal.setAttribute('aria-hidden', 'true');
+        resetRescheduleSlotUi();
 
-        window.setTimeout(() => {
-            modal.classList.remove('closing');
+        document
+            .getElementById(
+                'rescheduleForm'
+            )
+            ?.reset();
 
-            document.documentElement.classList.remove('modal-lock');
-
-            if (!document.querySelector('.ui-modal.open')) {
-                document.body.classList.remove('modal-lock');
-            }
-        }, 170);
+        window.closeModal?.(
+            'rescheduleModal'
+        );
 
         selectedRescheduleId = null;
     }
@@ -540,10 +556,6 @@
             closeRescheduleModal();
         }
     }
-
-    document.getElementById("cancelBtn")?.addEventListener("click", () => {
-        closeRescheduleModal();
-    });
 
     document.getElementById("rescheduleForm")?.addEventListener("submit", async e => {
         e.preventDefault();

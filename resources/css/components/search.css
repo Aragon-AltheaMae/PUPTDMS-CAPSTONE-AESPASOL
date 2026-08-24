@@ -374,3 +374,28 @@
     appearance: none;
     -webkit-appearance: none;
 }
+
+.search-compact .search-input {
+    height: 34px !important;
+    min-height: 34px !important;
+
+    padding:
+        0 34px 0 34px !important;
+
+    font-size: .72rem !important;
+    line-height: 34px !important;
+}
+
+.search-compact .search-icon {
+    left: 12px !important;
+    font-size: .72rem !important;
+}
+
+.search-compact .search-clear {
+    right: 9px !important;
+
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
+}

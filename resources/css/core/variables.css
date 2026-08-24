@@ -545,6 +545,41 @@
     --calendar-closed-stripe-b: var(--neutral-warm-200);
     --calendar-closed-text: var(--neutral-warm-500);
     --calendar-closed-border: var(--gray-300);
+
+    --calendar-panel-bg:
+        linear-gradient(145deg,
+            var(--calendar-panel-bg-start),
+            var(--calendar-panel-bg-end));
+
+    --calendar-panel-text:
+        var(--calendar-heading-text);
+
+    --calendar-panel-muted:
+        var(--calendar-muted-text);
+
+    --calendar-slot-hover-bg:
+        var(--crimson-light);
+
+    --calendar-slot-hover-border:
+        var(--crimson);
+
+    --calendar-slot-hover-text:
+        var(--crimson);
+
+    --calendar-slot-selected-bg:
+        var(--crimson);
+
+    --calendar-slot-selected-border:
+        var(--crimson);
+
+    --calendar-slot-selected-text:
+        var(--text-on-brand);
+
+    --calendar-slot-disabled-bg:
+        var(--neutral-warm-50);
+
+    --calendar-slot-disabled-border:
+        var(--neutral-warm-200);
 }
 
 [data-theme="dark"],
@@ -845,6 +880,41 @@
     --calendar-closed-stripe-b: var(--card);
     --calendar-closed-text: var(--text-3);
     --calendar-closed-border: var(--border);
+
+    --calendar-panel-bg:
+        linear-gradient(145deg,
+            var(--calendar-panel-bg-start),
+            var(--calendar-panel-bg-end));
+
+    --calendar-panel-text:
+        var(--calendar-heading-text);
+
+    --calendar-panel-muted:
+        var(--calendar-muted-text);
+
+    --calendar-slot-hover-bg:
+        var(--alpha-crimson-16);
+
+    --calendar-slot-hover-border:
+        var(--alpha-red-300-28);
+
+    --calendar-slot-hover-text:
+        var(--red-200);
+
+    --calendar-slot-selected-bg:
+        var(--crimson);
+
+    --calendar-slot-selected-border:
+        var(--red-300);
+
+    --calendar-slot-selected-text:
+        var(--color-white);
+
+    --calendar-slot-disabled-bg:
+        var(--surface);
+
+    --calendar-slot-disabled-border:
+        var(--border);
 }
 
 @media (max-width: 1199px) {

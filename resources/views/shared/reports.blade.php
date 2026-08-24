@@ -860,9 +860,12 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                                 <div class="report-chart-legend"></div>
                                 <div id="gadChartWrap" class="relative flex-1 min-h-[260px]">
                                     <canvas id="gadChart"></canvas>
-                                    <div id="gadEmptyState" class="empty-state-host absolute inset-0"></div>
-                                    <div id="gadLoadingState" class="chart-loading hidden absolute inset-0"><i
-                                            class="fa-solid fa-spinner"></i></div>
+                                    <div id="gadEmptyState"
+                                        class="empty-state-host absolute inset-0 pointer-events-none"></div>
+                                    <div id="gadLoadingState"
+                                        class="chart-loading hidden absolute inset-0 pointer-events-none">
+                                        <i class="fa-solid fa-spinner"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -897,9 +900,13 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                             <div class="card-body">
                                 <div id="weeklyChartWrap" class="relative flex-1 min-h-[260px]">
                                     <canvas id="weeklyDentalCasesChart"></canvas>
-                                    <div id="weeklyEmptyState" class="empty-state-host absolute inset-0"></div>
-                                    <div id="weeklyLoadingState" class="chart-loading hidden absolute inset-0"><i
-                                            class="fa-solid fa-spinner"></i></div>
+                                    <div id="weeklyEmptyState"
+                                        class="empty-state-host absolute inset-0 pointer-events-none"></div>
+
+                                    <div id="weeklyLoadingState"
+                                        class="chart-loading hidden absolute inset-0 pointer-events-none">
+                                        <i class="fa-solid fa-spinner"></i>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1147,7 +1154,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                                     </div>
                                 </div>
 
-                                <div class="col-span-1 bg-gray-50 rounded-xl p-5 low-stock-alert-card">
+                                <div class="col-span-1 rounded-xl p-5 low-stock-alert-card">
                                     <div class="low-stock-alert-header flex items-center gap-2 mb-4">
                                         <span class="card-header-icon s-danger">
                                             <i class="fa-solid fa-triangle-exclamation"></i>
@@ -3398,17 +3405,22 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             type: 'bar',
             data: {
                 labels,
-                datasets: [{
-                    label: 'Female',
-                    data: female,
-                    backgroundColor: '#8B0000',
-                    borderRadius: 4
-                }, {
-                    label: 'Male',
-                    data: male,
-                    backgroundColor: '#FCA5A5',
-                    borderRadius: 4
-                }]
+                datasets: [
+                    {
+                        label: 'Female',
+                        data: female,
+                        backgroundColor: '#EC4899',
+                        borderColor: '#EC4899',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Male',
+                        data: male,
+                        backgroundColor: '#60A5FA',
+                        borderColor: '#60A5FA',
+                        borderRadius: 4
+                    }
+                ]
             },
             options: {
                 responsive: true,

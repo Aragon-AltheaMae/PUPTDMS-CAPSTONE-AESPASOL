@@ -758,6 +758,7 @@
         }
 
         if (
+            !state.myAppointment &&
             allowAllDatesExceptHolidays &&
             disableWeekends &&
             state.isWeekend
@@ -767,11 +768,14 @@
         Clinic closed on weekends
     `;
 
-            tooltipClass = "calendar-tooltip-neutral";
+            tooltipClass =
+                "calendar-tooltip-neutral";
+
         } else if (
             state.isHoliday &&
             !allowAllDates
         ) {} else if (
+            !state.myAppointment &&
             !ignoreAvailabilityRestrictions &&
             state.isToday &&
             calendarConfig.disallowToday
@@ -780,8 +784,12 @@
         <i class="fa-solid fa-calendar-day mr-1"></i>
         Same-day booking is not allowed
     `;
-            tooltipClass = "calendar-tooltip-neutral";
+
+            tooltipClass =
+                "calendar-tooltip-neutral";
+
         } else if (
+            !state.myAppointment &&
             !ignoreAvailabilityRestrictions &&
             state.isPast &&
             !state.hasCompletedAppointment
@@ -790,8 +798,12 @@
         <i class="fa-solid fa-clock-rotate-left mr-1"></i>
         Past date — booking not allowed
     `;
-            tooltipClass = "calendar-tooltip-neutral";
+
+            tooltipClass =
+                "calendar-tooltip-neutral";
+
         } else if (
+            !state.myAppointment &&
             !ignoreAvailabilityRestrictions &&
             state.isClosed
         ) {
@@ -799,14 +811,25 @@
         <i class="fa-solid fa-circle-minus mr-1"></i>
         Clinic closed on this date
     `;
-            tooltipClass = "calendar-tooltip-neutral";
-        } else if (state.isToday && !tooltip && !state.myAppointment) {
+
+            tooltipClass =
+                "calendar-tooltip-neutral";
+
+        } else if (
+            state.isToday &&
+            !tooltip &&
+            !state.myAppointment
+        ) {
             tooltip = `
-        <i class="fa-solid fa-calendar-day mr-1 text-white/90"></i>
+        <i class="fa-solid fa-calendar-day mr-1"></i>
         Today
     `;
+
             tooltipClass =
-                CALENDAR_THEME.statuses.today.tooltipClass;
+                CALENDAR_THEME
+                .statuses
+                .today
+                .tooltipClass;
         }
 
         if (tooltip) {
@@ -1435,7 +1458,7 @@
                     ${MONTHS[month]}
                 </p>
 
-                <p class="text-[0.65rem] text-[#9e9690] font-semibold tracking-widest">
+                <p class="calendar-year-label text-[0.65rem] font-semibold tracking-widest">
                     ${year}
                 </p>
             </div>
@@ -1445,7 +1468,7 @@
             <div class="calendar-main-header">
                 <button
                     type="button"
-                    class="cal-nav-btn w-8 h-8 rounded-full border border-[#e8e2dd] flex items-center justify-center text-[#8B0000] text-xs ${prevDisabled ? 'opacity-40 cursor-not-allowed' : ''}"
+                    class="cal-nav-btn w-8 h-8 rounded-full border flex items-center justify-center text-xs ${prevDisabled ? 'opacity-40 cursor-not-allowed' : ''}"
                     ${prevDisabled ? 'disabled' : 'onclick="changeMonth(-1)"'}
                     aria-label="Previous month"
                 >
@@ -1456,7 +1479,7 @@
 
                 <button
                     type="button"
-                    class="cal-nav-btn w-8 h-8 rounded-full border border-[#e8e2dd] flex items-center justify-center text-[#8B0000] text-xs ${nextDisabled ? 'opacity-40 cursor-not-allowed' : ''}"
+                    class="cal-nav-btn w-8 h-8 rounded-full border flex items-center justify-center text-xs ${nextDisabled ? 'opacity-40 cursor-not-allowed' : ''}"
                     ${nextDisabled ? 'disabled' : 'onclick="changeMonth(1)"'}
                     aria-label="Next month"
                 >
@@ -1466,7 +1489,7 @@
 
             ${dashboardToolbar}
 
-            <hr class="border-[#f0ebe6] mb-3">
+            <hr class="calendar-divider mb-3">
 
             <div
                 class="cal-grid"
@@ -2297,17 +2320,32 @@
                 banner.style.display = "none";
                 banner.innerHTML = "";
             } else {
-                const slotColor = remaining <= 2 ? "rgba(255,220,100,0.9)" : "rgba(160,255,180,0.9)";
-                banner.innerHTML =
-                    `<i class="fa-regular fa-calendar mr-2"></i>${MONTHS[parseInt(m) - 1]} ${parseInt(d)}, ${y}<span style="margin-left:8px; font-size:0.75rem; color:${slotColor};">(${remaining}/${maxSlots} slots left)</span>`;
+                const slotAvailabilityClass =
+                    remaining <= 2 ?
+                    "slot-availability-low" :
+                    "slot-availability-good";
+                banner.innerHTML = `
+                    <i class="fa-regular fa-calendar mr-2"></i>
+                    ${MONTHS[parseInt(m) - 1]} ${parseInt(d)}, ${y}
+
+                    <span class="slot-availability-count ${slotAvailabilityClass}">
+                        (${remaining}/${maxSlots} slots left)
+                    </span>
+                `;
                 banner.classList.remove("hidden");
                 banner.style.display = "block";
             }
         }
 
         if (pill) {
-            pill.innerHTML =
-                `<i class="fa-regular fa-calendar mr-1"></i>${MONTHS[parseInt(m) - 1]} ${parseInt(d)}, ${y}<span style="margin-left:.5rem;opacity:.8;">${remaining}/${maxSlots} slots left</span>`;
+            pill.innerHTML = `
+                <i class="fa-regular fa-calendar mr-1"></i>
+                ${MONTHS[parseInt(m) - 1]} ${parseInt(d)}, ${y}
+
+                <span class="slot-pill-availability">
+                    ${remaining}/${maxSlots} slots left
+                </span>
+            `;
             pill.classList.add("show");
         }
 
@@ -2324,7 +2362,7 @@
         if (!slots.length) {
             if (slotGrid) {
                 slotGrid.innerHTML =
-                    `<div class="text-sm text-[#9e9690] italic py-4 text-center w-full">${payload?.message || 'No available slots for this date.'}</div>`;
+                    `<div class="slot-empty-message text-sm italic py-4 text-center w-full">${payload?.message || 'No available slots for this date.'}</div>`;
             }
             if (slotPlaceholder && calendarConfig.renderStyle === 'dentist') {
                 slotPlaceholder.style.display = "flex";
@@ -2348,25 +2386,34 @@
 
             const chip = document.createElement("div");
 
-            if (calendarConfig.renderStyle === 'dentist') {
+            if (
+                calendarConfig.renderStyle ===
+                'dentist'
+            ) {
                 chip.className =
                     "slot-chip flex items-center justify-center gap-2 rounded-2xl border font-bold text-[0.98rem] " +
-                    (disabled ?
-                        "disabled border-[#e8dfdb] bg-[#f8f5f4] text-[#8f8580] line-through opacity-60 cursor-not-allowed pointer-events-none" :
-                        "border-[#e7d8d2] bg-white text-[#2f2f2f] cursor-pointer");
+                    (
+                        disabled ?
+                        "disabled line-through opacity-60 cursor-not-allowed pointer-events-none" :
+                        "cursor-pointer"
+                    );
 
-                chip.innerHTML = disabled ?
+                chip.innerHTML =
+                    disabled ?
                     `<i class="fa-solid fa-ban text-[0.9rem]"></i><span>${timeValue}</span>` :
                     `<i class="fa-regular fa-clock text-[0.9rem]"></i><span>${timeValue}</span>`;
             } else {
                 chip.className =
-                    "slot-chip flex items-center gap-2.5 px-4 py-2.5 rounded-xl border font-semibold text-sm cursor-pointer " +
-                    (disabled ?
-                        "border-[#e8e2dd] text-[#c4bfba] line-through opacity-60 cursor-not-allowed" :
-                        "border-[#e8e2dd] bg-[#fafaf8] text-[#1a1410] hover:border-[#8B0000] hover:bg-[#fff5f5] hover:text-[#8B0000]"
+                    "slot-chip flex items-center gap-2.5 px-4 py-2.5 rounded-xl border font-semibold text-sm " +
+                    (
+                        disabled ?
+                        "disabled line-through opacity-60 cursor-not-allowed" :
+                        "cursor-pointer"
                     );
-                chip.innerHTML = disabled ?
-                    `<i class="text-xs opacity-70 fa-solid fa-ban"></i><span>${timeValue} </span>` :
+
+                chip.innerHTML =
+                    disabled ?
+                    `<i class="text-xs opacity-70 fa-solid fa-ban"></i><span>${timeValue}</span>` :
                     `<i class="text-xs opacity-70 fa-regular fa-clock"></i><span>${timeValue}</span>`;
             }
 
@@ -2410,14 +2457,10 @@
                     if (dateError) dateError.style.display = "none";
                     if (slotsWrap) slotsWrap.classList.remove("error");
 
-                    // click ulit sa same selected time = unselect
                     if (selectedTime === timeValue) {
                         chip.classList.remove(
-                            "selected", "bg-[#8B0000]", "text-white",
-                            "border-[#8B0000]", "shadow-[0_2px_12px_rgba(139,0,0,0.25)]"
+                            "selected"
                         );
-
-                        chip.classList.add("border-[#e8e2dd]", "bg-[#fafaf8]", "text-[#1a1410]");
                         chip.setAttribute("aria-pressed", "false");
 
                         selectedTime = null;
@@ -2445,21 +2488,29 @@
                         return;
                     }
 
-                    slotGrid.querySelectorAll(".slot-chip").forEach(c => {
-                        c.classList.remove(
-                            "selected", "bg-[#8B0000]", "text-white",
-                            "border-[#8B0000]", "shadow-[0_2px_12px_rgba(139,0,0,0.25)]"
-                        );
-                        c.classList.add("border-[#e8e2dd]", "bg-[#fafaf8]", "text-[#1a1410]");
-                        c.setAttribute("aria-pressed", "false");
-                    });
+                    slotGrid
+                        .querySelectorAll(
+                            ".slot-chip"
+                        )
+                        .forEach(c => {
+                            c.classList.remove(
+                                "selected"
+                            );
 
-                    chip.classList.add("selected", "bg-[#8B0000]", "text-white", "border-[#8B0000]");
-                    chip.classList.remove(
-                        "border-[#e8e2dd]", "border-[#e7d8d2]", "bg-[#fafaf8]",
-                        "bg-white", "text-[#1a1410]", "text-[#2f2f2f]"
+                            c.setAttribute(
+                                "aria-pressed",
+                                "false"
+                            );
+                        });
+
+                    chip.classList.add(
+                        "selected"
                     );
-                    chip.setAttribute("aria-pressed", "true");
+
+                    chip.setAttribute(
+                        "aria-pressed",
+                        "true"
+                    );
 
                     selectedTime = timeValue;
                     if (timeInput) {

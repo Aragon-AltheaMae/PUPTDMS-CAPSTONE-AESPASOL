@@ -1284,30 +1284,52 @@
 .signature-methods-grid {
     width: 100%;
     min-width: 0;
+
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
     align-items: stretch;
     gap: 1rem;
+}
+
+.signature-methods-grid.signature-drawing-only {
+    grid-template-columns: 1fr;
+
+    max-width: 820px;
+    margin-inline: auto;
 }
 
 .signature-upload-card,
 .signature-draw-card {
     width: 100%;
     min-width: 0;
-    min-height: 330px;
+    min-height: 340px;
+
     padding: 1rem;
+
     display: flex;
     flex-direction: column;
-    border: 1px solid var(--border);
+
+    border:
+        1px solid var(--border);
+
     border-radius: 18px;
-    background: var(--surface);
+
+    background:
+        var(--surface);
+
     box-sizing: border-box;
 }
+
 
 .signature-method-title,
 .signature-draw-title {
     margin: 0 0 .85rem;
-    color: var(--crimson);
+
+    color:
+        var(--crimson);
+
     font-size: .88rem;
     font-weight: 800;
     line-height: 1.35;
@@ -1321,15 +1343,23 @@
 .signature-upload-content {
     flex: 1 1 auto;
     min-width: 0;
+
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
     gap: .4rem;
     padding: 1.25rem;
-    border: 2px dashed var(--border);
+
+    border:
+        2px dashed var(--border);
+
     border-radius: 16px;
-    background: var(--card);
+
+    background:
+        var(--card);
+
     text-align: center;
 }
 
@@ -1363,33 +1393,50 @@
 
 .signature-pad-wrap {
     position: relative;
+
     flex: 1 1 auto;
+
+    height: 210px;
     min-height: 210px;
+
     overflow: hidden;
-    border: 2px dashed var(--border);
+
+    border:
+        2px dashed var(--border);
+
     border-radius: 16px;
-    background: #ffffff;
+
+    background:
+        var(--color-white);
 }
 
 .signature-pad-canvas {
-    display: block;
     width: 100%;
-    height: 210px;
+    height: 100%;
     min-height: 210px;
-    background: #ffffff;
+
+    display: block;
+
+    background:
+        var(--color-white);
+
     cursor: crosshair;
     touch-action: none;
 }
 
 .signature-pad-footer {
     margin-top: .85rem;
+
     display: flex;
     flex-direction: column;
+
     gap: .75rem;
 }
 
 .signature-pad-help {
-    color: var(--text-2);
+    color:
+        var(--text-2);
+
     font-size: .72rem;
     font-weight: 550;
     line-height: 1.4;
@@ -1397,11 +1444,11 @@
 }
 
 .signature-pad-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
     gap: .6rem;
-    flex-wrap: wrap;
+    width: 100%;
 }
 
 .signature-pad-actions .ui-btn {
@@ -1457,11 +1504,6 @@
         padding: 1rem;
     }
 
-    .signature-pad-actions {
-        grid-template-columns:
-            1fr;
-    }
-
 }
 
 .booking-summary-card {
@@ -1504,6 +1546,65 @@
 .booking-summary-card-header i {
     flex: 0 0 auto;
     color: currentColor;
+}
+
+.booking-summary-view-only {
+    flex: 0 0 auto;
+
+    min-height: 30px;
+    padding: 0 .7rem;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: .4rem;
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 999px;
+
+    background:
+        var(--surface);
+
+    color:
+        var(--text-2);
+
+    font-size: .68rem;
+    font-weight: 800;
+
+    line-height: 1;
+    letter-spacing: 0;
+
+    text-transform: none;
+
+    white-space: nowrap;
+
+    cursor: default;
+}
+
+.booking-summary-view-only i {
+    color: var(--crimson);
+    font-size: .7rem;
+}
+
+[data-theme="dark"] .booking-summary-view-only,
+.dark .booking-summary-view-only {
+    background:
+        var(--surface);
+
+    border-color:
+        var(--border);
+
+    color:
+        var(--text-2);
+}
+
+[data-theme="dark"] .booking-summary-view-only i,
+.dark .booking-summary-view-only i {
+    color:
+        var(--red-300);
 }
 
 .booking-summary-card-body {
@@ -1662,10 +1763,12 @@
 @media (max-width: 640px) {
 
     .signature-pad-actions {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        width: 100%;
-        gap: .55rem;
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .signature-pad-actions #signatureUseDrawnBtn {
+        grid-column: 1 / -1;
     }
 
     .signature-pad-actions button {
@@ -1674,10 +1777,6 @@
         padding: .45rem .55rem;
         font-size: .72rem;
         line-height: 1.15;
-    }
-
-    .signature-pad-actions #signatureUseDrawnBtn {
-        grid-column: 1 / -1;
     }
 
     .signature-pad-wrap {
@@ -1724,27 +1823,30 @@
 .signature-existing-header {
     display: flex;
     align-items: flex-start;
-    gap: .65rem;
+    gap: .35rem;
 }
 
 .signature-existing-header>i {
-    margin-top: .15rem;
+    margin-top: .10rem;
     color: var(--success, #16a34a);
-    font-size: 1rem;
+    font-size: 0.87rem;
 }
 
 .signature-existing-title {
     margin: 0;
     color: var(--success, #16a34a);
-    font-size: .95rem;
+    font-size: .85rem;
     font-weight: 800;
 }
 
 .signature-existing-help {
-    margin: .25rem 0 0;
+    margin: 0;
+    padding-top: .1rem;
     color: var(--text-2);
-    font-size: .82rem;
-    line-height: 1.5;
+    font-size: .68rem;
+    font-style: italic;
+    line-height: 1.45;
+    text-align: center;
 }
 
 .signature-existing-preview {

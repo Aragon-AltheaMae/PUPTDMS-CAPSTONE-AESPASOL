@@ -100,7 +100,11 @@ class WalkInController extends Controller
         StudentApiService $studentApiService
     ) {
         $search = trim((string) $request->query('q', ''));
-        $showAll = $request->boolean('show_all');
+
+        $showAll =
+            $request->boolean(
+                'show_all'
+            );
 
         $page = max(
             1,
@@ -119,22 +123,18 @@ class WalkInController extends Controller
         )
             ? $perPageInput
             : 10;
-        $sourceLimit = 150;
-
-        if ($search === '' && ! $showAll) {
-            return response()->json([
-                'data' => [],
-                'current_page' => 1,
-                'last_page' => 1,
-                'per_page' => $perPage,
-                'total' => 0,
-                'from' => null,
-                'to' => null,
-            ]);
-        }
+            
+        $sourceLimit = max(
+            20,
+            min(
+                $perPage,
+                50
+            )
+        );
 
         try {
-            $hasMeaningfulSearch = mb_strlen($search) >= 2;
+            $hasMeaningfulSearch =
+                mb_strlen($search) >= 2;
 
             $shouldLoadConnectedSources =
                 $hasMeaningfulSearch ||

@@ -466,365 +466,70 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                         </div>
 
                         <div id="futureContent" class="treatment-tab-panel is-active">
-                            @forelse($futureVisits ?? [] as $visit)
-                            @php
-                            $visitDate = $visit->appointment_date
-                            ? Carbon::parse($visit->appointment_date)->format('d M Y')
-                            : 'N/A';
-                            $visitTime = $visit->appointment_time
-                            ? Carbon::parse($visit->appointment_time)->format('g:i A')
-                            : 'N/A';
-                            $rawVisitService = $visit->service_type ?? 'Appointment';
-                            $visitService = strtolower(trim((string) $rawVisitService)) === 'follow-up'
-                            ? 'Follow-up Appointment'
-                            : $rawVisitService;
-                            $visitStatus = $visit->status ?? 'upcoming';
-                            $visitProcedure = $visit->procedure;
-                            $visitFollowUp = $visit->followUpAppointments
-                            ->sortBy('appointment_time')
-                            ->sortBy('appointment_date')
-                            ->first();
-                            $visitRecord = [
-                            'id' => $visit->id,
-                            'date' => $visitDate,
-                            'time' => $visitTime,
-                            'service' => $visitService,
-                            'status' => $visitStatus,
-                            'duration_seconds' =>
-                            $visitProcedure
-                            ?->procedure_duration_seconds,
-                            'oral_examination' => $visitProcedure?->oral_examination,
-                            'diagnosis' => $visitProcedure?->diagnosis,
-                            'prescriptions' => $visitProcedure?->prescriptions,
-                            'odontogram_data' => $visitProcedure?->odontogram_data,
-                            'follow_up' => $visitFollowUp
-                            ? [
-                            'date' => $visitFollowUp->appointment_date
-                            ? Carbon::parse($visitFollowUp->appointment_date)->format('d M Y')
-                            : 'N/A',
-                            'time' => $visitFollowUp->appointment_time
-                            ? Carbon::parse($visitFollowUp->appointment_time)->format('g:i A')
-                            : 'N/A',
-                            'service' => $visitFollowUp->service_type ?? 'Follow-up',
-                            'status' => $visitFollowUp->status ?? 'upcoming',
-                            'reason' => $visitFollowUp->follow_up_reason,
-                            ]
-                            : null,
-                            ];
-                            @endphp
+                            <div data-show-more data-show-more-step="5" data-show-more-label="appointments">
+                                <div class="space-y-3" data-show-more-list>
+                                    @forelse($futureVisits ?? [] as $visit)
 
-                            @php
-                            $apptDate = Carbon::parse($visit->appointment_date);
-                            $apptTime = Carbon::parse($visit->appointment_time);
+                                    <x-appointment-record-card :appointment="$visit" variant="upcoming"
+                                        :show-details="false" :show-countdown="true" :show-time-range="false"
+                                        data-show-more-item />
 
-                            $rawStatus = strtolower(
-                            trim((string) ($visit->status ?? 'upcoming'))
-                            );
+                                    @empty
 
-                            $statusClass = match ($rawStatus) {
-                            'rescheduled' => 'status-rescheduled',
-
-                            'upcoming',
-                            'scheduled',
-                            'confirmed' => 'status-upcoming',
-
-                            'completed' => 'status-completed',
-
-                            'cancelled',
-                            'canceled' => 'status-cancelled',
-
-                            default => 'status-default',
-                            };
-
-                            $dentistName =
-                            $visit->dentist?->name
-                            ?? 'Not yet assigned';
-                            @endphp
-
-                            <div class="global-record-card appt-visit-card appt-visit-card-upcoming {{ $statusClass }}">
-
-                                <div class="appt-visit-date">
-                                    <span class="appt-visit-day">
-                                        {{ $apptDate->format('d') }}
-                                    </span>
-
-                                    <span class="appt-visit-month">
-                                        {{ $apptDate->format('M') }}
-                                    </span>
-
-                                    <span class="appt-visit-year">
-                                        {{ $apptDate->format('Y') }}
-                                    </span>
-                                </div>
-
-                                <div class="appt-visit-main">
-
-                                    <div class="appt-visit-head">
-
-                                        <div class="appt-visit-title-group">
-
-                                            <h3 class="appt-visit-title">
-                                                {{ $visitService }}
-                                            </h3>
-
-                                            <span class="status-pill {{ $statusClass }}">
-                                                <span class="status-dot"></span>
-                                                {{ Str::headline($rawStatus) }}
-                                            </span>
-
+                                    <div class="empty-state treatment-history-empty">
+                                        <div class="appointment-empty-icon">
+                                            <i class="fa-regular fa-calendar-xmark"></i>
                                         </div>
 
+                                        <h3 class="empty-state-title">
+                                            No upcoming appointments
+                                        </h3>
+
+                                        <p class="empty-state-sub">
+                                            This patient currently has no scheduled or rescheduled appointments.
+                                        </p>
                                     </div>
 
-                                    <div class="appt-visit-meta">
-
-                                        <span class="global-info-pill">
-                                            <i class="fa-regular fa-clock"></i>
-                                            <span>
-                                                {{ $apptTime->format('g:i A') }}
-                                            </span>
-                                        </span>
-
-                                        <span class="global-info-pill">
-                                            <i class="fa-solid fa-user-doctor"></i>
-                                            <span>{{ $dentistName }}</span>
-                                        </span>
-
-                                    </div>
-
+                                    @endforelse
                                 </div>
 
+                                @if (($futureVisits ?? collect())->count() > 0)
+                                <x-show-more label="appointments" />
+                                @endif
                             </div>
-                            @empty
-                            <div class="empty-state treatment-history-empty">
-                                <div class="appointment-empty-icon">
-                                    <i class="fa-regular fa-calendar-xmark"></i>
-                                </div>
-
-                                <h3 class="empty-state-title">
-                                    No upcoming appointments
-                                </h3>
-
-                                <p class="empty-state-sub">
-                                    This patient currently has no scheduled or rescheduled appointments.
-                                </p>
-                            </div>
-                            @endforelse
                         </div>
 
                         <div id="pastContent" class="treatment-tab-panel" hidden>
-                            @forelse($pastVisits ?? [] as $visit)
-                            @php
-                            $visitDate = $visit->appointment_date
-                            ? Carbon::parse($visit->appointment_date)->format('d M Y')
-                            : 'N/A';
-                            $visitTime = $visit->appointment_time
-                            ? Carbon::parse($visit->appointment_time)->format('g:i A')
-                            : 'N/A';
-                            $rawVisitService = $visit->service_type ?? 'Appointment';
-                            $visitService = strtolower(trim((string) $rawVisitService)) === 'follow-up'
-                            ? 'Follow-up Appointment'
-                            : $rawVisitService;
-                            $visitStatus = $visit->status ?? 'completed';
-                            $visitProcedure = $visit->procedure;
+                            <div data-show-more data-show-more-step="5" data-show-more-label="visits">
+                                <div class="space-y-3" data-show-more-list>
+                                    @forelse($pastVisits ?? [] as $visit)
 
-                            $visitOdontogramData = collect($visitProcedure?->odontogram_data ?? []);
-                            $appliedTreatments = $visitOdontogramData
-                            ->flatMap(function ($entry) {
-                            $labels = collect();
+                                    <x-appointment-record-card :appointment="$visit" variant="past" :show-details="true"
+                                        :show-countdown="false" :show-time-range="false" data-show-more-item />
 
-                            $statusLabel = data_get($entry, 'status.label');
-                            if ($statusLabel) {
-                            $labels->push($statusLabel);
-                            }
+                                    @empty
 
-                            $threeDLabel = data_get($entry, 'threeD.label');
-                            if ($threeDLabel) {
-                            $labels->push($threeDLabel);
-                            }
-
-                            foreach (['top', 'left', 'center', 'right', 'bottom'] as $surface) {
-                            $surfaceLabel = data_get($entry, "surfaces.$surface.label");
-
-                            if ($surfaceLabel) {
-                            $labels->push($surfaceLabel);
-                            }
-                            }
-
-                            return $labels;
-                            })
-                            ->filter()
-                            ->unique()
-                            ->values();
-
-                            $isOralProphylaxis =strcasecmp(trim((string) $visitService),
-                            'Oral Prophylaxis'
-                            ) === 0;
-
-                            $visitTreatment = $appliedTreatments->isNotEmpty()
-                            ? $appliedTreatments->implode(', ')
-                            : ($isOralProphylaxis ? 'Teeth Cleaning' : 'N/A');
-
-                            $visitFollowUp = $visit->followUpAppointments
-                            ->sortBy('appointment_time')
-                            ->sortBy('appointment_date')
-                            ->first();
-                            $visitRecord = [
-                            'id' => $visit->id,
-                            'date' => $visitDate,
-                            'time' => $visitTime,
-                            'service' => $visitService,
-                            'status' => $visitStatus,
-                            'treatment' => $visitTreatment,
-                            'duration_seconds' =>
-                            $visitProcedure
-                            ?->procedure_duration_seconds,
-                            'oral_examination' => $visitProcedure?->oral_examination,
-                            'diagnosis' => $visitProcedure?->diagnosis,
-                            'prescriptions' => $visitProcedure?->prescriptions,
-                            'odontogram_data' => $visitProcedure?->odontogram_data,
-                            'follow_up' => $visitFollowUp
-                            ? [
-                            'date' => $visitFollowUp->appointment_date
-                            ? Carbon::parse($visitFollowUp->appointment_date)->format('d M Y')
-                            : 'N/A',
-                            'time' => $visitFollowUp->appointment_time
-                            ? Carbon::parse($visitFollowUp->appointment_time)->format('g:i A')
-                            : 'N/A',
-                            'service' => $visitFollowUp->service_type ?? 'Follow-up',
-                            'status' => $visitFollowUp->status ?? 'upcoming',
-                            'reason' => $visitFollowUp->follow_up_reason,
-                            ]
-                            : null,
-                            ];
-                            @endphp
-
-                            @php
-                            $apptDate = Carbon::parse($visit->appointment_date);
-                            $apptTime = Carbon::parse($visit->appointment_time);
-
-                            $rawStatus = strtolower(
-                            trim((string) ($visit->status ?? 'completed'))
-                            );
-                            @endphp
-
-                            @php
-                            $displayStatus = $rawStatus;
-                            $statusClass = match ($displayStatus) {
-                            'completed' => 'status-completed',
-
-                            'cancelled',
-                            'canceled' => 'status-cancelled',
-
-                            'rescheduled' => 'status-rescheduled',
-
-                            'upcoming',
-                            'scheduled',
-                            'confirmed' => 'status-upcoming',
-
-                            default => 'status-default',
-                            };
-
-                            $dentistName =
-                            $visit->dentist?->name
-                            ?? 'Not assigned';
-                            @endphp
-
-                            <div class="global-record-card appt-visit-card appt-visit-card-past {{ $statusClass }}">
-
-                                <div class="appt-visit-date appt-visit-date-muted">
-
-                                    <span class="appt-visit-day">
-                                        {{ $apptDate->format('d') }}
-                                    </span>
-
-                                    <span class="appt-visit-month">
-                                        {{ $apptDate->format('M') }}
-                                    </span>
-
-                                    <span class="appt-visit-year">
-                                        {{ $apptDate->format('Y') }}
-                                    </span>
-
-                                </div>
-
-                                <div class="appt-visit-main">
-
-                                    <div class="appt-visit-head">
-
-                                        <div class="appt-visit-title-group">
-
-                                            <h3 class="appt-visit-title">
-                                                {{ $visitService }}
-                                            </h3>
-
-                                            <span class="status-pill {{ $statusClass }}">
-                                                <span class="status-dot"></span>
-
-                                                <span>
-                                                    {{ Str::headline($displayStatus) }}
-                                                </span>
-                                            </span>
-
+                                    <div class="empty-state treatment-history-empty">
+                                        <div class="appointment-empty-icon">
+                                            <i class="fa-solid fa-clock-rotate-left"></i>
                                         </div>
 
+                                        <h3 class="empty-state-title">
+                                            No past visits
+                                        </h3>
+
+                                        <p class="empty-state-sub">
+                                            Completed and cancelled appointment records will appear here.
+                                        </p>
                                     </div>
 
-                                    <div class="appt-visit-meta">
-
-                                        <span class="global-info-pill">
-                                            <i class="fa-regular fa-clock"></i>
-
-                                            <span>
-                                                {{ $apptTime->format('g:i A') }}
-                                            </span>
-                                        </span>
-
-                                        <span class="global-info-pill">
-                                            <i class="fa-solid fa-user-doctor"></i>
-
-                                            <span>
-                                                {{ $dentistName }}
-                                            </span>
-                                        </span>
-
-                                    </div>
-
+                                    @endforelse
                                 </div>
 
-                                <div class="appt-visit-actions">
-
-                                    <button type="button" data-record='@json(
-                $visitRecord,
-                JSON_HEX_TAG |
-                JSON_HEX_APOS |
-                JSON_HEX_AMP |
-                JSON_HEX_QUOT
-            )' onclick="openRecordModal(
-                JSON.parse(this.dataset.record)
-            )" class="ui-action-btn ui-action-view" aria-label="View details" data-tooltip="View details"
-                                        data-tooltip-tone="view">
-                                        <i class="fa-regular fa-eye"></i>
-                                    </button>
-
-                                </div>
-
+                                @if (($pastVisits ?? collect())->count() > 0)
+                                <x-show-more label="visits" />
+                                @endif
                             </div>
-                            @empty
-                            <div class="empty-state treatment-history-empty">
-                                <div class="appointment-empty-icon">
-                                    <i class="fa-solid fa-clock-rotate-left"></i>
-                                </div>
-
-                                <h3 class="empty-state-title">
-                                    No past visits
-                                </h3>
-
-                                <p class="empty-state-sub">
-                                    Completed and cancelled appointment records will appear here.
-                                </p>
-                            </div>
-                            @endforelse
                         </div>
                     </div>
                 </section>

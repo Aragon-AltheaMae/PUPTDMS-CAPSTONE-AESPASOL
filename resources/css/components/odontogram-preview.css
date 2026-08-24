@@ -1,10 +1,10 @@
 .odontogram-preview {
     width: 100%;
     min-width: 0;
-
+    min-height: 22px;
+    padding: 2px 7px;
     border: 1px solid var(--border);
     border-radius: 18px;
-
     background: var(--card);
     overflow: hidden;
 }

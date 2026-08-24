@@ -2,6 +2,7 @@ import './bootstrap';
 import './odontogram-preview';
 import './header';
 import './pagination-bar';
+import './show-more';
 import './profile-avatar';
 import './search-bar';
 import './empty-state';

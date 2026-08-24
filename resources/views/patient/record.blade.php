@@ -75,7 +75,7 @@
                                                 <span
                                                     class="font-medium truncate">{{ $upcomingAppointment->dentist_name ??
                                                         'Dr.
-                                                                                                                                                                                                                                                            Nelson P. Angeles' }}</span>
+                                                                                                Nelson P. Angeles' }}</span>
                                             </span>
                                         </div>
 
@@ -160,115 +160,8 @@
 
                             <div class="space-y-0">
                                 @foreach ($records as $i => $record)
-                                    @php
-                                        $apptDate = \Carbon\Carbon::parse($record->appointment_date);
-                                        $apptTime = \Carbon\Carbon::parse($record->appointment_time);
-
-                                        $fmtDate = $apptDate->format('F d, Y');
-                                        $fmtTime = $apptTime->format('g:i A');
-
-                                        $recordProcedure = $record->procedure;
-
-                                        $recordDuration = $recordProcedure?->procedure_duration_seconds
-                                            ? \Carbon\CarbonInterval::seconds(
-                                                (int) $recordProcedure->procedure_duration_seconds,
-                                            )
-                                                ->cascade()
-                                                ->forHumans([
-                                                    'short' => true,
-                                                    'minimumUnit' => 'second',
-                                                ])
-                                            : $record->duration ??
-                                                ($record->procedure_duration ??
-                                                    ($record->treatment_duration ?? '60 mins'));
-
-                                        $recordOdontogramData = collect($recordProcedure?->odontogram_data ?? []);
-                                        $appliedTreatments = $recordOdontogramData
-                                            ->flatMap(function ($entry) {
-                                                $labels = collect();
-                                                $statusLabel = data_get($entry, 'status.label');
-
-                                                if ($statusLabel) {
-                                                    $labels->push($statusLabel);
-                                                }
-
-                                                $threeDLabel = data_get($entry, 'threeD.label');
-
-                                                if ($threeDLabel) {
-                                                    $labels->push($threeDLabel);
-                                                }
-
-                                                foreach (
-                                                    ['top', 'left', 'center', 'right', 'bottom']
-                                                    as $surface
-                                                ) {
-                                                    $surfaceLabel = data_get(
-                                                        $entry,
-                                                        "surfaces.$surface.label"
-                                                    );
-
-                                                    if ($surfaceLabel) {
-                                                        $labels->push($surfaceLabel);
-                                                    }
-                                                }
-
-                                                return $labels;
-                                            })
-                                            ->filter()
-                                            ->unique()
-                                            ->values();
-
-                                        $isOralProphylaxis =strcasecmp(trim((string) $record->service_type),
-                                                'Oral Prophylaxis'
-                                            ) === 0;
-
-                                        $recordTreatment = $isOralProphylaxis
-                                                ? 'Teeth Cleaning'
-                                                : (
-                                                    $appliedTreatments->isNotEmpty()
-                                                        ? $appliedTreatments->implode(', ')
-                                                        : 'N/A'
-                                                );
-                                    @endphp
-
-                                    <div class="rec-row" style="animation-delay:{{ $i * 0.08 }}s;">
-                                        <div class="rec-tl">
-                                            <div class="rec-dot"></div>
-                                            <div class="rec-line"></div>
-                                        </div>
-
-                                        <div class="rec-card">
-                                            <div class="rec-card-left">
-                                                <div class="rec-service">
-                                                    {{ $record->service_type }}
-                                                </div>
-
-                                                <div class="rec-meta">
-                                                    <span class="rec-meta-chip">
-                                                        <i class="fa-regular fa-calendar-check text-[10px] mr-1.5"></i>
-                                                        {{ $fmtDate }}
-                                                    </span>
-
-                                                    <span class="rec-meta-chip">
-                                                        <i class="fa-regular fa-clock text-[10px]"></i>
-                                                        {{ $fmtTime }}
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            <button class="rec-btn" onclick="openRecordModal(this)"
-                                                data-appointment-id="{{ $record->id }}"
-                                                data-service="{{ $record->service_type }}" data-date="{{ $fmtDate }}"
-                                                data-time="{{ $record->appointment_time }}"
-                                                data-status="{{ $record->status }}" data-duration="{{ $recordDuration }}"
-                                                data-remarks="{{ $recordTreatment }}"
-                                                data-oral="{{ $recordProcedure?->oral_examination ?? '' }}"
-                                                data-diagnosis="{{ $recordProcedure?->diagnosis ?? '' }}"
-                                                data-prescription="{{ $recordProcedure?->prescriptions ?? '' }}">
-                                                View Details
-                                            </button>
-                                        </div>
-                                    </div>
+                                    <x-appointment-record-card :appointment="$record" variant="past" :show-details="true"
+                                        :show-countdown="false" :show-time-range="false" :animation-delay="$i * 0.08" />
                                 @endforeach
                             </div>
 
@@ -499,7 +392,7 @@
             if (targetAppointmentId) {
                 const targetButton =
                     document.querySelector(
-                        `[data-appointment-id="${CSS.escape(targetAppointmentId)}"]`
+                        `.ui-action-btn[data-record][data-appointment-id="${CSS.escape(targetAppointmentId)}"]`
                     );
 
                 if (targetButton) {

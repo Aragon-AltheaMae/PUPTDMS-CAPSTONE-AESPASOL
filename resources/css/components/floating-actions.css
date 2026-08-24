@@ -1165,7 +1165,6 @@ body.role-patient .assistive-fab-group {
     z-index: auto !important;
 }
 
-/* Hide both while filter drawer is open */
 html.filter-lock .assistive-fab-group,
 body.filter-lock .assistive-fab-group,
 html.filter-lock .back-to-top,

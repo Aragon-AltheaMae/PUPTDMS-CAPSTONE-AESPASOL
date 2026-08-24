@@ -1228,9 +1228,12 @@ body:has(dialog[open]) .back-to-top {
 }
 
 [data-theme="dark"] .form-input-custom,
-[data-theme="dark"] .form-select-custom {
-    background: #0d1117;
-    border-color: #21262d;
+[data-theme="dark"] .form-select-custom,
+.dark .form-input-custom,
+.dark .form-select-custom {
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+    color: var(--text-1) !important;
 }
 
 [data-theme="dark"] .ui-modal .modal-profile-card,
@@ -1827,16 +1830,16 @@ body:has(dialog[open]) .back-to-top {
 .dark .ui-modal .form-input,
 .dark .ui-modal input,
 .dark .ui-modal select {
-    background: #0D1117 !important;
-    border-color: #30363D !important;
-    color: #F8FAFC !important;
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+    color: var(--text-1) !important;
 }
 
 [data-theme="dark"] .ui-modal .form-input::placeholder,
 [data-theme="dark"] .ui-modal input::placeholder,
 .dark .ui-modal .form-input::placeholder,
 .dark .ui-modal input::placeholder {
-    color: #6E7681 !important;
+    color: var(--text-3) !important;
 }
 
 [data-theme="dark"] .ui-modal .btn-close-modal,
@@ -3939,6 +3942,14 @@ body.session-expired {
     border: 1px solid var(--border);
     border-radius: 16px;
     background: var(--card);
+}
+
+[data-theme="dark"] .ui-modal .modal-calendar-panel,
+[data-theme="dark"] .ui-modal .modal-option-panel,
+.dark .ui-modal .modal-calendar-panel,
+.dark .ui-modal .modal-option-panel {
+    background: var(--card);
+    border-color: var(--border);
 }
 
 @media (max-width: 767px) {

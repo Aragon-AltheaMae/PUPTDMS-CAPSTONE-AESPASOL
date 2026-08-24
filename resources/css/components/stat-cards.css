@@ -83,12 +83,8 @@
 
 .stat-card-link:hover .stat-card-link-indicator {
     opacity: 1;
-
-    transform:
-        translate(2px, -2px);
-
-    background: #ffffff;
-
+    transform: translate(2px, -2px);
+    background: rgba(255, 255, 255, .06);
     box-shadow:
         0 8px 18px color-mix(in srgb,
             var(--stat-accent) 14%,
@@ -98,7 +94,6 @@
 [data-theme="dark"] .stat-card-link-indicator,
 .dark .stat-card-link-indicator {
     background: rgba(255, 255, 255, .06);
-
     border-color:
         color-mix(in srgb,
             var(--stat-accent) 22%,
@@ -139,17 +134,17 @@
 .dark .stat-card {
     background:
         radial-gradient(circle at top right,
-            color-mix(in srgb, var(--stat-accent) 14%, transparent) 0%,
-            transparent 35%),
-        linear-gradient(160deg,
-            rgba(17, 24, 39, 0.94),
-            rgba(13, 18, 28, 0.96)) !important;
+            color-mix(in srgb, var(--stat-accent) 12%, transparent) 0%,
+            transparent 36%),
+        var(--card) !important;
 
-    border-color: color-mix(in srgb, var(--stat-accent) 20%, rgba(255, 255, 255, .12)) !important;
+    border-color:
+        color-mix(in srgb,
+            var(--stat-accent) 20%,
+            var(--border)) !important;
 
     box-shadow:
-        0 16px 34px rgba(0, 0, 0, 0.26),
-        inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+        0 14px 30px rgba(0, 0, 0, .28) !important;
 }
 
 .stat-grid {
@@ -568,12 +563,15 @@
         linear-gradient(180deg,
             rgba(255, 255, 255, .88),
             color-mix(in srgb, var(--stat-soft) 88%, #ffffff));
-    color: var(--stat-accent);
-    border: 1px solid color-mix(in srgb, var(--stat-accent) 14%, #ece6e0);
 
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .78),
-        0 8px 18px color-mix(in srgb, var(--stat-accent) 12%, transparent);
+    color: var(--stat-accent);
+
+    border:
+        1px solid color-mix(in srgb,
+            var(--stat-accent) 14%,
+            #ece6e0);
+
+    box-shadow: none;
 
     font-size: 18px;
     flex: 0 0 52px;
@@ -582,6 +580,16 @@
 .stat-icon i,
 .stat-icon-wrapper i {
     color: currentColor;
+}
+
+[data-theme="dark"] .stat-icon,
+[data-theme="dark"] .stat-icon-wrapper,
+.dark .stat-icon,
+.dark .stat-icon-wrapper {
+    background: var(--border) !important;
+    border-color: currentColor !important;
+    color: var(--stat-accent) !important;
+    box-shadow: none !important;
 }
 
 .stat-card.stat-active,
@@ -673,22 +681,6 @@
 .dark .stat-num,
 .dark .stat-count {
     color: var(--stat-accent) !important;
-}
-
-[data-theme="dark"] .stat-icon,
-[data-theme="dark"] .stat-icon-wrapper,
-.dark .stat-icon,
-.dark .stat-icon-wrapper {
-    background:
-        linear-gradient(180deg,
-            color-mix(in srgb, var(--stat-accent) 16%, rgba(255, 255, 255, .03)),
-            rgba(255, 255, 255, .04)) !important;
-
-    border-color: color-mix(in srgb, var(--stat-accent) 24%, rgba(255, 255, 255, .10)) !important;
-
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .05),
-        0 10px 24px color-mix(in srgb, var(--stat-accent) 12%, transparent) !important;
 }
 
 [data-theme="dark"] .stat-card .dashboard-kpi-breakdown span,
@@ -884,9 +876,19 @@
 [data-theme="dark"] #mainContent #statCards.admin-dashboard-stat-grid .stat-icon-wrapper,
 .dark #mainContent #statCards.admin-dashboard-stat-grid .stat-icon,
 .dark #mainContent #statCards.admin-dashboard-stat-grid .stat-icon-wrapper {
-    background: var(--stat-bg) !important;
+    background:
+        color-mix(in srgb,
+            var(--text-1) 14%,
+            var(--card)) !important;
+
     color: var(--stat-accent) !important;
-    border-color: var(--stat-border) !important;
+
+    border-color:
+        color-mix(in srgb,
+            var(--text-1) 18%,
+            var(--border)) !important;
+
+    box-shadow: none !important;
 }
 
 [data-theme="dark"] #mainContent #statCards.admin-dashboard-stat-grid .stat-card.s-all,
