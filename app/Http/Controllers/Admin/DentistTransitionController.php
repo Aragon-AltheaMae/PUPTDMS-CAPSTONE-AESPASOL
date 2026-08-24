@@ -112,6 +112,8 @@ class DentistTransitionController extends Controller
             'types' => DentistTransition::TYPES,
             'perPage' => $perPage,
             'filters' => $request->only(['search', 'status', 'transition_type', 'transition_type_other', 'successor', 'effective_date']),
+            'layoutRole' => $this->resolveLayoutRole(),
+            'routeNames' => $this->routeNames(),
         ]);
     }
 
@@ -124,8 +126,10 @@ class DentistTransitionController extends Controller
             'transition' => new DentistTransition(),
             'dentists' => $this->activeDentists(),
             'types' => DentistTransition::TYPES,
-            'formAction' => route('admin.dentist-transitions.store'),
+            'formAction' => route($this->routeName('store')),
             'formMethod' => 'POST',
+            'layoutRole' => $this->resolveLayoutRole(),
+            'routeNames' => $this->routeNames(),
         ]);
     }
 
@@ -136,7 +140,7 @@ class DentistTransitionController extends Controller
         $transition = $this->service->createTransition($request->validated(), $request->user());
 
         return redirect()
-            ->route('admin.dentist-transitions.show', $transition)
+            ->route($this->routeName('show'), $transition)
             ->with('success', 'Dentist transition created successfully.');
     }
 
@@ -165,6 +169,8 @@ class DentistTransitionController extends Controller
             'summary' => $this->service->generateImpactSummary($transition),
             'dentists' => $this->activeDentists($transition->dentist_id),
             'readiness' => $this->service->validateTransitionReadiness($transition),
+            'layoutRole' => $this->resolveLayoutRole(),
+            'routeNames' => $this->routeNames(),
         ]);
     }
 
@@ -177,8 +183,10 @@ class DentistTransitionController extends Controller
             'transition' => $transition,
             'dentists' => $this->activeDentists($transition->dentist_id),
             'types' => DentistTransition::TYPES,
-            'formAction' => route('admin.dentist-transitions.update', $transition),
+            'formAction' => route($this->routeName('update'), $transition),
             'formMethod' => 'PUT',
+            'layoutRole' => $this->resolveLayoutRole(),
+            'routeNames' => $this->routeNames(),
         ]);
     }
 
@@ -193,7 +201,7 @@ class DentistTransitionController extends Controller
         $transition = $this->service->updateTransition($transition, $request->validated(), $request->user());
 
         return redirect()
-            ->route('admin.dentist-transitions.show', $transition)
+            ->route($this->routeName('show'), $transition)
             ->with('success', 'Transition details updated successfully.');
     }
 
@@ -289,8 +297,6 @@ class DentistTransitionController extends Controller
         $user = request()->user();
 
         abort_unless($user, 403);
-        abort_unless($user->hasAnyRole(['admin', 'super_admin']), 403);
-
         $allowed = $user->hasPermission($permission) || $user->hasPermission('manage_dentist_accounts');
 
         abort_unless($allowed, 403, 'Unauthorized.');
@@ -315,10 +321,55 @@ class DentistTransitionController extends Controller
             'progress_percentage' => (int) $transition->progress_percentage,
             'status' => $status,
             'status_label' => str_replace('_', ' ', ucfirst($status)),
-            'show_url' => route('admin.dentist-transitions.show', $transition),
+            'show_url' => route($this->routeName('show'), $transition),
             'edit_url' => !in_array($status, ['completed', 'cancelled'], true)
-                ? route('admin.dentist-transitions.edit', $transition)
+                ? route($this->routeName('edit'), $transition)
                 : null,
+        ];
+    }
+
+    private function resolveLayoutRole(): string
+    {
+        return request()->routeIs('dentist.dentist.transitions.*') ? 'dentist' : 'admin';
+    }
+
+    private function routeName(string $action): string
+    {
+        return $this->routeNames()[$action];
+    }
+
+    private function routeNames(): array
+    {
+        if (request()->routeIs('dentist.dentist.transitions.*')) {
+            return [
+                'index' => 'dentist.dentist.transitions.index',
+                'create' => 'dentist.dentist.transitions.create',
+                'store' => 'dentist.dentist.transitions.store',
+                'show' => 'dentist.dentist.transitions.show',
+                'edit' => 'dentist.dentist.transitions.edit',
+                'update' => 'dentist.dentist.transitions.update',
+                'generate_items' => 'dentist.dentist.transitions.generate-items',
+                'assignments' => 'dentist.dentist.transitions.assignments',
+                'checklist' => 'dentist.dentist.transitions.checklist',
+                'finalize' => 'dentist.dentist.transitions.finalize',
+                'extend_access' => 'dentist.dentist.transitions.extend-access',
+                'cancel' => 'dentist.dentist.transitions.cancel',
+            ];
+        }
+
+        return [
+            'index' => 'admin.dentist-transitions.index',
+            'create' => 'admin.dentist-transitions.create',
+            'store' => 'admin.dentist-transitions.store',
+            'show' => 'admin.dentist-transitions.show',
+            'edit' => 'admin.dentist-transitions.edit',
+            'update' => 'admin.dentist-transitions.update',
+            'generate_items' => 'admin.dentist-transitions.generate-items',
+            'assignments' => 'admin.dentist-transitions.assignments',
+            'checklist' => 'admin.dentist-transitions.checklist',
+            'finalize' => 'admin.dentist-transitions.finalize',
+            'extend_access' => 'admin.dentist-transitions.extend-access',
+            'cancel' => 'admin.dentist-transitions.cancel',
         ];
     }
 

@@ -17,6 +17,12 @@ use App\Helpers\AuditLogger;
 class UserManagementController extends Controller
 {
     private const PASSWORD_LENGTH = 12;
+    private const USER_MANAGEMENT_PERMISSIONS = [
+        'manage_user_accounts',
+        'manage_user_roles',
+        'manage_dentist_accounts',
+        'manage_super_admin_accounts',
+    ];
 
     public function __construct(
         private readonly ConcurrentSessionService $concurrentSessionService
@@ -24,6 +30,8 @@ class UserManagementController extends Controller
 
     public function index(Request $request)
     {
+        $this->authorizeAnyUserManagementAccess();
+
         $roles = Role::withCount('users')->orderBy('name')->get();
         $roleCounts = $roles->mapWithKeys(fn($role) => [$role->slug => $role->users_count]);
 
@@ -124,11 +132,22 @@ class UserManagementController extends Controller
             'search',
             'roleFilter',
             'statusFilter'
-        ));
+        ) + [
+            'layoutRole' => request()->routeIs('dentist.user_management*') ? 'dentist' : 'admin',
+            'routeNames' => [
+                'index' => $this->routeName('index'),
+                'store' => $this->routeName('store'),
+                'update' => $this->routeName('update'),
+                'reset_password' => $this->routeName('reset_password'),
+                'toggle_status' => $this->routeName('toggle_status'),
+            ],
+        ]);
     }
 
     public function store(Request $request)
     {
+        $this->authorizeUserManagementAccess('manage_user_accounts');
+
         $request->merge([
             'phone' => $this->normalizePhoneNumber($request->input('phone')),
         ]);
@@ -189,11 +208,13 @@ class UserManagementController extends Controller
             "Created user #{$user->id} ({$user->email})"
         );
 
-        return redirect()->route('admin.user_management')
+        return redirect()->route($this->routeName('index'))
             ->with('success', 'User created successfully.');
     }
     public function update(Request $request, User $user)
     {
+        $this->authorizeUserManagementAccess('manage_user_accounts');
+
         $request->merge([
             'phone' => $this->normalizePhoneNumber($request->input('phone')),
         ]);
@@ -306,6 +327,8 @@ class UserManagementController extends Controller
 
     private function authorizeRoleChange(Request $request, User $user): void
     {
+        $this->authorizeUserManagementAccess('manage_user_roles');
+
         $actor = Auth::user();
 
         if (!$actor) {
@@ -341,6 +364,8 @@ class UserManagementController extends Controller
 
     public function resetPassword(Request $request, User $user)
     {
+        $this->authorizeUserManagementAccess('manage_user_accounts');
+
         $request->validate([
             'password' => 'required|min:8|confirmed',
         ]);
@@ -366,12 +391,14 @@ class UserManagementController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.user_management')
+        return redirect()->route($this->routeName('index'))
             ->with('success', 'Password reset successfully.');
     }
 
     public function toggleStatus(User $user)
     {
+        $this->authorizeUserManagementAccess('manage_user_accounts');
+
         $user->status = $user->status === 'active' ? 'inactive' : 'active';
         $user->save();
 
@@ -396,6 +423,8 @@ class UserManagementController extends Controller
 
     public function updatePatient(Request $request, Patient $patient)
     {
+        $this->authorizeUserManagementAccess('manage_user_accounts');
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:patients,email,' . $patient->id,
@@ -406,12 +435,14 @@ class UserManagementController extends Controller
             'email' => $request->email,
         ]);
 
-        return redirect()->route('admin.user_management')
+        return redirect()->route($this->routeName('index'))
             ->with('success', 'Patient updated successfully.');
     }
 
     public function resetPatientPassword(Request $request, Patient $patient)
     {
+        $this->authorizeUserManagementAccess('manage_user_accounts');
+
         $request->validate([
             'password' => 'required|min:8|confirmed',
         ]);
@@ -445,12 +476,14 @@ class UserManagementController extends Controller
             );
         }
 
-        return redirect()->route('admin.user_management')
+        return redirect()->route($this->routeName('index'))
             ->with('success', 'Patient password reset successfully.');
     }
 
     public function destroy(User $user)
     {
+        $this->authorizeUserManagementAccess('manage_user_accounts');
+
         $email = $user->email;
 
         $this->concurrentSessionService->revokeAllSessions($user, null, 'account_deleted');
@@ -466,8 +499,52 @@ class UserManagementController extends Controller
             "Deleted user #{$user->id} ({$email})",
         );
 
-        return redirect()->route('admin.user_management')
+        return redirect()->route($this->routeName('index'))
             ->with('success', 'User deleted successfully.');
+    }
+
+    private function authorizeAnyUserManagementAccess(): void
+    {
+        $user = Auth::user();
+
+        abort_unless($user, 403);
+
+        foreach (self::USER_MANAGEMENT_PERMISSIONS as $permission) {
+            if ($user->hasPermission($permission)) {
+                return;
+            }
+        }
+
+        abort(403, 'Unauthorized.');
+    }
+
+    private function authorizeUserManagementAccess(string $permission): void
+    {
+        $user = Auth::user();
+
+        abort_unless($user, 403);
+        abort_unless($user->hasPermission($permission), 403, 'Unauthorized.');
+    }
+
+    private function routeName(string $action): string
+    {
+        if (request()->routeIs('dentist.user_management*')) {
+            return match ($action) {
+                'index' => 'dentist.user_management',
+                'store' => 'dentist.user_management.store',
+                'update' => 'dentist.user_management.update',
+                'reset_password' => 'dentist.user_management.reset_password',
+                'toggle_status' => 'dentist.user_management.toggle_status',
+            };
+        }
+
+        return match ($action) {
+            'index' => 'admin.user_management',
+            'store' => 'admin.user_management.store',
+            'update' => 'admin.user_management.update',
+            'reset_password' => 'admin.user_management.reset_password',
+            'toggle_status' => 'admin.user_management.toggle_status',
+        };
     }
 
     private function formatUserForResponse(User $user): array

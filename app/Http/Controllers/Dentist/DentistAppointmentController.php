@@ -76,7 +76,7 @@ class DentistAppointmentController extends Controller
 
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return redirect('/login');
         }
 
@@ -93,14 +93,8 @@ class DentistAppointmentController extends Controller
 
         $appointments = $upcomingAppointments;
 
-        $pastAppointments = Appointment::with(['patient', 'procedure', 'followUpAppointments'])
-            ->where(function ($q) use ($today) {
-                $q->whereIn('status', ['completed', 'cancelled'])
-                    ->orWhere(function ($sub) use ($today) {
-                        $sub->whereDate('appointment_date', '<', $today)
-                            ->whereIn('status', ['upcoming', 'rescheduled']);
-                    });
-            })
+        $pastAppointments = Appointment::with(['patient', 'procedure', 'followUpAppointments',])
+            ->whereIn('status', ['completed', 'cancelled',])
             ->orderBy('appointment_date', 'desc')
             ->orderBy('appointment_time', 'desc')
             ->get();
@@ -213,7 +207,7 @@ class DentistAppointmentController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return redirect('/login');
         }
 
@@ -246,29 +240,46 @@ class DentistAppointmentController extends Controller
 
         $today = Carbon::today()->toDateString();
 
-        $futureVisits = Appointment::with(['procedure', 'followUpAppointments', 'dentist'])
+        $futureVisits = Appointment::with([
+            'procedure',
+            'followUpAppointments',
+            'dentist',
+        ])
             ->where('patient_id', $patient->id)
-            ->whereIn('status', ['upcoming', 'rescheduled'])
+            ->whereDate('appointment_date', '>=', $today)
+            ->whereIn('status', [
+                'upcoming',
+                'rescheduled',
+            ])
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        $pastVisits = Appointment::with(['procedure', 'followUpAppointments', 'dentist'])
+        $pastVisits = Appointment::with([
+            'procedure',
+            'followUpAppointments',
+            'dentist',
+        ])
             ->where('patient_id', $patient->id)
-            ->where(function ($q) use ($today) {
-                $q->whereIn('status', ['completed', 'cancelled'])
-                    ->orWhereDate('appointment_date', '<', $today);
-            })
+            ->whereIn('status', [
+                'completed',
+                'cancelled',
+            ])
             ->orderBy('appointment_date', 'desc')
             ->orderBy('appointment_time', 'desc')
             ->get();
 
-        $lastVisit = $pastVisits->first();
+        $completedVisits = $pastVisits
+            ->where('status', 'completed')
+            ->values();
+
+        $lastVisit = $completedVisits->first();
+
         $nextAppointment = $futureVisits->first();
-        $totalVisits = $pastVisits->count() + $futureVisits->count();
+
+        $totalVisits = $completedVisits->count();
 
         $notifications = collect([]);
-
 
         return view('patient.shared-profile', [
             'patient' => $patient,
@@ -288,7 +299,7 @@ class DentistAppointmentController extends Controller
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if ($activeRole !== 'dentist') {
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return redirect('/login');
         }
 
@@ -306,6 +317,18 @@ class DentistAppointmentController extends Controller
             return redirect()
                 ->route('dentist.dentist.appointments')
                 ->with('error', 'Only upcoming or rescheduled appointments can be started.');
+        }
+
+        if (
+            empty($appointment->appointment_date) ||
+            !Carbon::parse($appointment->appointment_date)->isToday()
+        ) {
+            return redirect()
+                ->route('dentist.dentist.appointments')
+                ->with(
+                    'error',
+                    'The procedure can only be started on the scheduled appointment date.'
+                );
         }
 
         AuditLogger::log(
@@ -339,13 +362,20 @@ class DentistAppointmentController extends Controller
         }
 
         if ($patientUser) {
-            $patientUser->notify(
-                new AppointmentCancelledNotification(
-                    $appointment,
-                    $cancelledBy,
-                    $request->reason
-                )
-            );
+            try {
+                $patientUser->notify(
+                    new AppointmentCancelledNotification(
+                        $appointment,
+                        $cancelledBy,
+                        $request->reason
+                    )
+                );
+            } catch (\Throwable $e) {
+                \Log::error('Appointment cancellation notification failed.', [
+                    'appointment_id' => $appointment->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
         try {
@@ -420,12 +450,19 @@ class DentistAppointmentController extends Controller
         $rescheduledBy = Auth::user()?->name ?? 'the dentist';
 
         if ($patientUser) {
-            $patientUser->notify(
-                new AppointmentRescheduledNotification(
-                    $appointment,
-                    $rescheduledBy
-                )
-            );
+            try {
+                $patientUser->notify(
+                    new AppointmentRescheduledNotification(
+                        $appointment,
+                        $rescheduledBy
+                    )
+                );
+            } catch (\Throwable $e) {
+                \Log::error('Appointment reschedule notification failed.', [
+                    'appointment_id' => $appointment->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
         try {
@@ -464,7 +501,7 @@ class DentistAppointmentController extends Controller
         $request->validate([
             'followup_appointment_date' => 'required|date|after:today',
             'followup_appointment_time' => 'required',
-            'followup_reason' => 'required|string|max:1000',
+            'followup_reason' => 'nullable|string|max:1000',
         ]);
 
         if (Carbon::parse($request->followup_appointment_date)->isToday()) {
@@ -499,7 +536,7 @@ class DentistAppointmentController extends Controller
             'status' => 'upcoming',
             'is_follow_up' => true,
             'follow_up_for_appointment_id' => $originalAppointment->id,
-            'follow_up_reason' => $request->followup_reason,
+            'follow_up_reason' => $request->filled('followup_reason') ? trim($request->followup_reason) : null,
             'follow_up_reminder_sent_at' => null,
             'follow_up_today_reminder_sent_at' => null,
             'follow_up_one_day_reminder_sent_at' => null,

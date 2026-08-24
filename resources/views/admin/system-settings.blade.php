@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('layout-role', 'admin')
+@section('layout-role', $layoutRole ?? 'admin')
 
 @section('title', 'System Settings')
 
@@ -28,7 +28,7 @@
             </div>
         </div>
 
-        <form id="settingsForm" action="{{ route('admin.system_settings.update') }}" method="POST">
+        <form id="settingsForm" action="{{ route($updateRoute ?? 'admin.system_settings.update') }}" method="POST">
             @csrf
 
             <div class="settings-view" id="settingsListView">

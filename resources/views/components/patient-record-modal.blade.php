@@ -84,7 +84,9 @@
                     </div>
 
                     <div class="record-modal-content">
-                        <span id="m_remarks">—</span>
+                        <div id="m_remarks" class="odontogram-preview-marking-list">
+                            —
+                        </div>
                     </div>
                 </div>
 
@@ -95,7 +97,7 @@
                     </div>
 
                     <div class="record-modal-content">
-                        <span id="m_oral">—</span>
+                        <div id="m_oral">—</div>
                     </div>
                 </div>
             </div>
@@ -108,7 +110,7 @@
                     </div>
 
                     <div class="record-modal-content">
-                        <span id="m_diagnosis">—</span>
+                        <div id="m_diagnosis">—</div>
                     </div>
                 </div>
 
@@ -119,7 +121,7 @@
                     </div>
 
                     <div class="record-modal-content">
-                        <span id="m_prescription">—</span>
+                        <div id="m_prescription">—</div>
                     </div>
                 </div>
             </div>
@@ -241,6 +243,9 @@
                 source?.procedure_duration_seconds ??
                 null,
 
+            duration: source?.duration ??
+                '',
+
             remarks: source?.remarks ||
                 source?.treatment_notes ||
                 source?.treatment ||
@@ -261,7 +266,8 @@
                 source?.followUp ||
                 null,
 
-            odontogramData: source?.odontogram_data ||
+            odontogramData: source?.odontogram ||
+                source?.odontogram_data ||
                 source?.odontogramData || []
         };
     }
@@ -449,44 +455,73 @@
                 odontogram || {}
             );
 
-        const treatments =
-            new Map();
+        const treatments = [];
 
-        const addTreatment =
-            record => {
-                if (
-                    !record ||
-                    !record.code
-                ) {
-                    return;
-                }
+        const addTreatment = (
+            surface,
+            record
+        ) => {
+            if (
+                !record ||
+                !record.code
+            ) {
+                return;
+            }
 
-                const code =
-                    String(
-                        record.code
-                    ).trim();
+            let code =
+                String(
+                    record.code
+                )
+                .trim()
+                .toUpperCase();
 
-                const label =
-                    String(
-                        record.label ||
-                        code
-                    ).trim();
+            if (
+                code === 'PT' ||
+                code === '+'
+            ) {
+                code = '✓';
+            }
 
-                treatments.set(
-                    `${code}|${label}`,
-                    label
-                );
-            };
+            const label =
+                String(
+                    record.label ||
+                    code
+                ).trim();
+
+            const colorHex =
+                String(
+                    record.colorHex ||
+                    record.color_hex ||
+                    ''
+                ).trim();
+
+            treatments.push({
+                surface,
+                code,
+                label,
+                colorHex,
+            });
+        };
 
         entries.forEach(entry => {
-            addTreatment(
-                entry?.status
-            );
 
-            addTreatment(
+            if (entry?.status) {
+                addTreatment(
+                    'Status',
+                    entry.status
+                );
+            }
+
+            if (
                 entry?.threeD ||
                 entry?.three_d
-            );
+            ) {
+                addTreatment(
+                    '3D',
+                    entry.threeD ||
+                    entry.three_d
+                );
+            }
 
             const surfaces =
                 entry?.surfaces || {};
@@ -498,23 +533,111 @@
                 'right',
                 'bottom'
             ].forEach(surface => {
-                addTreatment(
+
+                const record =
                     surfaces?.[
                         surface
-                    ]
+                    ];
+
+                if (!record) {
+                    return;
+                }
+
+                addTreatment(
+                    surface
+                    .charAt(0)
+                    .toUpperCase() +
+                    surface.slice(1),
+
+                    record
                 );
             });
         });
 
-        if (
-            treatments.size === 0
-        ) {
-            return 'No treatment record yet.';
+        return treatments;
+    }
+
+    function safeRecordText(
+        value
+    ) {
+        return String(
+                value ?? ''
+            )
+            .replaceAll(
+                '&',
+                '&amp;'
+            )
+            .replaceAll(
+                '<',
+                '&lt;'
+            )
+            .replaceAll(
+                '>',
+                '&gt;'
+            )
+            .replaceAll(
+                '"',
+                '&quot;'
+            )
+            .replaceAll(
+                "'",
+                '&#039;'
+            );
+    }
+
+    function renderRecordTreatments(
+        containerId,
+        treatments,
+        fallbackText = ''
+    ) {
+        const container =
+            document.getElementById(
+                containerId
+            );
+
+        if (!container) {
+            return;
         }
 
-        return Array.from(
-            treatments.values()
-        ).join(', ');
+        if (
+            !Array.isArray(
+                treatments
+            ) ||
+            treatments.length === 0
+        ) {
+            container.textContent =
+                String(
+                    fallbackText ||
+                    'No treatment record yet.'
+                ).trim();
+
+            return;
+        }
+
+        container.innerHTML =
+            treatments
+            .map(
+                treatment => `
+                    <span class="odontogram-preview-marking">
+                        <i
+                            class="odontogram-preview-marking-swatch"
+                            style="background:${safeRecordText(
+                                treatment.colorHex ||
+                                '#111827'
+                            )}"
+                        ></i>
+
+                        <span>${safeRecordText(
+                            treatment.surface
+                        )}: ${safeRecordText(
+                            treatment.code
+                        )} - ${safeRecordText(
+                            treatment.label
+                        )}</span>
+                    </span>
+                `
+            )
+            .join('');
     }
 
     function setRecordModalData(source) {
@@ -578,20 +701,16 @@
     `;
         }
 
-        const treatmentSummary =
+        const treatments =
             formatRecordTreatments(
                 data.odontogramData
             );
 
-        setText(
+        renderRecordTreatments(
             'm_remarks',
-            treatmentSummary !==
-            'No treatment record yet.' ?
-            treatmentSummary :
-            (
-                data.remarks ||
-                'No treatment record yet.'
-            )
+            treatments,
+            data.remarks ||
+            'No treatment record yet.'
         );
 
         setText(

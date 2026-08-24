@@ -30,10 +30,12 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                 <div>
                     <form id="existingAppointmentForm" method="POST"
                         action="{{ route('dentist.odontogram.existing-appointment.intake.store', ['patient' => $patient->id]) }}"
+                        data-history-autosave-url="{{ route('dentist.odontogram.existing-appointment.history.autosave', ['patient' => $patient->id]) }}"
                         data-global-selects data-global-validation data-discard-form
                         data-discard-title="Discard existing appointment?"
                         data-discard-subtitle="You have unsaved appointment information."
                         data-discard-message="Leaving this page will remove the appointment details you entered. Do you want to discard your changes?">
+
                         @csrf
 
                         <div class="step-content hidden">
@@ -243,6 +245,24 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     </div>
 </main>
 
+<x-booking.confirmed-modal id="existingAppointmentConfirmModal" eyebrow="Existing Appointment"
+    title="Appointment Details Confirmed" subtitle="The existing appointment information has been saved successfully."
+    header-icon="fa-check" section-icon="fa-file-circle-check" section-eyebrow="Record Status"
+    section-title="Ready for odontogram"
+    section-message="The appointment intake has been recorded and is ready for clinical charting." detail-label="Status"
+    result-title="Recorded" message-title="Appointment details" message-id="existingAppointmentConfirmMessage">
+    <p class="confirmed-modal-message">
+        The existing appointment was recorded successfully.
+    </p>
+
+    <x-slot:footer>
+        <button type="button" id="continueToOdontogramBtn" class="ui-btn ui-btn-primary">
+            <i class="fa-solid fa-arrow-right"></i>
+            Continue to Odontogram
+        </button>
+    </x-slot:footer>
+</x-booking.confirmed-modal>
+
 @include('components.appointment-calendar-script', [
 'mode' => 'booking',
 'renderStyle' => 'patient',
@@ -288,6 +308,33 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         let step5ConfirmationActive =
             false;
 
+        let editingHistoryFromReview = null;
+
+        const hasExistingBookingInformation =
+            @json(!empty($dentalAnswers) && !empty($medicalAnswers));
+
+        let patientInformationToastShown =
+            false;
+
+        function showExistingPatientInformationToast() {
+            if (
+                !hasExistingBookingInformation ||
+                patientInformationToastShown
+            ) {
+                return;
+            }
+
+            patientInformationToastShown =
+                true;
+
+            window.showToast?.({
+                type: 'success',
+                title: 'Patient Information Loaded',
+                message:
+                    'The saved dental and medical history will be reused.',
+            });
+        }
+
         const summarySection =
             document.getElementById(
                 'summarySection'
@@ -306,6 +353,298 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         const existingAppointmentForm =
             document.getElementById(
                 'existingAppointmentForm'
+            );
+
+        const historyAutosaveUrl =
+            existingAppointmentForm
+                ?.dataset
+                .historyAutosaveUrl;
+
+        const existingConfirmModal =
+            document.getElementById(
+                'existingAppointmentConfirmModal'
+            );
+
+        const existingConfirmMessage =
+            document.getElementById(
+                'existingAppointmentConfirmMessage'
+            );
+
+        const continueToOdontogramBtn =
+            document.getElementById(
+                'continueToOdontogramBtn'
+            );
+
+        const workflowNextBtn =
+            document.getElementById(
+                'nextBtn'
+            );
+
+        let existingAppointmentSubmitRunning =
+            false;
+
+        let historyAutosaveTimer = null;
+
+        let historyAutosaveController = null;
+
+        let lastHistoryAutosavePayload = '';
+
+        function isHistoryField(field) {
+            if (!field?.name) {
+                return false;
+            }
+
+            return (
+                field.name ===
+                'last_dental_visit' ||
+
+                field.name ===
+                'previous_dentist' ||
+
+                field.name ===
+                'extraction_date' ||
+
+                field.name ===
+                'dentures_date' ||
+
+                field.name ===
+                'ortho_date' ||
+
+                field.name ===
+                'additional_concerns' ||
+
+                field.name ===
+                'emergency_person' ||
+
+                field.name ===
+                'emergency_number' ||
+
+                field.name ===
+                'emergency_relation' ||
+
+                field.name.startsWith(
+                    'dental_answers['
+                ) ||
+
+                field.name.startsWith(
+                    'medical_answers['
+                ) ||
+
+                field.name ===
+                'diseases[]'
+            );
+        }
+
+        function buildHistoryAutosaveData() {
+            const data =
+                new FormData();
+
+            data.append(
+                'diseases_present',
+                '1'
+            );
+
+            const historyFields =
+                existingAppointmentForm
+                    ?.querySelectorAll(
+                        'input[name], textarea[name], select[name]'
+                    ) || [];
+
+            historyFields.forEach(
+                field => {
+                    if (
+                        !isHistoryField(
+                            field
+                        )
+                    ) {
+                        return;
+                    }
+
+                    if (
+                        (
+                            field.type ===
+                            'checkbox' ||
+                            field.type ===
+                            'radio'
+                        ) &&
+                        !field.checked
+                    ) {
+                        return;
+                    }
+
+                    data.append(
+                        field.name,
+                        field.value
+                    );
+                }
+            );
+
+            return data;
+        }
+
+        function createHistoryPayloadSignature(
+            formData
+        ) {
+            return JSON.stringify(
+                Array.from(
+                    formData.entries()
+                )
+            );
+        }
+
+        async function autosavePatientHistory() {
+            if (
+                !historyAutosaveUrl ||
+                !existingAppointmentForm
+            ) {
+                return;
+            }
+
+            const formData =
+                buildHistoryAutosaveData();
+
+            const payloadSignature =
+                createHistoryPayloadSignature(
+                    formData
+                );
+
+            if (
+                payloadSignature ===
+                lastHistoryAutosavePayload
+            ) {
+                return;
+            }
+
+            historyAutosaveController
+                ?.abort();
+
+            historyAutosaveController =
+                new AbortController();
+
+            try {
+                const response =
+                    await fetch(
+                        historyAutosaveUrl, {
+                        method: 'PATCH',
+
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector(
+                                'meta[name="csrf-token"]'
+                            )?.content ||
+                                existingAppointmentForm
+                                    .querySelector(
+                                        'input[name="_token"]'
+                                    )
+                                    ?.value ||
+                                '',
+
+                            'Accept': 'application/json',
+
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+
+                        body: formData,
+
+                        signal: historyAutosaveController
+                            .signal,
+                    }
+                    );
+
+                const result =
+                    await response.json();
+
+                if (!response.ok) {
+                    console.error(
+                        'Patient history autosave failed:',
+                        result
+                    );
+
+                    return;
+                }
+
+                lastHistoryAutosavePayload =
+                    payloadSignature;
+
+            } catch (error) {
+                if (
+                    error.name ===
+                    'AbortError'
+                ) {
+                    return;
+                }
+
+                console.error(
+                    'Patient history autosave error:',
+                    error
+                );
+            }
+        }
+
+        function queueHistoryAutosave(
+            delay = 650
+        ) {
+            clearTimeout(
+                historyAutosaveTimer
+            );
+
+            historyAutosaveTimer =
+                window.setTimeout(
+                    autosavePatientHistory,
+                    delay
+                );
+        }
+
+        existingAppointmentForm
+            ?.addEventListener(
+                'input',
+                event => {
+                    const field =
+                        event.target;
+
+                    if (
+                        !isHistoryField(
+                            field
+                        )
+                    ) {
+                        return;
+                    }
+
+                    if (
+                        field.type ===
+                        'radio' ||
+                        field.type ===
+                        'checkbox' ||
+                        field.tagName ===
+                        'SELECT'
+                    ) {
+                        return;
+                    }
+
+                    queueHistoryAutosave(
+                        650
+                    );
+                }
+            );
+
+        existingAppointmentForm
+            ?.addEventListener(
+                'change',
+                event => {
+                    const field =
+                        event.target;
+
+                    if (
+                        !isHistoryField(
+                            field
+                        )
+                    ) {
+                        return;
+                    }
+
+                    queueHistoryAutosave(
+                        100
+                    );
+                }
             );
 
 
@@ -351,6 +690,30 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
                     icon: 'fa-arrow-right',
                 });
+        }
+
+        function resetStep5View() {
+            showStep5Review();
+        }
+
+        function editDentalHistoryFromReview() {
+            editingHistoryFromReview =
+                'dental';
+
+            resetStep5View();
+
+            bookingWorkflow
+                ?.goTo(2);
+        }
+
+        function editMedicalHistoryFromReview() {
+            editingHistoryFromReview =
+                'medical';
+
+            resetStep5View();
+
+            bookingWorkflow
+                ?.goTo(3);
         }
 
         const isFemalePatient = @json($isFemalePatient);
@@ -524,29 +887,29 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                         input
                             .nextElementSibling
                             ?.textContent
-                            ?.trim()
-                        || input.value
+                            ?.trim() ||
+                        input.value
                 );
 
 
             const diseaseTags =
-                diseaseLabels.length
-                    ? `
+                diseaseLabels.length ?
+                    `
             <div class="booking-summary-tag-list">
 
                 ${diseaseLabels
                         .map(
                             label => `
-                            <span class="booking-summary-tag">
-                                ${label}
-                            </span>
-                        `
+                                                                        <span class="booking-summary-tag">
+                                                                            ${label}
+                                                                        </span>
+                                                                    `
                         )
                         .join('')}
 
             </div>
-        `
-                    : `
+        ` :
+                    `
             <span class="booking-summary-muted">
                 None selected
             </span>
@@ -558,9 +921,9 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             ) => {
                 const resolvedValue =
                     value &&
-                        String(value).trim() !== ''
-                        ? value
-                        : `
+                        String(value).trim() !== '' ?
+                        value :
+                        `
                 <span class="booking-summary-muted">
                     N/A
                 </span>
@@ -603,16 +966,31 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             const summaryCard = (
                 title,
                 icon,
-                body
+                body,
+                viewOnly = false
             ) => `
     <section class="booking-summary-card">
 
-        <div class="booking-summary-card-header">
-            <i class="fa-solid ${icon}"></i>
+        <div class="booking-summary-card-header flex items-center">
 
-            <span>
-                ${title}
+            <div class="flex items-center gap-2">
+                <i class="fa-solid ${icon}"></i>
+
+                <span>
+                    ${title}
+                </span>
+            </div>
+
+            ${viewOnly
+                    ? `
+            <span class="booking-summary-view-only ml-auto">
+                <i class="fa-regular fa-eye"></i>
+                <span>View Only</span>
             </span>
+        `
+                    : ''
+                }
+
         </div>
 
         <div class="booking-summary-card-body">
@@ -670,78 +1048,78 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
             const dentalHistoryBody = `
             ${subSection("Basic Info", `
-                        ${row("Last Dental Visit", get("last_dental_visit"))}
-                        ${row("Previous Dentist", get("previous_dentist"))}
-                    `)}
+                                                                    ${row("Last Dental Visit", get("last_dental_visit"))}
+                                                                    ${row("Previous Dentist", get("previous_dentist"))}
+                                                                `)}
 
             ${subSection("Dental Symptoms", `
-                        ${row("Bleeding Gums", get("dental_answers[bleeding_gums]"))}
-                        ${row("Sensitive (Hot/Cold)", get("dental_answers[sensitive_temp]"))}
-                        ${row("Sensitive (Sweets/Sour)", get("dental_answers[sensitive_taste]"))}
-                        ${row("Tooth Pain", get("dental_answers[tooth_pain]"))}
-                        ${row("Sores/Lumps", get("dental_answers[sores]"))}
-                        ${row("Jaw Injuries", get("dental_answers[injuries]"))}
-                    `)}
+                                                                    ${row("Bleeding Gums", get("dental_answers[bleeding_gums]"))}
+                                                                    ${row("Sensitive (Hot/Cold)", get("dental_answers[sensitive_temp]"))}
+                                                                    ${row("Sensitive (Sweets/Sour)", get("dental_answers[sensitive_taste]"))}
+                                                                    ${row("Tooth Pain", get("dental_answers[tooth_pain]"))}
+                                                                    ${row("Sores/Lumps", get("dental_answers[sores]"))}
+                                                                    ${row("Jaw Injuries", get("dental_answers[injuries]"))}
+                                                                `)}
 
             ${subSection("Jaw & Bite Symptoms", `
-                        ${row("Clicking", get("dental_answers[clicking]"))}
-                        ${row("Joint Pain", get("dental_answers[joint_pain]"))}
-                        ${row("Difficulty Moving", get("dental_answers[difficulty_moving]"))}
-                        ${row("Difficulty Chewing", get("dental_answers[difficulty_chewing]"))}
-                        ${row("Frequent Headaches", get("dental_answers[jaw_headaches]"))}
-                        ${row("Grinding/Clenching", get("dental_answers[clench_grind]"))}
-                        ${row("Lips/Cheek Biting", get("dental_answers[biting]"))}
-                        ${row("Teeth Loosening", get("dental_answers[teeth_loosening]"))}
-                        ${row("Food Caught Between Teeth", get("dental_answers[food_teeth]"))}
-                        ${row("Medicine Reaction", get("dental_answers[med_reaction]"))}
-                    `)}
+                                                                    ${row("Clicking", get("dental_answers[clicking]"))}
+                                                                    ${row("Joint Pain", get("dental_answers[joint_pain]"))}
+                                                                    ${row("Difficulty Moving", get("dental_answers[difficulty_moving]"))}
+                                                                    ${row("Difficulty Chewing", get("dental_answers[difficulty_chewing]"))}
+                                                                    ${row("Frequent Headaches", get("dental_answers[jaw_headaches]"))}
+                                                                    ${row("Grinding/Clenching", get("dental_answers[clench_grind]"))}
+                                                                    ${row("Lips/Cheek Biting", get("dental_answers[biting]"))}
+                                                                    ${row("Teeth Loosening", get("dental_answers[teeth_loosening]"))}
+                                                                    ${row("Food Caught Between Teeth", get("dental_answers[food_teeth]"))}
+                                                                    ${row("Medicine Reaction", get("dental_answers[med_reaction]"))}
+                                                                `)}
 
             ${subSection("Dental Procedures", `
-                        ${row("Periodontal Treatment", get("dental_answers[periodontal]"))}
-                        ${row("Difficult Extraction", get("dental_answers[difficult_extraction]"))}
-                        ${get("dental_answers[difficult_extraction]") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
-                        ${row("Prolonged Bleeding", get("dental_answers[prolonged_bleeding]"))}
-                        ${row("Dentures", get("dental_answers[dentures]"))}
-                        ${get("dental_answers[dentures]") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
-                        ${row("Orthodontic Treatment", get("dental_answers[ortho_treatment]"))}
-                        ${get("dental_answers[ortho_treatment]") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
-                    `)}
+                                                                    ${row("Periodontal Treatment", get("dental_answers[periodontal]"))}
+                                                                    ${row("Difficult Extraction", get("dental_answers[difficult_extraction]"))}
+                                                                    ${get("dental_answers[difficult_extraction]") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
+                                                                    ${row("Prolonged Bleeding", get("dental_answers[prolonged_bleeding]"))}
+                                                                    ${row("Dentures", get("dental_answers[dentures]"))}
+                                                                    ${get("dental_answers[dentures]") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
+                                                                    ${row("Orthodontic Treatment", get("dental_answers[ortho_treatment]"))}
+                                                                    ${get("dental_answers[ortho_treatment]") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
+                                                                `)}
 
             ${fullWidthSection("Additional Concerns", `
-                        ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
+                                                                    ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
                     ? get("additional_concerns")
                     : '<span class="text-[#9e9690] italic">No additional concerns provided.</span>'}
-                    `)}
+                                                                `)}
         `;
 
             const medicalHistoryBody = `
             ${subSection("General Health", `
-                        ${row("Good Health", get("medical_answers[good_health]"))}
-                        ${get("medical_answers[good_health]") === "NO" ? row("Health Details", get("medical_answers[good_health_details]")) : ""}
-                        ${row("Had Medical Exam", get("medical_answers[had_medical_exam]"))}
-                        ${get("medical_answers[had_medical_exam]") === "YES" ? row("Medical Exam Date", get("medical_answers[medical_exam_date]")) : ""}
-                        ${row("Under Treatment", get("medical_answers[under_treatment]"))}
-                        ${get("medical_answers[under_treatment]") === "YES" ? row("Treatment Details", get("medical_answers[treatment_details]")) : ""}
-                        ${row("Hospitalized", get("medical_answers[hospitalized]"))}
-                        ${get("medical_answers[hospitalized]") === "YES" ? row("Hospital Details", get("medical_answers[hospital_details]")) : ""}
-                    `)}
+                                                                    ${row("Good Health", get("medical_answers[good_health]"))}
+                                                                    ${get("medical_answers[good_health]") === "NO" ? row("Health Details", get("medical_answers[good_health_details]")) : ""}
+                                                                    ${row("Had Medical Exam", get("medical_answers[had_medical_exam]"))}
+                                                                    ${get("medical_answers[had_medical_exam]") === "YES" ? row("Medical Exam Date", get("medical_answers[medical_exam_date]")) : ""}
+                                                                    ${row("Under Treatment", get("medical_answers[under_treatment]"))}
+                                                                    ${get("medical_answers[under_treatment]") === "YES" ? row("Treatment Details", get("medical_answers[treatment_details]")) : ""}
+                                                                    ${row("Hospitalized", get("medical_answers[hospitalized]"))}
+                                                                    ${get("medical_answers[hospitalized]") === "YES" ? row("Hospital Details", get("medical_answers[hospital_details]")) : ""}
+                                                                `)}
 
             ${subSection("Allergies", `
-                        ${row("Allergy (Medicine)", get("medical_answers[allergy_medicine]"))}
-                        ${row("Allergy (Food)", get("medical_answers[allergy_food]"))}
-                        ${optionalRow("Allergy (Others)", get("medical_answers[allergy_others]"))}
-                    `)}
+                                                                    ${row("Allergy (Medicine)", get("medical_answers[allergy_medicine]"))}
+                                                                    ${row("Allergy (Food)", get("medical_answers[allergy_food]"))}
+                                                                    ${optionalRow("Allergy (Others)", get("medical_answers[allergy_others]"))}
+                                                                `)}
 
             ${subSection("Medications", `
-                        ${row("Medication", get("medical_answers[medication]"))}
-                        ${get("medical_answers[medication]") === "YES" ? row("Medication Details", get("medical_answers[medication_details]")) : ""}
-                    `)}
+                                                                    ${row("Medication", get("medical_answers[medication]"))}
+                                                                    ${get("medical_answers[medication]") === "YES" ? row("Medication Details", get("medical_answers[medication_details]")) : ""}
+                                                                `)}
 
             ${isFemalePatient ? subSection("For Women Only", `
-                        ${row("Pregnant", get("medical_answers[pregnant]"))}
-                        ${row("Nursing", get("medical_answers[nursing]"))}
-                        ${row("Birth Control Pills", get("medical_answers[birth_control]"))}
-                    `) : ""}
+                                                                    ${row("Pregnant", get("medical_answers[pregnant]"))}
+                                                                    ${row("Nursing", get("medical_answers[nursing]"))}
+                                                                    ${row("Birth Control Pills", get("medical_answers[birth_control]"))}
+                                                                `) : ""}
 
             ${fullWidthSection(
                 "Medical Conditions",
@@ -749,38 +1127,115 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             )}
 
             ${subSection("Tobacco Use", `
-                        ${row("Tobacco Use", get("medical_answers[tobacco_use]"))}
-                        ${get("medical_answers[tobacco_use]") === "YES" ? row("Amount Per Day", get("medical_answers[tobacco_per_day]")) : ""}
-                        ${get("medical_answers[tobacco_use]") === "YES" ? row("Amount Per Week", get("medical_answers[tobacco_per_week]")) : ""}
-                    `)}
+                                                                    ${row("Tobacco Use", get("medical_answers[tobacco_use]"))}
+                                                                    ${get("medical_answers[tobacco_use]") === "YES" ? row("Amount Per Day", get("medical_answers[tobacco_per_day]")) : ""}
+                                                                    ${get("medical_answers[tobacco_use]") === "YES" ? row("Amount Per Week", get("medical_answers[tobacco_per_week]")) : ""}
+                                                                `)}
 
             ${subSection("Do You Suffer From", `
-                        ${row("Headaches", get("medical_answers[headaches]"))}
-                        ${row("Earaches", get("medical_answers[earaches]"))}
-                        ${row("Neck Aches", get("medical_answers[neck_aches]"))}
-                    `)}
+                                                                    ${row("Headaches", get("medical_answers[headaches]"))}
+                                                                    ${row("Earaches", get("medical_answers[earaches]"))}
+                                                                    ${row("Neck Aches", get("medical_answers[neck_aches]"))}
+                                                                `)}
+        `;
+
+            const hasExistingSignature =
+                @json($hasReusableSignature ?? false);
+
+            const existingSignatureUrl =
+                @json($existingSignatureUrl ?? null);
+
+            const signatureBody =
+                hasExistingSignature &&
+                    existingSignatureUrl
+                    ? `
+            <div class="signature-existing-card">
+
+                <div class="signature-existing-header">
+                    <i class="fa-solid fa-circle-check"></i>
+
+                    <div>
+                        <p class="signature-existing-title">
+                            Existing signature on file
+                        </p>
+                    </div>
+                </div>
+
+                <div class="signature-existing-preview">
+                    <img
+                        src="${existingSignatureUrl}"
+                        alt="Existing signature"
+                    >
+                </div>
+
+                <p class="signature-existing-help">
+                    The patient's previously saved signature is shown for reference and cannot be edited here.
+                </p>
+
+            </div>
+        `
+                    : `
+            <span class="booking-summary-muted">
+                No existing signature on file.
+            </span>
         `;
 
             reviewGrid.innerHTML = `
             ${summaryCard("Appointment Details", "fa-calendar-check", `
-                        <div class="grid grid-cols-1 gap-y-1">
-                            ${row("Service", get("service_type"))}
-                            ${row("Date", get("appointment_date"))}
-                            ${row("Time", toDisplayTime(get("appointment_time")) || 'N/A')}
-                            ${row("Duration", get("procedure_duration_hms"))}
-                        </div>
-                    `)}
-            ${summaryCard("Dental History", "fa-tooth", dentalHistoryBody)}
-            ${summaryCard("Medical History", "fa-heart-pulse", medicalHistoryBody)}
+                                                                    <div class="grid grid-cols-1 gap-y-1">
+                                                                        ${row("Service", get("service_type"))}
+                                                                        ${row("Date", get("appointment_date"))}
+                                                                        ${row("Time", toDisplayTime(get("appointment_time")) || 'N/A')}
+                                                                        ${row("Duration", get("procedure_duration_hms"))}
+                                                                    </div>
+                                                                `)}
+          ${summaryCard(
+                "Dental History",
+                "fa-tooth",
+                dentalHistoryBody,
+                true
+            )}
+
+${summaryCard(
+                "Medical History",
+                "fa-heart-pulse",
+                medicalHistoryBody,
+                true
+            )}
+
             <div class="grid grid-cols-2 gap-4 sm-grid-1col">
-                ${summaryCard("Emergency Contact", "fa-phone", `
-                            <div class="grid grid-cols-1 gap-y-1">
-                                ${row("Name", get("emergency_person"))}
-                                ${row("Number", get("emergency_number"))}
-                                ${row("Relation", get("emergency_relation"))}
-                            </div>
-                        `)}
+
+    ${summaryCard(
+                "Emergency Contact",
+                "fa-phone",
+                `
+            <div class="grid grid-cols-1 gap-y-1">
+                ${row(
+                    "Name",
+                    get("emergency_person")
+                )}
+
+                ${row(
+                    "Number",
+                    get("emergency_number")
+                )}
+
+                ${row(
+                    "Relation",
+                    get("emergency_relation")
+                )}
             </div>
+        `
+            )}
+
+    ${summaryCard(
+                "Signature",
+                "fa-signature",
+                signatureBody,
+                true
+            )}
+
+</div>
         `;
 
             document.querySelectorAll(".sm-grid-1col").forEach(el => {
@@ -1110,6 +1565,255 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             return true;
         }
 
+        function setExistingAppointmentLoading(
+            loading
+        ) {
+            if (!workflowNextBtn) {
+                return;
+            }
+
+            workflowNextBtn.disabled =
+                loading;
+
+            if (loading) {
+                workflowNextBtn.innerHTML = `
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>Saving Appointment...</span>
+        `;
+
+                return;
+            }
+
+            bookingWorkflow
+                ?.setNextButton({
+                    label:
+                        'Continue to Odontogram',
+
+                    icon:
+                        'fa-arrow-right',
+                });
+        }
+
+        async function submitExistingAppointment() {
+            if (
+                !existingAppointmentForm ||
+                existingAppointmentSubmitRunning
+            ) {
+                return;
+            }
+
+            existingAppointmentSubmitRunning =
+                true;
+
+            setExistingAppointmentLoading(
+                true
+            );
+
+            try {
+                const response =
+                    await fetch(
+                        existingAppointmentForm.action,
+                        {
+                            method: 'POST',
+
+                            headers: {
+                                Accept:
+                                    'application/json',
+
+                                'X-Requested-With':
+                                    'XMLHttpRequest',
+                            },
+
+                            body:
+                                new FormData(
+                                    existingAppointmentForm
+                                ),
+                        }
+                    );
+
+                const data =
+                    await response
+                        .json()
+                        .catch(
+                            () => ({})
+                        );
+
+                if (!response.ok) {
+                    if (
+                        response.status === 422 &&
+                        data?.errors
+                    ) {
+                        const firstMessage =
+                            Object.values(
+                                data.errors
+                            )
+                                .flat()
+                                .find(
+                                    Boolean
+                                );
+
+                        throw new Error(
+                            firstMessage ||
+                            'Please check the appointment information.'
+                        );
+                    }
+
+                    throw new Error(
+                        data?.message ||
+                        'Unable to save the existing appointment.'
+                    );
+                }
+
+                window.DiscardChanges
+                    ?.markSubmitting(
+                        existingAppointmentForm
+                    );
+
+                const appointment =
+                    data?.appointment || {};
+
+                if (existingConfirmMessage) {
+                    existingConfirmMessage.innerHTML = `
+        <div class="confirmed-modal-schedule-grid">
+
+            <div class="confirmed-modal-schedule-item">
+                <div class="confirmed-modal-schedule-icon">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div>
+                    <span class="confirmed-modal-schedule-label">
+                        Patient
+                    </span>
+
+                    <strong class="confirmed-modal-schedule-value">
+                        ${appointment.patient || 'N/A'}
+                    </strong>
+                </div>
+            </div>
+
+            <div class="confirmed-modal-schedule-item">
+                <div class="confirmed-modal-schedule-icon">
+                    <i class="fa-solid fa-tooth"></i>
+                </div>
+
+                <div>
+                    <span class="confirmed-modal-schedule-label">
+                        Service
+                    </span>
+
+                    <strong class="confirmed-modal-schedule-value">
+                        ${appointment.service || 'N/A'}
+                    </strong>
+                </div>
+            </div>
+
+            <div class="confirmed-modal-schedule-item">
+                <div class="confirmed-modal-schedule-icon">
+                    <i class="fa-regular fa-calendar"></i>
+                </div>
+
+                <div>
+                    <span class="confirmed-modal-schedule-label">
+                        Date & Time
+                    </span>
+
+                    <strong class="confirmed-modal-schedule-value">
+                        ${appointment.date || 'N/A'}
+                        ·
+                        ${appointment.time || 'N/A'}
+                    </strong>
+                </div>
+            </div>
+
+            <div class="confirmed-modal-schedule-item">
+                <div class="confirmed-modal-schedule-icon">
+                    <i class="fa-solid fa-stopwatch"></i>
+                </div>
+
+                <div>
+                    <span class="confirmed-modal-schedule-label">
+                        Procedure Duration
+                    </span>
+
+                    <strong class="confirmed-modal-schedule-value">
+                        ${appointment.duration || 'N/A'}
+                    </strong>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="confirmed-modal-schedule-note">
+            <i class="fa-solid fa-circle-info"></i>
+
+            <span>
+                The appointment details are saved.
+                Continue to the odontogram to encode the completed treatment.
+            </span>
+        </div>
+    `;
+                }
+
+                if (
+                    continueToOdontogramBtn
+                ) {
+                    continueToOdontogramBtn
+                        .dataset
+                        .odontogramUrl =
+                        data?.odontogram_url ||
+                        '';
+                }
+
+                window.openModal?.(
+                    'existingAppointmentConfirmModal'
+                );
+
+            } catch (error) {
+                window.showToast?.({
+                    type: 'error',
+
+                    title:
+                        'Unable to save appointment',
+
+                    message:
+                        error.message ||
+                        'Please try again.',
+                });
+
+            } finally {
+                existingAppointmentSubmitRunning =
+                    false;
+
+                setExistingAppointmentLoading(
+                    false
+                );
+            }
+        }
+
+        continueToOdontogramBtn
+            ?.addEventListener(
+                'click',
+                () => {
+                    const odontogramUrl =
+                        continueToOdontogramBtn
+                            .dataset
+                            .odontogramUrl;
+
+                    if (!odontogramUrl) {
+                        return;
+                    }
+
+                    window.closeModal?.(
+                        'existingAppointmentConfirmModal'
+                    );
+
+                    window.location.assign(
+                        odontogramUrl
+                    );
+                }
+            );
+
         bookingWorkflow =
             window.BookingWorkflow?.create({
                 panels: '#existingAppointmentForm > .step-content',
@@ -1134,13 +1838,109 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                         return false;
                     }
 
+
+                    if (
+                        hasExistingBookingInformation &&
+                        currentStep === 4 &&
+                        !editingHistoryFromReview
+                    ) {
+                        bookingWorkflow
+                            .goTo(1);
+
+                        return false;
+                    }
+
                     return true;
                 },
 
                 beforeNext: currentStep => {
-                    return validateCurrentStep(
-                        currentStep
-                    );
+                    const isValid =
+                        validateCurrentStep(
+                            currentStep
+                        );
+
+                    if (!isValid) {
+                        return false;
+                    }
+
+                    if (
+                        hasExistingBookingInformation &&
+                        currentStep === 1 &&
+                        !editingHistoryFromReview
+                    ) {
+                        bookingWorkflow
+                            .markComplete(1);
+
+                        bookingWorkflow
+                            .markComplete(2);
+
+                        bookingWorkflow
+                            .markComplete(3);
+
+                        bookingWorkflow
+                            .goTo(4);
+
+                        return false;
+                    }
+
+                    if (
+                        editingHistoryFromReview ===
+                        'dental' &&
+                        currentStep === 2
+                    ) {
+                        clearTimeout(
+                            historyAutosaveTimer
+                        );
+
+                        autosavePatientHistory();
+
+                        bookingWorkflow
+                            .markComplete(2);
+
+                        editingHistoryFromReview =
+                            null;
+
+                        bookingWorkflow
+                            .goTo(4);
+
+                        return false;
+                    }
+
+                    if (
+                        editingHistoryFromReview ===
+                        'medical' &&
+                        currentStep === 3
+                    ) {
+                        clearTimeout(
+                            historyAutosaveTimer
+                        );
+
+                        autosavePatientHistory();
+
+                        bookingWorkflow
+                            .markComplete(3);
+
+                        editingHistoryFromReview =
+                            null;
+
+                        bookingWorkflow
+                            .goTo(4);
+
+                        return false;
+                    }
+
+                    if (
+                        currentStep === 2 ||
+                        currentStep === 3
+                    ) {
+                        clearTimeout(
+                            historyAutosaveTimer
+                        );
+
+                        autosavePatientHistory();
+                    }
+
+                    return true;
                 },
 
                 onLastStep: () => {
@@ -1170,13 +1970,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                         return false;
                     }
 
-                    window.DiscardChanges
-                        ?.markSubmitting(
-                            existingAppointmentForm
-                        );
-
-                    existingAppointmentForm
-                        ?.requestSubmit();
+                    submitExistingAppointment();
 
                     return true;
                 },
@@ -1204,6 +1998,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         });
 
         syncTimeFieldFromState();
+        showExistingPatientInformationToast();
     });
 </script>
 @endsection

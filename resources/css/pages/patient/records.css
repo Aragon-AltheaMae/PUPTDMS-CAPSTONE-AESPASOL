@@ -87,17 +87,17 @@
 .record-modal-content {
     min-height: 58px;
     padding: 14px 15px;
-
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 15px;
-
     color: var(--text-2);
     font-size: 13px;
     font-weight: 600;
     line-height: 1.55;
-
-    white-space: pre-wrap;
     overflow-wrap: anywhere;
 }
 
@@ -578,16 +578,16 @@ body.role-patient #mainContent.patient-records-page .records-hero .hero-sub {
     scrollbar-gutter: stable;
 }
 
-.document-history-list > .global-record-card {
+.document-history-list>.global-record-card {
     width: calc(100% - 4rem);
     justify-self: center;
 }
 
-.document-history-list > .global-record-card .global-record-subline {
+.document-history-list>.global-record-card .global-record-subline {
     margin-top: 4px;
 }
 
-.document-history-list > .global-record-card .global-info-pill {
+.document-history-list>.global-record-card .global-info-pill {
     min-height: 20px;
     padding: 2px 7px;
     font-size: 9px;
@@ -734,7 +734,7 @@ body.role-patient #mainContent.patient-records-page .records-hero .hero-sub {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .document-history-list > .global-record-card {
+    .document-history-list>.global-record-card {
         width: calc(100% - 2rem);
     }
 }
@@ -745,8 +745,7 @@ body.role-patient #mainContent.patient-records-page .records-hero .hero-sub {
         padding: 1.5rem 1.25rem 2.25rem;
     }
 
-    body.role-patient #mainContent.patient-records-page
-    .records-hero .hero-title {
+    body.role-patient #mainContent.patient-records-page .records-hero .hero-title {
         font-size: 1.5rem;
     }
 
@@ -782,7 +781,7 @@ body.role-patient #mainContent.patient-records-page .records-hero .hero-sub {
         overflow-x: hidden;
     }
 
-    .document-history-list > .global-record-card {
+    .document-history-list>.global-record-card {
         width: calc(100% - 1rem);
     }
 
@@ -806,14 +805,12 @@ body.role-patient #mainContent.patient-records-page .records-hero .hero-sub {
         border-radius: 1rem;
     }
 
-    body.role-patient #mainContent.patient-records-page
-    .records-hero .hero-title {
+    body.role-patient #mainContent.patient-records-page .records-hero .hero-title {
         font-size: clamp(1.15rem, 6vw, 1.4rem);
         line-height: 1.15;
     }
 
-    body.role-patient #mainContent.patient-records-page
-    .records-hero .hero-sub {
+    body.role-patient #mainContent.patient-records-page .records-hero .hero-sub {
         font-size: .75rem;
         line-height: 1.4;
     }
@@ -908,7 +905,7 @@ body.role-patient #mainContent.patient-records-page .records-hero .hero-sub {
         scrollbar-gutter: stable;
     }
 
-    .document-history-list > .global-record-card {
+    .document-history-list>.global-record-card {
         width: 100%;
         justify-self: stretch;
     }

@@ -10,6 +10,7 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/css/pages/auth/login.css',
                 'resources/css/pages/auth/backup-login.css',
+                'resources/css/pages/admin/dentist-continuity.css',
             ],
             refresh: true,
         }),

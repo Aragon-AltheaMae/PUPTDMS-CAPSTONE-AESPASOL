@@ -11,6 +11,23 @@ class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;
 
+    public const CLINICAL_PERMISSION_SLUGS = [
+        'access_dentist_dashboard',
+        'manage_appointments',
+        'manage_patient_profiles',
+        'manage_document_requests',
+        'manage_inventory',
+        'manage_reports',
+        'manage_dental_records',
+        'view_dentist_transitions',
+        'create_dentist_transitions',
+        'update_dentist_transitions',
+        'assign_dentist_successors',
+        'finalize_dentist_transitions',
+        'cancel_dentist_transitions',
+        'extend_dentist_access',
+    ];
+
     protected $fillable = [
         'name',
         'first_name',
@@ -117,6 +134,44 @@ class User extends Authenticatable implements JWTSubject
         }
 
         return $this->role->permissions()->where('slug', $permissionSlug)->exists();
+    }
+
+    public function hasAnyClinicalPermission(): bool
+    {
+        if (!$this->role) {
+            return false;
+        }
+
+        return $this->role->permissions()
+            ->whereIn('slug', self::CLINICAL_PERMISSION_SLUGS)
+            ->exists();
+    }
+
+    public function canAccessClinicalArea(?string $activeRoleSlug = null): bool
+    {
+        $normalizedRole = strtolower(trim((string) $activeRoleSlug));
+
+        if (in_array($normalizedRole, ['admin', 'patient'], true)) {
+            return false;
+        }
+
+        if (in_array($normalizedRole, ['super_admin', 'dentist'], true)) {
+            return true;
+        }
+
+        return $this->hasAnyClinicalPermission();
+    }
+
+    public function currentRoleNotifications()
+    {
+        $currentRole = optional($this->role)->slug;
+
+        return $this->notifications()->where(function ($query) use ($currentRole) {
+            $query->where('data->recipient_role', $currentRole)
+                  ->orWhere('data->recipient_role', 'like', '%,' . $currentRole . ',%')
+                  ->orWhere('data->recipient_role', 'like', $currentRole . ',%')
+                  ->orWhere('data->recipient_role', 'like', '%,' . $currentRole);
+        });
     }
 
     /*

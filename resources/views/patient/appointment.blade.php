@@ -8,18 +8,123 @@
 
 @php
 $calendarAppointments = [];
+
 foreach (
 collect($appointments ?? [])->filter(function ($appt) {
 $status = strtolower($appt->status ?? '');
-return !in_array($status, ['completed', 'cancelled']);
+
+return !in_array(
+$status,
+['completed', 'cancelled']
+);
 })
 as $appt
 ) {
-$calendarAppointments[\Carbon\Carbon::parse($appt->appointment_date)->format('Y-m-d')] =
+if (empty($appt->appointment_date)) {
+continue;
+}
+
+$calendarAppointments[
+\Carbon\Carbon::parse(
+$appt->appointment_date
+)->format('Y-m-d')
+] =
 'My Appointment: ' .
-$appt->service_type .
+($appt->service_type ?? 'Dental Appointment') .
 ' • ' .
-\Carbon\Carbon::parse($appt->appointment_time)->format('g:i A');
+(
+!empty($appt->appointment_time)
+? \Carbon\Carbon::parse(
+$appt->appointment_time
+)->format('g:i A')
+: 'Time not recorded'
+);
+}
+
+$completedCalendarAppointments = [];
+
+foreach (
+collect($pastVisits ?? [])->filter(function ($appt) {
+return strtolower(
+trim((string) ($appt->status ?? ''))
+) === 'completed';
+})
+as $appt
+) {
+if (empty($appt->appointment_date)) {
+continue;
+}
+
+$dateKey = \Carbon\Carbon::parse(
+$appt->appointment_date
+)->format('Y-m-d');
+
+$completedCalendarAppointments[$dateKey] ??= [];
+
+$completedCalendarAppointments[$dateKey][] = [
+'service' =>
+$appt->service_type
+?? 'Dental Appointment',
+
+'time' =>
+!empty($appt->appointment_time)
+? \Carbon\Carbon::parse(
+$appt->appointment_time
+)->format('g:i A')
+: 'Time not recorded',
+
+'status' => 'completed',
+
+'dentist' =>
+$appt->dentist_name
+?? (
+optional($appt->dentist)->name
+?? optional($clinicDentist)->name
+?? 'Assigned Dentist'
+),
+
+'duration' =>
+$appt->procedure?->procedure_duration_seconds
+? \Carbon\CarbonInterval::seconds(
+(int) $appt->procedure->procedure_duration_seconds
+)
+->cascade()
+->forHumans([
+'short' => true,
+'minimumUnit' => 'second',
+])
+: (
+$appt->duration
+?? $appt->procedure_duration
+?? $appt->treatment_duration
+?? null
+),
+
+'remarks' =>
+$appt->procedure?->completion_action
+? \Illuminate\Support\Str::of(
+$appt->procedure->completion_action
+)
+->replace('_', ' ')
+->title()
+->toString()
+: ($appt->remarks ?? null),
+
+'oral' =>
+$appt->procedure?->oral_examination
+?? $appt->oral_examination
+?? null,
+
+'diagnosis' =>
+$appt->procedure?->diagnosis
+?? $appt->diagnosis
+?? null,
+
+'prescription' =>
+$appt->procedure?->prescriptions
+?? $appt->prescription
+?? null,
+];
 }
 @endphp
 
@@ -66,8 +171,17 @@ $appt->service_type .
 
         $nextRecommendedText = $nextRecommendedDate->format('M d, Y');
         $daysUntilRecommended = \Carbon\Carbon::today()->diffInDays($nextRecommendedDate->copy()->startOfDay(), false);
-        $recommendedHint = $daysUntilRecommended < 0 ? 'Due now' : ($daysUntilRecommended===0 ? 'Due today' : 'In ' .
-            $daysUntilRecommended . ' days' ); @endphp <section class="appt-section-reveal mb-5">
+        $recommendedHint =
+            $daysUntilRecommended < 0
+                ? 'Due now'
+                : (
+                    $daysUntilRecommended === 0
+                        ? 'Due today'
+                        : 'In ' . $daysUntilRecommended . ' days'
+                );
+        @endphp
+
+        <section class="appt-section-reveal mb-5">
             <div class="appt-summary-grid">
                 <div class="appt-summary-card">
                     <div class="flex items-center gap-4">
@@ -131,9 +245,9 @@ $appt->service_type .
                     </div>
                 </div>
 
-                <button type="button" class="appt-secondary-btn" onclick="handleScheduleCheckup()">
+                <button type="button" class="ui-btn ui-btn-secondary" onclick="handleScheduleCheckup()">
                     <i class="fa-solid fa-calendar-plus"></i>
-                    Schedule Check-Up
+                    <span>Schedule Check-Up</span>
                 </button>
             </div>
             </section>
@@ -153,16 +267,27 @@ $appt->service_type .
                                     your appointment history.</p>
 
                                 <div class="mt-4 space-y-2.5">
-                                    <div class="appt-calendar-side-stat flex items-center justify-between">
-                                        <span
-                                            class="text-xs font-bold uppercase tracking-[0.1em] text-gray-500 dark:text-gray-400">Most
-                                            Visited Service</span>
-                                        <span class="text-sm font-extrabold text-emerald-700 dark:text-emerald-300">{{
-                                            $mostVisitedCount > 0 ? $mostVisitedCount . 'x' : '—' }}</span>
+                                    <div class="appt-calendar-side-stat appt-highlight-service">
+                                        <div class="appt-highlight-service-copy">
+                                            <span class="appt-highlight-label">
+                                                Most Visited Service
+                                            </span>
+
+                                            <strong class="appt-highlight-service-name">
+                                                {{ $mostVisitedCount > 0
+                                                ? $mostVisitedService
+                                                : 'No visits recorded yet' }}
+                                            </strong>
+                                        </div>
+
+                                        <span class="status-pill status-completed appt-highlight-count">
+                                            <span class="status-dot"></span>
+
+                                            {{ $mostVisitedCount > 0
+                                            ? $mostVisitedCount . 'x'
+                                            : '—' }}
+                                        </span>
                                     </div>
-                                    <p
-                                        class="px-1 -mt-1 text-xs font-semibold text-gray-700 dark:text-gray-200 truncate">
-                                        {{ $mostVisitedService }}</p>
 
                                     <div class="appt-calendar-side-stat flex items-center justify-between">
                                         <span
@@ -213,152 +338,98 @@ $appt->service_type .
                 </div>
 
                 <div class="appt-quick-actions">
-                    <a href="{{ route('patient.book.appointment') }}" class="appt-quick-btn">
+                    <a href="{{ route('patient.book.appointment') }}" class="ui-btn ui-btn-secondary ui-btn-block">
                         <i class="fa-solid fa-calendar-plus"></i>
-                        Rebook Appointment
+                        <span>Rebook Appointment</span>
                     </a>
-                    <button type="button" class="appt-quick-btn"
+
+                    <button type="button" class="ui-btn ui-btn-secondary ui-btn-block"
                         onclick="apptShowPast(); document.getElementById('apptPastPanel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });">
                         <i class="fa-solid fa-clock-rotate-left"></i>
-                        View Past Visits
+                        <span>View Past Visits</span>
                     </button>
-                    <button type="button" class="appt-quick-btn" onclick="scrollToAppointmentCalendar()">
+
+                    <button type="button" class="ui-btn ui-btn-secondary ui-btn-block"
+                        onclick="scrollToAppointmentCalendar()">
                         <i class="fa-solid fa-calendar-days"></i>
-                        Focus Calendar
+                        <span>Focus Calendar</span>
                     </button>
                 </div>
             </section>
 
-            <section class="fade-up mb-8 sm:mb-10">
-
-                <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
-                    <div>
-                        <h2
-                            class="text-2xl sm:text-3xl font-extrabold text-[#660000] dark:text-[#ff6b6b] leading-tight">
-                            My
-                            Appointments</h2>
-                        <p class="text-sm text-gray-500 mt-1">
-                            You have {{ $futureVisits->count() }} upcoming
-                            {{ $futureVisits->count() === 1 ? 'visit' : 'visits' }} scheduled
-                        </p>
-                    </div>
-                </div>
+            <section class="appt-appointments-section">
 
                 @php
                 $futureCount = $futureVisits->count();
                 $pastCount = $pastVisits->count();
                 @endphp
 
-                <div
-                    class="flex flex-row bg-white dark:bg-[#07111f] rounded-xl p-1 shadow-sm border border-gray-200 dark:border-[#1f2d3d] mb-6 w-full md:w-max">
-                    <button
-                        class="appt-tab appt-active flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-[13px] font-bold rounded-lg text-gray-500 transition-all"
-                        id="apptFutureTab" onclick="apptShowFuture()">
+                <div class="appt-list-toolbar">
 
-                        Future Visits
+                    <div class="appt-list-heading">
+                        <div class="appt-list-heading-icon">
+                            <i class="fa-regular fa-calendar-check"></i>
+                        </div>
 
-                        <span class="status-pill s-upcoming appt-count">
-                            <span class="status-dot"></span>
-                            {{ $futureCount }}
-                        </span>
-                    </button>
-                    <button
-                        class="appt-tab flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 text-[13px] font-bold rounded-lg text-gray-500 transition-all"
-                        id="apptPastTab" onclick="apptShowPast()">
+                        <div class="appt-list-heading-copy">
+                            <h2>My Appointments</h2>
 
-                        Past Visits
+                            <p>
+                                You have {{ $futureVisits->count() }} upcoming
+                                {{ $futureVisits->count() === 1 ? 'visit' : 'visits' }} scheduled
+                            </p>
+                        </div>
+                    </div>
 
-                        <span class="status-pill s-ended appt-count">
-                            <span class="status-dot"></span>
-                            {{ $pastCount }}
-                        </span>
-                    </button>
+                    <div class="appt-list-tabs" id="apptListTabs">
+
+                        <button type="button" class="appt-tab appt-active" id="apptFutureTab"
+                            onclick="apptShowFuture()">
+                            <i class="fa-regular fa-calendar"></i>
+
+                            <span>Future Visits</span>
+
+                            <span class="status-pill s-upcoming appt-count">
+                                <span class="status-dot"></span>
+                                {{ $futureCount }}
+                            </span>
+                        </button>
+
+                        <button type="button" class="appt-tab" id="apptPastTab" onclick="apptShowPast()">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+
+                            <span>Past Visits</span>
+
+                            <span class="status-pill s-ended appt-count">
+                                <span class="status-dot"></span>
+                                {{ $pastCount }}
+                            </span>
+                        </button>
+
+                    </div>
+
                 </div>
 
                 <div id="apptFuturePanel">
                     @if ($futureVisits->count())
-                    <div
-                        class="text-xs font-bold tracking-[0.12em] uppercase text-gray-400 mb-4 flex items-center gap-3">
-                        Upcoming <div class="h-px flex-1 bg-gray-200 dark:bg-gray-800"></div>
+                    <div class="appt-list-divider">
+                        <span>Upcoming</span>
+                        <span class="appt-list-divider-line"></span>
                     </div>
 
-                    @foreach ($futureVisits as $index => $appt)
-                    @php
-                    $apptDate = \Carbon\Carbon::parse($appt->appointment_date);
-                    $apptTime = \Carbon\Carbon::parse($appt->appointment_time);
-                    $now = \Carbon\Carbon::now();
-                    $diffDays = (int) $now
-                    ->startOfDay()
-                    ->diffInDays($apptDate->copy()->startOfDay(), false);
-                    if ($diffDays === 0) {
-                    $countdown = 'Today';
-                    } elseif ($diffDays === 1) {
-                    $countdown = 'Tomorrow';
-                    } else {
-                    $countdown = 'In ' . $diffDays . ' days';
-                    }
+                    <div data-show-more data-show-more-step="5" data-show-more-label="visits">
+                        <div class="space-y-3" data-show-more-list>
+                            @foreach ($futureVisits as $index => $appt)
 
-                    $rawStatus = strtolower($appt->status ?? 'scheduled');
-                    $statusClass = match ($rawStatus) {
-                    'confirmed' => 's-confirmed',
-                    'upcoming',
-                    'scheduled' => 's-upcoming',
-                    default => 's-upcoming',
-                    };
-                    $showDot = in_array($rawStatus, ['upcoming', 'scheduled']);
-                    @endphp
+                            <x-appointment-record-card :appointment="$appt" variant="upcoming" :show-details="false"
+                                :show-countdown="true" :show-time-range="true" :animation-delay="$index * 0.08"
+                                data-show-more-item />
 
-                    <div class="bg-white dark:bg-[#0a1628] border border-gray-100 dark:border-[#1a2a3a] rounded-[1.25rem] shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col sm:flex-row mb-4 animate-[apptSlideUp_0.35s_ease_backwards]"
-                        style="animation-delay: {{ $index * 0.08 }}s">
-
-                        <div
-                            class="bg-red-50/70 dark:bg-[#111827] flex flex-row sm:flex-col items-center sm:justify-center px-5 py-4 sm:py-6 sm:w-[100px] border-b sm:border-b-0 sm:border-r border-red-100 dark:border-[#1a2a3a] gap-3 sm:gap-0 flex-shrink-0">
-                            <span
-                                class="text-3xl sm:text-4xl font-extrabold text-[#8B0000] dark:text-[#ff6b6b] leading-none">{{
-                                $apptDate->format('d') }}</span>
-                            <div class="flex sm:flex-col items-baseline sm:items-center gap-1 sm:gap-0 mt-0 sm:mt-1">
-                                <span
-                                    class="text-xs font-bold tracking-widest uppercase text-red-700 dark:text-red-400">{{
-                                    $apptDate->format('M') }}</span>
-                                <span class="text-[11px] text-gray-500">{{ $apptDate->format('Y') }}</span>
-                            </div>
+                            @endforeach
                         </div>
 
-                        <div class="p-4 sm:p-5 flex-1 flex flex-col gap-3 min-w-0 justify-center">
-                            <div class="flex flex-wrap items-center gap-3">
-                                <span class="text-base font-bold text-gray-800 dark:text-gray-200 truncate">{{
-                                    $appt->service_type }}{{ $appt->other_services ? ' (' . $appt->other_services . ')'
-                                    : ''
-                                    }}</span>
-                                <span class="status-pill {{ $statusClass }}">
-                                    <span class="status-dot"></span>
-                                    {{ ucfirst($rawStatus) }}
-                                </span>
-                            </div>
-                            <div
-                                class="flex flex-wrap items-center gap-4 text-sm font-medium text-gray-500 dark:text-gray-400">
-                                <div class="flex items-center gap-1.5"><i
-                                        class="fa-regular fa-clock text-red-700/70 dark:text-red-400"></i> <strong
-                                        class="text-gray-700 dark:text-gray-300">{{ $apptTime->format('g:i A') }} –
-                                        {{ $apptTime->copy()->addHour()->format('g:i A') }}</strong></div>
-                                <div class="flex items-center gap-1.5"><i
-                                        class="fa-regular fa-user text-red-700/70 dark:text-red-400"></i> Dr. Nelson
-                                    Angeles</div>
-                            </div>
-                        </div>
-
-                        <div
-                            class="p-4 sm:p-5 border-t sm:border-t-0 border-gray-50 dark:border-[#1a2a3a] flex flex-row sm:flex-col items-center sm:items-end justify-between gap-3 flex-shrink-0 bg-gray-50/30 dark:bg-transparent">
-                            <button
-                                class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-[#8B0000] hover:bg-red-50 dark:hover:bg-gray-800 transition-colors">
-                                <i class="fa-solid fa-ellipsis-vertical"></i>
-                            </button>
-                            <span
-                                class="px-3 py-1.5 rounded-full bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/50 text-[#8B0000] dark:text-red-400 text-xs font-bold whitespace-nowrap">{{
-                                $countdown }}</span>
-                        </div>
+                        <x-show-more label="visits" />
                     </div>
-                    @endforeach
                     @else
                     <div class="appt-timeline-empty">
                         <div class="appt-timeline-empty-grid">
@@ -457,94 +528,24 @@ $appt->service_type .
 
                 <div id="apptPastPanel" style="display:none;">
                     @if ($pastVisits->count())
-                    <div
-                        class="text-xs font-bold tracking-[0.12em] uppercase text-gray-400 mb-4 flex items-center gap-3">
-                        Recent History <div class="h-px flex-1 bg-gray-200 dark:bg-gray-800"></div>
+                    <div class="appt-list-divider">
+                        <span>Recent History</span>
+                        <span class="appt-list-divider-line"></span>
                     </div>
 
-                    @foreach ($pastVisits as $index => $appt)
-                    @php
-                    $apptDate = \Carbon\Carbon::parse($appt->appointment_date);
-                    $apptTime = \Carbon\Carbon::parse($appt->appointment_time);
-                    $rawStatus = 'completed';
-                    $dentistName = optional($clinicDentist)->name ?? 'Assigned Dentist';
-                    $dentistRole = optional(optional($clinicDentist)->role)->name ?? 'Dentist';
+                    <div data-show-more data-show-more-step="5" data-show-more-label="visits">
+                        <div class="space-y-3" data-show-more-list>
+                            @foreach ($pastVisits as $index => $appt)
 
-                    $modalPayload = [
-                    'service' => $appt->service_type ?? '—',
-                    'date' => $appt->appointment_date
-                    ? \Carbon\Carbon::parse($appt->appointment_date)->format('F d, Y')
-                    : '—',
-                    'time' => $appt->appointment_time
-                    ? \Carbon\Carbon::parse($appt->appointment_time)->format('g:i A')
-                    : '—',
-                    'status' => $rawStatus,
-                    'duration' => $appt->duration ?? '—',
-                    'remarks' => $appt->remarks ?? '—',
-                    'oral' => $appt->oral_examination ?? '—',
-                    'diagnosis' => $appt->diagnosis ?? '—',
-                    'prescription' => $appt->prescription ?? '—',
-                    'dentist_name' => $dentistName,
-                    'dentist_label' => $dentistRole,
-                    'dentist_initials' => collect(explode(' ', $dentistName))
-                    ->filter()
-                    ->map(fn($word) => strtoupper(substr($word, 0, 1)))
-                    ->take(2)
-                    ->implode(''),
-                    'odontogram' => $odontogramTeeth ?? [],
-                    ];
-                    @endphp
+                            <x-appointment-record-card :appointment="$appt" variant="past" :show-details="true"
+                                :show-countdown="false" :show-time-range="true" :animation-delay="$index * 0.08"
+                                data-show-more-item />
 
-                    <div class="bg-white dark:bg-[#0a1628] border border-gray-100 dark:border-[#1a2a3a] rounded-[1.25rem] shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col sm:flex-row mb-4 animate-[apptSlideUp_0.35s_ease_backwards]"
-                        style="animation-delay: {{ $index * 0.08 }}s">
-
-                        <div
-                            class="bg-gray-50 dark:bg-[#111827] flex flex-row sm:flex-col items-center sm:justify-center px-5 py-4 sm:py-6 sm:w-[100px] border-b sm:border-b-0 sm:border-r border-gray-100 dark:border-[#1a2a3a] gap-3 sm:gap-0 flex-shrink-0 opacity-80">
-                            <span class="text-3xl sm:text-4xl font-extrabold text-gray-500 leading-none">{{
-                                $apptDate->format('d') }}</span>
-                            <div class="flex sm:flex-col items-baseline sm:items-center gap-1 sm:gap-0 mt-0 sm:mt-1">
-                                <span class="text-xs font-bold tracking-widest uppercase text-gray-400">{{
-                                    $apptDate->format('M') }}</span>
-                                <span class="text-[11px] text-gray-400">{{ $apptDate->format('Y') }}</span>
-                            </div>
+                            @endforeach
                         </div>
 
-                        <div class="p-4 sm:p-5 flex-1 flex flex-col gap-3 min-w-0 justify-center">
-                            <div class="flex flex-wrap items-center gap-3">
-                                <span class="text-base font-bold text-gray-600 dark:text-gray-400 truncate">{{
-                                    $appt->service_type }}{{ $appt->other_services ? ' (' . $appt->other_services . ')'
-                                    : ''
-                                    }}</span>
-                                <span class="status-pill s-completed">
-                                    <span class="status-dot"></span>
-                                    Completed
-                                </span>
-                            </div>
-                            <div class="flex flex-wrap items-center gap-4 text-sm font-medium text-gray-400">
-                                <div class="flex items-center gap-1.5"><i class="fa-regular fa-clock"></i> <strong
-                                        class="text-gray-500 dark:text-gray-400">{{ $apptTime->format('g:i A') }}
-                                        –
-                                        {{ $apptTime->copy()->addHour()->format('g:i A') }}</strong></div>
-                                <div class="flex items-center gap-1.5"><i class="fa-regular fa-user"></i> Dr.
-                                    Nelson
-                                    Angeles</div>
-                            </div>
-                        </div>
-
-                        <div
-                            class="p-4 sm:p-5 border-t sm:border-t-0 border-gray-50 dark:border-[#1a2a3a] flex flex-row sm:flex-col items-center sm:items-end justify-between gap-3 flex-shrink-0 bg-gray-50/30 dark:bg-transparent">
-                            <button
-                                class="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-[#8B0000] hover:bg-red-50 dark:hover:bg-gray-800 transition-colors hidden sm:flex">
-                                <i class="fa-solid fa-ellipsis-vertical"></i>
-                            </button>
-                            <button type="button"
-                                class="px-4 py-1.5 rounded-full bg-white dark:bg-[#111827] border border-gray-200 dark:border-[#21262d] text-gray-700 dark:text-gray-300 hover:bg-[#8B0000] hover:text-white hover:border-[#8B0000] transition-colors text-xs font-bold"
-                                data-appt='@json($modalPayload)' onclick="openApptDetailModal(this)">
-                                View Details
-                            </button>
-                        </div>
+                        <x-show-more label="visits" />
                     </div>
-                    @endforeach
                     @else
                     <div class="appt-empty-state text-center">
                         <div class="appt-empty-icon">
@@ -559,7 +560,7 @@ $appt->service_type .
                             Your completed appointments will appear here.
                         </p>
 
-                        <button onclick="apptShowFuture()" class="appt-secondary-btn mt-4">
+                        <button type="button" onclick="apptShowFuture()" class="ui-btn ui-btn-secondary mt-4">
                             <i class="fa-solid fa-calendar-plus"></i>
                             Book First Appointment
                         </button>
@@ -593,13 +594,16 @@ $appt->service_type .
             };
             @endphp
 
-            <section class="mt-2 mb-8 fade-up">
-                <div class="flex items-end justify-between gap-3 mb-4 sm:mb-5">
-                    <div>
-                        <h2 class="text-[1.6rem] sm:text-[2rem] font-extrabold text-[#8B0000] leading-tight">
-                            Services Offered
-                        </h2>
-                        <p class="text-sm text-gray-500 mt-1">
+            <section class="appointment-services-section">
+                <div class="appointment-services-heading">
+                    <div class="appointment-services-heading-icon">
+                        <i class="fa-solid fa-tooth"></i>
+                    </div>
+
+                    <div class="appointment-services-heading-copy">
+                        <h2>Services Offered</h2>
+
+                        <p>
                             Available dental care services at the clinic.
                         </p>
                     </div>
@@ -607,26 +611,38 @@ $appt->service_type .
 
                 <div class="services-grid">
                     @forelse ($bookingServiceTypes as $service)
-                    <div class="service-card">
-                        <div class="service-card-icon">
-                            <i class="{{ $serviceIconFor($service->name) }}"></i>
+
+                    <article class="card appointment-service-card">
+
+                        <div class="card-body appointment-service-card-body">
+
+                            <div class="card-header-icon appointment-service-icon">
+                                <i class="{{ $serviceIconFor($service->name) }}"></i>
+                            </div>
+
+                            <div class="appointment-service-copy">
+
+                                <h3 class="appointment-service-title">
+                                    {{ $service->name }}
+                                </h3>
+
+                                <p class="appointment-service-desc">
+                                    {{ $service->description
+                                    ?: 'This dental service is currently available for patient booking.' }}
+                                </p>
+
+                            </div>
+
+                            <span class="status-pill s-active appointment-service-status">
+                                <span class="status-dot"></span>
+                                Available
+                            </span>
+
                         </div>
 
-                        <h3 class="service-card-title">
-                            {{ $service->name }}
-                        </h3>
-
-                        <p class="service-card-desc">
-                            {{ $service->description ?: 'This dental service is currently available for patient
-                            booking.' }}
-                        </p>
-
-                        <span class="service-card-tag">
-                            Available for Booking
-                        </span>
-                    </div>
+                    </article>
                     @empty
-                    <div class="service-card-empty">
+                    <div class="card service-card-empty">
                         <div>
                             <div class="appt-empty-icon">
                                 <i class="fa-solid fa-tooth text-3xl"></i>
@@ -647,164 +663,47 @@ $appt->service_type .
     </div>
 </main>
 
-<div id="appt_detail_modal" class="appt-detail-modal hidden">
-    <div class="appt-detail-backdrop" onclick="closeApptDetailModal()"></div>
-
-    <div class="appt-detail-box">
-        <div class="appt-sheet-handle">
-            <span></span>
-            <p>Swipe down to close</p>
-        </div>
-        <!-- HEADER -->
-        <div class="appt-record-hero relative">
-            <button onclick="closeApptDetailModal()" class="appt-record-close">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <span class="appt-record-chip">
-                <i class="fa-solid fa-circle-check"></i>
-                Dental Record
-            </span>
-
-            <h3 id="d_service" class="mt-3 text-2xl font-extrabold">—</h3>
-
-            <div class="mt-2 text-sm opacity-90">
-                <i class="fa-regular fa-calendar"></i>
-                <span id="d_date"></span> •
-                <i class="fa-regular fa-clock"></i>
-                <span id="d_time"></span>
-            </div>
-        </div>
-
-        <!-- BODY -->
-        <div class="appt-side-scroll appt-record-body">
-
-            <div class="appt-record-info-grid">
-                <div class="appt-info-card">
-                    <p class="appt-info-label">Status</p>
-                    <p id="d_status_text" class="appt-info-value">—</p>
-                </div>
-
-                <div class="appt-info-card">
-                    <p class="appt-info-label">Duration</p>
-                    <p id="d_duration" class="appt-info-value">—</p>
-                </div>
-            </div>
-
-            <div class="appt-section-title">Attending Dentist</div>
-
-            <div class="appt-dentist-card">
-                <div id="d_dentist_initials" class="appt-dentist-avatar">AD</div>
-                <div>
-                    <p id="d_dentist_name" class="font-extrabold">Assigned Dentist</p>
-                    <p id="d_dentist_label" class="text-sm opacity-70">Dental Clinic Dentist</p>
-                </div>
-            </div>
-
-            <div id="apptOdontogramSection" class="hidden">
-                <div class="appt-section-title">Odontogram</div>
-
-                @include('components.odontogram-preview')
-            </div>
-
-            <div class="appt-section-title">Clinical Details</div>
-
-            <details class="appt-record-accordion" open>
-                <summary>
-                    <span class="appt-record-accordion-icon">
-                        <i class="fa-solid fa-clipboard-list"></i>
-                    </span>
-
-                    <span class="flex flex-col sm:flex-row sm:items-center gap-0 sm:gap-2">
-                        <span>Treatment</span>
-                        <span class="text-xs font-bold text-gray-400 dark:text-gray-400">remarks</span>
-                    </span>
-
-                    <span class="appt-record-chevron">
-                        <i class="fa-solid fa-angle-down"></i>
-                    </span>
-                </summary>
-
-                <div class="appt-record-panel">
-                    <div id="d_remarks">—</div>
-                </div>
-            </details>
-
-            <details class="appt-record-accordion">
-                <summary>
-                    <span class="appt-record-accordion-icon">
-                        <i class="fa-solid fa-eye"></i>
-                    </span>
-
-                    <span>Oral Examination</span>
-
-                    <span class="appt-record-chevron">
-                        <i class="fa-solid fa-angle-down"></i>
-                    </span>
-                </summary>
-
-                <div class="appt-record-panel">
-                    <div id="d_oral">—</div>
-                </div>
-            </details>
-
-            <details class="appt-record-accordion">
-                <summary>
-                    <span class="appt-record-accordion-icon">
-                        <i class="fa-solid fa-circle-info"></i>
-                    </span>
-
-                    <span>Diagnosis</span>
-
-                    <span class="appt-record-chevron">
-                        <i class="fa-solid fa-angle-down"></i>
-                    </span>
-                </summary>
-
-                <div class="appt-record-panel">
-                    <div id="d_diagnosis">—</div>
-                </div>
-            </details>
-
-            <details class="appt-record-accordion">
-                <summary>
-                    <span class="appt-record-accordion-icon">
-                        <i class="fa-solid fa-prescription-bottle-medical"></i>
-                    </span>
-
-                    <span>Prescription</span>
-
-                    <span class="appt-record-chevron">
-                        <i class="fa-solid fa-angle-down"></i>
-                    </span>
-                </summary>
-
-                <div class="appt-record-panel">
-                    <div id="d_prescription">—</div>
-                </div>
-            </details>
-        </div>
-    </div>
-</div>
 @include('components.appointment-calendar-script', [
 'mode' => 'patient-dashboard',
 'renderStyle' => 'patient',
 'calendarContainerId' => 'calendarSkeletonContainer',
+
 'dateInputId' => null,
 'timeInputId' => null,
+
 'slotEndpoint' => route('book.appointment.slots'),
+'bookingUrl' => route('patient.book.appointment'),
+
+'scheduleRules' => isset($schedules)
+? $schedules
+: (
+isset($scheduleRules)
+? $scheduleRules
+: \App\Models\ClinicSchedule::active()
+->get()
+->values()
+->toArray()
+),
+
 'blockedDates' => $unavailableDates ?? [],
 'appointmentCountsPerDay' => $appointmentCountsPerDay ?? [],
 'philippineHolidays' => $philippineHolidays ?? [],
+
 'personalAppointments' => $calendarAppointments ?? [],
-'useDynamicScheduleRules' => false,
-'disallowToday' => false,
+'completedAppointments' => $completedCalendarAppointments ?? [],
+
+'useDynamicScheduleRules' => true,
+'disallowToday' => true,
 'allowToggleOffDate' => false,
+
+'maxFutureMonths' => 6,
+'historyMonths' => 12,
+
+'appointmentHistoryUrl' => route('patient.record'),
 ])
 @endsection
 
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script>
     let apptActivityChartInstance = null;
 
@@ -880,21 +779,21 @@ $appt->service_type .
                     }
                 },
                 plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        backgroundColor: 'rgba(17, 24, 39, 0.95)',
-                        borderColor: 'rgba(255, 255, 255, 0.16)',
-                        borderWidth: 1,
-                        titleColor: '#F9FAFB',
-                        bodyColor: '#E5E7EB',
-                        cornerRadius: 10,
-                        padding: 10,
-                        boxPadding: 4,
-                        displayColors: true,
-                        usePointStyle: true,
-                    }
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip:
+                        (
+                            window.getGlobalChartTooltipOptions?.({
+                                label(context) {
+                                    const value =
+                                        Number(context.raw || 0);
+
+                                    return `${context.dataset.label}: ${value}`;
+                                }
+                            }) || {}
+                        )
                 }
             }
         });
@@ -909,27 +808,61 @@ $appt->service_type .
     }
 
     function apptShowFuture() {
-        const futurePanel = document.getElementById('apptFuturePanel');
-        const pastPanel = document.getElementById('apptPastPanel');
+        const futurePanel =
+            document.getElementById('apptFuturePanel');
+
+        const pastPanel =
+            document.getElementById('apptPastPanel');
+
+        const tabs =
+            document.getElementById('apptListTabs');
+
+        if (!futurePanel || !pastPanel) {
+            return;
+        }
 
         futurePanel.style.display = '';
         pastPanel.style.display = 'none';
 
-        document.getElementById('apptFutureTab').classList.add('appt-active');
-        document.getElementById('apptPastTab').classList.remove('appt-active');
+        document
+            .getElementById('apptFutureTab')
+            ?.classList.add('appt-active');
+
+        document
+            .getElementById('apptPastTab')
+            ?.classList.remove('appt-active');
+
+        tabs?.classList.remove('is-past');
 
         apptAnimatePanel(futurePanel);
     }
 
     function apptShowPast() {
-        const futurePanel = document.getElementById('apptFuturePanel');
-        const pastPanel = document.getElementById('apptPastPanel');
+        const futurePanel =
+            document.getElementById('apptFuturePanel');
+
+        const pastPanel =
+            document.getElementById('apptPastPanel');
+
+        const tabs =
+            document.getElementById('apptListTabs');
+
+        if (!futurePanel || !pastPanel) {
+            return;
+        }
 
         futurePanel.style.display = 'none';
         pastPanel.style.display = '';
 
-        document.getElementById('apptPastTab').classList.add('appt-active');
-        document.getElementById('apptFutureTab').classList.remove('appt-active');
+        document
+            .getElementById('apptPastTab')
+            ?.classList.add('appt-active');
+
+        document
+            .getElementById('apptFutureTab')
+            ?.classList.remove('appt-active');
+
+        tabs?.classList.add('is-past');
 
         apptAnimatePanel(pastPanel);
     }
@@ -1167,8 +1100,8 @@ $appt->service_type .
             ? `
             <div class="vo-history-item">
                 <span class="vo-history-dot"></span>
-                <span>${document.getElementById('d_date')?.textContent || 'Visit date'}</span>
-                <strong>${document.getElementById('d_service')?.textContent || 'Dental Treatment'}</strong>
+                <span>${document.getElementById('m_date')?.textContent || 'Visit date'}</span>
+                <strong>${document.getElementById('m_service')?.textContent || 'Dental Treatment'}</strong>
             </div>
         `
             : `
@@ -1187,203 +1120,6 @@ $appt->service_type .
     function closeViewToothModal() {
         document.getElementById('viewToothModal')?.classList.add('hidden');
     }
-
-    function openApptDetailModal(btn) {
-        const modal = document.getElementById('appt_detail_modal');
-        if (!modal) return;
-
-        let data = {};
-        try {
-            data = JSON.parse(btn.getAttribute('data-appt') || '{}');
-        } catch (e) { }
-
-        function set(id, val, fallback = '—') {
-            const el = document.getElementById(id);
-            if (!el) return;
-            el.textContent = val && val !== '—' ? val : fallback;
-        }
-
-        function setPanel(id, val, title, icon) {
-            const el = document.getElementById(id);
-            if (!el) return;
-
-            const clean = val && val !== '—' && String(val).trim() !== '' ? String(val).trim() : '';
-
-            if (clean) {
-                el.textContent = clean;
-                return;
-            }
-
-            el.innerHTML = `
-                <div class="appt-empty-mini">
-                    <div class="appt-empty-mini-icon">
-                        <i class="${icon}"></i>
-                    </div>
-                    <p class="appt-empty-mini-title">No ${title} recorded</p>
-                    <p class="appt-empty-mini-text">This section has no saved details yet.</p>
-                </div>
-            `;
-        }
-
-        set('d_service', data.service);
-        set('d_date', data.date);
-        set('d_time', data.time);
-        set('d_duration', data.duration);
-        set('d_status_text', data.status);
-        set('d_dentist_name', data.dentist_name, 'Assigned Dentist');
-        set('d_dentist_label', data.dentist_label, 'Dentist');
-        set('d_dentist_initials', data.dentist_initials, 'AD');
-
-        const odoSection = document.getElementById('apptOdontogramSection');
-        const isCompleted = String(data.status || '').toLowerCase() === 'completed';
-
-        if (odoSection) {
-            odoSection.classList.toggle('hidden', !isCompleted);
-
-            if (isCompleted) {
-                renderViewOdontogram(data.odontogram || window.patientOdontogramTeeth || []);
-            }
-        }
-
-        setPanel('d_remarks', data.remarks, 'treatment remarks', 'fa-solid fa-clipboard-list');
-        setPanel('d_oral', data.oral, 'oral examination', 'fa-solid fa-eye');
-        setPanel('d_diagnosis', data.diagnosis, 'diagnosis', 'fa-solid fa-circle-info');
-        setPanel('d_prescription', data.prescription, 'prescription', 'fa-solid fa-prescription-bottle-medical');
-
-        modal.classList.remove('hidden');
-
-        const sheet = modal.querySelector('.appt-detail-box');
-        const backdrop = modal.querySelector('.appt-detail-backdrop');
-
-        if (sheet) {
-            sheet.style.opacity = '';
-            sheet.style.transform = '';
-        }
-
-        if (backdrop) {
-            backdrop.style.opacity = '';
-        }
-
-        document.documentElement.style.overflow = 'hidden';
-
-        initApptAccordions();
-        initApptSwipeToClose();
-    }
-
-    function closeApptDetailModal() {
-        const modal = document.getElementById('appt_detail_modal');
-        const sheet = modal ? modal.querySelector('.appt-detail-box') : null;
-        const backdrop = modal ? modal.querySelector('.appt-detail-backdrop') : null;
-
-        if (!modal || modal.classList.contains('hidden')) return;
-
-        if (sheet) {
-            sheet.style.transition = 'transform .22s ease, opacity .18s ease';
-            sheet.style.transform = window.innerWidth <= 640
-                ? 'translateY(100%)'
-                : 'translateY(10px) scale(.98)';
-            sheet.style.opacity = '0';
-        }
-
-        if (backdrop) {
-            backdrop.style.transition = 'opacity .18s ease';
-            backdrop.style.opacity = '0';
-        }
-
-        setTimeout(function () {
-            modal.classList.add('hidden');
-            document.documentElement.style.overflow = '';
-
-            if (sheet) {
-                sheet.style.transition = '';
-                sheet.style.transform = '';
-                sheet.style.opacity = '';
-            }
-
-            if (backdrop) {
-                backdrop.style.transition = '';
-                backdrop.style.opacity = '';
-            }
-        }, 220);
-    }
-
-    let apptTouchStartY = 0;
-    let apptTouchCurrentY = 0;
-    let apptIsDragging = false;
-
-    function initApptSwipeToClose() {
-        const modal = document.getElementById('appt_detail_modal');
-        const sheet = modal ? modal.querySelector('.appt-detail-box') : null;
-        const
-            dragArea = modal ? modal.querySelector('.appt-sheet-handle') : null;
-        const backdrop = modal ? modal.querySelector('.appt-detail-backdrop') : null;
-
-        if (!modal || !sheet || !dragArea || sheet.dataset.swipeReady === 'true') return;
-
-        sheet.dataset.swipeReady = 'true';
-        dragArea.style.touchAction = 'none';
-
-        function resetSheet() {
-            sheet.style.transition = '';
-            sheet.style.transform = '';
-            if (backdrop) backdrop.style.opacity = '';
-        }
-
-        dragArea.addEventListener('pointerdown', function (e) {
-            if (window.innerWidth > 640) return;
-
-            apptTouchStartY = e.clientY;
-            apptTouchCurrentY = e.clientY;
-            apptIsDragging = true;
-
-            sheet.style.animation = 'none';
-            sheet.style.transition = 'none';
-            if (backdrop) backdrop.style.transition = 'none';
-
-            dragArea.setPointerCapture(e.pointerId);
-        });
-
-        dragArea.addEventListener('pointermove', function (e) {
-            if (!apptIsDragging || window.innerWidth > 640) return;
-
-            apptTouchCurrentY = e.clientY;
-            const diff = Math.max(0, apptTouchCurrentY - apptTouchStartY);
-            const opacity = Math.max(0.15, 1 - diff / 280);
-
-            sheet.style.transform = `translateY(${diff}px)`;
-            if (backdrop) backdrop.style.opacity = opacity;
-        });
-
-        dragArea.addEventListener('pointerup', function (e) {
-            if (!apptIsDragging || window.innerWidth > 640) return;
-
-            const diff = Math.max(0, apptTouchCurrentY - apptTouchStartY);
-            apptIsDragging = false;
-
-            sheet.style.transition = 'transform .22s cubic-bezier(.22,1,.36,1)';
-            if (backdrop) backdrop.style.transition = 'opacity .22s ease';
-
-            if (diff > 75) {
-                sheet.style.transform = 'translateY(110%)';
-                if (backdrop) backdrop.style.opacity = '0';
-
-                setTimeout(function () {
-                    closeApptDetailModal();
-                    resetSheet();
-                }, 220);
-            } else {
-                resetSheet();
-            }
-
-            try {
-                dragArea.releasePointerCapture(e.pointerId);
-            } catch (err) { }
-        });
-
-        dragArea.addEventListener('pointercancel', resetSheet);
-    }
-
-    document.addEventListener('DOMContentLoaded', initApptSwipeToClose);
 
     function scrollToAppointmentCalendar() {
         var calendar = document.getElementById('calendarSkeletonContainer');

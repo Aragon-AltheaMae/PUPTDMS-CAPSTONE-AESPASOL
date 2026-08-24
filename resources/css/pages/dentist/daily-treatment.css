@@ -147,25 +147,6 @@
     object-fit: contain !important;
 }
 
-.daily-treatment-page~#filterModal .filter-drawer-panel {
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-.daily-treatment-page~#filterModal .filter-drawer-body {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    overflow-y: auto !important;
-}
-
-#filterModal.open .filter-drawer-overlay {
-    opacity: 1 !important;
-}
-
-#filterModal.closing .filter-drawer-overlay {
-    opacity: 0 !important;
-}
-
 #createReportModal .fp-date-input-wrap {
     position: relative !important;
     width: 100% !important;
@@ -179,83 +160,6 @@
     color: #9CA3AF !important;
     font-size: 14px !important;
     pointer-events: none !important;
-}
-
-#createReportModal .report-qty-row {
-    display: inline-grid !important;
-    grid-template-columns: max-content auto !important;
-    align-items: center !important;
-    gap: .85rem !important;
-    width: auto !important;
-    max-width: 100% !important;
-}
-
-#createReportModal .report-qty-control {
-    width: max-content !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    display: grid !important;
-    grid-template-columns: 40px 108px 40px !important;
-    align-items: center !important;
-    justify-content: start !important;
-    gap: 6px !important;
-    padding: 6px !important;
-    border-radius: 16px !important;
-    background: #F9FAFB !important;
-    border: 1px solid #E5E7EB !important;
-}
-
-#createReportModal .report-qty-btn {
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 13px !important;
-    border: 1px solid rgba(139, 0, 0, .12) !important;
-    background: #FFFFFF !important;
-    color: #8B0000 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-size: .72rem !important;
-    cursor: pointer !important;
-    transition: all .18s ease !important;
-}
-
-#createReportModal .report-qty-btn:hover {
-    background: #8B0000 !important;
-    color: #FFFFFF !important;
-}
-
-#createReportModal .report-qty-btn.is-disabled,
-#createReportModal .report-qty-btn:disabled {
-    opacity: .45 !important;
-    cursor: not-allowed !important;
-    background: #F3F4F6 !important;
-    color: #9CA3AF !important;
-}
-
-#createReportModal .report-qty-input {
-    width: 108px !important;
-    min-width: 108px !important;
-    max-width: 108px !important;
-    height: 40px !important;
-    padding: 0 .5rem !important;
-    text-align: center !important;
-    border-radius: 13px !important;
-    font-weight: 850 !important;
-    -moz-appearance: textfield !important;
-}
-
-#createReportModal .report-qty-input::-webkit-outer-spin-button,
-#createReportModal .report-qty-input::-webkit-inner-spin-button {
-    -webkit-appearance: none !important;
-    margin: 0 !important;
-}
-
-#createReportModal .report-qty-helper {
-    color: #9CA3AF !important;
-    font-size: 11px !important;
-    font-weight: 800 !important;
-    white-space: nowrap !important;
 }
 
 .daily-treatment-page .dtr-month-picker {
@@ -413,20 +317,6 @@
         font-size: .68rem !important;
         padding: .55rem .45rem !important;
     }
-
-    #createReportModal .report-qty-row {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
-        justify-items: start !important;
-        gap: .45rem !important;
-        width: 100% !important;
-    }
-
-    #createReportModal .report-qty-control {
-        width: max-content !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
-    }
 }
 
 @media only screen and (max-width: 480px) {
@@ -449,29 +339,6 @@
     }
 }
 
-[data-theme="dark"] .report-select-trigger,
-.dark .report-select-trigger,
-[data-theme="dark"] .report-select-menu,
-.dark .report-select-menu {
-    background: rgba(13, 17, 23, .96) !important;
-    border-color: rgba(255, 255, 255, .12) !important;
-    color: #E5E7EB !important;
-}
-
-[data-theme="dark"] .report-select-option,
-.dark .report-select-option {
-    color: #E5E7EB !important;
-}
-
-[data-theme="dark"] .report-select-option:hover,
-[data-theme="dark"] .report-select-option.is-active,
-.dark .report-select-option:hover,
-.dark .report-select-option.is-active {
-    background: rgba(139, 0, 0, .28) !important;
-    border-color: rgba(248, 113, 113, .28) !important;
-    color: #FCA5A5 !important;
-}
-
 [data-theme="dark"] #downloadCompleteModal .ui-modal-card,
 .dark #downloadCompleteModal .ui-modal-card {
     background: #161B22 !important;
@@ -482,30 +349,6 @@
 .dark #createReportModal .modal-ft {
     background: #161B22 !important;
     border-color: rgba(255, 255, 255, .10) !important;
-}
-
-[data-theme="dark"] #createReportModal .report-qty-control,
-.dark #createReportModal .report-qty-control,
-[data-theme="dark"] #createReportModal .report-qty-btn,
-.dark #createReportModal .report-qty-btn {
-    background: #0D1117 !important;
-    border-color: rgba(255, 255, 255, .12) !important;
-    color: #E5E7EB !important;
-}
-
-[data-theme="dark"] body:has(:where(.daily-treatment-page)) #filterModal .filter-cancel-btn,
-.dark body:has(:where(.daily-treatment-page)) #filterModal .filter-cancel-btn {
-    background: #0D1117 !important;
-    color: #F8FAFC !important;
-    border-color: #30363D !important;
-    box-shadow: none !important;
-}
-
-[data-theme="dark"] body:has(:where(.daily-treatment-page)) #filterModal .filter-cancel-btn:hover,
-.dark body:has(:where(.daily-treatment-page)) #filterModal .filter-cancel-btn:hover {
-    background: #161B22 !important;
-    color: #FFFFFF !important;
-    border-color: #484F58 !important;
 }
 
 [data-theme="dark"] .daily-treatment-page .dtr-month-picker .fp-date-input,

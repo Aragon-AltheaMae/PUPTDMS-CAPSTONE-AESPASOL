@@ -50,17 +50,31 @@
             ? str_replace('_', ' ', ucfirst($value))
             : $value;
     };
+    $routeNames = $routeNames ?? [
+        'index' => 'admin.dentist-transitions.index',
+        'create' => 'admin.dentist-transitions.create',
+        'store' => 'admin.dentist-transitions.store',
+        'show' => 'admin.dentist-transitions.show',
+        'edit' => 'admin.dentist-transitions.edit',
+        'update' => 'admin.dentist-transitions.update',
+        'generate_items' => 'admin.dentist-transitions.generate-items',
+        'assignments' => 'admin.dentist-transitions.assignments',
+        'checklist' => 'admin.dentist-transitions.checklist',
+        'finalize' => 'admin.dentist-transitions.finalize',
+        'extend_access' => 'admin.dentist-transitions.extend-access',
+        'cancel' => 'admin.dentist-transitions.cancel',
+    ];
 
     if ($pageMode === 'index') {
         $pageTitle = 'Dentist Continuity Management';
         $heroTitle = 'Dentist Continuity Management';
         $heroSubtitle = null;
-        $heroActions = '<a href="' . route('admin.dentist-transitions.create') . '" class="ui-btn ui-btn-primary"><i class="fa-solid fa-plus"></i><span>Create Transition</span></a>';
+        $heroActions = '<a href="' . route($routeNames['create']) . '" class="ui-btn ui-btn-primary"><i class="fa-solid fa-plus"></i><span>Create Transition</span></a>';
     } elseif ($pageMode === 'show') {
         $pageTitle = 'Dentist Transition Details';
         $heroTitle = $transition->dentist->name ?? 'Unknown dentist';
         $heroSubtitle = $formatTransitionType($transition->transition_type) . ' transition. Last working date: ' . optional($transition->last_working_date)->format('M d, Y') . '. Access ends: ' . optional($transition->access_ends_at)->format('M d, Y h:i A') . '.';
-        $heroActions = '<span class="dt-badge dt-badge-' . e($transition->status) . '">' . e(str_replace('_', ' ', ucfirst($transition->status))) . '</span><a href="' . route('admin.dentist-transitions.edit', $transition) . '" class="dt-btn dt-btn-light">Edit Transition</a>';
+        $heroActions = '<span class="dt-badge dt-badge-' . e($transition->status) . '">' . e(str_replace('_', ' ', ucfirst($transition->status))) . '</span><a href="' . route($routeNames['edit'], $transition) . '" class="dt-btn dt-btn-light">Edit Transition</a>';
     } else {
         $pageTitle = $transition && $transition->exists ? 'Edit Dentist Transition' : 'Create Dentist Transition';
         $heroTitle = $transition && $transition->exists ? 'Update Transition Plan' : 'Create Transition Plan';
@@ -174,7 +188,7 @@
                         </span>
                     </div>
 
-                    <form method="GET" action="{{ route('admin.dentist-transitions.index') }}" id="continuityToolbarForm"
+                    <form method="GET" action="{{ route($routeNames['index']) }}" id="continuityToolbarForm"
                         class="dt-directory-filter-form">
                         <input type="hidden" name="status" id="dtStatusInput" value="{{ $filters['status'] ?? '' }}">
                         <input type="hidden" name="transition_type" id="dtTypeInput" value="{{ $filters['transition_type'] ?? '' }}">
@@ -245,14 +259,14 @@
                                     <td class="table-cell-center table-action-cell">
                                         <div class="ui-action-group dt-table-actions">
                                             @if (!in_array($transition->status, ['completed', 'cancelled'], true))
-                                            <a href="{{ route('admin.dentist-transitions.edit', $transition) }}"
+                                            <a href="{{ route($routeNames['edit'], $transition) }}"
                                                 class="ui-action-btn ui-action-edit" data-tooltip="Edit transition"
                                                 aria-label="Edit transition">
                                                 <i class="fa-solid fa-pen"></i>
                                             </a>
                                             @endif
 
-                                            <a href="{{ route('admin.dentist-transitions.show', $transition) }}"
+                                            <a href="{{ route($routeNames['show'], $transition) }}"
                                                 class="ui-action-btn ui-action-view" data-tooltip="View transition"
                                                 aria-label="View transition">
                                                 <i class="fa-solid fa-eye"></i>
@@ -316,14 +330,14 @@
 
                             <div class="ui-action-group dt-grid-actions">
                                 @if (!in_array($transition->status, ['completed', 'cancelled'], true))
-                                <a href="{{ route('admin.dentist-transitions.edit', $transition) }}"
+                                <a href="{{ route($routeNames['edit'], $transition) }}"
                                     class="ui-action-btn ui-action-edit" data-tooltip="Edit transition"
                                     aria-label="Edit transition">
                                     <i class="fa-solid fa-pen"></i>
                                 </a>
                                 @endif
 
-                                <a href="{{ route('admin.dentist-transitions.show', $transition) }}"
+                                <a href="{{ route($routeNames['show'], $transition) }}"
                                     class="ui-action-btn ui-action-view" data-tooltip="View transition"
                                     aria-label="View transition">
                                     <i class="fa-solid fa-eye"></i>
@@ -469,7 +483,7 @@
                     @if ($layoutRole === 'admin')
                     <div class="dt-show-actions">
                         <span class="dt-badge dt-badge-{{ $transition->status }}">{{ str_replace('_', ' ', ucfirst($transition->status)) }}</span>
-                        <form action="{{ route('admin.dentist-transitions.generate-items', $transition) }}" method="POST">
+                        <form action="{{ route($routeNames['generate_items'], $transition) }}" method="POST">
                             @csrf
                             <button type="submit" class="dt-btn dt-btn-primary dt-btn-sm dt-btn-impact"><i class="fa-solid fa-rotate"></i>Refresh Impact Summary</button>
                         </form>
@@ -627,7 +641,7 @@
                 </div>
             </div>
 
-            <form action="{{ route('admin.dentist-transitions.assignments', $transition) }}" method="POST">
+            <form action="{{ route($routeNames['assignments'], $transition) }}" method="POST">
                 @csrf
                 @method('PUT')
 
@@ -759,7 +773,7 @@
                 </div>
             </div>
 
-            <form action="{{ route('admin.dentist-transitions.checklist', $transition) }}" method="POST">
+            <form action="{{ route($routeNames['checklist'], $transition) }}" method="POST">
                 @csrf
                 @method('PUT')
 
@@ -823,7 +837,7 @@
             </div>
 
             <div class="dt-actions-grid dt-finalization-grid">
-                <form action="{{ route('admin.dentist-transitions.finalize', $transition) }}" method="POST" class="dt-action-card dt-finalization-card">
+                <form action="{{ route($routeNames['finalize'], $transition) }}" method="POST" class="dt-action-card dt-finalization-card">
                     @csrf
                     <div class="dt-finalization-card-head">
                         <div class="dt-finalization-card-icon">
@@ -859,7 +873,7 @@
                     <button type="submit" class="dt-btn dt-btn-primary dt-finalization-btn" @disabled(in_array($transition->status, ['completed', 'cancelled'], true))>Finalize</button>
                 </form>
 
-                <form action="{{ route('admin.dentist-transitions.extend-access', $transition) }}" method="POST" class="dt-action-card dt-finalization-card" id="dtExtendAccessForm">
+                <form action="{{ route($routeNames['extend_access'], $transition) }}" method="POST" class="dt-action-card dt-finalization-card" id="dtExtendAccessForm">
                     @csrf
                     <div class="dt-finalization-card-head">
                         <div class="dt-finalization-card-icon">
@@ -908,7 +922,7 @@
                     <button type="submit" class="dt-btn dt-btn-secondary dt-finalization-btn dt-finalization-btn-outline">Extend Access</button>
                 </form>
 
-                <form action="{{ route('admin.dentist-transitions.cancel', $transition) }}" method="POST" class="dt-action-card dt-finalization-card">
+                <form action="{{ route($routeNames['cancel'], $transition) }}" method="POST" class="dt-action-card dt-finalization-card">
                     @csrf
                     <div class="dt-finalization-card-head">
                         <div class="dt-finalization-card-icon">
@@ -1159,7 +1173,7 @@
                 </div>
 
                 <div class="dt-form-actions">
-                    <a href="{{ route('admin.dentist-transitions.index') }}" class="dt-btn dt-btn-secondary">Back</a>
+                    <a href="{{ route($routeNames['index']) }}" class="dt-btn dt-btn-secondary">Back</a>
                     <button type="submit" class="dt-btn dt-btn-primary">{{ $transition->exists ? 'Save Transition Plan' : 'Create Transition Plan' }}</button>
                 </div>
             </form>
@@ -1607,7 +1621,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             history.replaceState(null, '', window.location.pathname + '?' + params.toString());
 
-            fetch('{{ route('admin.dentist-transitions.index') }}?' + params.toString(), {
+            fetch('{{ route($routeNames['index']) }}?' + params.toString(), {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Accept': 'application/json',

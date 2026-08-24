@@ -100,7 +100,11 @@ class WalkInController extends Controller
         StudentApiService $studentApiService
     ) {
         $search = trim((string) $request->query('q', ''));
-        $showAll = $request->boolean('show_all');
+
+        $showAll =
+            $request->boolean(
+                'show_all'
+            );
 
         $page = max(
             1,
@@ -119,22 +123,18 @@ class WalkInController extends Controller
         )
             ? $perPageInput
             : 10;
-        $sourceLimit = 150;
-
-        if ($search === '' && ! $showAll) {
-            return response()->json([
-                'data' => [],
-                'current_page' => 1,
-                'last_page' => 1,
-                'per_page' => $perPage,
-                'total' => 0,
-                'from' => null,
-                'to' => null,
-            ]);
-        }
+            
+        $sourceLimit = max(
+            20,
+            min(
+                $perPage,
+                50
+            )
+        );
 
         try {
-            $hasMeaningfulSearch = mb_strlen($search) >= 2;
+            $hasMeaningfulSearch =
+                mb_strlen($search) >= 2;
 
             $shouldLoadConnectedSources =
                 $hasMeaningfulSearch ||
@@ -398,14 +398,17 @@ class WalkInController extends Controller
             ->values()
             ->all()
             : [];
-
         $hasExistingDentalHistory =
-            $patient->dentalHistory !== null &&
-            $patient->dentalHistoryAnswers->isNotEmpty();
+            $this->hasExistingDentalHistoryRecord($patient);
 
         $hasExistingMedicalHistory =
-            $patient->medicalHistory !== null &&
-            $patient->medicalHistory->answers->isNotEmpty();
+            $this->hasExistingMedicalHistoryRecord($patient);
+
+        $hasExistingAppointment =
+            Appointment::where(
+                'patient_id',
+                $patient->id
+            )->exists();
 
         $hasExistingBookingInformation =
             $hasExistingDentalHistory &&
@@ -416,6 +419,33 @@ class WalkInController extends Controller
             $patient->medicalHistory?->signature_review_status !==
             'invalid_reupload_required';
 
+        $existingSignatureUrl = null;
+
+        if (
+            $hasReusableSignature &&
+            filled($patient->medicalHistory?->patient_signature)
+        ) {
+            $signaturePath = ltrim(
+                str_replace(
+                    'storage/',
+                    '',
+                    $patient->medicalHistory->patient_signature
+                ),
+                '/'
+            );
+
+            if (
+                Storage::disk('public')->exists(
+                    $signaturePath
+                )
+            ) {
+                $existingSignatureUrl =
+                    Storage::disk('public')->url(
+                        $signaturePath
+                    );
+            }
+        }
+
         return response()->json([
             'success' => true,
 
@@ -425,11 +455,17 @@ class WalkInController extends Controller
             'has_existing_medical_history' =>
             $hasExistingMedicalHistory,
 
+            'has_existing_appointment' =>
+            $hasExistingAppointment,
+
             'has_existing_booking_information' =>
             $hasExistingBookingInformation,
 
             'has_reusable_signature' =>
             $hasReusableSignature,
+
+            'existing_signature_url' =>
+            $existingSignatureUrl,
 
             'dental' =>
             $dentalDefaults,
@@ -453,6 +489,51 @@ class WalkInController extends Controller
                 $patient->address ?? '',
             ],
         ]);
+    }
+
+    private function hasExistingDentalHistoryRecord(Patient $patient): bool
+    {
+        if ($patient->dentalHistoryAnswers->isNotEmpty()) {
+            return true;
+        }
+
+        if (filled($patient->dentalHistoryConcerns?->additional_concerns)) {
+            return true;
+        }
+
+        if (
+            filled($patient->dentalHistory?->last_dental_visit) ||
+            filled($patient->dentalHistory?->previous_dentist) ||
+            filled($patient->dentalHistoryDates?->extraction_date) ||
+            filled($patient->dentalHistoryDates?->dentures_date) ||
+            filled($patient->dentalHistoryDates?->ortho_date)
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function hasExistingMedicalHistoryRecord(Patient $patient): bool
+    {
+        if ($patient->medicalHistory?->answers->isNotEmpty()) {
+            return true;
+        }
+
+        if ($patient->medicalHistory?->diseaseAnswers->isNotEmpty()) {
+            return true;
+        }
+
+        if (
+            filled($patient->medicalHistory?->emergency_person) ||
+            filled($patient->medicalHistory?->emergency_number) ||
+            filled($patient->medicalHistory?->emergency_relation) ||
+            filled($patient->medicalHistory?->patient_signature)
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     private function searchOgosPatients(string $search, int $limit, StudentApiService $studentApiService): array
@@ -1070,6 +1151,11 @@ class WalkInController extends Controller
                 'regex:/^09\d{9}$/',
             ],
 
+            'guest_patient_type' => [
+                'required',
+                'in:student,faculty,administrative',
+            ],
+
             'guest_gender' => [
                 'required',
                 'in:Male,Female',
@@ -1082,12 +1168,6 @@ class WalkInController extends Controller
             ],
 
             'guest_program' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
-            'guest_faculty' => [
                 'nullable',
                 'string',
                 'max:255',
@@ -1114,6 +1194,11 @@ class WalkInController extends Controller
         try {
             $patient = DB::transaction(function () use ($validated) {
                 $email = $validated['guest_email'];
+                $patientType = match ($validated['guest_patient_type']) {
+                    'student' => 'Student',
+                    'faculty' => 'Faculty',
+                    default => 'Administrative',
+                };
 
                 $fullName = trim(
                     collect([
@@ -1151,9 +1236,6 @@ class WalkInController extends Controller
                     'program' =>
                     $validated['guest_program'] ?? null,
 
-                    'faculty_code' =>
-                    $validated['guest_faculty'] ?? null,
-
                     'year_level' =>
                     $validated['guest_year_level'] ?? null,
 
@@ -1164,10 +1246,11 @@ class WalkInController extends Controller
                     (bool) $validated['guest_is_pwd'],
 
                     'student_number' => null,
+                    'patient_type' => $patientType,
                 ];
 
                 $user = $this->syncWalkInUser($studentLikeData);
-                return $this->syncWalkInPatient($user, $studentLikeData, 'Guest');
+                return $this->syncWalkInPatient($user, $studentLikeData, $patientType);
             });
 
             return response()->json([
@@ -1226,7 +1309,8 @@ class WalkInController extends Controller
                             ?? optional($patient->user)->name
                     ),
 
-                    'type' => 'Guest',
+                    'patient_type' => $patient->patient_type,
+                    'type' => $patient->patient_type ?: 'Guest',
                 ],
             ]);
         } catch (\Throwable $e) {

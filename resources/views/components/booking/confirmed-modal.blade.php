@@ -13,7 +13,7 @@
 
     'messageTitle' => 'Confirmation details',
     'messageId' => 'confirmMessage',
-    'size' => 'modal-md',
+    'size' => 'modal-lg',
 ])
 
 <div id="{{ $id }}" class="ui-modal" aria-hidden="true">

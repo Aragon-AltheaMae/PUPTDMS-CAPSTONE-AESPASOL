@@ -529,7 +529,7 @@ class ConcurrentSessionService
     protected function activeCutoffTimestamp(): int
     {
         $sessionLifetimeSeconds = max(60, (int) config('session.lifetime', 120) * 60);
-        $idleTimeoutSeconds = (int) env('SESSION_IDLE_TIMEOUT_SECONDS', 0);
+        $idleTimeoutSeconds = (int) config('session.idle_timeout_seconds', 0);
 
         if ($idleTimeoutSeconds > 0) {
             $sessionLifetimeSeconds = min($sessionLifetimeSeconds, $idleTimeoutSeconds);

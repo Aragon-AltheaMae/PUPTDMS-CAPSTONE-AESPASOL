@@ -86,13 +86,23 @@
         if (!waveform) return;
 
         waveform.classList.remove('is-active');
-        waveform.classList.add('is-idle');
+        waveform.classList.add('is-leaving');
 
-        waveform
-            .querySelectorAll('span')
-            .forEach((bar) => {
-                bar.style.height = '';
-            });
+        window.setTimeout(() => {
+            waveform.classList.remove(
+                'is-leaving'
+            );
+
+            waveform.classList.add(
+                'is-idle'
+            );
+
+            waveform
+                .querySelectorAll('span')
+                .forEach((bar) => {
+                    bar.style.height = '';
+                });
+        }, 180);
     }
 
     function runFallbackWaveform(controller) {
@@ -769,6 +779,10 @@
         );
 
         buttons.forEach((button) => {
+            button.classList.remove('hidden');
+
+            resetMic(button);
+
             if (
                 button.dataset.voiceReady ===
                 'true' ||
@@ -778,10 +792,6 @@
             ) {
                 return;
             }
-
-            resetMic(
-                button
-            );
 
             button.classList.add(
                 'voice-control-ready'
@@ -883,8 +893,7 @@
 
                     setVoiceStatus(
                         statusLabel,
-                        'Listening...',
-                        'listening'
+                        ''
                     );
 
                     controller.noSpeechTimer =
@@ -1076,6 +1085,8 @@
                 };
 
                 activeController = controller;
+
+                startAudioWaveform(controller);
 
                 try {
                     recognition.start();

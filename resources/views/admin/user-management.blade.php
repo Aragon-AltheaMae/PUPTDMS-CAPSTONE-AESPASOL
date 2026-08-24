@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('layout-role', 'admin')
+@section('layout-role', $layoutRole ?? 'admin')
 
 @section('title', 'User Management')
 
@@ -109,7 +109,7 @@ $inactiveCount = $inactiveCount ?? 0;
                         </span>
                     </div>
 
-                    <form method="GET" action="{{ route('admin.user_management') }}" id="umFilterForm"
+                    <form method="GET" action="{{ route($routeNames['index'] ?? 'admin.user_management') }}" id="umFilterForm"
                         class="um-users-filter-form">
                         <div class="um-search-row voice-search-row">
 
@@ -501,7 +501,7 @@ $inactiveCount = $inactiveCount ?? 0;
             </button>
         </div>
 
-        <form method="POST" action="{{ route('admin.user_management.store') }}" id="addUserForm" class="modal-card-form"
+        <form method="POST" action="{{ route($routeNames['store'] ?? 'admin.user_management.store') }}" id="addUserForm" class="modal-card-form"
             data-global-validation data-global-selects data-discard-form data-discard-title="Discard new user?"
             data-discard-subtitle="You have unsaved account details."
             data-discard-message="Closing this modal will remove the user information you entered. Do you want to discard your changes?"
@@ -1979,7 +1979,7 @@ $inactiveCount = $inactiveCount ?? 0;
 
         history.replaceState(null, '', window.location.pathname + '?' + params.toString());
 
-        fetch('{{ route('admin.user_management') }}?' + params.toString(), {
+        fetch('{{ route($routeNames['index'] ?? 'admin.user_management') }}?' + params.toString(), {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json'
@@ -2029,6 +2029,11 @@ $inactiveCount = $inactiveCount ?? 0;
             ''
         ).trim().toLowerCase();
 
+        const derivedSlug = rawName
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+
         const invalidValues = [
             '',
             '-',
@@ -2045,7 +2050,7 @@ $inactiveCount = $inactiveCount ?? 0;
 
         return {
             label: hasNoRole ? 'Patient' : rawName,
-            slug: hasNoRole ? 'none' : rawSlug || 'none'
+            slug: hasNoRole ? 'none' : rawSlug || derivedSlug || 'none'
         };
     }
 

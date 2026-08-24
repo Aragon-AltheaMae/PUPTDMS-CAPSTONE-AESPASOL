@@ -70,23 +70,46 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                             <div id="calendarSkeletonContainer"></div>
                                         </div>
 
-                                        <div class="time-panel flex flex-col is-empty" data-global-field>
-                                            <div class="mb-5">
-                                                <p
-                                                    class="text-[0.78rem] font-extrabold text-[#8B0000] uppercase tracking-[0.24em]">
-                                                    Pick a Time Slot
-                                                </p>
-                                                <p class="text-sm text-[#8c817a] mt-1 leading-6">
-                                                    Choose your preferred schedule for the selected date.
-                                                </p>
+                                        <div class="time-panel appointment-time-panel is-empty" data-global-field>
+
+                                            <div class="appointment-time-heading">
+
+                                                <span class="appointment-time-heading-icon">
+                                                    <i class="fa-regular fa-clock"></i>
+                                                </span>
+
+                                                <div>
+                                                    <h4>Pick a Time Slot</h4>
+
+                                                    <p>
+                                                        Choose your preferred schedule for the selected date.
+                                                    </p>
+                                                </div>
+
                                             </div>
 
-                                            <div id="dateBanner"
-                                                class="hidden rounded-xl px-3 py-2 text-sm font-semibold text-white mb-3 shadow-md date-banner-gradient">
+                                            <div id="dateBanner" class="hidden appointment-slot-date-banner">
+                                            </div>
+
+                                            <div id="slotPlaceholder" class="appointment-slot-placeholder">
+
+                                                <div class="empty-icon">
+                                                    <i class="fa-regular fa-calendar"></i>
+                                                </div>
+
+                                                <p class="empty-title">
+                                                    Choose a date
+                                                </p>
+
+                                                <p class="empty-subtitle">
+                                                    Select an available day to see time slots.
+                                                </p>
+
                                             </div>
 
                                             <div id="slotContainer" class="hidden">
-                                                <div id="slotGrid" class="slot-grid-ui grid grid-cols-2 gap-4">
+
+                                                <div id="slotGrid" class="appointment-slot-grid">
                                                 </div>
 
                                                 <button type="button" id="clearSlotSelectionBtn"
@@ -95,28 +118,19 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                                     Clear selection
                                                 </button>
 
-                                                <div id="selectedSlotDisplay"
-                                                    class="hidden rounded-2xl px-4 py-3 text-sm font-semibold text-[#8B0000] bg-[linear-gradient(135deg,#fff5f5,#fffafa)] border border-[#e8caca] shadow-sm">
-                                                    <i class="fa-solid fa-circle-check mr-1.5"></i>
+                                                <div id="selectedSlotDisplay" class="hidden appointment-selected-slot">
+
+                                                    <i class="fa-solid fa-circle-check"></i>
+
                                                     Selected:
-                                                    <span id="selectedSlotText" class="font-bold"></span>
+
+                                                    <span id="selectedSlotText" class="font-bold">
+                                                    </span>
+
                                                 </div>
+
                                             </div>
 
-                                            <div id="slotPlaceholder"
-                                                class="slot-placeholder-empty flex flex-col items-center justify-center gap-3 py-8 text-center text-[#9e9690]">
-                                                <div
-                                                    class="empty-icon w-12 h-12 rounded-full bg-[#f9e8e8] flex items-center justify-center text-[#8B0000] text-lg">
-                                                    <i class="fa-regular fa-calendar"></i>
-                                                </div>
-                                                <div>
-                                                    <p class="empty-title text-sm font-semibold text-[#5c5550]">Choose
-                                                        a
-                                                        date</p>
-                                                    <p class="empty-subtitle text-xs mt-1">Select an available day to
-                                                        see time slots.</p>
-                                                </div>
-                                            </div>
                                         </div>
 
                                     </div>
@@ -149,11 +163,9 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         :selected-diseases="$selectedDiseases" :is-female="$isFemalePatient" />
 
                                     <x-booking.signature :has-existing-signature="$hasReusableSignature"
-                                        :existing-signature-url="
-        $patient->medicalHistory?->patient_signature
-            ? asset('storage/' . $patient->medicalHistory->patient_signature)
-            : null
-    " />
+                                        :existing-signature-url="$patient->medicalHistory?->patient_signature
+                                            ? asset('storage/' . $patient->medicalHistory->patient_signature)
+                                            : null" />
                                 </div>
                             </div>
                         </div>
@@ -223,7 +235,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
 <div id="introBookingModal" class="ui-modal" aria-hidden="true">
 
-    <div class="ui-modal-card modal-md">
+    <div class="ui-modal-card modal-lg">
 
         <div class="modal-hd">
             <div class="modal-heading">
@@ -2095,37 +2107,38 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
         let sigHTML = hasReusableSignature ?
             `
-            <div class="space-y-3">
+        <div class="signature-existing-card">
 
-                <div class="booking-summary-saved-info">
-                    <p class="text-emerald-700 font-semibold">
-                        <i class="fa-solid fa-circle-check mr-1"></i>
+            <div class="signature-existing-header">
+                <i class="fa-solid fa-circle-check"></i>
+
+                <div>
+                    <p class="signature-existing-title">
                         Existing signature on file
                     </p>
-
-                    <p class="booking-summary-muted mt-1">
-                        Your previously verified signature will be reused.
-                    </p>
                 </div>
-
-                @if ($patient->medicalHistory?->patient_signature)
-                    <div class="signature-summary-preview">
-                        <img
-                            src="{{ asset('storage/' . $patient->medicalHistory->patient_signature) }}"
-                            alt="Existing signature"
-                            class="max-w-[220px] max-h-[130px] rounded-lg border border-[#e8e2dd]"
-                        >
-                    </div>
-                @endif
-
             </div>
+
+            @if ($patient->medicalHistory?->patient_signature)
+                <div class="signature-existing-preview">
+                    <img
+                        src="{{ asset('storage/' . $patient->medicalHistory->patient_signature) }}"
+                        alt="Existing signature"
+                    >
+                </div>
+            @endif
+
+            <p class="signature-existing-help">
+                Your previously verified signature will be reused.
+            </p>
+
+        </div>
+    ` :
             `
-            :
-            `
-            <span class="text-[#9e9690] italic">
-                Not uploaded
-            </span>
-            `;
+        <span class="booking-summary-muted">
+            Not uploaded
+        </span>
+    `;
 
         if (sigFile && sigFile.size > 0) {
             const url = URL.createObjectURL(sigFile);
@@ -2206,15 +2219,15 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     </div>
 
     ${editAction ? `
-                <button
-                    type="button"
-                    class="ui-btn ui-btn-secondary ui-btn-sm ml-auto"
-                    onclick="${editAction}"
-                >
-                    <i class="fa-solid fa-pen"></i>
-                    Edit
-                </button>
-            ` : ''}
+                    <button
+                        type="button"
+                        class="ui-btn ui-btn-secondary ui-btn-sm ml-auto"
+                        onclick="${editAction}"
+                    >
+                        <i class="fa-solid fa-pen"></i>
+                        Edit
+                    </button>
+                ` : ''}
 </div>
 
     <div class="booking-summary-card-body">
@@ -2291,10 +2304,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                 ${diseaseLabels
                     .map(
                         label => `
-                                                                                                                <span class="booking-summary-tag">
-                                                                                                                    ${label}
-                                                                                                                </span>
-                                                                                                            `
+                                                                                                                    <span class="booking-summary-tag">
+                                                                                                                        ${label}
+                                                                                                                    </span>
+                                                                                                                `
                     )
                     .join('')}
             </div>
@@ -2317,83 +2330,83 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             document.getElementById('contact_address')?.value || 'N/A';
         const dentalHistoryBody = `
     ${subSection("Basic Info", `
-                                                                                                    ${row("Last Dental Visit", get("last_dental_visit"))}
-                                                                                                    ${row("Previous Dentist", get("previous_dentist"))}
-                                                                                                `)}
+                                                                                                        ${row("Last Dental Visit", get("last_dental_visit"))}
+                                                                                                        ${row("Previous Dentist", get("previous_dentist"))}
+                                                                                                    `)}
 
     ${subSection("Dental Symptoms", `
-                                                                                                    ${row("Bleeding Gums", get("bleeding_gums"))}
-                                                                                                    ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
-                                                                                                    ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
-                                                                                                    ${row("Tooth Pain", get("tooth_pain"))}
-                                                                                                    ${row("Sores/Lumps", get("sores"))}
-                                                                                                    ${row("Jaw Injuries", get("injuries"))}
-                                                                                                `)}
+                                                                                                        ${row("Bleeding Gums", get("bleeding_gums"))}
+                                                                                                        ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
+                                                                                                        ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
+                                                                                                        ${row("Tooth Pain", get("tooth_pain"))}
+                                                                                                        ${row("Sores/Lumps", get("sores"))}
+                                                                                                        ${row("Jaw Injuries", get("injuries"))}
+                                                                                                    `)}
 
     ${subSection("Jaw & Bite Symptoms", `
-                                                                                                    ${row("Clicking", get("clicking"))}
-                                                                                                    ${row("Joint Pain", get("joint_pain"))}
-                                                                                                    ${row("Difficulty Moving", get("difficulty_moving"))}
-                                                                                                    ${row("Difficulty Chewing", get("difficulty_chewing"))}
-                                                                                                    ${row("Frequent Headaches", get("jaw_headaches"))}
-                                                                                                    ${row("Grinding/Clenching", get("clench_grind"))}
-                                                                                                    ${row("Lips/Cheek Biting", get("biting"))}
-                                                                                                    ${row("Teeth Loosening", get("teeth_loosening"))}
-                                                                                                    ${row("Food Caught Between Teeth", get("food_teeth"))}
-                                                                                                    ${row("Medicine Reaction", get("med_reaction"))}
-                                                                                                `)}
+                                                                                                        ${row("Clicking", get("clicking"))}
+                                                                                                        ${row("Joint Pain", get("joint_pain"))}
+                                                                                                        ${row("Difficulty Moving", get("difficulty_moving"))}
+                                                                                                        ${row("Difficulty Chewing", get("difficulty_chewing"))}
+                                                                                                        ${row("Frequent Headaches", get("jaw_headaches"))}
+                                                                                                        ${row("Grinding/Clenching", get("clench_grind"))}
+                                                                                                        ${row("Lips/Cheek Biting", get("biting"))}
+                                                                                                        ${row("Teeth Loosening", get("teeth_loosening"))}
+                                                                                                        ${row("Food Caught Between Teeth", get("food_teeth"))}
+                                                                                                        ${row("Medicine Reaction", get("med_reaction"))}
+                                                                                                    `)}
 
     ${subSection("Dental Procedures", `
-                                                                                                    ${row("Periodontal Treatment", get("periodontal"))}
-                                                                                                    ${row("Difficult Extraction", get("difficult_extraction"))}
-                                                                                                    ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
+                                                                                                        ${row("Periodontal Treatment", get("periodontal"))}
+                                                                                                        ${row("Difficult Extraction", get("difficult_extraction"))}
+                                                                                                        ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
 
-                                                                                                    ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
-                                                                                                    ${row("Dentures", get("dentures"))}
-                                                                                                    ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
+                                                                                                        ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
+                                                                                                        ${row("Dentures", get("dentures"))}
+                                                                                                        ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
 
-                                                                                                    ${row("Orthodontic Treatment", get("ortho_treatment"))}
-                                                                                                    ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
-                                                                                                `)}
+                                                                                                        ${row("Orthodontic Treatment", get("ortho_treatment"))}
+                                                                                                        ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
+                                                                                                    `)}
 
     ${fullWidthSection("Additional Concerns", `
-                                                                                                    ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
+                                                                                                        ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
                 ? get("additional_concerns")
                 : '<span class="text-[#9e9690] italic">No additional concerns provided.</span>'}
-                                                                                                `)}
+                                                                                                    `)}
     `;
 
         const medicalHistoryBody = `
     ${subSection("General Health", `
-                                                                                                    ${row("Good Health", get("good_health"))}
-                                                                                                    ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
+                                                                                                        ${row("Good Health", get("good_health"))}
+                                                                                                        ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
 
-                                                                                                    ${row("Had Medical Exam", get("had_medical_exam"))}
-                                                                                                    ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
+                                                                                                        ${row("Had Medical Exam", get("had_medical_exam"))}
+                                                                                                        ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
 
-                                                                                                    ${row("Under Treatment", get("under_treatment"))}
-                                                                                                    ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
+                                                                                                        ${row("Under Treatment", get("under_treatment"))}
+                                                                                                        ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
 
-                                                                                                    ${row("Hospitalized", get("hospitalized"))}
-                                                                                                    ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
-                                                                                                `)}
+                                                                                                        ${row("Hospitalized", get("hospitalized"))}
+                                                                                                        ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
+                                                                                                    `)}
 
     ${subSection("Allergies", `
-                                                                                                    ${row("Allergy (Medicine)", get("allergy_medicine"))}
-                                                                                                    ${row("Allergy (Food)", get("allergy_food"))}
-                                                                                                    ${optionalRow("Allergy (Others)", get("allergy_others"))}
-                                                                                                `)}
+                                                                                                        ${row("Allergy (Medicine)", get("allergy_medicine"))}
+                                                                                                        ${row("Allergy (Food)", get("allergy_food"))}
+                                                                                                        ${optionalRow("Allergy (Others)", get("allergy_others"))}
+                                                                                                    `)}
 
     ${subSection("Medications", `
-                                                                                                    ${row("Medication", get("medication"))}
-                                                                                                    ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
-                                                                                                `)}
+                                                                                                        ${row("Medication", get("medication"))}
+                                                                                                        ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
+                                                                                                    `)}
 
     ${isFemalePatient ? subSection("For Women Only", `
-                                                                                                    ${row("Pregnant", get("pregnant"))}
-                                                                                                    ${row("Nursing", get("nursing"))}
-                                                                                                    ${row("Birth Control Pills", get("birth_control"))}
-                                                                                                `) : ""}
+                                                                                                        ${row("Pregnant", get("pregnant"))}
+                                                                                                        ${row("Nursing", get("nursing"))}
+                                                                                                        ${row("Birth Control Pills", get("birth_control"))}
+                                                                                                    `) : ""}
 
    ${fullWidthSection(
             "Medical Conditions",
@@ -2401,127 +2414,127 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         )}
 
     ${subSection("Tobacco Use", `
-                                                                                                    ${row("Tobacco Use", get("tobacco_use"))}
-                                                                                                    ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
-                                                                                                    ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
-                                                                                                `)}
+                                                                                                        ${row("Tobacco Use", get("tobacco_use"))}
+                                                                                                        ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
+                                                                                                        ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
+                                                                                                    `)}
 
     ${subSection("Do You Suffer From", `
-                                                                                                    ${row("Headaches", get("headaches"))}
-                                                                                                    ${row("Earaches", get("earaches"))}
-                                                                                                    ${row("Neck Aches", get("neck_aches"))}
-                                                                                                `)}
+                                                                                                        ${row("Headaches", get("headaches"))}
+                                                                                                        ${row("Earaches", get("earaches"))}
+                                                                                                        ${row("Neck Aches", get("neck_aches"))}
+                                                                                                    `)}
     `;
 
         document.getElementById("summaryBox").innerHTML = `
     ${summaryCard("Patient Information", "fa-user", `
-                                                                                                    <div class="grid grid-cols-1 gap-y-1">
-                                                                                                        ${row("Name", patientName)}
-                                                                                                        ${row("Gender", patientGender)}
-                                                                                                    </div>
-                                                                                                `)}
+                                                                                                        <div class="grid grid-cols-1 gap-y-1">
+                                                                                                            ${row("Name", patientName)}
+                                                                                                            ${row("Gender", patientGender)}
+                                                                                                        </div>
+                                                                                                    `)}
                                                                     ${summaryCard(
             "Contact Information",
             "fa-address-card",
             `
-                                    <div id="contactSummaryView">
-                                        <div class="grid grid-cols-1 gap-y-1">
-                                            ${row("Email", contactEmail)}
-                                            ${row("Phone", contactPhone)}
-                                            ${row("Address", contactAddress)}
-                                        </div>
-                                    </div>
-
-                                    <div
-                                        id="contactSummaryEditor"
-                                        class="hidden space-y-4"
-                                    >
-                                        <div class="global-form-group">
-                                            <label
-                                                for="contactEditEmail"
-                                                class="global-form-label"
-                                            >
-                                                Email
-                                            </label>
-
-                                            <input
-                                                type="email"
-                                                id="contactEditEmail"
-                                                class="form-input-custom"
-                                                value="${contactEmail === 'N/A' ? '' : contactEmail}"
-                                            >
+                                        <div id="contactSummaryView">
+                                            <div class="grid grid-cols-1 gap-y-1">
+                                                ${row("Email", contactEmail)}
+                                                ${row("Phone", contactPhone)}
+                                                ${row("Address", contactAddress)}
+                                            </div>
                                         </div>
 
-                                        <div class="global-form-group">
-                                            <label
-                                                for="contactEditPhone"
-                                                class="global-form-label"
-                                            >
-                                                Phone
-                                            </label>
+                                        <div
+                                            id="contactSummaryEditor"
+                                            class="hidden space-y-4"
+                                        >
+                                            <div class="global-form-group">
+                                                <label
+                                                    for="contactEditEmail"
+                                                    class="global-form-label"
+                                                >
+                                                    Email
+                                                </label>
 
-                                            <input
-                                                type="tel"
-                                                id="contactEditPhone"
-                                                class="form-input-custom"
-                                                maxlength="11"
-                                                inputmode="numeric"
-                                                placeholder="09XXXXXXXXX"
-                                                value="${contactPhone === 'N/A' ? '' : contactPhone}"
-                                            >
+                                                <input
+                                                    type="email"
+                                                    id="contactEditEmail"
+                                                    class="form-input-custom"
+                                                    value="${contactEmail === 'N/A' ? '' : contactEmail}"
+                                                >
+                                            </div>
+
+                                            <div class="global-form-group">
+                                                <label
+                                                    for="contactEditPhone"
+                                                    class="global-form-label"
+                                                >
+                                                    Phone
+                                                </label>
+
+                                                <input
+                                                    type="tel"
+                                                    id="contactEditPhone"
+                                                    class="form-input-custom"
+                                                    maxlength="11"
+                                                    inputmode="numeric"
+                                                    placeholder="09XXXXXXXXX"
+                                                    value="${contactPhone === 'N/A' ? '' : contactPhone}"
+                                                >
+                                            </div>
+
+                                            <div class="global-form-group">
+                                                <label
+                                                    for="contactEditAddress"
+                                                    class="global-form-label"
+                                                >
+                                                    Address
+                                                </label>
+
+                                                <textarea
+                                                    id="contactEditAddress"
+                                                    class="form-input-custom global-form-textarea"
+                                                    rows="3"
+                                                >${contactAddress === 'N/A' ? '' : contactAddress}</textarea>
+                                            </div>
+
+                                            <div class="flex flex-wrap gap-2">
+                                                <button
+                                                    type="button"
+                                                    class="ui-btn ui-btn-primary ui-btn-sm"
+                                                    onclick="saveContactInformation()"
+                                                >
+                                                    <i class="fa-solid fa-check"></i>
+                                                    Save Changes
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    class="ui-btn ui-btn-secondary ui-btn-sm"
+                                                    onclick="cancelContactInformationEdit()"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
                                         </div>
-
-                                        <div class="global-form-group">
-                                            <label
-                                                for="contactEditAddress"
-                                                class="global-form-label"
-                                            >
-                                                Address
-                                            </label>
-
-                                            <textarea
-                                                id="contactEditAddress"
-                                                class="form-input-custom global-form-textarea"
-                                                rows="3"
-                                            >${contactAddress === 'N/A' ? '' : contactAddress}</textarea>
-                                        </div>
-
-                                        <div class="flex flex-wrap gap-2">
-                                            <button
-                                                type="button"
-                                                class="ui-btn ui-btn-primary ui-btn-sm"
-                                                onclick="saveContactInformation()"
-                                            >
-                                                <i class="fa-solid fa-check"></i>
-                                                Save Changes
-                                            </button>
-
-                                            <button
-                                                type="button"
-                                                class="ui-btn ui-btn-secondary ui-btn-sm"
-                                                onclick="cancelContactInformationEdit()"
-                                            >
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    </div>
-                                `,
+                                    `,
             "editContactInformationFromReview()"
         )}
 
     <div class="grid grid-cols-2 gap-4 sm-grid-1col">
         ${summaryCard("Appointment Details", "fa-calendar-check", `
-                                                                                                    <div class="grid grid-cols-1 gap-y-1">
-                                                                                                        ${row("Date", get("appointment_date"))}
-                                                                                                        ${row("Time", get("appointment_time"))}
-                                                                                                    </div>
-                                                                                                `)}
-
-        ${summaryCard("Service", "fa-tooth", `
                                                                                                         <div class="grid grid-cols-1 gap-y-1">
-                                                                                                            ${row("Type", get("service_type"))}
+                                                                                                            ${row("Date", get("appointment_date"))}
+                                                                                                            ${row("Time", get("appointment_time"))}
                                                                                                         </div>
                                                                                                     `)}
+
+        ${summaryCard("Service", "fa-tooth", `
+                                                                                                            <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                ${row("Type", get("service_type"))}
+                                                                                                            </div>
+                                                                                                        `)}
     </div>
 
         ${summaryCard("Dental History", "fa-teeth",
@@ -2536,12 +2549,12 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
     <div class="grid grid-cols-2 gap-4 sm-grid-1col">
         ${summaryCard("Emergency Contact", "fa-phone", `
-                                                                                                        <div class="grid grid-cols-1 gap-y-1">
-                                                                                                            ${row("Name", get("emergency_person"))}
-                                                                                                            ${row("Number", get("emergency_number"))}
-                                                                                                            ${row("Relation", emergencyRelation)}
-                                                                                                        </div>
-                                                                                                    `)}
+                                                                                                            <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                ${row("Name", get("emergency_person"))}
+                                                                                                                ${row("Number", get("emergency_number"))}
+                                                                                                                ${row("Relation", emergencyRelation)}
+                                                                                                            </div>
+                                                                                                        `)}
 
         ${summaryCard(
             "Signature",
@@ -2860,19 +2873,12 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         );
 
         document
-            .querySelectorAll("#slotGrid .slot-chip")
+            .querySelectorAll(
+                "#slotGrid .slot-chip"
+            )
             .forEach(chip => {
                 chip.classList.remove(
-                    "selected",
-                    "bg-[#8B0000]",
-                    "text-white",
-                    "border-[#8B0000]"
-                );
-
-                chip.classList.add(
-                    "border-[#e8e2dd]",
-                    "bg-[#fafaf8]",
-                    "text-[#1a1410]"
+                    "selected"
                 );
 
                 chip.setAttribute(

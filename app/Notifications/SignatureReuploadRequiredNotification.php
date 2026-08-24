@@ -31,6 +31,7 @@ class SignatureReuploadRequiredNotification extends Notification
             'icon' => 'fa-file-signature',
             'patient_id' => $this->patient->id,
             'event' => 'signature.reupload_required',
+            'recipient_role' => optional($notifiable->role)->slug,
         ];
     }
 
@@ -46,6 +47,7 @@ class SignatureReuploadRequiredNotification extends Notification
             'event' => 'signature.reupload_required',
             'created_at_label' => 'Just now',
             'state' => 'unread',
+            'recipient_role' => optional($notifiable->role)->slug,
         ]);
     }
 }
