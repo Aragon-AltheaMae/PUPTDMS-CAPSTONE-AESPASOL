@@ -14,6 +14,7 @@
     $hideSidebar = View::hasSection('hide-sidebar');
     $hideMobileNav = View::hasSection('hide-mobile-nav');
     $hidePatientModals = View::hasSection('hide-patient-modals');
+    $hideFooter = View::hasSection('hide-footer');
 
     $showMobileMenu = ($isAdmin || $isDentist) && !$hideSidebar;
     $showSettings = $isAdmin;
@@ -184,10 +185,12 @@
 
     @yield('content')
 
-    @include('partials.footer')
+    @if (!$hideFooter)
+        @include('partials.footer')
+    @endif
 
     @include('components.active-appointment-modal')
-    
+
     @include('components.discard-changes')
 
     @include('partials.global-toast')

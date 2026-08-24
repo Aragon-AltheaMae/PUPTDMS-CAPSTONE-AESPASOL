@@ -14,11 +14,54 @@ $homeRecords = ($records ?? collect())
 return in_array(strtolower($r->status ?? ''), ['completed', 'cancelled']);
 })
 ->map(function ($r) {
+$followUp =
+$r->followUpAppointments
+?->sortBy(function ($followUpAppt) {
+return sprintf(
+'%s %s',
+$followUpAppt->appointment_date ?? '',
+$followUpAppt->appointment_time ?? ''
+);
+})
+?->first();
 return [
+'id' => $r->id,
 'service' => $r->service_type,
 'date' => $r->appointment_date ? \Carbon\Carbon::parse($r->appointment_date)->format('F d, Y') : '',
 'time' => $r->appointment_time ?? '',
 'status' => strtolower($r->status ?? ''),
+'dentist_name' =>
+$r->dentist_name
+?? optional($r->dentist)->name
+?? optional($r->originalDentist)->name
+?? 'Not assigned',
+'follow_up' => $followUp
+? [
+'date' => $followUp->appointment_date
+? \Carbon\Carbon::parse(
+$followUp->appointment_date
+)->format('F d, Y')
+: null,
+
+'time' => $followUp->appointment_time
+? \Carbon\Carbon::parse(
+$followUp->appointment_time
+)->format('g:i A')
+: null,
+
+'service' =>
+$followUp->service_type
+?? 'Follow-up',
+
+'status' =>
+$followUp->status
+?? 'upcoming',
+
+'reason' =>
+$followUp->follow_up_reason
+?? null,
+]
+: null,
 'duration' => $r->procedure?->procedure_duration_seconds
 ? \Carbon\CarbonInterval::seconds((int) $r->procedure->procedure_duration_seconds)
 ->cascade()
@@ -399,6 +442,34 @@ $birthdateDisplay = 'N/A';
         </div>
 </main>
 
+<template id="dashboardRecordCardsTemplate">
+    <div class="space-y-3">
+
+        @foreach (
+        collect($homeRecords ?? [])
+        ->take(3)
+        as $index => $record
+        )
+
+        <x-appointment-record-card :appointment="$record" variant="past" :show-details="true" :show-countdown="false"
+            :show-time-range="false" :compact="true" :animation-delay="$index * 0.08" />
+
+        @endforeach
+
+        <div class="pt-2">
+            <a href="{{ route('patient.record') }}" class="ui-btn ui-btn-primary w-full">
+                <i class="fa-solid fa-folder-open"></i>
+
+                <span>
+                    View All Records
+                </span>
+
+                <i class="fa-solid fa-arrow-right text-[11px]"></i>
+            </a>
+        </div>
+
+    </div>
+</template>
 @if (session('appointment_confirmation'))
 @php
 $appointmentConfirmation = session('appointment_confirmation');
@@ -1810,90 +1881,15 @@ $appointmentConfirmation = session('appointment_confirmation');
 
         if (viewAll) viewAll.classList.remove("hidden");
 
-        var html = '<div class="space-y-3">';
-        HOME_RECORDS.slice(0, 3).forEach(function (r, idx) {
-            var encoded = encodeURIComponent(JSON.stringify(r));
-            var dispTime = formatTime(r.time);
-            var dispDate = r.date;
+        const recordsTemplate =
+            document.getElementById(
+                'dashboardRecordCardsTemplate'
+            );
 
-            html +=
-                '<article class="dental-record-card ' +
-                (idx === 0 ? 'is-latest' : '') +
-                '">' +
-
-                '<div class="dental-record-main">' +
-
-                '<div class="dental-record-icon">' +
-                '<i class="fa-solid fa-tooth"></i>' +
-                '</div>' +
-
-                '<div class="dental-record-copy">' +
-
-                '<div class="dental-record-title-row">' +
-
-                '<h3 class="dental-record-title">' +
-                window.escapeHtml(r.service) +
-                '</h3>' +
-
-                '<span class="status-pill ' +
-                (
-                    (r.status || '').toLowerCase() === 'completed' ?
-                        'status-completed' :
-                        'status-cancelled'
-                ) +
-                '">' +
-
-                '<span class="status-dot"></span>' +
-
-                window.escapeHtml(
-                    (r.status || '').toLowerCase() === 'completed' ?
-                        'Completed' :
-                        'Cancelled'
-                ) +
-
-                '</span>' +
-
-                '</div>' +
-
-                '<div class="dental-record-meta">' +
-
-                '<span>' +
-                '<i class="fa-regular fa-calendar"></i>' +
-                window.escapeHtml(dispDate) +
-                '</span>' +
-
-                '<span>' +
-                '<i class="fa-regular fa-clock"></i>' +
-                window.escapeHtml(dispTime) +
-                '</span>' +
-
-                '</div>' +
-
-                '</div>' +
-                '</div>' +
-
-                '<button type="button" ' +
-                'class="ui-btn ui-btn-secondary ui-btn-sm dental-record-action" ' +
-                'onclick="openDashboardRecordModal(\'' + encoded + '\')">' +
-
-                '<i class="fa-solid fa-eye"></i>' +
-                '<span>View Details</span>' +
-
-                '</button>' +
-
-                '</article>';
-        });
-
-        html +=
-            '<div class="pt-2">' +
-            '<a href="' + ROUTE_RECORD +
-            '" class="ui-btn ui-btn-primary w-full">' +
-            '<i class="fa-solid fa-folder-open"></i>' +
-            '<span>View All Records</span>' +
-            '<i class="fa-solid fa-arrow-right text-[11px]"></i>' +
-            '</a>' +
-            '</div>' +
-            '</div>';
+        const html =
+            recordsTemplate
+                ? recordsTemplate.innerHTML
+                : '';
 
         window.swapSkeletonContent(
             'dentalOverviewContainer',

@@ -23,13 +23,13 @@ class PhilippineHolidays
     {
         $holidays = [];
 
-        // ── Fixed-date Regular Holidays ──────────────────────────────────────
+        // Fixed-date Regular Holidays
         $fixed = [
             '01-01' => "New Year's Day",
             '04-09' => 'Araw ng Kagitingan (Day of Valor)',
             '05-01' => 'Labor Day',
             '06-12' => 'Independence Day',
-            '08-26' => 'National Heroes Day',   // last Monday of August — overridden below
+            '08-26' => 'National Heroes Day',
             '11-30' => 'Bonifacio Day',
             '12-25' => 'Christmas Day',
             '12-30' => 'Rizal Day',
@@ -43,7 +43,7 @@ class PhilippineHolidays
         $lastMonday = self::lastWeekdayOfMonth($year, 8, 1); // 1 = Monday
         $holidays[$lastMonday] = 'National Heroes Day';
 
-        // ── Easter-based Moveable Holidays ───────────────────────────────────
+        // Easter-based Moveable Holidays
         $easter     = self::easterDate($year);
         $maundy     = (clone $easter)->modify('-3 days');
         $goodFriday = (clone $easter)->modify('-2 days');
@@ -53,7 +53,7 @@ class PhilippineHolidays
         $holidays[$goodFriday->format('Y-m-d')]  = 'Good Friday';
         $holidays[$blackSat->format('Y-m-d')]    = 'Black Saturday';
 
-        // ── Special (Non-Working) Holidays ───────────────────────────────────
+        // Special (Non-Working) Holidays
         $special = [
             '02-25' => 'EDSA People Power Revolution Anniversary',
             '08-21' => 'Ninoy Aquino Day',
@@ -103,7 +103,7 @@ class PhilippineHolidays
         return $merged;
     }
 
-    // ── Private Helpers ──────────────────────────────────────────────────────
+    // Private Helpers
 
     private static function easterDate(int $year): \DateTime
     {

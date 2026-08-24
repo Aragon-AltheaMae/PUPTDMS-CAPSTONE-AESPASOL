@@ -449,11 +449,6 @@
     color: var(--text-2);
 }
 
-[data-theme="dark"] .bg-gray-50 {
-    background: rgba(13, 17, 23, .82) !important;
-    border-color: rgba(255, 255, 255, .08) !important;
-}
-
 [data-theme="dark"] h2.text-gray-800 {
     color: #FCA5A5 !important;
 }

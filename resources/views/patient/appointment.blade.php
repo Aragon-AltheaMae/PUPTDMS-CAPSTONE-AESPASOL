@@ -171,8 +171,17 @@ $appt->procedure?->prescriptions
 
         $nextRecommendedText = $nextRecommendedDate->format('M d, Y');
         $daysUntilRecommended = \Carbon\Carbon::today()->diffInDays($nextRecommendedDate->copy()->startOfDay(), false);
-        $recommendedHint = $daysUntilRecommended < 0 ? 'Due now' : ($daysUntilRecommended===0 ? 'Due today' : 'In ' .
-            $daysUntilRecommended . ' days' ); @endphp <section class="appt-section-reveal mb-5">
+        $recommendedHint =
+            $daysUntilRecommended < 0
+                ? 'Due now'
+                : (
+                    $daysUntilRecommended === 0
+                        ? 'Due today'
+                        : 'In ' . $daysUntilRecommended . ' days'
+                );
+        @endphp
+
+        <section class="appt-section-reveal mb-5">
             <div class="appt-summary-grid">
                 <div class="appt-summary-card">
                     <div class="flex items-center gap-4">
@@ -408,111 +417,19 @@ $appt->procedure?->prescriptions
                         <span class="appt-list-divider-line"></span>
                     </div>
 
-                    @foreach ($futureVisits as $index => $appt)
-                    @php
-                    $apptDate = \Carbon\Carbon::parse($appt->appointment_date);
-                    $apptTime = \Carbon\Carbon::parse($appt->appointment_time);
-                    $now = \Carbon\Carbon::now();
-                    $diffDays = (int) $now
-                    ->startOfDay()
-                    ->diffInDays($apptDate->copy()->startOfDay(), false);
-                    if ($diffDays === 0) {
-                    $countdown = 'Today';
-                    } elseif ($diffDays === 1) {
-                    $countdown = 'Tomorrow';
-                    } else {
-                    $countdown = 'In ' . $diffDays . ' days';
-                    }
+                    <div data-show-more data-show-more-step="5" data-show-more-label="visits">
+                        <div class="space-y-3" data-show-more-list>
+                            @foreach ($futureVisits as $index => $appt)
 
-                    $rawStatus = strtolower(
-                    trim((string) ($appt->status ?? 'upcoming'))
-                    );
+                            <x-appointment-record-card :appointment="$appt" variant="upcoming" :show-details="false"
+                                :show-countdown="true" :show-time-range="true" :animation-delay="$index * 0.08"
+                                data-show-more-item />
 
-                    $statusClass = match ($rawStatus) {
-                    'rescheduled' => 'status-rescheduled',
-                    'upcoming',
-                    'scheduled',
-                    'confirmed' => 'status-upcoming',
-                    default => 'status-default',
-                    };
-
-                    $dentistName =
-                    $appt->dentist?->name
-                    ?? $appt->originalDentist?->name
-                    ?? 'Not yet assigned';
-
-                    $isFollowUpAppointment =
-                    (bool) ($appt->is_follow_up ?? false);
-                    @endphp
-
-                    <div class="global-record-card appt-visit-card appt-visit-card-upcoming {{ $statusClass }}"
-                        style="animation-delay: {{ $index * 0.08 }}s">
-                        <div class="appt-visit-date">
-                            <span class="appt-visit-day">
-                                {{ $apptDate->format('d') }}
-                            </span>
-
-                            <span class="appt-visit-month">
-                                {{ $apptDate->format('M') }}
-                            </span>
-
-                            <span class="appt-visit-year">
-                                {{ $apptDate->format('Y') }}
-                            </span>
+                            @endforeach
                         </div>
 
-                        <div class="appt-visit-main">
-                            <div class="appt-visit-head">
-                                <div class="appt-visit-title-group">
-
-                                    <div class="appt-visit-title-row">
-
-                                        <h3 class="appt-visit-title">
-                                            {{ $appt->service_type }}
-
-                                            {{ $appt->other_services
-                                            ? ' (' . $appt->other_services . ')'
-                                            : '' }}
-                                        </h3>
-
-                                        @if ($isFollowUpAppointment)
-                                        <span class="appt-type-icon" data-tooltip="Follow-up appointment"
-                                            data-tooltip-tone="neutral" aria-label="Follow-up appointment" tabindex="0">
-                                            <i class="fa-solid fa-calendar-plus"></i>
-                                        </span>
-                                        @endif
-
-                                    </div>
-
-                                    <span class="status-pill {{ $statusClass }}">
-                                        <span class="status-dot"></span>
-                                        {{ \Illuminate\Support\Str::headline($rawStatus) }}
-                                    </span>
-                                </div>
-
-                                <span class="urgency-chip urgency-upcoming">
-                                    {{ $countdown }}
-                                </span>
-                            </div>
-
-                            <div class="appt-visit-meta">
-                                <span class="global-info-pill">
-                                    <i class="fa-regular fa-clock"></i>
-                                    <span>
-                                        {{ $apptTime->format('g:i A') }}
-                                        –
-                                        {{ $apptTime->copy()->addHour()->format('g:i A') }}
-                                    </span>
-                                </span>
-
-                                <span class="global-info-pill">
-                                    <i class="fa-solid fa-user-doctor"></i>
-                                    <span>{{ $dentistName }}</span>
-                                </span>
-                            </div>
-                        </div>
+                        <x-show-more label="visits" />
                     </div>
-                    @endforeach
                     @else
                     <div class="appt-timeline-empty">
                         <div class="appt-timeline-empty-grid">
@@ -616,206 +533,19 @@ $appt->procedure?->prescriptions
                         <span class="appt-list-divider-line"></span>
                     </div>
 
-                    @foreach ($pastVisits as $index => $appt)
-                    @php
-                    $apptDate =
-                    \Carbon\Carbon::parse(
-                    $appt->appointment_date
-                    );
+                    <div data-show-more data-show-more-step="5" data-show-more-label="visits">
+                        <div class="space-y-3" data-show-more-list>
+                            @foreach ($pastVisits as $index => $appt)
 
-                    $apptTime =
-                    \Carbon\Carbon::parse(
-                    $appt->appointment_time
-                    );
+                            <x-appointment-record-card :appointment="$appt" variant="past" :show-details="true"
+                                :show-countdown="false" :show-time-range="true" :animation-delay="$index * 0.08"
+                                data-show-more-item />
 
-                    $rawStatus =
-                    strtolower(
-                    trim(
-                    (string) (
-                    $appt->status
-                    ?? 'completed'
-                    )
-                    )
-                    );
-
-                    $statusClass = match ($rawStatus) {
-                    'completed' => 'status-completed',
-                    'cancelled',
-                    'canceled' => 'status-cancelled',
-                    'rescheduled' => 'status-rescheduled',
-                    default => 'status-default',
-                    };
-
-                    $dentistName =
-                    $appt->dentist?->name
-                    ?? $appt->originalDentist?->name
-                    ?? 'Not assigned';
-
-                    $isFollowUpAppointment =
-                    (bool) ($appt->is_follow_up ?? false);
-
-                    $followUp =
-                    $appt->followUpAppointments
-                    ?->sortBy('appointment_date')
-                    ?->first();
-
-                    $recordPayload = [
-                    'service' =>
-                    $appt->service_type
-                    ?? 'Dental Appointment',
-
-                    'date' =>
-                    $appt->appointment_date
-                    ? \Carbon\Carbon::parse(
-                    $appt->appointment_date
-                    )->format('F d, Y')
-                    : null,
-
-                    'time' =>
-                    $appt->appointment_time
-                    ? \Carbon\Carbon::parse(
-                    $appt->appointment_time
-                    )->format('g:i A')
-                    : null,
-
-                    'status' =>
-                    $rawStatus,
-
-                    'duration_seconds' =>
-                    $appt->procedure
-                    ?->procedure_duration_seconds,
-
-                    'remarks' =>
-                    $appt->procedure
-                    ?->completion_action
-                    ?? $appt->remarks
-                    ?? null,
-
-                    'oral' =>
-                    $appt->procedure
-                    ?->oral_examination
-                    ?? $appt->oral_examination
-                    ?? null,
-
-                    'diagnosis' =>
-                    $appt->procedure
-                    ?->diagnosis
-                    ?? $appt->diagnosis
-                    ?? null,
-
-                    'prescription' =>
-                    $appt->procedure
-                    ?->prescriptions
-                    ?? $appt->prescription
-                    ?? null,
-
-                    'follow_up' =>
-                    $followUp
-                    ? [
-                    'date' =>
-                    $followUp->appointment_date
-                    ? \Carbon\Carbon::parse(
-                    $followUp->appointment_date
-                    )->format('F d, Y')
-                    : null,
-
-                    'time' =>
-                    $followUp->appointment_time
-                    ? \Carbon\Carbon::parse(
-                    $followUp->appointment_time
-                    )->format('g:i A')
-                    : null,
-
-                    'service' =>
-                    $followUp->service_type
-                    ?? null,
-
-                    'reason' =>
-                    $followUp->follow_up_reason
-                    ?? null,
-                    ]
-                    : null,
-
-                    'odontogram_data' =>
-                    $odontogramTeeth
-                    ?? [],
-                    ];
-                    @endphp
-
-                    <div class="global-record-card appt-visit-card appt-visit-card-past {{ $statusClass }}"
-                        style="animation-delay: {{ $index * 0.08 }}s">
-                        <div class="appt-visit-date appt-visit-date-muted">
-                            <span class="appt-visit-day">
-                                {{ $apptDate->format('d') }}
-                            </span>
-
-                            <span class="appt-visit-month">
-                                {{ $apptDate->format('M') }}
-                            </span>
-
-                            <span class="appt-visit-year">
-                                {{ $apptDate->format('Y') }}
-                            </span>
+                            @endforeach
                         </div>
 
-                        <div class="appt-visit-main">
-                            <div class="appt-visit-head">
-                                <div class="appt-visit-title-group">
-                                    <div class="appt-visit-title-row">
-
-                                        <h3 class="appt-visit-title">
-                                            {{ $appt->service_type }}
-
-                                            {{ $appt->other_services
-                                            ? ' (' . $appt->other_services . ')'
-                                            : '' }}
-                                        </h3>
-
-                                        @if ($isFollowUpAppointment)
-                                        <span class="appt-type-icon" data-tooltip="Follow-up appointment"
-                                            data-tooltip-tone="neutral" aria-label="Follow-up appointment" tabindex="0">
-                                            <i class="fa-solid fa-calendar-plus"></i>
-                                        </span>
-                                        @endif
-
-                                    </div>
-
-                                    <span class="status-pill {{ $statusClass }}">
-                                        <span class="status-dot"></span>
-                                        {{ \Illuminate\Support\Str::headline($rawStatus) }}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="appt-visit-meta">
-                                <span class="global-info-pill">
-                                    <i class="fa-regular fa-clock"></i>
-
-                                    <span>
-                                        {{ $apptTime->format('g:i A') }}
-                                        –
-                                        {{ $apptTime->copy()->addHour()->format('g:i A') }}
-                                    </span>
-                                </span>
-
-                                <span class="global-info-pill">
-                                    <i class="fa-solid fa-user-doctor"></i>
-                                    <span>{{ $dentistName }}</span>
-                                </span>
-                            </div>
-                        </div>
-
-                        <div class="appt-visit-actions">
-
-                            <button type="button" class="ui-action-btn ui-action-view"
-                                data-record='@json($recordPayload)' onclick="openRecordModal(this)"
-                                aria-label="View details" data-tooltip="View details" data-tooltip-tone="view">
-                                <i class="fa-regular fa-eye"></i>
-                            </button>
-
-                        </div>
+                        <x-show-more label="visits" />
                     </div>
-                    @endforeach
                     @else
                     <div class="appt-empty-state text-center">
                         <div class="appt-empty-icon">

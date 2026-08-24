@@ -432,7 +432,8 @@ return $aPriority <=> $bPriority;
                 )->format('F Y');
                 @endphp
 
-                <details class="appt-month-group" data-month="{{ $monthKey }}" data-visible-count="7" open>
+                <details class="appt-month-group" data-month="{{ $monthKey }}" data-show-more data-show-more-step="7"
+                    data-show-more-label="appointments" open>
                     <summary class="appt-month-summary">
                         <span class="appt-month-left">
                             <span class="timeline-dot"></span>
@@ -441,7 +442,8 @@ return $aPriority <=> $bPriority;
                                 {{ $monthLabel }}
                             </span>
 
-                            <span class="month-count-pill" data-month-count>
+                            <span class="month-count-pill" data-month-count data-show-more-count
+                                data-show-more-count-label="appointments" data-show-more-count-singular="appointment">
                                 {{ $items->count() }}
                                 {{ Str::plural('appointment', $items->count()) }}
                             </span>
@@ -452,9 +454,6 @@ return $aPriority <=> $bPriority;
 
                     <div class="appt-month-body">
 
-                        {{-- =========================
-                        DESKTOP / LIST VIEW
-                        ========================== --}}
                         <div class="desktop-appointments-table relative pl-10">
 
                             <div class="appointment-timeline-line"></div>
@@ -495,7 +494,8 @@ return $aPriority <=> $bPriority;
                                 </div>
                             </div>
 
-                            <div class="space-y-2.5" data-month-list>
+                            <div class="space-y-2.5" data-month-list data-show-more-list
+                                data-show-more-reference="true">
                                 @foreach ($items as $i => $appt)
 
                                 @php
@@ -789,7 +789,7 @@ return $aPriority <=> $bPriority;
                                     data-service="{{ strtolower($serviceLabel) }}"
                                     data-patient-id="{{ strtolower((string) ($appt->patient_id ?? '')) }}"
                                     data-status="{{ $normalizedStatus }}"
-                                    data-follow-up="{{ $isFollowUpAppointment ? '1' : '0' }}"
+                                    data-follow-up="{{ $isFollowUpAppointment ? '1' : '0' }}" data-show-more-item
                                     style="animation-delay:{{ $i * 0.04 }}s">
                                     <div class="appointment-table-grid
                                            grid gap-4 items-center
@@ -997,11 +997,7 @@ return $aPriority <=> $bPriority;
                             </div>
                         </div>
 
-
-                        {{-- =========================
-                        GRID / MOBILE CARDS
-                        ========================== --}}
-                        <div class="mobile-appointments-list" data-month-grid>
+                        <div class="mobile-appointments-list" data-month-grid data-show-more-list>
                             @foreach ($items as $i => $appt)
 
                             @php
@@ -1253,7 +1249,7 @@ return $aPriority <=> $bPriority;
                                 data-service="{{ strtolower($serviceLabel) }}"
                                 data-patient-id="{{ strtolower((string) ($appt->patient_id ?? '')) }}"
                                 data-status="{{ $normalizedStatus }}"
-                                data-follow-up="{{ $isFollowUpAppointment ? '1' : '0' }}"
+                                data-follow-up="{{ $isFollowUpAppointment ? '1' : '0' }}" data-show-more-item
                                 style="animation-delay:{{ $i * 0.04 }}s">
 
                                 <div class="flex items-start justify-between gap-2 mb-4 pl-1">
@@ -1430,13 +1426,7 @@ return $aPriority <=> $bPriority;
                             @endforeach
                         </div>
 
-                        <div class="appointment-month-more-wrap">
-                            <button type="button" class="ui-btn ui-btn-secondary appointment-month-more-btn hidden"
-                                data-month-show-more>
-                                <i class="fa-solid fa-chevron-down"></i>
-                                <span data-month-show-more-text></span>
-                            </button>
-                        </div>
+                        <x-show-more label="appointments" />
 
                     </div>
                 </details>
@@ -1928,7 +1918,11 @@ return $aPriority <=> $bPriority;
                     updateAppointmentFilterButtonState();
                     revealAppointmentContainer?.();
                     setupAppointmentAccordions();
-                    setupMonthShowMore();
+
+                    window.ShowMore?.init(
+                        document
+                    );
+
                     initAppointmentRefreshWatcher();
                 }
             );
@@ -2165,219 +2159,6 @@ return $aPriority <=> $bPriority;
                 });
             }
 
-            const APPOINTMENT_MONTH_STEP = 7;
-
-            function getMonthHolderCards(holder) {
-                if (!holder) {
-                    return [];
-                }
-
-                return Array.from(
-                    holder.querySelectorAll(
-                        ':scope > .appt-card, :scope > .mobile-appt-card'
-                    )
-                );
-            }
-
-            function getFilteredMonthCards(holder) {
-                return getMonthHolderCards(holder).filter(function (card) {
-                    return card.dataset.filterMatch === '1';
-                });
-            }
-
-            function updateMonthShowMore(group) {
-                if (!group) {
-                    return;
-                }
-
-                const desktopHolder =
-                    group.querySelector('[data-month-list]');
-
-                const mobileHolder =
-                    group.querySelector('[data-month-grid]');
-
-                const referenceHolder =
-                    desktopHolder || mobileHolder;
-
-                if (!referenceHolder) {
-                    return;
-                }
-
-                const visibleCount =
-                    Math.max(
-                        APPOINTMENT_MONTH_STEP,
-                        Number(
-                            group.dataset.visibleCount ||
-                            APPOINTMENT_MONTH_STEP
-                        )
-                    );
-
-                const matchingReferenceCards =
-                    getFilteredMonthCards(referenceHolder);
-
-                const matchingTotal =
-                    matchingReferenceCards.length;
-
-                [
-                    desktopHolder,
-                    mobileHolder
-                ].forEach(function (holder) {
-                    if (!holder) {
-                        return;
-                    }
-
-                    const matchingCards =
-                        getFilteredMonthCards(holder);
-
-                    matchingCards.forEach(function (card, index) {
-                        const shouldShow =
-                            index < visibleCount;
-
-                        card.hidden =
-                            !shouldShow;
-
-                        card.classList.toggle(
-                            'hidden',
-                            !shouldShow
-                        );
-                    });
-                });
-
-                const countPill =
-                    group.querySelector(
-                        '[data-month-count]'
-                    );
-
-                if (countPill) {
-                    countPill.textContent =
-                        `${matchingTotal} ${matchingTotal === 1
-                            ? 'appointment'
-                            : 'appointments'
-                        }`;
-                }
-
-                const button =
-                    group.querySelector(
-                        '[data-month-show-more]'
-                    );
-
-                const text =
-                    group.querySelector(
-                        '[data-month-show-more-text]'
-                    );
-
-                if (!button || !text) {
-                    return;
-                }
-
-                if (matchingTotal <= APPOINTMENT_MONTH_STEP) {
-                    button.classList.add('hidden');
-                    return;
-                }
-
-                button.classList.remove('hidden');
-
-                const isFullyExpanded =
-                    visibleCount >= matchingTotal;
-
-                if (isFullyExpanded) {
-                    text.textContent = 'Show less';
-
-                    button.dataset.mode = 'less';
-
-                    button
-                        .querySelector('i')
-                        ?.classList.replace(
-                            'fa-chevron-down',
-                            'fa-chevron-up'
-                        );
-
-                    return;
-                }
-
-                const remaining =
-                    Math.min(
-                        APPOINTMENT_MONTH_STEP,
-                        matchingTotal - visibleCount
-                    );
-
-                text.textContent =
-                    `Show ${remaining} more`;
-
-                button.dataset.mode = 'more';
-
-                button
-                    .querySelector('i')
-                    ?.classList.replace(
-                        'fa-chevron-up',
-                        'fa-chevron-down'
-                    );
-            }
-
-            function updateAllMonthShowMore() {
-                document
-                    .querySelectorAll(
-                        '.appt-month-group'
-                    )
-                    .forEach(updateMonthShowMore);
-            }
-
-            function setupMonthShowMore() {
-                document
-                    .querySelectorAll(
-                        '.appt-month-group'
-                    )
-                    .forEach(function (group) {
-                        if (
-                            group.dataset.showMoreReady ===
-                            'true'
-                        ) {
-                            return;
-                        }
-
-                        group.dataset.showMoreReady =
-                            'true';
-
-                        const button =
-                            group.querySelector(
-                                '[data-month-show-more]'
-                            );
-
-                        button?.addEventListener(
-                            'click',
-                            function () {
-                                const current =
-                                    Number(
-                                        group.dataset.visibleCount ||
-                                        APPOINTMENT_MONTH_STEP
-                                    );
-
-                                if (
-                                    button.dataset.mode ===
-                                    'less'
-                                ) {
-                                    group.dataset.visibleCount =
-                                        String(
-                                            APPOINTMENT_MONTH_STEP
-                                        );
-                                } else {
-                                    group.dataset.visibleCount =
-                                        String(
-                                            current +
-                                            APPOINTMENT_MONTH_STEP
-                                        );
-                                }
-
-                                updateMonthShowMore(
-                                    group
-                                );
-                            }
-                        );
-                    });
-
-                updateAllMonthShowMore();
-            }
-
             function clearAppointmentSearch() {
                 if (apptSearchInput) {
                     apptSearchInput.value = '';
@@ -2421,22 +2202,27 @@ return $aPriority <=> $bPriority;
                         '.appt-month-group'
                     )
                     .forEach(function (group) {
-                        group.dataset.visibleCount =
-                            String(
-                                APPOINTMENT_MONTH_STEP
+                        const referenceHolder =
+                            group.querySelector(
+                                '[data-month-list]'
+                            ) ||
+                            group.querySelector(
+                                '[data-month-grid]'
                             );
 
                         const cardsInGroup =
                             Array.from(
-                                group.querySelectorAll(
-                                    '.appt-card, .mobile-appt-card'
-                                )
+                                referenceHolder
+                                    ?.querySelectorAll(
+                                        ':scope > [data-show-more-item]'
+                                    ) || []
                             );
 
                         const hasMatchingCard =
                             cardsInGroup.some(
                                 card =>
-                                    card.dataset.filterMatch ===
+                                    card.dataset
+                                        .filterMatch ===
                                     '1'
                             );
 
@@ -2449,7 +2235,7 @@ return $aPriority <=> $bPriority;
                         );
 
                         if (hasMatchingCard) {
-                            updateMonthShowMore(
+                            window.ShowMore?.reset(
                                 group
                             );
                         }

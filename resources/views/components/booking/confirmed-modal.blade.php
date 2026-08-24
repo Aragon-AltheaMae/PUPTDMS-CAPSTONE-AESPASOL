@@ -97,9 +97,7 @@
                 </div>
 
                 <div id="{{ $messageId }}" class="confirmed-modal-details-content">
-                    <p class="confirmed-modal-message">
-                        {{ $slot }}
-                    </p>
+                    {{ $slot }}
                 </div>
             </div>
         </div>

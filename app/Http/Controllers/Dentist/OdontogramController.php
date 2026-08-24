@@ -24,13 +24,14 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Patient;
 use Carbon\Carbon;
 use App\Models\ClinicSchedule;
 use App\Models\BlockedDate;
 use App\Helpers\PhilippineHolidays;
 use App\Helpers\BookingQuestions;
-use Illuminate\Support\Facades\Auth;
 
 class OdontogramController extends Controller
 {
@@ -811,6 +812,50 @@ class OdontogramController extends Controller
 
         session()->forget($this->existingAppointmentDraftSessionKey($patient));
 
+        $patient->loadMissing(
+            'medicalHistory'
+        );
+
+        $hasReusableSignature =
+            !empty($patient
+                ->medicalHistory
+                ?->patient_signature) &&
+            $patient
+            ->medicalHistory
+            ?->signature_review_status !==
+            'invalid_reupload_required';
+
+        $existingSignatureUrl = null;
+
+        if (
+            $hasReusableSignature &&
+            filled(
+                $patient
+                    ->medicalHistory
+                    ?->patient_signature
+            )
+        ) {
+            $signaturePath = ltrim(
+                str_replace(
+                    'storage/',
+                    '',
+                    $patient
+                        ->medicalHistory
+                        ->patient_signature
+                ),
+                '/'
+            );
+
+            if (
+                Storage::disk('public')
+                ->exists($signaturePath)
+            ) {
+                $existingSignatureUrl =
+                    Storage::disk('public')
+                    ->url($signaturePath);
+            }
+        }
+
         $defaults = $this->getPatientHistoryDefaults($patient);
 
         $defaults['appointment_date'] = '';
@@ -818,21 +863,36 @@ class OdontogramController extends Controller
         $defaults['service_type'] = '';
         $defaults['procedure_duration_hms'] = '';
 
-        return view('dentist.add-existing-appointment', [
-            'patient' => $patient,
-            'serviceTypes' => ServiceType::activeForBooking()
-                ->orderBy('name')
-                ->get(),
+        return view(
+            'dentist.add-existing-appointment',
+            [
+                'patient' => $patient,
 
-            'diseases' => Disease::orderBy('sort_order')
-                ->get(),
+                'serviceTypes' =>
+                ServiceType::activeForBooking()
+                    ->orderBy('name')
+                    ->get(),
 
-            'defaults' => $defaults,
+                'diseases' =>
+                Disease::orderBy('sort_order')
+                    ->get(),
 
-            'dentalQuestions' => BookingQuestions::dental(),
-            'medicalQuestions' => BookingQuestions::medical(),
+                'defaults' => $defaults,
 
-        ] + $this->getExistingAppointmentCalendarContext());
+                'dentalQuestions' =>
+                BookingQuestions::dental(),
+
+                'medicalQuestions' =>
+                BookingQuestions::medical(),
+
+                'hasReusableSignature' =>
+                $hasReusableSignature,
+
+                'existingSignatureUrl' =>
+                $existingSignatureUrl,
+
+            ] + $this->getExistingAppointmentCalendarContext()
+        );
     }
 
     public function storeExistingAppointmentIntake(Request $request, Patient $patient)
@@ -878,9 +938,26 @@ class OdontogramController extends Controller
             ->exists();
 
         if (!$serviceExists) {
-            return redirect()->back()
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' =>
+                    'Please select a valid service type.',
+
+                    'errors' => [
+                        'service_type' => [
+                            'Please select a valid service type.',
+                        ],
+                    ],
+                ], 422);
+            }
+
+            return redirect()
+                ->back()
                 ->withInput()
-                ->withErrors(['service_type' => 'Please select a valid service type.']);
+                ->withErrors([
+                    'service_type' =>
+                    'Please select a valid service type.',
+                ]);
         }
 
         $validated['dental_answers'] = collect($validated['dental_answers'] ?? [])
@@ -923,6 +1000,19 @@ class OdontogramController extends Controller
             $appointmentDate->isSaturday() ||
             $appointmentDate->isSunday()
         ) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' =>
+                    'The clinic is closed on Saturdays and Sundays.',
+
+                    'errors' => [
+                        'appointment_date' => [
+                            'The clinic is closed on Saturdays and Sundays.',
+                        ],
+                    ],
+                ], 422);
+            }
+
             return redirect()
                 ->back()
                 ->withInput()
@@ -947,6 +1037,19 @@ class OdontogramController extends Controller
                 $holidayDates[$appointmentDateIso]
             )
         ) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' =>
+                    'The clinic is closed on Philippine holidays.',
+
+                    'errors' => [
+                        'appointment_date' => [
+                            'The clinic is closed on Philippine holidays.',
+                        ],
+                    ],
+                ], 422);
+            }
+
             return redirect()
                 ->back()
                 ->withInput()
@@ -960,10 +1063,59 @@ class OdontogramController extends Controller
             $this->existingAppointmentDraftSessionKey($patient) => $validated,
         ]);
 
-        return redirect()->route(
-            'dentist.odontogram.existing-appointment.odontogram',
-            ['patient' => $patient->id]
-        );
+        $odontogramUrl =
+            route(
+                'dentist.odontogram.existing-appointment.odontogram',
+                [
+                    'patient' =>
+                    $patient->id,
+                ]
+            );
+
+        if (
+            $request->expectsJson()
+        ) {
+            return response()->json([
+                'success' => true,
+
+                'message' =>
+                'The existing appointment details were recorded successfully.',
+
+                'odontogram_url' =>
+                $odontogramUrl,
+
+                'appointment' => [
+                    'patient' =>
+                    $patient->name,
+
+                    'service' =>
+                    $validated['service_type'],
+
+                    'date' =>
+                    Carbon::parse(
+                        $validated['appointment_date']
+                    )->format(
+                        'F j, Y'
+                    ),
+
+                    'time' =>
+                    Carbon::createFromFormat(
+                        'H:i',
+                        $validated['appointment_time']
+                    )->format(
+                        'g:i A'
+                    ),
+
+                    'duration' =>
+                    $validated['procedure_duration_hms'],
+                ],
+            ]);
+        }
+
+        return redirect()
+            ->to(
+                $odontogramUrl
+            );
     }
 
     public function autosaveExistingAppointmentHistory(
@@ -1158,11 +1310,23 @@ class OdontogramController extends Controller
         ]);
     }
 
-    public function showExistingAppointmentOdontogram(Patient $patient)
+    public function showExistingAppointmentOdontogram(Request $request, Patient $patient)
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
-        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
+        if (
+            !optional(Auth::user())
+                ->canAccessClinicalArea(
+                    $activeRole
+                )
+        ) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' =>
+                    'Your session is no longer authorized.',
+                ], 403);
+            }
+
             return redirect('/login');
         }
 
@@ -1173,6 +1337,8 @@ class OdontogramController extends Controller
                 ->route('dentist.odontogram.existing-appointment.create', ['patient' => $patient->id])
                 ->with('error', 'Please complete the existing appointment details first.');
         }
+
+        $patient->loadMissing('user');
 
         return view('dentist.dentist-odontogram', [
             'patient' => $patient,
@@ -1264,7 +1430,8 @@ class OdontogramController extends Controller
             ], 403);
         }
 
-        $appointment->load('patient');
+        $appointment->load('patient.user');
+        $patient = $appointment->patient;
 
         if (!$appointment->patient) {
             return response()->json([

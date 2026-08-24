@@ -5,32 +5,55 @@
 @section('hide-sidebar')
 @endsection
 
-@section('title', 'Patient Odontogram')
-
-@section('hide-sidebar')
+@section('hide-footer')
 @endsection
+
+@section('title', 'Patient Odontogram')
 
 @section('content')
 
 @php
 use Carbon\Carbon;
+
+$existingAppointmentMode = (bool) ($existingAppointmentMode ?? false);
 $patientName = $patient->name ?? 'Unknown Patient';
+$patientAvatarUrl = !empty($patient?->profile_image)
+? asset('storage/' . $patient->profile_image)
+: (!empty($patient?->user?->profile_image)
+? asset('storage/' . $patient->user->profile_image)
+: '');
+
+$appointmentDateValue = $existingAppointmentMode
+? data_get($existingAppointmentDraft ?? [], 'appointment_date')
+: $appointment?->appointment_date;
+
+$appointmentTimeValue = $existingAppointmentMode
+? data_get($existingAppointmentDraft ?? [], 'appointment_time')
+: $appointment?->appointment_time;
+
+$appointmentStatusValue = $existingAppointmentMode
+? 'Completed Record'
+: ucfirst((string) ($appointment?->status ?? 'Ongoing'));
+
+$formattedAppointmentDate = filled($appointmentDateValue)
+? Carbon::parse($appointmentDateValue)->format('M d, Y')
+: '—';
+
+$formattedAppointmentTime = filled($appointmentTimeValue)
+? Carbon::parse($appointmentTimeValue)->format('h:i A')
+: '—';
+
 $today = Carbon::now()->format('F d, Y');
-$existingAppointmentMode =
-(bool) (
-$existingAppointmentMode ??
-false
-);
 
 $currentServiceType = $existingAppointmentMode
-    ? data_get($existingAppointmentDraft ?? [], 'service_type', '')
-    : ($appointment?->service_type ?? '');
+? data_get($existingAppointmentDraft ?? [], 'service_type', '')
+: ($appointment?->service_type ?? '');
 
 $isOralProphylaxis =
-    strcasecmp(
-        trim((string) $currentServiceType),
-        'Oral Prophylaxis'
-    ) === 0;
+strcasecmp(
+trim((string) $currentServiceType),
+'Oral Prophylaxis'
+) === 0;
 
 $pageEyebrow =
 $existingAppointmentMode
@@ -48,316 +71,379 @@ $existingAppointmentMode
 : '2D / 3D Treatment &amp; Condition Mapping';
 @endphp
 
-<main id="mainContent" class="odontogram-page pt-[100px] pb-6">
-    <div class="w-full fade-in">
-        <div class="odontogram-hero mb-6">
-            <div class="odontogram-hero-main">
-                <div class="odontogram-hero-left">
-                    <button type="button" id="cancelProcedureBtn" class="hero-danger-btn"
-                        data-tooltip="{{ $existingAppointmentMode ? 'Cancel Entry' : 'Cancel Procedure' }}"
-                        aria-label="{{ $existingAppointmentMode ? 'Cancel Entry' : 'Cancel Procedure' }}">
-                        <i class="fa-solid fa-xmark"></i>
-                        <span>{{ $existingAppointmentMode ? 'Cancel Entry' : 'Cancel Procedure' }}</span>
-                    </button>
+<main id="mainContent" class="odontogram-page">
 
-                    <div class="hero-title-card">
-                        <div class="hero-title-icon">
-                            <i class="fa-solid fa-tooth"></i>
-                        </div>
-                        <div>
-                            <p class="hero-eyebrow">{{ $pageEyebrow }}</p>
-                            <h1 class="hero-title">{{ $pageTitle }}</h1>
-                            <p class="hero-subtitle">{!! $pageSubtitle !!}</p>
-                        </div>
-                    </div>
-                </div>
+    <div id="odontogramDockLayout" class="odontogram-dock-layout">
 
-                <div class="hero-patient-card">
-                    <div class="hero-patient-meta">
-                        <p class="hero-patient-label">Patient</p>
-                        <h2 class="hero-patient-name">{{ $patientName }}</h2>
-                    </div>
+        <section class="odontogram-dock-main">
+            <div class="page-enter">
 
-                    <div class="hero-procedure-meta">
-                        <div class="hero-stat">
-                            <span class="hero-stat-label">{{ $existingAppointmentMode ? 'Session Timer' : 'Procedure
-                                Time'
-                                }}</span>
-                            <span id="procedureTimer" class="hero-stat-value">00:00:00</span>
-                        </div>
-                        <div class="hero-stat">
-                            <span class="hero-stat-label">{{ $existingAppointmentMode ? 'Entry Date' : 'Date' }}</span>
-                            <span class="hero-stat-date">{{ $today }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <div class="odontogram-hero">
+                    <div class="odontogram-hero-main">
+                        <div class="card hero-title-card">
 
-            <div class="odontogram-toolbar" id="odontogramToolbar">
-                <div class="toolbar-group toolbar-group-tools">
-                    <span class="toolbar-label">Selection Tools</span>
-                    <div class="toolbar-actions">
-                        <button type="button" id="clearSelectionBtn" class="toolbar-soft-btn"
-                            data-tooltip="Clear Selection" title="Clear Selection" disabled>
-                            <i class="fa-solid fa-arrow-pointer"></i>
-                            <span>Clear Selection</span>
-                        </button>
-
-                        <button type="button" id="undoBtn" class="toolbar-soft-btn" data-tooltip="Undo" title="Undo"
-                            disabled>
-                            <span>Undo</span>
-                        </button>
-
-                        <button type="button" id="redoBtn" class="toolbar-soft-btn" data-tooltip="Redo" title="Redo"
-                            disabled>
-                            <i class="fa-solid fa-rotate-right"></i>
-                            <span>Redo</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="toolbar-group toolbar-group-view">
-                    <span class="toolbar-label">View Mode</span>
-                    <div class="toolbar-actions">
-                        <button type="button" id="view2dBtn" class="view-toggle-btn active" data-tooltip="2D View"
-                            title="2D View">
-                            <i class="fa-regular fa-image"></i>
-                            <span>2D View</span>
-                        </button>
-
-                        <button type="button" id="view3dBtn" class="view-toggle-btn" data-tooltip="3D View"
-                            title="3D View">
-                            <i class="fa-solid fa-cube"></i>
-                            <span>3D View</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="odontogramToolbarSentinel" class="odontogram-toolbar-sentinel" aria-hidden="true"></div>
-        </div>
-
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 odontogram-layout">
-            <div class="xl:col-span-8 glass-panel p-4 odontogram-left-panel">
-                <div class="flex items-center justify-between gap-3 mb-4">
-                    <div>
-                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                            <i class="fa-solid fa-arrows-rotate"></i>
-                            Click a tooth surface in 2D or switch to 3D view
-                        </p>
-                    </div>
-                </div>
-
-                <div class="soft-card p-4 left-view-shell">
-                    <div class="w-full flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-4 px-2">
-                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                            <i class="fa-solid fa-tooth"></i>
-                            <span id="viewInstructionText">Click a tooth surface to assign a treatment legend</span>
-                        </p>
-
-                        <div
-                            class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100 shadow-inner">
-                            <i class="fa-solid fa-tooth text-[#8B0000]"></i>
-                            <p id="toothHoverLabel" class="text-sm font-extrabold text-[#8B0000]">Select a tooth</p>
-                        </div>
-                    </div>
-
-                    <div id="odontogram2DPanel" class="mode-panel active">
-                        <div class="odontogram2d-shell custom-scrollbar">
-                            <div id="odontogram2DBoard" class="odontogram-board"></div>
-                        </div>
-                    </div>
-
-                    <div id="odontogram3DPanel" class="mode-panel">
-                        <div id="canvas-container" class="relative">
-                            <div id="loadingOverlay"
-                                class="absolute inset-0 bg-white flex flex-col gap-3 items-center justify-center z-10 rounded-xl transition-opacity duration-500">
-                                <i class="fa-solid fa-circle-notch fa-spin text-4xl text-[#8B0000]"></i>
-                                <p class="text-sm font-semibold text-gray-600">Generating 3D Model...</p>
+                            <div class="hero-title-icon">
+                                <i class="fa-solid fa-tooth"></i>
                             </div>
 
-                            <div class="three-mouse-guide" aria-label="3D model mouse controls">
-                                <div class="three-mouse-guide-item">
-                                    <span class="mouse-button-key">L</span>
-                                    <span><strong>Left mouse:</strong> Navigate and select a tooth</span>
-                                </div>
-                                <div class="three-mouse-guide-item">
-                                    <span class="mouse-button-key">R</span>
-                                    <span><strong>Right mouse:</strong> Move the model</span>
-                                </div>
-                                <div class="three-mouse-guide-item">
-                                    <span class="mouse-button-key mouse-wheel-key"><i
-                                            class="fa-solid fa-arrows-up-down"></i></span>
-                                    <span><strong>Scroll:</strong> Zoom in/out</span>
+                            <div class="odontogram-hero-copy">
+                                <p class="hero-eyebrow">{{ $pageEyebrow }}</p>
+
+                                <h1 class="hero-title">
+                                    {{ $pageTitle }}
+                                </h1>
+
+                                <p class="hero-subtitle">
+                                    {!! $pageSubtitle !!}
+                                </p>
+                            </div>
+
+                            <button type="button" id="cancelProcedureBtn" class="ui-btn ui-btn-danger">
+
+                                <i class="fa-solid fa-xmark"></i>
+
+                                <span>
+                                    {{ $existingAppointmentMode
+                                    ? 'Cancel Entry'
+                                    : 'Cancel Procedure' }}
+                                </span>
+                            </button>
+
+                        </div>
+
+                        <div class="card odontogram-patient-card">
+                            <div class="odontogram-patient-main">
+                                <span class="patient-avatar patient-avatar-lg" data-patient-avatar
+                                    data-patient-name="{{ $patientName }}" data-patient-url="{{ $patientAvatarUrl }}"
+                                    aria-label="{{ $patientName }}">
+                                </span>
+
+                                <div class="odontogram-patient-copy">
+                                    <span class="odontogram-patient-eyebrow">
+                                        Patient
+                                    </span>
+
+                                    <h2 class="odontogram-patient-name">
+                                        {{ $patientName }}
+                                    </h2>
+
+                                    <span class="odontogram-patient-service">
+                                        <i class="fa-solid fa-tooth"></i>
+                                        {{ $currentServiceType ?: 'No service type' }}
+                                    </span>
                                 </div>
                             </div>
 
-                            <div id="toothTooltip" class="tooth-tooltip">
-                                <div id="toothTooltipContent"></div>
-                            </div>
+                            <div class="odontogram-appointment-meta">
+                                <div class="odontogram-appointment-meta-item">
+                                    <span class="odontogram-appointment-meta-icon">
+                                        <i class="fa-regular fa-calendar"></i>
+                                    </span>
 
-                            <div id="surfacePicker3D"
-                                class="hidden absolute right-4 bottom-4 z-20 w-[320px] max-w-[calc(100%-2rem)] rounded-2xl border border-red-100 bg-white/95 backdrop-blur shadow-2xl p-4">
-                                <div class="flex items-start justify-between gap-3 mb-4">
-                                    <div class="min-w-0">
-                                        <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-gray-400">3D
-                                            Surface Picker</p>
-                                        <h4 id="surfacePickerToothLabel"
-                                            class="text-base font-extrabold text-[#8B0000] leading-tight">No tooth
-                                            selected</h4>
-                                        <p id="surfacePickerHelperText"
-                                            class="text-xs text-gray-500 mt-1 leading-relaxed">
-                                            Step 1: Click a tooth in the 3D model. The camera will zoom in
-                                            automatically.
-                                        </p>
-                                    </div>
-                                    <div class="flex items-center gap-2 shrink-0">
-                                        <span
-                                            class="inline-flex items-center justify-center w-11 h-11 rounded-2xl bg-red-50 text-[#8B0000]">
-                                            <i class="fa-solid fa-cube text-lg"></i>
+                                    <div>
+                                        <span class="odontogram-appointment-meta-label">
+                                            Appointment Date
                                         </span>
-                                        <button type="button" id="close3DSurfacePickerBtn"
-                                            class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 transition"
-                                            title="Hide surface picker" aria-label="Hide surface picker">
-                                            <i class="fa-solid fa-xmark"></i>
-                                        </button>
+
+                                        <strong class="odontogram-appointment-meta-value">
+                                            {{ $formattedAppointmentDate }}
+                                        </strong>
                                     </div>
                                 </div>
 
-                                <div class="rounded-2xl bg-gray-50 border border-gray-100 p-3 mb-3">
-                                    <div class="grid grid-cols-3 gap-3">
-                                        <div></div>
-                                        <button type="button" data-surface="top"
-                                            class="surface-picker-btn min-h-[44px] inline-flex items-center justify-center px-3 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 text-xs font-extrabold transition hover:border-red-200 hover:bg-red-50">
-                                            Top
-                                        </button>
-                                        <div></div>
+                                <div class="odontogram-appointment-meta-item">
+                                    <span class="odontogram-appointment-meta-icon">
+                                        <i class="fa-regular fa-clock"></i>
+                                    </span>
 
-                                        <button type="button" data-surface="left"
-                                            class="surface-picker-btn min-h-[44px] inline-flex items-center justify-center px-3 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 text-xs font-extrabold transition hover:border-red-200 hover:bg-red-50">
-                                            Left
-                                        </button>
-                                        <button type="button" data-surface="center"
-                                            class="surface-picker-btn min-h-[50px] inline-flex items-center justify-center px-3 py-2 rounded-full border border-gray-200 bg-white text-gray-700 text-xs font-extrabold transition hover:border-red-200 hover:bg-red-50">
-                                            Center
-                                        </button>
-                                        <button type="button" data-surface="right"
-                                            class="surface-picker-btn min-h-[44px] inline-flex items-center justify-center px-3 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 text-xs font-extrabold transition hover:border-red-200 hover:bg-red-50">
-                                            Right
-                                        </button>
+                                    <div>
+                                        <span class="odontogram-appointment-meta-label">
+                                            Appointment Time
+                                        </span>
 
-                                        <div></div>
-                                        <button type="button" data-surface="bottom"
-                                            class="surface-picker-btn min-h-[44px] inline-flex items-center justify-center px-3 py-2 rounded-xl border border-gray-200 bg-white text-gray-700 text-xs font-extrabold transition hover:border-red-200 hover:bg-red-50">
-                                            Bottom
-                                        </button>
-                                        <div></div>
+                                        <strong class="odontogram-appointment-meta-value">
+                                            {{ $formattedAppointmentTime }}
+                                        </strong>
                                     </div>
                                 </div>
 
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-[11px] text-gray-500 leading-snug">
-                                        Pick a large surface button, choose a legend, then click Apply Treatment.
+                                <div class="odontogram-appointment-meta-item">
+                                    <span class="odontogram-appointment-meta-icon">
+                                        <i class="fa-solid fa-stopwatch"></i>
+                                    </span>
+
+                                    <div>
+                                        <span class="odontogram-appointment-meta-label">
+                                            {{ $existingAppointmentMode ? 'Session Timer' : 'Procedure Time' }}
+                                        </span>
+
+                                        <strong id="procedureTimer" class="odontogram-appointment-meta-value">
+                                            00:00:00
+                                        </strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card odontogram-toolbar" id="odontogramToolbar">
+                        <div class="toolbar-group toolbar-group-tools">
+                            <span class="toolbar-label">Selection Tools</span>
+                            <div class="toolbar-actions">
+                                <button type="button" id="clearSelectionBtn" class="ui-icon-btn neutral"
+                                    data-tooltip="Clear Selection" data-tooltip-tone="neutral"
+                                    aria-label="Clear Selection" disabled>
+                                    <i class="fa-solid fa-arrow-pointer"></i>
+                                </button>
+
+                                <button type="button" id="undoBtn" class="ui-icon-btn neutral" data-tooltip="Undo"
+                                    data-tooltip-tone="neutral" aria-label="Undo" disabled>
+                                    <i class="fa-solid fa-undo"></i>
+                                </button>
+
+                                <button type="button" id="redoBtn" class="ui-icon-btn neutral" data-tooltip="Redo"
+                                    data-tooltip-tone="neutral" aria-label="Redo" disabled>
+                                    <i class="fa-solid fa-rotate-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="toolbar-group toolbar-group-view">
+                            <span class="toolbar-label">View Mode</span>
+                            <div class="toolbar-actions">
+                                <button type="button" id="view2dBtn" class="ui-icon-btn neutral active"
+                                    data-tooltip="2D View" data-tooltip-tone="neutral" aria-label="2D View">
+                                    <i class="fa-regular fa-image"></i>
+                                </button>
+
+                                <button type="button" id="view3dBtn" class="ui-icon-btn neutral" data-tooltip="3D View"
+                                    data-tooltip-tone="neutral" aria-label="3D View">
+                                    <i class="fa-solid fa-cube"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="odontogramToolbarSentinel" class="odontogram-toolbar-sentinel" aria-hidden="true"></div>
+                </div>
+
+                <div class="odontogram-workspace-grid">
+                    <div class="card odontogram-left-panel">
+
+                        <div class="card-body left-view-shell">
+                            <div class="odontogram-guide-row">
+                                <div class="global-info-group">
+                                    <span class="global-info-icon status-all">
+                                        <i class="fa-solid fa-tooth"></i>
+                                    </span>
+
+                                    <div class="global-info-copy">
+                                        <span class="global-info-label">
+                                            Tooth Selection
+                                        </span>
+
+                                        <span id="viewInstructionText" class="global-info-subvalue">
+                                            Select a surface to begin treatment
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="global-info-pill">
+                                    <i class="fa-solid fa-tooth"></i>
+
+                                    <span id="toothHoverLabel">
+                                        Select a tooth
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div id="odontogram2DPanel" class="mode-panel active">
+                                <div class="odontogram2d-shell custom-scrollbar">
+                                    <div id="odontogram2DBoard" class="odontogram-board"></div>
+                                </div>
+                            </div>
+
+                            <div id="odontogram3DPanel" class="mode-panel">
+                                <div id="canvas-container">
+                                    <div id="loadingOverlay" class="odontogram-loading-overlay">
+                                        <i class="fa-solid fa-circle-notch fa-spin"></i>
+                                        <p>Generating 3D Model...</p>
+                                    </div>
+
+                                    <div class="three-mouse-guide" aria-label="3D model mouse controls">
+                                        <div class="three-mouse-guide-item">
+                                            <span class="mouse-button-key">L</span>
+                                            <span><strong>Left mouse:</strong> Navigate and select a tooth</span>
+                                        </div>
+                                        <div class="three-mouse-guide-item">
+                                            <span class="mouse-button-key">R</span>
+                                            <span><strong>Right mouse:</strong> Move the model</span>
+                                        </div>
+                                        <div class="three-mouse-guide-item">
+                                            <span class="mouse-button-key mouse-wheel-key"><i
+                                                    class="fa-solid fa-arrows-up-down"></i></span>
+                                            <span><strong>Scroll:</strong> Zoom in/out</span>
+                                        </div>
+                                    </div>
+
+                                    <div id="toothTooltip" class="tooth-tooltip">
+                                        <div id="toothTooltipContent"></div>
+                                    </div>
+
+                                    <div id="surfacePicker3D" class="hidden odontogram-surface-picker">
+                                        <div class="odontogram-surface-picker-head">
+                                            <div class="odontogram-surface-picker-copy">
+                                                <p class="global-form-label">
+                                                    3D Surface Picker
+                                                </p>
+                                                <h4 id="surfacePickerToothLabel"
+                                                    class="odontogram-surface-picker-title">No
+                                                    tooth
+                                                    selected</h4>
+                                                <p id="surfacePickerHelperText" class="ui-muted-text">
+                                                    Step 1: Click a tooth in the 3D model. The camera will zoom in
+                                                    automatically.
+                                                </p>
+                                            </div>
+                                            <div class="odontogram-surface-picker-actions">
+                                                <span class="global-info-icon crimson">
+                                                    <i class="fa-solid fa-cube"></i>
+                                                </span>
+                                                <button type="button" id="close3DSurfacePickerBtn"
+                                                    class="ui-icon-btn neutral" title="Hide surface picker"
+                                                    aria-label="Hide surface picker">
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="section-block odontogram-surface-grid-shell">
+                                            <div class="odontogram-surface-grid">
+                                                <div></div>
+                                                <button type="button" data-surface="top" class="surface-picker-btn">
+                                                    Top
+                                                </button>
+                                                <div></div>
+
+                                                <button type="button" data-surface="left" class="surface-picker-btn">
+                                                    Left
+                                                </button>
+                                                <button type="button" data-surface="center"
+                                                    class="surface-picker-btn surface-picker-btn-center">
+                                                    Center
+                                                </button>
+                                                <button type="button" data-surface="right" class="surface-picker-btn">
+                                                    Right
+                                                </button>
+
+                                                <div></div>
+                                                <button type="button" data-surface="bottom" class="surface-picker-btn">
+                                                    Bottom
+                                                </button>
+                                                <div></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="odontogram-surface-picker-footer">
+                                            <p class="ui-muted-text">
+                                                Choose a surface, select a treatment, then apply.
+                                            </p>
+                                            <button type="button" id="reset3DViewBtn"
+                                                class="ui-btn ui-btn-secondary ui-btn-sm">
+                                                <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
+                                                Full View
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="odontogram-clinical-section">
+                            <div class="odontogram-clinical-header">
+                                <div>
+                                    <p class="right-section-eyebrow">
+                                        Clinical Documentation
                                     </p>
-                                    <button type="button" id="reset3DViewBtn"
-                                        class="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold transition">
-                                        <i class="fa-solid fa-up-right-and-down-left-from-center"></i>
-                                        Full View
+
+                                    <h3 class="right-section-title">
+                                        Procedure Notes
+                                    </h3>
+                                </div>
+                            </div>
+
+                            <div class="odontogram-clinical-grid">
+                                <div class="global-form-group">
+                                    <label for="oralExaminationNotes" class="global-form-label">
+                                        Oral Examination
+                                    </label>
+
+                                    <textarea id="oralExaminationNotes" rows="4"
+                                        class="form-input-custom global-form-textarea"
+                                        placeholder="Record oral examination findings..."></textarea>
+                                </div>
+
+                                <div class="global-form-group">
+                                    <label for="diagnosisNotes" class="global-form-label">
+                                        Diagnosis
+                                    </label>
+
+                                    <textarea id="diagnosisNotes" rows="4"
+                                        class="form-input-custom global-form-textarea"
+                                        placeholder="Record the clinical diagnosis..."></textarea>
+                                </div>
+
+                                <div class="global-form-group odontogram-prescription-field">
+                                    <label for="prescriptionsNotes" class="global-form-label">
+                                        Prescription
+                                        <span class="odontogram-label-optional">
+                                            (Optional)
+                                        </span>
+                                    </label>
+
+                                    <textarea id="prescriptionsNotes" rows="3"
+                                        class="form-input-custom global-form-textarea"
+                                        placeholder="Add medication or aftercare instructions..."></textarea>
+                                </div>
+
+                                <div class="odontogram-procedure-actions">
+                                    @unless ($existingAppointmentMode)
+                                    <button type="button" id="followUpBtn" class="ui-btn ui-btn-warning">
+                                        <i class="fa-solid fa-calendar-plus"></i>
+                                        <span>Set Follow-Up Appointment</span>
+                                    </button>
+                                    @endunless
+
+                                    <button type="button" id="finishProcedureBtn" class="ui-btn ui-btn-primary">
+                                        <i class="fa-solid fa-check"></i>
+
+                                        <span>
+                                            {{ $existingAppointmentMode
+                                            ? 'Save Existing Appointment'
+                                            : 'Finish Procedure' }}
+                                        </span>
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="xl:col-span-4 glass-panel p-6 odontogram-right-shell">
-                <div class="odontogram-right-top">
-                    <div class="selected-tooth-card rounded-2xl p-4">
-                        <div class="flex items-center justify-between gap-3 mb-2">
-                            <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-wider">
-                                Selected Target
-                            </label>
-                            <span id="selectedViewBadge"
-                                class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-50 text-[#8B0000] text-[11px] font-bold border border-red-100">
-                                2D View
-                            </span>
-                        </div>
-
-                        <div id="selectedToothDisplay"
-                            class="w-full bg-white border border-red-100 text-[#8B0000] text-base font-extrabold rounded-2xl px-4 py-3">
-                            Click a tooth on the chart
-                        </div>
-
-                        <p id="selectedToothName" class="mt-2 text-sm font-bold text-gray-700">
-                            No tooth selected
-                        </p>
-
-                        <div class="mt-3">
-                            <p class="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">
-                                Current Treatment
-                            </p>
-                            <div id="selectedToothLegendList" class="flex flex-wrap gap-2">
-                                <span class="text-[11px] text-gray-400 italic">No treatment assigned yet.</span>
-                            </div>
-                        </div>
-
-                        <div id="legendStatusNote"
-                            class="hidden mt-3 rounded-xl px-3 py-2 text-xs font-semibold legend-status-note">
-                            Choose a treatment legend below, then click Apply Treatment.
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3">
-                            <button type="button" id="applyTreatmentBtn"
-                                class="primary-action-btn w-full text-sm font-semibold py-2.5 rounded-xl shadow-sm"
-                                disabled>
-                                <i class="fa-solid fa-stethoscope mr-2"></i>
-                                Apply Treatment
-                            </button>
-
-                            <button type="button" id="clearCurrentToothBtn"
-                                class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-semibold py-2.5 rounded-xl transition"
-                                disabled>
-                                <i class="fa-solid fa-eraser mr-2"></i>
-                                Clear Target
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="odontogram-right-scroll">
-                    <div class="right-panel-sections">
-                        <section class="right-section-card">
+                    @if ($existingAppointmentMode)
+                    <div class="odontogram-existing-appointment-panel odontogram-workspace-full">
+                        <section class="card right-section-card">
                             <div class="right-section-head">
                                 <div>
-                                    <p class="right-section-eyebrow">Treatment Legend</p>
-                                    <h3 class="right-section-title">Legend Selection</h3>
-                                </div>
+                                    <p class="right-section-eyebrow">
+                                        Existing Appointment
+                                    </p>
 
-                                <button type="button" id="openLegendDrawerBtn"
-                                    class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-[#8B0000] text-sm font-semibold border border-red-100 transition">
-                                    <i class="fa-solid fa-layer-group"></i>
-                                    Open Legend
-                                </button>
-                            </div>
-
-                            <div class="right-section-body">
-                                <p id="selectedLegendPreview" class="text-sm text-[#8B0000] font-bold">
-                                    No legend selected yet.
-                                </p>
-                            </div>
-                        </section>
-
-                        <section class="right-section-card">
-                            @if ($existingAppointmentMode)
-                            <div class="right-section-head">
-                                <div>
-                                    <p class="right-section-eyebrow">Existing Appointment</p>
-                                    <h3 class="right-section-title">Appointment Details</h3>
+                                    <h3 class="right-section-title">
+                                        Appointment Details
+                                    </h3>
                                 </div>
                             </div>
 
-                            <div class="right-section-body space-y-4">
+                            <div class="right-section-body existing-appointment-body">
                                 <div class="existing-appointment-intro-card">
                                     Review the existing appointment details below.
                                     When you save this odontogram,
@@ -367,426 +453,318 @@ $existingAppointmentMode
 
                                 <div class="existing-appointment-grid">
                                     <div>
-                                        <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">
-                                            Service Type</p>
-                                        <div class="existing-appointment-summary-card">{{
-                                            data_get($existingAppointmentDraft ??
-                                            [],
-                                            'service_type', '—') }}</div>
+                                        <p class="global-form-label">
+                                            Service Type
+                                        </p>
+
+                                        <div class="existing-appointment-summary-card">
+                                            {{ data_get($existingAppointmentDraft ?? [], 'service_type', '—') }}
+                                        </div>
                                     </div>
 
                                     <div>
-                                        <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">
-                                            Appointment Date</p>
-                                        <div class="existing-appointment-summary-card">{{
-                                            data_get($existingAppointmentDraft ??
-                                            [],
-                                            'appointment_date', '—') }}</div>
+                                        <p class="global-form-label">
+                                            Appointment Date
+                                        </p>
+
+                                        <div class="existing-appointment-summary-card">
+                                            {{ data_get($existingAppointmentDraft ?? [], 'appointment_date', '—') }}
+                                        </div>
                                     </div>
 
                                     <div>
-                                        <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">
-                                            Appointment Time</p>
-                                        <div class="existing-appointment-summary-card">{{
-                                            data_get($existingAppointmentDraft ??
-                                            [],
-                                            'appointment_time', '—') }}</div>
+                                        <p class="global-form-label">
+                                            Appointment Time
+                                        </p>
+
+                                        <div class="existing-appointment-summary-card">
+                                            {{ data_get($existingAppointmentDraft ?? [], 'appointment_time', '—') }}
+                                        </div>
                                     </div>
 
                                     <div>
-                                        <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5">
-                                            Procedure Duration</p>
-                                        <div class="existing-appointment-summary-card">{{
-                                            data_get($existingAppointmentDraft ??
-                                            [],
-                                            'procedure_duration_hms', '—') }}</div>
+                                        <p class="global-form-label">
+                                            Procedure Duration
+                                        </p>
+
+                                        <div class="existing-appointment-summary-card">
+                                            {{ data_get($existingAppointmentDraft ?? [], 'procedure_duration_hms', '—')
+                                            }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </section>
-                        @endif
-
-                        <section class="right-section-card">
-                            <div class="right-section-head">
-                                <div>
-                                    <p class="right-section-eyebrow">Clinical Documentation</p>
-                                    <h3 class="right-section-title">Oral Examination Notes</h3>
-                                </div>
-                            </div>
-
-                            <div class="right-section-body space-y-4">
-                                <div>
-                                    <label
-                                        class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                                        Oral Examination Notes
-                                    </label>
-                                    <textarea id="oralExaminationNotes" rows="5"
-                                        class="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm focus:ring-2 focus:ring-[#8B0000] focus:border-[#8B0000] resize-none transition"
-                                        placeholder="Add examination notes here..."></textarea>
-                                </div>
-
-                                <div>
-                                    <label
-                                        class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                                        Diagnosis
-                                    </label>
-                                    <textarea id="diagnosisNotes" rows="5"
-                                        class="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm focus:ring-2 focus:ring-[#8B0000] focus:border-[#8B0000] resize-none transition"
-                                        placeholder="Add diagnosis here..."></textarea>
-                                </div>
-
-                                <div>
-                                    <label
-                                        class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">
-                                        Prescriptions <span class="normal-case text-gray-400">(Optional)</span>
-                                    </label>
-                                    <textarea id="prescriptionsNotes" rows="5"
-                                        class="w-full bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm focus:ring-2 focus:ring-[#8B0000] focus:border-[#8B0000] resize-none transition"
-                                        placeholder="Add prescriptions here..."></textarea>
-                                </div>
-                            </div>
-                        </section>
-
-                        <input type="hidden" id="odontogramData" name="odontogram_data" value="[]">
                     </div>
-                </div>
+                    @endif
 
-                <div class="odontogram-right-bottom space-y-3">
-                    @unless ($existingAppointmentMode)
-                    <button type="button" id="followUpBtn"
-                        class="w-full flex justify-center items-center gap-2 bg-amber-100 hover:bg-amber-200 text-amber-800 text-sm font-semibold py-2.75 rounded-xl transition shadow-sm border border-amber-200">
-                        <i class="fa-solid fa-calendar-plus"></i>
-                        Follow-Up Appointment
-                    </button>
-                    @endunless
+                    <input type="hidden" id="odontogramData" name="odontogram_data" value="[]">
 
-                    <button type="button" id="finishProcedureBtn"
-                        class="w-full flex justify-center items-center gap-2 bg-[#8B0000] hover:bg-[#660000] text-white text-sm font-semibold py-2.75 rounded-xl transition shadow-md">
-                        <i class="fa-solid fa-check"></i>
-                        {{ $existingAppointmentMode ? 'Save Existing Appointment' : 'Finish Procedure' }}
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</main>
+                </div> {{-- odontogram-workspace-grid --}}
 
-<div id="legendDrawerBackdrop" class="fixed inset-0 bg-black/30 z-[60]"></div>
+            </div> {{-- fade-in --}}
+        </section> {{-- odontogram-dock-main --}}
 
-<div id="legendDrawer"
-    class="fixed top-0 right-0 h-full w-full sm:w-[460px] bg-white z-[61] shadow-2xl border-l border-gray-200 transition-transform duration-300 flex flex-col">
+        <div id="legendResizeHandle" class="odontogram-legend-resizer" role="separator" aria-orientation="vertical"
+            aria-label="Resize Treatment Legend panel"></div>
 
-    <div class="legend-drawer-header px-5 py-4 border-b border-gray-100 bg-white">
-        <div class="flex items-start justify-between gap-4">
-            <div class="min-w-0">
-                <div class="flex items-center gap-2 mb-1">
-                    <span class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-red-50 text-[#8B0000]">
+        <aside id="legendDrawer" class="odontogram-legend-panel">
+            <div class="legend-drawer-header">
+                <div class="legend-drawer-heading">
+                    <span class="legend-drawer-title-icon">
                         <i class="fa-solid fa-layer-group"></i>
                     </span>
                     <div>
-                        <h3 class="text-lg font-extrabold text-[#8B0000] leading-tight">Treatment Legend</h3>
-                        <p class="text-xs text-gray-500">Choose a legend and apply it to the selected target.</p>
+                        <h3 class="legend-drawer-title">Treatment Legend</h3>
+                        <p class="legend-drawer-subtitle">
+                            Select a treatment for the chosen surface.
+                        </p>
                     </div>
+                </div>
+
+                <div class="section-block odontogram-legend-target">
+                    <div class="odontogram-target-row">
+                        <span class="global-form-label">
+                            Target
+                        </span>
+
+                        <span id="selectedViewBadge" class="badge-pill status-all">
+                            2D
+                        </span>
+                    </div>
+
+                    <div id="selectedToothDisplay" class="odontogram-selected-display">
+                        Select a tooth surface
+                    </div>
+
+                    <p id="selectedToothName" class="odontogram-selected-name"></p>
+
+                    <div class="odontogram-treatment-row">
+                        <span class="global-form-label">
+                            Treatment
+                        </span>
+
+                        <div id="selectedToothLegendList">
+                            <span class="ui-muted-text">
+                                None selected
+                            </span>
+                        </div>
+                    </div>
+
+                    <div id="legendStatusNote" class="hidden legend-status-note odontogram-legend-status-note">
+                        Select a treatment, then apply.
+                    </div>
+
+                    <div class="odontogram-target-actions">
+                        <button type="button" id="applyTreatmentBtn" class="ui-btn ui-btn-primary w-full" disabled>
+                            <i class="fa-solid fa-stethoscope"></i>
+                            Apply
+                        </button>
+
+                        <button type="button" id="clearCurrentToothBtn" class="ui-btn ui-btn-secondary w-full" disabled>
+                            <i class="fa-solid fa-eraser"></i>
+                            Clear
+                        </button>
+                    </div>
+                </div>
+
+                <span id="selectedLegendPreview" hidden>None selected</span>
+                <span id="drawerSelectedLegendPreview" hidden>None selected</span>
+
+                <div class="odontogram-legend-search-wrap">
+                    <x-search-bar id="legendSearchInput" class="search-compact" placeholder="Search treatments…"
+                        clear-label="Clear treatment search" callback="filterOdontogramLegends" :debounce="150" />
+                </div>
+
+                <div class="odontogram-legend-options-head">
+                    <p class="global-form-label">
+                        Treatment Options
+                    </p>
+
+                    <p id="legendResultCount" class="ui-muted-text">
+                        0
+                    </p>
                 </div>
             </div>
 
-            <button type="button" id="closeLegendDrawerBtn"
-                class="ui-icon-btn neutral shrink-0"  aria-label="Close treatment legend" title="Close treatment legend">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <div class="mt-4">
-            <div class="soft-card px-4 py-3 border border-red-100 bg-red-50/40">
-                <p class="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1">Selected Legend</p>
-                <p id="drawerSelectedLegendPreview" class="text-sm font-semibold text-[#8B0000]">
-                    No legend selected yet.
-                </p>
+            <div class="legend-drawer-body custom-scrollbar">
+                <div id="legendContainer" class="odontogram-legend-list"></div>
+                <div id="legendEmptyState" class="empty-state-host"></div>
             </div>
-        </div>
-
-        <div class="mt-4">
-            <div class="relative">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                </span>
-                <input type="text" id="legendSearchInput"
-                    class="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-[#8B0000] focus:border-[#8B0000]"
-                    placeholder="Search legend code or label...">
-                <button type="button" id="clearLegendSearchBtn"
-                    class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-        </div>
-
-        <div class="mt-3 flex items-center justify-between">
-            <p class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Legend Categories</p>
-            <p id="legendResultCount" class="text-xs font-semibold text-gray-500">0 results</p>
-        </div>
+        </aside>
     </div>
-
-    <div class="p-5 overflow-y-auto custom-scrollbar flex-1">
-        <div id="legendContainer" class="space-y-5"></div>
-        <div id="legendEmptyState" class="hidden soft-card p-5 text-center">
-            <div class="w-12 h-12 mx-auto rounded-full bg-gray-100 text-gray-400 flex items-center justify-center mb-3">
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </div>
-            <p class="text-sm font-semibold text-gray-700">No matching legend found.</p>
-            <p class="text-xs text-gray-500 mt-1">Try a different keyword or clear the search.</p>
-        </div>
-    </div>
-</div>
-
-<div id="resetTreatmentModal" class="fixed inset-0 z-[70] hidden items-center justify-center p-4">
-    <div class="absolute inset-0 modal-backdrop"></div>
-
-    <div class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gray-100 p-6">
-        <div class="flex items-start gap-4">
-            <div
-                class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xl shrink-0">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
-
-            <div class="flex-1">
-                <h3 class="text-lg font-extrabold text-gray-900 mb-2">Reset Tooth Treatment</h3>
-                <p id="resetTreatmentMessage" class="text-sm text-gray-600 leading-relaxed">
-                    Are you sure you want to reset the treatment for this tooth?
-                </p>
-            </div>
-        </div>
-
-        <div class="mt-6 flex flex-col sm:flex-row gap-3">
-            <button type="button" id="confirmResetTreatmentBtn"
-                class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition">
-                Yes, Reset
-            </button>
-
-            <button type="button" id="cancelResetTreatmentBtn"
-                class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-xl transition">
-                Cancel
-            </button>
-        </div>
-    </div>
-</div>
-
-<div id="cancelProcedureModal" class="fixed inset-0 z-[80] hidden items-center justify-center p-4">
-    <div class="absolute inset-0 modal-backdrop"></div>
-
-    <div class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gray-100 p-6">
-        <div class="flex items-start gap-4">
-            <div
-                class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xl shrink-0">
-                <i class="fa-solid fa-circle-xmark"></i>
-            </div>
-
-            <div class="flex-1">
-                <h3 class="text-lg font-extrabold text-gray-900 mb-2">Cancel Procedure?</h3>
-                <p class="text-sm text-gray-600 leading-relaxed">
-                    Are you sure you want to cancel this procedure? Any unsaved progress in this session may be lost.
-                </p>
-            </div>
-        </div>
-
-        <div class="mt-6 flex flex-col sm:flex-row gap-3">
-            <button type="button" id="confirmCancelProcedureBtn"
-                class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition">
-                Yes, Cancel
-            </button>
-
-            <button type="button" id="dismissCancelProcedureBtn"
-                class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-xl transition">
-                No, Stay
-            </button>
-        </div>
-    </div>
-</div>
-
-<div id="finishProcedureModal"
-    class="procedure-confirm-modal fixed inset-0 z-[90] hidden items-center justify-center p-4" role="dialog"
-    aria-modal="true" aria-labelledby="finishProcedureModalTitle">
-    <div class="procedure-confirm-backdrop absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
-
-    <div
-        class="procedure-confirm-card relative w-[calc(100vw-2rem)] max-w-[480px] overflow-hidden rounded-2xl bg-[#8B0000] px-8 py-10 text-center shadow-[0_25px_60px_rgba(0,0,0,0.25)]">
-        <div class="w-16 h-16 rounded-full bg-white/15 flex items-center justify-center mx-auto mb-6">
-            <i id="finishProcedureModalIcon" class="fa-solid fa-clipboard-check text-white text-2xl"></i>
-        </div>
-
-        <h2 id="finishProcedureModalTitle" class="text-2xl font-extrabold text-white mb-4">
-            Procedure Completed!
-        </h2>
-
-        <p id="finishProcedureModalMessage" class="text-white/85 text-sm leading-7 mb-6"></p>
-
-        <div id="finishProcedureConfirmActions" class="hidden flex-col sm:flex-row justify-center gap-3">
-            <button type="button" id="confirmFinishProcedureBtn"
-                class="bg-white text-[#8B0000] border-0 px-8 py-2.5 rounded-xl font-bold text-sm cursor-pointer transition hover:scale-[1.03] hover:shadow-lg active:scale-[0.98]">
-                Yes, Finish Procedure
-            </button>
-
-            <button type="button" id="dismissFinishProcedureBtn"
-                class="bg-white/10 hover:bg-white/20 text-white border border-white/30 px-8 py-2.5 rounded-xl font-bold text-sm cursor-pointer transition">
-                No, Review
-            </button>
-        </div>
-
-        <button type="button" id="finishProcedureModalActionBtn"
-            class="hidden bg-white text-[#8B0000] border-0 px-8 py-2.5 rounded-xl font-bold text-sm cursor-pointer transition hover:scale-[1.03] hover:shadow-lg active:scale-[0.98]">
-            Back to Appointments
-        </button>
-    </div>
-</div>
+</main>
 
 @unless ($existingAppointmentMode)
-<div id="followUpModal"
-    class="fixed inset-0 bg-black/50 hidden items-end sm:items-center justify-center backdrop-blur-sm z-[9999] p-0 sm:p-4">
+<x-follow-up-modal :patient-name="$patientName" :patient-avatar-url="$patientAvatarUrl"
+    :service-type="$currentServiceType ?: '—'" :appointment-date="$formattedAppointmentDate"
+    :appointment-time="$formattedAppointmentTime"
+    :store-url="route('dentist.dentist.appointments.follow-up.store', $appointment->id)" />
+@endunless
 
-    <div
-        class="reschedule-modal-panel follow-up-modal-panel bg-white w-full rounded-t-2xl sm:rounded-2xl overflow-hidden shadow-2xl flex flex-col">
-
-        <div class="relative bg-gradient-to-r from-[#8B0000] via-[#A00000] to-[#C1121F] px-5 sm:px-6 py-4">
-            <button type="button" onclick="closeFollowUpModal()"
-                class="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 text-white/90 hover:text-white flex items-center justify-center transition text-sm">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <div class="flex items-start gap-3 pr-10">
-                <div
-                    class="w-11 h-11 rounded-2xl bg-white/20 border border-white/25 shadow-sm flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
-                    <i class="fa-solid fa-calendar-plus text-white text-lg"></i>
+<div id="resetTreatmentModal" class="ui-modal modal-theme-danger" aria-hidden="true" role="dialog" aria-modal="true"
+    aria-labelledby="resetTreatmentModalTitle">
+    <div class="ui-modal-card modal-md">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
                 </div>
 
-                <div class="min-w-0">
-                    <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-white/75 mb-1">
-                        Follow-up Schedule
-                    </p>
-                    <h2 class="text-white font-bold text-lg leading-tight">
-                        Set Follow-Up Appointment
+                <div class="modal-copy">
+                    <h2 id="resetTreatmentModalTitle" class="modal-title">
+                        Reset Tooth Treatment
                     </h2>
-                    <p class="text-white/85 text-[12px] mt-1 leading-relaxed">
-                        Choose the follow-up date, time, and reason before completing this procedure.
+                    <p class="modal-subtitle">
+                        Remove the treatment currently assigned to this target.
                     </p>
+                </div>
+            </div>
+
+            <button type="button" id="closeResetTreatmentModalBtn" class="modal-x"
+                aria-label="Close reset treatment modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="modal-bd">
+            <div class="global-confirm-alert">
+                <i class="fa-solid fa-eraser"></i>
+
+                <div>
+                    <strong>Reset selected treatment?</strong>
+                    <span id="resetTreatmentMessage">
+                        Are you sure you want to reset the treatment for this tooth?
+                    </span>
                 </div>
             </div>
         </div>
 
-        <div class="reschedule-modal-body follow-up-modal-body px-5 sm:px-6 py-4 sm:py-5 bg-gray-50 overflow-y-auto">
-            <div
-                class="bg-white border border-[#f1ece7] rounded-2xl px-4 sm:px-5 py-4 mb-4 shadow-[0_4px_18px_rgba(0,0,0,0.04)]">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div>
-                        <div class="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-1">
-                            <i class="fa-solid fa-user fa-xs mr-1"></i>Patient
-                        </div>
-                        <div class="text-[14px] font-bold text-gray-800 truncate">
-                            {{ $patientName }}
-                        </div>
-                    </div>
+        <div class="modal-ft">
+            <button type="button" id="cancelResetTreatmentBtn" class="ui-btn ui-btn-secondary">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Keep Treatment</span>
+            </button>
 
-                    <div>
-                        <div class="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-1">
-                            <i class="fa-regular fa-calendar fa-xs mr-1"></i>Current Date
-                        </div>
-                        <div class="text-[13px] font-medium text-gray-700">
-                            {{ $today }}
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-1">
-                            <i class="fa-solid fa-tooth fa-xs mr-1"></i>Procedure
-                        </div>
-                        <div class="text-[13px] font-medium text-gray-700">
-                            Odontogram
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <form id="followUpForm" method="POST"
-                action="{{ route('dentist.dentist.appointments.follow-up.store', $appointment->id) }}">
-                @csrf
-
-                <input type="hidden" id="followup_appointment_date" name="followup_appointment_date" required>
-                <input type="hidden" id="followup_appointment_time" name="followup_appointment_time" required>
-
-                <div class="section-label">
-                    <i class="fa-regular fa-calendar fa-xs"></i> Follow-up Date & Time
-                </div>
-
-                <div id="followUpDateError" class="error-msg" style="display:none;">
-                    <i class="fa-solid fa-circle-exclamation"></i> Please select a follow-up date.
-                </div>
-
-                <div class="two-col mb-2 sm:mb-3">
-                    <div class="cal-wrap follow-up-cal-wrap">
-                        <div id="followUpCalendarWrap"></div>
-                    </div>
-
-                    <div class="slots-wrap follow-up-slots-wrap">
-                        <div class="section-label follow-up-slot-title">
-                            <i class="fa-regular fa-clock fa-xs"></i> Pick a Time Slot
-                        </div>
-                        <p class="follow-up-slot-helper">
-                            Choose your preferred schedule for the selected date.
-                        </p>
-
-                        <div class="slots-date-pill" id="followUpDatePill"></div>
-
-                        <div id="followUpSlotPlaceholder" class="slots-placeholder follow-up-empty-slot-placeholder">
-                            <div class="follow-up-empty-icon">
-                                <i class="fa-regular fa-calendar"></i>
-                            </div>
-                            <h4>Choose a date</h4>
-                            <p>Select an available day to see time slots.</p>
-                        </div>
-
-                        <div id="followUpSlotContainer" class="hidden">
-                            <div id="followUpSlotGrid" class="slots-grid" style="display:none;"></div>
-                            <button type="button" id="followUpClearTimeBtn" class="follow-up-clear-time-btn hidden">
-                                <i class="fa-solid fa-xmark"></i>
-                                Clear selection
-                            </button>
-                        </div>
-
-                        <div id="followUpSelectedTimePill" class="hidden follow-up-selected-time-pill">
-                            <i class="fa-solid fa-circle-check"></i>
-                            <span>Selected: <strong id="followUpSelectedTimeText"></strong></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="followUpTimeError" class="error-msg" style="display:none;">
-                    <i class="fa-solid fa-circle-exclamation"></i> Please select a follow-up time slot.
-                </div>
-
-                <div class="section-label mt-5 sm:mt-6">
-                    <i class="fa-regular fa-message fa-xs"></i>
-                    Reason for Follow-up
-                    <span style="font-weight:400;text-transform:none;letter-spacing:0;">(Optional)</span>
-                </div>
-
-                <div class="reason-wrap w-full">
-                    <textarea id="followup_reason" name="followup_reason" rows="3"
-                        placeholder="e.g. Check healing progress after extraction..."
-                        class="reason-textarea w-full min-h-[92px] resize-none"></textarea>
-                </div>
-
-                <div class="btn-row flex flex-col-reverse sm:flex-row gap-3">
-                    <button type="button" class="btn btn-cancel" onclick="closeFollowUpModal()">
-                        <i class="fa-solid fa-xmark"></i> Cancel
-                    </button>
-
-                    <button type="submit" class="btn btn-confirm follow-up-confirm-btn" id="confirmFollowUpBtn">
-                        <i class="fa-solid fa-check"></i> Save Procedure & Schedule Follow-up
-                    </button>
-                </div>
-            </form>
+            <button type="button" id="confirmResetTreatmentBtn" class="ui-btn ui-btn-danger">
+                <i class="fa-solid fa-eraser"></i>
+                <span>Yes, Reset</span>
+            </button>
         </div>
     </div>
 </div>
-@endunless
+
+<div id="cancelProcedureModal" class="ui-modal modal-theme-danger" aria-hidden="true" role="dialog" aria-modal="true"
+    aria-labelledby="cancelProcedureModalTitle">
+    <div class="ui-modal-card modal-md">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </div>
+
+                <div class="modal-copy">
+                    <h2 id="cancelProcedureModalTitle" class="modal-title">
+                        Cancel Procedure?
+                    </h2>
+                    <p class="modal-subtitle">
+                        Unsaved changes in this procedure session may be lost.
+                    </p>
+                </div>
+            </div>
+
+            <button type="button" id="closeCancelProcedureModalBtn" class="modal-x"
+                aria-label="Close cancel procedure modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="modal-bd">
+            <div class="global-confirm-alert">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+
+                <div>
+                    <strong>Leave this procedure?</strong>
+                    <span>
+                        Are you sure you want to cancel this procedure? Any unsaved progress in this session may be
+                        lost.
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-ft">
+            <button type="button" id="dismissCancelProcedureBtn" class="ui-btn ui-btn-secondary">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>No, Stay</span>
+            </button>
+
+            <button type="button" id="confirmCancelProcedureBtn" class="ui-btn ui-btn-danger">
+                <i class="fa-solid fa-ban"></i>
+                <span>Yes, Cancel</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="finishProcedureModal" class="ui-modal modal-theme-success" aria-hidden="true" role="dialog" aria-modal="true"
+    aria-labelledby="finishProcedureModalTitle">
+    <div class="ui-modal-card modal-md">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i id="finishProcedureModalIcon" class="fa-solid fa-clipboard-check"></i>
+                </div>
+
+                <div class="modal-copy">
+                    <h2 id="finishProcedureModalTitle" class="modal-title">
+                        Procedure Completed!
+                    </h2>
+                    <p id="finishProcedureModalMessage" class="modal-subtitle"></p>
+                </div>
+            </div>
+
+            <button type="button" id="closeFinishProcedureModalBtn" class="modal-x" aria-label="Close procedure modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="modal-bd">
+            <div class="global-confirm-alert">
+                <i class="fa-solid fa-circle-check"></i>
+
+                <div>
+                    <strong id="finishProcedureModalAlertTitle">
+                        Procedure status
+                    </strong>
+                    <span id="finishProcedureModalAlertMessage">
+                        Review the message above before continuing.
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div id="finishProcedureConfirmActions" class="modal-ft hidden">
+            <button type="button" id="dismissFinishProcedureBtn" class="ui-btn ui-btn-secondary">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>No, Review</span>
+            </button>
+
+            <button type="button" id="confirmFinishProcedureBtn" class="ui-btn ui-btn-success">
+                <i class="fa-solid fa-check"></i>
+                <span>Yes, Finish Procedure</span>
+            </button>
+        </div>
+
+        <div id="finishProcedureResultActions" class="modal-ft">
+            <button type="button" id="finishProcedureModalActionBtn" class="ui-btn ui-btn-primary">
+                <i class="fa-solid fa-arrow-right"></i>
+                <span>Back to Appointments</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 
 @endsection
 
@@ -794,6 +772,7 @@ $existingAppointmentMode
 @unless ($existingAppointmentMode)
 @include('components.appointment-calendar-script', [
 'mode' => 'booking',
+
 'calendarContainerId' => 'followUpCalendarWrap',
 'calGridId' => 'followUpCalGrid',
 'calMonthLabelId' => 'followUpCalMonthLabel',
@@ -802,22 +781,22 @@ $existingAppointmentMode
 'dateInputId' => 'followup_appointment_date',
 'timeInputId' => 'followup_appointment_time',
 
-'dateBannerId' => 'followUpDatePill',
+'dateBannerId' => 'followUpDateBanner',
+
 'slotPlaceholderId' => 'followUpSlotPlaceholder',
 'slotContainerId' => 'followUpSlotContainer',
 'slotGridId' => 'followUpSlotGrid',
 
-'selectedSlotDisplayId' => 'followUpSelectedTimePill',
-'selectedSlotTextId' => 'followUpSelectedTimeText',
-'selectedTimePillId' => 'followUpSelectedTimePill',
-'selectedTimeTextId' => 'followUpSelectedTimeText',
+'selectedSlotDisplayId' => 'followUpSelectedSlotDisplay',
+'selectedSlotTextId' => 'followUpSelectedSlotText',
 
 'datePillId' => null,
+
 'dateErrorId' => 'followUpDateError',
 'timeErrorId' => 'followUpTimeError',
 
-'calendarWrapSelector' => '.follow-up-cal-wrap',
-'slotsWrapSelector' => '.follow-up-slots-wrap',
+'calendarWrapSelector' => '#followUpCalendarWrap',
+'slotsWrapSelector' => '#followUpTimeWrap',
 
 'slotEndpoint' => route('dentist.appointment.slots'),
 
@@ -847,14 +826,17 @@ $existingAppointmentMode
         const confirmFinishProcedureBtn = document.getElementById('confirmFinishProcedureBtn');
         const dismissFinishProcedureBtn = document.getElementById('dismissFinishProcedureBtn');
         const finishProcedureModalActionBtn = document.getElementById('finishProcedureModalActionBtn');
+        const finishProcedureResultActions = document.getElementById('finishProcedureResultActions');
+        const finishProcedureModalAlertTitle = document.getElementById('finishProcedureModalAlertTitle');
+        const finishProcedureModalAlertMessage = document.getElementById('finishProcedureModalAlertMessage');
+        const closeResetTreatmentModalBtn = document.getElementById('closeResetTreatmentModalBtn');
+        const closeCancelProcedureModalBtn = document.getElementById('closeCancelProcedureModalBtn');
+        const closeFinishProcedureModalBtn = document.getElementById('closeFinishProcedureModalBtn');
         const existingAppointmentMode = @json($existingAppointmentMode);
         const isOralProphylaxis = @json($isOralProphylaxis);
         const cancelProcedureRedirectUrl = @json(route('dentist.dentist.patient.profile', $patient -> id ?? 1));
         let finishProcedureModalRedirectUrl = null;
-        let finishProcedureModalCloseTimer = null;
 
-        const legendSearchInput = document.getElementById('legendSearchInput');
-        const clearLegendSearchBtn = document.getElementById('clearLegendSearchBtn');
         const legendResultCount = document.getElementById('legendResultCount');
         const legendEmptyState = document.getElementById('legendEmptyState');
         const drawerSelectedLegendPreview = document.getElementById('drawerSelectedLegendPreview');
@@ -862,10 +844,10 @@ $existingAppointmentMode
         const procedureTimer = document.getElementById('procedureTimer');
         const container = document.getElementById('canvas-container');
         const loadingOverlay = document.getElementById('loadingOverlay');
-        const openLegendDrawerBtn = document.getElementById('openLegendDrawerBtn');
-        const closeLegendDrawerBtn = document.getElementById('closeLegendDrawerBtn');
         const legendDrawer = document.getElementById('legendDrawer');
-        const legendDrawerBackdrop = document.getElementById('legendDrawerBackdrop');
+
+        const odontogramDockLayout = document.getElementById('odontogramDockLayout');
+        const legendResizeHandle = document.getElementById('legendResizeHandle');
 
         const view2dBtn = document.getElementById('view2dBtn');
         const view3dBtn = document.getElementById('view3dBtn');
@@ -1049,13 +1031,13 @@ $existingAppointmentMode
 
         const legendCategories = [{
             key: 'conditions',
-            title: 'Legend Condition',
+            title: 'Conditions',
             icon: 'fa-solid fa-heart-pulse',
             items: ['D', 'M', 'F', 'I', 'RF', 'MO', 'IM']
         },
         {
             key: 'restoration-prosthetics',
-            title: 'Restoration and Prosthetics',
+            title: 'Restorations & Prosthetics',
             icon: 'fa-solid fa-screwdriver-wrench',
             items: ['J', 'A', 'AB', 'P', 'IN', 'LC', 'RM']
         },
@@ -1064,8 +1046,7 @@ $existingAppointmentMode
             title: 'Surgery',
             icon: 'fa-solid fa-user-doctor',
             items: ['X', 'XO', '✓', 'CM', 'SP']
-        }
-        ];
+        }];
 
         const rawSavedOdontogramData = @json($savedOdontogramData ?? []);
         const savedOdontogramData = Array.isArray(rawSavedOdontogramData) ?
@@ -1413,14 +1394,40 @@ $existingAppointmentMode
             return names[toothNumber] || `Tooth #${toothNumber}`;
         }
 
+        function openUiModal(modal) {
+            if (!modal) return;
+
+            modal.classList.remove('closing');
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+
+            document.documentElement.classList.add('modal-lock');
+            document.body.classList.add('modal-lock');
+        }
+
+        function closeUiModal(modal) {
+            if (!modal || !modal.classList.contains('open')) return;
+
+            modal.classList.remove('open');
+            modal.classList.add('closing');
+            modal.setAttribute('aria-hidden', 'true');
+
+            window.setTimeout(() => {
+                modal.classList.remove('closing');
+
+                if (!document.querySelector('.ui-modal.open')) {
+                    document.documentElement.classList.remove('modal-lock');
+                    document.body.classList.remove('modal-lock');
+                }
+            }, 170);
+        }
+
         function openCancelProcedureModal() {
-            cancelProcedureModal.classList.remove('hidden');
-            cancelProcedureModal.classList.add('flex');
+            openUiModal(cancelProcedureModal);
         }
 
         function closeCancelProcedureModal() {
-            cancelProcedureModal.classList.add('hidden');
-            cancelProcedureModal.classList.remove('flex');
+            closeUiModal(cancelProcedureModal);
         }
 
         function openFinishProcedureModal({
@@ -1431,47 +1438,79 @@ $existingAppointmentMode
             redirectUrl = null,
             confirmation = false,
         }) {
-            if (finishProcedureModalCloseTimer) {
-                clearTimeout(finishProcedureModalCloseTimer);
-                finishProcedureModalCloseTimer = null;
-            }
-
             finishProcedureModalTitle.textContent = title;
             finishProcedureModalMessage.textContent = message;
-            finishProcedureModalIcon.className = `fa-solid ${icon} text-white text-2xl`;
-            finishProcedureModalActionBtn.textContent = buttonText;
+            finishProcedureModalIcon.className = `fa-solid ${icon}`;
             finishProcedureModalRedirectUrl = redirectUrl;
 
-            finishProcedureConfirmActions.classList.toggle('hidden', !confirmation);
-            finishProcedureConfirmActions.classList.toggle('flex', confirmation);
-            finishProcedureModalActionBtn.classList.toggle('hidden', confirmation);
+            const actionButton = finishProcedureModalActionBtn;
 
-            finishProcedureModal.classList.remove('hidden');
-            finishProcedureModal.classList.add('flex');
+            if (actionButton) {
+                actionButton.classList.remove(
+                    'ui-btn-primary',
+                    'ui-btn-success',
+                    'ui-btn-warning',
+                    'ui-btn-danger'
+                );
+
+                actionButton.classList.add(
+                    redirectUrl
+                        ? 'ui-btn-success'
+                        : confirmation
+                            ? 'ui-btn-warning'
+                            : 'ui-btn-primary'
+                );
+            }
+
+            finishProcedureModal.classList.remove(
+                'modal-theme-success',
+                'modal-theme-warning',
+                'modal-theme-danger'
+            );
+
+            finishProcedureModal.classList.add(
+                confirmation
+                    ? 'modal-theme-warning'
+                    : (redirectUrl ? 'modal-theme-success' : 'modal-theme-danger')
+            );
+
+            finishProcedureModalAlertTitle.textContent = confirmation
+                ? 'Confirm procedure completion'
+                : (redirectUrl ? 'Procedure saved successfully' : 'Action required');
+
+            finishProcedureModalAlertMessage.textContent = message;
+
+            finishProcedureConfirmActions.classList.toggle('hidden', !confirmation);
+            finishProcedureResultActions.classList.toggle('hidden', confirmation);
+
+            const actionLabel = finishProcedureModalActionBtn?.querySelector('span');
+            if (actionLabel) {
+                actionLabel.textContent = buttonText;
+            }
+
+            openUiModal(finishProcedureModal);
 
             requestAnimationFrame(() => {
-                finishProcedureModal.classList.add('is-open');
-                (confirmation ? confirmFinishProcedureBtn : finishProcedureModalActionBtn).focus();
+                (confirmation ? confirmFinishProcedureBtn : finishProcedureModalActionBtn)?.focus();
             });
         }
 
         function closeFinishProcedureModal() {
-            finishProcedureModal.classList.remove('is-open');
             const redirectUrl = finishProcedureModalRedirectUrl;
             finishProcedureModalRedirectUrl = null;
 
-            finishProcedureModalCloseTimer = setTimeout(() => {
-                finishProcedureModal.classList.add('hidden');
-                finishProcedureModal.classList.remove('flex');
-                finishProcedureModalCloseTimer = null;
+            closeUiModal(finishProcedureModal);
 
-                if (redirectUrl) {
+            if (redirectUrl) {
+                window.setTimeout(() => {
                     window.location.href = redirectUrl;
-                    return;
-                }
+                }, 180);
+                return;
+            }
 
+            window.setTimeout(() => {
                 finishProcedureBtn?.focus();
-            }, 220);
+            }, 180);
         }
 
         function getSurfaceLabel(surface) {
@@ -1510,26 +1549,23 @@ $existingAppointmentMode
             surfacePickerButtons.forEach(btn => {
                 const surfaceKey = btn.dataset.surface;
                 const disabled = !selectedTooth;
-                const isActive = selectedTooth && selectedTargetType === 'surface' && selectedSurfaceKey === surfaceKey;
+                const isActive =
+                    selectedTooth &&
+                    selectedTargetType === 'surface' &&
+                    selectedSurfaceKey === surfaceKey;
 
                 btn.disabled = disabled;
-                btn.classList.toggle('opacity-50', disabled);
-                btn.classList.toggle('cursor-not-allowed', disabled);
-                btn.classList.toggle('scale-[0.98]', disabled);
-
-                btn.classList.remove('bg-red-600', 'text-white', 'border-red-600', 'shadow-md', 'ring-2', 'ring-red-100');
-                btn.classList.add('bg-white', 'text-gray-700', 'border-gray-200');
-
-                if (isActive) {
-                    btn.classList.remove('bg-white', 'text-gray-700', 'border-gray-200');
-                    btn.classList.add('bg-red-600', 'text-white', 'border-red-600', 'shadow-md', 'ring-2', 'ring-red-100');
-                }
+                btn.classList.toggle('active', isActive);
             });
         }
 
         function selectSurfaceFrom3DPicker(surfaceKey) {
             if (!selectedTooth) {
-                alert('Please click a tooth in the 3D model first.');
+                showProcedureToast(
+                    'Select a tooth in the 3D model before choosing a surface.',
+                    'warning',
+                    'Select a Tooth'
+                );
                 return;
             }
 
@@ -1612,16 +1648,23 @@ $existingAppointmentMode
 
             if (!selectedRecord) {
                 selectedToothLegendList.innerHTML =
-                    '<span class="text-[11px] text-gray-400 italic">No treatment assigned yet.</span>';
+                    '<span class="ui-muted-text">None selected</span>';
+
                 return;
             }
 
             selectedToothLegendList.innerHTML = `
-                    <span class="treatment-chip inline-flex items-center gap-2">
-                        <span class="legend-color-dot" style="background:${selectedRecord.colorHex};"></span>
-                        ${getLegendDisplayCode(selectedRecord.code)} - ${selectedRecord.label}
-                    </span>
-                `;
+        <span class="odontogram-preview-marking">
+            <span
+                class="odontogram-preview-marking-swatch"
+                style="background:${selectedRecord.colorHex};"
+            ></span>
+
+            <span>
+                ${getLegendDisplayCode(selectedRecord.code)} - ${selectedRecord.label}
+            </span>
+        </span>
+    `;
         }
 
         function updateActionButtons() {
@@ -1636,15 +1679,18 @@ $existingAppointmentMode
 
         function updateSelectedToothUI() {
             if (!selectedTooth || !selectedTargetType) {
-                drawerSelectedLegendPreview.textContent = selectedLegend ?
-                    `${selectedLegend} - ${(getLegendByCode(selectedLegend)?.label || selectedLegend)}` :
-                    'No legend selected yet';
+                drawerSelectedLegendPreview.textContent =
+                    selectedLegend
+                        ? `${getLegendDisplayCode(selectedLegend)} - ${getLegendByCode(selectedLegend)?.label || selectedLegend
+                        }`
+                        : 'None selected';
 
-                selectedToothDisplay.textContent = currentView === '2d' ?
-                    'Click a tooth surface on the 2D odontogram' :
-                    'Click a tooth on the 3D odontogram';
+                selectedToothDisplay.textContent =
+                    currentView === '2d'
+                        ? 'Select a tooth surface.'
+                        : 'Select a tooth.';
 
-                selectedToothName.textContent = 'No tooth selected';
+                selectedToothName.textContent = '';
                 toothHoverLabel.innerText = 'Select a tooth';
                 legendStatusNote.classList.add('hidden');
                 selectedLegend = null;
@@ -1663,7 +1709,8 @@ $existingAppointmentMode
                 toothHoverLabel.innerText = `Selected: #${selectedTooth}`;
                 selectedViewBadge.textContent = '3D View';
                 legendStatusNote.classList.remove('hidden');
-                legendStatusNote.textContent = 'Step 2: Choose one of the 5 surfaces from the 3D surface picker below, then select a legend and click Apply Treatment.';
+                legendStatusNote.textContent =
+                    'Choose a surface, select a treatment, then apply.';
                 selectedLegend = null;
 
                 updateLegendActiveState();
@@ -1684,7 +1731,7 @@ $existingAppointmentMode
             toothHoverLabel.innerText = `Selected: #${selectedTooth}`;
             selectedViewBadge.textContent = currentView === '2d' ? '2D View' : '3D View';
             legendStatusNote.classList.remove('hidden');
-            legendStatusNote.textContent = 'Choose a treatment legend below, then click Apply Treatment.';
+            legendStatusNote.textContent = 'Select a treatment, then apply.';
 
             const record = getSelectedRecord();
             selectedLegend = record ? record.code : null;
@@ -1694,38 +1741,6 @@ $existingAppointmentMode
             updateActionButtons();
             update3DSurfacePicker();
         }
-
-        function openLegendDrawer() {
-            legendSearchInput.value = '';
-            clearLegendSearchBtn.classList.add('hidden');
-            renderLegendButtons('');
-            legendDrawer.classList.add('open');
-            legendDrawerBackdrop.classList.add('show');
-            document.body.classList.add('legend-drawer-open');
-        }
-
-        function closeLegendDrawer() {
-            legendDrawer.classList.remove('open');
-            legendDrawerBackdrop.classList.remove('show');
-            document.body.classList.remove('legend-drawer-open');
-        }
-
-        openLegendDrawerBtn.addEventListener('click', openLegendDrawer);
-        closeLegendDrawerBtn.addEventListener('click', closeLegendDrawer);
-        legendDrawerBackdrop.addEventListener('click', closeLegendDrawer);
-
-        legendSearchInput.addEventListener('input', function () {
-            const value = legendSearchInput.value.trim();
-            clearLegendSearchBtn.classList.toggle('hidden', value.length === 0);
-            renderLegendButtons(value);
-        });
-
-        clearLegendSearchBtn.addEventListener('click', function () {
-            legendSearchInput.value = '';
-            clearLegendSearchBtn.classList.add('hidden');
-            renderLegendButtons('');
-            legendSearchInput.focus();
-        });
 
         function renderLegendButtons(searchTerm = '') {
             legendContainer.innerHTML = '';
@@ -1759,8 +1774,9 @@ $existingAppointmentMode
                                     <i class="${category.icon}"></i>
                                 </span>
                                 <div>
-                                    <p class="text-sm font-bold text-gray-900">${category.title}</p>
-                                    <p class="text-[11px] text-gray-500">Choose a legend from this group</p>
+                                    <p class="odontogram-legend-category-name">
+                                        ${category.title}
+                                    </p>
                                 </div>
                             </div>
                             <span class="legend-category-count">${categoryLegends.length}</span>
@@ -1775,10 +1791,11 @@ $existingAppointmentMode
                     btn.type = 'button';
                     btn.dataset.code = legend.code;
                     btn.className = 'legend-btn';
+                    btn.title = `${legend.displayCode || legend.code} - ${legend.label}`;
 
                     btn.innerHTML = `
                             <span class="legend-color-dot" style="background:${legendColors[legend.code]};"></span>
-                            <i class="${legendIcons[legend.code]} text-[#8B0000] w-4 text-center"></i>
+                            <i class="${legendIcons[legend.code]}"></i>
                             <span class="legend-meta">
                                 <span class="legend-code">${legend.displayCode || legend.code}</span>
                                 <span class="legend-label">${legend.label}</span>
@@ -1787,7 +1804,11 @@ $existingAppointmentMode
 
                     btn.addEventListener('click', function () {
                         if (!selectedTooth || !selectedTargetType) {
-                            alert('Please select a tooth target first.');
+                            showProcedureToast(
+                                'Select a tooth surface first, then choose a treatment legend.',
+                                'warning',
+                                'Select a Tooth'
+                            );
                             return;
                         }
 
@@ -1807,16 +1828,30 @@ $existingAppointmentMode
                 legendContainer.appendChild(categoryBlock);
             });
 
-            legendResultCount.textContent = `${totalResults} result${totalResults === 1 ? '' : 's'}`;
+            legendResultCount.textContent =
+                String(totalResults);
 
             if (totalResults === 0) {
-                legendEmptyState.classList.remove('hidden');
+                window.renderGlobalSearchEmptyState?.({
+                    host: legendEmptyState,
+                    input: '#legendSearchInput',
+                    title: 'No treatments found',
+                    message: 'Try another name or code.',
+                    icon: 'fa-tooth',
+                    className: 'empty-state-compact',
+                });
             } else {
-                legendEmptyState.classList.add('hidden');
+                window.hideGlobalSearchEmptyState?.(
+                    legendEmptyState
+                );
             }
 
             updateLegendActiveState();
         }
+
+        window.filterOdontogramLegends = function (query = '') {
+            renderLegendButtons(query);
+        };
 
         function createLegendPayload(code) {
             const legendObj = getLegendByCode(code);
@@ -2077,7 +2112,11 @@ $existingAppointmentMode
             if (!selectedTooth || !selectedTargetType) return;
 
             if (selectedTargetType === 'status') {
-                alert('Please apply treatments by clicking an actual tooth surface, not the divided indicator box.');
+                showProcedureToast(
+                    'Apply treatments to an actual tooth surface instead of the divided status indicator.',
+                    'warning',
+                    'Select a Tooth Surface'
+                );
                 return;
             }
 
@@ -2110,7 +2149,6 @@ $existingAppointmentMode
             updateActionButtons();
             selectedLegendPreview.textContent = `${getLegendDisplayCode(payload.code)} - ${payload.label}`;
             drawerSelectedLegendPreview.textContent = `${getLegendDisplayCode(payload.code)} - ${payload.label}`;
-            closeLegendDrawer();
 
             if (currentView === '3d') {
                 setTimeout(function () {
@@ -2147,8 +2185,8 @@ $existingAppointmentMode
             selectedLegend = null;
             pendingResetPayload = null;
 
-            selectedLegendPreview.textContent = 'No legend selected yet.';
-            drawerSelectedLegendPreview.textContent = 'No legend selected yet.';
+            selectedLegendPreview.textContent = 'None selected';
+            drawerSelectedLegendPreview.textContent = 'None selected';
 
             updateHiddenInput();
             render2DOdontogram();
@@ -2181,14 +2219,12 @@ $existingAppointmentMode
             resetTreatmentMessage.textContent =
                 `Are you sure you want to reset the treatment for tooth #${selectedTooth} (${getToothName(selectedTooth)}) - ${partText}?`;
 
-            resetTreatmentModal.classList.remove('hidden');
-            resetTreatmentModal.classList.add('flex');
+            openUiModal(resetTreatmentModal);
         }
 
         function closeResetModal() {
             pendingResetPayload = null;
-            resetTreatmentModal.classList.add('hidden');
-            resetTreatmentModal.classList.remove('flex');
+            closeUiModal(resetTreatmentModal);
         }
 
         function createToothUnit(toothNumber, statusPlacement = 'top') {
@@ -2290,7 +2326,7 @@ $existingAppointmentMode
             leftTeeth.forEach(tooth => row.appendChild(createToothUnit(tooth, statusPlacement)));
 
             const spacer = document.createElement('div');
-            spacer.className = 'w-3 md:w-5';
+            spacer.className = 'odontogram-arch-spacer';
             row.appendChild(spacer);
 
             rightTeeth.forEach(tooth => row.appendChild(createToothUnit(tooth, statusPlacement)));
@@ -2340,17 +2376,16 @@ $existingAppointmentMode
                 view2dBtn.classList.add('active');
                 view3dBtn.classList.remove('active');
                 viewInstructionText.textContent =
-                    'Click a tooth surface to assign a treatment legend';
+                    'Select a surface to begin treatment';
             } else {
                 panel2d.classList.remove('active');
                 panel3d.classList.add('active');
                 view2dBtn.classList.remove('active');
                 view3dBtn.classList.add('active');
-                viewInstructionText.textContent = 'Click a tooth in the 3D model, then choose a surface below';
+                viewInstructionText.textContent =
+                    'Select a tooth, then choose a surface';
 
                 if (previousView !== '3d') {
-                    // Keep odontogramState unchanged so all saved markings
-                    // render in 3D, but do not carry the active 2D selection.
                     selectedTooth = null;
                     selectedTargetType = null;
                     selectedSurfaceKey = null;
@@ -2406,13 +2441,25 @@ $existingAppointmentMode
             const treatment = state.threeD || getPreferredToothVisual(state);
 
             toothTooltipContent.innerHTML = `
-                    <div class="text-xs font-extrabold tracking-wide text-red-200 mb-1">Tooth #${toothNumber}</div>
-                    <div class="text-sm font-bold leading-tight">${toothName}</div>
-                    <div class="mt-1 text-[11px] text-gray-300">Click to choose this tooth, then select a surface.</div>
-                    <div class="mt-2 text-xs ${treatment ? 'text-emerald-200' : 'text-gray-300'}">
-                        ${treatment ? `Current visual: ${getLegendDisplayCode(treatment.code)} - ${treatment.label}` : 'No treatment assigned'}
-                    </div>
-                `;
+    <div class="tooth-tooltip-number">
+        Tooth #${toothNumber}
+    </div>
+
+    <div class="tooth-tooltip-name">
+        ${toothName}
+    </div>
+
+    <div class="tooth-tooltip-help">
+        Click to choose this tooth, then select a surface.
+    </div>
+
+    <div class="tooth-tooltip-treatment ${treatment ? 'has-treatment' : ''}">
+        ${treatment
+                    ? `Current visual: ${getLegendDisplayCode(treatment.code)} - ${treatment.label}`
+                    : 'No treatment assigned'
+                }
+    </div>
+`;
 
             const rect = container.getBoundingClientRect();
             const x = event.clientX - rect.left;
@@ -2443,15 +2490,23 @@ $existingAppointmentMode
 
         applyTreatmentBtn.addEventListener('click', function () {
             if (!selectedTooth || !selectedTargetType) {
-                alert('Please select a tooth target first.');
+                showProcedureToast(
+                    'Please select a tooth surface before choosing a treatment legend.',
+                    'warning',
+                    'Select a Tooth'
+                );
                 selectedLegendPreview.textContent = selectedLegend ?
                     `${selectedLegend} - ${(getLegendByCode(selectedLegend)?.label || selectedLegend)}` :
-                    'No legend selected yet.';
+                    'None selected';
                 return;
             }
 
             if (!selectedLegend) {
-                alert('Please choose a treatment legend first.');
+                showProcedureToast(
+                    'Choose a treatment legend before applying treatment.',
+                    'warning',
+                    'Select a Legend'
+                );
                 return;
             }
 
@@ -2465,10 +2520,12 @@ $existingAppointmentMode
 
         confirmResetTreatmentBtn.addEventListener('click', clearSelectedTargetTreatment);
         cancelResetTreatmentBtn.addEventListener('click', closeResetModal);
+        closeResetTreatmentModalBtn?.addEventListener('click', closeResetModal);
+        closeCancelProcedureModalBtn?.addEventListener('click', closeCancelProcedureModal);
+        closeFinishProcedureModalBtn?.addEventListener('click', closeFinishProcedureModal);
 
         resetTreatmentModal.addEventListener('click', function (event) {
-            if (event.target === resetTreatmentModal || event.target.classList.contains(
-                'modal-backdrop')) {
+            if (event.target === resetTreatmentModal) {
                 closeResetModal();
             }
         });
@@ -2477,188 +2534,26 @@ $existingAppointmentMode
 
         const finishProcedureBtn = document.getElementById('finishProcedureBtn');
         const followUpBtn = document.getElementById('followUpBtn');
+        const closeFollowUpModalBtn = document.getElementById('closeFollowUpModalBtn');
+        const cancelFollowUpModalBtn = document.getElementById('cancelFollowUpModalBtn');
         const saveProcedureUrl = @json($saveProcedureUrl ?? null);
         const storeFollowUpUrl = @json(!$existingAppointmentMode && $appointment ? route('dentist.dentist.appointments.follow-up.store', $appointment -> id) : null);
 
-        function showProcedureToast(message, type = 'success') {
-            const existingToast = document.getElementById('procedureToast');
-            if (existingToast) {
-                existingToast.remove();
-            }
-
-            const toast = document.createElement('div');
-            toast.id = 'procedureToast';
-
-            const isSuccess = type === 'success';
-
-            toast.className = `
-        fixed top-24 right-6 z-[100000]
-        min-w-[280px] max-w-[420px]
-        rounded-2xl px-5 py-4 shadow-2xl border
-        flex items-start gap-3
-        transition-all duration-300
-        translate-x-6 opacity-0
-        ${isSuccess
-                    ? 'bg-white border-green-100 text-gray-800'
-                    : 'bg-white border-red-100 text-gray-800'}
-    `;
-
-            toast.innerHTML = `
-        <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0
-            ${isSuccess ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}">
-            <i class="fa-solid ${isSuccess ? 'fa-circle-check' : 'fa-circle-exclamation'}"></i>
-        </div>
-
-        <div class="min-w-0 flex-1">
-            <p class="text-sm font-extrabold ${isSuccess ? 'text-green-700' : 'text-red-700'}">
-                ${isSuccess ? 'Success' : 'Error'}
-            </p>
-            <p class="text-sm font-semibold text-gray-700 mt-0.5 leading-relaxed">
-                ${message}
-            </p>
-        </div>
-
-        <button type="button" class="text-gray-400 hover:text-gray-700 transition">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
-    `;
-
-            toast.querySelector('button')?.addEventListener('click', () => {
-                toast.classList.add('translate-x-6', 'opacity-0');
-                setTimeout(() => toast.remove(), 250);
+        function showProcedureToast(message, type = 'success', title = null) {
+            window.showToast?.({
+                type,
+                title:
+                    title ||
+                    (
+                        type === 'error'
+                            ? 'Action Required'
+                            : type === 'warning'
+                                ? 'Attention'
+                                : 'Success'
+                    ),
+                message,
+                duration: 4000,
             });
-
-            document.body.appendChild(toast);
-
-            requestAnimationFrame(() => {
-                toast.classList.remove('translate-x-6', 'opacity-0');
-            });
-
-            setTimeout(() => {
-                toast.classList.add('translate-x-6', 'opacity-0');
-                setTimeout(() => toast.remove(), 250);
-            }, 3500);
-        }
-
-        function setFollowUpEmptySlotPlaceholder() {
-            const slotPlaceholder = document.getElementById('followUpSlotPlaceholder');
-
-            if (!slotPlaceholder) return;
-
-            slotPlaceholder.classList.add('follow-up-empty-slot-placeholder');
-            slotPlaceholder.innerHTML = `
-                    <div class="follow-up-empty-icon">
-                        <i class="fa-regular fa-calendar"></i>
-                    </div>
-                    <h4>Choose a date</h4>
-                    <p>Select an available day to see time slots.</p>
-                `;
-        }
-
-        function hideFollowUpSelectedTime() {
-            const selectedTimePill = document.getElementById('followUpSelectedTimePill');
-            const selectedTimeText = document.getElementById('followUpSelectedTimeText');
-
-            if (selectedTimeText) {
-                selectedTimeText.textContent = '';
-            }
-
-            if (selectedTimePill) {
-                selectedTimePill.classList.add('hidden');
-                selectedTimePill.classList.remove('show');
-                selectedTimePill.style.display = 'none';
-            }
-        }
-
-        function syncFollowUpSlotState() {
-            const slotsWrap = document.querySelector('.follow-up-slots-wrap');
-            const dateInput = document.getElementById('followup_appointment_date');
-            const timeInput = document.getElementById('followup_appointment_time');
-            const datePill = document.getElementById('followUpDatePill');
-            const slotPlaceholder = document.getElementById('followUpSlotPlaceholder');
-            const slotContainer = document.getElementById('followUpSlotContainer');
-            const slotGrid = document.getElementById('followUpSlotGrid');
-            const selectedTimePill = document.getElementById('followUpSelectedTimePill');
-            const selectedTimeText = document.getElementById('followUpSelectedTimeText');
-            const clearTimeBtn = document.getElementById('followUpClearTimeBtn');
-
-            const hasDate = Boolean(dateInput?.value);
-            const hasSlotMarkup = Boolean(slotGrid?.children?.length);
-            const hasAvailableSlots = Boolean(slotGrid?.querySelector('.slot-chip:not(.disabled)'));
-            const selectedValue = timeInput?.value || '';
-
-            slotsWrap?.classList.toggle('is-empty', !hasDate);
-            slotsWrap?.classList.toggle('has-date', hasDate);
-            slotsWrap?.classList.toggle('has-slots', hasDate && hasSlotMarkup);
-
-            if (!hasDate) {
-                if (datePill) {
-                    datePill.innerHTML = '';
-                    datePill.classList.add('hidden');
-                    datePill.classList.remove('show');
-                    datePill.style.display = 'none';
-                }
-
-                if (slotContainer) {
-                    slotContainer.classList.add('hidden');
-                    slotContainer.style.display = 'none';
-                }
-
-                if (slotGrid) {
-                    slotGrid.innerHTML = '';
-                    slotGrid.style.display = 'none';
-                }
-
-                if (slotPlaceholder) {
-                    setFollowUpEmptySlotPlaceholder();
-                    slotPlaceholder.classList.remove('hidden');
-                    slotPlaceholder.style.display = 'flex';
-                }
-
-                if (clearTimeBtn) {
-                    clearTimeBtn.classList.add('hidden');
-                }
-
-                hideFollowUpSelectedTime();
-                return;
-            }
-
-            if (datePill) {
-                if (datePill.textContent.trim().length > 0) {
-                    datePill.classList.remove('hidden');
-                    datePill.classList.add('show');
-                    datePill.style.display = 'flex';
-                } else {
-                    datePill.classList.add('hidden');
-                    datePill.classList.remove('show');
-                    datePill.style.display = 'none';
-                }
-            }
-
-            if (slotPlaceholder) {
-                slotPlaceholder.classList.add('hidden');
-                slotPlaceholder.style.display = 'none';
-            }
-
-            if (slotContainer) {
-                slotContainer.classList.remove('hidden');
-                slotContainer.style.display = 'block';
-            }
-
-            if (clearTimeBtn) {
-                clearTimeBtn.classList.toggle('hidden', !hasAvailableSlots);
-            }
-
-            if (selectedTimePill && selectedTimeText) {
-                if (selectedValue) {
-                    selectedTimeText.textContent = selectedValue;
-                    selectedTimePill.classList.remove('hidden');
-                    selectedTimePill.classList.add('show');
-                    selectedTimePill.style.display = 'flex';
-                } else {
-                    hideFollowUpSelectedTime();
-                }
-            }
         }
 
         function resetFollowUpForm() {
@@ -2666,13 +2561,52 @@ $existingAppointmentMode
             const dateInput = document.getElementById('followup_appointment_date');
             const timeInput = document.getElementById('followup_appointment_time');
             const reasonInput = document.getElementById('followup_reason');
-            const datePill = document.getElementById('followUpDatePill');
-            const slotPlaceholder = document.getElementById('followUpSlotPlaceholder');
-            const slotContainer = document.getElementById('followUpSlotContainer');
-            const slotGrid = document.getElementById('followUpSlotGrid');
-            const clearTimeBtn = document.getElementById('followUpClearTimeBtn');
+            const dateBanner =
+                document.getElementById(
+                    'followUpDateBanner'
+                );
 
-            if (form) form.reset();
+            const slotPlaceholder =
+                document.getElementById(
+                    'followUpSlotPlaceholder'
+                );
+
+            const slotContainer =
+                document.getElementById(
+                    'followUpSlotContainer'
+                );
+
+            const slotGrid =
+                document.getElementById(
+                    'followUpSlotGrid'
+                );
+
+            const selectedSlotDisplay =
+                document.getElementById(
+                    'followUpSelectedSlotDisplay'
+                );
+
+            const selectedSlotText =
+                document.getElementById(
+                    'followUpSelectedSlotText'
+                );
+
+            const clearTimeBtn =
+                document.getElementById(
+                    'followUpClearTimeBtn'
+                );
+
+            const dateGroup =
+                document.getElementById(
+                    'followUpCalendarWrap'
+                );
+
+            const timeGroup =
+                document.getElementById(
+                    'followUpTimeWrap'
+                );
+
+            form?.reset();
             if (dateInput) dateInput.value = '';
             if (timeInput) timeInput.value = '';
             if (reasonInput) reasonInput.value = '';
@@ -2680,149 +2614,156 @@ $existingAppointmentMode
             if (typeof selectedDate !== 'undefined') selectedDate = null;
             if (typeof selectedTime !== 'undefined') selectedTime = null;
 
-            document.getElementById('followUpDateError')?.classList.add('hidden');
-            document.getElementById('followUpTimeError')?.classList.add('hidden');
+            window.clearGlobalGroupError?.(
+                dateGroup,
+                'followup_appointment_date'
+            );
 
-            document.querySelector('.follow-up-cal-wrap')?.classList.remove('error');
-            document.querySelector('.follow-up-slots-wrap')?.classList.remove('error');
+            window.clearGlobalGroupError?.(
+                timeGroup,
+                'followup_appointment_time'
+            );
 
-            if (datePill) {
-                datePill.innerHTML = '';
-                datePill.classList.add('hidden');
-                datePill.classList.remove('show');
-                datePill.style.display = 'none';
+            document.getElementById('followUpDateError')?.classList.remove('show');
+            document.getElementById('followUpTimeError')?.classList.remove('show');
+
+            if (dateBanner) {
+                dateBanner.replaceChildren();
+                dateBanner.classList.add('hidden');
+                dateBanner.style.removeProperty('display');
             }
 
             if (slotPlaceholder) {
-                setFollowUpEmptySlotPlaceholder();
                 slotPlaceholder.classList.remove('hidden');
-                slotPlaceholder.style.display = 'flex';
+                slotPlaceholder.style.removeProperty('display');
             }
 
             if (slotContainer) {
                 slotContainer.classList.add('hidden');
-                slotContainer.style.display = 'none';
+                slotContainer.style.removeProperty('display');
             }
 
             if (slotGrid) {
-                slotGrid.innerHTML = '';
-                slotGrid.style.display = 'none';
+                slotGrid.replaceChildren();
+                slotGrid.style.removeProperty('display');
             }
 
-            if (clearTimeBtn) {
-                clearTimeBtn.classList.add('hidden');
+            selectedSlotDisplay?.classList.add(
+                'hidden'
+            );
+
+            if (selectedSlotText) {
+                selectedSlotText.textContent = '';
             }
 
-            hideFollowUpSelectedTime();
-            syncFollowUpSlotState();
+            clearTimeBtn?.classList.add(
+                'hidden'
+            );
         }
 
-        const followUpClearTimeBtn = document.getElementById('followUpClearTimeBtn');
+        const followUpClearTimeBtn =
+            document.getElementById(
+                'followUpClearTimeBtn'
+            );
 
-        function clearFollowUpTimeSelection() {
-            const slotGrid = document.getElementById('followUpSlotGrid');
-            const timeInput = document.getElementById('followup_appointment_time');
+        followUpClearTimeBtn?.addEventListener(
+            'click',
+            function () {
 
-            if (typeof selectedTime !== 'undefined') {
-                selectedTime = null;
-            }
+                const slotGrid =
+                    document.getElementById(
+                        'followUpSlotGrid'
+                    );
 
-            if (timeInput) {
-                timeInput.value = '';
-                timeInput.dispatchEvent(new Event('change', { bubbles: true }));
-            }
+                const timeInput =
+                    document.getElementById(
+                        'followup_appointment_time'
+                    );
 
-            slotGrid?.querySelectorAll('.slot-chip').forEach(chip => {
-                chip.classList.remove(
-                    'selected',
-                    'bg-[#8B0000]',
-                    'text-white',
-                    'border-[#8B0000]',
-                    'shadow-[0_2px_12px_rgba(139,0,0,0.25)]'
+                const selectedDisplay =
+                    document.getElementById(
+                        'followUpSelectedSlotDisplay'
+                    );
+
+                const selectedText =
+                    document.getElementById(
+                        'followUpSelectedSlotText'
+                    );
+
+                if (
+                    typeof selectedTime !==
+                    'undefined'
+                ) {
+                    selectedTime = null;
+                }
+
+                if (timeInput) {
+                    timeInput.value = '';
+
+                    timeInput.dispatchEvent(
+                        new Event(
+                            'change',
+                            {
+                                bubbles: true
+                            }
+                        )
+                    );
+                }
+
+                slotGrid
+                    ?.querySelectorAll(
+                        '.slot-chip'
+                    )
+                    .forEach(chip => {
+
+                        chip.classList.remove(
+                            'selected'
+                        );
+
+                        chip.setAttribute(
+                            'aria-pressed',
+                            'false'
+                        );
+                    });
+
+                selectedDisplay?.classList.add(
+                    'hidden'
                 );
-                chip.classList.add('border-[#e8e2dd]', 'bg-[#fafaf8]', 'text-[#1a1410]');
-                chip.setAttribute('aria-pressed', 'false');
-            });
 
-            syncFollowUpSlotState();
-        }
+                if (selectedText) {
+                    selectedText.textContent = '';
+                }
 
-        if (followUpClearTimeBtn) {
-            followUpClearTimeBtn.addEventListener('click', clearFollowUpTimeSelection);
-        }
+                followUpClearTimeBtn.classList.add(
+                    'hidden'
+                );
 
-        if (typeof renderSlotLoading === 'function') {
-            const originalRenderSlotLoading = renderSlotLoading;
-            renderSlotLoading = function (iso) {
-                originalRenderSlotLoading(iso);
-                setTimeout(syncFollowUpSlotState, 0);
-            };
-        }
+                window.clearGlobalGroupError?.(
+                    document.getElementById(
+                        'followUpTimeWrap'
+                    ),
+                    'followup_appointment_time'
+                );
+            }
+        );
 
-        if (typeof renderSlots === 'function') {
-            const originalRenderSlots = renderSlots;
-            renderSlots = function (payload, iso) {
-                originalRenderSlots(payload, iso);
-                setTimeout(syncFollowUpSlotState, 0);
-            };
-        }
+        function openFollowUpModal() {
+            const modal =
+                document.getElementById(
+                    'followUpModal'
+                );
 
-        if (typeof clearSlotSelectionUI === 'function') {
-            const originalClearSlotSelectionUI = clearSlotSelectionUI;
-            clearSlotSelectionUI = function () {
-                originalClearSlotSelectionUI();
-                setFollowUpEmptySlotPlaceholder();
-                setTimeout(syncFollowUpSlotState, 0);
-            };
-        }
+            if (!modal) return;
 
-        document.getElementById('followUpSlotGrid')?.addEventListener('click', function () {
-            setTimeout(syncFollowUpSlotState, 0);
-        });
-
-        document.getElementById('followup_appointment_date')?.addEventListener('change', function () {
-            setTimeout(syncFollowUpSlotState, 0);
-        });
-
-        document.getElementById('followup_appointment_time')?.addEventListener('change', syncFollowUpSlotState);
-
-        ['followUpDatePill', 'followUpSlotGrid'].forEach(function (id) {
-            const el = document.getElementById(id);
-            if (!el) return;
-
-            new MutationObserver(function () {
-                setTimeout(syncFollowUpSlotState, 0);
-            }).observe(el, {
-                childList: true,
-                subtree: true
-            });
-        });
-
-        window.openFollowUpModal = function () {
             resetFollowUpForm();
 
-            const modal = document.getElementById('followUpModal');
-            if (!modal) return;
+            window.PatientUI
+                ?.initAvatars?.(modal);
 
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-
-            requestAnimationFrame(() => {
-                if (typeof renderCalendar === 'function') {
-                    renderCalendar();
-                } else {
-                    console.warn('renderCalendar is not loaded.');
-                }
-            });
-        };
-
-        window.closeFollowUpModal = function () {
-            const modal = document.getElementById('followUpModal');
-            if (!modal) return;
-
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        };
+            window.openModal?.(
+                'followUpModal'
+            );
+        }
 
         function getCleanOdontogramDataForSave() {
             let rawData = [];
@@ -2908,8 +2849,10 @@ $existingAppointmentMode
             updateHiddenInput();
 
             if (!isOralProphylaxis && !hasAppliedTreatmentThisSession) {
-                alert(
-                    'Please apply at least one treatment to the tooth chart before finishing the procedure.'
+                showProcedureToast(
+                    'Apply at least one treatment to the tooth chart before finishing the procedure.',
+                    'warning',
+                    'Treatment Required'
                 );
 
                 return;
@@ -2918,9 +2861,12 @@ $existingAppointmentMode
             const cleanOdontogramData = getCleanOdontogramDataForSave();
 
             if (!isOralProphylaxis && cleanOdontogramData.length === 0) {
-                alert(
-                    'Please apply at least one treatment to the tooth chart before finishing the procedure.'
+                showProcedureToast(
+                    'Apply at least one treatment to the tooth chart before finishing the procedure.',
+                    'warning',
+                    'Treatment Required'
                 );
+
                 return;
             }
 
@@ -3039,13 +2985,29 @@ $existingAppointmentMode
         finishProcedureModalActionBtn.addEventListener('click', closeFinishProcedureModal);
 
         finishProcedureModal.addEventListener('click', function (event) {
-            if (event.target === finishProcedureModal || event.target.classList.contains('procedure-confirm-backdrop')) {
+            if (event.target === finishProcedureModal) {
                 closeFinishProcedureModal();
             }
         });
 
         followUpBtn?.addEventListener('click', function () {
             openFollowUpModal();
+        });
+
+        closeFollowUpModalBtn?.addEventListener(
+            'click',
+            closeFollowUpModal
+        );
+
+        cancelFollowUpModalBtn?.addEventListener(
+            'click',
+            closeFollowUpModal
+        );
+
+        document.getElementById('followUpModal')?.addEventListener('click', function (event) {
+            if (event.target === event.currentTarget) {
+                closeFollowUpModal();
+            }
         });
 
         document.getElementById('followUpForm')?.addEventListener('submit', async function (event) {
@@ -3059,19 +3021,49 @@ $existingAppointmentMode
 
             let valid = true;
 
+            const dateGroup =
+                document.getElementById(
+                    'followUpCalendarWrap'
+                );
+
+            const timeGroup =
+                document.getElementById(
+                    'followUpTimeWrap'
+                );
+
             if (!dateInput?.value) {
-                document.getElementById('followUpDateError')?.classList.remove('hidden');
-                document.querySelector('.follow-up-cal-wrap')?.classList.add('error');
+                window.showGlobalGroupError?.(
+                    dateGroup,
+                    'followup_appointment_date',
+                    'Select a follow-up date.'
+                );
+
                 valid = false;
+            } else {
+                window.clearGlobalGroupError?.(
+                    dateGroup,
+                    'followup_appointment_date'
+                );
             }
 
             if (!timeInput?.value) {
-                document.getElementById('followUpTimeError')?.classList.remove('hidden');
-                document.querySelector('.follow-up-slots-wrap')?.classList.add('error');
+                window.showGlobalGroupError?.(
+                    timeGroup,
+                    'followup_appointment_time',
+                    'Select a follow-up time.'
+                );
+
                 valid = false;
+            } else {
+                window.clearGlobalGroupError?.(
+                    timeGroup,
+                    'followup_appointment_time'
+                );
             }
 
-            if (!valid) return;
+            if (!valid) {
+                return;
+            }
 
             const originalBtnHtml = confirmBtn.innerHTML;
             confirmBtn.disabled = true;
@@ -3092,7 +3084,7 @@ $existingAppointmentMode
                 const followUpResult = await followUpResponse.json().catch(() => null);
 
                 if (!followUpResponse.ok) {
-                    alert(followUpResult?.message || 'Failed to schedule follow-up appointment.');
+                    showProcedureToast(followUpResult?.message || 'Failed to schedule follow-up appointment.', 'error');
                     confirmBtn.disabled = false;
                     confirmBtn.innerHTML = originalBtnHtml;
                     return;
@@ -3102,7 +3094,7 @@ $existingAppointmentMode
 
             } catch (error) {
                 console.error(error);
-                alert('Something went wrong while scheduling the follow-up appointment.');
+                showProcedureToast('Something went wrong while scheduling the follow-up appointment.', 'error');
                 confirmBtn.disabled = false;
                 confirmBtn.innerHTML = originalBtnHtml;
             }
@@ -3164,10 +3156,107 @@ $existingAppointmentMode
 
         if (cancelProcedureModal) {
             cancelProcedureModal.addEventListener('click', function (event) {
-                if (event.target === cancelProcedureModal || event.target.classList.contains(
-                    'modal-backdrop')) {
+                if (event.target === cancelProcedureModal) {
                     closeCancelProcedureModal();
                 }
+            });
+        }
+
+        function initLegendPanelResize() {
+            if (!odontogramDockLayout || !legendResizeHandle || !legendDrawer) {
+                return;
+            }
+
+            const MIN_WIDTH = 320;
+            const MAX_WIDTH = 560;
+            const MIN_MAIN_WIDTH = 680;
+
+            let resizing = false;
+
+            function stopResize() {
+                if (!resizing) return;
+
+                resizing = false;
+
+                legendResizeHandle.classList.remove('is-resizing');
+                document.body.classList.remove('odontogram-resizing');
+
+                document.removeEventListener('pointermove', handleResizeMove);
+                document.removeEventListener('pointerup', stopResize);
+                document.removeEventListener('pointercancel', stopResize);
+
+                handleResize();
+            }
+
+            function handleResizeMove(event) {
+                if (!resizing) return;
+
+                const layoutRect = odontogramDockLayout.getBoundingClientRect();
+
+                let nextWidth = layoutRect.right - event.clientX;
+
+                const availableMaxWidth = Math.max(
+                    MIN_WIDTH,
+                    layoutRect.width - MIN_MAIN_WIDTH
+                );
+
+                nextWidth = Math.min(
+                    nextWidth,
+                    MAX_WIDTH,
+                    availableMaxWidth
+                );
+
+                nextWidth = Math.max(
+                    MIN_WIDTH,
+                    nextWidth
+                );
+
+                odontogramDockLayout.style.setProperty(
+                    '--legend-panel-width',
+                    `${nextWidth}px`
+                );
+
+                localStorage.setItem(
+                    'odontogramLegendPanelWidth',
+                    String(nextWidth)
+                );
+
+                handleResize();
+            }
+
+            const savedWidth = Number(
+                localStorage.getItem('odontogramLegendPanelWidth')
+            );
+
+            if (Number.isFinite(savedWidth)) {
+                const safeSavedWidth = Math.min(
+                    MAX_WIDTH,
+                    Math.max(MIN_WIDTH, savedWidth)
+                );
+
+                odontogramDockLayout.style.setProperty(
+                    '--legend-panel-width',
+                    `${safeSavedWidth}px`
+                );
+            }
+
+            legendResizeHandle.addEventListener('pointerdown', function (event) {
+                if (window.innerWidth <= 900) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                resizing = true;
+
+                legendResizeHandle.classList.add('is-resizing');
+                document.body.classList.add('odontogram-resizing');
+
+                legendResizeHandle.setPointerCapture?.(event.pointerId);
+
+                document.addEventListener('pointermove', handleResizeMove);
+                document.addEventListener('pointerup', stopResize);
+                document.addEventListener('pointercancel', stopResize);
             });
         }
 
@@ -3176,7 +3265,7 @@ $existingAppointmentMode
                 closeResetModal();
                 closeCancelProcedureModal();
                 closeFinishProcedureModal();
-                closeLegendDrawer();
+                closeFollowUpModal();
 
                 if (currentView === '3d' && selectedTooth) {
                     clear3DSurfacePickerSelection(false);
@@ -3202,6 +3291,7 @@ $existingAppointmentMode
             });
         }
 
+        initLegendPanelResize();
         updateProcedureTimer();
         setInterval(updateProcedureTimer, 1000);
 

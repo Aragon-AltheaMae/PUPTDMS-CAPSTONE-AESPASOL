@@ -1713,14 +1713,6 @@
     align-items: stretch !important;
 }
 
-#followUpModal .cal-wrap,
-#followUpModal .slots-wrap {
-    background: #ffffff !important;
-    border: 1px solid #efcaca !important;
-    border-radius: 20px !important;
-    box-shadow: 0 6px 18px rgba(139, 0, 0, 0.04) !important;
-}
-
 #followUpModal .cal-wrap {
     padding: 18px !important;
 }

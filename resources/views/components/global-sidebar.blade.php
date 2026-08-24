@@ -6,8 +6,9 @@
 
     $drawerDisplayName = $authUser?->name ?? ucwords(str_replace('_', ' ', $sidebarRole));
 
-    $drawerDisplayRole = $authUser?->role?->name
-        ?? match ($sidebarRole) {
+    $drawerDisplayRole =
+        $authUser?->role?->name ??
+        match ($sidebarRole) {
             'admin' => 'Administrator',
             'dentist' => 'Dentist',
             default => ucwords(str_replace('_', ' ', $sidebarRole)),
@@ -79,7 +80,12 @@
                 'items' => [
                     [
                         'route' => 'admin.user_management',
-                        'permissions_any' => ['manage_user_accounts', 'manage_user_roles', 'manage_dentist_accounts', 'manage_super_admin_accounts'],
+                        'permissions_any' => [
+                            'manage_user_accounts',
+                            'manage_user_roles',
+                            'manage_dentist_accounts',
+                            'manage_super_admin_accounts',
+                        ],
                         'active' => ['admin.user_management*'],
                         'icon' => 'fa-user-gear',
                         'label' => 'User Management',
@@ -267,7 +273,12 @@
                 'items' => [
                     [
                         'route' => 'dentist.user_management',
-                        'permissions_any' => ['manage_user_accounts', 'manage_user_roles', 'manage_dentist_accounts', 'manage_super_admin_accounts'],
+                        'permissions_any' => [
+                            'manage_user_accounts',
+                            'manage_user_roles',
+                            'manage_dentist_accounts',
+                            'manage_super_admin_accounts',
+                        ],
                         'active' => ['dentist.user_management*'],
                         'icon' => 'fa-user-gear',
                         'label' => 'User Management',
@@ -341,9 +352,8 @@
 
         $groups = collect($groups)
             ->map(function ($group) use ($permissionSlugs, $isSuperAdmin) {
-                $group['items'] = array_values(array_filter(
-                    $group['items'],
-                    function ($item) use ($permissionSlugs, $isSuperAdmin) {
+                $group['items'] = array_values(
+                    array_filter($group['items'], function ($item) use ($permissionSlugs, $isSuperAdmin) {
                         if ($isSuperAdmin) {
                             return true;
                         }
@@ -366,12 +376,12 @@
                         }
 
                         return true;
-                    }
-                ));
+                    }),
+                );
 
                 return $group;
             })
-            ->filter(fn ($group) => !empty($group['items']))
+            ->filter(fn($group) => !empty($group['items']))
             ->values()
             ->all();
     }
@@ -435,16 +445,21 @@
 
             <div class="nav-group">
                 @if ($sidebarRole === 'admin')
-                    <button type="button" class="group-trigger {{ $isGroupActive($group) ? 'active-group' : '' }}"
+                    <button type="button"
+                        class="sidebar-group-trigger {{ $isGroupActive($group) ? 'active-group' : '' }}"
                         data-admin-group-toggle aria-expanded="false">
-                        <div class="group-icon-wrap">
+                        <div class="sidebar-group-icon">
                             <i class="fa-solid {{ $group['icon'] }}"></i>
                         </div>
 
-                        <div class="group-text">
+                        <div class="sidebar-group-text">
                             <span class="group-label">{{ $group['label'] }}</span>
                             <span class="group-sublabel">{{ $group['sublabel'] }}</span>
                         </div>
+
+                        <span class="sidebar-item-tooltip">
+                            {{ $group['label'] }}
+                        </span>
                     </button>
                 @endif
 
@@ -457,28 +472,36 @@
                         @if ($itemUrl)
                             @if ($sidebarRole === 'dentist')
                                 <a href="{{ $itemUrl }}"
-                                    class="sidebar-nav-item {{ $isItemActive($item) ? 'active' : '' }}">
-                                    <span class="sidebar-nav-icon">
+                                    class="sidebar-item {{ $isItemActive($item) ? 'active' : '' }}">
+                                    <span class="sidebar-item-icon">
                                         <i class="fa-solid {{ $item['icon'] }}"></i>
                                     </span>
 
-                                    <span class="sidebar-nav-text">{{ $item['label'] }}</span>
-                                    <span class="sidebar-tooltip">{{ $item['label'] }}</span>
+                                    <span class="sidebar-item-text">
+                                        {{ $item['label'] }}
+                                    </span>
+                                    <span class="sidebar-item-tooltip">
+                                        {{ $item['label'] }}
+                                    </span>
                                 </a>
                             @else
                                 <a href="{{ $itemUrl }}"
-                                    class="nav-link {{ $isItemActive($item) ? 'active' : '' }}">
+                                    class="sidebar-item {{ $isItemActive($item) ? 'active' : '' }}">
 
                                     @if ($sidebarRole === 'patient')
-                                        <span class="nav-icon-wrap">
+                                        <span class="sidebar-item-icon">
                                             <i class="fa-solid {{ $item['icon'] }}"></i>
                                         </span>
                                     @else
                                         <i class="fa-solid {{ $item['icon'] }}"></i>
                                     @endif
 
-                                    <span class="menu-text sidebar-nav-text">{{ $item['label'] }}</span>
-                                    <span class="sidebar-tooltip">{{ $item['label'] }}</span>
+                                    <span class="sidebar-item-text">
+                                        {{ $item['label'] }}
+                                    </span>
+                                    <span class="sidebar-item-tooltip">
+                                        {{ $item['label'] }}
+                                    </span>
                                 </a>
                             @endif
                         @endif
@@ -507,10 +530,10 @@
             </div>
 
             <div class="sidebar-theme-collapsed" data-sidebar-theme-dropdown>
-                <button type="button" class="sidebar-theme-mini-btn" data-sidebar-theme-trigger
+                <button type="button" class="sidebar-theme-mini-btn sidebar-mini-control" data-sidebar-theme-trigger
                     aria-label="Switch Mode">
                     <i class="fa-solid fa-sun" data-sidebar-theme-icon></i>
-                    <span class="sidebar-tooltip">Switch Mode</span>
+                    <span class="sidebar-item-tooltip">Switch Mode</span>
                 </button>
 
                 <div class="sidebar-theme-popover">
@@ -531,13 +554,13 @@
         <form action="{{ route('logout') }}" method="POST" class="js-logout-form">
             @csrf
 
-            <button type="submit" class="logout-btn">
-                <span class="logout-icon">
+            <button type="submit" class="logout-btn sidebar-mini-control">
+                <span class="sidebar-control-icon">
                     <i class="fa-solid fa-right-from-bracket"></i>
                 </span>
 
-                <span class="menu-text sidebar-nav-text">Log Out</span>
-                <span class="sidebar-tooltip">Log Out</span>
+                <span class="sidebar-item-text">Log Out</span>
+                <span class="sidebar-item-tooltip">Log Out</span>
             </button>
         </form>
     </div>
@@ -563,7 +586,10 @@
         </div>
 
         <div class="drawer-user">
-            <img src="{{ $drawerAvatarUrl }}" class="drawer-avatar" alt="{{ $drawerDisplayName }}">
+            <span class="patient-avatar patient-avatar-md drawer-user-avatar" data-patient-avatar
+                data-patient-name="{{ $drawerDisplayName }}" data-patient-url="{{ $drawerAvatarUrl }}"
+                aria-label="{{ $drawerDisplayName }}">
+            </span>
 
             <div>
                 <div class="drawer-user-name">{{ $drawerDisplayName }}</div>
@@ -575,7 +601,9 @@
             @foreach ($groups as $group)
                 <div class="drawer-group">
                     <div class="drawer-group-header">
-                        <i class="drawer-group-icon fa-solid {{ $group['icon'] }}"></i>
+                        <span class="drawer-group-icon" aria-hidden="true">
+                            <i class="fa-solid {{ $group['icon'] }}"></i>
+                        </span>
                         <span class="drawer-group-label">{{ $group['section'] }}</span>
                     </div>
 
@@ -587,7 +615,7 @@
                                 class="drawer-link {{ $isItemActive($item) ? 'active' : '' }}">
 
                                 <span class="drawer-link-icon" aria-hidden="true">
-                                    <i class="fa-solid {{ $item['icon'] }}"></i>
+                                    <i class="sidebar-item-inline-icon fa-solid {{ $item['icon'] }}"></i>
                                 </span>
 
                                 <span class="drawer-link-text">

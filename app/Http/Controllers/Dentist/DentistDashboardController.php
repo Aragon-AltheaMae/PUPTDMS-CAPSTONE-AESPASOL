@@ -23,7 +23,14 @@ class DentistDashboardController extends Controller
 
         $todayAppointments = Appointment::with('patient')
             ->whereDate('appointment_date', $today)
-            ->whereIn('status', ['upcoming', 'rescheduled', 'pending', 'confirmed'])
+            ->whereIn('status', [
+                'upcoming',
+                'rescheduled',
+                'pending',
+                'confirmed',
+                'completed',
+                'cancelled',
+            ])
             ->orderBy('appointment_time', 'asc')
             ->get();
 
@@ -89,6 +96,11 @@ class DentistDashboardController extends Controller
                             'dentist.dentist.appointments.cancel',
                             $appointment->id
                         ),
+                        'is_walk_in' =>
+                        (bool) ($appointment->is_walk_in ?? false),
+
+                        'is_follow_up' =>
+                        (bool) ($appointment->is_follow_up ?? false),
                     ];
                 })->values()->toArray();
             })
@@ -96,14 +108,12 @@ class DentistDashboardController extends Controller
 
         $dashboardAppointmentWindow = Appointment::with('patient')
             ->whereBetween('appointment_date', [
-                Carbon::today()->subDays(90)->toDateString(),
+                Carbon::today()->toDateString(),
                 Carbon::today()->addDays(90)->toDateString(),
             ])
             ->whereIn('status', [
                 'upcoming',
                 'rescheduled',
-                'completed',
-                'cancelled',
             ])
             ->orderBy('appointment_date', 'asc')
             ->orderBy('appointment_time', 'asc')
@@ -132,6 +142,8 @@ class DentistDashboardController extends Controller
                         'service' => ucwords($service),
                         'status' => $appointment->status ?? 'upcoming',
                         'date' => Carbon::parse($appointment->appointment_date)->format('Y-m-d'),
+                        'is_walk_in' => (bool) ($appointment->is_walk_in ?? false),
+                        'is_follow_up' => (bool) ($appointment->is_follow_up ?? false),
 
                         'patientPhotoUrl' =>
                         optional($appointment->patient)->profile_photo_url
