@@ -192,12 +192,51 @@
                 </div>
 
                 <div class="sl-role-tabs">
-                    @foreach ([['key' => 'all', 'label' => 'All', 'icon' => 'fa-layer-group', 'count' => $totalCount], ['key' => 'admin', 'label' => 'Admin', 'icon' => 'fa-user-tie', 'count' => $adminCount], ['key' => 'dentist', 'label' => 'Dentist', 'icon' => 'fa-user-doctor', 'count' => $dentistCount], ['key' => 'patient', 'label' => 'Patient', 'icon' => 'fa-user', 'count' => $patientCount], ['key' => 'login', 'label' => 'Logins', 'icon' => 'fa-right-to-bracket', 'count' => $loginCount], ['key' => 'error', 'label' => 'Errors', 'icon' => 'fa-triangle-exclamation', 'count' => $errorCount ?? 0]] as $tab)
-                        <button class="tab-btn {{ $activeRole === $tab['key'] ? 'active' : '' }}"
+                    @foreach ([
+            [
+                'key' => 'all',
+                'label' => 'All',
+                'icon' => 'fa-layer-group',
+                'count' => $totalCount,
+            ],
+            [
+                'key' => 'admin',
+                'label' => 'Admin',
+                'icon' => 'fa-user-tie',
+                'count' => $adminCount,
+            ],
+            [
+                'key' => 'dentist',
+                'label' => 'Dentist',
+                'icon' => 'fa-user-doctor',
+                'count' => $dentistCount,
+            ],
+            [
+                'key' => 'patient',
+                'label' => 'Patient',
+                'icon' => 'fa-user',
+                'count' => $patientCount,
+            ],
+            [
+                'key' => 'login',
+                'label' => 'Logins',
+                'icon' => 'fa-right-to-bracket',
+                'count' => $loginCount,
+            ],
+            [
+                'key' => 'error',
+                'label' => 'Errors',
+                'icon' => 'fa-triangle-exclamation',
+                'count' => $errorCount ?? 0,
+            ],
+        ] as $tab)
+                        <button type="button" class="tab-btn {{ $activeRole === $tab['key'] ? 'active' : '' }}"
                             onclick="slSetTab(this, '{{ $tab['key'] }}')">
-                            <i class="fa-solid {{ $tab['icon'] }} mr-1 text-[0.7rem]"></i>{{ $tab['label'] }}
-                            <span
-                                class="tab-count {{ $activeRole === $tab['key'] ? 'bg-red-200 text-[#8B0000]' : 'bg-gray-200 text-gray-500' }} text-[0.62rem] font-bold px-1.5 py-0.5 rounded-full ml-1">
+                            <i class="fa-solid {{ $tab['icon'] }} mr-1 text-[0.7rem]"></i>
+
+                            {{ $tab['label'] }}
+
+                            <span class="tab-count {{ $activeRole === $tab['key'] ? 'active' : '' }}">
                                 {{ $tab['count'] }}
                             </span>
                         </button>
@@ -802,19 +841,23 @@
                 data-discard-message="Closing this modal will reset the export options you selected. Do you want to discard these changes?">
 
                 <div class="modal-hd">
+
                     <div class="modal-heading">
+
                         <div class="modal-icon">
                             <i class="fa-solid fa-file-pdf"></i>
                         </div>
 
                         <div class="modal-copy">
+
                             <h3 id="slExportModalTitle" class="modal-title">
                                 Export System Logs
                             </h3>
 
                             <p class="modal-subtitle">
-                                Export all matching logs, or narrow the PDF with a date range.
+                                Select which system logs you want to include in the PDF.
                             </p>
+
                         </div>
                     </div>
 
@@ -822,13 +865,115 @@
                         aria-label="Close export modal">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
+
                 </div>
 
+
                 <div class="modal-bd">
+
                     <div class="modal-form-grid">
 
-                        <div class="modal-field modal-field-full report-date-range-section" data-global-field>
+
+                        {{-- Export Filters --}}
+                        <div class="modal-field modal-field-full sl-export-filter-section">
+
                             <div class="report-date-range-heading">
+
+                                <div>
+                                    <div class="report-date-range-title">
+                                        Filter Logs
+                                    </div>
+
+                                    <p class="report-date-range-subtitle">
+                                        Select the role and action to include in the exported PDF.
+                                    </p>
+                                </div>
+
+                            </div>
+
+
+                            <div class="sl-export-filter-grid">
+
+
+                                {{-- Role --}}
+                                <div class="modal-field sl-export-filter-field">
+
+                                    <label class="global-form-label" for="slExportRole">
+                                        Role
+                                        <span class="required-mark">*</span>
+                                    </label>
+
+                                    <select id="slExportRole" name="role" class="js-custom-select">
+                                        <option value="" selected disabled>
+                                            Select role
+                                        </option>
+
+                                        <option value="all">
+                                            All Roles
+                                        </option>
+
+                                        <option value="admin">
+                                            Admin
+                                        </option>
+
+                                        <option value="dentist">
+                                            Dentist
+                                        </option>
+
+                                        <option value="patient">
+                                            Patient
+                                        </option>
+                                    </select>
+
+                                </div>
+
+
+                                {{-- Action --}}
+                                <div class="modal-field sl-export-filter-field">
+
+                                    <label class="global-form-label" for="slExportAction">
+                                        Action
+                                        <span class="required-mark">*</span>
+                                    </label>
+
+                                    <select id="slExportAction" name="action_type" class="js-custom-select">
+                                        <option value="" selected disabled>
+                                            Select action
+                                        </option>
+
+                                        <option value="all">
+                                            All Actions
+                                        </option>
+
+                                        <option value="login">
+                                            Login
+                                        </option>
+
+                                        <option value="view">
+                                            View
+                                        </option>
+
+                                        <option value="book">
+                                            Book
+                                        </option>
+
+                                        <option value="logout">
+                                            Logout
+                                        </option>
+                                    </select>
+
+                                </div>
+
+
+                            </div>
+                        </div>
+
+
+                        {{-- Date Range --}}
+                        <div class="modal-field modal-field-full report-date-range-section" data-global-field>
+
+                            <div class="report-date-range-heading">
+
                                 <div>
                                     <div class="report-date-range-title">
                                         Date Range
@@ -838,16 +983,26 @@
                                         Select a single date or define a custom range.
                                     </p>
                                 </div>
+
                             </div>
 
+
                             <div class="report-date-range-grid">
+
+
+                                {{-- From --}}
                                 <div class="modal-field" data-global-field>
+
                                     <label class="global-form-label" for="slExportDateFrom">
                                         From
-                                        <span class="required-mark">*</span>
+
+                                        <span class="required-mark">
+                                            *
+                                        </span>
                                     </label>
 
                                     <div class="fp-date-input-wrap">
+
                                         <input id="slExportDateFrom" name="date_from" type="text"
                                             class="form-input-custom js-flatpickr-date-max-today"
                                             placeholder="Select start date" data-field-label="From Date"
@@ -855,37 +1010,54 @@
                                             autocomplete="off">
 
                                         <i class="fa-regular fa-calendar fp-date-icon" aria-hidden="true"></i>
+
                                     </div>
+
                                 </div>
 
+
+                                {{-- To --}}
                                 <div class="modal-field" data-global-field>
+
                                     <label class="global-form-label" for="slExportDateTo">
                                         To
+
                                         <span class="modal-helper-text">
                                             (optional)
                                         </span>
                                     </label>
 
                                     <div class="fp-date-input-wrap">
+
                                         <input id="slExportDateTo" name="date_to" type="text"
                                             class="form-input-custom js-flatpickr-date-max-today"
                                             placeholder="Select end date" data-field-label="To Date" readonly
                                             autocomplete="off">
 
                                         <i class="fa-regular fa-calendar fp-date-icon" aria-hidden="true"></i>
+
                                     </div>
+
                                 </div>
+
                             </div>
+
 
                             <p class="report-date-range-helper">
                                 <i class="fa-solid fa-circle-info"></i>
+
                                 Leave "To" empty to export a single date.
                             </p>
+
                         </div>
+
+
                     </div>
                 </div>
 
+
                 <div class="modal-ft">
+
                     <button type="button" class="ui-btn ui-btn-secondary" data-discard-close="slExportModal">
                         Cancel
                     </button>
@@ -893,9 +1065,14 @@
                     <button type="button" id="slExportConfirmBtn" class="ui-btn ui-btn-primary"
                         onclick="submitSlExportModal()">
                         <i class="fa-solid fa-file-pdf"></i>
-                        <span>Export PDF</span>
+
+                        <span>
+                            Export PDF
+                        </span>
                     </button>
+
                 </div>
+
             </form>
         </div>
     </div>
@@ -910,9 +1087,10 @@
         var slArchiveConfirmBtn = null;
         var slExportDateFromInput = null;
         var slExportDateToInput = null;
+        var slExportRoleInput = null;
+        var slExportActionInput = null;
         var slExportConfirmBtn = null;
         var perPageSelect = null;
-        var slExportRole = @json($role ?? 'all');
 
         async function exportSystemLogsPdf(exportOptions = {}) {
             const button =
@@ -926,33 +1104,17 @@
 
             const params =
                 new URLSearchParams({
-                    role: exportOptions.role ||
-                        slExportRole ||
-                        slState.role ||
-                        'all',
+                    role: exportOptions.role || 'all',
 
-                    search: slState.search ||
-                        '',
+                    status: slState.status || 'active',
 
-                    status: slState.status ||
-                        'active',
+                    sort: 'desc',
 
-                    sort: slState.sort ||
-                        'desc',
+                    date_from: exportOptions.dateFrom || '',
 
-                    date_from: (exportOptions.dateFrom ??
-                            slState.dateFrom) ||
-                        '',
+                    date_to: exportOptions.dateTo || '',
 
-                    date_to: (exportOptions.dateTo ??
-                            slState.dateTo) ||
-                        '',
-
-                    action_type: slState.actionType ||
-                        '',
-
-                    module: slState.module ||
-                        ''
+                    action_type: exportOptions.actionType || ''
                 });
 
             const endpoint =
@@ -1172,6 +1334,9 @@
             }
         }
 
+        window.handleSlExportButtonClick =
+            handleSlExportButtonClick;
+
         function openSlExportModal() {
             const modal =
                 document.getElementById(
@@ -1184,14 +1349,42 @@
                 );
             }
 
+            if (slExportRoleInput) {
+                slExportRoleInput.value = '';
+
+                window.syncCustomSelect?.(
+                    slExportRoleInput.closest(
+                        '.custom-select'
+                    )
+                );
+            }
+
+            if (slExportActionInput) {
+                slExportActionInput.value = '';
+
+                window.syncCustomSelect?.(
+                    slExportActionInput.closest(
+                        '.custom-select'
+                    )
+                );
+            }
+
             if (slExportDateFromInput) {
                 slExportDateFromInput.value =
-                    slState.dateFrom || '';
+                    '';
+
+                slExportDateFromInput
+                    ._flatpickr
+                    ?.clear();
             }
 
             if (slExportDateToInput) {
                 slExportDateToInput.value =
-                    slState.dateTo || '';
+                    '';
+
+                slExportDateToInput
+                    ._flatpickr
+                    ?.clear();
             }
 
             [
@@ -1209,34 +1402,71 @@
             });
 
             try {
-                if (typeof window.openModal === 'function') {
+
+                if (
+                    typeof window.openModal ===
+                    'function'
+                ) {
                     window.openModal(
                         'slExportModal'
                     );
 
-                    window.initGlobalNumberSteppers?.(
-                        document.getElementById(
-                            'slExportModal'
-                        )
+                    window.initCustomSelects?.(
+                        modal
                     );
+
                 } else {
-                    modal.classList.add('open');
-                    modal.setAttribute('aria-hidden', 'false');
-                    document.documentElement.classList.add('modal-open');
-                    document.body.classList.add('modal-open');
+
+                    modal.classList.add(
+                        'open'
+                    );
+
+                    modal.setAttribute(
+                        'aria-hidden',
+                        'false'
+                    );
+
+                    document.documentElement
+                        .classList.add(
+                            'modal-open'
+                        );
+
+                    document.body
+                        .classList.add(
+                            'modal-open'
+                        );
                 }
+
             } catch (error) {
+
                 console.error(
                     'System logs export modal open failed:',
                     error
                 );
 
-                modal.classList.add('open');
-                modal.setAttribute('aria-hidden', 'false');
-                document.documentElement.classList.add('modal-open');
-                document.body.classList.add('modal-open');
+                modal.classList.add(
+                    'open'
+                );
+
+                modal.setAttribute(
+                    'aria-hidden',
+                    'false'
+                );
+
+                document.documentElement
+                    .classList.add(
+                        'modal-open'
+                    );
+
+                document.body
+                    .classList.add(
+                        'modal-open'
+                    );
             }
         }
+
+        window.openSlExportModal =
+            openSlExportModal;
 
         function closeSlExportModal() {
             const modal =
@@ -1281,11 +1511,39 @@
         }
 
         async function submitSlExportModal() {
+            const role =
+                slExportRoleInput?.value || '';
+
+            const rawActionType =
+                slExportActionInput?.value || '';
+
             const dateFrom =
                 slExportDateFromInput?.value || '';
 
             const dateTo =
                 slExportDateToInput?.value || '';
+
+            if (!role) {
+                window.showToast?.({
+                    type: 'error',
+                    title: 'Required field',
+                    message: 'Please select a role first.'
+                });
+
+                slExportRoleInput?.focus();
+                return;
+            }
+
+            if (!rawActionType) {
+                window.showToast?.({
+                    type: 'error',
+                    title: 'Required field',
+                    message: 'Please select an action first.'
+                });
+
+                slExportActionInput?.focus();
+                return;
+            }
 
             if (
                 dateFrom &&
@@ -1301,19 +1559,24 @@
                 slExportDateFromInput?.focus();
                 return;
             }
+
+            const actionType =
+                rawActionType === 'all' ?
+                '' :
+                rawActionType;
+
             closeSlExportModal();
 
             await exportSystemLogsPdf({
+                role,
+                actionType,
                 dateFrom,
                 dateTo,
             });
         }
 
-        function setSlExportRole(role) {
-            slExportRole = role ||
-                slState.role ||
-                'all';
-        }
+        window.submitSlExportModal =
+            submitSlExportModal;
 
         function handleSystemLogsPerPageChange(value) {
             const nextPerPage = Number(value) || 10;
@@ -1354,7 +1617,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             syncSlFilterInputs();
             updateSlClearFilterButton();
-            setSlExportRole(slState.role);
 
             window.initGlobalVoiceInputs?.();
 
@@ -1442,9 +1704,70 @@
             slArchiveDaysInput = document.getElementById('slArchiveDaysInput');
             slArchiveError = document.getElementById('slArchiveError');
             slArchiveConfirmBtn = document.getElementById('slArchiveConfirmBtn');
-            slExportDateFromInput = document.getElementById('slExportDateFrom');
-            slExportDateToInput = document.getElementById('slExportDateTo');
-            slExportConfirmBtn = document.getElementById('slExportConfirmBtn');
+            slExportRoleInput =
+                document.getElementById('slExportRole');
+
+            slExportActionInput =
+                document.getElementById('slExportAction');
+
+            slExportRoleInput?.addEventListener(
+                'change',
+                syncSlExportActionOptions
+            );
+
+            function syncSlExportActionOptions() {
+                if (
+                    !slExportRoleInput ||
+                    !slExportActionInput
+                ) {
+                    return;
+                }
+
+                const selectedRole =
+                    slExportRoleInput.value || 'all';
+
+                const bookOption =
+                    slExportActionInput.querySelector(
+                        'option[value="book"]'
+                    );
+
+                if (!bookOption) {
+                    return;
+                }
+
+                const allowBook =
+                    selectedRole === 'all' ||
+                    selectedRole === 'patient';
+
+                bookOption.disabled = !allowBook;
+
+                if (
+                    !allowBook &&
+                    slExportActionInput.value === 'book'
+                ) {
+                    slExportActionInput.value = '';
+                }
+
+                const wrapper =
+                    slExportActionInput.closest(
+                        '.custom-select'
+                    );
+
+                if (wrapper) {
+                    window.syncCustomSelect?.(
+                        wrapper
+                    );
+                }
+            }
+
+            slExportDateFromInput =
+                document.getElementById('slExportDateFrom');
+
+            slExportDateToInput =
+                document.getElementById('slExportDateTo');
+
+            slExportConfirmBtn =
+                document.getElementById('slExportConfirmBtn');
             perPageSelect =
                 document.getElementById('perPageSelect');
 
@@ -1590,40 +1913,6 @@
                     .replaceAll("'", '&#039;');
             }
 
-            function syncSlRoleTab(
-                role = 'all'
-            ) {
-                document
-                    .querySelectorAll(
-                        '.sl-role-tabs .tab-btn'
-                    )
-                    .forEach(button => {
-                        const onclick =
-                            button.getAttribute(
-                                'onclick'
-                            ) || '';
-
-                        const isActive =
-                            onclick.includes(
-                                `'${role}'`
-                            );
-
-                        button.classList.toggle(
-                            'active',
-                            isActive
-                        );
-
-                        button
-                            .querySelector(
-                                '.tab-count'
-                            )
-                            ?.classList.toggle(
-                                'active',
-                                isActive
-                            );
-                    });
-            }
-
             window.handleSystemLogsSearch =
                 function(value) {
                     const query =
@@ -1635,38 +1924,8 @@
 
                     slState.page = 1;
 
-                    if (query) {
-                        slState.role =
-                            'all';
-
-                        setSlExportRole(
-                            'all'
-                        );
-
-                        syncSlRoleTab(
-                            'all'
-                        );
-                    }
-
                     return slFetch();
                 };
-
-            function slSetTab(el, role) {
-                slState.role =
-                    role || 'all';
-
-                setSlExportRole(
-                    slState.role
-                );
-
-                slState.page = 1;
-
-                syncSlRoleTab(
-                    slState.role
-                );
-
-                return slFetch();
-            }
 
             function openSlArchiveModal() {
                 if (slState.status === "archived") {
@@ -1901,22 +2160,95 @@
                     });
             }
 
-            function slSetStatus(el, status) {
-                slState.status = status || 'active';
-                slState.role = 'all';
+            function syncSlRoleTab(role = 'all') {
+                document
+                    .querySelectorAll(
+                        '.sl-role-tabs .tab-btn'
+                    )
+                    .forEach(function(button) {
+                        const onclick =
+                            button.getAttribute(
+                                'onclick'
+                            ) || '';
+
+                        const active =
+                            onclick.includes(
+                                "'" + role + "'"
+                            );
+
+                        button.classList.toggle(
+                            'active',
+                            active
+                        );
+
+                        const count =
+                            button.querySelector(
+                                '.tab-count'
+                            );
+
+                        count?.classList.toggle(
+                            'active',
+                            active
+                        );
+                    });
+            }
+
+            function slSetTab(el, role) {
+                slState.role =
+                    role || 'all';
+
                 slState.page = 1;
+
+                syncSlRoleTab(
+                    slState.role
+                );
+
+                return slFetch();
+            }
+
+            function slSetTab(el, role) {
+                slState.role =
+                    role || 'all';
+
+                slState.page = 1;
+
+                syncSlRoleTab(
+                    slState.role
+                );
+
+                return slFetch();
+            }
+
+            function slSetStatus(el, status) {
+                slState.status =
+                    status || 'active';
+
+                slState.role =
+                    'all';
+
+                slState.page =
+                    1;
+
+                syncSlRoleTab(
+                    'all'
+                );
 
                 document
                     .querySelectorAll('.sl-status-tab')
                     .forEach(function(button) {
-                        button.classList.remove('active');
+                        button.classList.remove(
+                            'active'
+                        );
                     });
 
-                el?.classList.add('active');
+                el?.classList.add(
+                    'active'
+                );
 
-                syncSlRoleTab('all');
-
-                if (slState.status === 'archived') {
+                if (
+                    slState.status ===
+                    'archived'
+                ) {
                     systemLogsRefreshWatcher?.stop();
                 } else {
                     initializeSystemLogsRefreshWatcher();
@@ -3231,7 +3563,6 @@
 
             window.slSetTab = slSetTab;
             window.slSetStatus = slSetStatus;
-
             window.openSlFilterPanel = openSlFilterPanel;
             window.closeSlFilterPanel = closeSlFilterPanel;
             window.applySlFilters = applySlFilters;
@@ -3250,8 +3581,7 @@
             window.openSlExportModal =
                 openSlExportModal;
 
-            window.setSlExportRole =
-                setSlExportRole;
+
             window.handleSlExportButtonClick =
                 handleSlExportButtonClick;
             window.closeSlExportModal =

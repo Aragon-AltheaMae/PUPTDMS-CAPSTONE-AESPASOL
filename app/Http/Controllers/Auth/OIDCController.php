@@ -530,14 +530,17 @@ class OIDCController extends Controller
 
     private function clinicalLandingRoute(User $user): ?string
     {
-        foreach ([
-            'access_dentist_dashboard' => 'dentist.dentist.dashboard',
-            'manage_appointments' => 'dentist.dentist.appointments',
-            'manage_patient_profiles' => 'dentist.dentist.patients',
-            'manage_document_requests' => 'dentist.dentist.documentrequests',
-            'manage_inventory' => 'dentist.dentist.inventory',
-            'manage_reports' => 'dentist.dentist.report',
-        ] as $permission => $route) {
+        foreach (
+            [
+                'access_dentist_dashboard' => 'dentist.dentist.dashboard',
+                'manage_appointments' => 'dentist.dentist.appointments',
+                'manage_clinic_schedule' => 'dentist.dentist.clinic_schedule',
+                'manage_patient_profiles' => 'dentist.dentist.patients',
+                'manage_document_requests' => 'dentist.dentist.documentrequests',
+                'manage_inventory' => 'dentist.dentist.inventory',
+                'manage_reports' => 'dentist.dentist.report',
+            ] as $permission => $route
+        ) {
             if ($user->hasPermission($permission)) {
                 return $route;
             }
@@ -557,7 +560,7 @@ class OIDCController extends Controller
         ?Faculty $facultyAccess
     ): Patient {
         $phone = $this->extractStudentPhone($studentData);
-        $facultyCode = null;
+        $facultyCode = $patient?->faculty_code;
         $studentNo = $this->extractStudentNumber($studentData) ?: $patient?->student_no;
         $programCode = $this->extractStudentProgramCode($studentData) ?: $patient?->course_code;
         $programName = $this->extractStudentProgramName($studentData) ?: $patient?->course_name;
@@ -746,6 +749,36 @@ class OIDCController extends Controller
             'address' => $address,
         ]);
 
+        $existingClassification = strtolower(trim((string) (
+            $patient?->classification ?? ''
+        )));
+
+        $classification = 'dependent_alumni';
+
+        if (
+            $facultyAccess ||
+            filled($facultyCode)
+        ) {
+            $classification = 'faculty';
+        } elseif (filled($studentNo)) {
+            $classification = 'student';
+        } elseif ($assignedAccess) {
+            $classification = 'administrative';
+        } elseif (
+            in_array(
+                $existingClassification,
+                [
+                    'student',
+                    'faculty',
+                    'administrative',
+                    'dependent_alumni',
+                ],
+                true
+            )
+        ) {
+            $classification = $existingClassification;
+        }
+
         $user->phone = $phone ?: $user->phone;
         $user->birthdate = $birthdate ?: $user->birthdate;
         $user->gender = $gender ?: $user->gender;
@@ -770,6 +803,7 @@ class OIDCController extends Controller
                 $patient->weight_kg = $weightKg ?? $patient->weight_kg;
             }
             $patient->faculty_code = $facultyCode ?: $patient->faculty_code;
+            $patient->classification = $classification;
             $patient->student_no = $studentNo ?: $patient->student_no;
             $patient->course_code = $programCode ?: $patient->course_code;
             $patient->course_name = $programName ?: $patient->course_name;
@@ -798,6 +832,7 @@ class OIDCController extends Controller
             'gender' => $gender,
             'password' => Hash::make(Str::random(16)),
             'faculty_code' => $facultyCode,
+            'classification' => $classification,
             'student_no' => $studentNo,
             'course_code' => $programCode,
             'course_name' => $programName,

@@ -2357,6 +2357,10 @@
     font-size: 10px;
 }
 
+.u-text-capitalize {
+    text-transform: capitalize !important;
+}
+
 .global-info-icon.status-all,
 .global-info-icon.status-today,
 .global-info-icon.status-upcoming,

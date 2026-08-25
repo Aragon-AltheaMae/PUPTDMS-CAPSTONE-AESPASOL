@@ -224,6 +224,17 @@ request(
                         </div>
                     </div>
                 </div>
+
+                @if (
+                $recordsSource instanceof
+                \Illuminate\Pagination\AbstractPaginator
+                )
+                <x-pagination-bar id="dentalRecordsPagebarTop" info-id="dentalRecordsPageInfoTop"
+                    pagination-id="dentalRecordsPaginationTop" position="top" :show-entries="true"
+                    page-size-id="dentalRecordsPageSize" page-size-callback="changeDentalRecordsPageSize"
+                    :page-size-value="$recordPerPage" label="records" />
+                @endif
+
                 <div id="dentalRecordsResultsRegion">
                     @if ($recordItems->isEmpty())
                     <div id="dentalRecordEmptyState" class="empty-state-host show"></div>
@@ -533,18 +544,17 @@ request(
                         @endforeach
                     </div>
                     <div id="dentalRecordEmptyState" class="empty-state-host"></div>
-
-                    @if (
-                    $recordsSource instanceof
-                    \Illuminate\Pagination\AbstractPaginator
-                    )
-                    <x-pagination-bar id="dentalRecordsPagebar" info-id="dentalRecordsPageInfo"
-                        pagination-id="dentalRecordsPagination" position="bottom" :show-entries="true"
-                        page-size-id="dentalRecordsPageSize" page-size-callback="changeDentalRecordsPageSize"
-                        :page-size-value="$recordPerPage" label="records" />
-                    @endif
                     @endif
                 </div>
+
+                @if (
+                $recordsSource instanceof
+                \Illuminate\Pagination\AbstractPaginator
+                )
+                <x-pagination-bar id="dentalRecordsPagebarBottom" info-id="dentalRecordsPageInfoBottom"
+                    pagination-id="dentalRecordsPaginationBottom" position="bottom" :show-entries="false"
+                    :page-size-value="$recordPerPage" label="records" />
+                @endif
             </section>
 
             <aside class="space-y-5">
@@ -674,6 +684,43 @@ request(
         </div>
     </div>
 </main>
+
+<div id="dentalRecordDetailsModal" class="ui-modal" role="dialog" aria-modal="true"
+    aria-labelledby="dentalRecordDetailsModalTitle">
+    <div class="ui-modal-card record-modal-wide">
+        <div class="modal-hd appointment-modal-header">
+            <div class="modal-heading">
+                <div class="appointment-modal-header-icon">
+                    <i class="fa-solid fa-notes-medical"></i>
+                </div>
+                <div class="appointment-modal-header-copy">
+                    <span class="appointment-modal-eyebrow">Dental Record Details</span>
+                    <h3 id="dentalRecordDetailsModalTitle" class="appointment-modal-title">Patient Record</h3>
+                </div>
+            </div>
+            <button type="button" class="modal-x" onclick="closeDentalRecordDetailsModal()"
+                aria-label="Close dental record details">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div id="dentalRecordDetailsModalBody" class="modal-bd">
+            <div class="text-center py-8">
+                <div class="empty-state-icon !w-[64px] !h-[64px] !rounded-2xl !mb-4">
+                    <i class="fa-solid fa-notes-medical !text-[26px]"></i>
+                </div>
+                <h3 class="empty-state-title !text-[15px]">Select a dental record</h3>
+                <p class="empty-state-sub !text-[13px] !mt-2">The full answered patient form will appear here.</p>
+            </div>
+        </div>
+
+        <div class="modal-ft">
+            <button type="button" class="btn-close-modal" onclick="closeDentalRecordDetailsModal()">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
@@ -722,11 +769,219 @@ request(
     }
 
     function detailRow(label, value) {
+        const normalizedValue =
+            escapeHtml(value || '—')
+            .replace(/\n/g, '<br>');
+
         return `
             <div class="flex items-start gap-3 py-2 border-b border-gray-100 last:border-0">
                 <span class="w-28 flex-shrink-0 text-[11px] font-black uppercase tracking-wider text-gray-400">${escapeHtml(label)}</span>
-                <span class="min-w-0 text-sm font-bold text-gray-800 break-words">${escapeHtml(value || '—')}</span>
+                <span class="min-w-0 text-sm font-bold text-gray-800 break-words">${normalizedValue}</span>
             </div>`;
+    }
+
+    function profileInfoRow(item = {}) {
+        const icon = item.icon || 'fa-regular fa-circle';
+        const label = item.label || 'Item';
+        const value = item.value || 'N/A';
+
+        return `
+            <div class="global-info-item global-info-item-compact">
+                <span class="global-info-icon status-default">
+                    <i class="${escapeHtml(icon)}"></i>
+                </span>
+                <div class="global-info-copy min-w-0">
+                    <span class="global-info-label">${escapeHtml(label)}</span>
+                    <strong class="global-info-value break-words">${escapeHtml(value)}</strong>
+                </div>
+            </div>`;
+    }
+
+    function reviewRow(label, value) {
+        const hasValue =
+            value &&
+            String(value).trim() !== '';
+
+        const normalizedValue =
+            hasValue
+                ? escapeHtml(String(value)).replace(/\n/g, '<br>')
+                : '<span class="booking-summary-muted">N/A</span>';
+
+        return `
+            <p class="booking-summary-row">
+                <span class="booking-summary-row-label">
+                    ${escapeHtml(label)}:
+                </span>
+                ${normalizedValue}
+            </p>`;
+    }
+
+    function reviewSubSection(title, rows = []) {
+        if (!Array.isArray(rows) || rows.length === 0) {
+            return '';
+        }
+
+        return `
+            <section class="booking-summary-section">
+                <div class="booking-summary-section-title">
+                    ${escapeHtml(title)}
+                </div>
+                <div class="booking-summary-section-body">
+                    <div class="grid grid-cols-1 gap-x-8 gap-y-1 sm:grid-cols-2">
+                        ${rows.map(item => reviewRow(item.label, item.value)).join('')}
+                    </div>
+                </div>
+            </section>`;
+    }
+
+    function reviewFullWidthSection(title, rows = []) {
+        if (!Array.isArray(rows) || rows.length === 0) {
+            return '';
+        }
+
+        return `
+            <section class="booking-summary-section">
+                <div class="booking-summary-section-title">
+                    ${escapeHtml(title)}
+                </div>
+                <div class="booking-summary-section-body">
+                    <div class="grid grid-cols-1 gap-y-1">
+                        ${rows.map(item => reviewRow(item.label, item.value)).join('')}
+                    </div>
+                </div>
+            </section>`;
+    }
+
+    function recordSummaryCard(title, icon, body) {
+        return `
+            <section class="booking-summary-card">
+                <div class="booking-summary-card-header flex items-center justify-between gap-4 w-full">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <i class="fa-solid ${escapeHtml(icon)}"></i>
+                        <span>${escapeHtml(title)}</span>
+                    </div>
+                </div>
+                <div class="booking-summary-card-body">
+                    ${body}
+                </div>
+            </section>`;
+    }
+
+    function renderPatientInformationCard(profileFields = []) {
+        if (!Array.isArray(profileFields) || profileFields.length === 0) {
+            return '';
+        }
+
+        return recordSummaryCard(
+            'Patient Information',
+            'fa-user',
+            `
+                <div class="grid grid-cols-1 gap-y-1 sm:grid-cols-2 sm:gap-x-8">
+                    ${profileFields.map(item => reviewRow(item.label || 'Field', item.value || 'N/A')).join('')}
+                </div>
+            `
+        );
+    }
+
+    function renderRecordSection(section = {}) {
+        if (Array.isArray(section.groups) && section.groups.length > 0) {
+            const body = section.groups
+                .map(group => reviewSubSection(group.title || 'Section', Array.isArray(group.rows) ? group.rows : []))
+                .filter(Boolean)
+                .join('');
+
+            return recordSummaryCard(section.title || 'Record Section', section.icon || 'fa-regular fa-circle', body);
+        }
+
+        if (Array.isArray(section.rows) && section.rows.length > 0) {
+            return recordSummaryCard(
+                section.title || 'Record Section',
+                section.icon || 'fa-regular fa-circle',
+                reviewFullWidthSection('Details', section.rows)
+            );
+        }
+
+        return '';
+    }
+
+    function openDentalRecordDetailsModal() {
+        const modal = document.getElementById('dentalRecordDetailsModal');
+
+        if (!modal) {
+            return;
+        }
+
+        modal.classList.remove('closing');
+        modal.classList.add('open');
+        document.documentElement.classList.add('modal-lock');
+        document.body.classList.add('modal-lock');
+    }
+
+    function closeDentalRecordDetailsModal() {
+        const modal = document.getElementById('dentalRecordDetailsModal');
+
+        if (!modal || !modal.classList.contains('open')) {
+            return;
+        }
+
+        modal.classList.add('closing');
+
+        setTimeout(() => {
+            modal.classList.remove('open', 'closing');
+            document.documentElement.classList.remove('modal-lock');
+            document.body.classList.remove('modal-lock');
+        }, 160);
+    }
+
+    function setDentalRecordDetailsModalData(data) {
+        const title = document.getElementById('dentalRecordDetailsModalTitle');
+        const body = document.getElementById('dentalRecordDetailsModalBody');
+
+        if (!title || !body) {
+            return;
+        }
+
+        title.textContent = `${data.patient_name || 'Patient'} Record`;
+
+        const sections = Array.isArray(data.record_sections) ? data.record_sections : [];
+        const profileFields = Array.isArray(data.profile_fields) ? data.profile_fields : [];
+
+        body.innerHTML = `
+            <div class="booking-step-header">
+                <p class="booking-step-eyebrow">Admin Dental Record Review</p>
+                <h2 class="booking-step-title">Review Your Information</h2>
+                <p class="booking-step-subtitle">
+                    Please review the patient's recorded dental, medical, and appointment information.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                ${renderPatientInformationCard(profileFields)}
+                ${sections.map(section => renderRecordSection(section)).filter(Boolean).join('')}
+            </div>`;
+    }
+
+    function initDentalRecordDetailsModal() {
+        const modal = document.getElementById('dentalRecordDetailsModal');
+        const card = modal?.querySelector('.ui-modal-card');
+
+        if (!modal || modal.dataset.initialized === 'true') {
+            return;
+        }
+
+        modal.dataset.initialized = 'true';
+
+        modal.addEventListener('click', event => {
+            if (card && !card.contains(event.target)) {
+                closeDentalRecordDetailsModal();
+            }
+        });
+
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && modal.classList.contains('open')) {
+                closeDentalRecordDetailsModal();
+            }
+        });
     }
 
     async function openRecordPanel(id) {
@@ -779,20 +1034,22 @@ request(
                     </span>
                 </div>
 
-                <div class="rounded-2xl border border-gray-100 bg-white px-4 py-3">
-                    ${detailRow('Procedure', data.procedure || '—')}
-                    ${detailRow('Dentist', data.dentist_name || '—')}
-                    ${detailRow('Date', data.date || '—')}
-                    ${data.notes ? detailRow('Notes', data.notes) : ''}
+                <div class="rounded-2xl border border-gray-100 bg-white px-4 py-4">
+                    <div class="global-info-grid">
+                        ${(data.profile_fields || []).map(item => profileInfoRow(item)).join('')}
+                    </div>
                 </div>`;
+
+            window.currentDentalRecordData = data;
+            setDentalRecordDetailsModalData(data);
 
             panelFoot.classList.remove('hidden');
             panelFoot.classList.add('flex');
             panelFoot.innerHTML = `
-                <a href="/admin/dental-records/${escapeHtml(data.id || id)}" class="ui-btn ui-btn-primary ui-btn-block">
-                    <i class="fa-solid fa-arrow-right"></i>
-                    <span>View Full Record</span>
-                </a>`;
+                <button type="button" class="ui-btn ui-btn-primary ui-btn-block" onclick="openDentalRecordDetailsModal()">
+                    <i class="fa-solid fa-eye"></i>
+                    <span>View Record Details</span>
+                </button>`;
         } catch (error) {
             panelBody.innerHTML = `
                 <div class="text-center py-8">
@@ -820,20 +1077,32 @@ request(
             return;
         }
 
-        const pagebar =
+        const pagebars = [
             document.getElementById(
-                'dentalRecordsPagebar'
-            );
+                'dentalRecordsPagebarTop'
+            ),
+            document.getElementById(
+                'dentalRecordsPagebarBottom'
+            ),
+        ].filter(Boolean);
 
-        const info =
+        const infoElements = [
             document.getElementById(
-                'dentalRecordsPageInfo'
-            );
+                'dentalRecordsPageInfoTop'
+            ),
+            document.getElementById(
+                'dentalRecordsPageInfoBottom'
+            ),
+        ].filter(Boolean);
 
-        const paginationHost =
+        const paginationHosts = [
             document.getElementById(
-                'dentalRecordsPagination'
-            );
+                'dentalRecordsPaginationTop'
+            ),
+            document.getElementById(
+                'dentalRecordsPaginationBottom'
+            ),
+        ].filter(Boolean);
 
 
         window.renderGlobalPagination?.({
@@ -852,17 +1121,14 @@ request(
             to:
                 pagination.to,
 
-            containers: [
-                paginationHost,
-            ],
+            containers:
+                paginationHosts,
 
-            infoElements: [
-                info,
-            ],
+            infoElements:
+                infoElements,
 
-            bars: [
-                pagebar,
-            ],
+            bars:
+                pagebars,
 
             itemLabel:
                 'records',
@@ -979,6 +1245,27 @@ request(
             );
 
         if (!host) {
+            return;
+        }
+
+        const hasRenderedResults =
+            (
+                document.querySelectorAll(
+                    '#dentalRecordsTableBody tr'
+                ).length > 0
+            ) ||
+            (
+                document.querySelectorAll(
+                    '#dentalRecordGridView .dental-record-item'
+                ).length > 0
+            );
+
+        if (hasRenderedResults) {
+            host.innerHTML = '';
+            host.classList.remove(
+                'show'
+            );
+
             return;
         }
 
@@ -1131,10 +1418,14 @@ request(
                 'dentalRecordSearch'
             );
 
-        const pagebar =
+        const pagebars = [
             document.getElementById(
-                'dentalRecordsPagebar'
-            );
+                'dentalRecordsPagebarTop'
+            ),
+            document.getElementById(
+                'dentalRecordsPagebarBottom'
+            ),
+        ].filter(Boolean);
 
         const search =
             String(
@@ -1190,8 +1481,12 @@ request(
 
 
         try {
-            pagebar?.classList.add(
-                'is-loading'
+            pagebars.forEach(
+                pagebar => {
+                    pagebar?.classList.add(
+                        'is-loading'
+                    );
+                }
             );
 
 
@@ -1315,8 +1610,12 @@ request(
             dentalRecordsLoading =
                 false;
 
-            pagebar?.classList.remove(
-                'is-loading'
+            pagebars.forEach(
+                pagebar => {
+                    pagebar?.classList.remove(
+                        'is-loading'
+                    );
+                }
             );
         }
     }
@@ -1373,6 +1672,7 @@ request(
             window.initSearchClearButtons?.();
             window.initGlobalViewToggles?.();
             window.initGlobalFilterSelects?.();
+            initDentalRecordDetailsModal();
 
             updateDentalRecordsPagination(
                 @json($recordPaginationMeta)

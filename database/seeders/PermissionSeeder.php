@@ -42,6 +42,7 @@ class PermissionSeeder extends Seeder
 
             ['name' => 'Manage Dental Records', 'slug' => 'manage_dental_records', 'module' => 'Dental Records'],
             ['name' => 'Manage Appointments', 'slug' => 'manage_appointments', 'module' => 'Appointments'],
+            ['name' => 'Manage Clinic Schedule', 'slug' => 'manage_clinic_schedule', 'module' => 'Appointments'],
             ['name' => 'Manage Patient Profiles', 'slug' => 'manage_patient_profiles', 'module' => 'Patients'],
             ['name' => 'Manage Document Requests', 'slug' => 'manage_document_requests', 'module' => 'Document Requests'],
 

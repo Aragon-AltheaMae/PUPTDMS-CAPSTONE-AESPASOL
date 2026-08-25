@@ -292,9 +292,8 @@ Route::prefix('admin')
         // Safe stub routes used by blades to avoid missing-route exceptions.
         // These redirect to the index until full handlers are implemented.
 
-        Route::get('/dental-records/{id}', function ($id) {
-            return redirect()->route('admin.dental-records.index');
-        })->name('admin.dental-records.show');
+        Route::get('/dental-records/{patient}', [DentalRecordController::class, 'show'])
+            ->name('admin.dental-records.show');
 
         // Route aliases for blade views
         Route::get('/reports-index', function () {
@@ -437,27 +436,35 @@ Route::prefix('admin')
         |--------------------------------------------------------------------------
         */
         Route::get('/clinic-schedule', [ClinicScheduleController::class, 'index'])
+            ->middleware('permission:manage_clinic_schedule')
             ->name('admin.clinic_schedule');
 
         Route::post('/clinic-schedule', [ClinicScheduleController::class, 'store'])
+            ->middleware('permission:manage_clinic_schedule')
             ->name('admin.clinic_schedule.store');
 
         Route::put('/clinic-schedule/rules/{clinicSchedule}', [ClinicScheduleController::class, 'update'])
+            ->middleware('permission:manage_clinic_schedule')
             ->name('admin.clinic_schedule.update');
 
         Route::delete('/clinic-schedule/rules/{clinicSchedule}', [ClinicScheduleController::class, 'destroy'])
+            ->middleware('permission:manage_clinic_schedule')
             ->name('admin.clinic_schedule.destroy');
 
         Route::post('/clinic-schedule/block-date', [ClinicScheduleController::class, 'blockDate'])
+            ->middleware('permission:manage_clinic_schedule')
             ->name('admin.clinic_schedule.block');
 
         Route::delete('/clinic-schedule/block-date/{blockedDate}', [ClinicScheduleController::class, 'unblockDate'])
+            ->middleware('permission:manage_clinic_schedule')
             ->name('admin.clinic_schedule.unblock');
 
         Route::get('/clinic-schedule/unavailable-dates', [ClinicScheduleController::class, 'unavailableDates'])
+            ->middleware('permission:manage_clinic_schedule')
             ->name('admin.clinic_schedule.unavailable_dates');
 
         Route::get('/clinic-schedule/slots', [ClinicScheduleController::class, 'slotsForDate'])
+            ->middleware('permission:manage_clinic_schedule')
             ->name('admin.clinic_schedule.slots');
 
         // INVENTORY
@@ -993,9 +1000,55 @@ Route::prefix('dentist')->middleware(['auth'])->group(function () {
         $gadMale = [];
 
         foreach ($gadLabels as $label) {
-            $key = $label === 'Student' ? null : $label;
-            $gadFemale[] = (int) $gadRaw->where('office_type', $key)->where('gender', 'Female')->sum('total');
-            $gadMale[] = (int) $gadRaw->where('office_type', $key)->where('gender', 'Male')->sum('total');
+            $normalizedLabel = strtolower($label);
+            $gadFemale[] = (int) $gadRaw
+                ->filter(function ($row) use ($normalizedLabel) {
+                    $officeType = strtolower(trim((string) ($row->office_type ?? '')));
+
+                    if ($normalizedLabel === 'student') {
+                        return $officeType === '' || str_contains($officeType, 'student');
+                    }
+
+                    if ($normalizedLabel === 'faculty') {
+                        return str_contains($officeType, 'faculty');
+                    }
+
+                    if ($normalizedLabel === 'administrative') {
+                        return str_contains($officeType, 'admin')
+                            || str_contains($officeType, 'administrative')
+                            || str_contains($officeType, 'personnel');
+                    }
+
+                    return str_contains($officeType, 'dependent')
+                        || str_contains($officeType, 'alumni')
+                        || str_contains($officeType, 'guest');
+                })
+                ->where('gender', 'Female')
+                ->sum('total');
+            $gadMale[] = (int) $gadRaw
+                ->filter(function ($row) use ($normalizedLabel) {
+                    $officeType = strtolower(trim((string) ($row->office_type ?? '')));
+
+                    if ($normalizedLabel === 'student') {
+                        return $officeType === '' || str_contains($officeType, 'student');
+                    }
+
+                    if ($normalizedLabel === 'faculty') {
+                        return str_contains($officeType, 'faculty');
+                    }
+
+                    if ($normalizedLabel === 'administrative') {
+                        return str_contains($officeType, 'admin')
+                            || str_contains($officeType, 'administrative')
+                            || str_contains($officeType, 'personnel');
+                    }
+
+                    return str_contains($officeType, 'dependent')
+                        || str_contains($officeType, 'alumni')
+                        || str_contains($officeType, 'guest');
+                })
+                ->where('gender', 'Male')
+                ->sum('total');
         }
 
         $philippineHolidays = PhilippineHolidays::range(yearsBefore: 1, yearsAfter: 5);
@@ -1067,35 +1120,35 @@ Route::prefix('dentist')->middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
     Route::get('/clinic-schedule', [DentistClinicScheduleController::class, 'index'])
-        ->middleware('permission:manage_appointments')
+        ->middleware('permission:manage_clinic_schedule')
         ->name('dentist.dentist.clinic_schedule');
 
     Route::post('/clinic-schedule', [DentistClinicScheduleController::class, 'store'])
-        ->middleware('permission:manage_appointments')
+        ->middleware('permission:manage_clinic_schedule')
         ->name('dentist.dentist.clinic_schedule.store');
 
     Route::put('/clinic-schedule/rules/{clinicSchedule}', [DentistClinicScheduleController::class, 'update'])
-        ->middleware('permission:manage_appointments')
+        ->middleware('permission:manage_clinic_schedule')
         ->name('dentist.dentist.clinic_schedule.update');
 
     Route::delete('/clinic-schedule/rules/{clinicSchedule}', [DentistClinicScheduleController::class, 'destroy'])
-        ->middleware('permission:manage_appointments')
+        ->middleware('permission:manage_clinic_schedule')
         ->name('dentist.dentist.clinic_schedule.destroy');
 
     Route::post('/clinic-schedule/block-date', [DentistClinicScheduleController::class, 'blockDate'])
-        ->middleware('permission:manage_appointments')
+        ->middleware('permission:manage_clinic_schedule')
         ->name('dentist.dentist.clinic_schedule.block');
 
     Route::delete('/clinic-schedule/block-date/{blockedDate}', [DentistClinicScheduleController::class, 'unblockDate'])
-        ->middleware('permission:manage_appointments')
+        ->middleware('permission:manage_clinic_schedule')
         ->name('dentist.dentist.clinic_schedule.unblock');
 
     Route::get('/clinic-schedule/unavailable-dates', [DentistClinicScheduleController::class, 'unavailableDates'])
-        ->middleware('permission:manage_appointments')
+        ->middleware('permission:manage_clinic_schedule')
         ->name('dentist.dentist.clinic_schedule.unavailable_dates');
 
     Route::get('/clinic-schedule/slots', [DentistClinicScheduleController::class, 'slotsForDate'])
-        ->middleware('permission:manage_appointments')
+        ->middleware('permission:manage_clinic_schedule')
         ->name('dentist.dentist.clinic_schedule.slots');
 
     // Patients
@@ -1303,6 +1356,7 @@ Route::prefix('dentist')->middleware(['auth'])->group(function () {
 
     // clinic status
     Route::post('/dentist/clinic-status', [DentistDashboardController::class, 'updateClinicStatus'])
+        ->middleware('permission:manage_clinic_schedule')
         ->name('dentist.clinic-status.update');
 
     Route::get('/system-settings', [SystemSettingsController::class, 'index'])

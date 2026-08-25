@@ -19,6 +19,7 @@ use App\Models\MedicalHistoryQuestion;
 use App\Models\MedicalHistoryAnswer;
 use App\Models\MedicalHistoryDiseaseAnswer;
 use App\Models\Patient;
+use App\Models\Role;
 use App\Models\ServiceType;
 use App\Models\User;
 use App\Services\FacultyApiService;
@@ -736,18 +737,11 @@ class WalkInController extends Controller
             'student_no',
             'course_name',
             'faculty_code',
+            'classification',
             'year_level',
             'section',
             'is_pwd',
         ];
-
-        if (Schema::hasColumn('patients', 'patient_type')) {
-            $patientColumns[] = 'patient_type';
-        }
-
-        if (Schema::hasColumn('patients', 'type')) {
-            $patientColumns[] = 'type';
-        }
 
         if (Schema::hasColumn('patients', 'profile_image')) {
             $patientColumns[] = 'profile_image';
@@ -793,21 +787,13 @@ class WalkInController extends Controller
                     $resolvedName = trim((string) ($patient->name ?? ''));
                 }
 
-                $patientType = trim((string) (
-                    $patient->getAttribute('patient_type')
-                    ?: $patient->getAttribute('type')
-                    ?: ''
-                ));
-
-                if ($patientType === '') {
-                    $patientType = $patient->student_no
-                        ? 'Student'
-                        : (
-                            $patient->faculty_code
-                            ? 'Faculty'
-                            : 'Patient'
-                        );
-                }
+                $patientType = match ($patient->classification) {
+                    'student' => 'Student',
+                    'faculty' => 'Faculty',
+                    'administrative' => 'Administrative Personnel',
+                    'dependent_alumni' => 'Dependent & Alumni',
+                    default => 'Dependent & Alumni',
+                };
 
                 return [
                     'id' =>
@@ -1153,7 +1139,7 @@ class WalkInController extends Controller
 
             'guest_patient_type' => [
                 'required',
-                'in:student,faculty,administrative',
+                'in:student,faculty,alumni,dependent,administrative',
             ],
 
             'guest_gender' => [
@@ -1171,6 +1157,20 @@ class WalkInController extends Controller
                 'nullable',
                 'string',
                 'max:255',
+            ],
+
+            'guest_student_number' => [
+                'nullable',
+                'string',
+                'max:100',
+                'required_if:guest_patient_type,student',
+            ],
+
+            'guest_faculty_code' => [
+                'nullable',
+                'string',
+                'max:100',
+                'required_if:guest_patient_type,faculty',
             ],
 
             'guest_year_level' => [
@@ -1191,14 +1191,27 @@ class WalkInController extends Controller
             ],
         ]);
 
+        $selectedPatientType = $this->normalizeGuestPatientType(
+            $validated['guest_patient_type']
+        );
+
         try {
             $patient = DB::transaction(function () use ($validated) {
-                $email = $validated['guest_email'];
-                $patientType = match ($validated['guest_patient_type']) {
-                    'student' => 'Student',
-                    'faculty' => 'Faculty',
-                    default => 'Administrative',
-                };
+                $email =
+                    $validated['guest_email'];
+
+                $guestPatientType =
+                    $validated['guest_patient_type'];
+
+                $patientType =
+                    $this->normalizeGuestPatientType(
+                        $guestPatientType
+                    );
+
+                $classification =
+                    $this->guestClassification(
+                        $guestPatientType
+                    );
 
                 $fullName = trim(
                     collect([
@@ -1236,6 +1249,11 @@ class WalkInController extends Controller
                     'program' =>
                     $validated['guest_program'] ?? null,
 
+                    'faculty_code' =>
+                    $guestPatientType === 'faculty'
+                        ? trim((string) ($validated['guest_faculty_code'] ?? ''))
+                        : null,
+
                     'year_level' =>
                     $validated['guest_year_level'] ?? null,
 
@@ -1245,8 +1263,21 @@ class WalkInController extends Controller
                     'is_pwd' =>
                     (bool) $validated['guest_is_pwd'],
 
-                    'student_number' => null,
-                    'patient_type' => $patientType,
+                    'student_number' =>
+                    $guestPatientType === 'student'
+                        ? trim(
+                            (string) (
+                                $validated['guest_student_number']
+                                ?? ''
+                            )
+                        )
+                        : null,
+
+                    'patient_type' =>
+                    $patientType,
+
+                    'classification' =>
+                    $classification,
                 ];
 
                 $user = $this->syncWalkInUser($studentLikeData);
@@ -1294,6 +1325,8 @@ class WalkInController extends Controller
 
                     'program' => $patient->course_name,
 
+                    'student_number' => $patient->student_number,
+
                     'faculty_code' => $patient->faculty_code,
 
                     'year_level' => $patient->year_level,
@@ -1309,8 +1342,21 @@ class WalkInController extends Controller
                             ?? optional($patient->user)->name
                     ),
 
-                    'patient_type' => $patient->patient_type,
-                    'type' => $patient->patient_type ?: 'Guest',
+                    'patient_type' => match ($patient->classification) {
+                        'student' => 'Student',
+                        'faculty' => 'Faculty',
+                        'administrative' => 'Administrative Personnel',
+                        'dependent_alumni' => 'Dependent & Alumni',
+                        default => $selectedPatientType,
+                    },
+
+                    'type' => match ($patient->classification) {
+                        'student' => 'Student',
+                        'faculty' => 'Faculty',
+                        'administrative' => 'Administrative Personnel',
+                        'dependent_alumni' => 'Dependent & Alumni',
+                        default => $selectedPatientType,
+                    },
                 ],
             ]);
         } catch (\Throwable $e) {
@@ -2089,6 +2135,16 @@ class WalkInController extends Controller
                 : null;
         }
 
+        if (Schema::hasColumn('users', 'role_id')) {
+            $patientRoleId = Role::query()
+                ->where('slug', 'patient')
+                ->value('id');
+
+            if ($patientRoleId) {
+                $userData['role_id'] = $patientRoleId;
+            }
+        }
+
         if (!$user) {
             $user = new User();
 
@@ -2230,13 +2286,12 @@ class WalkInController extends Controller
 
 
         if (
-            Schema::hasColumn('patients', 'program_code') &&
+            Schema::hasColumn('patients', 'course_code') &&
             array_key_exists('program', $data) &&
             filled($data['program'])
         ) {
-            $patientData['program_code'] = $data['program'];
+            $patientData['course_code'] = $data['program'];
         }
-
         if (
             Schema::hasColumn('patients', 'course_name') &&
             array_key_exists('program', $data) &&
@@ -2247,38 +2302,95 @@ class WalkInController extends Controller
 
         if (
             Schema::hasColumn('patients', 'faculty_code') &&
-            array_key_exists('faculty_code', $data) &&
-            filled($data['faculty_code'])
+            array_key_exists('faculty_code', $data)
         ) {
-            $patientData['faculty_code'] = $data['faculty_code'];
+            $value = trim((string) ($data['faculty_code'] ?? ''));
+            $patientData['faculty_code'] =
+                $value !== ''
+                ? $value
+                : null;
         }
 
 
         if (
             Schema::hasColumn('patients', 'student_number') &&
-            array_key_exists('student_number', $data) &&
-            filled($data['student_number'])
+            array_key_exists('student_number', $data)
         ) {
+            $value = trim((string) ($data['student_number'] ?? ''));
             $patientData['student_number'] =
-                $data['student_number'];
+                $value !== ''
+                ? $value
+                : null;
         }
 
         if (
             Schema::hasColumn('patients', 'student_no') &&
-            array_key_exists('student_number', $data) &&
-            filled($data['student_number'])
+            array_key_exists('student_number', $data)
         ) {
+            $value = trim((string) ($data['student_number'] ?? ''));
             $patientData['student_no'] =
-                $data['student_number'];
+                $value !== ''
+                ? $value
+                : null;
         }
 
 
-        if (Schema::hasColumn('patients', 'patient_type')) {
-            $patientData['patient_type'] = $type;
-        }
+        if (
+            Schema::hasColumn(
+                'patients',
+                'classification'
+            )
+        ) {
+            $studentNumber =
+                trim(
+                    (string) (
+                        $data['student_number']
+                        ?? ''
+                    )
+                );
 
-        if (Schema::hasColumn('patients', 'type')) {
-            $patientData['type'] = $type;
+            $facultyCode =
+                trim(
+                    (string) (
+                        $data['faculty_code']
+                        ?? ''
+                    )
+                );
+
+            $incomingClassification =
+                trim(
+                    (string) (
+                        $data['classification']
+                        ?? ''
+                    )
+                );
+
+            if ($studentNumber !== '') {
+                $patientData['classification'] =
+                    'student';
+            } elseif ($facultyCode !== '') {
+                $patientData['classification'] =
+                    'faculty';
+            } elseif (
+                in_array(
+                    $incomingClassification,
+                    [
+                        'student',
+                        'faculty',
+                        'administrative',
+                        'dependent_alumni',
+                    ],
+                    true
+                )
+            ) {
+                $patientData['classification'] =
+                    $incomingClassification;
+            } else {
+                $patientData['classification'] =
+                    $this->normalizePatientClassification(
+                        $type
+                    );
+            }
         }
 
         if (Schema::hasColumn('patients', 'status')) {
@@ -2301,11 +2413,11 @@ class WalkInController extends Controller
             }
 
             if (
-                Schema::hasColumn('patients', 'program_code') &&
+                Schema::hasColumn('patients', 'course_code') &&
                 array_key_exists('program', $data) &&
-                ! array_key_exists('program_code', $patientData)
+                ! array_key_exists('course_code', $patientData)
             ) {
-                $patientData['program_code'] =
+                $patientData['course_code'] =
                     $data['program'];
             }
 
@@ -2466,5 +2578,65 @@ class WalkInController extends Controller
         return $normalized === 'YES'
             ? 'YES'
             : 'NO';
+    }
+
+    private function normalizeGuestPatientType(string $guestPatientType): string
+    {
+        return match (strtolower(trim($guestPatientType))) {
+            'student' => 'Student',
+            'faculty' => 'Faculty',
+            'alumni' => 'Alumni',
+            'dependent' => 'Dependent',
+            'administrative' => 'Administrative Personnel',
+            default => 'Guest',
+        };
+    }
+
+    private function guestClassification(
+        string $guestPatientType
+    ): string {
+        return match (strtolower(trim($guestPatientType))) {
+            'student' =>
+            'student',
+
+            'faculty' =>
+            'faculty',
+
+            'administrative' =>
+            'administrative',
+
+            'dependent',
+            'alumni' =>
+            'dependent_alumni',
+
+            default =>
+            'dependent_alumni',
+        };
+    }
+
+    private function normalizePatientClassification(?string $type): string
+    {
+        $type = strtolower(trim((string) $type));
+
+        return match (true) {
+            str_contains($type, 'student') =>
+            'student',
+
+            str_contains($type, 'faculty') =>
+            'faculty',
+
+            str_contains($type, 'administrative'),
+            str_contains($type, 'admin'),
+            str_contains($type, 'personnel') =>
+            'administrative',
+
+            str_contains($type, 'dependent'),
+            str_contains($type, 'alumni'),
+            str_contains($type, 'guest') =>
+            'dependent_alumni',
+
+            default =>
+            'dependent_alumni',
+        };
     }
 }
