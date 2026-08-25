@@ -1970,9 +1970,3 @@ html {
         background: rgba(22, 27, 34, 0.96) !important;
     }
 }
-
-.scheduled-patient-name,
-.sched-patient-name,
-.scheduled-patient-service {
-    text-transform: capitalize;
-}

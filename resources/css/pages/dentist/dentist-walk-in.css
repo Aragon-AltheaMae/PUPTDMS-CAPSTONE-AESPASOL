@@ -881,8 +881,3 @@ html[data-theme="dark"] body #mainContent #patientAccountSection .selected-patie
         width: 100% !important;
     }
 }
-
-.patient-card-name,
-html body #mainContent #patientAccountSection .patient-result-name {
-    text-transform: capitalize;
-}

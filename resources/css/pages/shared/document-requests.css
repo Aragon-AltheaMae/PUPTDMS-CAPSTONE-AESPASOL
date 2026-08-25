@@ -1483,7 +1483,3 @@
 #mainContent.docreq-page #requestGridContainer {
     min-height: 420px;
 }
-
-.cell-patient-name {
-    text-transform: capitalize;
-}

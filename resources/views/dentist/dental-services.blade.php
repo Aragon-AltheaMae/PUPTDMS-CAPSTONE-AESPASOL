@@ -1621,7 +1621,7 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
             <tr>
                 <td class="muted-cell whitespace-nowrap">${safeDate}</td>
                 <td class="whitespace-nowrap text-[11px]">${safeTimeIn}</td>
-                <td><div class="name-cell">${safeName}</div></td>
+                <td><div class="name-cell" data-patient-name>${safeName}</div></td>
                 <td><div class="program-cell">${safeProgram}</div></td>
                 <td>${escapeDentalText(r.age)}</td>
                 <td>${r.gad?.gender === 'Male' ? '<span class="check-mark"><i class="fa-solid fa-check"></i></span>' : ''}</td>
@@ -1643,7 +1643,7 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
                 <article class="service-record-card">
                     <div class="service-record-card-head">
                         <div>
-                            <h3>${safeName}</h3>
+                            <h3 data-patient-name>${safeName}</h3>
                             <p>${safeDate} • ${safeTimeIn} - ${safeTimeOut}</p>
                         </div>
                         <span class="service-record-chip">${safeType}</span>

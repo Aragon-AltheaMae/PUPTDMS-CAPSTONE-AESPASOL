@@ -80,6 +80,7 @@
 @import './pages/admin/user-management.css';
 @import './pages/admin/ai-generated-report.css';
 @import './pages/admin/session-management.css';
+@import './pages/admin/dentist-continuity.css';
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 @plugin "daisyui";

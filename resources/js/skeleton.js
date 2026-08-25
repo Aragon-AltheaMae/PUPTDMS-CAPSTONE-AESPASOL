@@ -1,25 +1,55 @@
-export function swapSkeletonContent(targetId, html, options = {}) {
-    const el = document.getElementById(targetId);
+export function swapSkeletonContent(
+    targetId,
+    html,
+    options = {}
+) {
+    const el =
+        document.getElementById(
+            targetId
+        );
+
     if (!el) return;
 
-    const leaveDuration = options.leaveDuration ?? 140;
-    const revealClass = options.revealClass ?? 'content-reveal';
+    const leaveDuration =
+        options.leaveDuration ?? 140;
 
-    el.classList.add('skeleton-fade-leave');
-    el.style.pointerEvents = 'none';
+    const revealClass =
+        options.revealClass ??
+        'content-reveal';
 
-    setTimeout(() => {
+    el.classList.add(
+        'skeleton-fade-leave'
+    );
+
+    el.style.pointerEvents =
+        'none';
+
+    window.setTimeout(() => {
         el.innerHTML = html;
-        el.classList.remove('skeleton-fade-leave');
 
-        void el.offsetWidth;
+        el.classList.remove(
+            'skeleton-fade-leave'
+        );
 
-        el.classList.add(revealClass);
-        el.style.pointerEvents = '';
+        el.style.pointerEvents =
+            '';
 
-        setTimeout(() => {
-            el.classList.remove(revealClass);
-        }, 460);
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                el.classList.add(
+                    revealClass
+                );
+
+                window.setTimeout(
+                    () => {
+                        el.classList.remove(
+                            revealClass
+                        );
+                    },
+                    460
+                );
+            });
+        });
     }, leaveDuration);
 }
 

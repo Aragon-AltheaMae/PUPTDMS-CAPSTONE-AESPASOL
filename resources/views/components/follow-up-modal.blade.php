@@ -71,7 +71,7 @@
                                 Appointment for
                             </span>
 
-                            <strong class="modal-profile-name">
+                            <strong class="modal-profile-name" data-patient-name>
                                 {{ $patientName }}
                             </strong>
 

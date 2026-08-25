@@ -21,6 +21,12 @@
     border-color: var(--status-completed-border) !important;
 }
 
+.cal-pill-blue {
+    background: #e8edff !important;
+    color: #4338ca !important;
+    border-color: #cdd5ff !important;
+}
+
 .cal-pill-red {
     background: var(--status-cancelled-bg) !important;
     color: var(--status-cancelled-text) !important;

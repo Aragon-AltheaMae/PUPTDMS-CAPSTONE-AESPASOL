@@ -843,7 +843,9 @@
                 <div class="text-gray-800">${escapeDtrHtml(record.requested_date_time || formatDateToMMDDYY(record.treatment_date) || '—')}</div>
               </td>
               <td class="min-w-[220px]">
-                <div class="text-gray-800">${escapeDtrHtml(record.patient_name || '—')}</div>
+                <div class="text-gray-800" data-patient-name>
+                    ${escapeDtrHtml(record.patient_name || '—')}
+                </div>
               </td>
             <td class="min-w-[240px] text-[12px] leading-5">${escapeDtrHtml(contact)}</td>
             <td class="min-w-[140px]">

@@ -123,7 +123,7 @@ $existingAppointmentMode
                                         Patient
                                     </span>
 
-                                    <h2 class="odontogram-patient-name">
+                                    <h2 class="odontogram-patient-name" data-patient-name>
                                         {{ $patientName }}
                                     </h2>
 
