@@ -1878,3 +1878,64 @@
         justify-content: center;
     }
 }
+
+@media (min-width: 641px) {
+
+    #slExportModal .sl-export-filter-section {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: .8rem !important;
+
+        width: 100% !important;
+
+        padding-bottom: 1rem !important;
+        margin-bottom: .35rem !important;
+
+        border-bottom: 1px solid var(--border) !important;
+    }
+
+    #slExportModal .sl-export-filter-grid {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+
+        width: 100% !important;
+        gap: .75rem !important;
+
+        align-items: start !important;
+    }
+
+    #slExportModal .sl-export-filter-field {
+        display: block !important;
+
+        width: 100% !important;
+        min-width: 0 !important;
+
+        margin: 0 !important;
+    }
+
+    #slExportModal .sl-export-filter-field .global-form-label {
+        display: flex !important;
+        align-items: center !important;
+        gap: .25rem !important;
+
+        margin: 0 0 .38rem !important;
+    }
+
+    #slExportModal .sl-export-filter-field .custom-select {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    #slExportModal .sl-export-filter-field .custom-select-button {
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 44px !important;
+
+        border-radius: 12px !important;
+    }
+
+    #slExportModal .sl-export-filter-field .custom-select-menu {
+        width: 100% !important;
+    }
+}
+

@@ -4069,3 +4069,8 @@ body.session-expired {
     }
 
 }
+
+.modal-profile-name,
+.modal-profile-value {
+    text-transform: capitalize;
+}

@@ -263,17 +263,13 @@ class DentistDashboardController extends Controller
         $gadMale = [];
 
         foreach ($gadLabels as $label) {
-            $key = $label === 'Student'
-                ? null
-                : $label;
-
             $gadFemale[] = (int) $gadRaw
-                ->where('office_type', $key)
+                ->filter(fn($row) => $this->normalizeDashboardOfficeType($row->office_type) === strtolower($label))
                 ->where('gender', 'Female')
                 ->sum('total');
 
             $gadMale[] = (int) $gadRaw
-                ->where('office_type', $key)
+                ->filter(fn($row) => $this->normalizeDashboardOfficeType($row->office_type) === strtolower($label))
                 ->where('gender', 'Male')
                 ->sum('total');
         }
@@ -391,5 +387,39 @@ class DentistDashboardController extends Controller
         }
 
         return User::where('patient_id', $patient->id)->first();
+    }
+
+    private function normalizeDashboardOfficeType(?string $officeType): string
+    {
+        $officeType = strtolower(trim((string) $officeType));
+
+        if (
+            $officeType === '' ||
+            str_contains($officeType, 'student')
+        ) {
+            return 'student';
+        }
+
+        if (str_contains($officeType, 'faculty')) {
+            return 'faculty';
+        }
+
+        if (
+            str_contains($officeType, 'admin') ||
+            str_contains($officeType, 'administrative') ||
+            str_contains($officeType, 'personnel')
+        ) {
+            return 'administrative';
+        }
+
+        if (
+            str_contains($officeType, 'dependent') ||
+            str_contains($officeType, 'alumni') ||
+            str_contains($officeType, 'guest')
+        ) {
+            return 'dependent';
+        }
+
+        return 'student';
     }
 }

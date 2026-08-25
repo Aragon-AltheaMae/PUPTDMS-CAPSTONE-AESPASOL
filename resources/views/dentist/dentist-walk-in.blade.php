@@ -166,10 +166,12 @@
                                                     </label>
 
                                                     <select id="guestPatientType" name="guest_patient_type"
-                                                        class="form-select-custom js-custom-select" disabled required>
+                                                        class="form-select-custom" disabled required>
                                                         <option value="">Select patient type</option>
                                                         <option value="student">Student</option>
                                                         <option value="faculty">Faculty</option>
+                                                        <option value="alumni">Alumni</option>
+                                                        <option value="dependent">Dependent</option>
                                                         <option value="administrative">Administrative Personnel
                                                         </option>
                                                     </select>
@@ -215,6 +217,33 @@
 
                                                     <input type="text" id="guestProgram" name="guest_program"
                                                         class="form-input-custom" placeholder="Enter program" disabled>
+                                                </div>
+
+                                            </div>
+                                            <div class="walkin-two-col">
+
+                                                <div class="global-form-group" data-global-field
+                                                    data-guest-student-number-field hidden>
+                                                    <label class="global-form-label" for="guestStudentNumber">
+                                                        Student Number
+                                                        <span class="required-mark">*</span>
+                                                    </label>
+
+                                                    <input type="text" id="guestStudentNumber"
+                                                        name="guest_student_number" class="form-input-custom"
+                                                        placeholder="Enter student number" disabled>
+                                                </div>
+
+                                                <div class="global-form-group" data-global-field
+                                                    data-guest-faculty-code-field hidden>
+                                                    <label class="global-form-label" for="guestFacultyCode">
+                                                        Faculty Code
+                                                        <span class="required-mark">*</span>
+                                                    </label>
+
+                                                    <input type="text" id="guestFacultyCode" name="guest_faculty_code"
+                                                        class="form-input-custom" placeholder="Enter faculty code"
+                                                        disabled>
                                                 </div>
 
                                             </div>
@@ -563,11 +592,27 @@
     const guestProgram =
         document.getElementById("guestProgram");
 
+    const guestStudentNumber =
+        document.getElementById("guestStudentNumber");
+
+    const guestFacultyCode =
+        document.getElementById("guestFacultyCode");
+
     const guestYearLevel =
         document.getElementById("guestYearLevel");
 
     const guestSection =
         document.getElementById("guestSection");
+
+    const guestStudentNumberField =
+        document.querySelector(
+            "[data-guest-student-number-field]"
+        );
+
+    const guestFacultyCodeField =
+        document.querySelector(
+            "[data-guest-faculty-code-field]"
+        );
 
     const guestPwdRadios =
         document.querySelectorAll(
@@ -586,6 +631,8 @@
             guestGender,
             guestBirthdate,
             guestProgram,
+            guestStudentNumber,
+            guestFacultyCode,
             guestYearLevel,
             guestSection,
         ];
@@ -650,6 +697,8 @@
             guestBirthdate.required = enabled;
         }
 
+        updateGuestIdentityFields();
+
         guestPwdRadios.forEach((radio, index) => {
             radio.required =
                 enabled &&
@@ -697,6 +746,8 @@
         guestGender,
         guestBirthdate,
         guestProgram,
+        guestStudentNumber,
+        guestFacultyCode,
         guestYearLevel,
         guestSection,
     ].forEach(input => {
@@ -721,6 +772,61 @@
         });
     });
 
+    function updateGuestIdentityFields() {
+        const selectedType =
+            guestPatientType?.value || "";
+
+        const isStudent =
+            selectedType === "student";
+
+        const isFaculty =
+            selectedType === "faculty";
+
+        if (guestStudentNumberField) {
+            guestStudentNumberField.hidden =
+                !isStudent;
+        }
+
+        if (guestFacultyCodeField) {
+            guestFacultyCodeField.hidden =
+                !isFaculty;
+        }
+
+        if (guestStudentNumber) {
+            guestStudentNumber.disabled =
+                patientModeInput?.value !== "guest" ||
+                !isStudent;
+
+            guestStudentNumber.required =
+                patientModeInput?.value === "guest" &&
+                isStudent;
+
+            if (!isStudent) {
+                guestStudentNumber.value = "";
+                window.clearFormInputValidation?.(
+                    guestStudentNumber
+                );
+            }
+        }
+
+        if (guestFacultyCode) {
+            guestFacultyCode.disabled =
+                patientModeInput?.value !== "guest" ||
+                !isFaculty;
+
+            guestFacultyCode.required =
+                patientModeInput?.value === "guest" &&
+                isFaculty;
+
+            if (!isFaculty) {
+                guestFacultyCode.value = "";
+                window.clearFormInputValidation?.(
+                    guestFacultyCode
+                );
+            }
+        }
+    }
+
     guestPwdRadios.forEach(radio => {
         radio.addEventListener("change", () => {
             if (
@@ -734,6 +840,11 @@
             }
         });
     });
+
+    guestPatientType?.addEventListener(
+        "change",
+        updateGuestIdentityFields
+    );
 
     const forWomenSection =
         document.getElementById(
@@ -964,6 +1075,8 @@
                 guestGender,
                 guestBirthdate,
                 guestProgram,
+                guestStudentNumber,
+                guestFacultyCode,
                 guestYearLevel,
                 guestSection,
             ].forEach(input => {
@@ -988,6 +1101,8 @@
                     );
                 }
             }
+
+            updateGuestIdentityFields();
         }
     }
 
@@ -1301,6 +1416,8 @@
             guestGender,
             guestBirthdate,
             guestProgram,
+            guestStudentNumber,
+            guestFacultyCode,
             guestYearLevel,
             guestSection,
         ].forEach(input => {
@@ -1377,6 +1494,12 @@
 
         const program =
             guestProgram?.value?.trim() || "";
+
+        const studentNumber =
+            guestStudentNumber?.value?.trim() || "";
+
+        const facultyCode =
+            guestFacultyCode?.value?.trim() || "";
 
         const yearLevel =
             guestYearLevel?.value?.trim() || "";
@@ -1473,6 +1596,36 @@
             return false;
         }
 
+        if (
+            guestPatientType?.value === "student" &&
+            !studentNumber
+        ) {
+            window.validateFormInputField?.(
+                guestStudentNumber
+            );
+
+            window.focusGlobalInvalidField?.(
+                guestStudentNumber
+            );
+
+            return false;
+        }
+
+        if (
+            guestPatientType?.value === "faculty" &&
+            !facultyCode
+        ) {
+            window.validateFormInputField?.(
+                guestFacultyCode
+            );
+
+            window.focusGlobalInvalidField?.(
+                guestFacultyCode
+            );
+
+            return false;
+        }
+
         if (pwdValue === undefined) {
             const firstPwdRadio =
                 guestPwdRadios[0];
@@ -1520,6 +1673,14 @@
             guestBirthdate
         );
 
+        window.clearFormInputValidation?.(
+            guestStudentNumber
+        );
+
+        window.clearFormInputValidation?.(
+            guestFacultyCode
+        );
+
         const patientType =
             guestPatientType?.value || "";
 
@@ -1528,6 +1689,10 @@
                 "Student" :
                 patientType === "faculty" ?
                     "Faculty" :
+                    patientType === "alumni" ?
+                        "Alumni" :
+                        patientType === "dependent" ?
+                            "Dependent" :
                     patientType === "administrative" ?
                         "Administrative Personnel" :
                         "Guest Patient";
@@ -1544,6 +1709,8 @@
             patient_type: patientType,
 
             program,
+            student_number: studentNumber,
+            faculty_code: facultyCode,
             year_level: yearLevel,
             section,
 
@@ -1642,6 +1809,16 @@
         payload.append(
             "guest_program",
             guestProgram?.value?.trim() || ""
+        );
+
+        payload.append(
+            "guest_student_number",
+            guestStudentNumber?.value?.trim() || ""
+        );
+
+        payload.append(
+            "guest_faculty_code",
+            guestFacultyCode?.value?.trim() || ""
         );
 
         payload.append(

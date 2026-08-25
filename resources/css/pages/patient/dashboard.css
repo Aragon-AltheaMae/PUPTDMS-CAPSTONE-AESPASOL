@@ -1747,3 +1747,10 @@ body.role-patient #mainContent.patient-dashboard-page * {
         grid-template-columns: 1fr;
     }
 }
+
+.patient-profile-name,
+.patient-profile-emergency-name,
+.patient-profile-summary-value,
+.patient-profile-value {
+    text-transform: capitalize;
+}

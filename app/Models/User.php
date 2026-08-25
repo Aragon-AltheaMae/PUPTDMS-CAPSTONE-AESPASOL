@@ -14,6 +14,7 @@ class User extends Authenticatable implements JWTSubject
     public const CLINICAL_PERMISSION_SLUGS = [
         'access_dentist_dashboard',
         'manage_appointments',
+        'manage_clinic_schedule',
         'manage_patient_profiles',
         'manage_document_requests',
         'manage_inventory',

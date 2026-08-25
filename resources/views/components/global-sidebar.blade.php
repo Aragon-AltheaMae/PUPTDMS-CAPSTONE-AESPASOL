@@ -113,7 +113,7 @@
                     ],
                     [
                         'route' => 'admin.clinic_schedule',
-                        'permission' => 'manage_appointments',
+                        'permission' => 'manage_clinic_schedule',
                         'active' => ['admin.clinic_schedule*'],
                         'icon' => 'fa-calendar-days',
                         'label' => 'Clinic Schedule',
@@ -230,7 +230,7 @@
                     ],
                     [
                         'route' => 'dentist.dentist.clinic_schedule',
-                        'permission' => 'manage_appointments',
+                        'permission' => 'manage_clinic_schedule',
                         'active' => ['dentist.dentist.clinic_schedule*'],
                         'icon' => 'fa-calendar-days',
                         'label' => 'Clinic Schedule',

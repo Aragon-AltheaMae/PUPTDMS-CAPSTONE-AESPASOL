@@ -820,7 +820,7 @@ return $aPriority <=> $bPriority;
                                         </div>
 
                                         <div class="appt-service-cell flex items-center justify-start">
-                                            <span class="service-badge {{ $badgeClass }}">
+                                            <span class="service-badge u-text-capitalize {{ $badgeClass }}">
                                                 {{ $serviceLabel }}
                                             </span>
                                         </div>
@@ -845,7 +845,7 @@ return $aPriority <=> $bPriority;
 
                                                 <div class="appt-patient-name-row">
 
-                                                    <p class="appt-patient-name">
+                                                    <p class="appt-patient-name u-text-capitalize">
                                                         {{ $patientName }}
                                                     </p>
 
@@ -877,7 +877,7 @@ return $aPriority <=> $bPriority;
                                         </div>
 
                                         <div class="appt-program-cell">
-                                            <span class="global-info-pill" title="{{ $programFull }}">
+                                            <span class="global-info-pill u-text-capitalize" title="{{ $programFull }}">
                                                 <i class="fa-solid fa-graduation-cap"></i>
                                                 {{ $program }}
                                             </span>
@@ -1258,7 +1258,7 @@ return $aPriority <=> $bPriority;
 
                                         <div class="flex items-center gap-2 flex-wrap mb-1">
 
-                                            <p class="mobile-patient-name">
+                                            <p class="mobile-patient-name u-text-capitalize">
                                                 {{ $patientName }}
                                             </p>
 
@@ -1293,7 +1293,7 @@ return $aPriority <=> $bPriority;
                                                 {{ $studentNumber }}
                                             </span>
 
-                                            <span class="global-info-pill" title="{{ $programFull }}">
+                                            <span class="global-info-pill u-text-capitalize" title="{{ $programFull }}">
                                                 <i class="fa-solid fa-graduation-cap"></i>
                                                 {{ $program }}
                                             </span>
@@ -1329,7 +1329,7 @@ return $aPriority <=> $bPriority;
                                             Service Type
                                         </span>
 
-                                        <span class="service-badge {{ $badgeClass }}">
+                                        <span class="service-badge u-text-capitalize {{ $badgeClass }}">
                                             {{ $serviceLabel }}
                                         </span>
                                     </div>

@@ -773,3 +773,9 @@
         flex: 1 1 0;
     }
 }
+
+.patient-summary-name,
+.patient-emergency-name,
+.patient-detail-value {
+    text-transform: capitalize;
+}

@@ -20,6 +20,7 @@ class Patient extends Model
         'height_m',
         'weight_kg',
         'faculty_code',
+        'classification',
         'student_no',
         'course_code',
         'course_name',

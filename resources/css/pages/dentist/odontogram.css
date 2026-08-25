@@ -2804,3 +2804,6 @@ body.odontogram-resizing * {
 
     gap: .4rem;
 }
+.hero-patient-name {
+    text-transform: capitalize;
+}

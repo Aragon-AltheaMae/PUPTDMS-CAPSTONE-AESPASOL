@@ -2217,3 +2217,10 @@
         pointer-events: auto !important;
     }
 }
+
+.patient-list-name,
+.patient-grid-name,
+.patient-grid-card-name,
+.patient-grid-card-service-name {
+    text-transform: capitalize;
+}
