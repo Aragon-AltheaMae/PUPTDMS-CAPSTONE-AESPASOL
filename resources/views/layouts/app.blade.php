@@ -88,40 +88,6 @@
         })();
     </script>
 
-    <style>
-        html.accessibility-preload .header,
-        html.accessibility-preload #sidebar,
-        html.accessibility-preload #mainContent,
-        html.accessibility-preload #siteFooter {
-            visibility: hidden !important;
-        }
-    </style>
-
-    <script>
-        (function() {
-            const root = document.documentElement;
-
-            root.classList.add('accessibility-preload');
-
-            const releaseAccessibilityPreload = () => {
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        root.classList.remove(
-                            'accessibility-preload'
-                        );
-                    });
-                });
-            };
-
-            window.releaseAccessibilityPreload =
-                releaseAccessibilityPreload;
-            setTimeout(
-                releaseAccessibilityPreload,
-                1500
-            );
-        })();
-    </script>
-
     <title>
         @hasSection('title')
             @yield('title') | PUP Taguig Dental Clinic
@@ -318,45 +284,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sienna-accessibility@latest/dist/sienna-accessibility.umd.js"
         data-position="bottom-right" data-offset="{{ $accessibilityOffset }}" defer></script>
-
-    <script>
-        document.addEventListener(
-            'DOMContentLoaded',
-            function() {
-                const release = () => {
-                    window.releaseAccessibilityPreload?.();
-                };
-
-                if (document.querySelector('.asw-widget')) {
-                    release();
-                    return;
-                }
-
-                const observer = new MutationObserver(() => {
-                    if (
-                        !document.querySelector(
-                            '.asw-widget'
-                        )
-                    ) {
-                        return;
-                    }
-
-                    observer.disconnect();
-                    release();
-                });
-
-                observer.observe(document.body, {
-                    childList: true,
-                    subtree: true
-                });
-
-                setTimeout(() => {
-                    observer.disconnect();
-                    release();
-                }, 1500);
-            }
-        );
-    </script>
 
     @include('partials.chatbot')
 

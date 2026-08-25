@@ -314,7 +314,7 @@ request(
                                                 </span>
                                             </div>
                                             <div class="dental-record-patient-copy">
-                                                <strong class="dental-record-patient-name">
+                                                <strong class="dental-record-patient-name" data-patient-name>
                                                     {{ $patientName }}
                                                 </strong>
 
@@ -474,7 +474,7 @@ request(
                                             </div>
 
                                             <div class="dental-record-patient-copy">
-                                                <h3 class="table-record-title">
+                                                <h3 class="table-record-title" data-patient-name>
                                                     {{ $patientName }}
                                                 </h3>
 
@@ -771,7 +771,7 @@ request(
     function detailRow(label, value) {
         const normalizedValue =
             escapeHtml(value || '—')
-            .replace(/\n/g, '<br>');
+                .replace(/\n/g, '<br>');
 
         return `
             <div class="flex items-start gap-3 py-2 border-b border-gray-100 last:border-0">
@@ -1015,7 +1015,9 @@ request(
             const patientName = data.patient_name || 'Record Details';
             const initial = (patientName.charAt(0) || '?').toUpperCase();
 
-            title.textContent = patientName;
+            title.textContent =
+                window.formatPatientName?.(patientName) ||
+                patientName;
 
             panelBody.innerHTML = `
                 <div class="rounded-2xl border border-red-100 bg-red-50/70 p-4 mb-4 flex items-center gap-3">
@@ -1025,7 +1027,10 @@ request(
                         </span>
                     </div>
                     <div class="min-w-0 flex-1">
-                        <div class="text-sm font-black text-gray-900 truncate">${escapeHtml(patientName)}</div>
+                        <div class="text-sm font-black text-gray-900 truncate"
+                            data-patient-name>
+                            ${escapeHtml(patientName)}
+                        </div>
                         <div class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Selected record</div>
                     </div>
                     <span class="status-pill ${statusPillClass(status)}">

@@ -99,7 +99,7 @@
         from: null,
         to: null,
     };
-    
+
     renderPatientPagination();
     window.handleExistingRecordSearch =
         function (value) {
@@ -667,28 +667,18 @@
                 </span>
 
                 <div class="patient-select-identity">
-                    <p class="patient-select-name">
-                        ${escapeHtml(
-                    patientName
-                )}
+                    <p class="patient-select-name" data-patient-name>
+                        ${escapeHtml(patientName)}
                     </p>
 
                     <p class="patient-select-meta">
-                        ${escapeHtml(
-                    patientEmail
-                )}
+                        ${escapeHtml(patientEmail)}
                     </p>
                 </div>
 
                 <span
-                    class="
-                        badge-role
-                        ${roleClass}
-                    "
-                >
-                    ${escapeHtml(
-                    patientType
-                )}
+                    class="badge-role ${roleClass}">
+                    ${escapeHtml(patientType)}
                 </span>
             </div>
 

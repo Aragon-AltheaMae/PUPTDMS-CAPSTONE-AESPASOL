@@ -451,7 +451,7 @@ $notifCount = $notifications->count();
                                         <div class="patient-list-person">
                                             <div class="patient-list-name-row">
 
-                                                <h3 class="patient-list-name">
+                                                <h3 class="patient-list-name" data-patient-name>
                                                     {{ $patientName }}
                                                 </h3>
 
@@ -558,7 +558,7 @@ $notifCount = $notifications->count();
                                             <div class="patient-grid-card-person">
                                                 <div class="patient-grid-name-row">
 
-                                                    <h3 class="patient-grid-card-name">
+                                                    <h3 class="patient-grid-card-name" data-patient-name>
                                                         {{ $patientName }}
                                                     </h3>
 

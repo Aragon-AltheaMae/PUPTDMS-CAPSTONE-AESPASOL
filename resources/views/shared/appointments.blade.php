@@ -344,7 +344,7 @@ return $aPriority <=> $bPriority;
                                         data-patient-url="{{ $nextPatientImage }}"></span>
 
                                     <div class="today-snapshot-next-copy">
-                                        <strong class="today-snapshot-next-name">
+                                        <strong class="today-snapshot-next-name" data-patient-name>
                                             {{ $nextName }}
                                         </strong>
 
@@ -820,7 +820,7 @@ return $aPriority <=> $bPriority;
                                         </div>
 
                                         <div class="appt-service-cell flex items-center justify-start">
-                                            <span class="service-badge u-text-capitalize {{ $badgeClass }}">
+                                            <span class="service-badge  {{ $badgeClass }}">
                                                 {{ $serviceLabel }}
                                             </span>
                                         </div>
@@ -845,7 +845,7 @@ return $aPriority <=> $bPriority;
 
                                                 <div class="appt-patient-name-row">
 
-                                                    <p class="appt-patient-name u-text-capitalize">
+                                                    <p class="appt-patient-name" data-patient-name>
                                                         {{ $patientName }}
                                                     </p>
 
@@ -877,7 +877,7 @@ return $aPriority <=> $bPriority;
                                         </div>
 
                                         <div class="appt-program-cell">
-                                            <span class="global-info-pill u-text-capitalize" title="{{ $programFull }}">
+                                            <span class="global-info-pill " title="{{ $programFull }}">
                                                 <i class="fa-solid fa-graduation-cap"></i>
                                                 {{ $program }}
                                             </span>
@@ -1203,6 +1203,10 @@ return $aPriority <=> $bPriority;
                             $recordProcedure =
                             $appt->procedure;
 
+                            $recordOdontogramData =
+                            $recordProcedure?->odontogram_data
+                            ?? [];
+
                             $recordFollowUp =
                             $appt->followUpAppointments
                             ?->sortBy('appointment_date')
@@ -1258,7 +1262,7 @@ return $aPriority <=> $bPriority;
 
                                         <div class="flex items-center gap-2 flex-wrap mb-1">
 
-                                            <p class="mobile-patient-name u-text-capitalize">
+                                            <p class="mobile-patient-name" data-patient-name>
                                                 {{ $patientName }}
                                             </p>
 
@@ -1293,7 +1297,7 @@ return $aPriority <=> $bPriority;
                                                 {{ $studentNumber }}
                                             </span>
 
-                                            <span class="global-info-pill u-text-capitalize" title="{{ $programFull }}">
+                                            <span class="global-info-pill " title="{{ $programFull }}">
                                                 <i class="fa-solid fa-graduation-cap"></i>
                                                 {{ $program }}
                                             </span>
@@ -1329,7 +1333,7 @@ return $aPriority <=> $bPriority;
                                             Service Type
                                         </span>
 
-                                        <span class="service-badge u-text-capitalize {{ $badgeClass }}">
+                                        <span class="service-badge  {{ $badgeClass }}">
                                             {{ $serviceLabel }}
                                         </span>
                                     </div>
@@ -1351,12 +1355,18 @@ return $aPriority <=> $bPriority;
                                         data-oral="{{ $recordProcedure?->oral_examination ?? '' }}"
                                         data-diagnosis="{{ $recordProcedure?->diagnosis ?? '' }}"
                                         data-prescription="{{ $recordProcedure?->prescriptions ?? '' }}" data-follow-up='@json(
-                                            $recordFollowUpPayload,
-                                            JSON_HEX_TAG |
-                                            JSON_HEX_APOS |
-                                            JSON_HEX_AMP |
-                                            JSON_HEX_QUOT
-                                        )'>
+    $recordFollowUpPayload,
+    JSON_HEX_TAG |
+    JSON_HEX_APOS |
+    JSON_HEX_AMP |
+    JSON_HEX_QUOT
+)' data-odontogram-data='@json(
+    $recordOdontogramData,
+    JSON_HEX_TAG |
+    JSON_HEX_APOS |
+    JSON_HEX_AMP |
+    JSON_HEX_QUOT
+)'>
                                         <i class="fa-regular fa-eye"></i>
                                     </button>
                                     @endif

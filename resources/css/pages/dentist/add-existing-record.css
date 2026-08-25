@@ -322,8 +322,3 @@
     color:
         #fff;
 }
-
-.patient-select-name,
-.patient-select-tag {
-    text-transform: capitalize;
-}

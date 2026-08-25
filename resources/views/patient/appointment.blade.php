@@ -143,15 +143,32 @@ $appt->procedure?->prescriptions
         ? \Carbon\Carbon::parse($latestPastVisit->appointment_date)->format('M d, Y')
         : 'No record yet';
 
-        $allAppointments = collect($appointments ?? [])->filter(fn($appt) => !empty($appt->appointment_date));
+        $completedRegularVisits = collect($appointments ?? [])
+        ->filter(function ($appt) {
+        return
+        !empty($appt->appointment_date) &&
+        strtolower(trim((string) ($appt->status ?? ''))) === 'completed' &&
+        !((bool) ($appt->is_follow_up ?? false));
+        });
 
-        $serviceStats = $allAppointments
-        ->groupBy(fn($appt) => trim((string)($appt->service_type ?? 'General Consultation')))
+        $serviceStats = $completedRegularVisits
+        ->groupBy(function ($appt) {
+        return trim(
+        (string) (
+        $appt->service_type
+        ?? 'General Consultation'
+        )
+        );
+        })
         ->map(fn($group) => $group->count())
         ->sortDesc();
 
-        $mostVisitedService = $serviceStats->keys()->first() ?: 'No visit yet';
-        $mostVisitedCount = (int) ($serviceStats->first() ?? 0);
+        $mostVisitedService =
+        $serviceStats->keys()->first()
+        ?: 'No visit yet';
+
+        $mostVisitedCount =
+        (int) ($serviceStats->first() ?? 0);
 
         $latestCompleted = collect($pastVisits ?? [])
         ->filter(function ($appt) {
@@ -172,16 +189,8 @@ $appt->procedure?->prescriptions
         $nextRecommendedText = $nextRecommendedDate->format('M d, Y');
         $daysUntilRecommended = \Carbon\Carbon::today()->diffInDays($nextRecommendedDate->copy()->startOfDay(), false);
         $recommendedHint =
-            $daysUntilRecommended < 0
-                ? 'Due now'
-                : (
-                    $daysUntilRecommended === 0
-                        ? 'Due today'
-                        : 'In ' . $daysUntilRecommended . ' days'
-                );
-        @endphp
-
-        <section class="appt-section-reveal mb-5">
+        $daysUntilRecommended < 0 ? 'Due now' : ( $daysUntilRecommended===0 ? 'Due today' : 'In ' .
+            $daysUntilRecommended . ' days' ); @endphp <section class="appt-section-reveal mb-5">
             <div class="appt-summary-grid">
                 <div class="appt-summary-card">
                     <div class="flex items-center gap-4">

@@ -20,7 +20,7 @@ use Illuminate\Support\Str;
 $isDentistProfile = $profileMode === 'dentist';
 
 $patientName = $patient->name ?? 'Unknown Patient';
-$displayName = ucwords(strtolower($patient->name ?? 'Guest'));
+$displayName = $patient->name ?? 'Guest';
 $age = $patient->birthdate ? Carbon::parse($patient->birthdate)->age : null;
 $birthdateFormatted = $patient->birthdate ? Carbon::parse($patient->birthdate)->format('M d, Y') : 'N/A';
 
@@ -163,7 +163,7 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
 
                         <div class="patient-summary-heading">
                             <div class="patient-summary-name-row">
-                                <h2 class="patient-summary-name">
+                                <h2 class="patient-summary-name" data-patient-name>
                                     {{ $displayName }}
                                 </h2>
 

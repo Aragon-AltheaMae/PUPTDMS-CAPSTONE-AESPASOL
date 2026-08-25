@@ -622,18 +622,18 @@
                         <i
                             class="odontogram-preview-marking-swatch"
                             style="background:${safeRecordText(
-                                treatment.colorHex ||
-                                '#111827'
-                            )}"
+                        treatment.colorHex ||
+                        '#111827'
+                    )}"
                         ></i>
 
                         <span>${safeRecordText(
-                            treatment.surface
-                        )}: ${safeRecordText(
-                            treatment.code
-                        )} - ${safeRecordText(
-                            treatment.label
-                        )}</span>
+                        treatment.surface
+                    )}: ${safeRecordText(
+                        treatment.code
+                    )} - ${safeRecordText(
+                        treatment.label
+                    )}</span>
                     </span>
                 `
             )
@@ -758,30 +758,56 @@
         }
     }
 
-    function openRecordModal(source) {
+    async function openRecordModal(source) {
         const modal =
-            document.getElementById('record_modal');
+            document.getElementById(
+                'record_modal'
+            );
 
-        if (!modal) return;
+        if (!modal) {
+            return;
+        }
 
-        modal.classList.remove('closing');
-        modal.classList.add('open');
+        const recordData =
+            normalizeRecordData(
+                source || {}
+            );
 
-        document.documentElement.classList.add(
-            'modal-lock'
+        setRecordModalData(
+            recordData
         );
 
-        document.body.classList.add(
-            'modal-lock'
+        window.openModal?.(
+            'record_modal'
         );
 
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                setRecordModalData(
-                    source || {}
+        try {
+            await window
+                .loadOdontogramPreviewModule?.();
+
+            const odontogramPreview =
+                modal.querySelector(
+                    '[data-odontogram-preview]'
                 );
-            });
-        });
+
+            if (
+                odontogramPreview &&
+                typeof window
+                .setOdontogramPreviewData ===
+                'function'
+            ) {
+                window.setOdontogramPreviewData(
+                    odontogramPreview,
+                    recordData.odontogramData
+                );
+            }
+
+        } catch (error) {
+            console.error(
+                'Unable to load odontogram preview.',
+                error
+            );
+        }
     }
 
     function closeRecordModal() {

@@ -1,11 +1,25 @@
-import {
-    createOdontogramThreeScene,
-    updateOdontogramThreeScene,
-    resizeOdontogramThreeScene,
-    resetOdontogramThreeCamera,
-    focusOdontogramThreeTooth,
-    getOdontogramThreeToothMesh
-} from './odontogram/odontogram-three';
+let odontogramThreeModulePromise = null;
+
+async function loadOdontogramThreeModule() {
+    if (!odontogramThreeModulePromise) {
+        odontogramThreeModulePromise =
+            import(
+                './odontogram/odontogram-three'
+            )
+                .catch(error => {
+                    odontogramThreeModulePromise =
+                        null;
+
+                    throw error;
+                });
+    }
+
+    return odontogramThreeModulePromise;
+}
+
+export function preloadOdontogramThreeModule() {
+    return loadOdontogramThreeModule();
+}
 
 const ODONTOGRAM_PREVIEW_COLORS = {
     D: '#ef4444',
@@ -425,9 +439,7 @@ function openOdontogramPreviewTooth(
     });
 }
 
-function initOdontogramPreviews(
-    root = document
-) {
+export function initOdontogramPreviews(root = document) {
     const scope =
         root &&
             typeof root.querySelectorAll ===
@@ -520,23 +532,6 @@ function showOdontogramPreviewEmptyState(
     }
 }
 
-document.addEventListener(
-    'DOMContentLoaded',
-    () => {
-        initOdontogramPreviews();
-    }
-);
-
-document.addEventListener(
-    'ui-modal:opened',
-    event => {
-        initOdontogramPreviews(
-            event.detail?.modal ||
-            document
-        );
-    }
-);
-
 window.initOdontogramPreviews =
     initOdontogramPreviews;
 
@@ -593,12 +588,11 @@ function setOdontogramPreviewData(
 window.setOdontogramPreviewData =
     setOdontogramPreviewData;
 
-const odontogramPreviewThreeStates =
-    new WeakMap();
+const odontogramPreviewThreeStates = new WeakMap();
+const odontogramPreviewCreationPromises = new WeakMap();
+const odontogramPreviewRenderRetries = new WeakMap();
 
-function renderOdontogramPreview(
-    root
-) {
+async function renderOdontogramPreview(root) {
     if (!root) {
         return;
     }
@@ -627,14 +621,34 @@ function renderOdontogramPreview(
         width < 10 ||
         height < 10
     ) {
-        requestAnimationFrame(() => {
+        const retryCount =
+            odontogramPreviewRenderRetries
+                .get(root) || 0;
+
+        if (retryCount >= 20) {
+            odontogramPreviewRenderRetries
+                .delete(root);
+
+            return;
+        }
+
+        odontogramPreviewRenderRetries.set(
+            root,
+            retryCount + 1
+        );
+
+        window.setTimeout(() => {
             renderOdontogramPreview(
                 root
             );
-        });
+        }, 50);
 
         return;
     }
+
+    odontogramPreviewRenderRetries.delete(
+        root
+    );
 
     let state =
         odontogramPreviewThreeStates.get(
@@ -642,43 +656,100 @@ function renderOdontogramPreview(
         );
 
     if (!state) {
-        try {
-            state =
-                createOdontogramThreeScene({
-                    container,
+        let creationPromise =
+            odontogramPreviewCreationPromises.get(
+                root
+            );
 
-                    data:
-                        root
-                            .__odontogramPreviewData ||
-                        [],
+        if (!creationPromise) {
+            creationPromise =
+                (async () => {
+                    const {
+                        createOdontogramThreeScene
+                    } =
+                        await loadOdontogramThreeModule();
 
-                    mode: 'preview',
+                    const createdState =
+                        createOdontogramThreeScene({
+                            container,
 
-                    onToothClick:
-                        tooth => {
-                            openOdontogramPreviewTooth(
-                                root,
-                                tooth
-                            );
-                        },
+                            data:
+                                root
+                                    .__odontogramPreviewData ||
+                                [],
 
-                    onReady: () => {
-                        loading?.classList.add(
-                            'is-hidden'
+                            mode:
+                                'preview',
+
+                            onToothClick:
+                                tooth => {
+                                    openOdontogramPreviewTooth(
+                                        root,
+                                        tooth
+                                    );
+                                },
+
+                            onReady:
+                                () => {
+                                    if (!loading) {
+                                        return;
+                                    }
+
+                                    loading.classList.add(
+                                        'is-hidden'
+                                    );
+
+                                    loading.style.opacity =
+                                        '0';
+
+                                    loading.style.pointerEvents =
+                                        'none';
+
+                                    window.setTimeout(
+                                        () => {
+                                            loading.style.display =
+                                                'none';
+                                        },
+                                        180
+                                    );
+                                }
+                        });
+
+                    if (!createdState) {
+                        throw new Error(
+                            'Odontogram scene was not created.'
                         );
                     }
-                });
 
-            if (!state) {
-                throw new Error(
-                    'Odontogram scene was not created.'
-                );
-            }
+                    odontogramPreviewThreeStates.set(
+                        root,
+                        createdState
+                    );
 
-            odontogramPreviewThreeStates.set(
+                    return createdState;
+                })();
+
+            odontogramPreviewCreationPromises.set(
                 root,
-                state
+                creationPromise
             );
+        }
+
+        try {
+            state =
+                await creationPromise;
+
+            const {
+                updateOdontogramThreeScene
+            } =
+                await loadOdontogramThreeModule();
+
+            updateOdontogramThreeScene(
+                state,
+                root.__odontogramPreviewData ||
+                []
+            );
+
         } catch (error) {
             console.error(
                 'Odontogram 3D preview failed:',
@@ -697,20 +768,35 @@ function renderOdontogramPreview(
                 </span>
             `;
             }
+
+        } finally {
+            odontogramPreviewCreationPromises.delete(
+                root
+            );
         }
 
         return;
     }
 
-    updateOdontogramThreeScene(
-        state,
-        root.__odontogramPreviewData || []
-    );
+    try {
+        const {
+            updateOdontogramThreeScene
+        } =
+            await loadOdontogramThreeModule();
+
+        updateOdontogramThreeScene(
+            state,
+            root.__odontogramPreviewData || []
+        );
+    } catch (error) {
+        console.error(
+            'Unable to update odontogram preview:',
+            error
+        );
+    }
 }
 
-function resizeOdontogramPreview(
-    root
-) {
+async function resizeOdontogramPreview(root) {
     const state =
         odontogramPreviewThreeStates.get(
             root
@@ -720,9 +806,21 @@ function resizeOdontogramPreview(
         return;
     }
 
-    resizeOdontogramThreeScene(
-        state
-    );
+    try {
+        const {
+            resizeOdontogramThreeScene
+        } =
+            await loadOdontogramThreeModule();
+
+        resizeOdontogramThreeScene(
+            state
+        );
+    } catch (error) {
+        console.error(
+            'Unable to resize odontogram preview:',
+            error
+        );
+    }
 }
 
 let odontogramPreviewResizeFrame =

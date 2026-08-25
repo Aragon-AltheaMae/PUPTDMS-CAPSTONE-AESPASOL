@@ -1,14 +1,106 @@
 import './bootstrap';
-import './odontogram-preview';
+
+let odontogramPreviewModulePromise = null;
+
+async function loadOdontogramPreviewModule() {
+    if (!odontogramPreviewModulePromise) {
+        odontogramPreviewModulePromise =
+            import('./odontogram-preview')
+                .catch(error => {
+                    odontogramPreviewModulePromise = null;
+                    throw error;
+                });
+    }
+
+    return odontogramPreviewModulePromise;
+}
+
+window.loadOdontogramPreviewModule = loadOdontogramPreviewModule;
+
+function preloadOdontogramPreviewWhenIdle() {
+    const hasRecordAction =
+        document.querySelector(
+            [
+                '[onclick*="openRecordModal"]',
+                '[data-record]'
+            ].join(',')
+        );
+
+    if (!hasRecordAction) {
+        return;
+    }
+
+    const preload = async () => {
+        try {
+            const module =
+                await window
+                    .loadOdontogramPreviewModule?.();
+
+            await module
+                ?.preloadOdontogramThreeModule?.();
+
+        } catch (_) {
+        }
+    };
+
+    if (
+        'requestIdleCallback'
+        in window
+    ) {
+        window.requestIdleCallback(
+            preload,
+            {
+                timeout: 2500
+            }
+        );
+
+        return;
+    }
+
+    window.setTimeout(
+        preload,
+        1200
+    );
+}
+
+document.addEventListener(
+    'DOMContentLoaded',
+    preloadOdontogramPreviewWhenIdle
+);
+
+if (
+    document.querySelector(
+        [
+            '[data-global-voice-trigger]',
+            '.voice-search-mic.external[data-voice-trigger]'
+        ].join(',')
+    )
+) {
+    import('./voice-logic');
+}
+
+if (
+    document.querySelector(
+        '.step-content'
+    )
+) {
+    import('./booking-workflow');
+}
+
+if (
+    document.querySelector(
+        '[data-booking-signature]'
+    )
+) {
+    import('./booking-signature');
+}
+
 import './header';
 import './pagination-bar';
 import './show-more';
 import './profile-avatar';
 import './search-bar';
 import './empty-state';
-import './voice-logic';
-import './booking-workflow';
-import './booking-signature';
 import './filter-select';
 
 import '@fontsource/inter/300.css';
@@ -20,11 +112,40 @@ import '@fontsource/inter/800.css';
 import '@fontsource/inter/900.css';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import Chart from 'chart.js/auto';
-import JSVoice from 'jsvoice';
 
-window.Chart = Chart;
-window.JSVoice = JSVoice;
+let chartJsPromise = null;
+
+async function loadChartJs() {
+    if (window.Chart) {
+        return window.Chart;
+    }
+
+    if (!chartJsPromise) {
+        chartJsPromise =
+            import(
+                'chart.js/auto'
+            )
+                .then(module => {
+                    window.Chart =
+                        module.default;
+
+                    return (
+                        module.default
+                    );
+                })
+                .catch(error => {
+                    chartJsPromise =
+                        null;
+
+                    throw error;
+                });
+    }
+
+    return chartJsPromise;
+}
+
+window.loadChartJs =
+    loadChartJs;
 
 import {
     swapSkeletonContent,
@@ -34,10 +155,34 @@ import {
     finishDashboardLoading
 } from './skeleton';
 
-import flatpickr from "flatpickr";
-import "flatpickr/dist/flatpickr.min.css";
+let flatpickrPromise = null;
 
-window.flatpickr = flatpickr;
+async function loadFlatpickr() {
+    if (window.flatpickr) {
+        return window.flatpickr;
+    }
+
+    if (!flatpickrPromise) {
+        flatpickrPromise = Promise.all([
+            import('flatpickr'),
+            import('flatpickr/dist/flatpickr.min.css')
+        ])
+            .then(([module]) => {
+                window.flatpickr =
+                    module.default;
+
+                return module.default;
+            })
+            .catch(error => {
+                flatpickrPromise = null;
+                throw error;
+            });
+    }
+
+    return flatpickrPromise;
+}
+
+window.loadFlatpickr = loadFlatpickr;
 
 function normalizeDateOnly(value) {
     if (!value) return null;
@@ -466,7 +611,7 @@ function initGlobalFlatpickr() {
             options.maxDate = "today";
         }
 
-        flatpickr(el, options);
+        window.flatpickr(el, options);
     });
 
     const timeInputs = document.querySelectorAll('.js-flatpickr-time');
@@ -505,7 +650,7 @@ function initGlobalFlatpickr() {
             options.positionElement = el;
         }
 
-        flatpickr(el, options);
+        window.flatpickr(el, options);
     });
 }
 
@@ -528,7 +673,7 @@ function initMonthOnlyFlatpickr(root = document) {
         const limitToToday =
             el.hasAttribute('data-month-max-today');
 
-        flatpickr(el, {
+        window.flatpickr(el, {
             dateFormat: 'Y-m',
             altInput: true,
             altFormat: 'F Y',
@@ -599,10 +744,39 @@ function setMonthOnlyPickerValue(inputOrSelector, value, dispatch = true) {
 window.initMonthOnlyFlatpickr = initMonthOnlyFlatpickr;
 window.setMonthOnlyPickerValue = setMonthOnlyPickerValue;
 
-document.addEventListener("DOMContentLoaded", () => {
-    initGlobalFlatpickr();
-    initMonthOnlyFlatpickr();
-});
+document.addEventListener(
+    'DOMContentLoaded',
+    async () => {
+        const hasFlatpickrFields =
+            document.querySelector(
+                [
+                    '.js-flatpickr-date',
+                    '.js-flatpickr-date-min-today',
+                    '.js-flatpickr-date-max-today',
+                    '.js-flatpickr-date-range-from',
+                    '.js-flatpickr-date-range-to',
+                    '.js-flatpickr-time',
+                    '[data-month-only-picker]'
+                ].join(',')
+            );
+
+        if (!hasFlatpickrFields) {
+            return;
+        }
+
+        try {
+            await window.loadFlatpickr();
+
+            initGlobalFlatpickr();
+            initMonthOnlyFlatpickr();
+        } catch (error) {
+            console.error(
+                'Unable to load Flatpickr.',
+                error
+            );
+        }
+    }
+);
 
 let activeFlatpickrInstance = null;
 
@@ -1116,19 +1290,44 @@ function fixSiennaPosition() {
         });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    fixSiennaPosition();
+let siennaPositionFrame = null;
 
-    requestAnimationFrame(() => {
-        fixSiennaPosition();
-    });
+function scheduleSiennaPosition() {
+    cancelAnimationFrame(
+        siennaPositionFrame
+    );
 
-    setTimeout(fixSiennaPosition, 250);
-});
+    siennaPositionFrame =
+        requestAnimationFrame(() => {
+            fixSiennaPosition();
+        });
+}
 
-window.addEventListener('load', fixSiennaPosition);
-window.addEventListener('resize', fixSiennaPosition);
-window.addEventListener('orientationchange', fixSiennaPosition);
+document.addEventListener(
+    'DOMContentLoaded',
+    scheduleSiennaPosition
+);
+
+window.addEventListener(
+    'load',
+    scheduleSiennaPosition
+);
+
+window.addEventListener(
+    'resize',
+    scheduleSiennaPosition,
+    {
+        passive: true
+    }
+);
+
+window.addEventListener(
+    'orientationchange',
+    scheduleSiennaPosition,
+    {
+        passive: true
+    }
+);
 
 function syncAssistiveFloatingState() {
     const group = document.getElementById('assistiveFabGroup');
@@ -1584,13 +1783,43 @@ document.addEventListener(
 
 document.addEventListener(
     'ui-modal:opened',
-    function (event) {
-        const modal = event.detail?.modal || document;
+    async function (event) {
+        const modal =
+            event.detail?.modal ||
+            document;
 
         initCharLimitFields(modal);
         initSearchClearButtons(modal);
 
-        window.initGlobalVoiceInputs?.(modal);
+        window.initGlobalVoiceInputs?.(
+            modal
+        );
+
+        const hasOdontogramPreview =
+            modal.matches?.(
+                '[data-odontogram-preview]'
+            ) ||
+            modal.querySelector?.(
+                '[data-odontogram-preview]'
+            );
+
+        if (!hasOdontogramPreview) {
+            return;
+        }
+
+        try {
+            const module =
+                await loadOdontogramPreviewModule();
+
+            module.initOdontogramPreviews?.(
+                modal
+            );
+        } catch (error) {
+            console.error(
+                'Unable to load odontogram preview.',
+                error
+            );
+        }
     }
 );
 
@@ -2650,7 +2879,7 @@ function initGlobalDateTime() {
     }
 
     updateDateTime();
-    setInterval(updateDateTime, 1000);
+    setInterval(updateDateTime, 60000);
 }
 
 function initPatientMobileFab() {
@@ -3937,26 +4166,15 @@ function initGlobalPreviewZoom(
 }
 
 document.addEventListener(
-    'DOMContentLoaded',
-    () => {
-        initGlobalPreviewZoom();
-    }
-);
-
-document.addEventListener(
     'ui-modal:opened',
     event => {
         const modal =
             event.detail?.modal ||
             document;
 
-        initGlobalPreviewZoom(modal);
-
-        requestAnimationFrame(() => {
-            refreshGlobalPreviewZoom(
-                modal
-            );
-        });
+        initGlobalPreviewZoom(
+            modal
+        );
     }
 );
 
@@ -5600,6 +5818,102 @@ function escapeHtml(value = '') {
         .replaceAll("'", '&#039;');
 }
 
+function formatPatientName(value = '') {
+    return String(value || '')
+        .trim()
+        .replace(/\s+/g, ' ')
+        .toLocaleLowerCase('en-PH')
+        .replace(
+            /(^|[\s.'’\-])\p{L}/gu,
+            character =>
+                character.toLocaleUpperCase('en-PH')
+        );
+}
+
+function formatPatientNameElement(element) {
+    if (!element) return;
+
+    const currentName =
+        element.dataset.patientName ||
+        element.textContent ||
+        '';
+
+    const formattedName =
+        formatPatientName(currentName);
+
+    if (!formattedName) return;
+
+    element.textContent =
+        formattedName;
+}
+
+function initGlobalPatientNames(root = document) {
+    const scope =
+        root &&
+            typeof root.querySelectorAll ===
+            'function'
+            ? root
+            : document;
+
+    const shouldFormatPatientName =
+        element =>
+            element &&
+            !element.matches(
+                '[data-patient-avatar]'
+            );
+
+    if (
+        scope.matches?.(
+            '[data-patient-name]'
+        ) &&
+        shouldFormatPatientName(
+            scope
+        )
+    ) {
+        formatPatientNameElement(
+            scope
+        );
+    }
+
+    scope
+        .querySelectorAll?.(
+            '[data-patient-name]'
+        )
+        .forEach(element => {
+            if (
+                !shouldFormatPatientName(
+                    element
+                )
+            ) {
+                return;
+            }
+
+            formatPatientNameElement(
+                element
+            );
+        });
+}
+
+document.addEventListener(
+    'DOMContentLoaded',
+    () => {
+        initGlobalPatientNames();
+    }
+);
+
+document.addEventListener(
+    'ui-modal:opened',
+    event => {
+        initGlobalPatientNames(
+            event.detail?.modal ||
+            document
+        );
+    }
+);
+
+window.formatPatientName = formatPatientName;
+window.initGlobalPatientNames = initGlobalPatientNames;
+
 function debounce(callback, wait = 250) {
     let timeout;
 
@@ -6678,36 +6992,6 @@ document.addEventListener('DOMContentLoaded', () => {
 window.initGlobalPageSizeSelects = initGlobalPageSizeSelects;
 window.syncGlobalPageSizeSelect = syncGlobalPageSizeSelect;
 window.setGlobalPageSizeValue = setGlobalPageSizeValue;
-
-document.addEventListener('DOMContentLoaded', () => {
-    const openModalSelector = [
-        '.modal-overlay.open',
-        '.ui-modal.open',
-        'dialog[open]',
-        '[id$="Modal"].opacity-100:not(.pointer-events-none)'
-    ].join(',');
-
-    const syncModalLock = () => {
-        const hasOpenModal = !!document.querySelector(openModalSelector);
-
-        document.documentElement.classList.toggle('modal-lock', hasOpenModal);
-        document.body.classList.toggle('modal-lock', hasOpenModal);
-    };
-
-    const modalObserver = new MutationObserver(syncModalLock);
-
-    modalObserver.observe(document.body, {
-        subtree: true,
-        childList: true,
-        attributes: true,
-        attributeFilter: ['class', 'open', 'style', 'aria-hidden']
-    });
-
-    document.addEventListener('click', () => requestAnimationFrame(syncModalLock), true);
-    document.addEventListener('keydown', () => requestAnimationFrame(syncModalLock), true);
-
-    syncModalLock();
-});
 
 function closeCustomSelects(except = null) {
     document.querySelectorAll('.custom-select.is-open').forEach(wrapper => {

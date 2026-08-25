@@ -359,30 +359,86 @@
 
 @section('scripts')
     <script>
-        function buildUpcomingStatus(appt) {
-            const status =
-                String(
-                    appt?.status || 'upcoming'
-                )
+        function normalizeDashboardAppointmentStatus(
+            status = ''
+        ) {
+            const value =
+                String(status || '')
                 .toLowerCase()
                 .trim();
 
             if (
-                status === 'rescheduled' ||
-                status.includes('resched')
+                [
+                    'pending',
+                    'confirmed',
+                    'upcoming'
+                ].includes(value)
             ) {
-                return `
-            <span class="status-pill status-rescheduled">
-                <span class="status-dot"></span>
-                Rescheduled
-            </span>
-        `;
+                return 'upcoming';
             }
 
+            if (
+                value === 'reschedule' ||
+                value.includes('resched')
+            ) {
+                return 'rescheduled';
+            }
+
+            if (
+                value === 'completed' ||
+                value.includes('complete')
+            ) {
+                return 'completed';
+            }
+
+            if (
+                value === 'canceled' ||
+                value.includes('cancel')
+            ) {
+                return 'cancelled';
+            }
+
+            return value || 'upcoming';
+        }
+
+        function buildAppointmentStatus(appt) {
+            const status =
+                normalizeDashboardAppointmentStatus(
+                    appt?.status
+                );
+
+            const statuses = {
+                upcoming: {
+                    label: 'Upcoming',
+                    className: 'status-upcoming'
+                },
+
+                rescheduled: {
+                    label: 'Rescheduled',
+                    className: 'status-rescheduled'
+                },
+
+                completed: {
+                    label: 'Completed',
+                    className: 'status-completed'
+                },
+
+                cancelled: {
+                    label: 'Cancelled',
+                    className: 'status-cancelled'
+                }
+            };
+
+            const meta =
+                statuses[status] ||
+                statuses.upcoming;
+
             return `
-        <span class="status-pill status-upcoming">
+        <span
+            class="status-pill ${meta.className}"
+        >
             <span class="status-dot"></span>
-            Upcoming
+            ${meta.label}
         </span>
     `;
         }
@@ -444,16 +500,13 @@
                             ).filter(
                                 appointment => {
                                     const status =
-                                        String(
-                                            appointment?.status ||
-                                            ''
-                                        )
-                                        .toLowerCase()
-                                        .trim();
+                                        normalizeDashboardAppointmentStatus(
+                                            appointment?.status
+                                        );
 
                                     return [
                                         'upcoming',
-                                        'rescheduled',
+                                        'rescheduled'
                                     ].includes(
                                         status
                                     );
@@ -693,10 +746,10 @@ ${isToday ? 'is-today' : ''}
 ${
 hasAppointments
 ? `
-                                                                                                                                            <span class="upcoming-date-badge">
-                                                                                                                                            ${count}
-                                                                                                                                            </span>
-                                                                                                                                            `
+                                                                                                                                                                                <span class="upcoming-date-badge">
+                                                                                                                                                                                ${count}
+                                                                                                                                                                                </span>
+                                                                                                                                                                                `
 : ''
 }
 
@@ -812,7 +865,7 @@ ${buildAvatar(
             )}
         </p>
 
-        ${buildUpcomingStatus(appt)}
+        ${buildAppointmentStatus(appt)}
 
     </div>
 
@@ -1355,9 +1408,12 @@ View all appointments
                     html
                 );
 
-                if (!window.Chart) {
+                try {
+                    await window.loadChartJs();
+                } catch (error) {
                     console.error(
-                        'Dashboard GAD: Chart.js is not available.'
+                        'Dashboard GAD: Unable to load Chart.js.',
+                        error
                     );
 
                     return false;
@@ -1414,6 +1470,13 @@ View all appointments
                             options: {
                                 responsive: true,
                                 maintainAspectRatio: false,
+
+                                animation: window.matchMedia(
+                                        '(max-width: 767px)'
+                                    ).matches ?
+                                    false : {
+                                        duration: 350
+                                    },
 
                                 indexAxis: 'y',
 
@@ -2482,21 +2545,22 @@ Medicine inventory records will appear here once items are available.
                 .slice(0, 3)
                 .map(appt => {
                     const status =
-                        String(
-                            appt.status || ''
-                        )
-                        .toLowerCase()
-                        .trim();
+                        normalizeDashboardAppointmentStatus(
+                            appt.status
+                        );
 
-                    const canReschedule = [
+                    const isActiveAppointment = [
                         'upcoming',
                         'rescheduled'
-                    ].includes(status);
+                    ].includes(
+                        status
+                    );
 
-                    const canCancel = [
-                        'upcoming',
-                        'rescheduled'
-                    ].includes(status);
+                    const canReschedule =
+                        isActiveAppointment;
+
+                    const canCancel =
+                        isActiveAppointment;
 
                     const patientName =
                         appt.name ||
@@ -2562,7 +2626,7 @@ aria-label="View ${escHtml(patientName)} profile"
 
 <div class="scheduled-hover-patient-name-row">
 
-<p class="global-record-name">
+<p class="global-record-name" data-patient-name>
     ${escHtml(patientName)}
 </p>
 
@@ -2582,7 +2646,7 @@ ${buildAppointmentTypeIcons(appt)}
         ${escHtml(time)}
     </span>
 
-    ${buildUpcomingStatus(appt)}
+    ${buildAppointmentStatus(appt)}
 
 </div>
 
@@ -2603,52 +2667,52 @@ data-tooltip-tone="view"
 ${
 canReschedule
 ? `
-                                                                                                                                            <button
-                                                                                                                                            type="button"
-                                                                                                                                            class="ui-action-btn ui-action-warning"
-                                                                                                                                            aria-label="Reschedule appointment"
-                                                                                                                                            data-tooltip="Reschedule appointment"
-                                                                                                                                            data-tooltip-tone="reschedule"
-                                                                                                                                            onclick="
-                                                                                                                                            event.preventDefault();
-                                                                                                                                            event.stopPropagation();
-                                                                                                                                            openRescheduleModalFromDay(
-                                                                                                                                            '${escJs(appt.id)}',
-                                                                                                                                            '${safeName}',
-                                                                                                                                            '${safeSchedule}',
-                                                                                                                                            '${safeService}',
-                                                                                                                                            '${escJs(appt.rescheduleUrl || '#')}'
-                                                                                                                                            );
-                                                                                                                                            "
-                                                                                                                                            >
-                                                                                                                                            <i class="fa-solid fa-rotate-right"></i>
-                                                                                                                                            </button>
-                                                                                                                                            `
+                                                                                                                                                                                <button
+                                                                                                                                                                                type="button"
+                                                                                                                                                                                class="ui-action-btn ui-action-warning"
+                                                                                                                                                                                aria-label="Reschedule appointment"
+                                                                                                                                                                                data-tooltip="Reschedule appointment"
+                                                                                                                                                                                data-tooltip-tone="reschedule"
+                                                                                                                                                                                onclick="
+                                                                                                                                                                                event.preventDefault();
+                                                                                                                                                                                event.stopPropagation();
+                                                                                                                                                                                openRescheduleModalFromDay(
+                                                                                                                                                                                '${escJs(appt.id)}',
+                                                                                                                                                                                '${safeName}',
+                                                                                                                                                                                '${safeSchedule}',
+                                                                                                                                                                                '${safeService}',
+                                                                                                                                                                                '${escJs(appt.rescheduleUrl || '#')}'
+                                                                                                                                                                                );
+                                                                                                                                                                                "
+                                                                                                                                                                                >
+                                                                                                                                                                                <i class="fa-solid fa-rotate-right"></i>
+                                                                                                                                                                                </button>
+                                                                                                                                                                                `
 : ''
 }
 
 ${
 canCancel
 ? `
-                                                                                                                                            <button
-                                                                                                                                            type="button"
-                                                                                                                                            class="ui-action-btn ui-action-delete"
-                                                                                                                                            aria-label="Cancel appointment"
-                                                                                                                                            data-tooltip="Cancel appointment"
-                                                                                                                                            data-tooltip-tone="cancel"
-                                                                                                                                            onclick="
-                                                                                                                                            event.preventDefault();
-                                                                                                                                            event.stopPropagation();
-                                                                                                                                            cancelAppointmentFromModal(
-                                                                                                                                            '${escJs(appt.cancelUrl || '#')}',
-                                                                                                                                            '${safeName}',
-                                                                                                                                            '${safeSchedule}'
-                                                                                                                                            );
-                                                                                                                                            "
-                                                                                                                                            >
-                                                                                                                                            <i class="fa-solid fa-ban"></i>
-                                                                                                                                            </button>
-                                                                                                                                            `
+                                                                                                                                                                                <button
+                                                                                                                                                                                type="button"
+                                                                                                                                                                                class="ui-action-btn ui-action-delete"
+                                                                                                                                                                                aria-label="Cancel appointment"
+                                                                                                                                                                                data-tooltip="Cancel appointment"
+                                                                                                                                                                                data-tooltip-tone="cancel"
+                                                                                                                                                                                onclick="
+                                                                                                                                                                                event.preventDefault();
+                                                                                                                                                                                event.stopPropagation();
+                                                                                                                                                                                cancelAppointmentFromModal(
+                                                                                                                                                                                '${escJs(appt.cancelUrl || '#')}',
+                                                                                                                                                                                '${safeName}',
+                                                                                                                                                                                '${safeSchedule}'
+                                                                                                                                                                                );
+                                                                                                                                                                                "
+                                                                                                                                                                                >
+                                                                                                                                                                                <i class="fa-solid fa-ban"></i>
+                                                                                                                                                                                </button>
+                                                                                                                                                                                `
 : ''
 }
 
@@ -3006,36 +3070,43 @@ ${renderUnifiedCalendarLegend('dentist')}
             });
         }
 
-        function getStatusBadgeClass(status) {
-            const s = String(status || '').toLowerCase().trim();
+        function getStatusBadgeClass(
+            status
+        ) {
+            const normalized =
+                normalizeDashboardAppointmentStatus(
+                    status
+                );
 
-            if (s === 'cancelled' || s.includes('cancel')) {
-                return 'appointment-status-badge appointment-status-cancelled';
-            }
+            return {
+                upcoming: 'appointment-status-badge appointment-status-upcoming',
 
-            if (s === 'rescheduled' || s.includes('resched')) {
-                return 'appointment-status-badge appointment-status-rescheduled';
-            }
+                rescheduled: 'appointment-status-badge appointment-status-rescheduled',
 
-            if (s === 'completed' || s.includes('complete')) {
-                return 'appointment-status-badge appointment-status-completed';
-            }
+                completed: 'appointment-status-badge appointment-status-completed',
 
-            if (s === 'upcoming') {
-                return 'appointment-status-badge appointment-status-upcoming';
-            }
-
-            return 'appointment-status-badge appointment-status-upcoming';
+                cancelled: 'appointment-status-badge appointment-status-cancelled'
+            } [normalized] ||
+            'appointment-status-badge appointment-status-upcoming';
         }
 
-        function getAppointmentStatusLabel(status) {
-            const s = String(status || '').toLowerCase().trim();
+        function getAppointmentStatusLabel(
+            status
+        ) {
+            const normalized =
+                normalizeDashboardAppointmentStatus(
+                    status
+                );
 
-            if (s === 'rescheduled' || s.includes('resched')) return 'Rescheduled';
-            if (s === 'completed' || s.includes('complete')) return 'Completed';
-            if (s === 'cancelled' || s.includes('cancel')) return 'Cancelled';
+            return {
+                upcoming: 'Upcoming',
 
-            return 'Upcoming';
+                rescheduled: 'Rescheduled',
+
+                completed: 'Completed',
+
+                cancelled: 'Cancelled'
+            } [normalized] || 'Upcoming';
         }
 
         function openDayAppointmentsModal(dateStr, appointmentsJson) {
@@ -3063,15 +3134,22 @@ ${renderUnifiedCalendarLegend('dentist')}
                 listEl.innerHTML = appointments
                     .map(appt => {
                         const status =
-                            String(appt.status || '')
-                            .toLowerCase()
-                            .trim();
+                            normalizeDashboardAppointmentStatus(
+                                appt.status
+                            );
 
-                        const canReschedule = ['upcoming', 'rescheduled']
-                            .includes(status);
+                        const isActiveAppointment = [
+                            'upcoming',
+                            'rescheduled'
+                        ].includes(
+                            status
+                        );
 
-                        const canCancel = ['upcoming', 'rescheduled']
-                            .includes(status);
+                        const canReschedule =
+                            isActiveAppointment;
+
+                        const canCancel =
+                            isActiveAppointment;
 
                         const patientName =
                             appt.name ||
@@ -3116,14 +3194,15 @@ appt.date || dateStr
 )} • ${time}`
                             );
 
-                        const statusClass =
-                            status.includes('cancel') ?
-                            'status-cancelled' :
-                            status.includes('resched') ?
-                            'status-rescheduled' :
-                            status.includes('complete') ?
-                            'status-completed' :
-                            'status-upcoming';
+                        const statusClass = {
+                            upcoming: 'status-upcoming',
+
+                            rescheduled: 'status-rescheduled',
+
+                            completed: 'status-completed',
+
+                            cancelled: 'status-cancelled'
+                        } [status] || 'status-upcoming';
 
                         return `
 <article class="global-record-card scheduled-modal-patient-card">
@@ -3144,7 +3223,7 @@ aria-label="View ${escHtml(patientName)} profile"
 
 <div class="scheduled-modal-name-row">
 
-<p class="global-record-name">
+<p class="global-record-name" data-patient-name>
 ${escHtml(patientName)}
 </p>
 
@@ -3189,48 +3268,48 @@ data-tooltip-tone="view"
 ${
 canReschedule
 ? `
-                                                                                                                                            <button
-                                                                                                                                            type="button"
-                                                                                                                                            class="ui-action-btn ui-action-warning"
-                                                                                                                                            aria-label="Reschedule appointment"
-                                                                                                                                            data-tooltip="Reschedule appointment"
-                                                                                                                                            data-tooltip-tone="reschedule"
-                                                                                                                                            onclick="
-                                                                                                                                            openRescheduleModalFromDay(
-                                                                                                                                            '${escJs(appt.id)}',
-                                                                                                                                            '${safeName}',
-                                                                                                                                            '${safeSchedule}',
-                                                                                                                                            '${safeService}',
-                                                                                                                                            '${escJs(appt.rescheduleUrl || '#')}'
-                                                                                                                                            )
-                                                                                                                                            "
-                                                                                                                                            >
-                                                                                                                                            <i class="fa-solid fa-rotate-right"></i>
-                                                                                                                                            </button>
-                                                                                                                                            `
+                                                                                                                                                                                <button
+                                                                                                                                                                                type="button"
+                                                                                                                                                                                class="ui-action-btn ui-action-warning"
+                                                                                                                                                                                aria-label="Reschedule appointment"
+                                                                                                                                                                                data-tooltip="Reschedule appointment"
+                                                                                                                                                                                data-tooltip-tone="reschedule"
+                                                                                                                                                                                onclick="
+                                                                                                                                                                                openRescheduleModalFromDay(
+                                                                                                                                                                                '${escJs(appt.id)}',
+                                                                                                                                                                                '${safeName}',
+                                                                                                                                                                                '${safeSchedule}',
+                                                                                                                                                                                '${safeService}',
+                                                                                                                                                                                '${escJs(appt.rescheduleUrl || '#')}'
+                                                                                                                                                                                )
+                                                                                                                                                                                "
+                                                                                                                                                                                >
+                                                                                                                                                                                <i class="fa-solid fa-rotate-right"></i>
+                                                                                                                                                                                </button>
+                                                                                                                                                                                `
 : ''
 }
 
 ${
 canCancel
 ? `
-                                                                                                                                            <button
-                                                                                                                                            type="button"
-                                                                                                                                            class="ui-action-btn ui-action-delete"
-                                                                                                                                            aria-label="Cancel appointment"
-                                                                                                                                            data-tooltip="Cancel appointment"
-                                                                                                                                            data-tooltip-tone="cancel"
-                                                                                                                                            onclick="
-                                                                                                                                            cancelAppointmentFromModal(
-                                                                                                                                            '${escJs(appt.cancelUrl || '#')}',
-                                                                                                                                            '${safeName}',
-                                                                                                                                            '${safeSchedule}'
-                                                                                                                                            )
-                                                                                                                                            "
-                                                                                                                                            >
-                                                                                                                                            <i class="fa-solid fa-ban"></i>
-                                                                                                                                            </button>
-                                                                                                                                            `
+                                                                                                                                                                                <button
+                                                                                                                                                                                type="button"
+                                                                                                                                                                                class="ui-action-btn ui-action-delete"
+                                                                                                                                                                                aria-label="Cancel appointment"
+                                                                                                                                                                                data-tooltip="Cancel appointment"
+                                                                                                                                                                                data-tooltip-tone="cancel"
+                                                                                                                                                                                onclick="
+                                                                                                                                                                                cancelAppointmentFromModal(
+                                                                                                                                                                                '${escJs(appt.cancelUrl || '#')}',
+                                                                                                                                                                                '${safeName}',
+                                                                                                                                                                                '${safeSchedule}'
+                                                                                                                                                                                )
+                                                                                                                                                                                "
+                                                                                                                                                                                >
+                                                                                                                                                                                <i class="fa-solid fa-ban"></i>
+                                                                                                                                                                                </button>
+                                                                                                                                                                                `
 : ''
 }
 

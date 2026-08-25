@@ -134,9 +134,10 @@ $completedCalendarAppointments[$dateKey][] = [
 ];
 }
 
-$dashboardDisplayName = ucwords(
-strtolower(optional($patient)->name ?? (auth()->user()->name ?? 'Patient User')),
-);
+$dashboardDisplayName =
+optional($patient)->name
+?? auth()->user()->name
+?? 'Patient User';
 $dashboardPatientImage = optional($patient)->profile_image ?? null;
 $dashboardUserImage = auth()->user()->profile_image ?? null;
 
@@ -213,7 +214,7 @@ $birthdateDisplay = 'N/A';
                                 <span id="greetingText"></span>
                             </span>
                             <span class="greeting-line greeting-name-line">
-                                <span id="patientName"></span>
+                                <span id="patientName" data-patient-name></span>
                                 <i class="fa-solid fa-hand text-yellow-300 wave-hand"></i>
                             </span>
                         </h1>
@@ -692,7 +693,14 @@ $appointmentConfirmation = session('appointment_confirmation');
 
         if (!nameEl || !greetingEl || !iconEl) return;
 
-        nameEl.textContent = "{{ auth()->user()->name ?? 'Patient' }}";
+        const rawPatientName =
+            @json($patient -> name ?? auth() -> user() -> name ?? 'Patient');
+
+        nameEl.textContent =
+            window.formatPatientName?.(
+                rawPatientName
+            ) ||
+            rawPatientName;
 
         const h = new Date().getHours();
 
@@ -766,7 +774,7 @@ $appointmentConfirmation = session('appointment_confirmation');
     var NEXT_VISIT = @json($nextVisitText);
 
     var PROFILE_DATA = {
-        name: "{{ ucwords(strtolower($patient->name ?? 'Guest')) }}",
+        name: @json($patient->name ?? 'Guest'),
         roleLabel: "{{ $patient->faculty_code ? 'Faculty' : ($patient->student_no ? 'Student' : 'Patient') }}",
         facultyCode: "{{ $patient->faculty_code ?? '' }}",
         studentNo: "{{ $patient->student_no ?? '' }}",
@@ -775,7 +783,7 @@ $appointmentConfirmation = session('appointment_confirmation');
         gender: "{{ $gender ?? 'N/A' }}",
         contact: "{{ $patient->phone ?? 'N/A' }}",
         email: "{{ $patient->email ?? 'N/A' }}",
-        emergencyName: "{{ optional($patient->medicalHistory)->emergency_person ?? 'Not specified' }}",
+        emergencyName: "{{ optional($patient->medicalHistory)->empshaergency_person ?? 'Not specified' }}",
         emergencyNumber: "{{ optional($patient->medicalHistory)->emergency_number ?? 'N/A' }}",
         emergencyRelation: "{{ optional($patient->medicalHistory)->emergency_relation ?? '' }}",
         hasAlert: @json(

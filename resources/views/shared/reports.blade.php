@@ -1600,7 +1600,18 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 @section('scripts')
 @if ($isAdminView)
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', async function () {
+        try {
+            await window.loadChartJs();
+        } catch (error) {
+            console.error(
+                'Admin Reports: Unable to load Chart.js.',
+                error
+            );
+
+            return;
+        }
+
         const barLabels = @json($charts['bar']['labels'] ?? []);
         const barData = @json($charts['bar']['data'] ?? []);
         const pieLabels = @json($charts['pie']['labels'] ?? []);
@@ -3624,31 +3635,6 @@ $customReportTemplates = collect($customReportTemplates ?? []);
         }
     }
 
-    function waitForChartJs(maxTries = 30) {
-        return new Promise((resolve) => {
-            let tries = 0;
-
-            const check = () => {
-                if (window.Chart) {
-                    resolve(true);
-                    return;
-                }
-
-                tries += 1;
-
-                if (tries >= maxTries) {
-                    console.warn('Chart.js is not available on dentist report page.');
-                    resolve(false);
-                    return;
-                }
-
-                setTimeout(check, 100);
-            };
-
-            check();
-        });
-    }
-
     function initReportCharts() {
         if (!window.Chart) {
             showGadEmpty();
@@ -3684,7 +3670,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
         buildClinicOverviewChart();
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', async function () {
 
         initPrintableFormsCarousel();
 
@@ -3703,14 +3689,20 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             window.initGlobalVoiceInputs(document.getElementById('createReportModal'));
         }
 
-        waitForChartJs().then(chartReady => {
-            if (!chartReady) {
-                return;
-            }
+        try {
+            await window.loadChartJs();
 
             applyReportChartTheme();
             initReportCharts();
-        });
+        } catch (error) {
+            console.error(
+                'Dentist Reports: Unable to load Chart.js.',
+                error
+            );
+
+            showGadEmpty();
+            showWeeklyEmpty();
+        }
 
         const gadPeriodSelect =
             document.getElementById('gadPeriodSelect');
@@ -4004,7 +3996,6 @@ $customReportTemplates = collect($customReportTemplates ?? []);
         });
 
         syncReportQuantityState();
-        initPrintableFormsCarousel();
     });
 </script>
 @endif

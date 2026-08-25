@@ -448,7 +448,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                 <div class="global-info-profile-copy">
                     <span class="global-info-label">Patient</span>
 
-                    <strong id="approvePatientName" class="global-info-profile-name">
+                    <strong id="approvePatientName" class="global-info-profile-name" data-patient-name>
                         —
                     </strong>
                 </div>
@@ -554,7 +554,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                     <div class="global-info-profile-copy">
                         <span class="global-info-label">Patient</span>
 
-                        <strong id="rejectPatientName" class="global-info-profile-name">
+                        <strong id="rejectPatientName" class="global-info-profile-name" data-patient-name>
                             —
                         </strong>
                     </div>
@@ -1482,14 +1482,18 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
     }
 
     function getPatientDisplayName(name) {
-        const raw = String(name || '').trim();
+        const rawName =
+            String(
+                name ||
+                'Unknown Patient'
+            ).trim();
 
-        if (raw.includes(',')) {
-            const [lastName, firstPart] = raw.split(',').map(part => part.trim());
-            return `${firstPart} ${lastName}`.replace(/\s+/g, ' ').trim();
-        }
-
-        return raw;
+        return (
+            window.formatPatientName?.(
+                rawName
+            ) ||
+            rawName
+        );
     }
 
     function buildPatientAvatar(
@@ -1616,7 +1620,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                     ${avatarHtml}
 
                     <div class="global-record-identity">
-                        <div class="global-record-name">
+                        <div class="global-record-name" data-patient-name>
                             ${esc(displayName)}
                         </div>
 
@@ -1728,7 +1732,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                     ${avatarHtml}
 
                     <div class="global-record-identity">
-                        <div class="global-record-name">
+                        <div class="global-record-name" data-patient-name>
                             ${esc(displayName)}
                         </div>
 
@@ -1977,7 +1981,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                     ${avatarHtml}
 
                     <div class="docreq-mobile-person">
-                        <div class="mobile-patient-name">${esc(displayName)}</div>
+                        <div class="mobile-patient-name" data-patient-name>${esc(displayName)}</div>
                         <span class="docreq-id-pill mobile-sub-label">${identifier}</span>
                     </div>
                 </div>
