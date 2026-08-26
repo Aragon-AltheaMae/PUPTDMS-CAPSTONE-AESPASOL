@@ -334,8 +334,6 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                                         <thead>
                                             <tr>
                                                 <th>Permission</th>
-                                                <th>Slug</th>
-
                                                 <th class="table-cell-center">
                                                     Status
                                                 </th>
@@ -369,10 +367,6 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                                                         </strong>
                                                     </span>
 
-                                                </td>
-
-                                                <td>
-                                                    {{ $permission->slug }}
                                                 </td>
 
                                                 <td class="table-cell-center">
@@ -1156,6 +1150,27 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
         updateFABVisibility();
     }
 
+    function hasActiveRolePermissionModal() {
+        const modalIds = [
+            'newRoleModal',
+            'deleteRoleModal',
+            'resetConfirmModal',
+            'vaOverlay',
+            'patientPickerOverlay'
+        ];
+
+        return modalIds.some(id => {
+            const modal = document.getElementById(id);
+            if (!modal) return false;
+
+            const ariaHidden = modal.getAttribute('aria-hidden');
+            return ariaHidden === 'false' ||
+                modal.classList.contains('show') ||
+                modal.classList.contains('open') ||
+                !modal.hidden;
+        });
+    }
+
     function updateFABVisibility() {
         document.querySelectorAll('.floating-save-bar').forEach(b => b.classList.remove('show'));
 
@@ -1163,7 +1178,7 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
         const bar = document.getElementById('footer-bar-' + activeRoleId);
         if (!bar) return;
 
-        if (isModalActive) {
+        if (isModalActive && hasActiveRolePermissionModal()) {
             return;
         }
 

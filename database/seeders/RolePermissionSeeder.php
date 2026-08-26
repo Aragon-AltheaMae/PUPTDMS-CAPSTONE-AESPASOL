@@ -57,6 +57,8 @@ class RolePermissionSeeder extends Seeder
             'access_dentist_dashboard',
             'manage_patient_profiles',
             'manage_appointments',
+            'manage_walk_in_patients',
+            'manage_existing_records',
             'manage_clinic_schedule',
             'manage_document_requests',
             'manage_inventory',

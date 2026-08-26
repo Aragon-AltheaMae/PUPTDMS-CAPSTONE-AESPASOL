@@ -1,4 +1,5 @@
 @php
+    use App\Models\Role;
     use Illuminate\Support\Facades\Route;
     $sidebarRole = $role ?? (request()->is('admin*') ? 'admin' : (request()->is('dentist*') ? 'dentist' : 'patient'));
 
@@ -7,12 +8,9 @@
     $drawerDisplayName = $authUser?->name ?? ucwords(str_replace('_', ' ', $sidebarRole));
 
     $drawerDisplayRole =
-        $authUser?->role?->name ??
-        match ($sidebarRole) {
-            'admin' => 'Administrator',
-            'dentist' => 'Dentist',
-            default => ucwords(str_replace('_', ' ', $sidebarRole)),
-        };
+        session()->has('impersonated_role')
+            ? Role::displayNameFor(session('impersonated_role'))
+            : ($authUser?->display_role_name ?? Role::displayNameFor($sidebarRole));
 
     $drawerAvatarUrl = !empty($authUser?->profile_image)
         ? asset('storage/' . $authUser->profile_image)
@@ -209,14 +207,14 @@
                     ],
                     [
                         'route' => 'dentist.walk-in.index',
-                        'permission' => 'manage_appointments',
+                        'permission' => 'manage_walk_in_patients',
                         'active' => ['dentist.walk-in.*'],
                         'icon' => 'fa-person-walking',
                         'label' => 'Walk-in',
                     ],
                     [
                         'route' => 'dentist.existing-record.index',
-                        'permission' => 'manage_appointments',
+                        'permission' => 'manage_existing_records',
                         'active' => ['dentist.existing-record.*'],
                         'icon' => 'fa-folder-open',
                         'label' => 'Add Existing Record',

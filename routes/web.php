@@ -41,6 +41,7 @@ use App\Http\Controllers\Security\SessionManagementController;
 use App\Models\Patient;
 use App\Models\Role;
 use App\Services\StudentApiService;
+use App\Services\IdpHealthService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -101,7 +102,9 @@ Route::middleware(['web'])->group(function () {
 Route::get('/', fn() => redirect('/login'));
 
 // Patient Login
-Route::view('/login', 'auth.login')->name('login');
+Route::get('/login', function (IdpHealthService $idpHealthService) {
+    return view('auth.login', $idpHealthService->loginViewData());
+})->name('login');
 Route::get('/backup-login', [BackupLoginController::class, 'show'])->name('backup.login');
 
 Route::get('/dashboard', function () {
@@ -335,7 +338,7 @@ Route::prefix('admin')
         Route::post('/role-permissions/store-role', [RolePermissionController::class, 'storeRole'])
             ->name('admin.role_permissions.store_role');
 
-        Route::delete('/role-permissions/{id}/destroy', [RolePermissionController::class, 'destroyRole'])
+        Route::match(['post', 'delete'], '/role-permissions/{id}/destroy', [RolePermissionController::class, 'destroyRole'])
             ->name('admin.role_permissions.destroy_role');
 
         /*
@@ -344,6 +347,7 @@ Route::prefix('admin')
         |--------------------------------------------------------------------------
         */
         Route::get('/system-logs', [SystemLogController::class, 'index'])
+            ->middleware('permission:manage_audit_trail')
             ->name('admin.system_logs');
 
         Route::get('/session-management', [AdminSessionManagementController::class, 'index'])
@@ -356,15 +360,19 @@ Route::prefix('admin')
             ->name('admin.session_management.destroy_user_sessions');
 
         Route::get('/system-logs/fetch', [SystemLogController::class, 'fetchLatest'])
+            ->middleware('permission:manage_audit_trail')
             ->name('admin.system_logs.fetch');
 
         Route::get('/system-logs/check', [SystemLogController::class, 'checkLatest'])
+            ->middleware('permission:manage_audit_trail')
             ->name('admin.system_logs.check');
 
         Route::get('/system-logs/export', [SystemLogController::class, 'export'])
+            ->middleware('permission:manage_audit_trail')
             ->name('admin.system_logs.export');
 
         Route::post('/system-logs/archive', [SystemLogController::class, 'archive'])
+            ->middleware('permission:manage_audit_trail')
             ->name('admin.system_logs.archive');
 
         /*
@@ -1239,23 +1247,29 @@ Route::prefix('dentist')->middleware(['auth'])->group(function () {
 
     // Walk-in Patients
     Route::get('/walk-in', [WalkInController::class, 'index'])
+        ->middleware('permission:manage_walk_in_patients')
         ->name('dentist.walk-in.index');
 
     Route::get('/walk-in/search-patient', [WalkInController::class, 'searchPatient'])
+        ->middleware('permission:manage_walk_in_patients')
         ->name('dentist.walk-in.search-patient');
 
     Route::get(
         '/walk-in/patients/{patient}/booking-information',
         [WalkInController::class, 'patientBookingInformation']
-    )->name('dentist.walk-in.patient-booking-information');
+    )
+        ->middleware('permission:manage_walk_in_patients')
+        ->name('dentist.walk-in.patient-booking-information');
 
     Route::post('/walk-in/guest', [WalkInController::class, 'storeGuest'])
+        ->middleware('permission:manage_walk_in_patients')
         ->name('dentist.walk-in.guest.store');
     Route::post('/walk-in/start', [WalkInController::class, 'startWalkIn'])
+        ->middleware('permission:manage_walk_in_patients')
         ->name('dentist.walk-in.start');
 
     Route::get('/add-existing-record', [\App\Http\Controllers\Dentist\ExistingRecordController::class, 'index'])
-        ->middleware('permission:manage_appointments')
+        ->middleware('permission:manage_existing_records')
         ->name('dentist.existing-record.index');
 
     // Document Requests
@@ -1300,11 +1314,11 @@ Route::prefix('dentist')->middleware(['auth'])->group(function () {
 
     // Add Existing Appointment - Odontogram
     Route::get('/odontogram/patient/{patient}/existing-appointment', [OdontogramController::class, 'createExistingAppointment'])
-        ->middleware('permission:manage_appointments')
+        ->middleware('permission:manage_existing_records')
         ->name('dentist.odontogram.existing-appointment.create');
 
     Route::post('/odontogram/patient/{patient}/existing-appointment', [OdontogramController::class, 'storeExistingAppointmentIntake'])
-        ->middleware('permission:manage_appointments')
+        ->middleware('permission:manage_existing_records')
         ->name('dentist.odontogram.existing-appointment.intake.store');
 
     Route::patch(
@@ -1315,22 +1329,22 @@ Route::prefix('dentist')->middleware(['auth'])->group(function () {
         ]
     )
         ->middleware(
-            'permission:manage_appointments'
+            'permission:manage_existing_records'
         )
         ->name(
             'dentist.odontogram.existing-appointment.history.autosave'
         );
 
     Route::get('/odontogram/existing-appointment/slots', [OdontogramController::class, 'existingAppointmentSlotsForDate'])
-        ->middleware('permission:manage_appointments')
+        ->middleware('permission:manage_existing_records')
         ->name('dentist.odontogram.existing-appointment.slots');
 
     Route::get('/odontogram/patient/{patient}/existing-appointment/odontogram', [OdontogramController::class, 'showExistingAppointmentOdontogram'])
-        ->middleware('permission:manage_appointments')
+        ->middleware('permission:manage_existing_records')
         ->name('dentist.odontogram.existing-appointment.odontogram');
 
     Route::post('/odontogram/patient/{patient}/existing-appointment/save', [OdontogramController::class, 'storeExistingAppointment'])
-        ->middleware('permission:manage_appointments')
+        ->middleware('permission:manage_existing_records')
         ->name('dentist.odontogram.existing-appointment.store');
 
     // Inventory

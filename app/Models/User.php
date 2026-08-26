@@ -14,6 +14,7 @@ class User extends Authenticatable implements JWTSubject
     public const CLINICAL_PERMISSION_SLUGS = [
         'access_dentist_dashboard',
         'manage_appointments',
+        'manage_walk_in_patients',
         'manage_clinic_schedule',
         'manage_patient_profiles',
         'manage_document_requests',
@@ -206,5 +207,19 @@ class User extends Authenticatable implements JWTSubject
             $this->last_name . ' ' .
             ($this->suffix_name ?? '')
         );
+    }
+
+    public function resolveRoleDisplayName(?string $fallbackRoleSlug = null): string
+    {
+        if ($this->role) {
+            return $this->role->display_name;
+        }
+
+        return Role::displayNameFor($fallbackRoleSlug);
+    }
+
+    public function getDisplayRoleNameAttribute(): string
+    {
+        return $this->resolveRoleDisplayName();
     }
 }
