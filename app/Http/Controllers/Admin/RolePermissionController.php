@@ -5,11 +5,58 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Permission;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Helpers\AuditLogger;
 
 class RolePermissionController extends Controller
 {
+    private const CORE_ROLE_SLUGS = ['admin', 'dentist', 'patient'];
+
+    private const REQUIRED_PERMISSIONS = [
+        ['name' => 'Access Super Admin Dashboard', 'slug' => 'access_super_admin_dashboard', 'module' => 'General Access'],
+        ['name' => 'Access Dentist Dashboard', 'slug' => 'access_dentist_dashboard', 'module' => 'General Access'],
+        ['name' => 'Access Patient Dashboard', 'slug' => 'access_patient_dashboard', 'module' => 'General Access'],
+        ['name' => 'Receive Notifications', 'slug' => 'receive_notifications', 'module' => 'General Access'],
+        ['name' => 'Manage System Settings', 'slug' => 'manage_system_settings', 'module' => 'System Settings'],
+        ['name' => 'Manage Audit Trail', 'slug' => 'manage_audit_trail', 'module' => 'System Settings'],
+        ['name' => 'Manage User Accounts', 'slug' => 'manage_user_accounts', 'module' => 'User Management'],
+        ['name' => 'Manage User Roles', 'slug' => 'manage_user_roles', 'module' => 'User Management'],
+        ['name' => 'Manage Dentist Accounts', 'slug' => 'manage_dentist_accounts', 'module' => 'User Management'],
+        ['name' => 'Manage Super Admin Accounts', 'slug' => 'manage_super_admin_accounts', 'module' => 'User Management'],
+        ['name' => 'View Dentist Transitions', 'slug' => 'view_dentist_transitions', 'module' => 'Dentist Continuity'],
+        ['name' => 'Create Dentist Transitions', 'slug' => 'create_dentist_transitions', 'module' => 'Dentist Continuity'],
+        ['name' => 'Update Dentist Transitions', 'slug' => 'update_dentist_transitions', 'module' => 'Dentist Continuity'],
+        ['name' => 'Assign Dentist Successors', 'slug' => 'assign_dentist_successors', 'module' => 'Dentist Continuity'],
+        ['name' => 'Finalize Dentist Transitions', 'slug' => 'finalize_dentist_transitions', 'module' => 'Dentist Continuity'],
+        ['name' => 'Cancel Dentist Transitions', 'slug' => 'cancel_dentist_transitions', 'module' => 'Dentist Continuity'],
+        ['name' => 'Extend Dentist Access', 'slug' => 'extend_dentist_access', 'module' => 'Dentist Continuity'],
+        ['name' => 'View Dentist Transition Audit Logs', 'slug' => 'view_dentist_transition_audit_logs', 'module' => 'Dentist Continuity'],
+        ['name' => 'Manage Document Templates', 'slug' => 'manage_document_templates', 'module' => 'Document Templates'],
+        ['name' => 'Manage Reports', 'slug' => 'manage_reports', 'module' => 'Reports'],
+        ['name' => 'Manage Inventory', 'slug' => 'manage_inventory', 'module' => 'Inventory'],
+        ['name' => 'Set Academic Year', 'slug' => 'set_academic_year', 'module' => 'System Settings'],
+        ['name' => 'Set Archive Records', 'slug' => 'set_archive_records', 'module' => 'System Settings'],
+        ['name' => 'Set Report Periods', 'slug' => 'set_report_periods', 'module' => 'System Settings'],
+        ['name' => 'Set Required Fields', 'slug' => 'set_required_fields', 'module' => 'System Settings'],
+        ['name' => 'Set Appointment Limit', 'slug' => 'set_appointment_limit', 'module' => 'System Settings'],
+        ['name' => 'Set Notification Rules', 'slug' => 'set_notification_rules', 'module' => 'System Settings'],
+        ['name' => 'Set Export File Type', 'slug' => 'set_export_file_type', 'module' => 'System Settings'],
+        ['name' => 'Manage Dental Records', 'slug' => 'manage_dental_records', 'module' => 'Dental Records'],
+        ['name' => 'Manage Appointments', 'slug' => 'manage_appointments', 'module' => 'Appointments'],
+        ['name' => 'Manage Walk-in Patients', 'slug' => 'manage_walk_in_patients', 'module' => 'Appointments'],
+        ['name' => 'Add Existing Record', 'slug' => 'manage_existing_records', 'module' => 'Appointments'],
+        ['name' => 'Manage Clinic Schedule', 'slug' => 'manage_clinic_schedule', 'module' => 'Appointments'],
+        ['name' => 'Manage Patient Profiles', 'slug' => 'manage_patient_profiles', 'module' => 'Patients'],
+        ['name' => 'Manage Document Requests', 'slug' => 'manage_document_requests', 'module' => 'Document Requests'],
+        ['name' => 'Book Appointments', 'slug' => 'book_appointments', 'module' => 'Appointments'],
+        ['name' => 'View Own Appointments', 'slug' => 'view_own_appointments', 'module' => 'Appointments'],
+        ['name' => 'View Own Profile', 'slug' => 'view_own_profile', 'module' => 'Patients'],
+        ['name' => 'View Own Records', 'slug' => 'view_own_records', 'module' => 'Dental Records'],
+        ['name' => 'Request Documents', 'slug' => 'request_documents', 'module' => 'Document Requests'],
+    ];
+
     private const DEFAULT_ROLE_PERMISSIONS = [
         'admin' => [
             'access_super_admin_dashboard',
@@ -48,6 +95,8 @@ class RolePermissionController extends Controller
             'access_dentist_dashboard',
             'manage_patient_profiles',
             'manage_appointments',
+            'manage_walk_in_patients',
+            'manage_existing_records',
             'manage_clinic_schedule',
             'manage_document_requests',
             'manage_inventory',
@@ -66,6 +115,7 @@ class RolePermissionController extends Controller
 
     public function index(Request $request)
     {
+        $this->ensureRequiredPermissionsExist();
         $this->seedDefaultsIfEmpty();
 
         $roles = Role::with('permissions')->get();
@@ -88,13 +138,21 @@ class RolePermissionController extends Controller
 
     private function seedDefaultsIfEmpty(): void
     {
-        $coreRoles = ['admin', 'dentist', 'patient'];
-
-        foreach ($coreRoles as $slug) {
+        foreach (self::CORE_ROLE_SLUGS as $slug) {
             $role = Role::where('slug', $slug)->first();
             if ($role && $role->permissions()->count() === 0) {
                 $this->applyDefaults($role, $slug);
             }
+        }
+    }
+
+    private function ensureRequiredPermissionsExist(): void
+    {
+        foreach (self::REQUIRED_PERMISSIONS as $permission) {
+            Permission::updateOrCreate(
+                ['slug' => $permission['slug']],
+                $permission
+            );
         }
     }
 
@@ -174,6 +232,12 @@ class RolePermissionController extends Controller
             $role->permissions()->sync($permissionIds);
         }
 
+        Role::query()
+            ->whereNotIn('slug', self::CORE_ROLE_SLUGS)
+            ->each(function (Role $role): void {
+                $role->permissions()->sync([]);
+            });
+
         AuditLogger::log
             ('update', 
             'roles_permissions', 
@@ -211,6 +275,8 @@ class RolePermissionController extends Controller
             'slug' => $request->slug,
         ]);
 
+        $role->permissions()->sync([]);
+
         $message = "Role \"{$role->name}\" created successfully. You can now assign permissions and use it in User Management.";
 
         AuditLogger::log(
@@ -240,57 +306,82 @@ class RolePermissionController extends Controller
 
     public function destroyRole($id)
     {
-        $role = Role::findOrFail($id);
+        try {
+            $role = Role::findOrFail($id);
 
-        if (
-            in_array(strtolower($role->slug), ['super_admin', 'super-admin', 'superadmin']) ||
-            str_contains(strtolower($role->name), 'super')
-        ) {
-            return redirect()->route('admin.role_permissions')
-                ->with('error', 'Cannot delete the Super Admin role.');
-        }
+            if (
+                in_array(strtolower($role->slug), ['super_admin', 'super-admin', 'superadmin']) ||
+                str_contains(strtolower($role->name), 'super')
+            ) {
+                $message = 'Cannot delete the Super Admin role.';
 
-        $fallbackRole = $this->resolveFallbackRole($role);
-        $affectedUsers = 0;
+                if (request()->ajax() || request()->wantsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => $message,
+                    ], 422);
+                }
 
-        DB::transaction(function () use ($role, $fallbackRole, &$affectedUsers) {
-            $affectedUsers = User::where('role_id', $role->id)->count();
+                return redirect()->route('admin.role_permissions')
+                    ->with('error', $message);
+            }
 
-            if ($affectedUsers > 0) {
-                User::where('role_id', $role->id)->update([
-                    'role_id' => $fallbackRole->id,
+            $fallbackRole = $this->resolveFallbackRole($role);
+            $affectedUsers = 0;
+
+            DB::transaction(function () use ($role, $fallbackRole, &$affectedUsers) {
+                $affectedUsers = User::where('role_id', $role->id)->count();
+
+                if ($affectedUsers > 0) {
+                    User::where('role_id', $role->id)->update([
+                        'role_id' => $fallbackRole->id,
+                    ]);
+                }
+
+                $role->permissions()->detach();
+                $role->delete();
+            });
+
+            AuditLogger::log(
+                'delete',
+                'roles_permissions',
+                "Deleted role ID {$role->id} ({$role->name}) and reassigned {$affectedUsers} user(s) to {$fallbackRole->display_name}"
+            );
+
+            $message = $affectedUsers > 0
+                ? "Role '{$role->name}' has been deleted. {$affectedUsers} user(s) were reassigned to {$fallbackRole->display_name}."
+                : "Role '{$role->name}' has been deleted.";
+
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                    'fallback_role' => [
+                        'id' => $fallbackRole->id,
+                        'name' => $fallbackRole->display_name,
+                        'slug' => $fallbackRole->slug,
+                    ],
+                    'affected_users' => $affectedUsers,
                 ]);
             }
 
-            $role->permissions()->detach();
-            $role->delete();
-        });
+            return redirect()->route('admin.role_permissions')
+                ->with('success', $message);
+        } catch (\Throwable $e) {
+            $message = app()->hasDebugModeEnabled() && config('app.debug')
+                ? $e->getMessage()
+                : 'Could not delete role.';
 
-        AuditLogger::log(
-            'delete',
-            'roles_permissions',
-            "Deleted role ID {$role->id} ({$role->name}) and reassigned {$affectedUsers} user(s) to {$fallbackRole->display_name}"
-        );
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $message,
+                ], 500);
+            }
 
-        $message = $affectedUsers > 0
-            ? "Role '{$role->name}' has been deleted. {$affectedUsers} user(s) were reassigned to {$fallbackRole->display_name}."
-            : "Role '{$role->name}' has been deleted.";
-
-        if (request()->ajax() || request()->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-                'fallback_role' => [
-                    'id' => $fallbackRole->id,
-                    'name' => $fallbackRole->display_name,
-                    'slug' => $fallbackRole->slug,
-                ],
-                'affected_users' => $affectedUsers,
-            ]);
+            return redirect()->route('admin.role_permissions')
+                ->with('error', $message);
         }
-
-        return redirect()->route('admin.role_permissions')
-            ->with('success', $message);
     }
 
     private function resolveFallbackRole(Role $deletedRole): Role

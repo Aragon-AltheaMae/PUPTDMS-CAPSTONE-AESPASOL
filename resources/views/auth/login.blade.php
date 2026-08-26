@@ -63,10 +63,12 @@
         <i class="fa-solid fa-arrow-right-to-bracket"></i>
         Login with SSO
       </a>
+      @unless ($idpAvailable ?? true)
       <a href="{{ route('backup.login') }}" class="auth-landing-mobile-local">
         <i class="fa-solid fa-key"></i>
         Login Locally
       </a>
+      @endunless
     </div>
   </div>
 
@@ -95,6 +97,7 @@
               <i class="fa-solid fa-arrow-right auth-landing-action-arrow"></i>
             </a>
 
+            @unless ($idpAvailable ?? true)
             <a href="{{ route('backup.login') }}" class="auth-landing-secondary-login">
               <span class="auth-landing-action-icon">
                 <i class="fa-solid fa-key"></i>
@@ -104,7 +107,14 @@
                 Login Locally
               </span>
             </a>
+            @endunless
           </div>
+
+          @unless ($idpAvailable ?? true)
+          <p class="backup-form-copy">
+            {{ $idpStatusMessage ?? 'Primary SSO is temporarily unavailable.' }} Admins may use local fallback login while the issue is ongoing.
+          </p>
+          @endunless
 
           <div class="auth-landing-trust-row">
             <div>

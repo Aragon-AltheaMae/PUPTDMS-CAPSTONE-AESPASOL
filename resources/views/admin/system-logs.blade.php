@@ -267,6 +267,7 @@
                                     @php
                                         $role = strtolower($log->actor_role ?? 'other');
                                         $action = strtolower($log->action ?? '');
+                                        $moduleName = strtolower($log->module ?? '');
                                         $actionClass = match (true) {
                                             str_contains($action, 'error') ||
                                                 str_contains($action, 'failed') ||
@@ -304,12 +305,16 @@
                                         $actionStatusClass = match ($actionClass) {
                                             'login' => 's-active',
                                             'logout' => 's-ended',
-                                            'create' => 's-upcoming',
+                                            'create' => 's-neutral',
                                             'update' => 's-rescheduled',
                                             'delete' => 's-cancelled',
                                             'error' => 's-failed',
                                             default => 's-neutral',
                                         };
+                                        $actionLabel = ($moduleName === 'inventory' &&
+                                            in_array($actionClass, ['create', 'delete'], true))
+                                            ? ucfirst($actionClass)
+                                            : ucwords(str_replace('_', ' ', $log->action));
                                     @endphp
                                     <tr data-role="{{ $role }}" data-action="{{ $actionClass }}">
                                         <td><span class="sl-id">#{{ str_pad($log->id, 3, '0', STR_PAD_LEFT) }}</span>
@@ -343,7 +348,7 @@
                                                     class="fa-solid {{ $actionIcon }}
         {{ $actionClass === 'error' ? 'sl-action-alert' : '' }}"></i>
 
-                                                {{ ucwords(str_replace('_', ' ', $log->action)) }}
+                                                {{ $actionLabel }}
                                             </span>
                                             @if ($log->is_archived)
                                                 <span class="status-pill s-archived"
@@ -378,6 +383,7 @@
                             @php
                                 $role = strtolower($log->actor_role ?? 'other');
                                 $action = strtolower($log->action ?? '');
+                                $moduleName = strtolower($log->module ?? '');
                                 $actionClass = match (true) {
                                     str_contains($action, 'error') ||
                                         str_contains($action, 'failed') ||
@@ -415,12 +421,16 @@
                                 $actionStatusClass = match ($actionClass) {
                                     'login' => 's-active',
                                     'logout' => 's-ended',
-                                    'create' => 's-upcoming',
+                                    'create' => 's-neutral',
                                     'update' => 's-rescheduled',
                                     'delete' => 's-cancelled',
                                     'error' => 's-failed',
                                     default => 's-neutral',
                                 };
+                                $actionLabel = ($moduleName === 'inventory' &&
+                                    in_array($actionClass, ['create', 'delete'], true))
+                                    ? ucfirst($actionClass)
+                                    : ucwords(str_replace('_', ' ', $log->action));
                             @endphp
                             <article class="table-record-card" data-role="{{ $role }}"
                                 data-action="{{ $actionClass }}">
@@ -441,7 +451,7 @@
                         {{ $actionClass === 'error' ? 'sl-action-alert' : '' }}">
                                             </i>
 
-                                            {{ ucwords(str_replace('_', ' ', $log->action)) }}
+                                            {{ $actionLabel }}
                                         </span>
                                     </div>
 
@@ -3022,19 +3032,23 @@
                         default: 's-neutral'
                     };
 
-                    var actionStatusClass =
-                        actionStatusClasses[actionClass] ||
-                        's-neutral';
+                    var isInventoryCrudLabel = String(log.module || '').toLowerCase() === 'inventory' &&
+                        ['create', 'delete'].includes(actionClass);
+                    var actionStatusClass = isInventoryCrudLabel ?
+                        's-neutral' :
+                        (actionStatusClasses[actionClass] || 's-neutral');
 
                     var actionIconHtml = '<i class="fa-solid ' + actionIcon + (actionClass === 'error' ?
                         ' sl-action-alert' : '') + '"></i>';
                     var roleIcon = roleIcons[role] || 'fa-circle-user';
                     var letter = escapeSlHtml((log.actor_name || role).charAt(0).toUpperCase());
                     var idPadded = '#' + String(log.id || '').padStart(3, '0');
-                    var actionLabel = escapeSlHtml((log.action || '').replace(/_/g, ' ').replace(/\b\w/g,
-                        function(c) {
-                            return c.toUpperCase();
-                        }));
+                    var actionLabel = isInventoryCrudLabel ?
+                        escapeSlHtml(actionClass.charAt(0).toUpperCase() + actionClass.slice(1)) :
+                        escapeSlHtml((log.action || '').replace(/_/g, ' ').replace(/\b\w/g,
+                            function(c) {
+                                return c.toUpperCase();
+                            }));
                     var moduleLabel = escapeSlHtml((log.module || '').replace(/_/g, ' ').replace(/\b\w/g,
                         function(c) {
                             return c.toUpperCase();

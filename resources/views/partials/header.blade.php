@@ -1,4 +1,6 @@
 @php
+    use App\Models\Role;
+
     $authUser = auth()->user();
 
     $role = $role ?? (optional(optional($authUser)->role)->slug ?? (session('role') ?? 'patient'));
@@ -162,16 +164,9 @@
         }
     } else {
         $displayName = $authUser->name ?? 'User';
-
-        if ($role === 'super_admin') {
-            $displayRole = 'Administrator';
-        } elseif ($role === 'admin') {
-            $displayRole = 'Administrator';
-        } elseif ($role === 'dentist') {
-            $displayRole = 'Dentist';
-        } else {
-            $displayRole = ucwords(str_replace('_', ' ', $role));
-        }
+        $displayRole = session()->has('impersonated_role')
+            ? Role::displayNameFor(session('impersonated_role'))
+            : ($authUser?->display_role_name ?? Role::displayNameFor($role));
 
         if (!empty($authUser->profile_image)) {
             $avatarUrl = asset('storage/' . $authUser->profile_image);
