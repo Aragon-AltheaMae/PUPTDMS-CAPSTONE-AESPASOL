@@ -4,7 +4,7 @@
 .asw-widget *,
 .asw-menu,
 .asw-menu * {
-    font-family: 'Inter', sans-serif !important;
+    font-family: 'Inter Variable', 'Inter', sans-serif !important;
     box-sizing: border-box !important;
 }
 

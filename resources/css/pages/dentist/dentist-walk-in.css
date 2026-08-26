@@ -421,7 +421,6 @@ html body #mainContent #patientAccountSection .account-tab {
     color: #7a6f68 !important;
     font-size: 0.78rem !important;
     font-weight: 900 !important;
-    font-family: 'Inter', sans-serif !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -468,7 +467,6 @@ html body #mainContent #patientAccountSection .patient-result {
     transition: all 0.18s ease !important;
     box-shadow: none !important;
     color: inherit !important;
-    font-family: 'Inter', sans-serif !important;
 }
 
 html body #mainContent #patientAccountSection .patient-result:hover {
