@@ -774,7 +774,7 @@ $appointmentConfirmation = session('appointment_confirmation');
     var NEXT_VISIT = @json($nextVisitText);
 
     var PROFILE_DATA = {
-        name: @json($patient->name ?? 'Guest'),
+        name: @json($patient -> name ?? 'Guest'),
         roleLabel: "{{ $patient->faculty_code ? 'Faculty' : ($patient->student_no ? 'Student' : 'Patient') }}",
         facultyCode: "{{ $patient->faculty_code ?? '' }}",
         studentNo: "{{ $patient->student_no ?? '' }}",
@@ -783,9 +783,9 @@ $appointmentConfirmation = session('appointment_confirmation');
         gender: "{{ $gender ?? 'N/A' }}",
         contact: "{{ $patient->phone ?? 'N/A' }}",
         email: "{{ $patient->email ?? 'N/A' }}",
-        emergencyName: "{{ optional($patient->medicalHistory)->empshaergency_person ?? 'Not specified' }}",
-        emergencyNumber: "{{ optional($patient->medicalHistory)->emergency_number ?? 'N/A' }}",
-        emergencyRelation: "{{ optional($patient->medicalHistory)->emergency_relation ?? '' }}",
+        emergencyName: "{{ optional($patient->medicalHistory)->emergency_person ?? 'Not specified' }}",
+        emergencyNumber: @json(optional($patient -> medicalHistory)-> emergency_number ?? 'N/A'),
+        emergencyRelation: @json(optional($patient -> medicalHistory) -> emergency_relation ?? ''),
         hasAlert: @json(
             (isset($patient -> medicalHistory -> diseaseAnswers) && $patient -> medicalHistory -> diseaseAnswers -> count() > 0) ||
             (isset($patient -> medicalHistoryAnswers) &&

@@ -1337,14 +1337,6 @@ body:has(#filterModal.closing) .ai-help-popover {
         font-size: 18px !important;
     }
 
-    #filterModal .filter-drawer-close {
-        width: 36px !important;
-        min-width: 36px !important;
-        height: 36px !important;
-
-        border-radius: 11px !important;
-    }
-
     #filterModal .filter-drawer-body {
         flex: 1 1 auto !important;
         min-height: 0 !important;

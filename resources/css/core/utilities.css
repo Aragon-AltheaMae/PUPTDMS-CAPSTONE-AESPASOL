@@ -502,16 +502,16 @@
 }
 
 .ui-btn-warning {
-    background: var(--status-pending-bg);
-    border-color: var(--status-pending-border);
-    color: var(--status-pending-text);
+    background: var(--amber-600);
+    border-color: var(--amber-600);
+    color: var(--color-white);
+    box-shadow: 0 8px 18px var(--alpha-amber-600-22);
 }
 
-.ui-btn-warning:hover,
-.ui-btn-warning:focus-visible {
-    background: var(--status-pending-solid);
-    border-color: var(--status-pending-solid);
-    color: var(--text-on-brand);
+.ui-btn-warning:hover {
+    background: var(--amber-700);
+    border-color: var(--amber-700);
+    color: var(--color-white);
     transform: translateY(-1px);
 }
 

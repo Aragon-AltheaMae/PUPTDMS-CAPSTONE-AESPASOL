@@ -34,9 +34,9 @@
 }
 
 .cal-pill-maroon {
-    background: var(--calendar-appointment-soft) !important;
-    color: var(--calendar-appointment-text) !important;
-    border-color: var(--calendar-appointment-border) !important;
+    background: var(--crimson-light) !important;
+    color: var(--crimson) !important;
+    border-color: var(--crimson-mid) !important;
 }
 
 .cal-pill-yellow {
@@ -2027,7 +2027,7 @@
 }
 
 .slot-availability-good {
-    color: var(--calendar-completed-text);
+    color: var(--green-400);
 }
 
 .slot-empty-message {

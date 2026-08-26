@@ -648,7 +648,7 @@ $existingAppointmentMode
 
             <button type="button" id="confirmResetTreatmentBtn" class="ui-btn ui-btn-danger">
                 <i class="fa-solid fa-eraser"></i>
-                <span>Yes, Reset</span>
+                <span>Reset Treatment</span>
             </button>
         </div>
     </div>
@@ -696,12 +696,12 @@ $existingAppointmentMode
         <div class="modal-ft">
             <button type="button" id="dismissCancelProcedureBtn" class="ui-btn ui-btn-secondary">
                 <i class="fa-solid fa-arrow-left"></i>
-                <span>No, Stay</span>
+                <span>Continue Procedure</span>
             </button>
 
             <button type="button" id="confirmCancelProcedureBtn" class="ui-btn ui-btn-danger">
                 <i class="fa-solid fa-ban"></i>
-                <span>Yes, Cancel</span>
+                <span>Cancel Procedure</span>
             </button>
         </div>
     </div>
@@ -747,12 +747,12 @@ $existingAppointmentMode
         <div id="finishProcedureConfirmActions" class="modal-ft hidden">
             <button type="button" id="dismissFinishProcedureBtn" class="ui-btn ui-btn-secondary">
                 <i class="fa-solid fa-arrow-left"></i>
-                <span>No, Review</span>
+                <span>Back to Review</span>
             </button>
 
-            <button type="button" id="confirmFinishProcedureBtn" class="ui-btn ui-btn-success">
+            <button type="button" id="confirmFinishProcedureBtn" class="ui-btn ui-btn-warning">
                 <i class="fa-solid fa-check"></i>
-                <span>Yes, Finish Procedure</span>
+                <span>Finish Procedure</span>
             </button>
         </div>
 
@@ -764,8 +764,6 @@ $existingAppointmentMode
         </div>
     </div>
 </div>
-
-
 @endsection
 
 @section('scripts')
@@ -1439,7 +1437,16 @@ $existingAppointmentMode
             confirmation = false,
         }) {
             finishProcedureModalTitle.textContent = title;
-            finishProcedureModalMessage.textContent = message;
+            finishProcedureModalMessage.textContent =
+                confirmation
+                    ? 'Confirm before completing this dental procedure.'
+                    : (
+                        redirectUrl
+                            ? 'The procedure was completed successfully.'
+                            : title === 'Treatment Required'
+                                ? 'A treatment entry is required before this procedure can be completed.'
+                                : message
+                    );
             finishProcedureModalIcon.className = `fa-solid ${icon}`;
             finishProcedureModalRedirectUrl = redirectUrl;
 
@@ -1474,9 +1481,16 @@ $existingAppointmentMode
                     : (redirectUrl ? 'modal-theme-success' : 'modal-theme-danger')
             );
 
-            finishProcedureModalAlertTitle.textContent = confirmation
-                ? 'Confirm procedure completion'
-                : (redirectUrl ? 'Procedure saved successfully' : 'Action required');
+            finishProcedureModalAlertTitle.textContent =
+                confirmation
+                    ? 'This action will complete the appointment'
+                    : (
+                        redirectUrl
+                            ? 'Appointment completed'
+                            : title === 'Treatment Required'
+                                ? 'Add a treatment first'
+                                : 'Action required'
+                    );
 
             finishProcedureModalAlertMessage.textContent = message;
 
@@ -2955,9 +2969,10 @@ $existingAppointmentMode
             ) {
                 openFinishProcedureModal({
                     title: 'Treatment Required',
-                    message: 'Please apply at least one treatment to the tooth chart before finishing the procedure.',
+                    message:
+                        'Select a tooth surface and apply at least one treatment before completing this procedure.',
                     icon: 'fa-tooth',
-                    buttonText: 'Review Procedure',
+                    buttonText: 'Back to Odontogram',
                 });
                 return;
             }

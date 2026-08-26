@@ -716,11 +716,40 @@ isset($scheduleRules)
 <script>
     let apptActivityChartInstance = null;
 
-    function initAppointmentActivityChart() {
-        const canvas = document.getElementById('apptActivityChart');
-        if (!canvas || typeof Chart === 'undefined') return;
+    async function initAppointmentActivityChart() {
+        const canvas =
+            document.getElementById(
+                'apptActivityChart'
+            );
 
-        const dataRows = Array.isArray(window.apptActivityChartData) ? window.apptActivityChartData : [];
+        if (!canvas) {
+            return;
+        }
+
+        let Chart;
+
+        try {
+            Chart =
+                await window.loadChartJs?.();
+        } catch (error) {
+            console.error(
+                'Unable to load appointment activity chart.',
+                error
+            );
+
+            return;
+        }
+
+        if (!Chart) {
+            return;
+        }
+
+        const dataRows =
+            Array.isArray(
+                window.apptActivityChartData
+            )
+                ? window.apptActivityChartData
+                : [];
         const labels = dataRows.map(row => row.label || '');
         const completed = dataRows.map(row => Number(row.completed || 0));
         const cancelled = dataRows.map(row => Number(row.cancelled || 0));
@@ -969,10 +998,13 @@ isset($scheduleRules)
         }, 310);
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        initApptAccordions();
-        initAppointmentActivityChart();
-    });
+    document.addEventListener(
+        'DOMContentLoaded',
+        function () {
+            initApptAccordions();
+            initAppointmentActivityChart();
+        }
+    );
 
     let viewOdontogramData = [];
 

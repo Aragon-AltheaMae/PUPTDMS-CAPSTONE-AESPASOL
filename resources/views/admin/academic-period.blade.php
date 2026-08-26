@@ -1293,7 +1293,7 @@ $activePeriodPayload = $activePeriod
                 </div>
             </div>
 
-            <button type="button" class="modal-x" data-close-modal="setActiveModal"
+            <button type="button" class="modal-x" data-modal-close="setActiveModal"
                 aria-label="Close confirmation modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -1301,12 +1301,13 @@ $activePeriodPayload = $activePeriod
 
         <div class="modal-bd">
             <div class="global-confirm-alert">
-                <i class="fa-solid fa-triangle-exclamation"></i>
+                <i class="fa-solid fa-circle-check"></i>
 
                 <div>
                     <p>
                         Set
-                        <strong id="setActivePeriodName"></strong>
+                        <strong id="setActivePeriodName" class="global-confirm-value">
+                        </strong>
                         as the active academic period?
                     </p>
 
@@ -1318,7 +1319,7 @@ $activePeriodPayload = $activePeriod
         </div>
 
         <div class="modal-ft">
-            <button type="button" class="ui-btn ui-btn-secondary" data-close-modal="setActiveModal">
+            <button type="button" class="ui-btn ui-btn-secondary" data-modal-close="setActiveModal">
                 Cancel
             </button>
 
@@ -1357,7 +1358,7 @@ $activePeriodPayload = $activePeriod
                 </div>
             </div>
 
-            <button type="button" class="modal-x" data-close-modal="syncFlssModal" aria-label="Close sync modal">
+            <button type="button" class="modal-x" data-modal-close="syncFlssModal" aria-label="Close sync modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -1372,25 +1373,19 @@ $activePeriodPayload = $activePeriod
                     </p>
 
                     <span>
-                        This will fetch the current academic year and semester
-                        from the external FLSS source.
+                        The current academic year and semester will be fetched
+                        from the FLSS source and applied to the system.
                     </span>
                 </div>
             </div>
-
-            <p class="modal-helper-text">
-                <i class="fa-solid fa-shield-halved"></i>
-                Existing records will only be updated based on the FLSS response.
-            </p>
         </div>
 
         <div class="modal-ft">
-            <button type="button" class="ui-btn ui-btn-secondary" data-close-modal="syncFlssModal">
+            <button type="button" class="ui-btn ui-btn-secondary" data-modal-close="syncFlssModal">
                 Cancel
             </button>
 
             <button type="submit" id="syncFlssSubmitBtn" class="ui-btn ui-btn-primary">
-
                 <i class="fa-solid fa-rotate"></i>
                 <span>Sync Now</span>
             </button>
@@ -2734,28 +2729,20 @@ $activePeriodPayload = $activePeriod
                     'periods',
 
                 onPageChange:
-                    loadAcademicPeriodPage,
+                    page =>
+                        refreshAcademicPeriods(
+                            page
+                        ),
             });
         }
 
-        async function loadAcademicPeriodPage(
-            page = 1
+        function buildAcademicPeriodUrl(
+            page = null
         ) {
-            if (academicPageLoading) {
-                return;
-            }
-
-            academicPageLoading = true;
-
             const url =
                 new URL(
                     window.location.href
                 );
-
-            url.searchParams.set(
-                'page',
-                String(page)
-            );
 
             const searchValue =
                 searchInput?.value
@@ -2766,6 +2753,13 @@ $activePeriodPayload = $activePeriod
 
             const statusValue =
                 statusFilter?.value || '';
+
+            if (page !== null) {
+                url.searchParams.set(
+                    'page',
+                    String(page)
+                );
+            }
 
             if (searchValue) {
                 url.searchParams.set(
@@ -2799,6 +2793,124 @@ $activePeriodPayload = $activePeriod
                     'status'
                 );
             }
+
+            return url;
+        }
+
+
+        function applyAcademicPeriodResponse(
+            parsed
+        ) {
+            const newTableBody =
+                parsed.getElementById(
+                    'academicTableBody'
+                );
+
+            const newRecordGrid =
+                parsed.querySelector(
+                    '#academicGridView ' +
+                    '.table-record-grid'
+                );
+
+            const newPagebar =
+                parsed.getElementById(
+                    'academicPeriodPagebar'
+                );
+
+            const newEntryBadge =
+                parsed.getElementById(
+                    'entryBadge'
+                );
+
+            if (
+                !newTableBody ||
+                !newRecordGrid ||
+                !newPagebar
+            ) {
+                throw new Error(
+                    'Invalid academic period response.'
+                );
+            }
+
+            tableBody.innerHTML =
+                newTableBody.innerHTML;
+
+            const currentRecordGrid =
+                gridView?.querySelector(
+                    '.table-record-grid'
+                );
+
+            if (currentRecordGrid) {
+                currentRecordGrid.innerHTML =
+                    newRecordGrid.innerHTML;
+            }
+
+            [
+                'currentPage',
+                'lastPage',
+                'total',
+                'from',
+                'to',
+            ].forEach(key => {
+                academicPagebar.dataset[key] =
+                    newPagebar.dataset[key] || '';
+            });
+
+            const entryBadge =
+                document.getElementById(
+                    'entryBadge'
+                );
+
+            if (
+                entryBadge &&
+                newEntryBadge
+            ) {
+                entryBadge.textContent =
+                    newEntryBadge.textContent;
+            }
+        }
+
+
+        function restoreAcademicViewMode() {
+            const activeMode =
+                window.getGlobalViewMode?.(
+                    'academicViewToggle'
+                ) || 'list';
+
+            window.setGlobalViewMode?.(
+                'academicViewToggle',
+                activeMode,
+                {
+                    persist: false,
+                }
+            );
+        }
+
+
+        async function refreshAcademicPeriods(
+            page = null,
+            options = {}
+        ) {
+            if (academicPageLoading) {
+                return false;
+            }
+
+            const {
+                updateUrl = true,
+                showErrorToast = true,
+            } = options;
+
+            academicPageLoading = true;
+
+            const requestedPage =
+                page ??
+                getAcademicPaginationMeta()
+                    .currentPage;
+
+            const url =
+                buildAcademicPeriodUrl(
+                    requestedPage
+                );
 
             try {
                 academicPagebar?.classList.add(
@@ -2838,110 +2950,43 @@ $activePeriodPayload = $activePeriod
                             'text/html'
                         );
 
-                const newTableBody =
-                    parsed.getElementById(
-                        'academicTableBody'
-                    );
-
-                const newRecordGrid =
-                    parsed.querySelector(
-                        '#academicGridView ' +
-                        '.table-record-grid'
-                    );
-
-                const newPagebar =
-                    parsed.getElementById(
-                        'academicPeriodPagebar'
-                    );
-
-                const newEntryBadge =
-                    parsed.getElementById(
-                        'entryBadge'
-                    );
-
-                if (
-                    !newTableBody ||
-                    !newRecordGrid ||
-                    !newPagebar
-                ) {
-                    throw new Error(
-                        'Invalid academic period response.'
-                    );
-                }
-
-                tableBody.innerHTML =
-                    newTableBody.innerHTML;
-
-                const currentRecordGrid =
-                    gridView?.querySelector(
-                        '.table-record-grid'
-                    );
-
-                if (currentRecordGrid) {
-                    currentRecordGrid.innerHTML =
-                        newRecordGrid.innerHTML;
-                }
-
-                [
-                    'currentPage',
-                    'lastPage',
-                    'total',
-                    'from',
-                    'to',
-                ].forEach(key => {
-                    academicPagebar.dataset[key] =
-                        newPagebar.dataset[key] ||
-                        '';
-                });
-
-                const entryBadge =
-                    document.getElementById(
-                        'entryBadge'
-                    );
-
-                if (
-                    entryBadge &&
-                    newentryBadge
-                ) {
-                    entryBadge.textContent =
-                        newentryBadge.textContent;
-                }
-
-                window.history.replaceState(
-                    {},
-                    '',
-                    url.toString()
+                applyAcademicPeriodResponse(
+                    parsed
                 );
+
+                if (updateUrl) {
+                    window.history.replaceState(
+                        {},
+                        '',
+                        url.toString()
+                    );
+                }
 
                 renderAcademicPagination();
                 filterItems();
                 renderAcademicBaseEmptyStates();
+                restoreAcademicViewMode();
 
-                const activeMode =
-                    window.getGlobalViewMode?.(
-                        'academicViewToggle'
-                    ) || 'list';
+                return true;
 
-                window.setGlobalViewMode?.(
-                    'academicViewToggle',
-                    activeMode,
-                    {
-                        persist: false,
-                    }
-                );
             } catch (error) {
-                window.showToast?.({
-                    type: 'error',
+                if (showErrorToast) {
+                    window.showToast?.({
+                        type: 'error',
 
-                    title:
-                        'Unable to load records',
+                        title:
+                            'Unable to load records',
 
-                    message:
-                        error.message ||
-                        'Please try again.',
+                        message:
+                            error.message ||
+                            'Please try again.',
 
-                    duration: 4500,
-                });
+                        duration: 4500,
+                    });
+                }
+
+                return false;
+
             } finally {
                 academicPageLoading = false;
 
@@ -2950,6 +2995,8 @@ $activePeriodPayload = $activePeriod
                 );
             }
         }
+
+        window.refreshAcademicPeriods = refreshAcademicPeriods;
 
         function filterItems() {
             const semesterValue = semesterFilter?.value || '';
@@ -3031,6 +3078,7 @@ $activePeriodPayload = $activePeriod
         statusFilter?.addEventListener('change', filterItems);
 
         filterItems();
+        renderAcademicPagination();
 
         const syncFlssForm =
             document.getElementById('syncFlssForm');
@@ -3148,6 +3196,8 @@ $activePeriodPayload = $activePeriod
 
                     renderCalendar();
 
+                    await refreshAcademicPeriods(1);
+
                     window.closeModal?.(
                         'syncFlssModal'
                     );
@@ -3165,6 +3215,7 @@ $activePeriodPayload = $activePeriod
 
                         duration: 5000,
                     });
+
                 } catch (error) {
                     window.showToast?.({
                         type: 'error',

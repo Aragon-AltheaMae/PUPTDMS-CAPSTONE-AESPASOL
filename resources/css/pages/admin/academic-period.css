@@ -632,8 +632,9 @@
 
 #mainContent.academic-period-page .ap-content-layout {
     display: grid !important;
-    grid-template-columns: minmax(0, 1fr) minmax(390px, 420px) !important;
-    gap: 1.5rem !important;
+    grid-template-columns: minmax(0, 1.14fr) minmax(320px, 360px) !important;
+    gap: 1.25rem !important;
+    align-items: start !important;
 }
 
 #mainContent.academic-period-page .ap-periods-column {

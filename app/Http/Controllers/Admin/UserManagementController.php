@@ -50,8 +50,26 @@ class UserManagementController extends Controller
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
+                $q->where(
+                    'name',
+                    'like',
+                    "%{$search}%"
+                )
+                    ->orWhere(
+                        'email',
+                        'like',
+                        "%{$search}%"
+                    )
+                    ->orWhereHas(
+                        'patient',
+                        function ($patientQuery) use ($search) {
+                            $patientQuery->where(
+                                'name',
+                                'like',
+                                "%{$search}%"
+                            );
+                        }
+                    );
             });
         }
 
@@ -553,6 +571,9 @@ class UserManagementController extends Controller
 
         $patient = $user->patient;
         $role = $user->role;
+        $displayName =
+            $patient?->name
+            ?? $user->name;
         $displayRole = $role?->display_name ?? $role?->name ?? 'No Role';
         $phone = $patient?->phone ?: $user->phone;
         $birthdate = $patient?->birthdate ?: $user->birthdate;
@@ -560,7 +581,7 @@ class UserManagementController extends Controller
 
         return [
             'id' => $user->id,
-            'name' => $user->name,
+            'name' => $displayName,
             'email' => $user->email,
             'status' => $user->status,
             'role_id' => $user->role_id,
@@ -570,7 +591,7 @@ class UserManagementController extends Controller
             'created_at_time' => optional($user->created_at)?->format('h:i A'),
             'details' => [
                 'id' => $user->id,
-                'name' => $user->name,
+                'name' => $displayName,
                 'email' => $user->email,
                 'role' => $displayRole,
                 'status' => ucfirst((string) $user->status),

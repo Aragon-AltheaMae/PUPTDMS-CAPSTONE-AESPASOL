@@ -1254,20 +1254,14 @@ body.layout-no-sidebar #mainContent.odontogram-page {
 }
 
 .odontogram-legend-resizer {
-    position: sticky;
+    position: fixed;
     top: var(--header-h);
-
-    width: 6px;
+    right: var(--legend-panel-width);
+    z-index: 31;
+    width: var(--legend-resizer-width);
     height: calc(100dvh - var(--header-h));
-
-    align-self: start;
-
     cursor: col-resize;
-
     background: transparent;
-
-    z-index: 25;
-
     touch-action: none;
 }
 
@@ -2108,8 +2102,10 @@ body.layout-no-sidebar #mainContent.odontogram-page {
 }
 
 .legend-drawer-header {
-    position: static;
-    z-index: 2;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    flex: 0 0 auto;
     padding: .75rem;
     border-bottom: 1px solid var(--border);
     background: var(--card);
@@ -2513,22 +2509,23 @@ body.layout-no-sidebar #mainContent.odontogram-page {
 }
 
 .odontogram-legend-panel {
-    position: sticky;
+    position: fixed;
     top: var(--header-h);
-    width: 100%;
-    min-width: 0;
+    right: 0;
+    z-index: 30;
+    width: var(--legend-panel-width);
+    min-width: var(--legend-panel-min);
+    max-width: var(--legend-panel-max);
     height: calc(100dvh - var(--header-h));
     display: flex;
     flex-direction: column;
-    align-self: start;
     border: 0;
     border-left: 1px solid var(--border);
     border-radius: 0;
     background: var(--card);
     overflow: hidden;
     container-type: inline-size;
-    box-shadow:
-        -10px 0 28px rgba(15, 23, 42, .04);
+    box-shadow: -10px 0 28px rgba(15, 23, 42, .04);
 }
 
 .odontogram-guide-row {
@@ -2541,11 +2538,6 @@ body.layout-no-sidebar #mainContent.odontogram-page {
     padding: .55rem .65rem;
 
     border-bottom: 1px solid var(--border);
-}
-
-.odontogram-legend-panel .legend-drawer-header {
-    position: static;
-    flex: 0 0 auto;
 }
 
 body.odontogram-resizing,

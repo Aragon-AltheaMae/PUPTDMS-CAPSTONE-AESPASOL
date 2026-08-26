@@ -147,7 +147,7 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
 
                             <div class="inventory-mobile-actions flex items-center gap-2 flex-nowrap lg:flex-none">
 
-                                <button id="filterBtn" type="button" onclick="openFilterPanel()"
+                                <button id="filterBtn" type="button" onclick="openFilterDrawer('filterModal')"
                                     class="global-filter-btn">
                                     <i class="fa-solid fa-sliders"></i>
                                     <span>Filter</span>

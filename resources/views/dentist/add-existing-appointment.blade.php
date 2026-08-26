@@ -295,9 +295,30 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
 @section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', async function () {
         const reviewGrid = document.getElementById('existingAppointmentReviewGrid');
         const timeField = document.getElementById('existing_time_input');
+
+        try {
+            await window
+                .loadBookingWorkflowModule?.();
+        } catch (error) {
+            console.error(
+                'Unable to load existing appointment workflow.',
+                error
+            );
+
+            return;
+        }
+
+        if (!window.BookingWorkflow) {
+            console.error(
+                'BookingWorkflow is unavailable.'
+            );
+
+            return;
+        }
+
         const timeHint = document.getElementById('existingAppointmentTimeHint');
         const slotGridElement = document.getElementById('slotGrid');
         const timeInput = document.getElementById('appointment_time');
@@ -1815,7 +1836,7 @@ ${summaryCard(
             );
 
         bookingWorkflow =
-            window.BookingWorkflow?.create({
+            window.BookingWorkflow.create({
                 panels: '#existingAppointmentForm > .step-content',
 
                 progressFill: '#headerProgressFill',
