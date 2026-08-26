@@ -439,6 +439,10 @@ function openOdontogramPreviewTooth(
     });
 }
 
+const odontogramPreviewThreeStates = new WeakMap();
+const odontogramPreviewCreationPromises = new WeakMap();
+const odontogramPreviewRenderRetries = new WeakMap();
+
 export function initOdontogramPreviews(root = document) {
     const scope =
         root &&
@@ -535,6 +539,37 @@ function showOdontogramPreviewEmptyState(
 window.initOdontogramPreviews =
     initOdontogramPreviews;
 
+function bootOdontogramPreviews() {
+    initOdontogramPreviews(
+        document
+    );
+}
+
+if (
+    document.readyState ===
+    'loading'
+) {
+    document.addEventListener(
+        'DOMContentLoaded',
+        bootOdontogramPreviews,
+        {
+            once: true,
+        }
+    );
+} else {
+    bootOdontogramPreviews();
+}
+
+document.addEventListener(
+    'ui-modal:opened',
+    event => {
+        initOdontogramPreviews(
+            event.detail?.modal ||
+            document
+        );
+    }
+);
+
 function setOdontogramPreviewData(
     preview,
     rawData = []
@@ -587,10 +622,6 @@ function setOdontogramPreviewData(
 
 window.setOdontogramPreviewData =
     setOdontogramPreviewData;
-
-const odontogramPreviewThreeStates = new WeakMap();
-const odontogramPreviewCreationPromises = new WeakMap();
-const odontogramPreviewRenderRetries = new WeakMap();
 
 async function renderOdontogramPreview(root) {
     if (!root) {

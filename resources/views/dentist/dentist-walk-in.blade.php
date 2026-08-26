@@ -205,6 +205,7 @@
                                                         class="form-input-custom js-flatpickr-date"
                                                         placeholder="Select birthday"
                                                         max="{{ now()->subDay()->format('Y-m-d') }}"
+                                                        data-flatpickr-min-year="1900"
                                                         data-validation-rule="notFutureDate" autocomplete="off"
                                                         disabled>
                                                 </div>
