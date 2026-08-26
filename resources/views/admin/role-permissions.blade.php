@@ -550,60 +550,9 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
     </div>
 </div>
 
-<div id="deleteRoleModal" class="ui-modal modal-theme-danger" aria-hidden="true">
-
-    <div class="ui-modal-card modal-sm">
-        <div class="modal-hd">
-            <div class="modal-heading">
-                <div class="modal-icon">
-                    <i class="fa-solid fa-trash-can"></i>
-                </div>
-
-                <div class="modal-copy">
-                    <h3 class="modal-title">Delete Role</h3>
-                    <p class="modal-subtitle">
-                        Permanently remove the selected role.
-                    </p>
-                </div>
-            </div>
-
-            <button type="button" onclick="closeDeleteModal()" class="modal-x" aria-label="Close delete role modal">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <div class="modal-bd">
-            <div class="global-confirm-alert">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-
-                <p>
-                    Delete
-                    <strong id="deleteRoleName"></strong>?
-
-                    <span id="deleteRoleFallbackNote">
-                        Affected users will be reassigned to a default role.
-                    </span>
-                </p>
-            </div>
-        </div>
-
-        <div class="modal-ft">
-            <button type="button" onclick="closeDeleteModal()" class="ui-btn ui-btn-secondary">
-                Cancel
-            </button>
-
-            <form id="deleteRoleForm" method="POST">
-                @csrf
-                @method('DELETE')
-
-                <button type="submit" class="ui-btn ui-btn-danger">
-                    <i class="fa-solid fa-trash-can"></i>
-                    <span>Delete</span>
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
+<x-delete-confirm-modal id="deleteRoleModal" form-id="deleteRoleForm" name-id="deleteRoleName" title="Delete Role"
+    subtitle="This action requires confirmation" message="Are you sure you want to delete"
+    helper="This role will be permanently removed." close-callback="closeDeleteModal()" />
 
 <div id="resetConfirmModal" class="ui-modal modal-theme-warning" aria-hidden="true">
     <div class="ui-modal-card modal-sm" role="dialog" aria-modal="true" aria-labelledby="resetConfirmTitle"
@@ -2161,8 +2110,6 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
         updateFABVisibility();
 
         document.getElementById('deleteRoleName').textContent = roleName;
-        document.getElementById('deleteRoleFallbackNote').textContent =
-            `Affected users will be reassigned to the default ${getFallbackRoleName(roleName, slug)} role.`;
         document.getElementById('deleteRoleForm').action = `/admin/role-permissions/${roleId}/destroy`;
         window.openModal?.('deleteRoleModal');
     }

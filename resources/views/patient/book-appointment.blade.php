@@ -1680,18 +1680,34 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             });
     }
 
+    async function bootBookingWorkflow() {
+        try {
+            await window
+                .loadBookingWorkflowModule?.();
+
+            initBookingWorkflow();
+
+        } catch (error) {
+            console.error(
+                'Unable to initialize booking workflow.',
+                error
+            );
+        }
+    }
+
     if (
         document.readyState ===
         'loading'
     ) {
         document.addEventListener(
             'DOMContentLoaded',
-            initBookingWorkflow, {
-            once: true
-        }
+            bootBookingWorkflow,
+            {
+                once: true
+            }
         );
     } else {
-        initBookingWorkflow();
+        bootBookingWorkflow();
     }
 
     function setupCharLimit(inputId, counterId, max = 150, warningId = null) {

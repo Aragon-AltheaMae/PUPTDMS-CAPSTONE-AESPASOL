@@ -170,9 +170,9 @@ class User extends Authenticatable implements JWTSubject
 
         return $this->notifications()->where(function ($query) use ($currentRole) {
             $query->where('data->recipient_role', $currentRole)
-                  ->orWhere('data->recipient_role', 'like', '%,' . $currentRole . ',%')
-                  ->orWhere('data->recipient_role', 'like', $currentRole . ',%')
-                  ->orWhere('data->recipient_role', 'like', '%,' . $currentRole);
+                ->orWhere('data->recipient_role', 'like', '%,' . $currentRole . ',%')
+                ->orWhere('data->recipient_role', 'like', $currentRole . ',%')
+                ->orWhere('data->recipient_role', 'like', '%,' . $currentRole);
         });
     }
 
@@ -198,14 +198,13 @@ class User extends Authenticatable implements JWTSubject
     |--------------------------------------------------------------------------
     */
 
-    // 🔥 Full name (automatic)
     public function getFullNameAttribute()
     {
         return trim(
             $this->first_name . ' ' .
-            ($this->middle_name ?? '') . ' ' .
-            $this->last_name . ' ' .
-            ($this->suffix_name ?? '')
+                ($this->middle_name ?? '') . ' ' .
+                $this->last_name . ' ' .
+                ($this->suffix_name ?? '')
         );
     }
 

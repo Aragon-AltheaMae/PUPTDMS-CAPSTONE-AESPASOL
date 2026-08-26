@@ -109,8 +109,8 @@ $inactiveCount = $inactiveCount ?? 0;
                         </span>
                     </div>
 
-                    <form method="GET" action="{{ route($routeNames['index'] ?? 'admin.user_management') }}" id="umFilterForm"
-                        class="um-users-filter-form">
+                    <form method="GET" action="{{ route($routeNames['index'] ?? 'admin.user_management') }}"
+                        id="umFilterForm" class="um-users-filter-form">
                         <div class="um-search-row voice-search-row">
 
                             <x-search-bar id="umSearch" name="search" placeholder="Search name or email…"
@@ -165,8 +165,13 @@ $inactiveCount = $inactiveCount ?? 0;
                                 </thead>
                                 <tbody id="umTableBody">
                                     @forelse($users as $user)
+                                    @php
+                                    $displayName =
+                                    $user->patient?->name
+                                    ?? $user->name;
+                                    @endphp
                                     <tr class="user-table-row border-b border-gray-50 last:border-0"
-                                        data-name="{{ strtolower($user->name) }}"
+                                        data-name="{{ strtolower($displayName) }}"
                                         data-email="{{ strtolower($user->email) }}"
                                         data-role="{{ strtolower(optional($user->role)->name ?? '') }}">
                                         <td class="py-3.5 px-3 sm:px-5 hidden sm:table-cell">
@@ -176,14 +181,12 @@ $inactiveCount = $inactiveCount ?? 0;
 
                                         <td class="py-3.5 px-2 sm:px-4">
                                             <div class="flex items-center gap-2 sm:gap-3">
-                                                <div class="patient-avatar patient-avatar-md">
-                                                    <span>
-                                                        {{ strtoupper(substr($user->name, 0, 1)) }}
-                                                    </span>
+                                                <div class="patient-avatar patient-avatar-md" data-patient-avatar
+                                                    data-patient-name="{{ $displayName }}">
                                                 </div>
                                                 <div>
                                                     <div class="font-semibold text-gray-800 text-sm leading-tight">
-                                                        {{ $user->name }}
+                                                        {{ $displayName }}
                                                     </div>
                                                     <div class="text-[11px] text-gray-400 mt-0.5 hidden sm:block">
                                                         {{ $user->email }}
@@ -196,7 +199,9 @@ $inactiveCount = $inactiveCount ?? 0;
                                             @php $roleSlug = optional($user->role)->slug ?? 'none'; @endphp
 
                                             <span class="badge-role role-{{ $roleSlug }}">
-                                                {{ optional($user->role)->name ?? 'Patient' }}
+                                                {{ optional($user->role)->display_name
+                                                ?? optional($user->role)->name
+                                                ?? 'Patient' }}
                                             </span>
                                         </td>
 
@@ -217,7 +222,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                             @php
                                             $userDetails = [
                                             'id' => $user->id,
-                                            'name' => $user->name,
+                                            'name' => $displayName,
                                             'email' => $user->email,
                                             'role' =>
                                             optional($user->role)->display_name ??
@@ -267,7 +272,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                             @endphp
                                             <div class="ui-action-group um-action-group">
                                                 <button type="button" data-user-details='@json($userDetails)'
-                                                    onclick="openEditModalFromButton(this, 'users', {{ $user->id }}, @js($user->name), @js($user->email), @js($user->role_id), @js($user->status))"
+                                                    onclick="openEditModalFromButton(this, 'users', {{ $user->id }}, @js($displayName), @js($user->email), @js($user->role_id), @js($user->status))"
                                                     class="ui-action-btn ui-action-edit" data-tooltip="Edit account"
                                                     aria-label="Edit account">
                                                     <i class="fa-solid fa-pen text-[11px]"></i>
@@ -276,7 +281,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                                 <button type="button" onclick="openToggleConfirm(
         {{ $user->id }},
         @js($user->status),
-        @js($user->name)
+        @js($displayName)
     )" class="ui-action-btn {{ $user->status === 'active' ? 'ui-action-warning' : 'ui-action-success' }}"
                                                     data-tooltip="{{ $user->status === 'active' ? 'Deactivate account' : 'Activate account' }}"
                                                     data-tooltip-tone="{{ $user->status === 'active' ? 'reschedule' : 'start' }}"
@@ -290,7 +295,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                                 <button type="button" onclick="openResetModal(
         'users',
         {{ $user->id }},
-        @js($user->name)
+        @js($displayName)
     )" class="ui-action-btn ui-action-reset" data-tooltip="Reset password" aria-label="Reset password">
 
                                                     <i class="fa-solid fa-key"></i>
@@ -323,8 +328,17 @@ $inactiveCount = $inactiveCount ?? 0;
                             <div class="um-grid" id="umGridBody">
                                 @forelse($users as $user)
                                 @php
-                                $roleSlug = optional($user->role)->slug;
-                                $roleName = optional($user->role)->name ?? 'Patient';
+                                $roleSlug =
+                                optional($user->role)->slug;
+
+                                $roleName =
+                                optional($user->role)->display_name
+                                ?? optional($user->role)->name
+                                ?? 'Patient';
+
+                                $displayName =
+                                $user->patient?->name
+                                ?? $user->name;
                                 @endphp
 
                                 <div class="um-grid-card">
@@ -339,14 +353,12 @@ $inactiveCount = $inactiveCount ?? 0;
                                     </div>
 
                                     <div class="flex items-center gap-3">
-                                        <div class="patient-avatar patient-avatar-sm">
-                                            <span>
-                                                {{ strtoupper(substr($user->name, 0, 1)) }}
-                                            </span>
+                                        <div class="patient-avatar patient-avatar-sm" data-patient-avatar
+                                            data-patient-name="{{ $displayName }}">
                                         </div>
                                         <div class="min-w-0">
                                             <div class="font-semibold text-gray-800 text-sm leading-tight">
-                                                {{ $user->name }}
+                                                {{ $displayName }}
                                             </div>
                                             <div class="text-[11px] text-gray-400 mt-0.5">
                                                 {{ $user->email }}
@@ -388,7 +400,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                         @php
                                         $userDetails = [
                                         'id' => $user->id,
-                                        'name' => $user->name,
+                                        'name' => $displayName,
                                         'email' => $user->email,
                                         'role' =>
                                         optional($user->role)->display_name ??
@@ -428,7 +440,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                         ];
                                         @endphp
                                         <button type="button" data-user-details='@json($userDetails)'
-                                            onclick="openEditModalFromButton(this, 'users', {{ $user->id }}, @js($user->name), @js($user->email), @js($user->role_id), @js($user->status))"
+                                            onclick="openEditModalFromButton(this, 'users', {{ $user->id }}, @js($displayName), @js($user->email), @js($user->role_id), @js($user->status))"
                                             class="ui-action-btn ui-action-edit" data-tooltip="Edit account"
                                             aria-label="Edit account">
                                             <i class="fa-solid fa-pen text-[11px]"></i>
@@ -437,7 +449,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                         <button type="button" onclick="openToggleConfirm(
         {{ $user->id }},
         @js($user->status),
-        @js($user->name)
+        @js($displayName)
     )" class="ui-action-btn {{ $user->status === 'active' ? 'ui-action-warning' : 'ui-action-success' }}"
                                             data-tooltip="{{ $user->status === 'active' ? 'Deactivate account' : 'Activate account' }}"
                                             aria-label="{{ $user->status === 'active' ? 'Deactivate account' : 'Activate account' }}">
@@ -450,7 +462,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                         <button type="button" onclick="openResetModal(
                                         'users',
                                         {{ $user->id }},
-                                        @js($user->name)
+                                        @js($displayName)
                                         )" class="ui-action-btn ui-action-reset" data-tooltip="Reset password"
                                             aria-label="Reset password">
 
@@ -501,9 +513,9 @@ $inactiveCount = $inactiveCount ?? 0;
             </button>
         </div>
 
-        <form method="POST" action="{{ route($routeNames['store'] ?? 'admin.user_management.store') }}" id="addUserForm" class="modal-card-form"
-            data-global-validation data-global-selects data-discard-form data-discard-title="Discard new user?"
-            data-discard-subtitle="You have unsaved account details."
+        <form method="POST" action="{{ route($routeNames['store'] ?? 'admin.user_management.store') }}" id="addUserForm"
+            class="modal-card-form" data-global-validation data-global-selects data-discard-form
+            data-discard-title="Discard new user?" data-discard-subtitle="You have unsaved account details."
             data-discard-message="Closing this modal will remove the user information you entered. Do you want to discard your changes?"
             novalidate>
             @csrf
@@ -649,7 +661,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                     value="{{ old('birthdate') }}"
                                     class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
                                     placeholder="Select birthdate" autocomplete="off" data-field-label="Birthdate"
-                                    data-validation-rule="notFutureDate">
+                                    data-validation-rule="notFutureDate" data-flatpickr-min-year="1900">
                             </div>
                         </div>
 
@@ -1002,7 +1014,7 @@ $inactiveCount = $inactiveCount ?? 0;
                                 <input type="text" id="editBirthdate" name="birthdate"
                                     class="form-input-custom global-control-with-icon js-flatpickr-date-max-today"
                                     placeholder="Select birthdate" autocomplete="off" data-field-label="Birthdate"
-                                    data-validation-rule="notFutureDate">
+                                    data-validation-rule="notFutureDate" data-flatpickr-min-year="1900">
                             </div>
                         </div>
 
@@ -1197,7 +1209,9 @@ $inactiveCount = $inactiveCount ?? 0;
 
         <div class="modal-bd">
             <div class="um-view-profile-card">
-                <div class="um-view-avatar" id="viewInitial">?</div>
+                <div id="viewInitial" class="patient-avatar patient-avatar-lg" data-patient-avatar
+                    data-patient-name="Patient">
+                </div>
 
                 <div class="um-view-profile-copy">
                     <div id="viewName" class="um-view-name"></div>
@@ -1905,7 +1919,17 @@ $inactiveCount = $inactiveCount ?? 0;
         if (viewLastLoginAt) viewLastLoginAt.textContent = payload.last_login_at || 'Never';
 
         if (viewInitial) {
-            viewInitial.textContent = String(payload.name || '?').trim().charAt(0).toUpperCase() || '?';
+            viewInitial.dataset.patientName =
+                payload.name ||
+                'Patient';
+
+            viewInitial.dataset.patientUrl =
+                payload.avatar_url ||
+                '';
+
+            window.PatientUI?.renderAvatar?.(
+                viewInitial
+            );
         }
 
         if (viewStatus) {
@@ -2298,12 +2322,6 @@ $inactiveCount = $inactiveCount ?? 0;
                     normalizedStatus.slice(1) :
                     'Unknown';
 
-            const initial =
-                String(user.name || 'U')
-                    .trim()
-                    .charAt(0)
-                    .toUpperCase() || 'U';
-
             const registeredDay =
                 user.created_at_day || '—';
 
@@ -2364,11 +2382,11 @@ $inactiveCount = $inactiveCount ?? 0;
 
                 <td class="py-3.5 px-2 sm:px-4">
                     <div class="flex items-center gap-2 sm:gap-3">
-                        <div class="patient-avatar patient-avatar-md">
-                            <span>
-                                ${initial}
-                            </span>
-                        </div>
+                        ${window.PatientUI?.buildAvatarHtml?.({
+                name: user.name || 'Patient',
+                size: 'md',
+                escapeHtml
+            }) || ''}
 
                         <div class="min-w-0">
                             <div class="font-semibold text-gray-800 text-sm leading-tight">
@@ -2421,11 +2439,11 @@ $inactiveCount = $inactiveCount ?? 0;
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <div class="patient-avatar patient-avatar-sm">
-                        <span>
-                            ${initial}
-                        </span>
-                    </div>
+                    ${window.PatientUI?.buildAvatarHtml?.({
+                name: user.name || 'Patient',
+                size: 'sm',
+                escapeHtml
+            }) || ''}
 
                     <div class="min-w-0">
                         <div class="font-semibold text-gray-800 text-sm leading-tight">

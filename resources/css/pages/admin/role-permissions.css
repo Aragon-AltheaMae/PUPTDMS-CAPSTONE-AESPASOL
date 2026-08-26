@@ -80,10 +80,18 @@
     cursor: pointer;
 }
 
+.role-delete-action {
+    position: absolute;
+    top: .85rem;
+    right: .85rem;
+    z-index: 3;
+}
+
 .role-card-header {
     display: flex;
     align-items: center;
     gap: .75rem;
+    padding-right: 3rem;
 }
 
 .role-card-copy {

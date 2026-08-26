@@ -77,6 +77,7 @@
             };
 
             document.documentElement.classList.add('sidebar-preload');
+            document.documentElement.classList.add('page-preload');
 
             try {
                 if (localStorage.getItem(sidebarKeys[role]) === '1') {
@@ -97,6 +98,38 @@
     </title>
 
     <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
+
+    <link rel="preload"
+        href="{{ Vite::asset('node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2') }}"
+        as="font" type="font/woff2" crossorigin>
+
+    <style>
+        html.page-preload .page-enter {
+            opacity: 0;
+            transform: translateY(10px);
+            animation: none !important;
+        }
+
+        @font-face {
+            font-family: 'Inter Variable';
+            font-style: normal;
+            font-display: block;
+            font-weight: 100 900;
+            src: url('{{ Vite::asset('node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2') }}') format('woff2');
+        }
+
+        html,
+        body {
+            font-family:
+                'Inter Variable',
+                ui-sans-serif,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                'Segoe UI',
+                sans-serif;
+        }
+    </style>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -285,6 +318,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sienna-accessibility@latest/dist/sienna-accessibility.umd.js"
         data-position="bottom-right" data-offset="{{ $accessibilityOffset }}" defer></script>
 
+        
     @include('partials.chatbot')
 
     @stack('scripts')

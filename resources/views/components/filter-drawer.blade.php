@@ -36,9 +36,9 @@
                 </h2>
             </div>
 
-            <button @if ($closeId) id="{{ $closeId }}" @endif type="button"
-                class="filter-drawer-close" @if ($closeCallback) onclick="{{ $closeCallback }}" @endif
-                aria-label="Close filters">
+            <button @if ($closeId) id="{{ $closeId }}" @endif type="button" class="modal-x"
+                @if ($closeCallback) onclick="{{ $closeCallback }}" @endif aria-label="Close filters"
+                data-tooltip="Close" data-tooltip-tone="neutral">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 

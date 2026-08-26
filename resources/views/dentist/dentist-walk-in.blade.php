@@ -3180,18 +3180,34 @@
             });
     }
 
+    async function bootWalkInWorkflow() {
+        try {
+            await window
+                .loadBookingWorkflowModule?.();
+
+            initWalkInWorkflow();
+
+        } catch (error) {
+            console.error(
+                'Unable to initialize walk-in workflow.',
+                error
+            );
+        }
+    }
+
     if (
         document.readyState ===
         'loading'
     ) {
         document.addEventListener(
             'DOMContentLoaded',
-            initWalkInWorkflow, {
-            once: true
-        }
+            bootWalkInWorkflow,
+            {
+                once: true
+            }
         );
     } else {
-        initWalkInWorkflow();
+        bootWalkInWorkflow();
     }
 
     function setupCharLimit(inputId, counterId, max = 150, warningId = null) {

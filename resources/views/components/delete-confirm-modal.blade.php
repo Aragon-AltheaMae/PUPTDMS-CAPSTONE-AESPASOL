@@ -6,10 +6,11 @@
     'subtitle' => 'This action requires confirmation',
     'message' => 'Are you sure you want to delete',
     'helper' => 'This item will be permanently removed.',
+    'closeCallback' => null,
 ])
 
 <div id="{{ $id }}" class="ui-modal modal-theme-danger global-delete-modal" aria-hidden="true">
-    <form id="{{ $formId }}" method="POST" action="" class="ui-modal-card modal-sm global-delete-card"
+    <form id="{{ $formId }}" method="POST" action="" class="ui-modal-card modal-md global-delete-card"
         role="dialog" aria-modal="true" aria-labelledby="{{ $id }}Title" onclick="event.stopPropagation()">
         @csrf
         @method('DELETE')
@@ -31,7 +32,7 @@
                 </div>
             </div>
 
-            <button type="button" class="modal-x" onclick="closeModal('{{ $id }}')"
+            <button type="button" class="modal-x" onclick="{{ $closeCallback ?: "closeModal('$id')" }}"
                 aria-label="Close delete modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -66,7 +67,8 @@
         </div>
 
         <div class="modal-ft">
-            <button type="button" class="ui-btn ui-btn-secondary" onclick="closeModal('{{ $id }}')">
+            <button type="button" class="ui-btn ui-btn-secondary"
+                onclick="{{ $closeCallback ?: "closeModal('$id')" }}">
                 Cancel
             </button>
 
