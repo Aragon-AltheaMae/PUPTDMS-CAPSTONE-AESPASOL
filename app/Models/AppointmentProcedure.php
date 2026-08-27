@@ -26,6 +26,7 @@ class AppointmentProcedure extends Model
         'odontogram_data' => 'array',
         'procedure_started_at' => 'datetime',
         'procedure_completed_at' => 'datetime',
+        'procedure_duration_seconds' => 'integer',
     ];
 
     public function appointment()

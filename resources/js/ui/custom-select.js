@@ -10,7 +10,7 @@ function closeCustomSelects(except = null) {
     });
 }
 
-function syncCustomSelect(wrapper) {
+export function syncCustomSelect(wrapper) {
     const select = wrapper.querySelector('select');
     const valueText = wrapper.querySelector('[data-custom-select-value]');
     const button = wrapper.querySelector('.custom-select-button');
@@ -209,7 +209,7 @@ function positionCustomSelectMenu(
         previousTransition;
 }
 
-function initCustomSelects(root = document) {
+export function initCustomSelects(root = document) {
     const scope =
         root && typeof root.querySelectorAll === 'function'
             ? root
@@ -370,6 +370,3 @@ document.addEventListener('keydown', event => {
 });
 
 initCustomSelects();
-
-window.initCustomSelects = initCustomSelects;
-window.syncCustomSelect = syncCustomSelect;

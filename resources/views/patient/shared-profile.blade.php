@@ -12,6 +12,10 @@ $layoutRole = $profileMode === 'admin' ? 'admin' : 'dentist';
 
 @section('usesPatientProfile', true)
 
+@section('styles')
+    @vite('resources/css/pages/patient/patient-profile.css')
+@endsection
+
 @section('content')
 
 @php

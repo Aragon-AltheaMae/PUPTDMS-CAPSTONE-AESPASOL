@@ -1,8 +1,14 @@
 @extends('layouts.app')
 
 @section('title', 'Account Sessions')
+
 @section('layout-role', $role)
+
 @section('body-class', 'bg-[#F4F4F4]')
+
+@section('styles')
+    @vite('resources/css/pages/shared/active-sessions.css')
+@endsection
 
 @section('content')
 

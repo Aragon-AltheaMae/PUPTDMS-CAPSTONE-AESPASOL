@@ -4,6 +4,10 @@
 
 @section('title', 'Dashboard')
 
+@section('styles')
+    @vite('resources/css/pages/patient/dashboard.css')
+@endsection
+
 @section('content')
 
 @php
@@ -784,7 +788,7 @@ $appointmentConfirmation = session('appointment_confirmation');
         contact: "{{ $patient->phone ?? 'N/A' }}",
         email: "{{ $patient->email ?? 'N/A' }}",
         emergencyName: "{{ optional($patient->medicalHistory)->emergency_person ?? 'Not specified' }}",
-        emergencyNumber: @json(optional($patient -> medicalHistory)-> emergency_number ?? 'N/A'),
+        emergencyNumber: @json(optional($patient -> medicalHistory) -> emergency_number ?? 'N/A'),
         emergencyRelation: @json(optional($patient -> medicalHistory) -> emergency_relation ?? ''),
         hasAlert: @json(
             (isset($patient -> medicalHistory -> diseaseAnswers) && $patient -> medicalHistory -> diseaseAnswers -> count() > 0) ||
@@ -822,7 +826,6 @@ $appointmentConfirmation = session('appointment_confirmation');
         );
 
         renderGreeting();
-        initRecordModal();
 
         if (quickAction === 'record') {
             setTimeout(() => {

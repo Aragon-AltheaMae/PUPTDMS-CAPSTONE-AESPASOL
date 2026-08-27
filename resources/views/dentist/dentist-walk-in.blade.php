@@ -7,6 +7,10 @@
 
 @section('title', 'Walk-in Appointment')
 
+@section('styles')
+@vite('resources/css/pages/dentist/dentist-walk-in.css')
+@endsection
+
 @section('content')
 
 <main id="mainContent" class="booking-page page-enter">
@@ -3096,13 +3100,6 @@
                         return false;
                     }
 
-                    /*
-                    |--------------------------------------------------------------------------
-                    | AFTER EDITING MEDICAL
-                    | MEDICAL -> REVIEW
-                    |--------------------------------------------------------------------------
-                    */
-
                     if (
                         editingHistoryFromReview ===
                         'medical' &&
@@ -3179,6 +3176,12 @@
                     );
                 },
             });
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                loadInitialPatientRecords();
+            });
+        });
     }
 
     async function bootWalkInWorkflow() {
@@ -4585,9 +4588,10 @@ ${summaryCard(
     }
 
     refreshWalkInGlobalControls();
-    setPatientMode("existing", false);
-    loadInitialPatientRecords();
-
+    setPatientMode(
+        "existing",
+        false
+    );
     window.addEventListener("resize", () => {
         document.querySelectorAll(".sm-grid-1col").forEach(el => {
             el.style.gridTemplateColumns = window.innerWidth < 640 ? "1fr" : "1fr 1fr";

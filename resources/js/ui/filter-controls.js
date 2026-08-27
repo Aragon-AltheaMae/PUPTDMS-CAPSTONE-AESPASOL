@@ -154,14 +154,9 @@ function setGlobalFilterButtonState({
     }
 }
 
-window.syncFilterTagGroup =
-    syncFilterTagGroup;
-
-window.bindFilterTagGroup =
-    bindFilterTagGroup;
-
-window.updateShowResultsText =
-    updateShowResultsText;
-
-window.setGlobalFilterButtonState =
-    setGlobalFilterButtonState;
+export {
+    syncFilterTagGroup,
+    bindFilterTagGroup,
+    updateShowResultsText,
+    setGlobalFilterButtonState
+};

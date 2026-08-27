@@ -1,4 +1,4 @@
-function openFilterDrawer(panelId = 'filterModal', overlayId = null) {
+export function openFilterDrawer(panelId = 'filterModal', overlayId = null) {
     const panel = document.getElementById(panelId);
 
     if (!panel) return;
@@ -17,7 +17,7 @@ function openFilterDrawer(panelId = 'filterModal', overlayId = null) {
     overlay?.classList.add('open');
 }
 
-function closeFilterDrawer(panelId = 'filterModal', overlayId = null) {
+export function closeFilterDrawer(panelId = 'filterModal', overlayId = null) {
     const panel = document.getElementById(panelId);
 
     if (!panel) return;
@@ -48,16 +48,10 @@ function closeFilterDrawer(panelId = 'filterModal', overlayId = null) {
     }, 300);
 }
 
-function openFilterPanel() {
+export function openFilterPanel() {
     openFilterDrawer('filterPanel', 'filterOverlay');
 }
 
-function closeFilterPanel() {
+export function closeFilterPanel() {
     closeFilterDrawer('filterPanel', 'filterOverlay');
 }
-
-window.openFilterDrawer = openFilterDrawer;
-window.closeFilterDrawer = closeFilterDrawer;
-
-window.openFilterPanel = openFilterPanel;
-window.closeFilterPanel = closeFilterPanel;

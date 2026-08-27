@@ -1575,13 +1575,13 @@
 
         hasCalendarRenderedOnce = true;
 
-        setTimeout(() => {
+        setTimeout(async () => {
             const calendarContainer =
                 document.getElementById(
                     calendarConfig.calendarContainerId
                 );
 
-            window.initCustomSelects?.(
+            await window.initCustomSelects?.(
                 calendarContainer
             );
 

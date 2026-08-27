@@ -13,6 +13,10 @@
 @section('hide-patient-modals')
 @endsection
 
+@section('styles')
+    @vite('resources/css/pages/patient/book-appointment.css')
+@endsection
+
 @php
 $notifications = collect($notifications ?? []);
 $notifCount = $notifications->count();

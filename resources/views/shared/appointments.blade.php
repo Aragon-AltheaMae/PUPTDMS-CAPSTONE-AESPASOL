@@ -6,6 +6,10 @@
 
 @section('usesAppointmentCalendar', true)
 
+@section('styles')
+    @vite('resources/css/pages/shared/appointments.css')
+@endsection
+
 @section('content')
 
 @php
@@ -71,7 +75,7 @@ $nextAppt && $nextAppt->appointment_time
 ? \Carbon\Carbon::parse($nextAppt->appointment_time)->format('g:i A')
 : null;
 
-$nextDate = $nextAppt ? \Carbon\Carbon::parse($nextAppt->appointment_date)->format('M j, Y') : null;
+$nextDate = $nextAppt ? \Carbon\Carbon::parse($nextAppt->appointment_date)->format('F j, Y') : null;
 
 $nextService = $nextAppt
 ? (($nextAppt->service_type ?? '') === 'Others'
@@ -97,20 +101,10 @@ default => $normalized ?: 'upcoming',
 };
 };
 
-$appointmentStatusPriority = [
-'upcoming' => 1,
-'rescheduled' => 2,
-'completed' => 3,
-'cancelled' => 4,
-];
-
 $allAppointments = $upcomingAppointments
 ->merge($pastAppointments)
 ->unique('id')
-->sort(function ($a, $b) use (
-$normalizeAppointmentStatus,
-$appointmentStatusPriority
-) {
+->sort(function ($a, $b) use ($normalizeAppointmentStatus) {
 $aStatus = $normalizeAppointmentStatus(
 $a->status ?? 'upcoming'
 );
@@ -119,27 +113,37 @@ $bStatus = $normalizeAppointmentStatus(
 $b->status ?? 'upcoming'
 );
 
-$aPriority =
-$appointmentStatusPriority[$aStatus] ?? 99;
+$aIsActive = in_array(
+$aStatus,
+['upcoming', 'rescheduled'],
+true
+);
 
-$bPriority =
-$appointmentStatusPriority[$bStatus] ?? 99;
+$bIsActive = in_array(
+$bStatus,
+['upcoming', 'rescheduled'],
+true
+);
 
-if ($aPriority !== $bPriority) {
-return $aPriority <=> $bPriority;
+if ($aIsActive !== $bIsActive) {
+return $aIsActive ? -1 : 1;
+}
+
+$aDateTime = Carbon::parse(
+($a->appointment_date ?? '1970-01-01') .
+' ' .
+($a->appointment_time ?? '00:00:00')
+);
+
+$bDateTime = Carbon::parse(
+($b->appointment_date ?? '1970-01-01') .
+' ' .
+($b->appointment_time ?? '00:00:00')
+);
+
+if ($aIsActive && $bIsActive) {
+return $aDateTime <=> $bDateTime;
     }
-
-    $aDateTime = sprintf(
-    '%s %s',
-    $a->appointment_date ?? '0000-00-00',
-    $a->appointment_time ?? '00:00:00'
-    );
-
-    $bDateTime = sprintf(
-    '%s %s',
-    $b->appointment_date ?? '0000-00-00',
-    $b->appointment_time ?? '00:00:00'
-    );
 
     return $bDateTime <=> $aDateTime;
         })
@@ -150,8 +154,7 @@ return $aPriority <=> $bPriority;
         return \Carbon\Carbon::parse(
         $appt->appointment_date
         )->format('Y-m');
-        })
-        ->sortKeysDesc();
+        });
         $appointmentRefreshItems = $allAppointments
         ->map(
         fn($appointment) => [
@@ -274,7 +277,7 @@ return $aPriority <=> $bPriority;
 
                             <span class="today-snapshot-date">
                                 <i class="fa-regular fa-calendar"></i>
-                                {{ Carbon::parse($today)->format('M j, Y') }}
+                                {{ Carbon::parse($today)->format('F j, Y') }}
                             </span>
                         </div>
 
@@ -383,9 +386,6 @@ return $aPriority <=> $bPriority;
                     </div>
 
                     <div class="appointment-controls-bar">
-                        <div class="appointment-control-copy">
-                            <span class="appointment-control-kicker">Manage view</span>
-                        </div>
 
                         <div class="appointment-filter-wrap">
                             <div class="appointment-search-row voice-search-row">
@@ -395,17 +395,21 @@ return $aPriority <=> $bPriority;
                                 <x-voice-input target="#apptSearchInput" status-id="apptVoiceStatus"
                                     label="Voice search appointments" title="Voice search" />
                             </div>
+                        </div>
+
+                        <div class="appointment-controls-actions">
 
                             <x-filter-select id="appointmentStatusFilter" name="appointment_status" label="Status"
                                 value="all" :options="$appointmentStatusOptions"
                                 callback="handleAppointmentStatusSelect" />
-                        </div>
 
-                        <div class="appointment-controls-actions">
                             <div class="appointment-filter-actions">
-                                <button id="appointmentFilterBtn" type="button" class="global-filter-btn">
+                                <button id="appointmentFilterBtn" type="button" class="global-filter-btn"
+                                    aria-label="Filter appointments" data-tooltip="Filter" data-tooltip-tone="neutral">
                                     <i class="fa-solid fa-sliders"></i>
+
                                     <span>Filter</span>
+
                                     <span id="appointmentFilterBadge" class="filter-badge" style="display:none;"></span>
                                 </button>
                             </div>
@@ -414,9 +418,11 @@ return $aPriority <=> $bPriority;
                                 storage-key="appointmentsViewMode" list-label="List" grid-label="Grid" />
 
                             <button id="appointmentClearFilterBtn" type="button" onclick="resetAppointmentFilters()"
-                                class="global-filter-reset-btn hidden" title="Reset filters">
+                                class="global-filter-reset-btn hidden" aria-label="Reset filters"
+                                data-tooltip="Reset filters" data-tooltip-tone="neutral">
                                 <i class="fa-solid fa-rotate-left"></i>
                             </button>
+
                         </div>
                     </div>
                 </div>
@@ -584,7 +590,7 @@ return $aPriority <=> $bPriority;
                                 $mobileDateLabel =
                                 \Carbon\Carbon::parse(
                                 $appt->appointment_date
-                                )->format('M j, Y');
+                                )->format('F j, Y');
 
                                 $weekday =
                                 \Carbon\Carbon::parse(
@@ -692,6 +698,39 @@ return $aPriority <=> $bPriority;
                                 true
                                 );
 
+                                $shouldHighlightToday =
+                                $isToday &&
+                                (
+                                $isActiveAppointment ||
+                                (
+                                $isFollowUpAppointment &&
+                                !in_array(
+                                $normalizedStatus,
+                                ['completed', 'cancelled'],
+                                true
+                                )
+                                )
+                                );
+
+                                $daysUntilAppointment =
+                                $isActiveAppointment && !$isToday
+                                ? (int) Carbon::today()->diffInDays(
+                                Carbon::parse(
+                                $appt->appointment_date
+                                )->startOfDay(),
+                                false
+                                )
+                                : null;
+
+                                $appointmentUrgencyClass =
+                                $normalizedStatus === 'rescheduled'
+                                ? 'status-rescheduled'
+                                : (
+                                $daysUntilAppointment === 1
+                                ? 'urgency-tomorrow'
+                                : 'urgency-upcoming'
+                                );
+
                                 $period =
                                 in_array(
                                 $normalizedStatus,
@@ -780,8 +819,9 @@ return $aPriority <=> $bPriority;
                                 ?? [];
                                 @endphp
 
-                                <div class="appt-card {{ $isToday ? 'is-today' : '' }}" data-appt-id="{{ $appt->id }}"
-                                    data-period="{{ $period }}" data-date="{{ $appt->appointment_date }}"
+                                <div class="appt-card {{ $shouldHighlightToday ? 'is-today' : '' }}"
+                                    data-appt-id="{{ $appt->id }}" data-period="{{ $period }}"
+                                    data-date="{{ $appt->appointment_date }}"
                                     data-time="{{ $appt->appointment_time ?? '' }}"
                                     data-patient="{{ strtolower($patientName) }}"
                                     data-student-no="{{ strtolower($studentNumber) }}"
@@ -803,13 +843,6 @@ return $aPriority <=> $bPriority;
                                             <p class="date-sub">
                                                 {{ $weekday }}
                                             </p>
-
-                                            @if ($isToday)
-                                            <span class="status-pill status-today">
-                                                <span class="status-dot"></span>
-                                                Today
-                                            </span>
-                                            @endif
                                         </div>
 
                                         <div>
@@ -884,10 +917,40 @@ return $aPriority <=> $bPriority;
                                         </div>
 
                                         <div class="appt-status-cell text-left">
-                                            <span class="status-pill {{ $statusMeta['class'] }}">
-                                                <span class="status-dot"></span>
-                                                {{ $statusMeta['label'] }}
-                                            </span>
+
+                                            <div class="flex flex-col items-start gap-1">
+
+                                                @if ($shouldHighlightToday)
+
+                                                <span class="status-pill status-today">
+                                                    <span class="status-dot"></span>
+                                                    Today
+                                                </span>
+
+                                                @else
+
+                                                <span class="status-pill {{ $statusMeta['class'] }}">
+                                                    <span class="status-dot"></span>
+                                                    {{ $statusMeta['label'] }}
+                                                </span>
+
+                                                @if (
+                                                $isActiveAppointment &&
+                                                $daysUntilAppointment !== null &&
+                                                $daysUntilAppointment > 0
+                                                )
+                                                <span class="urgency-chip {{ $appointmentUrgencyClass }}">
+                                                    {{ $daysUntilAppointment === 1
+                                                    ? 'Tomorrow'
+                                                    : 'In ' . $daysUntilAppointment . ' days'
+                                                    }}
+                                                </span>
+                                                @endif
+
+                                                @endif
+
+                                            </div>
+
                                         </div>
 
                                         <div class="appt-actions-wrap ui-action-group">
@@ -1083,7 +1146,7 @@ return $aPriority <=> $bPriority;
                             $dateLabel =
                             \Carbon\Carbon::parse(
                             $appt->appointment_date
-                            )->format('M j, Y');
+                            )->format('F j, Y');
 
                             $weekday =
                             \Carbon\Carbon::parse(
@@ -1184,6 +1247,39 @@ return $aPriority <=> $bPriority;
                             true
                             );
 
+                            $shouldHighlightToday =
+                            $isToday &&
+                            (
+                            $isActiveAppointment ||
+                            (
+                            $isFollowUpAppointment &&
+                            !in_array(
+                            $normalizedStatus,
+                            ['completed', 'cancelled'],
+                            true
+                            )
+                            )
+                            );
+
+                            $daysUntilAppointment =
+                            $isActiveAppointment && !$isToday
+                            ? (int) Carbon::today()->diffInDays(
+                            Carbon::parse(
+                            $appt->appointment_date
+                            )->startOfDay(),
+                            false
+                            )
+                            : null;
+
+                            $appointmentUrgencyClass =
+                            $normalizedStatus === 'rescheduled'
+                            ? 'status-rescheduled'
+                            : (
+                            $daysUntilAppointment === 1
+                            ? 'urgency-tomorrow'
+                            : 'urgency-upcoming'
+                            );
+
                             $period =
                             in_array(
                             $normalizedStatus,
@@ -1243,7 +1339,7 @@ return $aPriority <=> $bPriority;
                             : null;
                             @endphp
 
-                            <div class="mobile-appt-card {{ $isToday ? 'is-today' : '' }}"
+                            <div class="mobile-appt-card {{ $shouldHighlightToday ? 'is-today' : '' }}"
                                 data-appt-id="{{ $appt->id }}" data-period="{{ $period }}"
                                 data-date="{{ $appt->appointment_date }}"
                                 data-time="{{ $appt->appointment_time ?? '' }}"
@@ -1281,13 +1377,6 @@ return $aPriority <=> $bPriority;
                                                 <i class="fa-solid fa-calendar-plus"></i>
                                             </span>
                                             @endif
-
-                                            @if ($isToday)
-                                            <span class="status-pill status-today">
-                                                <span class="status-dot"></span>
-                                                Today
-                                            </span>
-                                            @endif
                                         </div>
 
                                         <div class="global-info-group">
@@ -1303,19 +1392,56 @@ return $aPriority <=> $bPriority;
                                             </span>
                                         </div>
 
-                                        <p class="mobile-appointment-date">
-                                            <i class="fa-regular fa-calendar"></i>
-                                            {{ $weekday }}, {{ $dateLabel }}
-                                        </p>
                                     </div>
 
-                                    <span class="status-pill {{ $statusMeta['class'] }}">
-                                        <span class="status-dot"></span>
-                                        {{ $statusMeta['label'] }}
-                                    </span>
+                                    <div class="flex items-center gap-2 flex-wrap justify-end">
+
+                                        <div class="flex flex-col items-end gap-1">
+
+                                            @if ($shouldHighlightToday)
+
+                                            <span class="status-pill status-today">
+                                                <span class="status-dot"></span>
+                                                Today
+                                            </span>
+
+                                            @else
+
+                                            <span class="status-pill {{ $statusMeta['class'] }}">
+                                                <span class="status-dot"></span>
+                                                {{ $statusMeta['label'] }}
+                                            </span>
+
+                                            @if (
+                                            $isActiveAppointment &&
+                                            $daysUntilAppointment !== null &&
+                                            $daysUntilAppointment > 0
+                                            )
+                                            <span class="urgency-chip {{ $appointmentUrgencyClass }}">
+                                                {{ $daysUntilAppointment === 1
+                                                ? 'Tomorrow'
+                                                : 'In ' . $daysUntilAppointment . ' days'
+                                                }}
+                                            </span>
+                                            @endif
+
+                                            @endif
+
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="appointment-grid-details">
+
+                                    <div class="appointment-grid-detail appointment-grid-detail-wide">
+                                        <span class="appointment-grid-detail-label">
+                                            Appointment Date
+                                        </span>
+
+                                        <span class="global-info-value">
+                                            {{ $weekday }}, {{ $dateLabel }}
+                                        </span>
+                                    </div>
 
                                     <div class="appointment-grid-detail">
                                         <span class="appointment-grid-detail-label">
@@ -1333,10 +1459,11 @@ return $aPriority <=> $bPriority;
                                             Service Type
                                         </span>
 
-                                        <span class="service-badge  {{ $badgeClass }}">
+                                        <span class="service-badge {{ $badgeClass }}">
                                             {{ $serviceLabel }}
                                         </span>
                                     </div>
+
                                 </div>
 
                                 <div class="mobile-appt-actions ui-action-group">
@@ -1492,8 +1619,8 @@ return $aPriority <=> $bPriority;
                 <h3 class="filter-section-title">Sort By</h3>
 
                 <div class="filter-chip-row" id="apptSortGroup">
-                    <button type="button" class="ftag ftag-active" data-sort="newest">
-                        Newest First
+                    <button type="button" class="ftag ftag-active" data-sort="nearest">
+                        Nearest Appointment
                     </button>
 
                     <button type="button" class="ftag" data-sort="oldest">
@@ -1612,12 +1739,6 @@ return $aPriority <=> $bPriority;
                 });
             }
 
-            document.addEventListener('DOMContentLoaded', () => {
-                if (typeof initRecordModal === 'function') {
-                    initRecordModal();
-                }
-            });
-
             function openStartProcedureModal(btn) {
                 if (
                     !btn ||
@@ -1677,7 +1798,7 @@ return $aPriority <=> $bPriority;
             let appointmentPeriodFilter = 'all';
             let appointmentStatusFilter = 'all';
             let appointmentStatusFilterSource = 'dropdown';
-            let appointmentSortFilter = 'newest';
+            let appointmentSortFilter = 'nearest';
             let appointmentFromDate = '';
             let appointmentToDate = '';
 
@@ -1902,9 +2023,7 @@ return $aPriority <=> $bPriority;
                 'DOMContentLoaded',
                 () => {
                     window.initGlobalVoiceInputs?.();
-                    window.initGlobalViewToggles?.();
                     window.initGlobalSearchBars?.();
-                    window.initGlobalFilterSelects?.();
 
                     apptSearchInput =
                         document.getElementById(
@@ -1918,11 +2037,27 @@ return $aPriority <=> $bPriority;
                             'appointmentStatusFilterInput'
                         )?.value || 'all';
 
-                    setAppointmentStatusFilter(
-                        initialStatus,
-                        false,
-                        'dropdown'
-                    );
+                    appointmentStatusFilter =
+                        apptStatusMeta[
+                            initialStatus
+                        ]
+                            ? initialStatus
+                            : 'all';
+
+                    appointmentPeriodFilter =
+                        appointmentStatusFilter ===
+                            'all'
+                            ? 'all'
+                            : (
+                                [
+                                    'completed',
+                                    'cancelled'
+                                ].includes(
+                                    appointmentStatusFilter
+                                )
+                                    ? 'past'
+                                    : 'upcoming'
+                            );
 
                     applyAppointmentFilters();
                     updateAppointmentFilterButtonState();
@@ -2136,29 +2271,30 @@ return $aPriority <=> $bPriority;
                                 return aDate - bDate;
                             }
 
-                            const statusPriority = {
-                                upcoming: 1,
-                                rescheduled: 2,
-                                completed: 3,
-                                cancelled: 4
-                            };
-
-                            const aPriority =
-                                statusPriority[
+                            const aStatus =
                                 normalizeAppointmentStatusFilter(
                                     a.dataset.status || ''
-                                )
-                                ] ?? 99;
+                                );
 
-                            const bPriority =
-                                statusPriority[
+                            const bStatus =
                                 normalizeAppointmentStatusFilter(
                                     b.dataset.status || ''
-                                )
-                                ] ?? 99;
+                                );
 
-                            if (aPriority !== bPriority) {
-                                return aPriority - bPriority;
+                            const aIsActive =
+                                ['upcoming', 'rescheduled']
+                                    .includes(aStatus);
+
+                            const bIsActive =
+                                ['upcoming', 'rescheduled']
+                                    .includes(bStatus);
+
+                            if (aIsActive !== bIsActive) {
+                                return aIsActive ? -1 : 1;
+                            }
+
+                            if (aIsActive && bIsActive) {
+                                return aDate - bDate;
                             }
 
                             return bDate - aDate;
@@ -2280,7 +2416,7 @@ return $aPriority <=> $bPriority;
 
                 const hasAdvancedFilters =
                     appointmentSortFilter !==
-                    'newest' ||
+                    'nearest' ||
                     !!appointmentFromDate ||
                     !!appointmentToDate;
 
@@ -2417,7 +2553,7 @@ return $aPriority <=> $bPriority;
                 return {
                     sort:
                         activeSort?.dataset.sort ||
-                        'newest',
+                        'nearest',
 
                     period:
                         appointmentPeriodFilter,
@@ -2469,7 +2605,7 @@ return $aPriority <=> $bPriority;
 
                 if (
                     appointmentSortFilter !==
-                    'newest'
+                    'nearest'
                 ) {
                     count++;
                 }
@@ -2542,13 +2678,13 @@ return $aPriority <=> $bPriority;
 
                 const draft = getDraftAppointmentFilters();
 
-                if (draft.sort !== 'newest') {
+                if (draft.sort !== 'nearest') {
                     const sortLabel = document.querySelector(`#apptSortGroup .ftag[data-sort="${draft.sort}"]`)?.textContent
                         .trim() || draft.sort;
                     addChip(`Sort: ${sortLabel}`, function () {
                         document.querySelectorAll('#apptSortGroup .ftag').forEach(btn => btn.classList.remove(
                             'ftag-active'));
-                        document.querySelector('#apptSortGroup .ftag[data-sort="newest"]')?.classList.add(
+                        document.querySelector('#apptSortGroup .ftag[data-sort="nearest"]')?.classList.add(
                             'ftag-active');
                     });
                 }
@@ -2582,7 +2718,7 @@ return $aPriority <=> $bPriority;
             function resetAppointmentPanelFilters(
                 shouldApply = true
             ) {
-                appointmentSortFilter = 'newest';
+                appointmentSortFilter = 'nearest';
                 appointmentFromDate = '';
                 appointmentToDate = '';
 

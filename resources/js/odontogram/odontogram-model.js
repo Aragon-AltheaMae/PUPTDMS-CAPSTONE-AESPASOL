@@ -214,9 +214,6 @@ export function createOdontogramTooth(
     neck.position.set(0, gumDirection * 0.08, 0);
     addVisualPart(toothGroup, neck, visualParts, colorableParts);
 
-    if (type === 'incisor') {
-    }
-
     if (type === 'canine') {
         const point = new THREE.Mesh(
             new THREE.ConeGeometry(size.width * 0.35, 0.16, 28, 1),

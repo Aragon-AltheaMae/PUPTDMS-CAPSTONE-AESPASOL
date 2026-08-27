@@ -225,6 +225,19 @@ function initGlobalSearchBars(
 
             let timer = null;
 
+            const syncClearButton = () => {
+                if (!clearButton) {
+                    return;
+                }
+
+                clearButton.classList.toggle(
+                    'show',
+                    input.value
+                        .trim()
+                        .length > 0
+                );
+            };
+
             const run = () => {
                 window.clearTimeout(
                     timer
@@ -246,6 +259,8 @@ function initGlobalSearchBars(
             input.addEventListener(
                 'input',
                 () => {
+                    syncClearButton();
+
                     window.clearTimeout(
                         timer
                     );
@@ -285,21 +300,38 @@ function initGlobalSearchBars(
 
                     input.value = '';
 
+                    syncClearButton();
+
                     run();
 
                     input.focus();
                 }
             );
 
+            syncClearButton();
         });
 }
 
-document.addEventListener(
-    'DOMContentLoaded',
-    () => {
-        initGlobalSearchBars();
-    }
-);
+function bootGlobalSearchBars() {
+    initGlobalSearchBars(
+        document
+    );
+}
+
+if (
+    document.readyState ===
+    'loading'
+) {
+    document.addEventListener(
+        'DOMContentLoaded',
+        bootGlobalSearchBars,
+        {
+            once: true
+        }
+    );
+} else {
+    bootGlobalSearchBars();
+}
 
 document.addEventListener(
     'ui-modal:opened',
@@ -345,6 +377,14 @@ document.addEventListener(
             );
 
         input.value = '';
+
+        wrapper
+            ?.querySelector(
+                '[data-search-clear]'
+            )
+            ?.classList.remove(
+                'show'
+            );
 
         const callback =
             resolveSearchCallback(

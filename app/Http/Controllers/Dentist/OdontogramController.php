@@ -713,7 +713,7 @@ class OdontogramController extends Controller
             }
 
             if (Schema::hasColumn('appointment_procedures', 'procedure_duration_seconds')) {
-                $procedurePayload['procedure_duration_seconds'] = $procedureDurationSeconds ?: null;
+                $procedurePayload['procedure_duration_seconds'] = max(0, $procedureDurationSeconds);
             }
 
             AppointmentProcedure::updateOrCreate(
@@ -1558,7 +1558,20 @@ class OdontogramController extends Controller
         $appointmentDate = Carbon::parse($draft['appointment_date'])->toDateString();
         $appointmentTime = $this->normalizeProcedureTime($draft['appointment_time']);
         $procedureDurationSeconds = $this->parseDurationToSeconds($draft['procedure_duration_hms'] ?? '00:00:00');
-        $procedureCompletedAt = Carbon::parse(trim($appointmentDate . ' ' . $appointmentTime));
+        $procedureStartedAt =
+            Carbon::parse(
+                trim(
+                    $appointmentDate . ' ' .
+                        $appointmentTime
+                )
+            );
+
+        $procedureCompletedAt =
+            $procedureStartedAt
+            ->copy()
+            ->addSeconds(
+                $procedureDurationSeconds
+            );
 
         $appointmentPayload = [
             'patient_id' => $patient->id,

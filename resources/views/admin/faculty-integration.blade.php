@@ -4,6 +4,10 @@
 
 @section('title', 'Faculty Integration')
 
+@section('styles')
+    @vite('resources/css/pages/admin/faculty-integration.css')
+@endsection
+
 @section('content')
 
 <main id="mainContent" class="admin-page-shell faculty-page page-enter">

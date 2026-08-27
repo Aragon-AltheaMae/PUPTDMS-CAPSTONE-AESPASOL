@@ -599,39 +599,92 @@ function setMonthOnlyPickerValue(inputOrSelector, value, dispatch = true) {
     }
 }
 
-document.addEventListener(
-    'DOMContentLoaded',
-    async () => {
-        const hasFlatpickrFields =
-            document.querySelector(
-                [
-                    '.js-flatpickr-date',
-                    '.js-flatpickr-date-min-today',
-                    '.js-flatpickr-date-max-today',
-                    '.js-flatpickr-date-range-from',
-                    '.js-flatpickr-date-range-to',
-                    '.js-flatpickr-time',
-                    '[data-month-only-picker]'
-                ].join(',')
-            );
+let globalDatePickerBootPromise =
+    null;
 
-        if (!hasFlatpickrFields) {
-            return;
-        }
+export async function initGlobalDatePickers(
+    root = document
+) {
+    const scope =
+        root &&
+            typeof root.querySelectorAll ===
+            'function'
+            ? root
+            : document;
 
-        try {
-            await window.loadFlatpickr();
+    const hasFlatpickrFields =
+        scope.matches?.(
+            [
+                '.js-flatpickr-date',
+                '.js-flatpickr-date-min-today',
+                '.js-flatpickr-date-max-today',
+                '.js-flatpickr-date-range-from',
+                '.js-flatpickr-date-range-to',
+                '.js-flatpickr-time',
+                '[data-month-only-picker]'
+            ].join(',')
+        ) ||
+        scope.querySelector?.(
+            [
+                '.js-flatpickr-date',
+                '.js-flatpickr-date-min-today',
+                '.js-flatpickr-date-max-today',
+                '.js-flatpickr-date-range-from',
+                '.js-flatpickr-date-range-to',
+                '.js-flatpickr-time',
+                '[data-month-only-picker]'
+            ].join(',')
+        );
 
-            initGlobalFlatpickr();
-            initMonthOnlyFlatpickr();
-        } catch (error) {
+    if (!hasFlatpickrFields) {
+        return;
+    }
+
+    if (!globalDatePickerBootPromise) {
+        globalDatePickerBootPromise =
+            loadFlatpickr()
+                .catch(error => {
+                    globalDatePickerBootPromise =
+                        null;
+
+                    throw error;
+                });
+    }
+
+    await globalDatePickerBootPromise;
+
+    initGlobalFlatpickr();
+    initMonthOnlyFlatpickr(
+        scope
+    );
+}
+
+function bootGlobalDatePickers() {
+    initGlobalDatePickers(
+        document
+    )
+        .catch(error => {
             console.error(
                 'Unable to load Flatpickr.',
                 error
             );
+        });
+}
+
+if (
+    document.readyState ===
+    'loading'
+) {
+    document.addEventListener(
+        'DOMContentLoaded',
+        bootGlobalDatePickers,
+        {
+            once: true
         }
-    }
-);
+    );
+} else {
+    bootGlobalDatePickers();
+}
 
 let activeFlatpickrInstance = null;
 
@@ -726,7 +779,20 @@ function initFlatpickrSwipeClose() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', initFlatpickrSwipeClose);
+if (
+    document.readyState ===
+    'loading'
+) {
+    document.addEventListener(
+        'DOMContentLoaded',
+        initFlatpickrSwipeClose,
+        {
+            once: true
+        }
+    );
+} else {
+    initFlatpickrSwipeClose();
+}
 
 window.loadFlatpickr = loadFlatpickr;
 window.createCalendarSource = createCalendarSource;

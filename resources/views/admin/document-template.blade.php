@@ -4,6 +4,10 @@
 
 @section('title', 'Document Templates')
 
+@section('styles')
+    @vite('resources/css/pages/admin/document-templates.css')
+@endsection
+
 @section('content')
 
 <main id="mainContent" class="admin-page-shell document-templates-page page-enter">

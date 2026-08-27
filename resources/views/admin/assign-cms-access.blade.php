@@ -2,6 +2,10 @@
 
 @section('layout-role', 'admin')
 
+@section('styles')
+    @vite('resources/css/pages/admin/cms-access.css')
+@endsection
+
 @section('title', 'CMS Access')
 
 @section('content')

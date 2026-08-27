@@ -4,6 +4,10 @@
 
 @section('title', 'System Settings')
 
+@section('styles')
+    @vite('resources/css/pages/admin/system-settings.css')
+@endsection
+
 @section('content')
 
 <main id="mainContent" class="system-settings-page admin-page-shell page-enter">

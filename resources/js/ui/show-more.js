@@ -322,9 +322,23 @@ window.ShowMore = {
     reset: resetShowMore,
 };
 
-document.addEventListener(
-    'DOMContentLoaded',
-    () => {
-        initShowMore();
-    }
-);
+function bootShowMore() {
+    initShowMore(
+        document
+    );
+}
+
+if (
+    document.readyState ===
+    'loading'
+) {
+    document.addEventListener(
+        'DOMContentLoaded',
+        bootShowMore,
+        {
+            once: true
+        }
+    );
+} else {
+    bootShowMore();
+}

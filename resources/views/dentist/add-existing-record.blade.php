@@ -4,6 +4,10 @@
 
 @section('title', 'Add Existing Record')
 
+@section('styles')
+    @vite('resources/css/pages/dentist/add-existing-record.css')
+@endsection
+
 @section('content')
 <main id="mainContent" class="dentist-page-shell existing-record-page page-enter">
     <div class="w-full">

@@ -4,6 +4,10 @@
 
 @section('title', $pageTitle)
 
+@section('styles')
+    @vite('resources/css/pages/shared/patient-list.css')
+@endsection
+
 @section('content')
 
 @php
@@ -211,11 +215,8 @@ $notifCount = $notifications->count();
                         <div class="table-scroll-inner">
 
                             <div class="card-col-header">
-                                <span></span>
                                 <span>Patient</span>
-                                <span></span>
                                 <span>Date &amp; Time</span>
-                                <span></span>
                                 <span>Service &amp; Status</span>
                                 <span></span>
                             </div>
@@ -292,273 +293,205 @@ $notifCount = $notifications->count();
 
                     <div id="patientContainer" class="space-y-3 px-3 md:px-6 pb-6 pt-4">
 
-                        @foreach ($appointments as $appt)
                         @php
-                        $status = strtolower($appt->status ?? '');
-                        $isCancelled = $status === 'cancelled';
-                        $isCompleted = $status === 'completed';
-                        $isRescheduled = $status === 'rescheduled';
-                        $isToday =
-                        $appt->appointment_date === $today && !$isCancelled && !$isCompleted;
-                        $isUpcoming =
-                        $appt->appointment_date > $today &&
-                        in_array(
-                        $status,
-                        ['upcoming', 'rescheduled', 'pending', 'confirmed'],
-                        true,
-                        );
+                        $appointments = collect($appointments)->sort(function ($a, $b) {
+                        $aStatus = strtolower(trim((string) ($a->status ?? 'upcoming')));
+                        $bStatus = strtolower(trim((string) ($b->status ?? 'upcoming')));
 
-                        $tabClass = $isCancelled
-                        ? 'cancelled'
-                        : ($isCompleted
-                        ? 'completed'
-                        : ($isRescheduled
-                        ? 'rescheduled'
-                        : ($isToday
-                        ? 'today'
-                        : ($isUpcoming
-                        ? 'upcoming'
-                        : 'all'))));
+                        $activeStatuses = ['upcoming', 'rescheduled', 'pending', 'confirmed'];
+                        $aIsActive = in_array($aStatus, $activeStatuses, true);
+                        $bIsActive = in_array($bStatus, $activeStatuses, true);
 
-                        $patient = $appt->patient;
-                        $isWalkInAppointment = (bool) ($appt->is_walk_in ?? false);
-                        $isFollowUpAppointment = (bool) ($appt->is_follow_up ?? false);
-                        $patientId = $patient?->id ?? $appt->patient_id;
-                        $patientName = $patient?->name ?? 'Unknown Patient';
-                        $patientStudentNo = filled($patient?->student_no)
-                        ? $patient->student_no
-                        : (filled($patient?->faculty_code)
-                        ? 'Faculty: ' . $patient->faculty_code
-                        : 'No identity number');
-
-                        $patientCourseCode = trim((string) ($patient?->course_code ?? ''));
-                        $patientCourseName = trim((string) ($patient?->course_name ?? ''));
-
-                        $patientCourse =
-                        $patientCourseCode !== ''
-                        ? $patientCourseCode
-                        : ($patientCourseName !== ''
-                        ? $patientCourseName
-                        : 'No program');
-
-                        $patientCourseFull = collect([
-                        $patientCourseCode,
-                        $patientCourseName !== $patientCourseCode ? $patientCourseName : null,
-                        ])
-                        ->filter()
-                        ->implode(' — ');
-
-                        if ($patientCourseFull === '') {
-                        $patientCourseFull = 'No program';
+                        if ($aIsActive !== $bIsActive) {
+                        return $aIsActive ? -1 : 1;
                         }
 
-                        $patientYearLevel = $patient?->year_level ?? '';
-                        $patientSection = $patient?->section ?? '';
+                        $aDateTime = Carbon::parse(($a->appointment_date ?? '1970-01-01') . ' ' . ($a->appointment_time
+                        ?? '00:00:00'));
+                        $bDateTime = Carbon::parse(($b->appointment_date ?? '1970-01-01') . ' ' . ($b->appointment_time
+                        ?? '00:00:00'));
 
-                        $patientImage = $patient?->profile_image
-                        ? asset('storage/' . $patient->profile_image)
-                        : null;
+                        if ($aIsActive && $bIsActive) {
+                        return $aDateTime <=> $bDateTime;
+                            }
+                            return $bDateTime <=> $aDateTime;
+                                })->values();
+                                @endphp
 
-                        $dateLabel = Carbon::parse($appt->appointment_date)->format('d M Y');
-                        $timeLabel = Carbon::parse($appt->appointment_time)->format('g:i A');
-                        $serviceLabel =
-                        $appt->service_type === 'Others'
-                        ? ($appt->other_services ?:
-                        'Others')
-                        : $appt->service_type;
+                                @foreach ($appointments as $appt)
+                                @php
+                                $status = strtolower($appt->status ?? '');
+                                $isCancelled = $status === 'cancelled';
+                                $isCompleted = $status === 'completed';
+                                $isRescheduled = $status === 'rescheduled';
+                                $isToday =
+                                $appt->appointment_date === $today && !$isCancelled && !$isCompleted;
+                                $isUpcoming =
+                                $appt->appointment_date > $today &&
+                                in_array(
+                                $status,
+                                ['upcoming', 'rescheduled', 'pending', 'confirmed'],
+                                true,
+                                );
 
-                        $statusToneClass = $isCancelled
-                        ? 'status-cancelled'
-                        : ($isCompleted
-                        ? 'status-completed'
-                        : ($isRescheduled
-                        ? 'status-rescheduled'
-                        : ($isToday
-                        ? 'status-today'
-                        : ($isUpcoming
-                        ? 'status-upcoming'
-                        : 'status-default'))));
-                        $pillClass = $isCancelled
-                        ? 'pill-cancelled'
-                        : ($isCompleted
-                        ? 'pill-completed'
-                        : ($isRescheduled
-                        ? 'pill-rescheduled'
-                        : ($isToday
-                        ? 'pill-today'
-                        : ($isUpcoming
-                        ? 'pill-upcoming'
-                        : 'pill-default'))));
-                        $pillText = $isCancelled
-                        ? 'Cancelled'
-                        : ($isCompleted
-                        ? 'Completed'
-                        : ($isRescheduled
-                        ? 'Rescheduled'
-                        : ($isToday
-                        ? 'Appointment Today'
-                        : ($isUpcoming
-                        ? ($status === 'upcoming'
-                        ? 'Upcoming'
-                        : 'Upcoming ·
-                        ' . ucfirst($status))
-                        : ucfirst($status ?: 'Pending')))));
+                                $tabClass = $isCancelled
+                                ? 'cancelled'
+                                : ($isCompleted
+                                ? 'completed'
+                                : ($isRescheduled
+                                ? 'rescheduled'
+                                : ($isToday
+                                ? 'today'
+                                : ($isUpcoming
+                                ? 'upcoming'
+                                : 'all'))));
 
-                        $appointmentDate = Carbon::parse($appt->appointment_date)->startOfDay();
-                        $todayDate = Carbon::today();
-                        $daysDiff = (int) $todayDate->diffInDays($appointmentDate, false);
+                                $patient = $appt->patient;
+                                $isWalkInAppointment = (bool) ($appt->is_walk_in ?? false);
+                                $isFollowUpAppointment = (bool) ($appt->is_follow_up ?? false);
+                                $patientId = $patient?->id ?? $appt->patient_id;
+                                $patientName = $patient?->name ?? 'Unknown Patient';
+                                $patientStudentNo = filled($patient?->student_no)
+                                ? $patient->student_no
+                                : (filled($patient?->faculty_code)
+                                ? 'Faculty: ' . $patient->faculty_code
+                                : 'No identity number');
 
-                        $showDateUrgency = !$isCancelled && !$isCompleted && $daysDiff >= 0;
+                                $patientCourseCode = trim((string) ($patient?->course_code ?? ''));
+                                $patientCourseName = trim((string) ($patient?->course_name ?? ''));
 
-                        $urgencyLabel = $showDateUrgency
-                        ? ($daysDiff === 0
-                        ? 'Today'
-                        : ($daysDiff === 1
-                        ? 'Tomorrow'
-                        : 'In ' . $daysDiff . ' days'))
-                        : '';
+                                $patientCourse =
+                                $patientCourseCode !== ''
+                                ? $patientCourseCode
+                                : ($patientCourseName !== ''
+                                ? $patientCourseName
+                                : 'No program');
 
-                        $urgencyClass = $showDateUrgency
-                        ? ($isRescheduled
-                        ? 'status-rescheduled'
-                        : ($daysDiff === 0
-                        ? 'urgency-today'
-                        : ($daysDiff === 1
-                        ? 'urgency-tomorrow'
-                        : 'urgency-upcoming')))
-                        : '';
-                        @endphp
+                                $patientCourseFull = collect([
+                                $patientCourseCode,
+                                $patientCourseName !== $patientCourseCode ? $patientCourseName : null,
+                                ])
+                                ->filter()
+                                ->implode(' — ');
 
-                        @php
-                        $patientProfileUrl = $patientId
-                        ? route($patientProfileRouteName, $patientId)
-                        : null;
-                        @endphp
-                        @if ($patientProfileUrl)
-                        <a href="{{ $patientProfileUrl }}" class="patient-card patient-item all {{ $tabClass }} block"
-                            data-patient-id="{{ $patientId }}">
-                            @else
-                            <div class="patient-card patient-item all {{ $tabClass }} block" data-patient-id="">
-                                @endif
+                                if ($patientCourseFull === '') {
+                                $patientCourseFull = 'No program';
+                                }
 
-                                <div class="accent-bar {{ $statusToneClass }}"></div>
+                                $patientYearLevel = $patient?->year_level ?? '';
+                                $patientSection = $patient?->section ?? '';
 
-                                <div class="patient-list-card-body">
-                                    <div class="patient-list-main">
-                                        <span class="patient-avatar patient-avatar-md" data-patient-avatar
-                                            data-patient-name="{{ $patientName }}"
-                                            data-patient-url="{{ $patientImage }}"></span>
-                                        <div class="patient-list-person">
-                                            <div class="patient-list-name-row">
+                                $patientImage = $patient?->profile_image
+                                ? asset('storage/' . $patient->profile_image)
+                                : null;
 
-                                                <h3 class="patient-list-name" data-patient-name>
-                                                    {{ $patientName }}
-                                                </h3>
+                                $dateLabel = Carbon::parse($appt->appointment_date)->format('l, F j, Y');
 
-                                                @if ($isWalkInAppointment)
-                                                <span class="appt-type-icon" data-tooltip="Walk-in appointment"
-                                                    data-tooltip-tone="neutral" aria-label="Walk-in appointment"
-                                                    tabindex="0">
-                                                    <i class="fa-solid fa-person-walking"></i>
-                                                </span>
-                                                @endif
+                                $gridDayLabel = Carbon::parse($appt->appointment_date)->format('l');
+                                $gridDateLabel = Carbon::parse($appt->appointment_date)->format('F j, Y');
 
-                                                @if ($isFollowUpAppointment)
-                                                <span class="appt-type-icon" data-tooltip="Follow-up appointment"
-                                                    data-tooltip-tone="neutral" aria-label="Follow-up appointment"
-                                                    tabindex="0">
-                                                    <i class="fa-solid fa-calendar-plus"></i>
-                                                </span>
-                                                @endif
+                                $timeLabel = Carbon::parse($appt->appointment_time)->format('g:i A');
+                                $serviceLabel =
+                                $appt->service_type === 'Others'
+                                ? ($appt->other_services ?:
+                                'Others')
+                                : $appt->service_type;
 
-                                            </div>
+                                $serviceLower = strtolower($serviceLabel);
+                                $badgeClass = 'service-badge-default';
 
-                                            <div class="patient-list-meta">
-                                                <span class="global-info-pill">
-                                                    <i class="fa-regular fa-id-card"></i>
-                                                    {{ $patientStudentNo }}
-                                                </span>
+                                if (str_contains($serviceLower, 'surgery')) {
+                                $badgeClass = 'service-badge-surgery';
+                                } elseif (str_contains($serviceLower, 'check')) {
+                                $badgeClass = 'service-badge-checkup';
+                                } elseif (str_contains($serviceLower, 'whiten')) {
+                                $badgeClass = 'service-badge-whitening';
+                                } elseif (str_contains($serviceLower, 'extrac')) {
+                                $badgeClass = 'service-badge-extraction';
+                                }
 
-                                                <span class="global-info-pill" title="{{ $patientCourseFull }}">
-                                                    <i class="fa-solid fa-graduation-cap"></i>
-                                                    {{ $patientCourse }}
-                                                </span>
-                                            </div>
+                                $statusToneClass = $isCancelled
+                                ? 'status-cancelled'
+                                : ($isCompleted
+                                ? 'status-completed'
+                                : ($isRescheduled
+                                ? 'status-rescheduled'
+                                : ($isToday
+                                ? 'status-today'
+                                : ($isUpcoming
+                                ? 'status-upcoming'
+                                : 'status-default'))));
+                                $pillClass = $isCancelled
+                                ? 'pill-cancelled'
+                                : ($isCompleted
+                                ? 'pill-completed'
+                                : ($isRescheduled
+                                ? 'pill-rescheduled'
+                                : ($isToday
+                                ? 'pill-today'
+                                : ($isUpcoming
+                                ? 'pill-upcoming'
+                                : 'pill-default'))));
+                                $pillText = $isCancelled
+                                ? 'Cancelled'
+                                : ($isCompleted
+                                ? 'Completed'
+                                : ($isRescheduled
+                                ? 'Rescheduled'
+                                : ($isToday
+                                ? 'Appointment Today'
+                                : ($isUpcoming
+                                ? ($status === 'upcoming'
+                                ? 'Upcoming'
+                                : 'Upcoming ·
+                                ' . ucfirst($status))
+                                : ucfirst($status ?: 'Pending')))));
 
-                                            <span class="patient-info hidden">
-                                                {{ $patientCourseCode }}|
-                                                {{ $patientYearLevel }}|
-                                                {{ $patientSection }}|
-                                                {{ $appt->appointment_date }}|
-                                                {{ $patient?->department ?? '' }}|
-                                                {{ optional($appt->created_at)->toDateTimeString() }}
-                                            </span>
-                                        </div>
-                                    </div>
+                                $appointmentDate = Carbon::parse($appt->appointment_date)->startOfDay();
+                                $todayDate = Carbon::today();
+                                $daysDiff = (int) $todayDate->diffInDays($appointmentDate, false);
 
-                                    <div class="patient-list-detail patient-list-date-block">
-                                        <span class="patient-list-detail-icon global-info-icon {{ $statusToneClass }}">
-                                            <i class="fa-regular fa-calendar"></i>
-                                        </span>
+                                $showDateUrgency = !$isCancelled && !$isCompleted && $daysDiff >= 0;
 
-                                        <div class="patient-list-detail-copy">
-                                            <span class="patient-list-detail-label">
-                                                Appointment
-                                            </span>
+                                $urgencyLabel = $showDateUrgency
+                                ? ($daysDiff === 0
+                                ? 'Today'
+                                : ($daysDiff === 1
+                                ? 'Tomorrow'
+                                : 'In ' . $daysDiff . ' days'))
+                                : '';
 
-                                            <strong class="patient-list-detail-value">
-                                                {{ $dateLabel }}
-                                            </strong>
+                                $urgencyClass = $showDateUrgency
+                                ? ($isRescheduled
+                                ? 'status-rescheduled'
+                                : ($daysDiff === 0
+                                ? 'urgency-today'
+                                : ($daysDiff === 1
+                                ? 'urgency-tomorrow'
+                                : 'urgency-upcoming')))
+                                : '';
+                                @endphp
 
-                                            <small class="patient-list-detail-subvalue">
-                                                {{ $timeLabel }}
-                                            </small>
+                                @php
+                                $patientProfileUrl = $patientId
+                                ? route($patientProfileRouteName, $patientId)
+                                : null;
+                                @endphp
+                                <div class="patient-card patient-item all {{ $tabClass }} block"
+                                    data-patient-id="{{ $patientId }}" data-status="{{ $status }}"
+                                    data-date="{{ $appt->appointment_date }}"
+                                    data-time="{{ $appt->appointment_time ?? '00:00:00' }}">
+                                    <div class="accent-bar {{ $statusToneClass }}"></div>
 
-                                            @if ($showDateUrgency)
-                                            <span class="urgency-chip {{ $urgencyClass }}">
-                                                {{ $urgencyLabel }}
-                                            </span>
-                                            @endif
-                                        </div>
-                                    </div>
-
-                                    <div class="patient-list-detail patient-list-service-block patient-service-block">
-                                        <span class="patient-list-detail-icon global-info-icon {{ $statusToneClass }}">
-                                            <i class="fa-solid fa-tooth"></i>
-                                        </span>
-
-                                        <div class="patient-list-detail-copy">
-                                            <span class="patient-list-detail-label global-info-label">
-                                                Service
-                                            </span>
-
-                                            <strong class="patient-list-detail-value font-semibold">
-                                                {{ $serviceLabel }}
-                                            </strong>
-
-                                            <span class="status-pill {{ $pillClass }} patient-list-status">
-                                                <span class="pill-dot"></span>
-                                                {{ $pillText }}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <span class="patient-list-chevron" aria-hidden="true">
-                                        <i class="fa-solid fa-chevron-right"></i>
-                                    </span>
-                                </div>
-
-                                <div class="patient-grid-card-body">
-                                    <div class="patient-grid-card-header">
-                                        <div class="patient-grid-card-identity">
+                                    <div class="patient-list-card-body">
+                                        <div class="patient-list-main">
                                             <span class="patient-avatar patient-avatar-md" data-patient-avatar
                                                 data-patient-name="{{ $patientName }}"
                                                 data-patient-url="{{ $patientImage }}"></span>
+                                            <div class="patient-list-person">
+                                                <div class="patient-list-name-row">
 
-                                            <div class="patient-grid-card-person">
-                                                <div class="patient-grid-name-row">
-
-                                                    <h3 class="patient-grid-card-name" data-patient-name>
+                                                    <h3 class="patient-list-name" data-patient-name>
                                                         {{ $patientName }}
                                                     </h3>
 
@@ -580,7 +513,114 @@ $notifCount = $notifications->count();
 
                                                 </div>
 
-                                                <div class="patient-grid-card-meta">
+                                                <div class="patient-list-meta">
+                                                    <span class="global-info-pill">
+                                                        <i class="fa-regular fa-id-card"></i>
+                                                        {{ $patientStudentNo }}
+                                                    </span>
+
+                                                    <span class="global-info-pill" title="{{ $patientCourseFull }}">
+                                                        <i class="fa-solid fa-graduation-cap"></i>
+                                                        {{ $patientCourse }}
+                                                    </span>
+                                                </div>
+
+                                                <span class="patient-info hidden">
+                                                    {{ $patientCourseCode }}|
+                                                    {{ $patientYearLevel }}|
+                                                    {{ $patientSection }}|
+                                                    {{ $appt->appointment_date }}|
+                                                    {{ $patient?->department ?? '' }}|
+                                                    {{ optional($appt->created_at)->toDateTimeString() }}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="patient-list-detail patient-list-date-block">
+                                            <span
+                                                class="patient-list-detail-icon global-info-icon {{ $statusToneClass }}">
+                                                <i class="fa-regular fa-calendar"></i>
+                                            </span>
+
+                                            <div class="patient-list-detail-copy">
+                                                <span class="patient-list-detail-label">
+                                                    Appointment
+                                                </span>
+
+                                                <strong class="patient-list-detail-value">
+                                                    {{ $dateLabel }}
+                                                </strong>
+
+                                                <small class="patient-list-detail-subvalue">
+                                                    {{ $timeLabel }}
+                                                </small>
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            class="patient-list-detail patient-list-service-block patient-service-block">
+                                            <span
+                                                class="patient-list-detail-icon global-info-icon {{ $statusToneClass }}">
+                                                <i class="fa-solid fa-tooth"></i>
+                                            </span>
+
+                                            <div class="patient-list-detail-copy">
+                                                <span class="patient-list-detail-label global-info-label">
+                                                    Service
+                                                </span>
+
+                                                <strong class="patient-list-detail-value font-semibold">
+                                                    {{ $serviceLabel }}
+                                                </strong>
+
+                                                <span class="status-pill {{ $pillClass }} patient-list-status">
+                                                    <span class="pill-dot"></span>
+                                                    {{ $pillText }}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="appt-actions-wrap ui-action-group ml-auto">
+                                            @if ($patientProfileUrl)
+                                            <a href="{{ $patientProfileUrl }}" class="ui-action-btn ui-action-view"
+                                                data-tooltip="View profile" aria-label="View profile">
+                                                <i class="fa-regular fa-user"></i>
+                                            </a>
+                                            @else
+                                            <button type="button" class="ui-action-btn ui-action-view" disabled
+                                                data-tooltip="No patient profile">
+                                                <i class="fa-regular fa-user"></i>
+                                            </button>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <div class="patient-grid-card-body flex-1">
+                                        <div class="flex items-start justify-between gap-2 mb-4 pl-1">
+                                            <div class="min-w-0">
+                                                <div class="flex items-center gap-2 flex-wrap mb-1">
+                                                    <p class="mobile-patient-name" data-patient-name>
+                                                        {{ $patientName }}
+                                                    </p>
+
+                                                    @if ($isWalkInAppointment)
+                                                    <span class="appt-type-icon" data-tooltip="Walk-in appointment"
+                                                        data-tooltip-tone="neutral" aria-label="Walk-in appointment"
+                                                        tabindex="0">
+                                                        <i class="fa-solid fa-person-walking"></i>
+                                                    </span>
+                                                    @endif
+
+                                                    @if ($isFollowUpAppointment)
+                                                    <span class="appt-type-icon" data-tooltip="Follow-up appointment"
+                                                        data-tooltip-tone="neutral" aria-label="Follow-up appointment"
+                                                        tabindex="0">
+                                                        <i class="fa-solid fa-calendar-plus"></i>
+                                                    </span>
+                                                    @endif
+                                                </div>
+
+                                                <div class="global-info-group">
                                                     <span class="global-info-pill">
                                                         <i class="fa-regular fa-id-card"></i>
                                                         {{ $patientStudentNo }}
@@ -592,58 +632,82 @@ $notifCount = $notifications->count();
                                                     </span>
                                                 </div>
                                             </div>
+
+                                            <div class="flex items-center gap-2 flex-wrap justify-end">
+                                                <div class="flex flex-col items-end gap-1">
+                                                    <span class="status-pill {{ $pillClass }} patient-grid-card-status">
+                                                        <span class="pill-dot"></span>
+                                                        {{ $pillText }}
+                                                    </span>
+
+                                                    @if ($showDateUrgency)
+                                                    <span class="urgency-chip {{ $urgencyClass }}">
+                                                        {{ $urgencyLabel }}
+                                                    </span>
+                                                    @endif
+                                                </div>
+                                            </div>
                                         </div>
 
-                                        <div class="patient-grid-card-schedule">
-                                            <strong>{{ $dateLabel }}</strong>
-                                            <span>{{ $timeLabel }}</span>
+                                        <div class="appointment-grid-details">
+                                            <div class="appointment-grid-detail appointment-grid-detail-wide">
+                                                <span class="appointment-grid-detail-label">
+                                                    Appointment Date
+                                                </span>
+                                                <span class="global-info-value">
+                                                    {{ $gridDayLabel }}, {{ $gridDateLabel }}
+                                                </span>
+                                            </div>
 
-                                            @if ($showDateUrgency)
-                                            <span class="urgency-chip {{ $urgencyClass }}">
-                                                {{ $urgencyLabel }}
-                                            </span>
+                                            <div class="appointment-grid-detail">
+                                                <span class="appointment-grid-detail-label">
+                                                    Schedule Time
+                                                </span>
+                                                <span class="time-chip">
+                                                    <i class="fa-regular fa-clock"></i>
+                                                    {{ $timeLabel }}
+                                                </span>
+                                            </div>
+
+                                            <div class="appointment-grid-detail">
+                                                <span class="appointment-grid-detail-label">
+                                                    Service Type
+                                                </span>
+                                                <span class="service-badge {{ $badgeClass }}">
+                                                    {{ $serviceLabel }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="mobile-appt-actions ui-action-group mt-2">
+                                            @if ($patientProfileUrl)
+                                            <a href="{{ $patientProfileUrl }}" class="ui-action-btn ui-action-view"
+                                                data-tooltip="View profile" aria-label="View profile">
+                                                <i class="fa-regular fa-user"></i>
+                                            </a>
+                                            @else
+                                            <button type="button" class="ui-action-btn ui-action-view" disabled
+                                                data-tooltip="No patient profile">
+                                                <i class="fa-regular fa-user"></i>
+                                            </button>
                                             @endif
                                         </div>
                                     </div>
-
-                                    <div class="patient-grid-card-footer">
-                                        <div class="patient-grid-card-service">
-                                            <span
-                                                class="patient-grid-card-service-icon global-info-icon {{ $statusToneClass }}">
-                                                <i class="fa-solid fa-tooth"></i>
-                                            </span>
-
-                                            <span class="patient-grid-card-service-name">
-                                                {{ $serviceLabel }}
-                                            </span>
-                                        </div>
-
-                                        <span class="status-pill {{ $pillClass }} patient-grid-card-status">
-                                            <span class="pill-dot"></span>
-                                            {{ $pillText }}
-                                        </span>
-                                    </div>
                                 </div>
-                                @if ($patientProfileUrl)
-                        </a>
-                        @else
+                                @endforeach
+
+                                <div id="patientBaseEmptyState" class="empty-state-host"></div>
+
+                                <div id="patientSearchEmptyState" class="empty-state-host"></div>
+
+                                <div id="patientStatusEmptyState" class="empty-state-host"></div>
                     </div>
-                    @endif
-                    @endforeach
-
-                    <div id="patientBaseEmptyState" class="empty-state-host"></div>
-
-                    <div id="patientSearchEmptyState" class="empty-state-host"></div>
-
-                    <div id="patientStatusEmptyState" class="empty-state-host"></div>
                 </div>
             </div>
+
+            <x-pagination-bar id="patientPaginationBottomBar" info-id="patientPageInfoBottom"
+                pagination-id="patientPaginationBottom" position="bottom" label="patients" class="patient-pagebar" />
+
         </div>
-
-        <x-pagination-bar id="patientPaginationBottomBar" info-id="patientPageInfoBottom"
-            pagination-id="patientPaginationBottom" position="bottom" label="patients" class="patient-pagebar" />
-
-    </div>
     </div>
     </div>
 </main>
@@ -1486,79 +1550,32 @@ $notifCount = $notifications->count();
                 };
             }
 
-            function getPatientAppointmentTime(patient) {
-                var dateValue =
-                    getInfo(patient).dateStr;
+            function compareNearestAppointments(firstPatient, secondPatient) {
+                var aStatus = firstPatient.getAttribute('data-status') || '';
+                var bStatus = secondPatient.getAttribute('data-status') || '';
 
-                if (!dateValue) {
-                    return null;
+                var activeStatuses = ['upcoming', 'rescheduled', 'pending', 'confirmed'];
+                var aActive = activeStatuses.includes(aStatus);
+                var bActive = activeStatuses.includes(bStatus);
+
+                if (aActive !== bActive) {
+                    return aActive ? -1 : 1;
                 }
 
-                var timestamp = Date.parse(
-                    dateValue + "T00:00:00"
-                );
+                var aDate = firstPatient.getAttribute('data-date') || '1970-01-01';
+                var aTime = firstPatient.getAttribute('data-time') || '00:00:00';
+                var aTimestamp = new Date(aDate + 'T' + aTime).getTime();
+                if (isNaN(aTimestamp)) aTimestamp = 0;
 
-                return Number.isNaN(timestamp) ?
-                    null :
-                    timestamp;
-            }
+                var bDate = secondPatient.getAttribute('data-date') || '1970-01-01';
+                var bTime = secondPatient.getAttribute('data-time') || '00:00:00';
+                var bTimestamp = new Date(bDate + 'T' + bTime).getTime();
+                if (isNaN(bTimestamp)) bTimestamp = 0;
 
-            function getPatientDateRank(patient) {
-                var appointmentTime =
-                    getPatientAppointmentTime(patient);
-
-                if (appointmentTime === null) {
-                    return {
-                        group: 3,
-                        distance: Number.MAX_SAFE_INTEGER
-                    };
+                if (aActive && bActive) {
+                    return aTimestamp - bTimestamp;
                 }
-
-                var today = new Date();
-
-                today.setHours(0, 0, 0, 0);
-
-                var difference =
-                    appointmentTime - today.getTime();
-
-                if (difference === 0) {
-                    return {
-                        group: 0,
-                        distance: 0
-                    };
-                }
-
-                if (difference > 0) {
-                    return {
-                        group: 1,
-                        distance: difference
-                    };
-                }
-
-                return {
-                    group: 2,
-                    distance: Math.abs(difference)
-                };
-            }
-
-            function compareNearestAppointments(
-                firstPatient,
-                secondPatient
-            ) {
-                var firstRank =
-                    getPatientDateRank(firstPatient);
-
-                var secondRank =
-                    getPatientDateRank(secondPatient);
-
-                if (firstRank.group !== secondRank.group) {
-                    return firstRank.group - secondRank.group;
-                }
-
-                return (
-                    firstRank.distance -
-                    secondRank.distance
-                );
+                return bTimestamp - aTimestamp;
             }
 
             function getName(patient) {
@@ -2113,135 +2130,270 @@ $notifCount = $notifications->count();
                 updatePage();
             };
 
-            function applyFilters() {
-                showPatientSkeleton();
+            function applyFilters(
+                options = {}
+            ) {
+                var showLoading =
+                    options.showLoading !== false;
 
-                window.clearTimeout(window.patientDirectoryFilterTimer);
-                window.patientDirectoryFilterTimer = window.setTimeout(function () {
+                var delay =
+                    Number.isFinite(options.delay) ?
+                        options.delay :
+                        300;
+
+                if (showLoading) {
+                    showPatientSkeleton();
+                }
+
+                window.clearTimeout(
+                    window.patientDirectoryFilterTimer
+                );
+
+                function runFiltering() {
                     try {
-                        var data = allPatients.slice();
+                        var data =
+                            allPatients.slice();
 
-                        if (activeTab !== "all") {
-                            data = data.filter(function (patient) {
-                                return patient.classList.contains(activeTab);
-                            });
+                        if (
+                            activeTab !== "all"
+                        ) {
+                            data =
+                                data.filter(
+                                    function (patient) {
+                                        return patient
+                                            .classList
+                                            .contains(
+                                                activeTab
+                                            );
+                                    }
+                                );
                         }
 
                         if (searchKeyword) {
-                            data = data.filter(function (patient) {
-                                return matchesSearch(patient, searchKeyword);
-                            });
+                            data =
+                                data.filter(
+                                    function (patient) {
+                                        return matchesSearch(
+                                            patient,
+                                            searchKeyword
+                                        );
+                                    }
+                                );
                         }
 
                         if (selectedProgram) {
-                            data = data.filter(function (patient) {
-                                return ilike(
-                                    getInfo(patient).program,
-                                    selectedProgram
+                            data =
+                                data.filter(
+                                    function (patient) {
+                                        return ilike(
+                                            getInfo(
+                                                patient
+                                            ).program,
+                                            selectedProgram
+                                        );
+                                    }
                                 );
-                            });
                         }
 
-                        if (selectedYearLevel || selectedSection) {
-                            data = data.filter(function (patient) {
-                                var info = getInfo(patient);
+                        if (
+                            selectedYearLevel ||
+                            selectedSection
+                        ) {
+                            data =
+                                data.filter(
+                                    function (patient) {
+                                        var info =
+                                            getInfo(
+                                                patient
+                                            );
 
-                                if (
-                                    selectedYearLevel &&
-                                    !ilike(info.year, selectedYearLevel)
-                                ) {
-                                    return false;
-                                }
+                                        if (
+                                            selectedYearLevel &&
+                                            !ilike(
+                                                info.year,
+                                                selectedYearLevel
+                                            )
+                                        ) {
+                                            return false;
+                                        }
 
-                                if (
-                                    selectedSection &&
-                                    String(info.section).trim() !==
-                                    String(selectedSection).trim()
-                                ) {
-                                    return false;
-                                }
+                                        if (
+                                            selectedSection &&
+                                            String(
+                                                info.section
+                                            ).trim() !==
+                                            String(
+                                                selectedSection
+                                            ).trim()
+                                        ) {
+                                            return false;
+                                        }
 
-                                return true;
-                            });
+                                        return true;
+                                    }
+                                );
                         }
 
                         if (selectedDepartment) {
-                            data = data.filter(function (patient) {
-                                return ilike(
-                                    getInfo(patient).department,
-                                    selectedDepartment
+                            data =
+                                data.filter(
+                                    function (patient) {
+                                        return ilike(
+                                            getInfo(
+                                                patient
+                                            ).department,
+                                            selectedDepartment
+                                        );
+                                    }
                                 );
-                            });
                         }
 
-                        if (activeFromDate || activeToDate) {
-                            data = data.filter(function (patient) {
-                                var date = new Date(
-                                    getInfo(patient).dateStr
+                        if (
+                            activeFromDate ||
+                            activeToDate
+                        ) {
+                            data =
+                                data.filter(
+                                    function (patient) {
+                                        var date =
+                                            new Date(
+                                                getInfo(
+                                                    patient
+                                                ).dateStr
+                                            );
+
+                                        if (
+                                            isNaN(
+                                                date.getTime()
+                                            )
+                                        ) {
+                                            return false;
+                                        }
+
+                                        if (
+                                            activeFromDate &&
+                                            date <
+                                            new Date(
+                                                activeFromDate
+                                            )
+                                        ) {
+                                            return false;
+                                        }
+
+                                        if (
+                                            activeToDate &&
+                                            date >
+                                            new Date(
+                                                activeToDate
+                                            )
+                                        ) {
+                                            return false;
+                                        }
+
+                                        return true;
+                                    }
                                 );
+                        }
 
-                                if (isNaN(date.getTime())) {
-                                    return false;
+                        if (
+                            nameSort === "az"
+                        ) {
+                            data.sort(
+                                function (a, b) {
+                                    return getName(a)
+                                        .localeCompare(
+                                            getName(b)
+                                        );
                                 }
+                            );
+                        }
 
-                                if (
-                                    activeFromDate &&
-                                    date < new Date(activeFromDate)
+                        if (
+                            nameSort === "za"
+                        ) {
+                            data.sort(
+                                function (a, b) {
+                                    return getName(b)
+                                        .localeCompare(
+                                            getName(a)
+                                        );
+                                }
+                            );
+                        }
+
+                        if (
+                            dateSort ===
+                            "nearest"
+                        ) {
+                            data.sort(
+                                compareNearestAppointments
+                            );
+                        }
+
+                        if (
+                            dateSort ===
+                            "farthest"
+                        ) {
+                            data.sort(
+                                function (
+                                    firstPatient,
+                                    secondPatient
                                 ) {
-                                    return false;
+                                    return compareNearestAppointments(
+                                        secondPatient,
+                                        firstPatient
+                                    );
                                 }
-
-                                if (
-                                    activeToDate &&
-                                    date > new Date(activeToDate)
-                                ) {
-                                    return false;
-                                }
-
-                                return true;
-                            });
+                            );
                         }
 
-                        if (nameSort === "az") data.sort(function (a, b) {
-                            return getName(a).localeCompare(getName(b));
-                        });
-                        if (nameSort === "za") data.sort(function (a, b) {
-                            return getName(b).localeCompare(getName(a));
-                        });
-                        if (dateSort === "nearest") {
-                            data.sort(compareNearestAppointments);
-                        }
+                        var rowCountEl =
+                            document.getElementById(
+                                "rowCount"
+                            );
 
-                        if (dateSort === "farthest") {
-                            data.sort(function (
-                                firstPatient,
-                                secondPatient
-                            ) {
-                                return compareNearestAppointments(
-                                    secondPatient,
-                                    firstPatient
-                                );
-                            });
-                        }
-
-                        var rowCountEl = document.getElementById("rowCount");
                         if (rowCountEl) {
-                            rowCountEl.textContent = data.length + " " + (data.length === 1 ?
-                                "patient" :
-                                "patients");
+                            rowCountEl.textContent =
+                                data.length +
+                                " " +
+                                (
+                                    data.length === 1 ?
+                                        "patient" :
+                                        "patients"
+                                );
                         }
 
-                        currentItems = data;
+                        currentItems =
+                            data;
+
                         currentPage = 1;
 
                         updatePage();
                         updateFilterButtonState();
+
                     } catch (error) {
-                        console.error("Patient list filtering error:", error);
+                        console.error(
+                            "Patient list filtering error:",
+                            error
+                        );
                     } finally {
-                        hidePatientSkeleton();
+                        if (showLoading) {
+                            hidePatientSkeleton();
+                        }
                     }
-                }, 300);
+                }
+
+                if (delay > 0) {
+                    window.patientDirectoryFilterTimer =
+                        window.setTimeout(
+                            runFiltering,
+                            delay
+                        );
+
+                    return;
+                }
+
+                runFiltering();
             }
 
             syncMutualExclusion();
@@ -2260,7 +2412,10 @@ $notifCount = $notifications->count();
                 document
             );
 
-            applyFilters();
+            applyFilters({
+                showLoading: false,
+                delay: 0
+            });
 
         } catch (err) {
             console.error("Initialization Error:", err);

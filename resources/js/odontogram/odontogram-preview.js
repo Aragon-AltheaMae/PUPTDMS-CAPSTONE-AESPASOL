@@ -17,10 +17,6 @@ async function loadOdontogramThreeModule() {
     return odontogramThreeModulePromise;
 }
 
-export function preloadOdontogramThreeModule() {
-    return loadOdontogramThreeModule();
-}
-
 const ODONTOGRAM_PREVIEW_COLORS = {
     D: '#ef4444',
     M: '#111827',
@@ -443,7 +439,9 @@ const odontogramPreviewThreeStates = new WeakMap();
 const odontogramPreviewCreationPromises = new WeakMap();
 const odontogramPreviewRenderRetries = new WeakMap();
 
-export function initOdontogramPreviews(root = document) {
+export function initOdontogramPreviews(
+    root = document
+) {
     const scope =
         root &&
             typeof root.querySelectorAll ===
@@ -451,11 +449,32 @@ export function initOdontogramPreviews(root = document) {
             ? root
             : document;
 
-    scope
-        .querySelectorAll(
+    const previews = [];
+
+    if (
+        scope.matches?.(
             '[data-odontogram-preview]'
         )
-        .forEach(preview => {
+    ) {
+        previews.push(
+            scope
+        );
+    }
+
+    scope
+        .querySelectorAll?.(
+            '[data-odontogram-preview]'
+        )
+        .forEach(
+            preview => {
+                previews.push(
+                    preview
+                );
+            }
+        );
+
+    previews.forEach(
+        preview => {
 
             if (
                 preview.dataset
@@ -536,41 +555,7 @@ function showOdontogramPreviewEmptyState(
     }
 }
 
-window.initOdontogramPreviews =
-    initOdontogramPreviews;
-
-function bootOdontogramPreviews() {
-    initOdontogramPreviews(
-        document
-    );
-}
-
-if (
-    document.readyState ===
-    'loading'
-) {
-    document.addEventListener(
-        'DOMContentLoaded',
-        bootOdontogramPreviews,
-        {
-            once: true,
-        }
-    );
-} else {
-    bootOdontogramPreviews();
-}
-
-document.addEventListener(
-    'ui-modal:opened',
-    event => {
-        initOdontogramPreviews(
-            event.detail?.modal ||
-            document
-        );
-    }
-);
-
-function setOdontogramPreviewData(
+export function setOdontogramPreviewData(
     preview,
     rawData = []
 ) {
@@ -620,9 +605,6 @@ function setOdontogramPreviewData(
     );
 }
 
-window.setOdontogramPreviewData =
-    setOdontogramPreviewData;
-
 async function renderOdontogramPreview(root) {
     if (!root) {
         return;
@@ -659,6 +641,15 @@ async function renderOdontogramPreview(root) {
         if (retryCount >= 20) {
             odontogramPreviewRenderRetries
                 .delete(root);
+
+            if (loading) {
+                loading.innerHTML = `
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>
+                Unable to initialize the 3D odontogram.
+            </span>
+        `;
+            }
 
             return;
         }

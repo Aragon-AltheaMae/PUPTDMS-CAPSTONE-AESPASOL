@@ -4,6 +4,10 @@
 
 @section('title', 'System Logs')
 
+@section('styles')
+    @vite('resources/css/pages/admin/system-logs.css')
+@endsection
+
 @section('content')
 
     @php

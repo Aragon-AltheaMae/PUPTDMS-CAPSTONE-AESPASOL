@@ -4,6 +4,10 @@
 
 @section('body-class', 'auth-guest-body backup-login-body')
 
+@section('styles')
+    @vite('resources/css/pages/auth/backup-login.css')
+@endsection
+
 @section('content')
 <div class="backup-page">
   <section class="backup-shell">

@@ -10,6 +10,10 @@
 
 @section('title', 'Patient Odontogram')
 
+@section('styles')
+    @vite('resources/css/pages/dentist/odontogram.css')
+@endsection
+
 @section('content')
 
 @php
@@ -31,10 +35,6 @@ $appointmentTimeValue = $existingAppointmentMode
 ? data_get($existingAppointmentDraft ?? [], 'appointment_time')
 : $appointment?->appointment_time;
 
-$appointmentStatusValue = $existingAppointmentMode
-? 'Completed Record'
-: ucfirst((string) ($appointment?->status ?? 'Ongoing'));
-
 $formattedAppointmentDate = filled($appointmentDateValue)
 ? Carbon::parse($appointmentDateValue)->format('M d, Y')
 : '—';
@@ -42,8 +42,6 @@ $formattedAppointmentDate = filled($appointmentDateValue)
 $formattedAppointmentTime = filled($appointmentTimeValue)
 ? Carbon::parse($appointmentTimeValue)->format('h:i A')
 : '—';
-
-$today = Carbon::now()->format('F d, Y');
 
 $currentServiceType = $existingAppointmentMode
 ? data_get($existingAppointmentDraft ?? [], 'service_type', '')
@@ -55,20 +53,26 @@ trim((string) $currentServiceType),
 'Oral Prophylaxis'
 ) === 0;
 
-$pageEyebrow =
-$existingAppointmentMode
-? 'Add Existing Appointment'
-: 'Dental Procedure Workspace';
+$entrySource = request()->query('from');
+$isWalkInMode = $entrySource === 'walk-in';
 
-$pageTitle =
-$existingAppointmentMode
-? 'Existing Appointment Odontogram'
-: 'Patient Odontogram';
+$pageEyebrow = 'Dental Procedure Workspace';
+$pageTitle = 'Patient Odontogram';
+$pageSubtitle = '2D / 3D Treatment &amp; Condition Mapping';
 
-$pageSubtitle =
-$existingAppointmentMode
-? 'Complete the odontogram and clinical notes for the existing appointment.'
-: '2D / 3D Treatment &amp; Condition Mapping';
+$entryContextLabel = $existingAppointmentMode
+? 'Existing Appointment'
+: ($isWalkInMode ? 'Walk-in Visit' : null);
+
+$entryContextMessage = $existingAppointmentMode
+? 'This odontogram is for an existing appointment. Saving it will store the visit as completed.'
+: ($isWalkInMode
+? 'This odontogram is being created for a walk-in visit.'
+: null);
+
+$existingProcedureDuration = $existingAppointmentMode
+? data_get($existingAppointmentDraft ?? [], 'procedure_duration_hms', '00:00:00')
+: '00:00:00';
 @endphp
 
 <main id="mainContent" class="odontogram-page">
@@ -80,6 +84,17 @@ $existingAppointmentMode
 
                 <div class="odontogram-hero">
                     <div class="odontogram-hero-main">
+
+                        @if ($entryContextLabel)
+                        <div class="alert-warning">
+                            <i class="fa-solid fa-circle-info"></i>
+
+                            <strong>{{ $entryContextLabel }}:</strong>
+
+                            <span>{{ $entryContextMessage }}</span>
+                        </div>
+                        @endif
+
                         <div class="card hero-title-card">
 
                             <div class="hero-title-icon">
@@ -96,6 +111,7 @@ $existingAppointmentMode
                                 <p class="hero-subtitle">
                                     {!! $pageSubtitle !!}
                                 </p>
+
                             </div>
 
                             <button type="button" id="cancelProcedureBtn" class="ui-btn ui-btn-danger">
@@ -174,11 +190,11 @@ $existingAppointmentMode
 
                                     <div>
                                         <span class="odontogram-appointment-meta-label">
-                                            {{ $existingAppointmentMode ? 'Session Timer' : 'Procedure Time' }}
+                                            {{ $existingAppointmentMode ? 'Procedure Duration' : 'Session Timer' }}
                                         </span>
 
                                         <strong id="procedureTimer" class="odontogram-appointment-meta-value">
-                                            00:00:00
+                                            {{ $existingAppointmentMode ? $existingProcedureDuration : '00:00:00' }}
                                         </strong>
                                     </div>
                                 </div>
@@ -223,8 +239,8 @@ $existingAppointmentMode
                             </div>
                         </div>
                     </div>
-
-                    <div id="odontogramToolbarSentinel" class="odontogram-toolbar-sentinel" aria-hidden="true"></div>
+                    <div id="odontogramToolbarSentinel" class="odontogram-toolbar-sentinel" aria-hidden="true">
+                    </div>
                 </div>
 
                 <div class="odontogram-workspace-grid">
@@ -427,83 +443,9 @@ $existingAppointmentMode
                             </div>
                         </div>
                     </div>
-
-                    @if ($existingAppointmentMode)
-                    <div class="odontogram-existing-appointment-panel odontogram-workspace-full">
-                        <section class="card right-section-card">
-                            <div class="right-section-head">
-                                <div>
-                                    <p class="right-section-eyebrow">
-                                        Existing Appointment
-                                    </p>
-
-                                    <h3 class="right-section-title">
-                                        Appointment Details
-                                    </h3>
-                                </div>
-                            </div>
-
-                            <div class="right-section-body existing-appointment-body">
-                                <div class="existing-appointment-intro-card">
-                                    Review the existing appointment details below.
-                                    When you save this odontogram,
-                                    the appointment will be stored as a completed visit
-                                    in the system.
-                                </div>
-
-                                <div class="existing-appointment-grid">
-                                    <div>
-                                        <p class="global-form-label">
-                                            Service Type
-                                        </p>
-
-                                        <div class="existing-appointment-summary-card">
-                                            {{ data_get($existingAppointmentDraft ?? [], 'service_type', '—') }}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <p class="global-form-label">
-                                            Appointment Date
-                                        </p>
-
-                                        <div class="existing-appointment-summary-card">
-                                            {{ data_get($existingAppointmentDraft ?? [], 'appointment_date', '—') }}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <p class="global-form-label">
-                                            Appointment Time
-                                        </p>
-
-                                        <div class="existing-appointment-summary-card">
-                                            {{ data_get($existingAppointmentDraft ?? [], 'appointment_time', '—') }}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <p class="global-form-label">
-                                            Procedure Duration
-                                        </p>
-
-                                        <div class="existing-appointment-summary-card">
-                                            {{ data_get($existingAppointmentDraft ?? [], 'procedure_duration_hms', '—')
-                                            }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-                    @endif
-
                     <input type="hidden" id="odontogramData" name="odontogram_data" value="[]">
-
-                </div> {{-- odontogram-workspace-grid --}}
-
-            </div> {{-- fade-in --}}
-        </section> {{-- odontogram-dock-main --}}
+                </div>
+        </section>
 
         <div id="legendResizeHandle" class="odontogram-legend-resizer" role="separator" aria-orientation="vertical"
             aria-label="Resize Treatment Legend panel"></div>
@@ -831,6 +773,7 @@ $existingAppointmentMode
         const closeCancelProcedureModalBtn = document.getElementById('closeCancelProcedureModalBtn');
         const closeFinishProcedureModalBtn = document.getElementById('closeFinishProcedureModalBtn');
         const existingAppointmentMode = @json($existingAppointmentMode);
+        const existingProcedureDuration = @json($existingProcedureDuration);
         const isOralProphylaxis = @json($isOralProphylaxis);
         const cancelProcedureRedirectUrl = @json(route('dentist.dentist.patient.profile', $patient -> id ?? 1));
         let finishProcedureModalRedirectUrl = null;
@@ -890,7 +833,6 @@ $existingAppointmentMode
         let selectedTargetType = null;
         let selectedSurfaceKey = null;
         let selectedMesh = null;
-        let hoveredMesh = null;
         let pendingResetPayload = null;
         let hasAppliedTreatmentThisSession = false;
 
@@ -1053,10 +995,37 @@ $existingAppointmentMode
 
         const odontogramState = {};
 
-        function initThreeScene() {
-            if (
-                odontogramThreeState
-            ) {
+        async function initThreeScene() {
+            if (odontogramThreeState) {
+                return;
+            }
+
+            if (!window.Odontogram3D) {
+                try {
+                    await window.loadOdontogramThreeModule?.();
+                } catch (error) {
+                    console.error(
+                        'Unable to load odontogram 3D module.',
+                        error
+                    );
+
+                    showProcedureToast(
+                        'Unable to load the 3D odontogram.',
+                        'error',
+                        '3D View Unavailable'
+                    );
+
+                    return;
+                }
+            }
+
+            if (!window.Odontogram3D) {
+                showProcedureToast(
+                    'The 3D odontogram module is unavailable.',
+                    'error',
+                    '3D View Unavailable'
+                );
+
                 return;
             }
 
@@ -1078,8 +1047,6 @@ $existingAppointmentMode
                             mesh,
                             event
                         ) => {
-                            hoveredMesh =
-                                mesh;
 
                             if (!toothNumber) {
                                 toothHoverLabel
@@ -1183,23 +1150,6 @@ $existingAppointmentMode
                         )
                 }
             );
-        }
-
-        function focusCameraOnTooth(
-            mesh
-        ) {
-            if (
-                !odontogramThreeState ||
-                !mesh
-            ) {
-                return;
-            }
-
-            window.Odontogram3D
-                .focusTooth(
-                    odontogramThreeState,
-                    mesh
-                );
         }
 
         function resetCameraToFull3DView() {
@@ -1939,12 +1889,6 @@ $existingAppointmentMode
             return null;
         }
 
-        function getStatusBoxDisplaySurfaceKey(state) {
-            if (!state || !state.surfaces) return null;
-
-            return getPreferredSurfaceKey(state);
-        }
-
         function applyDividedStatusBoxVisual(statusBox, record) {
             const colorPart = document.createElement('span');
             const codePart = document.createElement('span');
@@ -2140,15 +2084,23 @@ $existingAppointmentMode
             const payload = createLegendPayload(code);
             hasAppliedTreatmentThisSession = true;
 
-            if (selectedTargetType === 'status') {
-                state.status = payload;
+            if (
+                selectedTargetType === 'surface' &&
+                selectedSurfaceKey
+            ) {
+                state.surfaces[selectedSurfaceKey] =
+                    payload;
+
                 sync3DFrom2D(selectedTooth);
-            } else if (selectedTargetType === 'surface' && selectedSurfaceKey) {
-                state.surfaces[selectedSurfaceKey] = payload;
-                sync3DFrom2D(selectedTooth);
-            } else if (selectedTargetType === '3d') {
+            } else if (
+                selectedTargetType === '3d'
+            ) {
                 state.threeD = payload;
-                fillAll2DSurfacesFromLegend(state, payload);
+
+                fillAll2DSurfacesFromLegend(
+                    state,
+                    payload
+                );
             }
 
             updateHiddenInput();
@@ -2379,7 +2331,7 @@ $existingAppointmentMode
             board2d.appendChild(row4);
         }
 
-        function switchView(view) {
+        async function switchView(view) {
             const previousView = currentView;
             currentView = view;
 
@@ -2408,7 +2360,7 @@ $existingAppointmentMode
                 }
 
                 if (!odontogramThreeState) {
-                    initThreeScene();
+                    await initThreeScene();
                 } else {
                     handleResize();
                     renderThreeVisuals();
@@ -2436,17 +2388,6 @@ $existingAppointmentMode
 
         view2dBtn.addEventListener('click', () => switchView('2d'));
         view3dBtn.addEventListener('click', () => switchView('3d'));
-
-        function getOdontogramTheme() {
-            const root = document.documentElement;
-
-            return (
-                root.getAttribute('data-theme') === 'dark' ||
-                root.classList.contains('dark')
-            )
-                ? 'dark'
-                : 'light';
-        }
 
         function showTooltip(event, mesh) {
             const toothNumber = mesh.userData.tooth;
@@ -3307,8 +3248,13 @@ $existingAppointmentMode
         }
 
         initLegendPanelResize();
-        updateProcedureTimer();
-        setInterval(updateProcedureTimer, 1000);
+
+        if (existingAppointmentMode) {
+            procedureTimer.textContent = existingProcedureDuration || '00:00:00';
+        } else {
+            updateProcedureTimer();
+            setInterval(updateProcedureTimer, 1000);
+        }
 
         renderLegendButtons('');
         updateHiddenInput();

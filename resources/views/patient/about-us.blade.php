@@ -4,6 +4,10 @@
 
 @section('title', 'About Us')
 
+@section('styles')
+    @vite('resources/css/pages/patient/about-us.css')
+@endsection
+
 @section('content')
 
 <main id="mainContent"

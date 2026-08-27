@@ -7,6 +7,10 @@
 
 @section('title', 'Add Existing Appointment')
 
+@section('styles')
+    @vite('resources/css/pages/dentist/add-existing-appointment.css')
+@endsection
+
 @php
 $defaults = $defaults ?? [];
 $dentalAnswers = $defaults['dental_answers'] ?? [];

@@ -114,14 +114,16 @@
 
 @media (max-width: 767px) {
     .view-toggle-container[data-global-view-toggle] {
-        width: 100% !important;
-        min-width: 0 !important;
-        max-width: 100% !important;
+        box-sizing: border-box !important;
+        width: 88px !important;
+        min-width: 88px !important;
+        max-width: 88px !important;
         height: 44px !important;
         min-height: 44px !important;
-        flex: 0 0 100% !important;
+        flex: 0 0 88px !important;
+        margin-left: auto !important;
         padding: 4px !important;
-        display: inline-flex !important;
+        display: flex !important;
         align-items: center !important;
         position: relative !important;
         overflow: hidden !important;
@@ -130,16 +132,8 @@
     .view-toggle-container[data-global-view-toggle] .view-slider {
         top: 4px !important;
         left: 4px !important;
-        width: calc(50% - 4px) !important;
+        width: 39px !important;
         height: 34px !important;
-    }
-
-    .view-toggle-container[data-global-view-toggle] .btn-view-mode[data-view-mode="list"] {
-        order: 1 !important;
-    }
-
-    .view-toggle-container[data-global-view-toggle] .btn-view-mode[data-view-mode="grid"] {
-        order: 2 !important;
     }
 
     [data-global-view-toggle][data-current-view="list"] .view-slider {
@@ -147,23 +141,22 @@
     }
 
     [data-global-view-toggle][data-current-view="grid"] .view-slider {
-        transform: translateX(100%) !important;
+        transform: translateX(39px) !important;
     }
 
     .view-toggle-container[data-global-view-toggle] .btn-view-mode {
-        flex: 1 1 50% !important;
-        width: auto !important;
+        flex: 0 0 39px !important;
+        width: 39px !important;
         height: 34px !important;
         min-height: 34px !important;
-        padding: 0 10px !important;
-        gap: 7px !important;
+        padding: 0 !important;
+        gap: 0 !important;
         line-height: 1 !important;
-        white-space: nowrap !important;
         position: relative !important;
         z-index: 2 !important;
     }
 
     .view-toggle-container[data-global-view-toggle] .view-mode-label {
-        display: inline !important;
+        display: none !important;
     }
 }

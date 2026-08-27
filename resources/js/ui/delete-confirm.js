@@ -1,4 +1,4 @@
-function openDeleteConfirmModal({
+export function openDeleteConfirmModal({
     modalId,
     formId,
     nameId,
@@ -43,5 +43,3 @@ function openDeleteConfirmModal({
 
     return form;
 }
-
-window.openDeleteConfirmModal = openDeleteConfirmModal;

@@ -1,7 +1,12 @@
 @extends('layouts.app')
 
 @section('layout-role', $layoutRole ?? 'admin')
+
 @section('title', 'Dental Records')
+
+@section('styles')
+    @vite('resources/css/pages/admin/dental-records.css')
+@endsection
 
 @section('content')
 

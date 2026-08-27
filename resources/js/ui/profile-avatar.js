@@ -311,14 +311,26 @@ window.PatientUI = {
         initPatientAvatars,
 };
 
-document.addEventListener(
-    'DOMContentLoaded',
-    () => {
-        initPatientAvatars(
-            document
-        );
-    }
-);
+function bootPatientAvatars() {
+    initPatientAvatars(
+        document
+    );
+}
+
+if (
+    document.readyState ===
+    'loading'
+) {
+    document.addEventListener(
+        'DOMContentLoaded',
+        bootPatientAvatars,
+        {
+            once: true
+        }
+    );
+} else {
+    bootPatientAvatars();
+}
 
 document.addEventListener(
     'patient-avatar:refresh',

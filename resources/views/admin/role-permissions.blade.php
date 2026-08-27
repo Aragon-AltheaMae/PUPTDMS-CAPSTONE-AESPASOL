@@ -4,6 +4,10 @@
 
 @section('title', 'Roles & Permissions')
 
+@section('styles')
+    @vite('resources/css/pages/admin/role-permissions.css')
+@endsection
+
 @section('content')
 
 @php
