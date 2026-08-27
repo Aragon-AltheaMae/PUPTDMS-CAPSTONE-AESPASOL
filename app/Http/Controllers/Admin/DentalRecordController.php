@@ -16,11 +16,26 @@ class DentalRecordController extends Controller
     {
         $search = trim((string) $request->input('search', ''));
         $status = trim((string) $request->input('status', 'all'));
+        $classification = trim((string) $request->input('classification', 'all'));
+        $sort = trim((string) $request->input('sort', 'newest'));
+        $datePreset = trim((string) $request->input('date_preset', 'all'));
+        $dateFrom = trim((string) $request->input('date_from', ''));
+        $dateTo = trim((string) $request->input('date_to', ''));
+
         $perPageInput = (int) $request->input('per_page', 10);
         $perPage = in_array($perPageInput, [10, 20, 50, 100], true) ? $perPageInput : 10;
 
         $statsCollection = $this->loadRecordPatients(
-            $this->applyRecordFilters($this->buildRecordPatientsQuery(), '', 'all')
+            $this->applyRecordFilters(
+                $this->buildRecordPatientsQuery(),
+                '',
+                'all',
+                'all',
+                'newest',
+                'all',
+                '',
+                ''
+            )
         );
 
         $totalRecords = $statsCollection->count();
@@ -52,10 +67,15 @@ class DentalRecordController extends Controller
         $recordsPaginator = $this->applyRecordFilters(
             $this->buildRecordPatientsQuery(),
             $search,
-            $status
+            $status,
+            $classification,
+            $sort,
+            $datePreset,
+            $dateFrom,
+            $dateTo
         )->paginate($perPage)->withQueryString();
 
-        $recordItems = $this->summarizePatients($recordsPaginator->getCollection());
+        $recordItems = $this->summarizePatients($recordsPaginator->getCollection(),$sort);
         $recordsPaginator->setCollection($recordItems);
         $records = $recordsPaginator;
 
@@ -173,12 +193,19 @@ class DentalRecordController extends Controller
                 'dentalHistoryConcerns',
                 'dentalHistoryAnswers.condition',
                 'odontogram',
-            ])
-            ->orderBy('name');
-    }
+            ]);
+        }
 
-    private function applyRecordFilters(Builder $query, string $search, string $status): Builder
-    {
+    private function applyRecordFilters(
+        Builder $query,
+        string $search,
+        string $status,
+        string $classification,
+        string $sort,
+        string $datePreset,
+        string $dateFrom,
+        string $dateTo
+    ): Builder {
         if ($search !== '') {
             $query->where(function (Builder $searchQuery) use ($search) {
                 $searchQuery->where('name', 'like', "%{$search}%")
@@ -194,8 +221,18 @@ class DentalRecordController extends Controller
             });
         }
 
+        if ($classification !== 'all') {
+            $query->where('classification', $classification);
+        }
+
         if ($status !== 'all') {
             $query->where(function (Builder $statusQuery) use ($status) {
+
+                if ($status === 'not-started') {
+                    $statusQuery->whereDoesntHave('appointments');
+                    return;
+                }
+
                 if ($status === 'today') {
                     $statusQuery->whereHas('appointments', function (Builder $appointmentQuery) {
                         $appointmentQuery->whereDate('appointment_date', Carbon::today());
@@ -228,6 +265,44 @@ class DentalRecordController extends Controller
             });
         }
 
+        if ($dateFrom !== '') {
+            $query->whereHas('appointments', function (Builder $appointmentQuery) use ($dateFrom) {
+                $appointmentQuery->whereDate('appointment_date', '>=', $dateFrom);
+            });
+        }
+
+        if ($dateTo !== '') {
+            $query->whereHas('appointments', function (Builder $appointmentQuery) use ($dateTo) {
+                $appointmentQuery->whereDate('appointment_date', '<=', $dateTo);
+            });
+        }
+
+        if ($dateFrom === '' && $dateTo === '' && $datePreset !== 'all') {
+            $startDate = match ($datePreset) {
+                'today' => Carbon::today(),
+                '7' => Carbon::today()->subDays(6),
+                '30' => Carbon::today()->subDays(29),
+                '90' => Carbon::today()->subDays(89),
+                '180' => Carbon::today()->subDays(179),
+                '365' => Carbon::today()->subDays(364),
+                default => null,
+            };
+
+            if ($startDate) {
+                $query->whereHas('appointments', function (Builder $appointmentQuery) use ($startDate) {
+                    $appointmentQuery
+                        ->whereDate('appointment_date', '>=', $startDate)
+                        ->whereDate('appointment_date', '<=', Carbon::today());
+                });
+            }
+        }
+
+        if ($sort === 'name_asc') {
+            $query->orderBy('name', 'asc');
+        } elseif ($sort === 'name_desc') {
+            $query->orderBy('name', 'desc');
+        }
+
         return $query;
     }
 
@@ -236,25 +311,39 @@ class DentalRecordController extends Controller
         return $this->summarizePatients($query->get());
     }
 
-    private function summarizePatients(Collection $patients): Collection
-    {
-        return $patients
-            ->map(fn (Patient $patient) => $this->buildPatientRecordSummary($patient))
-            ->sortByDesc(function ($record) {
-                return $record->date_sort ?? '1900-01-01 00:00:00';
-            })
+    private function summarizePatients(Collection $patients, string $sort = 'newest'): Collection {
+        $records = $patients
+        ->map(fn (Patient $patient) => $this->buildPatientRecordSummary($patient));
+
+        if ($sort === 'oldest') {
+            return $records
+                ->sortBy(fn ($record) => $record->date_sort ?? '1900-01-01 00:00:00')
+                ->values();
+        }
+
+        return $records
+            ->sortByDesc(fn ($record) => $record->date_sort ?? '1900-01-01 00:00:00')
             ->values();
     }
 
     private function buildPatientRecordSummary(Patient $patient): object
     {
-        $appointments = $patient->appointments ?? collect();
-        $latestAppointment = $appointments->first();
-        $latestProcedure = $latestAppointment?->procedure;
-        $followUpAppointment = $latestAppointment?->followUpAppointments?->first();
+        $appointments = $patient->appointments ?? collect(); $latestAppointment = $appointments->first();
+        $latestClinicalAppointment = $appointments->first(fn ($appointment) => $appointment->procedure !== null);
+        $latestProcedure = $latestClinicalAppointment?->procedure;  
+
+        $followUpAppointment = $appointments ->where('is_follow_up', true) ->sortByDesc(function ($appointment) {
+                return trim(
+                    (string) $appointment->appointment_date . ' ' .
+                    (string) $appointment->appointment_time
+                );
+            })
+            ->first();
+
         $latestActivityAt = $this->resolveLatestActivityAt($patient, $latestAppointment, $latestProcedure);
-        $status = $this->normalizeRecordStatus($latestAppointment?->status);
-        $procedure = $latestAppointment?->service_type ?: 'Dental Record';
+        $status = ! $latestAppointment ? 'not-started': ($latestProcedure?->procedure_completed_at 
+            ? 'completed': $this->normalizeRecordStatus($latestAppointment->status));
+        $procedure = filled($latestAppointment?->service_type)? $latestAppointment->service_type: 'No service recorded';
         $visitCount = $appointments->count();
         $servicesCount = $appointments
             ->pluck('service_type')
@@ -263,7 +352,7 @@ class DentalRecordController extends Controller
             ->count();
         $medicalSummary = $this->buildMedicalHistorySummary($patient);
         $dentalSummary = $this->buildDentalHistorySummary($patient);
-        $treatmentSummary = $this->buildTreatmentSummary($latestProcedure, $procedure);
+        $treatmentSummary = $this->buildTreatmentSummary($latestProcedure);
 
         return (object) [
             'id' => $patient->id,
@@ -282,13 +371,20 @@ class DentalRecordController extends Controller
             'visit_count' => $visitCount,
             'services_count' => $servicesCount,
             'profile_fields' => $this->buildPatientProfileFields($patient),
+
+            'emergency_contact' => [
+                'name' => $patient->medicalHistory?->emergency_person ?: 'N/A',
+                'number' => $patient->medicalHistory?->emergency_number ?: 'N/A',
+                'relation' => $patient->medicalHistory?->emergency_relation ?: 'N/A',
+            ],
+
             'dental_history_summary' => $dentalSummary,
             'medical_history_summary' => $medicalSummary,
             'dental_history_fields' => $this->buildDentalHistoryFields($patient),
             'dental_symptoms' => $this->buildDentalSymptoms($patient),
             'medical_history_fields' => $this->buildMedicalHistoryFields($patient),
             'medical_conditions' => $this->buildMedicalConditions($patient),
-            'record_sections' => $this->buildRecordSections($patient, $latestAppointment, $latestProcedure),
+            'record_sections' => $this->buildRecordSections($patient, $latestAppointment, $latestProcedure, $followUpAppointment),
             'follow_up_summary' => $this->buildFollowUpSummary($followUpAppointment),
             'follow_up' => $followUpAppointment ? [
                 'date' => $followUpAppointment->appointment_date
@@ -319,7 +415,8 @@ class DentalRecordController extends Controller
             $latestProcedure?->procedure_completed_at,
             $latestProcedure?->updated_at,
             $latestAppointment?->appointment_date
-                ? Carbon::parse(trim((string) $latestAppointment->appointment_date) . ' ' . trim((string) ($latestAppointment->appointment_time ?: '00:00:00')))
+                ? Carbon::parse(trim((string) $latestAppointment->appointment_date) . ' ' . trim((string) 
+                    ($latestAppointment->appointment_time ?: '00:00:00')))
                 : null,
             $patient->odontogram?->updated_at,
             $patient->medicalHistory?->updated_at,
@@ -337,29 +434,56 @@ class DentalRecordController extends Controller
             ->first();
     }
 
-    private function normalizeRecordStatus(?string $status): string
-    {
+    private function normalizeRecordStatus(?string $status): string{
         $normalized = strtolower(trim((string) $status));
 
         return match ($normalized) {
             'ongoing', 'in-progress', 'in_progress' => 'ongoing',
             'cancelled', 'canceled' => 'cancelled',
             'completed' => 'completed',
-            'pending', 'confirmed', 'upcoming', 'rescheduled', 'today', 'scheduled_today' => 'pending',
-            default => 'completed',
+            'pending',
+            'confirmed',
+            'upcoming',
+            'rescheduled',
+            'today',
+            'scheduled_today' => 'pending',
+            default => 'pending',
         };
     }
 
-    private function buildTreatmentSummary($latestProcedure, string $fallback): string
+    private function buildTreatmentSummary($latestProcedure): string
     {
-        $parts = collect([
-            $latestProcedure?->completion_action === 'follow_up' ? 'Follow-up required' : null,
-            $latestProcedure?->diagnosis,
-            $latestProcedure?->oral_examination,
-            $fallback,
-        ])->filter(fn ($value) => filled($value));
+        if (! $latestProcedure) {
+            return 'No treatment recorded.';
+        }
 
-        return $parts->implode(' | ');
+        $odontogramData = $latestProcedure->odontogram_data ?? [];
+
+        if (empty($odontogramData) || ! is_array($odontogramData)) {
+            return 'No treatment recorded.';
+        }
+
+        $treatments = collect($odontogramData)->flatMap(function ($entry) {
+                $labels = collect([
+                    data_get($entry, 'status.label'),
+                    data_get($entry, 'threeD.label'),
+                ]);
+
+                foreach ((array) data_get($entry, 'surfaces', []) as $surface) {
+                    $labels->push(
+                        data_get($surface, 'label')
+                    );
+                }
+
+                return $labels;
+            })
+            ->filter(fn ($label) => filled($label))
+            ->unique()
+            ->values();
+
+        return $treatments->isNotEmpty()
+            ? $treatments->implode(', ')
+            : 'No treatment recorded.';
     }
 
     private function buildDentalHistorySummary(Patient $patient): string
@@ -395,37 +519,69 @@ class DentalRecordController extends Controller
     private function buildPatientProfileFields(Patient $patient): array
     {
         $program = trim((string) ($patient->course_code ?? ''));
-        $courseName = trim((string) ($patient->course_name ?? ''));
-        $programLabel = collect([
-            $program,
-            $courseName !== '' && $courseName !== $program ? $courseName : null,
-        ])->filter()->implode(' — ');
-
-        if ($programLabel === '') {
-            $programLabel = filled($patient->classification) ? $this->formatHistoryLabel($patient->classification) : 'No program';
+        if ($program === '') {
+            $program = filled($patient->classification)
+                ? $this->formatHistoryLabel($patient->classification)
+                : 'No program';
         }
 
-        $yearLevel = $patient->year_level ? 'Year ' . $patient->year_level : null;
-        $section = filled($patient->section) ? 'Section ' . $patient->section : null;
-        $programYear = collect([$programLabel, $yearLevel, $section])->filter()->implode(' • ');
+        $yearSection = collect([
+            filled($patient->year_level) ? $patient->year_level : null,
+            filled($patient->section) ? $patient->section : null,
+        ])->filter()->implode('-');
+
+        $programYear = trim(
+            $program . ($yearSection !== '' ? ' ' . $yearSection : '')
+        );
 
         $identity = filled($patient->student_no)
             ? $patient->student_no
             : (filled($patient->faculty_code) ? 'Faculty: ' . $patient->faculty_code : 'No identity number');
-
+        
         $emergencyContact = collect([
             $patient->medicalHistory?->emergency_person,
             $patient->medicalHistory?->emergency_number,
             $patient->medicalHistory?->emergency_relation,
         ])->filter()->implode(' • ');
 
-        return [
-            ['label' => 'Name', 'value' => $patient->name ?: 'Unknown Patient', 'icon' => 'fa-regular fa-user'],
-            ['label' => 'Program / Year', 'value' => $programYear !== '' ? $programYear : 'No program', 'icon' => 'fa-solid fa-graduation-cap'],
-            ['label' => 'Student No.', 'value' => $identity, 'icon' => 'fa-regular fa-id-badge'],
-            ['label' => 'Email', 'value' => $patient->email ?: 'No email', 'icon' => 'fa-regular fa-envelope'],
-            ['label' => 'Emergency Contact', 'value' => $emergencyContact !== '' ? $emergencyContact : 'No emergency contact', 'icon' => 'fa-solid fa-phone'],
+        $profileFields = [
+            [   'label' => 'Name',
+                'value' => $patient->name ?: 'Unknown Patient',
+                'icon' => 'fa-regular fa-user',
+            ],
+
+            [   'label' => 'Program / Year',
+                'value' => $programYear !== '' ? $programYear : 'No program',
+                'icon' => 'fa-solid fa-graduation-cap',
+            ],
+
+            [   'label' => 'Student No.',
+                'value' => $identity,
+                'icon' => 'fa-regular fa-id-badge',
+            ],
+
+            [   'label' => 'Email',
+                'value' => $patient->email ?: 'No email',
+                'icon' => 'fa-regular fa-envelope',
+            ],
+
+            [   'label' => 'Emergency Contact',
+                'value' => $emergencyContact !== ''
+                    ? $emergencyContact
+                    : 'No emergency contact',
+                'icon' => 'fa-solid fa-phone',
+            ],
         ];
+
+        if ($patient->is_pwd) {
+            $profileFields[] = [
+                'label' => 'PWD',
+                'value' => '',
+                'icon' => 'fa-solid fa-wheelchair',
+            ];
+        }
+
+        return $profileFields;
     }
 
     private function buildDentalHistoryFields(Patient $patient): array
@@ -529,17 +685,17 @@ class DentalRecordController extends Controller
             ->all();
     }
 
-    private function buildRecordSections(Patient $patient, $latestAppointment, $latestProcedure): array
+    private function buildRecordSections(Patient $patient, $latestAppointment, $latestProcedure, $followUpAppointment): array
     {
         $sections = [];
 
         $appointmentRows = [
-            ['label' => 'Service', 'value' => $latestAppointment?->service_type ?: 'Dental Record'],
+            ['label' => 'Service', 'value' => filled($latestAppointment?->service_type) ? $latestAppointment->service_type : 'No service recorded'],
             ['label' => 'Date', 'value' => $latestAppointment?->appointment_date ? Carbon::parse($latestAppointment->appointment_date)->format('F d, Y') : 'N/A'],
             ['label' => 'Time', 'value' => $latestAppointment?->appointment_time ? Carbon::parse($latestAppointment->appointment_time)->format('g:i A') : 'N/A'],
             ['label' => 'Duration', 'value' => $this->formatProcedureDurationForDisplay($latestProcedure?->procedure_duration_seconds)],
             ['label' => 'Status', 'value' => ucfirst($this->normalizeRecordStatus($latestAppointment?->status))],
-            ['label' => 'Follow-up', 'value' => $this->buildFollowUpSummary($latestAppointment?->followUpAppointments?->first())],
+            ['label' => 'Follow-up', 'value' => $this->buildFollowUpSummary($followUpAppointment),],
         ];
 
         $sections[] = [
@@ -590,16 +746,51 @@ class DentalRecordController extends Controller
             'groups' => $dentalGroups,
         ];
 
-        $medicalAnswerRows = collect($patient->medicalHistory?->answers ?? [])
+        $medicalAnswers = collect($patient->medicalHistory?->answers ?? []);
+        $tobaccoUseAnswer = $medicalAnswers ->first(fn ($answer) => $answer->question?->code === 'tobacco_use');
+
+        $tobaccoUse = $tobaccoUseAnswer?->answer_bool === true;
+        $medicalAnswerRows = $medicalAnswers->reject(function ($answer) use ($tobaccoUse) {
+            $code = $answer->question?->code;
+
+            return ! $tobaccoUse
+                && in_array($code, [
+                    'tobacco_per_day',
+                    'tobacco_per_week',
+                ], true);
+        })
             ->map(function ($answer) {
-                $value = collect([
-                    $answer->answer_bool === true ? 'Yes' : ($answer->answer_bool === false ? 'No' : null),
-                    filled($answer->answer_text) ? $answer->answer_text : null,
-                    filled($answer->answer_date) ? Carbon::parse($answer->answer_date)->format('F d, Y') : null,
-                ])->filter()->implode(' | ');
+                $code = $answer->question?->code;
+
+                if (in_array($code, [
+                    'tobacco_per_day',
+                    'tobacco_per_week',
+                ], true)) {
+                    $value = filled($answer->answer_text)
+                        ? $answer->answer_text
+                        : 'N/A';
+                } else {
+                    $value = collect([
+                        $answer->answer_bool === true
+                            ? 'Yes'
+                            : ($answer->answer_bool === false ? 'No' : null),
+
+                        filled($answer->answer_text)
+                            ? $answer->answer_text
+                            : null,
+
+                        filled($answer->answer_date)
+                            ? Carbon::parse($answer->answer_date)->format('F d, Y')
+                            : null,
+                    ])->filter()->implode(' | ');
+                }
 
                 return [
-                    'label' => $this->formatHistoryLabel($answer->question?->label ?: $answer->question?->code ?: 'Medical item'),
+                    'label' => $this->formatHistoryLabel(
+                        $answer->question?->label
+                            ?: $answer->question?->code
+                            ?: 'Medical item'
+                    ),
                     'value' => $value !== '' ? $value : 'N/A',
                 ];
             })
@@ -622,11 +813,6 @@ class DentalRecordController extends Controller
             'groups' => [
                 ['title' => 'Medical Answers', 'rows' => $medicalAnswerRows],
                 ['title' => 'Medical Conditions', 'rows' => $medicalConditionRows],
-                ['title' => 'Emergency Contact', 'rows' => [
-                    ['label' => 'Name', 'value' => $patient->medicalHistory?->emergency_person ?: 'N/A'],
-                    ['label' => 'Number', 'value' => $patient->medicalHistory?->emergency_number ?: 'N/A'],
-                    ['label' => 'Relation', 'value' => $patient->medicalHistory?->emergency_relation ?: 'N/A'],
-                ]],
             ],
         ];
 
@@ -634,7 +820,7 @@ class DentalRecordController extends Controller
             'title' => 'Clinical Notes',
             'icon' => 'fa-file-medical',
             'rows' => [
-                ['label' => 'Treatment', 'value' => $this->buildTreatmentSummary($latestProcedure, $latestAppointment?->service_type ?: 'Dental Record') ?: 'N/A'],
+                ['label' => 'Treatment', 'value' => $this->buildTreatmentSummary($latestProcedure)],
                 ['label' => 'Oral Examination', 'value' => $latestProcedure?->oral_examination ?: 'N/A'],
                 ['label' => 'Diagnosis', 'value' => $latestProcedure?->diagnosis ?: 'N/A'],
                 ['label' => 'Prescription', 'value' => $latestProcedure?->prescriptions ?: 'N/A'],
@@ -704,18 +890,27 @@ class DentalRecordController extends Controller
             return 'No follow-up appointment scheduled.';
         }
 
-        $parts = collect([
-            $followUpAppointment->appointment_date
-                ? Carbon::parse($followUpAppointment->appointment_date)->format('M d, Y')
-                : null,
-            $followUpAppointment->appointment_time
-                ? Carbon::parse($followUpAppointment->appointment_time)->format('g:i A')
-                : null,
-            $followUpAppointment->service_type,
-            $followUpAppointment->follow_up_reason,
-        ])->filter();
+        $date = $followUpAppointment->appointment_date
+            ? Carbon::parse($followUpAppointment->appointment_date)->format('F j, Y')
+            : null;
 
-        return $parts->implode(' | ') ?: 'No follow-up appointment scheduled.';
+        $time = $followUpAppointment->appointment_time
+            ? Carbon::parse($followUpAppointment->appointment_time)->format('g:i A')
+            : null;
+
+        if ($date && $time) {
+            return "{$date} at {$time}";
+        }
+
+        if ($date) {
+            return $date;
+        }
+
+        if ($time) {
+            return $time;
+        }
+
+        return 'Follow-up appointment scheduled.';
     }
 
     private function resolveLayoutRole(): string
