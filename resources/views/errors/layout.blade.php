@@ -14,7 +14,11 @@
 
     <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite([
+    'resources/css/app.css',
+    'resources/css/pages/error-pages.css',
+    'resources/js/app.js',
+])
 </head>
 
 <body class="error-page error-page--@yield('tone', 'general')">

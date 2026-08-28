@@ -8,6 +8,7 @@ export default defineConfig({
             input: [
                 'resources/css/app.css',
                 'resources/js/app.js',
+                'resources/css/pages/error-pages.css',
                 'resources/css/pages/auth/login.css',
                 'resources/css/pages/auth/backup-login.css',
 
