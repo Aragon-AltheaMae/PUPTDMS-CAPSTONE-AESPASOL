@@ -4,6 +4,10 @@
 
 @section('title', $pageTitle ?? 'Reports & Analytics')
 
+@section('styles')
+    @vite('resources/css/pages/shared/reports.css')
+@endsection
+
 @section('content')
 
 @php

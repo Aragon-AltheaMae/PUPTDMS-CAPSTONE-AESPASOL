@@ -4,6 +4,10 @@
 
 @section('title', 'Dental Records')
 
+@section('styles')
+    @vite('resources/css/pages/patient/records.css')
+@endsection
+
 @section('content')
 
     @php

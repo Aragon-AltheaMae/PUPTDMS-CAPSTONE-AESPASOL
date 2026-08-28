@@ -363,12 +363,6 @@
         overflow: hidden !important;
     }
 
-    #mainContent.shared-patient-page .patient-grid-card-body {
-        padding: .95rem !important;
-        gap: .75rem !important;
-        min-width: 0 !important;
-    }
-
     #mainContent.shared-patient-page .patient-grid-top,
     #mainContent.shared-patient-page .patient-grid-main,
     #mainContent.shared-patient-page .patient-grid-meta,
@@ -549,12 +543,6 @@
     color: #FFFFFF !important;
 }
 
-#mainContent.mode-grid #patientContainer>.patient-item:not(.hidden) {
-    display: flex !important;
-    height: 100% !important;
-    min-height: 0 !important;
-}
-
 .patient-hero-summary {
     margin-top: 14px !important;
 }
@@ -728,11 +716,6 @@
     border-color: rgba(248, 250, 252, 0.34) !important;
 }
 
-#mainContent.mode-grid #patientContainer {
-    align-items: stretch !important;
-    grid-auto-rows: 1fr !important;
-}
-
 #mainContent.mode-grid .patient-grid-skeleton-card {
     height: 100% !important;
     min-height: 245px !important;
@@ -804,15 +787,6 @@
             var(--crimson) 7%,
             transparent);
     transform: translateY(-2px);
-}
-
-.patient-card .accent-bar {
-    position: absolute;
-    left: 0;
-    top: 14px;
-    bottom: 14px;
-    width: 4px;
-    border-radius: 0 4px 4px 0;
 }
 
 [data-theme="dark"] .patient-card,
@@ -913,7 +887,6 @@
 
 @media (min-width: 1280px) {
 
-    #mainContent.mode-grid #patientContainer,
     #mainContent.mode-grid #patientSkeleton .skeleton-grid-layout {
         grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
     }
@@ -936,9 +909,11 @@
 
 .card-col-header {
     display: none;
-    grid-template-columns: 30px 180px 100px 176px 50px 1fr 40px;
+    grid-template-columns:
+        minmax(320px, 1.45fr) minmax(210px, 0.8fr) minmax(250px, 1fr) 36px;
     align-items: center;
-    padding: 10px 32px 10px 40px;
+    gap: 24px;
+    padding: 10px 22px 10px 28px;
     border-bottom: 1px solid var(--table-border);
     background: var(--table-header-surface);
     color: var(--table-heading-muted);
@@ -1388,17 +1363,12 @@
     }
 }
 
-.patient-list-card-body,
-.patient-grid-card-body {
+.patient-list-card-body {
     display: none;
 }
 
 #mainContent.mode-list .patient-list-card-body {
     display: grid;
-}
-
-#mainContent.mode-grid .patient-grid-card-body {
-    display: flex;
 }
 
 #mainContent.mode-list .table-scroll-wrapper,
@@ -1424,28 +1394,22 @@
     gap: 10px !important;
 }
 
-#mainContent.mode-grid #patientContainer {
-    display: grid !important;
-    grid-template-columns: 1fr !important;
-    align-items: stretch !important;
-    grid-auto-rows: 1fr !important;
-
-    width: 100% !important;
-    min-width: 0 !important;
-
-    gap: 18px !important;
-}
-
 #mainContent.mode-grid #patientSkeleton .skeleton-grid-layout {
     grid-template-columns: 1fr !important;
+}
+
+#mainContent.mode-grid #patientContainer {
+    display: grid !important;
+    gap: 18px !important;
+    align-items: stretch !important;
+    grid-auto-rows: 1fr !important;
 }
 
 @media (min-width: 768px) and (max-width: 1199px) {
 
     #mainContent.mode-grid #patientContainer,
     #mainContent.mode-grid #patientSkeleton .skeleton-grid-layout {
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr)) !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     }
 }
 
@@ -1453,17 +1417,24 @@
 
     #mainContent.mode-grid #patientContainer,
     #mainContent.mode-grid #patientSkeleton .skeleton-grid-layout {
-        grid-template-columns:
-            repeat(3, minmax(0, 1fr)) !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     }
 }
 
-#mainContent.mode-grid #patientContainer>.patient-item:not(.hidden) {
-    display: flex !important;
+.patient-grid-card-body {
+    display: none;
+    flex-direction: column;
+    padding: 1.15rem 1.25rem 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
 
-    width: 100% !important;
-    min-width: 0 !important;
-    height: 100% !important;
+#mainContent.mode-grid .patient-list-card-body {
+    display: none !important;
+}
+
+#mainContent.mode-grid .patient-grid-card-body {
+    display: flex !important;
 }
 
 #mainContent.mode-grid .patient-card {
@@ -1475,79 +1446,6 @@
     flex-direction: column !important;
 
     border-radius: 16px !important;
-}
-
-.patient-grid-card-body {
-    flex: 1 1 auto;
-    flex-direction: column;
-    width: 100%;
-    min-width: 0;
-    min-height: 220px;
-    gap: 16px;
-    padding: 20px 20px 17px 24px;
-}
-
-.patient-grid-card-header {
-    display: grid;
-    grid-template-columns:
-        minmax(0, 1fr) auto;
-
-    align-items: start;
-
-    width: 100%;
-    min-width: 0;
-
-    gap: 12px;
-}
-
-.patient-grid-card-identity {
-    display: grid;
-    grid-template-columns:
-        58px minmax(0, 1fr);
-    align-items: flex-start;
-    min-width: 0;
-    gap: 13px;
-}
-
-.patient-grid-card-identity>.patient-avatar {
-    margin-top: 0;
-}
-
-.patient-grid-card-person {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    min-width: 0;
-    gap: 5px;
-}
-
-.patient-grid-card-name {
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
-    color: #161B22;
-    font-size: 16px;
-    font-weight: 850;
-    line-height: 1.22;
-    letter-spacing: -0.01em;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-
-    white-space: normal;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    overflow-wrap: anywhere;
-}
-
-.patient-grid-card-meta {
-    display: flex;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    width: 100%;
-    min-width: 0;
-    gap: 5px;
 }
 
 .patient-grid-card-meta .global-info-pill {
@@ -1569,96 +1467,6 @@
     font-size: 8px;
 }
 
-.patient-grid-card-schedule {
-    min-width: 94px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 3px;
-    text-align: right;
-}
-
-.patient-grid-card-schedule>strong {
-    color: #161B22;
-    font-size: 12.5px;
-    font-weight: 850;
-    line-height: 1.2;
-    white-space: nowrap;
-}
-
-.patient-grid-name-row {
-    align-items: flex-start;
-}
-
-.patient-grid-card-schedule>span:not(.urgency-chip) {
-    color: var(--table-heading-muted);
-    font-size: 11px;
-    font-weight: 700;
-    line-height: 1.15;
-    white-space: nowrap;
-}
-
-.patient-grid-card-schedule .urgency-chip {
-    min-height: 17px;
-    margin-top: 2px;
-    padding: 3px 6px;
-    font-size: 7.5px;
-    line-height: 1;
-}
-
-.patient-grid-card-footer {
-    display: grid;
-    grid-template-columns:
-        minmax(0, 1fr) auto;
-    align-items: center;
-    width: 100%;
-    min-width: 0;
-    gap: 12px;
-    margin-top: auto;
-    padding-top: 12px;
-    border-top: 1px solid var(--table-border);
-}
-
-.patient-grid-card-service {
-    display: flex;
-    align-items: center;
-
-    min-width: 0;
-    gap: 7px;
-}
-
-.patient-grid-card-service-name {
-    display: block;
-
-    min-width: 0;
-    max-width: 190px;
-
-    color: #161B22;
-
-    font-size: 13px;
-    font-weight: 800;
-    line-height: 1.25;
-
-    white-space: normal;
-    overflow: visible;
-    text-overflow: clip;
-    overflow-wrap: anywhere;
-}
-
-.patient-grid-card-status {
-    flex-shrink: 0;
-
-    min-height: 27px !important;
-    max-width: none;
-
-    margin: 0 !important;
-    padding: 6px 10px !important;
-    gap: 5px !important;
-    font-size: 10px !important;
-    line-height: 1 !important;
-    white-space: nowrap;
-}
-
 #mainContent.mode-list .patient-card {
     width: 100% !important;
     min-width: 0 !important;
@@ -1669,7 +1477,7 @@
 
 .patient-list-card-body {
     grid-template-columns:
-        minmax(320px, 1.45fr) minmax(210px, 0.8fr) minmax(250px, 1fr) 36px;
+        minmax(320px, 1.45fr) minmax(210px, 0.8fr) minmax(250px, 1fr) 42px;
     align-items: center;
     width: 100%;
     min-width: 0;
@@ -1876,29 +1684,8 @@
 
 @media (max-width: 767px) {
 
-    #mainContent.mode-grid #patientContainer {
-        gap: 10px !important;
-        padding: 10px !important;
-    }
-
-    .patient-grid-card-body {
-        min-height: 152px;
-
-        gap: 10px;
-        padding: 13px 12px 11px 16px;
-    }
-
-    .patient-grid-card-identity {
-        grid-template-columns: 42px minmax(0, 1fr);
-        gap: 9px;
-    }
-
     .patient-grid-card-name {
         font-size: 12px;
-    }
-
-    .patient-grid-card-schedule {
-        min-width: 72px;
     }
 
     .patient-grid-card-service-name {
@@ -2025,8 +1812,6 @@
 
 [data-theme="dark"] .patient-grid-card-name,
 .dark .patient-grid-card-name,
-[data-theme="dark"] .patient-grid-card-schedule>strong,
-.dark .patient-grid-card-schedule>strong,
 [data-theme="dark"] .patient-grid-card-service-name,
 .dark .patient-grid-card-service-name,
 [data-theme="dark"] .patient-list-name,
@@ -2041,23 +1826,6 @@
     background: #0D1117;
     border-color: #30363D;
     color: #8B949E;
-}
-
-@media (min-width: 768px) {
-    #mainContent.mode-grid #patientContainer {
-        display: grid !important;
-        gap: 18px !important;
-        align-items: stretch !important;
-        grid-auto-rows: 1fr !important;
-    }
-
-    #mainContent.mode-grid #patientContainer>.patient-item:not(.hidden) {
-        display: flex !important;
-
-        width: 100% !important;
-        min-width: 0 !important;
-        height: 100% !important;
-    }
 }
 
 @media only screen and (max-width: 767px) {

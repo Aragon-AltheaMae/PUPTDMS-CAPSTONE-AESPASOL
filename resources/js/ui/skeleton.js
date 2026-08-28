@@ -106,10 +106,9 @@ export function runEnterpriseLoading(phases = [], options = {}) {
     phases.forEach((phase) => {
         setTimeout(() => {
             if (phase.label) {
-                const updater = window.setDashboardLoadingStatus || setDashboardLoadingStatus;
-                if (typeof updater === 'function') {
-                    updater(phase.label);
-                }
+                setDashboardLoadingStatus(
+                    phase.label
+                );
             }
 
             (phase.tasks || []).forEach((task, index) => {
@@ -123,9 +122,6 @@ export function runEnterpriseLoading(phases = [], options = {}) {
     });
 
     setTimeout(() => {
-        const finisher = window.finishDashboardLoading || finishDashboardLoading;
-        if (typeof finisher === 'function') {
-            finisher();
-        }
+        finishDashboardLoading();
     }, cursor + 260);
 }

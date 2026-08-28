@@ -1,7 +1,12 @@
 @extends('layouts.app')
 
 @section('layout-role', 'admin')
+
 @section('title', 'Session Dashboard')
+
+@section('styles')
+    @vite('resources/css/pages/admin/session-management.css')
+@endsection
 
 @section('content')
     <main id="mainContent" class="admin-page-shell session-admin-page">

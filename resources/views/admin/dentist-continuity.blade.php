@@ -94,7 +94,7 @@
 @section('title', $pageTitle)
 
 @section('styles')
-@vite('resources/css/pages/admin/dentist-continuity.css')
+    @vite('resources/css/pages/admin/dentist-continuity.css')
 @endsection
 
 @section('content')

@@ -4,6 +4,10 @@
 
 @section('title', 'AI Generated Report')
 
+@section('styles')
+    @vite('resources/css/pages/admin/ai-generated-report.css')
+@endsection
+
 @section('content')
 
     <main id="mainContent" class="admin-page-shell page-enter mode-list">

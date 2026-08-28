@@ -4,6 +4,10 @@
 
 @section('title', 'Admin Dashboard')
 
+@section('styles')
+    @vite('resources/css/pages/admin/admin-dashboard.css')
+@endsection
+
 @section('content')
 
 @php $logs = $logs ?? collect([]); @endphp
@@ -681,7 +685,7 @@
                 return;
             }
 
-            swapSkeletonContent('inventoryOverviewContent', buildInventoryOverviewHtml({
+            window.swapSkeletonContent('inventoryOverviewContent', buildInventoryOverviewHtml({
                 total,
                 medicine,
                 supplies,
@@ -757,7 +761,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        window.initGlobalViewToggles?.();
 
         if (typeof window.setDashboardLoadingStatus === 'function') {
             window.setDashboardLoadingStatus(

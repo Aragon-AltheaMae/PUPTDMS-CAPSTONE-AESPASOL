@@ -4,6 +4,10 @@
 
 @section('body-class', 'auth-guest-body auth-landing-body')
 
+@section('styles')
+    @vite('resources/css/pages/auth/login.css')
+@endsection
+
 @section('content')
 <div class="auth-landing-page">
   <header class="auth-landing-header">

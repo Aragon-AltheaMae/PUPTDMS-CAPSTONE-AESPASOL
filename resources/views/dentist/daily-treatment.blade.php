@@ -4,6 +4,10 @@
 
 @section('title', 'Daily Treatment Records')
 
+@section('styles')
+    @vite('resources/css/pages/dentist/daily-treatment.css')
+@endsection
+
 @section('content')
 
 <main id="mainContent" class="dentist-page-shell dentist-records-page daily-treatment-page page-enter">

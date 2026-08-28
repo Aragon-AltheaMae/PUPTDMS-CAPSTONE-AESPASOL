@@ -854,11 +854,8 @@ if (
     initGlobalFilterSelects();
 }
 
-window.initGlobalFilterSelects =
-    initGlobalFilterSelects;
-
-window.setGlobalFilterSelectValue =
-    setGlobalFilterSelectValue;
-
-window.closeGlobalFilterSelect =
-    closeGlobalFilterSelect;
+export {
+    initGlobalFilterSelects,
+    setGlobalFilterSelectValue,
+    closeGlobalFilterSelect
+};

@@ -18,6 +18,10 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
 
 @section('title', 'Inventory')
 
+@section('styles')
+    @vite('resources/css/pages/shared/inventory.css')
+@endsection
+
 @section('content')
 
 <main id="mainContent" class="{{ $pageShellClass }}

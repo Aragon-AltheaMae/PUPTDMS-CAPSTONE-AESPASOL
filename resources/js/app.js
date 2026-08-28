@@ -1,128 +1,300 @@
 import './bootstrap';
 
-function startPageEnterAnimation() {
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            document.documentElement.classList.remove(
-                'page-preload'
-            );
-        });
-    });
-}
+import './core/helpers';
+import './core/theme';
+import './core/sidebar';
+import './core/modal';
+import './core/toast';
+import './core/session';
 
-if (document.readyState === 'loading') {
-    document.addEventListener(
-        'DOMContentLoaded',
-        startPageEnterAnimation,
-        { once: true }
-    );
-} else {
-    startPageEnterAnimation();
-}
+import './ui/header';
 
-let odontogramPreviewModulePromise = null;
+const featurePromises = new Map();
 
-async function loadOdontogramPreviewModule() {
-    if (!odontogramPreviewModulePromise) {
-        odontogramPreviewModulePromise =
-            import('./odontogram/odontogram-preview')
+function loadFeature(
+    key,
+    loader
+) {
+    if (!featurePromises.has(key)) {
+        const promise =
+            loader()
                 .catch(error => {
-                    odontogramPreviewModulePromise = null;
+                    featurePromises.delete(
+                        key
+                    );
+
                     throw error;
                 });
+
+        featurePromises.set(
+            key,
+            promise
+        );
     }
 
-    return odontogramPreviewModulePromise;
+    return featurePromises.get(
+        key
+    );
+}
+
+function hasAny(
+    selectors,
+    root = document
+) {
+    return Boolean(
+        root.querySelector(
+            selectors
+        )
+    );
+}
+
+function loadPatientRecordModule() {
+    return loadFeature(
+        'patient-record',
+        () =>
+            import(
+                './records/patient-record-modal'
+            )
+    );
+}
+
+window.openRecordModal =
+    async function (source) {
+        const module =
+            await loadPatientRecordModule();
+
+        return module.openRecordModal(
+            source
+        );
+    };
+
+window.closeRecordModal =
+    async function () {
+        const module =
+            await loadPatientRecordModule();
+
+        return module.closeRecordModal();
+    };
+
+function loadOdontogramPreviewModule() {
+    return loadFeature(
+        'odontogram-preview',
+        () =>
+            import(
+                './odontogram/odontogram-preview'
+            )
+    );
 }
 
 window.loadOdontogramPreviewModule = loadOdontogramPreviewModule;
 
-function preloadOdontogramPreviewWhenIdle() {
-    const hasRecordAction =
-        document.querySelector(
-            [
-                '[onclick*="openRecordModal"]',
-                '[data-record]'
-            ].join(',')
+function initVisibleOdontogramPreviews() {
+    const previews =
+        document.querySelectorAll(
+            '[data-odontogram-preview]'
         );
 
-    if (!hasRecordAction) {
+    if (!previews.length) {
         return;
     }
 
-    const preload = async () => {
-        try {
-            const module =
-                await window
-                    .loadOdontogramPreviewModule?.();
+    const observer =
+        new IntersectionObserver(
+            entries => {
+                entries.forEach(
+                    async entry => {
+                        if (
+                            !entry.isIntersecting
+                        ) {
+                            return;
+                        }
 
-            await module
-                ?.preloadOdontogramThreeModule?.();
+                        observer.unobserve(
+                            entry.target
+                        );
 
-        } catch (_) {
-        }
-    };
+                        try {
+                            const module =
+                                await loadOdontogramPreviewModule();
 
-    if (
-        'requestIdleCallback'
-        in window
-    ) {
-        window.requestIdleCallback(
-            preload,
+                            module.initOdontogramPreviews?.(
+                                entry.target
+                            );
+                        } catch (error) {
+                            console.error(
+                                'Unable to initialize odontogram preview.',
+                                error
+                            );
+                        }
+                    }
+                );
+            },
             {
-                timeout: 2500
+                rootMargin:
+                    '200px 0px'
             }
         );
 
-        return;
-    }
+    previews.forEach(
+        preview => {
+            if (
+                preview.closest(
+                    '.ui-modal'
+                )
+            ) {
+                return;
+            }
 
-    window.setTimeout(
-        preload,
-        1200
+            observer.observe(
+                preview
+            );
+        }
+    );
+}
+
+if (
+    document.readyState ===
+    'loading'
+) {
+    document.addEventListener(
+        'DOMContentLoaded',
+        initVisibleOdontogramPreviews,
+        {
+            once: true
+        }
+    );
+} else {
+    initVisibleOdontogramPreviews();
+}
+
+function loadOdontogramThreeModule() {
+    return loadFeature(
+        'odontogram-three',
+        () =>
+            import(
+                './odontogram/odontogram-three'
+            )
+    );
+}
+
+window.loadOdontogramThreeModule = loadOdontogramThreeModule;
+
+function loadVoiceModule() {
+    return loadFeature(
+        'voice-input',
+        () =>
+            import(
+                './ui/voice-logic'
+            )
     );
 }
 
 document.addEventListener(
-    'DOMContentLoaded',
-    preloadOdontogramPreviewWhenIdle
+    'pointerdown',
+    event => {
+        const trigger =
+            event.target.closest?.(
+                [
+                    '[data-global-voice-trigger]',
+                    '.voice-search-mic.external[data-voice-trigger]'
+                ].join(',')
+            );
+
+        if (!trigger) {
+            return;
+        }
+
+        loadVoiceModule()
+            .then(() => {
+                window
+                    .initGlobalVoiceInputs?.(
+                        document
+                    );
+            })
+            .catch(error => {
+                console.error(
+                    'Unable to initialize voice input.',
+                    error
+                );
+            });
+    },
+    true
 );
 
-if (
-    document.querySelector(
-        [
-            '[data-global-voice-trigger]',
-            '.voice-search-mic.external[data-voice-trigger]'
-        ].join(',')
-    )
-) {
-    import('./ui/voice-logic');
-}
-
-let bookingWorkflowModulePromise =
-    null;
-
 function loadBookingWorkflowModule() {
-    if (!bookingWorkflowModulePromise) {
-        bookingWorkflowModulePromise =
+    return loadFeature(
+        'booking-workflow',
+        () =>
             import(
                 './forms/booking-workflow'
             )
-                .catch(error => {
-                    bookingWorkflowModulePromise =
-                        null;
-
-                    throw error;
-                });
-    }
-
-    return bookingWorkflowModulePromise;
+    );
 }
 
 window.loadBookingWorkflowModule = loadBookingWorkflowModule;
 
+function loadSkeletonModule() {
+    return loadFeature(
+        'skeleton',
+        () =>
+            import(
+                './ui/skeleton'
+            )
+    );
+}
+
+window.swapSkeletonContent =
+    async function (...args) {
+        const module =
+            await loadSkeletonModule();
+
+        return module.swapSkeletonContent(
+            ...args
+        );
+    };
+
+window.renderWithStagger =
+    async function (...args) {
+        const module =
+            await loadSkeletonModule();
+
+        return module.renderWithStagger(
+            ...args
+        );
+    };
+
+window.runEnterpriseLoading =
+    async function (...args) {
+        const module =
+            await loadSkeletonModule();
+
+        return module.runEnterpriseLoading(
+            ...args
+        );
+    };
+
+window.setDashboardLoadingStatus =
+    async function (...args) {
+        const module =
+            await loadSkeletonModule();
+
+        return module.setDashboardLoadingStatus(
+            ...args
+        );
+    };
+
+window.finishDashboardLoading =
+    async function (...args) {
+        const module =
+            await loadSkeletonModule();
+
+        return module.finishDashboardLoading(
+            ...args
+        );
+    };
+
 if (
-    document.querySelector(
+    hasAny(
         '.step-content'
     )
 ) {
@@ -136,56 +308,551 @@ if (
 }
 
 if (
-    document.querySelector(
+    hasAny(
         '[data-booking-signature]'
     )
 ) {
     import(
         './forms/booking-signature'
-    ).catch(error => {
-        console.error(
-            'Unable to load booking signature.',
-            error
-        );
-    });
+    );
 }
 
-import './ui/header';
-import './ui/pagination-bar';
-import './ui/show-more';
-import './ui/profile-avatar';
-import './ui/search-bar';
+function loadSearchBarModule() {
+    return loadFeature(
+        'search-bar',
+        () =>
+            import(
+                './ui/search-bar'
+            )
+    );
+}
+
+async function ensureSearchBarReady(
+    root = document
+) {
+    const module =
+        await loadSearchBarModule();
+
+    module;
+
+    window
+        .initGlobalSearchBars?.(
+            root
+        );
+}
+
+document.addEventListener(
+    'focusin',
+    event => {
+        const wrapper =
+            event.target.closest?.(
+                '[data-global-search-bar]'
+            );
+
+        if (!wrapper) {
+            return;
+        }
+
+        ensureSearchBarReady(
+            wrapper.parentElement ||
+            document
+        )
+            .catch(error => {
+                console.error(
+                    'Unable to initialize search bar.',
+                    error
+                );
+            });
+    },
+    true
+);
+
+if (
+    hasAny(
+        '[data-show-more]'
+    )
+) {
+    loadFeature(
+        'show-more',
+        () =>
+            import(
+                './ui/show-more'
+            )
+    )
+        .then(() => {
+            window.ShowMore
+                ?.init?.(
+                    document
+                );
+        })
+        .catch(error => {
+            console.error(
+                'Unable to initialize show more.',
+                error
+            );
+        });
+}
+
+function loadViewToggleModule() {
+    return loadFeature(
+        'view-toggle',
+        () =>
+            import(
+                './ui/view-toggle'
+            )
+    );
+}
+
+document.addEventListener(
+    'pointerdown',
+    event => {
+        const toggle =
+            event.target.closest?.(
+                '[data-global-view-toggle]'
+            );
+
+        if (!toggle) {
+            return;
+        }
+
+        loadViewToggleModule()
+            .then(() => {
+                window
+                    .initGlobalViewToggles?.(
+                        document
+                    );
+            })
+            .catch(error => {
+                console.error(
+                    'Unable to initialize view toggle.',
+                    error
+                );
+            });
+    },
+    true
+);
+
+function loadFilterSelectModule() {
+    return loadFeature(
+        'filter-select',
+        () =>
+            import(
+                './ui/filter-select'
+            )
+    );
+}
+
+function loadFilterDrawerModule() {
+    return loadFeature(
+        'filter-drawer',
+        () =>
+            import(
+                './ui/filter-drawer'
+            )
+    );
+}
+
+function loadFilterControlsModule() {
+    return loadFeature(
+        'filter-controls',
+        () =>
+            import(
+                './ui/filter-controls'
+            )
+    );
+}
+
+document.addEventListener(
+    'pointerdown',
+    event => {
+        const trigger =
+            event.target.closest?.(
+                '[data-filter-select-trigger]'
+            );
+
+        if (!trigger) {
+            return;
+        }
+
+        loadFilterSelectModule()
+            .then(module => {
+                module
+                    .initGlobalFilterSelects(
+                        document
+                    );
+            })
+            .catch(error => {
+                console.error(
+                    'Unable to initialize filter select.',
+                    error
+                );
+            });
+    },
+    true
+);
+
+window.openFilterDrawer =
+    async function (...args) {
+        const module =
+            await loadFilterDrawerModule();
+
+        return module.openFilterDrawer(
+            ...args
+        );
+    };
+
+window.closeFilterDrawer =
+    async function (...args) {
+        const module =
+            await loadFilterDrawerModule();
+
+        return module.closeFilterDrawer(
+            ...args
+        );
+    };
+
+window.openFilterPanel =
+    async function (...args) {
+        const module =
+            await loadFilterDrawerModule();
+
+        return module.openFilterPanel(
+            ...args
+        );
+    };
+
+window.closeFilterPanel =
+    async function (...args) {
+        const module =
+            await loadFilterDrawerModule();
+
+        return module.closeFilterPanel(
+            ...args
+        );
+    };
+
+window.initGlobalFilterSelects =
+    async function (...args) {
+        const module =
+            await loadFilterSelectModule();
+
+        return module.initGlobalFilterSelects(
+            ...args
+        );
+    };
+
+window.setGlobalFilterSelectValue =
+    async function (...args) {
+        const module =
+            await loadFilterSelectModule();
+
+        return module.setGlobalFilterSelectValue(
+            ...args
+        );
+    };
+
+window.closeGlobalFilterSelect =
+    async function (...args) {
+        const module =
+            await loadFilterSelectModule();
+
+        return module.closeGlobalFilterSelect(
+            ...args
+        );
+    };
+
+window.syncFilterTagGroup =
+    async function (...args) {
+        const module =
+            await loadFilterControlsModule();
+
+        return module.syncFilterTagGroup(
+            ...args
+        );
+    };
+
+window.bindFilterTagGroup =
+    async function (...args) {
+        const module =
+            await loadFilterControlsModule();
+
+        return module.bindFilterTagGroup(
+            ...args
+        );
+    };
+
+window.updateShowResultsText =
+    async function (...args) {
+        const module =
+            await loadFilterControlsModule();
+
+        return module.updateShowResultsText(
+            ...args
+        );
+    };
+
+window.setGlobalFilterButtonState =
+    async function (...args) {
+        const module =
+            await loadFilterControlsModule();
+
+        return module.setGlobalFilterButtonState(
+            ...args
+        );
+    };
+
+const flatpickrSelectors = [
+    '.js-flatpickr-date',
+    '.js-flatpickr-date-min-today',
+    '.js-flatpickr-date-max-today',
+    '.js-flatpickr-date-range-from',
+    '.js-flatpickr-date-range-to',
+    '.js-flatpickr-time',
+    '[data-month-only-picker]'
+].join(',');
+
+const customSelectSelectors = [
+    'select.js-custom-select',
+    '[data-global-selects] select:not([data-native-select])'
+].join(',');
+
+function loadCustomSelectModule() {
+    return loadFeature(
+        'custom-select',
+        () =>
+            import(
+                './ui/custom-select'
+            )
+    );
+}
+
+window.initCustomSelects =
+    async function (...args) {
+        const module =
+            await loadCustomSelectModule();
+
+        return module.initCustomSelects(
+            ...args
+        );
+    };
+
+window.syncCustomSelect =
+    async function (...args) {
+        const module =
+            await loadCustomSelectModule();
+
+        return module.syncCustomSelect(
+            ...args
+        );
+    };
+
+function loadDatePickerModule() {
+    return loadFeature(
+        'date-picker',
+        () =>
+            import(
+                './ui/date-picker'
+            )
+    );
+}
+
+async function ensureDatePickerReady(
+    input
+) {
+    await loadCustomSelectModule();
+
+    const module =
+        await loadDatePickerModule();
+
+    await module
+        .initGlobalDatePickers(
+            document
+        );
+
+    const instance =
+        input?._flatpickr;
+
+    if (
+        instance &&
+        !instance.isOpen
+    ) {
+        instance.open();
+    }
+}
+
+document.addEventListener(
+    'pointerdown',
+    event => {
+        const input =
+            event.target.closest?.(
+                flatpickrSelectors
+            );
+
+        if (!input) {
+            return;
+        }
+
+        ensureDatePickerReady(
+            input
+        )
+            .catch(error => {
+                console.error(
+                    'Unable to initialize date picker.',
+                    error
+                );
+            });
+    },
+    true
+);
+
+document.addEventListener(
+    'focusin',
+    event => {
+        const input =
+            event.target.closest?.(
+                flatpickrSelectors
+            );
+
+        if (!input) {
+            return;
+        }
+
+        ensureDatePickerReady(
+            input
+        )
+            .catch(error => {
+                console.error(
+                    'Unable to initialize date picker.',
+                    error
+                );
+            });
+    },
+    true
+);
+
+if (
+    hasAny(
+        [
+            'form[data-global-validation]',
+            '[data-char-limit]',
+            '[data-global-number-stepper]'
+        ].join(',')
+    )
+) {
+    import('./forms/validation');
+}
+
+let deleteConfirmModulePromise = null;
+
+window.openDeleteConfirmModal =
+    async function (options) {
+
+        if (!deleteConfirmModulePromise) {
+            deleteConfirmModulePromise =
+                import(
+                    './ui/delete-confirm'
+                )
+                    .catch(error => {
+                        deleteConfirmModulePromise =
+                            null;
+
+                        throw error;
+                    });
+        }
+
+        const module =
+            await deleteConfirmModulePromise;
+
+        return module.openDeleteConfirmModal(
+            options
+        );
+    };
+
 import './ui/empty-state';
-import './ui/filter-select';
-
-import './core/helpers';
-import './core/theme';
-import './core/sidebar';
-import './core/modal';
-import './core/toast';
-import './core/session';
-
-import './ui/custom-select';
-import './ui/preview-zoom';
-import './ui/delete-confirm';
-import './ui/date-picker';
 import './ui/assistive';
 import './ui/tooltips';
-import './ui/input-clear';
-import './ui/header-controls';
-import './ui/filter-drawer';
-import './ui/filter-controls';
-import './ui/patient-name';
-import './ui/view-toggle';
 import './ui/refresh-watcher';
-import './ui/page-size';
 import './ui/back-to-top';
-
-import './forms/validation';
 
 import './appointments/status-meta';
 
-let chartJsPromise = null;
+if (
+    hasAny(
+        '[data-patient-avatar]'
+    )
+) {
+    loadFeature(
+        'profile-avatar',
+        () =>
+            import(
+                './ui/profile-avatar'
+            )
+    )
+        .then(() => {
+            window.PatientUI
+                ?.initAvatars?.(
+                    document
+                );
+        })
+        .catch(error => {
+            console.error(
+                'Unable to initialize patient avatars.',
+                error
+            );
+        });
+}
+
+if (
+    hasAny(
+        [
+            '#currentDate',
+            '#mobFab',
+            '#mobFabMenu'
+        ].join(',')
+    )
+) {
+    import('./ui/header-controls');
+}
+
+if (
+    hasAny(
+        [
+            '[data-search-input]',
+            '[data-clearable-input]'
+        ].join(',')
+    )
+) {
+    import('./ui/input-clear');
+}
+
+if (
+    hasAny(
+        '[data-patient-name]'
+    )
+) {
+    import('./ui/patient-name');
+}
+
+if (
+    hasAny(
+        '[data-global-preview-zoom]'
+    )
+) {
+    import('./ui/preview-zoom');
+}
+
+if (
+    hasAny(
+        '[data-global-page-size]'
+    )
+) {
+    import('./ui/page-size');
+}
+
+import './ui/pagination-bar';
+
+let chartJsPromise =
+    null;
 
 async function loadChartJs() {
     if (window.Chart) {
@@ -201,9 +868,7 @@ async function loadChartJs() {
                     window.Chart =
                         module.default;
 
-                    return (
-                        module.default
-                    );
+                    return module.default;
                 })
                 .catch(error => {
                     chartJsPromise =
@@ -216,22 +881,7 @@ async function loadChartJs() {
     return chartJsPromise;
 }
 
-window.loadChartJs =
-    loadChartJs;
-
-import {
-    swapSkeletonContent,
-    renderWithStagger,
-    runEnterpriseLoading,
-    setDashboardLoadingStatus,
-    finishDashboardLoading
-} from './ui/skeleton';
-
-window.swapSkeletonContent = swapSkeletonContent;
-window.renderWithStagger = renderWithStagger;
-window.runEnterpriseLoading = runEnterpriseLoading;
-window.setDashboardLoadingStatus = setDashboardLoadingStatus;
-window.finishDashboardLoading = finishDashboardLoading;
+window.loadChartJs = loadChartJs;
 
 document.addEventListener(
     'ui-modal:opened',
@@ -240,9 +890,183 @@ document.addEventListener(
             event.detail?.modal ||
             document;
 
-        window.initCharLimitFields?.(modal);
-        window.initSearchClearButtons?.(modal);
-        window.initGlobalVoiceInputs?.(modal);
+        if (
+            hasAny(
+                [
+                    '[data-char-limit]',
+                    'form[data-global-validation]',
+                    '[data-global-number-stepper]'
+                ].join(','),
+                modal
+            )
+        ) {
+            try {
+                await import(
+                    './forms/validation'
+                );
+
+                window
+                    .initCharLimitFields?.(
+                        modal
+                    );
+
+                window
+                    .bindFormInputValidation?.(
+                        modal
+                    );
+
+                window
+                    .initGlobalNumberSteppers?.(
+                        modal
+                    );
+            } catch (error) {
+                console.error(
+                    'Unable to initialize modal validation.',
+                    error
+                );
+            }
+        }
+
+        if (
+            hasAny(
+                '[data-global-search-bar]',
+                modal
+            )
+        ) {
+            try {
+                await import(
+                    './ui/search-bar'
+                );
+
+                window
+                    .initGlobalSearchBars?.(
+                        modal
+                    );
+            } catch (error) {
+                console.error(
+                    'Unable to initialize modal search.',
+                    error
+                );
+            }
+        }
+
+        if (
+            hasAny(
+                customSelectSelectors,
+                modal
+            )
+        ) {
+            try {
+                await import(
+                    './ui/custom-select'
+                );
+
+                window
+                    .initCustomSelects?.(
+                        modal
+                    );
+            } catch (error) {
+                console.error(
+                    'Unable to initialize custom selects.',
+                    error
+                );
+            }
+        }
+
+        if (
+            hasAny(
+                [
+                    '[data-search-input]',
+                    '[data-clearable-input]'
+                ].join(','),
+                modal
+            )
+        ) {
+            try {
+                await import(
+                    './ui/input-clear'
+                );
+
+                window
+                    .initSearchClearButtons?.(
+                        modal
+                    );
+            } catch (error) {
+                console.error(
+                    'Unable to initialize input clear controls.',
+                    error
+                );
+            }
+        }
+
+        if (
+            hasAny(
+                '[data-patient-name]',
+                modal
+            )
+        ) {
+            try {
+                await import(
+                    './ui/patient-name'
+                );
+
+                window
+                    .initGlobalPatientNames?.(
+                        modal
+                    );
+            } catch (error) {
+                console.error(
+                    'Unable to initialize patient names.',
+                    error
+                );
+            }
+        }
+
+        if (
+            hasAny(
+                '[data-global-preview-zoom]',
+                modal
+            )
+        ) {
+            try {
+                await import(
+                    './ui/preview-zoom'
+                );
+
+                window
+                    .initGlobalPreviewZoom?.(
+                        modal
+                    );
+            } catch (error) {
+                console.error(
+                    'Unable to initialize preview zoom.',
+                    error
+                );
+            }
+        }
+
+        if (
+            hasAny(
+                '[data-patient-avatar]',
+                modal
+            )
+        ) {
+            try {
+                await import(
+                    './ui/profile-avatar'
+                );
+
+                window.PatientUI
+                    ?.initAvatars?.(
+                        modal
+                    );
+            } catch (error) {
+                console.error(
+                    'Unable to initialize patient avatars.',
+                    error
+                );
+            }
+        }
 
         const hasOdontogramPreview =
             modal.matches?.(
@@ -260,9 +1084,10 @@ document.addEventListener(
             const module =
                 await loadOdontogramPreviewModule();
 
-            module.initOdontogramPreviews?.(
-                modal
-            );
+            module
+                .initOdontogramPreviews?.(
+                    modal
+                );
         } catch (error) {
             console.error(
                 'Unable to load odontogram preview.',

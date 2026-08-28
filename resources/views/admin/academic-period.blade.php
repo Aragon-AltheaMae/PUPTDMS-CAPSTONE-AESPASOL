@@ -4,6 +4,10 @@
 
 @section('title', 'Academic Period')
 
+@section('styles')
+    @vite('resources/css/pages/admin/academic-period.css')
+@endsection
+
 @section('content')
 
 @php

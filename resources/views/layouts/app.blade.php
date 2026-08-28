@@ -77,15 +77,6 @@
             };
 
             document.documentElement.classList.add('sidebar-preload');
-            document.documentElement.classList.add('page-preload');
-
-            try {
-                if (localStorage.getItem(sidebarKeys[role]) === '1') {
-                    document.documentElement.classList.add(
-                        'sidebar-collapsed-init'
-                    );
-                }
-            } catch (error) {}
         })();
     </script>
 
@@ -100,14 +91,38 @@
     <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
 
     <style>
-        html.page-preload .page-enter {
-            opacity: 0;
-            transform: translateY(10px);
-            animation: none !important;
+        @keyframes page-enter-critical {
+            from {
+                opacity: .92;
+                transform: translateY(4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-enter {
+            animation: page-enter-critical 180ms ease-out both;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .page-enter {
+                animation: none;
+            }
         }
     </style>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    @if ($isAdmin)
+        @vite('resources/css/pages/admin/admin-shared.css')
+    @elseif ($isDentist)
+        @vite('resources/css/pages/dentist/dentist-shared.css')
+    @elseif ($isPatient)
+        @vite('resources/css/pages/patient/patient-shared.css')
+    @endif
 
     @yield('styles')
     @stack('styles')
@@ -293,7 +308,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/sienna-accessibility@latest/dist/sienna-accessibility.umd.js"
         data-position="bottom-right" data-offset="{{ $accessibilityOffset }}" defer></script>
-        
+
     @include('partials.chatbot')
 
     @stack('scripts')

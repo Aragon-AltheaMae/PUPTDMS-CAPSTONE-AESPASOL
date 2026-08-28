@@ -4,6 +4,10 @@
 
 @section('title', 'Appointments')
 
+@section('styles')
+    @vite('resources/css/pages/patient/appointment.css')
+@endsection
+
 @section('content')
 
 @php

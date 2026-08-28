@@ -4,6 +4,10 @@
 
 @section('title', $pageTitle ?? 'Clinic Schedule')
 
+@section('styles')
+    @vite('resources/css/pages/shared/clinic-schedule.css')
+@endsection
+
 @section('content')
 @php
 $layoutRole = $layoutRole ?? 'admin';

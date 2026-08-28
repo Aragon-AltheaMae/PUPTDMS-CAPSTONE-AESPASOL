@@ -4,6 +4,10 @@
 
 @section('title', 'User Management')
 
+@section('styles')
+    @vite('resources/css/pages/admin/user-management.css')
+@endsection
+
 @section('content')
 
 @php

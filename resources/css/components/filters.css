@@ -1,27 +1,3 @@
-@media (max-width: 767px) {
-    .filter-drawer-footer {
-        padding: 12px 18px calc(14px + env(safe-area-inset-bottom));
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-    }
-
-    .filter-footer-actions {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        width: 100%;
-        gap: 10px;
-    }
-
-    .filter-clear-btn,
-    .filter-cancel-btn,
-    .filter-apply-btn {
-        width: 100%;
-        min-width: 0;
-        justify-content: center;
-    }
-}
-
 .filter-badge {
     position: absolute;
     top: -4px;
@@ -559,9 +535,16 @@
 
 .global-filter-btn {
     position: relative !important;
-    min-height: 42px !important;
+
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+
     height: 42px !important;
-    padding: 0 16px !important;
+    min-height: 42px !important;
+
+    padding: 0 !important;
+
     border-radius: 14px !important;
     border: 1px solid var(--filter-btn-border, #E5E7EB) !important;
     background: var(--filter-btn-bg, #FFFFFF) !important;
@@ -571,13 +554,17 @@
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 8px !important;
+
+    gap: 0 !important;
 
     font-size: 13px !important;
     font-weight: 850 !important;
     line-height: 1 !important;
     white-space: nowrap !important;
+
+    flex: 0 0 42px !important;
     flex-shrink: 0 !important;
+
     cursor: pointer !important;
 
     transition:
@@ -594,9 +581,7 @@
 }
 
 .global-filter-btn span:not(.filter-badge) {
-    font-size: 13px !important;
-    font-weight: 850 !important;
-    line-height: 1 !important;
+    display: none !important;
 }
 
 .global-filter-btn:hover {
@@ -844,54 +829,6 @@ body:has(#filterModal.closing) .ai-help-popover {
     color: #FCA5A5 !important;
 }
 
-@media (max-width: 767px) {
-    .filter-active-section {
-        gap: 8px;
-        padding-bottom: 14px;
-    }
-
-    .filter-active-header {
-        gap: 10px;
-    }
-
-    .filter-active-title {
-        font-size: 12px;
-    }
-
-    .filter-active-header .filter-clear-all {
-        min-height: 30px;
-        padding: 0 10px;
-    }
-
-    .active-filters-container {
-        gap: 7px;
-    }
-
-    .global-filter-btn {
-        width: auto !important;
-        min-width: 0 !important;
-        min-height: 42px !important;
-        height: 42px !important;
-        border-radius: 14px !important;
-        flex: 1 1 0 !important;
-    }
-
-    .global-filter-reset-btn {
-        width: 44px !important;
-        min-width: 44px !important;
-        max-width: 44px !important;
-        flex: 0 0 44px !important;
-        min-height: 42px !important;
-        height: 42px !important;
-        border-radius: 14px !important;
-        padding: 0 !important;
-    }
-
-    .global-filter-reset-btn.hidden {
-        display: none !important;
-    }
-}
-
 .global-native-filter-select-field {
     --select-accent: #8B0000;
     --select-accent-soft: rgba(139, 0, 0, 0.08);
@@ -1047,31 +984,6 @@ body:has(#filterModal.closing) .ai-help-popover {
 .dark .global-native-filter-select option {
     background: var(--card) !important;
     color: var(--text-1) !important;
-}
-
-@media (max-width: 767px) {
-    .global-native-filter-select-field {
-        width: 100%;
-        flex: 1 1 100%;
-        height: 46px;
-        min-height: 46px;
-        border-radius: 18px;
-    }
-
-    .global-native-filter-select {
-        line-height: 46px;
-        font-size: 13px;
-    }
-
-    .global-native-filter-icon {
-        left: 16px;
-        font-size: 15px;
-    }
-
-    .global-native-filter-chevron {
-        right: 16px;
-        font-size: 12px;
-    }
 }
 
 @media (max-width: 480px) {
@@ -1240,7 +1152,161 @@ body:has(#filterModal.closing) .ai-help-popover {
     width: 100% !important;
 }
 
+@media (max-width: 380px) {
+    #filterModal.filter-drawer-wrapper .filter-drawer-panel {
+        height: min(94dvh, 680px) !important;
+        max-height: min(94dvh, 680px) !important;
+
+        border-radius: 22px 22px 0 0 !important;
+    }
+
+    #filterModal .filter-drawer-header {
+        min-height: 60px !important;
+        padding: 12px 15px !important;
+    }
+
+    #filterModal .filter-drawer-body {
+        padding: 12px 14px 14px !important;
+        gap: 14px !important;
+    }
+
+    #filterModal .filter-drawer-footer {
+        padding:
+            9px 14px calc(10px + env(safe-area-inset-bottom)) !important;
+    }
+
+    #filterModal #fSortGroup,
+    #filterModal #fStatusGroup,
+    #filterModal #datePresetGroup {
+        gap: 8px !important;
+    }
+
+    #filterModal #fSortGroup .ftag,
+    #filterModal #fStatusGroup .ftag,
+    #filterModal #datePresetGroup .quick-date-chip {
+        min-height: 40px !important;
+        padding: 7px 8px !important;
+        font-size: 11px !important;
+    }
+}
+
+.filter-two-column-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.filter-group {
+    min-width: 0;
+}
+
+.filter-group-content {
+    min-width: 0;
+}
+
+.filter-group-last {
+    padding-bottom: 24px;
+}
+
 @media (max-width: 767px) {
+    .filter-drawer-footer {
+        padding: 12px 18px calc(14px + env(safe-area-inset-bottom));
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .filter-footer-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        gap: 10px;
+    }
+
+    .filter-clear-btn,
+    .filter-cancel-btn,
+    .filter-apply-btn {
+        width: 100%;
+        min-width: 0;
+        justify-content: center;
+    }
+
+    .filter-active-section {
+        gap: 8px;
+        padding-bottom: 14px;
+    }
+
+    .filter-active-header {
+        gap: 10px;
+    }
+
+    .filter-active-title {
+        font-size: 12px;
+    }
+
+    .filter-active-header .filter-clear-all {
+        min-height: 30px;
+        padding: 0 10px;
+    }
+
+    .active-filters-container {
+        gap: 7px;
+    }
+
+    .global-filter-btn {
+        width: 42px !important;
+        min-width: 42px !important;
+        max-width: 42px !important;
+
+        height: 42px !important;
+        min-height: 42px !important;
+
+        padding: 0 !important;
+
+        border-radius: 14px !important;
+
+        flex: 0 0 42px !important;
+    }
+
+    .global-filter-reset-btn {
+        width: 44px !important;
+        min-width: 44px !important;
+        max-width: 44px !important;
+        flex: 0 0 44px !important;
+        min-height: 42px !important;
+        height: 42px !important;
+        border-radius: 14px !important;
+        padding: 0 !important;
+    }
+
+    .global-filter-reset-btn.hidden {
+        display: none !important;
+    }
+
+    .global-native-filter-select-field {
+        width: 100%;
+        flex: 1 1 100%;
+        height: 46px;
+        min-height: 46px;
+        border-radius: 18px;
+    }
+
+    .global-native-filter-select {
+        line-height: 46px;
+        font-size: 13px;
+    }
+
+    .global-native-filter-icon {
+        left: 16px;
+        font-size: 15px;
+    }
+
+    .global-native-filter-chevron {
+        right: 16px;
+        font-size: 12px;
+    }
+
     .filter-drawer-wrapper {
         display: flex !important;
         align-items: flex-end !important;
@@ -1467,66 +1533,7 @@ body:has(#filterModal.closing) .ai-help-popover {
         font-size: 12.5px !important;
         line-height: 1.05 !important;
     }
-}
 
-@media (max-width: 380px) {
-    #filterModal.filter-drawer-wrapper .filter-drawer-panel {
-        height: min(94dvh, 680px) !important;
-        max-height: min(94dvh, 680px) !important;
-
-        border-radius: 22px 22px 0 0 !important;
-    }
-
-    #filterModal .filter-drawer-header {
-        min-height: 60px !important;
-        padding: 12px 15px !important;
-    }
-
-    #filterModal .filter-drawer-body {
-        padding: 12px 14px 14px !important;
-        gap: 14px !important;
-    }
-
-    #filterModal .filter-drawer-footer {
-        padding:
-            9px 14px calc(10px + env(safe-area-inset-bottom)) !important;
-    }
-
-    #filterModal #fSortGroup,
-    #filterModal #fStatusGroup,
-    #filterModal #datePresetGroup {
-        gap: 8px !important;
-    }
-
-    #filterModal #fSortGroup .ftag,
-    #filterModal #fStatusGroup .ftag,
-    #filterModal #datePresetGroup .quick-date-chip {
-        min-height: 40px !important;
-        padding: 7px 8px !important;
-        font-size: 11px !important;
-    }
-}
-
-.filter-two-column-grid {
-    display: grid;
-    grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-    gap: 24px;
-}
-
-.filter-group {
-    min-width: 0;
-}
-
-.filter-group-content {
-    min-width: 0;
-}
-
-.filter-group-last {
-    padding-bottom: 24px;
-}
-
-@media (max-width: 767px) {
     .filter-two-column-grid {
         grid-template-columns: 1fr;
         gap: 16px;
