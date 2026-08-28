@@ -70,6 +70,15 @@ class SessionManagementController extends Controller
     public function expire(
         Request $request
     ): JsonResponse {
+        if ($this->isExemptFromIdleTimeout($request)) {
+            $request->session()->forget('session_idle_locked');
+
+            return response()->json([
+                'expired' => false,
+                'active' => true,
+            ]);
+        }
+
         $this->logoutCurrentSession(
             $request,
             $request->user(),
@@ -150,6 +159,22 @@ class SessionManagementController extends Controller
     private function normalizeRole(string $role): string
     {
         return $role === 'super_admin' ? 'admin' : ($role !== '' ? $role : 'patient');
+    }
+
+    private function isExemptFromIdleTimeout(Request $request): bool
+    {
+        $activeRole = strtolower(trim((string) (
+            $request->session()->get('impersonated_role')
+                ?: $request->session()->get('role')
+                ?: optional($request->user()?->role)->slug
+        )));
+
+        $exemptRoles = array_map(
+            static fn (mixed $role): string => strtolower(trim((string) $role)),
+            (array) config('session.idle_timeout_exempt_roles', [])
+        );
+
+        return in_array($activeRole, $exemptRoles, true);
     }
 
     private function logoutCurrentSession(

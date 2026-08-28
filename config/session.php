@@ -36,6 +36,10 @@ return [
 
     'idle_timeout_seconds' => (int) env('SESSION_IDLE_TIMEOUT_SECONDS', 600),
 
+    'idle_timeout_exempt_roles' => [
+        'dentist',
+    ],
+
     'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
 
     /*

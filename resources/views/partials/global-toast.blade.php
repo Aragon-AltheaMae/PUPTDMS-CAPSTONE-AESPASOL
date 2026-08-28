@@ -6,6 +6,18 @@
 
     $idleTimeoutMinutes = max(1, (int) ceil($idleTimeoutSeconds / 60));
 
+    $activeSessionRole = strtolower(trim((string) (
+        session('impersonated_role')
+            ?: ($layoutRole ?? session('role') ?? optional(auth()->user()?->role)->slug)
+    )));
+
+    $idleTimeoutExemptRoles = array_map(
+        static fn ($role) => strtolower(trim((string) $role)),
+        (array) config('session.idle_timeout_exempt_roles', [])
+    );
+
+    $showSessionTimeout = !in_array($activeSessionRole, $idleTimeoutExemptRoles, true);
+
     if (session('success')) {
         $flashToasts[] = [
             'type' => 'success',
@@ -47,7 +59,7 @@
     }
 @endphp
 
-@if (\Illuminate\Support\Facades\Auth::check())
+@if (\Illuminate\Support\Facades\Auth::check() && $showSessionTimeout)
     <div id="sessionTimeoutModal" class="ui-modal session-timeout-modal" data-session-timeout-modal data-modal-static
         data-session-expired="{{ request()->attributes->get('session_idle_expired', false) ? 'true' : 'false' }}"
         data-session-timeout-seconds="{{ $idleTimeoutSeconds }}"
@@ -102,6 +114,26 @@
             </div>
         </div>
     </div>
+@elseif (\Illuminate\Support\Facades\Auth::check())
+    <script>
+        (() => {
+            const activityUrl = @json(route('session.activity'));
+            const csrfToken = @json(csrf_token());
+
+            window.setInterval(() => {
+                fetch(activityUrl, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    cache: 'no-store',
+                }).catch(() => {});
+            }, 5 * 60 * 1000);
+        })();
+    </script>
 @endif
 
 <script type="application/json" id="flashToastPayload">
