@@ -74,10 +74,11 @@
 }
 
 .voice-search-mic.external {
-    width: 42px;
-    height: 42px;
-    min-width: 42px;
-    min-height: 42px;
+    width: var(--voice-mic-size);
+    height: var(--voice-mic-size);
+
+    min-width: var(--voice-mic-size);
+    min-height: var(--voice-mic-size);
     padding: 0;
     margin: 0;
     display: inline-flex;
@@ -370,22 +371,6 @@
     }
 }
 
-@media (max-width: 575px) {
-
-    .global-voice-row,
-    .st-voice-row,
-    .voice-search-row {
-        gap: 0.5rem;
-    }
-
-    .voice-status {
-        right: 0;
-        max-width: calc(100vw - 24px);
-        font-size: 0.7rem;
-        white-space: normal;
-    }
-}
-
 @media (prefers-reduced-motion: reduce) {
 
     .voice-search-mic.external,
@@ -521,14 +506,6 @@
     background: #fca5a5;
 }
 
-@media (max-width: 575px) {
-    .global-voice-waveform {
-        width: 42px;
-        height: 30px;
-        padding-inline: 6px;
-    }
-}
-
 .inventory-page .table-card,
 .inventory-page .table-toolbar,
 .inventory-page .inventory-toolbar-shell,
@@ -551,4 +528,60 @@
 .role-permission-toolbar,
 .role-permission-toolbar-row {
     overflow: visible !important;
+}
+
+@media (max-width: 575px) {
+    .global-voice-waveform {
+        width: 42px;
+        height: 30px;
+        padding-inline: 6px;
+    }
+
+    .global-voice-row,
+    .st-voice-row,
+    .voice-search-row {
+        gap: 0.5rem;
+    }
+
+    .voice-status {
+        right: 0;
+        max-width: calc(100vw - 24px);
+        font-size: 0.7rem;
+        white-space: normal;
+    }
+}
+
+@media (max-width: 767px) {
+
+    :root {
+        --voice-mic-size: 36px;
+        --voice-mic-radius: 11px;
+    }
+
+    .global-voice-row,
+    .st-voice-row,
+    .voice-search-row {
+        gap: 8px;
+    }
+
+    .voice-search-mic.external>i {
+        width: 13px;
+        height: 13px;
+
+        flex-basis: 13px;
+
+        font-size: 11px !important;
+    }
+}
+
+@media (max-width: 380px) {
+
+    :root {
+        --voice-mic-size: 34px;
+        --voice-mic-radius: 10px;
+    }
+
+    .voice-search-mic.external>i {
+        font-size: 10px !important;
+    }
 }

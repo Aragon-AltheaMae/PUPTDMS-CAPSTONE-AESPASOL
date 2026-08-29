@@ -166,21 +166,20 @@
 }
 
 .dashboard-loading-status {
-    transition: opacity 0.28s ease, transform 0.28s ease, filter 0.28s ease;
-}
-
-.dashboard-loading-status {
     overflow: hidden;
+
     max-height: 90px;
-    margin-bottom: 1rem;
+
+    margin-bottom: .75rem;
+
     transition:
-        opacity 0.28s ease,
-        transform 0.28s ease,
-        filter 0.28s ease,
-        max-height 0.32s ease,
-        padding 0.32s ease,
-        border-width 0.32s ease,
-        margin 0.32s ease;
+        opacity .28s ease,
+        transform .28s ease,
+        filter .28s ease,
+        max-height .32s ease,
+        padding .32s ease,
+        border-width .32s ease,
+        margin .32s ease;
 }
 
 .dashboard-loading-status.is-done {
@@ -204,7 +203,9 @@
 }
 
 @keyframes dashboardLoadingPulse {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 0.45;
         transform: scale(1);
     }

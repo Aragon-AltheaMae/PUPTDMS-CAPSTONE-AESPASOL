@@ -77,7 +77,7 @@ class AdminAppointmentController extends Controller
         return view('shared.appointments', [
             'layoutRole' => 'admin',
             'pageTitle' => 'Appointment Management',
-            'pageShellClass' => 'admin-page-shell',
+            'pageShellClass' => 'app-page-shell',
 
             'isDentistView' => false,
 

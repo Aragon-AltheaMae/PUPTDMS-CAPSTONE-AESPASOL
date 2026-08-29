@@ -21,7 +21,7 @@ class AdminInventoryController extends Controller
             'notifications' => collect([]),
 
             'layoutRole' => 'admin',
-            'pageShellClass' => 'admin-page-shell',
+            'pageShellClass' => 'app-page-shell',
             'isDentistView' => false,
 
             'inventoryRouteNames' => [

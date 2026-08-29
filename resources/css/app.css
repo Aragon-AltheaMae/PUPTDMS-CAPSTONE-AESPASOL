@@ -35,6 +35,7 @@
 @import './components/footer.css';
 @import './components/impersonation-banner.css';
 @import './components/odontogram-preview.css';
+@import './components/patient-record-modal.css';
 @import './components/booking-workflow.css';
 @import './components/filter-select.css';
 

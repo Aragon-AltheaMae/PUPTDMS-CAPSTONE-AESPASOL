@@ -137,7 +137,7 @@ $appt->procedure?->prescriptions
     window.apptActivityChartData = @json($appointmentActivityChart ?? []);
 </script>
 
-<main id="mainContent" class="patient-page-shell page-enter">
+<main id="mainContent" class="app-page-shell page-enter">
     <div id="appointmentPage" class="w-full">
 
         @php

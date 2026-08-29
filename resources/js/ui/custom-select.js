@@ -369,4 +369,29 @@ document.addEventListener('keydown', event => {
     }
 });
 
-initCustomSelects();
+window.initCustomSelects =
+    initCustomSelects;
+
+window.syncCustomSelect =
+    syncCustomSelect;
+
+function bootCustomSelects() {
+    initCustomSelects(
+        document
+    );
+}
+
+if (
+    document.readyState ===
+    'loading'
+) {
+    document.addEventListener(
+        'DOMContentLoaded',
+        bootCustomSelects,
+        {
+            once: true
+        }
+    );
+} else {
+    bootCustomSelects();
+}

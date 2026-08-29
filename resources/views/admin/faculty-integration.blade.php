@@ -10,7 +10,7 @@
 
 @section('content')
 
-<main id="mainContent" class="admin-page-shell faculty-page page-enter">
+<main id="mainContent" class="app-page-shell faculty-page page-enter">
     <div class="w-full">
         <div class="page-banner faculty-banner" style="display:flex!important; align-items:center!important;
                     justify-content:flex-start!important; text-align:left!important;">

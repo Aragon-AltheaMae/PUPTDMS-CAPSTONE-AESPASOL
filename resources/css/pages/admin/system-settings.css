@@ -1053,7 +1053,7 @@
     }
 }
 
-#mainContent.system-settings-page.admin-page-shell {
+#mainContent.system-settings-page.app-page-shell {
     height: auto !important;
     max-height: none !important;
     min-height: calc(100dvh - 96px) !important;
@@ -1061,7 +1061,7 @@
     overflow-y: visible !important;
 }
 
-#mainContent.system-settings-page.admin-page-shell>.w-full {
+#mainContent.system-settings-page.app-page-shell>.w-full {
     overflow: visible !important;
 }
 
@@ -1913,12 +1913,12 @@
         padding-bottom: 130px !important;
     }
 
-    #mainContent.system-settings-page.admin-page-shell {
+    #mainContent.system-settings-page.app-page-shell {
         min-height: calc(100dvh - 90px) !important;
         overflow: visible !important;
     }
 
-    #mainContent.system-settings-page.admin-page-shell > .w-full,
+    #mainContent.system-settings-page.app-page-shell > .w-full,
     .system-settings-page .admin-page-container,
     .system-settings-page .content-lift {
         width: 100% !important;

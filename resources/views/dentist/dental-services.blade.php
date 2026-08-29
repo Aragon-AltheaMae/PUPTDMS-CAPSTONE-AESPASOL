@@ -15,7 +15,7 @@ $frontendRecords = collect($records ?? [])->values();
 $selectedMonth = $selectedMonth ?? now()->format('Y-m');
 @endphp
 
-<main id="mainContent" class="dentist-page-shell dentist-records-page dental-services-page page-enter">
+<main id="mainContent" class="app-page-shell dentist-records-page dental-services-page page-enter">
     <div class="w-full">
 
         <section class="dentist-hero mb-5">

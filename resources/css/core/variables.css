@@ -181,6 +181,12 @@
     --status-denied-border: #E5E7EB;
     --status-denied-solid: #9CA3AF;
 
+    --status-pill-height: 28px;
+    --status-pill-padding-x: 12px;
+    --status-pill-gap: 6px;
+    --status-pill-font-size: 11px;
+    --status-pill-dot-size: 6px;
+
     --crimson: #8B0000;
     --crimson-dark: #6b0000;
     --crimson-light: #fef2f2;
@@ -437,6 +443,7 @@
     --neutral-warm-50: #F5F2EE;
     --neutral-warm-500: #9A9490;
     --orange-50: #FFF7ED;
+    --orange-100: #f7a945;
     --orange-700: #E65100;
     --purple-100: #F3E8FF;
     --purple-200: #E9D5FF;
@@ -921,6 +928,12 @@
 @media (max-width: 1199px) {
     :root {
         --float-right: 18px;
+
+        --status-pill-height: 25px;
+        --status-pill-padding-x: 9px;
+        --status-pill-gap: 5px;
+        --status-pill-font-size: 9.5px;
+        --status-pill-dot-size: 5px;
     }
 }
 
@@ -929,5 +942,21 @@
         --float-right-final: 18px;
         --fab-final-size: 48px;
         --fab-final-gap: clamp(10px, 1.5vw, 14px);
+
+        --status-pill-height: 22px;
+        --status-pill-padding-x: 7px;
+        --status-pill-gap: 4px;
+        --status-pill-font-size: 8.5px;
+        --status-pill-dot-size: 4px;
+    }
+}
+
+@media (max-width: 380px) {
+    :root {
+        --status-pill-height: 20px;
+        --status-pill-padding-x: 6px;
+        --status-pill-gap: 3px;
+        --status-pill-font-size: 8px;
+        --status-pill-dot-size: 4px;
     }
 }

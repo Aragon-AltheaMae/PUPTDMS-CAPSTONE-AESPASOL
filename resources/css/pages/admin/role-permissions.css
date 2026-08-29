@@ -736,7 +736,7 @@
 }
 
 @media (max-width: 900px) {
-    .admin-page-shell {
+    .app-page-shell {
         padding-inline: 1rem !important;
     }
 
@@ -820,7 +820,7 @@
 }
 
 @media (max-width: 767px) {
-    .admin-page-shell {
+    .app-page-shell {
         padding-inline: .85rem !important;
         padding-bottom: 7.5rem !important;
         overflow-x: hidden !important;

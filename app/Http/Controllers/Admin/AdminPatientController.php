@@ -79,7 +79,7 @@ class AdminPatientController extends Controller
         return view('shared.patient-list', [
             'layoutRole' => 'admin',
             'pageTitle' => 'Patient List',
-            'pageShellClass' => 'admin-page-shell',
+            'pageShellClass' => 'app-page-shell',
             'isDentistView' => false,
             'patientProfileRouteName' => 'admin.admin.patient.profile',
 

@@ -9,7 +9,7 @@
 @section('title', 'CMS Access')
 
 @section('content')
-<main id="mainContent" class="admin-page-shell cms-page page-enter">
+<main id="mainContent" class="app-page-shell cms-page page-enter">
     <div class="w-full">
         <div class="page-banner cms-banner" style="display:flex!important;align-items:center!important;
                     justify-content:flex-start!important;text-align:left!important;">

@@ -200,7 +200,7 @@ $birthdateDisplay = 'N/A';
 }
 @endphp
 
-<main id="mainContent" class="patient-page-shell patient-dashboard-page page-enter">
+<main id="mainContent" class="app-page-shell patient-dashboard-page page-enter">
     <div class="w-full">
 
         <x-dashboard-loading-status />

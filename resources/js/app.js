@@ -295,6 +295,30 @@ window.finishDashboardLoading =
 
 if (
     hasAny(
+        '#mainContent.patient-records-page'
+    )
+) {
+    loadFeature(
+        'patient-records-page',
+        () =>
+            import(
+                './records/patient-records-page'
+            )
+    )
+        .then(module => {
+            module
+                .initPatientRecordsPage?.();
+        })
+        .catch(error => {
+            console.error(
+                'Unable to initialize patient records page.',
+                error
+            );
+        });
+}
+
+if (
+    hasAny(
         '.step-content'
     )
 ) {
@@ -846,7 +870,19 @@ if (
         '[data-global-page-size]'
     )
 ) {
-    import('./ui/page-size');
+    import('./ui/page-size')
+        .then(() => {
+            window
+                .initGlobalPageSizeSelects?.(
+                    document
+                );
+        })
+        .catch(error => {
+            console.error(
+                'Unable to initialize page size controls.',
+                error
+            );
+        });
 }
 
 import './ui/pagination-bar';

@@ -98,7 +98,7 @@
 @endsection
 
 @section('content')
-<main id="mainContent" class="admin-page-shell page-enter mode-list continuity-page mode-{{ $pageMode }}">
+<main id="mainContent" class="app-page-shell page-enter mode-list continuity-page mode-{{ $pageMode }}">
     <div class="w-full dt-wrap">
         <div class="page-banner dt-hero">
             <div class="page-banner-inner">

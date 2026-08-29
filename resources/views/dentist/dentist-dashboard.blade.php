@@ -34,7 +34,7 @@
         $calendarAppointmentDetails = $calendarAppointmentDetails ?? [];
     @endphp
 
-    <main id="mainContent" class="dentist-dashboard-page dentist-page-shell page-enter mode-list">
+    <main id="mainContent" class="dentist-dashboard-page app-page-shell page-enter mode-list">
         <div class="w-full">
 
             <x-dashboard-loading-status />

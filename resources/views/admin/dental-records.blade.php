@@ -56,7 +56,7 @@
     $recordAppliedStatus = request('status', 'all');
 @endphp
 
-<main id="mainContent" class="admin-page-shell admin-dental-records-page page-enter mode-list">
+<main id="mainContent" class="app-page-shell admin-dental-records-page page-enter mode-list">
     <div class="w-full">
 
         <div class="page-banner mt-2 mb-6">
@@ -66,12 +66,6 @@
                 </div>
 
                 <div class="flex items-center gap-3 flex-shrink-0">
-                    <span class="page-badge">
-                        <span class="page-badge-dot"></span>
-                        {{ number_format($totalRecordsCount) }}
-                        {{ \Illuminate\Support\Str::plural('record', $totalRecordsCount) }}
-                    </span>
-
                     <a href="{{ route('admin.reports.index') }}" class="ui-btn ui-btn-primary">
                         <i class="fa-solid fa-chart-column"></i>
                         <span>View Reports</span>

@@ -243,7 +243,7 @@ class AdminReportController extends Controller
         return view('shared.reports', [
             'layoutRole' => 'admin',
             'pageTitle' => 'Reports & Analytics',
-            'pageShellClass' => 'admin-page-shell',
+            'pageShellClass' => 'app-page-shell',
 
             'isAdminView' => true,
             'isDentistView' => false,

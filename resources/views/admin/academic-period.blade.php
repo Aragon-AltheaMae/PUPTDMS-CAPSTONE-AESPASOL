@@ -51,7 +51,7 @@ $activePeriodPayload = $activePeriod
 : null;
 @endphp
 
-<main id="mainContent" class="admin-page-shell academic-period-page page-enter mode-list">
+<main id="mainContent" class="app-page-shell academic-period-page page-enter mode-list">
     <div class="full">
 
         @if ($errors->any())

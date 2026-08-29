@@ -9,7 +9,7 @@
 @endsection
 
 @section('content')
-<main id="mainContent" class="dentist-page-shell existing-record-page page-enter">
+<main id="mainContent" class="app-page-shell existing-record-page page-enter">
     <div class="w-full">
         <div class="dentist-hero page-title-row mb-6">
             <div class="dentist-hero-content">

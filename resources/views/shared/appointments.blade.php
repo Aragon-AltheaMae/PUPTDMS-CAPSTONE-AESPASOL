@@ -22,7 +22,7 @@ $pageTitle = $pageTitle ?? 'Appointments';
 $isDentistView = $isDentistView ?? false;
 $isAdminView = !$isDentistView;
 
-$pageShellClass = $pageShellClass ?? ($isDentistView ? 'dentist-page-shell' : 'admin-page-shell');
+$pageShellClass = $pageShellClass ?? ($isDentistView ? 'app-page-shell' : 'app-page-shell');
 
 $patientProfileRouteName =
 $patientProfileRouteName ??
@@ -1352,7 +1352,7 @@ return $aDateTime <=> $bDateTime;
                                 data-follow-up="{{ $isFollowUpAppointment ? '1' : '0' }}" data-show-more-item
                                 style="animation-delay:{{ $i * 0.04 }}s">
 
-                                <div class="flex items-start justify-between gap-2 mb-4 pl-1">
+                                <div class="mobile-appt-card-head">
 
                                     <div class="min-w-0">
 
