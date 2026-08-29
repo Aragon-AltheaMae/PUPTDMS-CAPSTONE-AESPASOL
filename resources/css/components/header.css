@@ -664,8 +664,12 @@ header-notif-item:hover {
 }
 
 @media (max-width: 768px) {
+    :root {
+        --header-h: 68px;
+    }
+
     .header {
-        height: 68px;
+        height: var(--header-h);
         padding: 0 12px;
     }
 

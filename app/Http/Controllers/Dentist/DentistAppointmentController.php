@@ -174,7 +174,7 @@ class DentistAppointmentController extends Controller
         return view('shared.appointments', [
             'layoutRole' => 'dentist',
             'pageTitle' => 'Appointments',
-            'pageShellClass' => 'dentist-page-shell',
+            'pageShellClass' => 'app-page-shell',
 
             'isDentistView' => true,
 

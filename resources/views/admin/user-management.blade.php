@@ -16,7 +16,7 @@ $activeCount = $activeCount ?? 0;
 $inactiveCount = $inactiveCount ?? 0;
 @endphp
 
-<main id="mainContent" class="admin-page-shell user-management-page page-enter mode-list">
+<main id="mainContent" class="app-page-shell user-management-page page-enter mode-list">
     <div class="w-full">
         <div class="page-banner">
             <div class="page-banner-inner">

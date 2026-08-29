@@ -189,7 +189,7 @@ class DentistReportController extends Controller
         return view('shared.reports', [
             'layoutRole' => 'dentist',
             'pageTitle' => 'Reports & Analytics',
-            'pageShellClass' => 'dentist-page-shell dentist-report-page',
+            'pageShellClass' => 'app-page-shell dentist-report-page',
 
             'isAdminView' => false,
             'isDentistView' => true,

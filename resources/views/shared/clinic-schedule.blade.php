@@ -14,7 +14,7 @@ $layoutRole = $layoutRole ?? 'admin';
 
 $isDentistView = $isDentistView ?? false;
 
-$pageShellClass = $pageShellClass ?? ($isDentistView ? 'dentist-page-shell' : 'admin-page-shell');
+$pageShellClass = $pageShellClass ?? ($isDentistView ? 'app-page-shell' : 'app-page-shell');
 
 $pageTitle = $pageTitle ?? 'Clinic Schedule';
 

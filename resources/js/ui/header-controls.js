@@ -32,12 +32,24 @@ function initGlobalDateTime() {
             hour12: false
         }).format(now));
 
-        if (hourInManila >= 5 && hourInManila < 18) {
-            dateIconEl.className = 'fa-solid fa-sun';
-            dateIconEl.style.color = hourInManila < 12 ? '#fcd34d' : '#fb923c';
+        dateIconEl.classList.remove(
+            'date-icon-morning',
+            'date-icon-afternoon',
+            'date-icon-night'
+        );
+
+        if (hourInManila >= 5 && hourInManila < 12) {
+            dateIconEl.className =
+                'fa-solid fa-sun date-icon-morning';
+        } else if (
+            hourInManila >= 12 &&
+            hourInManila < 18
+        ) {
+            dateIconEl.className =
+                'fa-solid fa-sun date-icon-afternoon';
         } else {
-            dateIconEl.className = 'fa-solid fa-moon';
-            dateIconEl.style.color = '#c4b5fd';
+            dateIconEl.className =
+                'fa-solid fa-moon date-icon-night';
         }
     }
 
@@ -93,10 +105,20 @@ function initPatientMobileFab() {
     });
 }
 
-document.addEventListener(
-    'DOMContentLoaded',
-    () => {
-        initGlobalDateTime();
-        initPatientMobileFab();
-    }
-);
+function initHeaderControls() {
+    initGlobalDateTime();
+    initPatientMobileFab();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener(
+        'DOMContentLoaded',
+        initHeaderControls,
+        { once: true }
+    );
+} else {
+    initHeaderControls();
+}
+
+window.initGlobalDateTime = initGlobalDateTime;
+window.initHeaderControls = initHeaderControls;

@@ -10,7 +10,7 @@
 
 @section('content')
 
-<main id="mainContent" class="admin-page-shell document-templates-page page-enter">
+<main id="mainContent" class="app-page-shell document-templates-page page-enter">
     <div class="w-full">
         <section class="page-banner document-template-banner">
             <div class="page-banner-inner">

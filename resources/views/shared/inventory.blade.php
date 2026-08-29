@@ -4,7 +4,7 @@
 $layoutRole = $layoutRole ?? 'admin';
 $isDentistView = $isDentistView ?? false;
 
-$pageShellClass = $pageShellClass ?? ($isDentistView ? 'dentist-page-shell' : 'admin-page-shell');
+$pageShellClass = $pageShellClass ?? ($isDentistView ? 'app-page-shell' : 'app-page-shell');
 
 $inventoryRouteNames = $inventoryRouteNames ?? [
 'data' => 'admin.inventory.data',
@@ -62,13 +62,6 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                     <h1 class="page-banner-title">
                         Admin Inventory
                     </h1>
-                </div>
-
-                <div class="page-banner-actions">
-                    <span class="page-badge">
-                        <i class="fa-solid fa-shield-heart"></i>
-                        Admin Control
-                    </span>
                 </div>
             </div>
         </div>

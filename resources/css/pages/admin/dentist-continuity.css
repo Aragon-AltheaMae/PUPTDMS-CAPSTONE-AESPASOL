@@ -13,7 +13,7 @@
     font-family: inherit;
 }
 
-#mainContent.continuity-page.admin-page-shell {
+#mainContent.continuity-page.app-page-shell {
     height: auto !important;
     max-height: none !important;
     min-height: calc(100dvh - 172px) !important;
@@ -21,7 +21,7 @@
     overflow-y: visible !important;
 }
 
-#mainContent.continuity-page.admin-page-shell > .w-full {
+#mainContent.continuity-page.app-page-shell > .w-full {
     overflow: visible !important;
 }
 
@@ -3179,7 +3179,7 @@
         max-width: none;
     }
 
-    #mainContent.continuity-page.admin-page-shell {
+    #mainContent.continuity-page.app-page-shell {
         min-height: calc(100dvh - 162px) !important;
         overflow: visible !important;
     }

@@ -11,7 +11,7 @@
 @section('content')
 
 <main id="mainContent"
-    class="about-us-page patient-page-shell page-enter pt-[90px] px-3 md:px-6 py-6 min-h-screen flex-1">
+    class="about-us-page app-page-shell page-enter pt-[90px] px-3 md:px-6 py-6 min-h-screen flex-1">
     <div class="w-full">
 
         <div class="mb-4">

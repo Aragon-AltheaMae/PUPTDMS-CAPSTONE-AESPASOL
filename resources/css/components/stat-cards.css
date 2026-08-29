@@ -1,46 +1,20 @@
-@media (max-width:380px) {
-    #statCards {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: .5rem !important;
-    }
+#statCards:has(> :nth-child(1):last-child) {
+    grid-template-columns: 1fr;
 }
 
-@media (max-width:1023px) and (min-width:768px) {
-
-    #statCards {
-        grid-template-columns: repeat(2, 1fr) !important;
-    }
+#statCards:has(> :nth-child(2):last-child) {
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
 }
 
-@media (max-width: 767px) {
-    #mainContent #statCards {
-        gap: 10px;
-    }
+#statCards:has(> :nth-child(3):last-child) {
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+}
 
-    #mainContent #statCards .stat-card {
-        min-height: 96px;
-        padding: 14px 12px;
-        gap: 10px;
-    }
-
-    #mainContent #statCards .stat-icon,
-    #mainContent #statCards .stat-icon-wrapper {
-        width: 38px;
-        height: 38px;
-        min-width: 38px;
-        min-height: 38px;
-        flex-basis: 38px;
-    }
-
-    #mainContent #statCards .stat-num {
-        font-size: 1.5rem;
-    }
-
-    #mainContent #statCards .stat-label {
-        font-size: 10px;
-        letter-spacing: .06em;
-        white-space: normal;
-    }
+#statCards:has(> :nth-child(4):last-child) {
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
 }
 
 .stat-card-link {
@@ -690,212 +664,213 @@
     color: color-mix(in srgb, var(--stat-accent) 72%, #e5e7eb) !important;
 }
 
-@media (max-width: 1023px) and (min-width: 768px) {
+@media (max-width: 767px) {
     #statCards {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: .45rem !important;
+        margin-bottom: .85rem;
+    }
+
+    #statCards .stat-card {
+        min-width: 0;
+
+        min-height: 0;
+        height: auto;
+
+        padding: .55rem .5rem .5rem;
+
+        border-radius: 14px;
+
+        display: block;
+
+        gap: 0;
+    }
+
+    #statCards .stat-card-info {
+        width: 100%;
+        min-width: 0;
+
+        display: flex;
+        flex-direction: column;
+
+        gap: 2px;
+
+        padding-right: 24px;
+    }
+
+    #statCards .stat-icon,
+    #statCards .stat-icon-wrapper {
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+        min-height: 24px;
+
+        position: absolute;
+        top: .5rem;
+        right: .45rem;
+        font-size: 9px;
+
+        border-radius: 8px;
+    }
+
+    #statCards .stat-label {
+        max-width: calc(100% - 28px);
+
+        font-size: 5.8px;
+        line-height: 1;
+
+        letter-spacing: .025em;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: clip;
+
+        overflow-wrap: normal;
+        word-break: normal;
+    }
+
+    #statCards .stat-value,
+    #statCards .stat-num,
+    #statCards .stat-count {
+        margin: 0;
+
+        font-size: 1.05rem;
+        line-height: 1;
+    }
+
+    #statCards .stat-footer {
+        margin: 1px 0 0;
+
+        font-size: .46rem;
+        line-height: 1.1;
+
+        gap: 2px;
+    }
+
+    #statCards .stat-footer i {
+        font-size: .44rem;
+    }
+
+    #statCards .dashboard-kpi-breakdown span {
+        min-height: 18px;
+
+        padding: .18rem .35rem;
+
+        font-size: .48rem;
+    }
+
+    .stat-card-link-indicator {
+        width: 22px;
+        height: 22px;
+
+        right: 7px;
+        bottom: 7px;
+
+        font-size: .5rem;
     }
 }
 
-@media (max-width: 767px) {
-    .stat-card-link-indicator {
-        right: 11px;
-        bottom: 10px;
-
-        width: 24px;
-        height: 24px;
-
-        font-size: .55rem;
+@media (min-width: 768px) and (max-width: 1023px) {
+    #statCards {
+        gap: .7rem !important;
     }
 
-    #mainContent #statCards {
-        gap: 12px !important;
+    #statCards .stat-card {
+        min-width: 0;
+        min-height: 96px;
+
+        padding: .8rem;
+
+        border-radius: 16px;
+
+        gap: .6rem;
     }
 
-    #mainContent #statCards .stat-card {
-        min-height: 112px;
-        padding: 14px 14px 13px;
-        border-radius: 18px;
-        gap: 12px;
+    #statCards .stat-icon,
+    #statCards .stat-icon-wrapper {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        min-height: 36px;
+
+        flex-basis: 36px;
+
+        border-radius: 12px;
+
+        font-size: 13px;
     }
 
-    #mainContent #statCards .stat-icon,
-    #mainContent #statCards .stat-icon-wrapper {
-        width: 42px;
-        height: 42px;
-        min-width: 42px;
-        min-height: 42px;
-        flex-basis: 42px;
-        border-radius: 13px;
-        font-size: 15px;
+    #statCards .stat-value,
+    #statCards .stat-num,
+    #statCards .stat-count {
+        font-size: 1.35rem;
     }
 
-    #mainContent #statCards .stat-num {
-        font-size: 1.55rem;
+    #statCards .stat-label {
+        font-size: 8px;
+        letter-spacing: .06em;
     }
 
-    #mainContent #statCards .stat-label {
-        font-size: 10px;
-        letter-spacing: .08em;
-        white-space: normal;
-    }
-
-    #mainContent #statCards .stat-footer {
-        font-size: .68rem;
-        gap: .28rem .38rem;
-    }
-
-    #mainContent #statCards .dashboard-kpi-breakdown span {
-        min-height: 22px;
-        padding: .22rem .48rem;
-        font-size: .62rem;
+    #statCards .stat-footer {
+        font-size: .56rem;
     }
 }
 
 @media (max-width: 380px) {
     #statCards {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: .55rem !important;
+        gap: .35rem !important;
     }
 
-    #mainContent #statCards .stat-card {
-        min-height: 102px;
-        padding: 12px;
-        border-radius: 16px;
-        gap: 10px;
-    }
+    #statCards .stat-card {
+        min-height: 0;
+        height: auto;
 
-    #mainContent #statCards .stat-icon,
-    #mainContent #statCards .stat-icon-wrapper {
-        width: 38px;
-        height: 38px;
-        min-width: 38px;
-        min-height: 38px;
-        flex-basis: 38px;
+        padding: .48rem .4rem .44rem;
+
         border-radius: 12px;
-        font-size: 14px;
     }
 
-    #mainContent #statCards .stat-num {
-        font-size: 1.35rem;
+    #statCards .stat-card-info {
+        padding-right: 21px;
+        gap: 1px;
     }
 
-    #mainContent #statCards .stat-label {
-        font-size: 9px;
+    #statCards .stat-icon,
+    #statCards .stat-icon-wrapper {
+        width: 21px;
+        height: 21px;
+        min-width: 21px;
+        min-height: 21px;
+
+        top: .44rem;
+        right: .38rem;
+
+        border-radius: 6px;
+
+        font-size: 8px;
     }
 
-    #mainContent #statCards .stat-footer {
-        font-size: .62rem;
+    #statCards .stat-label {
+        max-width: calc(100% - 22px);
+
+        font-size: 5.1px;
+        line-height: 1;
+
+        letter-spacing: .015em;
+
+        white-space: nowrap;
+        overflow: hidden;
+
+        overflow-wrap: normal;
+        word-break: normal;
     }
-}
 
-#mainContent #statCards.admin-dashboard-stat-grid .stat-card.s-all {
-    --stat-accent: var(--crimson, #8B0000);
-    --stat-soft: var(--crimson-light, #fef2f2);
-    --stat-bg: var(--crimson-light, #fef2f2);
-    --stat-text: var(--crimson, #8B0000);
-    --stat-border: rgba(139, 0, 0, .18);
-}
+    #statCards .stat-value,
+    #statCards .stat-num,
+    #statCards .stat-count {
+        font-size: .95rem;
+    }
 
-#mainContent #statCards.admin-dashboard-stat-grid .stat-card.s-ongoing {
-    --stat-accent: var(--status-ongoing-solid);
-    --stat-soft: var(--status-ongoing-soft);
-    --stat-bg: var(--status-ongoing-bg);
-    --stat-text: var(--status-ongoing-text);
-    --stat-border: var(--status-ongoing-border);
-}
-
-#mainContent #statCards.admin-dashboard-stat-grid .stat-card.s-approved {
-    --stat-accent: var(--status-approved-solid);
-    --stat-soft: var(--status-approved-soft);
-    --stat-bg: var(--status-approved-bg);
-    --stat-text: var(--status-approved-text);
-    --stat-border: var(--status-approved-border);
-}
-
-#mainContent #statCards.admin-dashboard-stat-grid .stat-card {
-    background:
-        radial-gradient(circle at 100% 100%, var(--stat-soft) 0%, transparent 34%),
-        linear-gradient(135deg, var(--stat-bg) 0%, var(--um-surface, #ffffff) 72%) !important;
-    border-color: var(--stat-border) !important;
-}
-
-#mainContent #statCards.admin-dashboard-stat-grid .stat-card::before {
-    background: linear-gradient(90deg,
-            var(--stat-accent),
-            color-mix(in srgb, var(--stat-accent) 62%, #ffffff)) !important;
-}
-
-#mainContent #statCards.admin-dashboard-stat-grid .stat-value,
-#mainContent #statCards.admin-dashboard-stat-grid .stat-num,
-#mainContent #statCards.admin-dashboard-stat-grid .stat-count {
-    color: var(--stat-accent) !important;
-}
-
-#mainContent #statCards.admin-dashboard-stat-grid .stat-icon,
-#mainContent #statCards.admin-dashboard-stat-grid .stat-icon-wrapper {
-    background: var(--stat-soft) !important;
-    color: var(--stat-accent) !important;
-    border-color: var(--stat-border) !important;
-}
-
-#mainContent #statCards.admin-dashboard-stat-grid .stat-icon i,
-#mainContent #statCards.admin-dashboard-stat-grid .stat-icon-wrapper i,
-#mainContent #statCards.admin-dashboard-stat-grid .stat-footer i {
-    color: currentColor !important;
-}
-
-#mainContent #statCards.admin-dashboard-stat-grid .stat-footer {
-    color: color-mix(in srgb, var(--stat-accent) 50%, #6b7280) !important;
-}
-
-[data-theme="dark"] #mainContent #statCards.admin-dashboard-stat-grid .stat-card,
-.dark #mainContent #statCards.admin-dashboard-stat-grid .stat-card {
-    background:
-        radial-gradient(circle at 100% 100%,
-            var(--stat-bg) 0%,
-            transparent 40%),
-        var(--card) !important;
-
-    border-color: var(--stat-border) !important;
-
-    box-shadow:
-        0 14px 30px rgba(0, 0, 0, .30),
-        inset 0 1px 0 rgba(255, 255, 255, .04) !important;
-}
-
-[data-theme="dark"] #mainContent #statCards.admin-dashboard-stat-grid .stat-value,
-[data-theme="dark"] #mainContent #statCards.admin-dashboard-stat-grid .stat-num,
-[data-theme="dark"] #mainContent #statCards.admin-dashboard-stat-grid .stat-count,
-.dark #mainContent #statCards.admin-dashboard-stat-grid .stat-value,
-.dark #mainContent #statCards.admin-dashboard-stat-grid .stat-num,
-.dark #mainContent #statCards.admin-dashboard-stat-grid .stat-count {
-    color: var(--stat-accent) !important;
-}
-
-[data-theme="dark"] #mainContent #statCards.admin-dashboard-stat-grid .stat-icon,
-[data-theme="dark"] #mainContent #statCards.admin-dashboard-stat-grid .stat-icon-wrapper,
-.dark #mainContent #statCards.admin-dashboard-stat-grid .stat-icon,
-.dark #mainContent #statCards.admin-dashboard-stat-grid .stat-icon-wrapper {
-    background:
-        color-mix(in srgb,
-            var(--text-1) 14%,
-            var(--card)) !important;
-
-    color: var(--stat-accent) !important;
-
-    border-color:
-        color-mix(in srgb,
-            var(--text-1) 18%,
-            var(--border)) !important;
-
-    box-shadow: none !important;
-}
-
-[data-theme="dark"] #mainContent #statCards.admin-dashboard-stat-grid .stat-card.s-all,
-.dark #mainContent #statCards.admin-dashboard-stat-grid .stat-card.s-all {
-    --stat-accent: #FCA5A5;
-    --stat-soft: rgba(139, 0, 0, .24);
-    --stat-bg: rgba(139, 0, 0, .16);
-    --stat-text: #FCA5A5;
-    --stat-border: rgba(252, 165, 165, .28);
+    #statCards .stat-footer {
+        font-size: .4rem;
+    }
 }

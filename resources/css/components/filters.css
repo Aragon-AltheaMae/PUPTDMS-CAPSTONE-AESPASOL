@@ -418,19 +418,6 @@
         justify-content: center !important;
     }
 
-    #externalClearFilterBtn {
-        width: 38px !important;
-        height: 38px !important;
-        padding: 0 !important;
-    }
-
-    #mainContent #externalClearFilterBtn {
-        width: 100% !important;
-        min-height: 40px !important;
-        height: 40px !important;
-        border-radius: 14px !important;
-    }
-
     .filter-drawer-wrapper #fSortGroup,
     .filter-drawer-wrapper #fStatusGroup {
         display: grid !important;
@@ -483,44 +470,6 @@
 
     .filter-drawer-wrapper #saveFilterPanelBtn {
         min-width: 0 !important;
-    }
-}
-
-@media (max-width: 380px) {
-    .filter-drawer-wrapper {
-        padding: 0 !important;
-    }
-
-    .filter-drawer-wrapper .filter-drawer-panel {
-        width: 100% !important;
-        height: min(84dvh, 620px) !important;
-        max-height: min(84dvh, 620px) !important;
-        border-radius: 24px 24px 0 0 !important;
-    }
-
-    .filter-drawer-wrapper #fSortGroup,
-    .filter-drawer-wrapper #fStatusGroup {
-        gap: 8px !important;
-    }
-
-    .filter-drawer-wrapper #fStatusGroup .ftag,
-    .filter-drawer-wrapper #fSortGroup .ftag {
-        min-height: 42px !important;
-        font-size: 11.5px !important;
-        padding: 7px 8px !important;
-    }
-
-    .filter-drawer-header {
-        padding: 16px 18px !important;
-        min-height: 66px !important;
-    }
-
-    .filter-drawer-wrapper .filter-drawer-body {
-        padding: 16px 16px 12px !important;
-    }
-
-    .filter-drawer-footer {
-        padding: 12px 16px calc(12px + env(safe-area-inset-bottom)) !important;
     }
 }
 
@@ -582,6 +531,29 @@
 
 .global-filter-btn span:not(.filter-badge) {
     display: none !important;
+}
+
+.filter-drawer-wrapper .custom-select {
+    width: 100%;
+}
+
+.filter-drawer-wrapper .custom-select-button {
+    min-height: 40px;
+    padding: 0 12px;
+    border-radius: 11px;
+    font-size: 12px;
+}
+
+.filter-drawer-wrapper .custom-select-menu {
+    border-radius: 12px;
+    padding: 5px;
+}
+
+.filter-drawer-wrapper .custom-select-option {
+    min-height: 36px;
+    padding: 0 10px;
+    border-radius: 9px;
+    font-size: 11px;
 }
 
 .global-filter-btn:hover {
@@ -1153,6 +1125,50 @@ body:has(#filterModal.closing) .ai-help-popover {
 }
 
 @media (max-width: 380px) {
+    .filter-drawer-wrapper {
+        padding: 0 !important;
+    }
+
+    .filter-drawer-wrapper .filter-drawer-panel {
+        width: 100% !important;
+        height: min(84dvh, 620px) !important;
+        max-height: min(84dvh, 620px) !important;
+        border-radius: 24px 24px 0 0 !important;
+    }
+
+    .filter-drawer-wrapper #fSortGroup,
+    .filter-drawer-wrapper #fStatusGroup {
+        gap: 8px !important;
+    }
+
+    .filter-drawer-wrapper #fStatusGroup .ftag,
+    .filter-drawer-wrapper #fSortGroup .ftag {
+        min-height: 42px !important;
+        font-size: 11.5px !important;
+        padding: 7px 8px !important;
+    }
+
+    .filter-drawer-header {
+        padding: 16px 18px !important;
+        min-height: 66px !important;
+    }
+
+    .filter-drawer-wrapper .filter-drawer-body {
+        padding: 16px 16px 12px !important;
+    }
+
+    .filter-drawer-footer {
+        padding: 12px 16px calc(12px + env(safe-area-inset-bottom)) !important;
+    }
+
+    .filter-drawer-wrapper .custom-select-button {
+        min-height: 34px;
+    }
+
+    .filter-drawer-wrapper .custom-select-option {
+        min-height: 30px;
+    }
+
     #filterModal.filter-drawer-wrapper .filter-drawer-panel {
         height: min(94dvh, 680px) !important;
         max-height: min(94dvh, 680px) !important;
@@ -1188,6 +1204,25 @@ body:has(#filterModal.closing) .ai-help-popover {
         padding: 7px 8px !important;
         font-size: 11px !important;
     }
+
+    .global-filter-btn,
+    .global-filter-reset-btn {
+        width: 34px !important;
+        min-width: 34px !important;
+        max-width: 34px !important;
+
+        height: 34px !important;
+        min-height: 34px !important;
+
+        flex-basis: 34px !important;
+
+        border-radius: 10px !important;
+    }
+
+    .global-filter-btn i,
+    .global-filter-reset-btn i {
+        font-size: 10px !important;
+    }
 }
 
 .filter-two-column-grid {
@@ -1210,6 +1245,29 @@ body:has(#filterModal.closing) .ai-help-popover {
 }
 
 @media (max-width: 767px) {
+    .filter-drawer-wrapper .custom-select-button {
+        min-height: 36px;
+        padding: 0 10px;
+        border-radius: 10px;
+        font-size: 10.5px;
+    }
+
+    .filter-drawer-wrapper .custom-select-button i {
+        font-size: 9px;
+    }
+
+    .filter-drawer-wrapper .custom-select-menu {
+        padding: 4px;
+        border-radius: 11px;
+    }
+
+    .filter-drawer-wrapper .custom-select-option {
+        min-height: 32px;
+        padding: 0 8px;
+        border-radius: 8px;
+        font-size: 10px;
+    }
+
     .filter-drawer-footer {
         padding: 12px 18px calc(14px + env(safe-area-inset-bottom));
         flex-direction: column;
@@ -1255,29 +1313,43 @@ body:has(#filterModal.closing) .ai-help-popover {
     }
 
     .global-filter-btn {
-        width: 42px !important;
-        min-width: 42px !important;
-        max-width: 42px !important;
+        width: 36px !important;
+        min-width: 36px !important;
+        max-width: 36px !important;
 
-        height: 42px !important;
-        min-height: 42px !important;
+        height: 36px !important;
+        min-height: 36px !important;
+
+        flex: 0 0 36px !important;
 
         padding: 0 !important;
 
-        border-radius: 14px !important;
+        border-radius: 11px !important;
 
-        flex: 0 0 42px !important;
+        font-size: 11px !important;
+    }
+
+    .global-filter-btn i {
+        font-size: 11px !important;
     }
 
     .global-filter-reset-btn {
-        width: 44px !important;
-        min-width: 44px !important;
-        max-width: 44px !important;
-        flex: 0 0 44px !important;
-        min-height: 42px !important;
-        height: 42px !important;
-        border-radius: 14px !important;
+        width: 36px !important;
+        min-width: 36px !important;
+        max-width: 36px !important;
+
+        height: 36px !important;
+        min-height: 36px !important;
+
+        flex: 0 0 36px !important;
+
         padding: 0 !important;
+
+        border-radius: 11px !important;
+    }
+
+    .global-filter-reset-btn i {
+        font-size: 10px !important;
     }
 
     .global-filter-reset-btn.hidden {
@@ -1378,8 +1450,8 @@ body:has(#filterModal.closing) .ai-help-popover {
     #filterModal .filter-drawer-header {
         flex: 0 0 auto !important;
 
-        min-height: 64px !important;
-        padding: 14px 18px !important;
+        min-height: 56px !important;
+        padding: 11px 15px !important;
 
         display: flex !important;
         align-items: center !important;
@@ -1394,25 +1466,22 @@ body:has(#filterModal.closing) .ai-help-popover {
     }
 
     #filterModal .filter-drawer-title h2 {
-        font-size: 20px !important;
+        font-size: 17px !important;
         font-weight: 850 !important;
         line-height: 1 !important;
     }
 
     #filterModal .filter-drawer-title i {
-        font-size: 18px !important;
+        font-size: 15px !important;
     }
 
     #filterModal .filter-drawer-body {
         flex: 1 1 auto !important;
         min-height: 0 !important;
-
-        padding: 14px 16px 16px !important;
-
+        padding: 12px 14px 14px !important;
+        gap: 14px !important;
         display: flex !important;
         flex-direction: column !important;
-        gap: 16px !important;
-
         overflow-y: auto !important;
         overflow-x: hidden !important;
 
@@ -1423,9 +1492,8 @@ body:has(#filterModal.closing) .ai-help-popover {
     }
 
     #filterModal .filter-section-title {
-        margin-bottom: 9px !important;
-
-        font-size: 13px !important;
+        margin-bottom: 7px !important;
+        font-size: 11.5px !important;
         font-weight: 800 !important;
         line-height: 1.2 !important;
     }
@@ -1447,13 +1515,10 @@ body:has(#filterModal.closing) .ai-help-popover {
     #filterModal .choice-chip {
         width: 100% !important;
         min-width: 0 !important;
-        min-height: 42px !important;
-
-        padding: 8px 10px !important;
-
-        border-radius: 14px !important;
-
-        font-size: 11.5px !important;
+        min-height: 36px !important;
+        padding: 6px 8px !important;
+        border-radius: 11px !important;
+        font-size: 10.5px !important;
         font-weight: 750 !important;
         line-height: 1.15 !important;
         text-align: center !important;
@@ -1468,13 +1533,10 @@ body:has(#filterModal.closing) .ai-help-popover {
 
     #filterModal .filter-date-input-wrap input,
     #filterModal .filter-date-input-wrap select {
-        width: 100% !important;
-        height: 42px !important;
-        min-height: 42px !important;
-
-        border-radius: 14px !important;
-
-        font-size: 12px !important;
+        height: 36px !important;
+        min-height: 36px !important;
+        border-radius: 11px !important;
+        font-size: 11px !important;
     }
 
     #filterModal .filter-drawer-footer {

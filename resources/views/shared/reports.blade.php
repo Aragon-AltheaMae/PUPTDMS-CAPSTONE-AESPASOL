@@ -17,7 +17,7 @@ $isAdminView = $isAdminView ?? $layoutRole === 'admin';
 $isDentistView = $isDentistView ?? $layoutRole === 'dentist';
 
 $pageShellClass =
-$pageShellClass ?? ($isDentistView ? 'dentist-page-shell dentist-report-page' : 'admin-page-shell');
+$pageShellClass ?? ($isDentistView ? 'app-page-shell dentist-report-page' : 'app-page-shell');
 
 $pageTitle = $pageTitle ?? 'Reports & Analytics';
 

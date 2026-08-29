@@ -86,7 +86,7 @@ hr.section-divider {
     max-width: 100%;
 }
 
-#mainContent.admin-page-shell {
+#mainContent.app-page-shell {
     padding-bottom: calc(6rem + env(safe-area-inset-bottom));
 }
 
@@ -107,7 +107,7 @@ hr.section-divider {
         height: 220px !important;
     }
 
-    #mainContent.admin-page-shell {
+    #mainContent.app-page-shell {
         padding-bottom: calc(8rem + env(safe-area-inset-bottom));
     }
 }
@@ -417,20 +417,20 @@ hr.section-divider {
 
 @media (min-width: 768px) and (max-width: 1280px) {
 
-    #mainContent.admin-page-shell {
+    #mainContent.app-page-shell {
         overflow-x: hidden !important;
         padding-left: 1rem !important;
         padding-right: 1rem !important;
         padding-bottom: calc(6rem + env(safe-area-inset-bottom)) !important;
     }
 
-    #mainContent.admin-page-shell .page-banner,
+    #mainContent.app-page-shell .page-banner,
     #mainContent .page-banner {
         width: 100% !important;
         text-align: left !important;
     }
 
-    #mainContent.admin-page-shell .page-banner .page-banner-inner,
+    #mainContent.app-page-shell .page-banner .page-banner-inner,
     #mainContent .page-banner .page-banner-inner {
         display: flex !important;
         align-items: center !important;
@@ -441,7 +441,7 @@ hr.section-divider {
         text-align: left !important;
     }
 
-    #mainContent.admin-page-shell .page-banner .page-banner-inner>div:first-child,
+    #mainContent.app-page-shell .page-banner .page-banner-inner>div:first-child,
     #mainContent .page-banner .page-banner-inner>div:first-child {
         flex: 1 1 auto !important;
         min-width: 0 !important;
@@ -454,7 +454,7 @@ hr.section-divider {
         justify-content: center !important;
     }
 
-    #mainContent.admin-page-shell .page-banner .page-title,
+    #mainContent.app-page-shell .page-banner .page-title,
     #mainContent .page-banner .page-title {
         width: 100% !important;
         max-width: 100% !important;
@@ -467,7 +467,7 @@ hr.section-divider {
         text-overflow: ellipsis !important;
     }
 
-    #mainContent.admin-page-shell .page-banner .page-subtitle,
+    #mainContent.app-page-shell .page-banner .page-subtitle,
     #mainContent .page-banner .page-subtitle {
         text-align: left !important;
         margin-left: 0 !important;
@@ -475,7 +475,7 @@ hr.section-divider {
         max-width: 100% !important;
     }
 
-    #mainContent.admin-page-shell .page-banner .page-banner-inner>div:last-child,
+    #mainContent.app-page-shell .page-banner .page-banner-inner>div:last-child,
     #mainContent .page-banner .page-banner-inner>div:last-child {
         flex: 0 0 auto !important;
         margin-left: auto !important;
@@ -521,12 +521,12 @@ hr.section-divider {
 
 @media (min-width: 768px) and (max-width: 900px) {
 
-    #mainContent.admin-page-shell .page-banner .page-banner-inner,
+    #mainContent.app-page-shell .page-banner .page-banner-inner,
     #mainContent .page-banner .page-banner-inner {
         align-items: flex-start !important;
     }
 
-    #mainContent.admin-page-shell .page-banner .page-title,
+    #mainContent.app-page-shell .page-banner .page-title,
     #mainContent .page-banner .page-title {
         white-space: normal !important;
         line-height: 1.15 !important;
@@ -1263,7 +1263,7 @@ hr.section-divider {
     color: #C9D1D9 !important;
 }
 
-#mainContent.dentist-page-shell {
+#mainContent.app-page-shell {
     background: #F9FAFB !important;
 }
 
@@ -1328,7 +1328,7 @@ hr.section-divider {
     background: #30363D !important;
 }
 
-#mainContent.dentist-page-shell .report-hero-actions {
+#mainContent.app-page-shell .report-hero-actions {
     position: relative !important;
     z-index: 4 !important;
     margin-left: auto !important;
@@ -1340,55 +1340,55 @@ hr.section-divider {
     flex: 0 0 auto !important;
 }
 
-#mainContent.dentist-page-shell .report-hero-meta {
+#mainContent.app-page-shell .report-hero-meta {
     margin-top: 12px !important;
 }
 
-#mainContent.dentist-page-shell .analytics-section-label {
+#mainContent.app-page-shell .analytics-section-label {
     letter-spacing: .08em !important;
 }
 
-#mainContent.dentist-page-shell.dentist-report-page .dentist-hero,
-#mainContent.dentist-page-shell.dentist-report-page .dentist-hero-content {
+#mainContent.app-page-shell.dentist-report-page .dentist-hero,
+#mainContent.app-page-shell.dentist-report-page .dentist-hero-content {
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
     box-sizing: border-box !important;
 }
 
-#mainContent.dentist-page-shell.dentist-report-page .dentist-hero-content>.min-w-0 {
+#mainContent.app-page-shell.dentist-report-page .dentist-hero-content>.min-w-0 {
     flex: 1 1 auto !important;
     width: auto !important;
     max-width: 100% !important;
     min-width: 0 !important;
 }
 
-#mainContent.dentist-page-shell.dentist-report-page .dentist-hero-icon {
+#mainContent.app-page-shell.dentist-report-page .dentist-hero-icon {
     flex: 0 0 auto !important;
 }
 
 @media only screen and (max-width: 600px) {
-    #mainContent.dentist-page-shell {
+    #mainContent.app-page-shell {
         padding-left: 10px !important;
         padding-right: 10px !important;
         padding-bottom: 28px !important;
         overflow-x: hidden !important;
     }
 
-    #mainContent.dentist-page-shell .w-full.fade-in {
+    #mainContent.app-page-shell .w-full.fade-in {
         width: 100% !important;
         max-width: 100% !important;
         min-width: 0 !important;
     }
 
-    #mainContent.dentist-page-shell .dentist-hero {
+    #mainContent.app-page-shell .dentist-hero {
         padding: 16px 14px !important;
         border-radius: 20px !important;
         margin-bottom: 18px !important;
         overflow: hidden !important;
     }
 
-    #mainContent.dentist-page-shell.dentist-report-page .dentist-hero-content {
+    #mainContent.app-page-shell.dentist-report-page .dentist-hero-content {
         width: 100% !important;
         max-width: 100% !important;
         min-width: 0 !important;
@@ -1400,14 +1400,14 @@ hr.section-divider {
         gap: 0 !important;
     }
 
-    #mainContent.dentist-page-shell.dentist-report-page .dentist-hero-content>.min-w-0 {
+    #mainContent.app-page-shell.dentist-report-page .dentist-hero-content>.min-w-0 {
         flex: 1 1 auto !important;
         width: auto !important;
         max-width: 100% !important;
         min-width: 0 !important;
     }
 
-    #mainContent.dentist-page-shell.dentist-report-page .dentist-hero-icon {
+    #mainContent.app-page-shell.dentist-report-page .dentist-hero-icon {
         width: 46px !important;
         height: 46px !important;
         min-width: 46px !important;
@@ -1421,7 +1421,7 @@ hr.section-divider {
     }
 
     @supports (display: grid) {
-        #mainContent.dentist-page-shell.dentist-report-page .dentist-hero-content {
+        #mainContent.app-page-shell.dentist-report-page .dentist-hero-content {
             display: grid !important;
             grid-template-columns: 46px minmax(0, 1fr) !important;
             column-gap: 12px !important;
@@ -1429,26 +1429,26 @@ hr.section-divider {
             align-items: start !important;
         }
 
-        #mainContent.dentist-page-shell.dentist-report-page .dentist-hero-icon {
+        #mainContent.app-page-shell.dentist-report-page .dentist-hero-icon {
             margin-right: 0 !important;
         }
     }
 
-    #mainContent.dentist-page-shell .dentist-hero-title {
+    #mainContent.app-page-shell .dentist-hero-title {
         font-size: 1.45rem !important;
         line-height: 1.05 !important;
         letter-spacing: -0.045em !important;
         white-space: normal !important;
     }
 
-    #mainContent.dentist-page-shell .dentist-hero-eyebrow {
+    #mainContent.app-page-shell .dentist-hero-eyebrow {
         font-size: 0.62rem !important;
         line-height: 1 !important;
         margin-bottom: 6px !important;
         white-space: nowrap !important;
     }
 
-    #mainContent.dentist-page-shell .report-hero-meta {
+    #mainContent.app-page-shell .report-hero-meta {
         grid-column: 1 / -1 !important;
         display: grid !important;
         grid-template-columns: 1fr !important;
@@ -1457,7 +1457,7 @@ hr.section-divider {
         margin-top: 10px !important;
     }
 
-    #mainContent.dentist-page-shell .summary-tag {
+    #mainContent.app-page-shell .summary-tag {
         width: 100% !important;
         max-width: 100% !important;
         justify-content: flex-start !important;
@@ -1469,65 +1469,65 @@ hr.section-divider {
         text-overflow: ellipsis !important;
     }
 
-    #mainContent.dentist-page-shell .report-hero-actions {
+    #mainContent.app-page-shell .report-hero-actions {
         width: 100% !important;
         margin: 12px 0 0 !important;
         align-self: stretch !important;
         justify-content: stretch !important;
     }
 
-    #mainContent.dentist-page-shell .analytics-section-label {
+    #mainContent.app-page-shell .analytics-section-label {
         font-size: 0.7rem !important;
         line-height: 1.25 !important;
         margin-bottom: 12px !important;
     }
 
-    #mainContent.dentist-page-shell .analytics-main-grid,
-    #mainContent.dentist-page-shell .analytics-secondary-grid {
+    #mainContent.app-page-shell .analytics-main-grid,
+    #mainContent.app-page-shell .analytics-secondary-grid {
         display: grid !important;
         grid-template-columns: 1fr !important;
         gap: 14px !important;
         margin-bottom: 22px !important;
     }
 
-    #mainContent.dentist-page-shell .chart-title {
+    #mainContent.app-page-shell .chart-title {
         font-size: 0.86rem !important;
         line-height: 1.25 !important;
     }
 
-    #mainContent.dentist-page-shell #gadChartWrap,
-    #mainContent.dentist-page-shell #weeklyChartWrap {
+    #mainContent.app-page-shell #gadChartWrap,
+    #mainContent.app-page-shell #weeklyChartWrap {
         min-height: 230px !important;
     }
 
-    #mainContent.dentist-page-shell .relative.h-\[280px\] {
+    #mainContent.app-page-shell .relative.h-\[280px\] {
         height: 230px !important;
     }
 
-    #mainContent.dentist-page-shell .metric-chip {
+    #mainContent.app-page-shell .metric-chip {
         font-size: 0.6rem !important;
         padding: 5px 8px !important;
         white-space: nowrap !important;
     }
 
-    #mainContent.dentist-page-shell .service-row {
+    #mainContent.app-page-shell .service-row {
         padding: 10px 11px !important;
         gap: 10px !important;
         border-radius: 13px !important;
     }
 
-    #mainContent.dentist-page-shell .service-meta {
+    #mainContent.app-page-shell .service-meta {
         min-width: 0 !important;
     }
 
-    #mainContent.dentist-page-shell .service-name {
+    #mainContent.app-page-shell .service-name {
         font-size: 0.76rem !important;
         line-height: 1.2 !important;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
     }
 
-    #mainContent.dentist-page-shell .service-count {
+    #mainContent.app-page-shell .service-count {
         font-size: 0.68rem !important;
         white-space: nowrap !important;
     }
@@ -1574,11 +1574,11 @@ hr.section-divider {
 }
 
 @media only screen and (max-width: 359px) {
-    #mainContent.dentist-page-shell.dentist-report-page .dentist-hero-content {
+    #mainContent.app-page-shell.dentist-report-page .dentist-hero-content {
         gap: 0 !important;
     }
 
-    #mainContent.dentist-page-shell.dentist-report-page .dentist-hero-icon {
+    #mainContent.app-page-shell.dentist-report-page .dentist-hero-icon {
         width: 42px !important;
         height: 42px !important;
         min-width: 42px !important;
@@ -1588,24 +1588,24 @@ hr.section-divider {
         border-radius: 13px !important;
     }
 
-    #mainContent.dentist-page-shell.dentist-report-page .dentist-hero-title {
+    #mainContent.app-page-shell.dentist-report-page .dentist-hero-title {
         font-size: 1.25rem !important;
         overflow-wrap: normal !important;
         word-break: normal !important;
     }
 
-    #mainContent.dentist-page-shell.dentist-report-page .dentist-hero-eyebrow {
+    #mainContent.app-page-shell.dentist-report-page .dentist-hero-eyebrow {
         white-space: normal !important;
         line-height: 1.15 !important;
     }
 
     @supports (display: grid) {
-        #mainContent.dentist-page-shell.dentist-report-page .dentist-hero-content {
+        #mainContent.app-page-shell.dentist-report-page .dentist-hero-content {
             grid-template-columns: 42px minmax(0, 1fr) !important;
             column-gap: 10px !important;
         }
 
-        #mainContent.dentist-page-shell.dentist-report-page .dentist-hero-icon {
+        #mainContent.app-page-shell.dentist-report-page .dentist-hero-icon {
             margin-right: 0 !important;
         }
     }
@@ -1642,158 +1642,158 @@ hr.section-divider {
 
 @media only screen and (min-width: 600px) {
 
-    #mainContent.dentist-page-shell .analytics-main-grid,
-    #mainContent.dentist-page-shell .analytics-secondary-grid {
+    #mainContent.app-page-shell .analytics-main-grid,
+    #mainContent.app-page-shell .analytics-secondary-grid {
         grid-template-columns: 1fr !important;
         gap: 16px !important;
     }
 
-    #mainContent.dentist-page-shell .report-hero-meta {
+    #mainContent.app-page-shell .report-hero-meta {
         display: flex !important;
         flex-wrap: wrap !important;
     }
 }
 
 @media only screen and (min-width: 768px) {
-    #mainContent.dentist-page-shell {
+    #mainContent.app-page-shell {
         padding-left: 1.25rem !important;
         padding-right: 1.25rem !important;
     }
 
-    #mainContent.dentist-page-shell .dentist-hero {
+    #mainContent.app-page-shell .dentist-hero {
         padding: 22px 24px !important;
     }
 
-    #mainContent.dentist-page-shell .dentist-hero-content {
+    #mainContent.app-page-shell .dentist-hero-content {
         padding-right: 0 !important;
     }
 
-    #mainContent.dentist-page-shell .dentist-hero-title {
+    #mainContent.app-page-shell .dentist-hero-title {
         font-size: 1.9rem !important;
     }
 
-    #mainContent.dentist-page-shell .report-hero-actions {
+    #mainContent.app-page-shell .report-hero-actions {
         margin-left: auto !important;
         flex-shrink: 0 !important;
     }
 
-    #mainContent.dentist-page-shell .analytics-main-grid {
+    #mainContent.app-page-shell .analytics-main-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
         gap: 18px !important;
     }
 
 
-    #mainContent.dentist-page-shell .analytics-secondary-grid {
+    #mainContent.app-page-shell .analytics-secondary-grid {
         grid-template-columns: 1fr !important;
         gap: 18px !important;
     }
 }
 
 @media only screen and (min-width: 601px) and (max-width: 991px) {
-    #mainContent.dentist-page-shell.dentist-report-page .dentist-hero-content {
+    #mainContent.app-page-shell.dentist-report-page .dentist-hero-content {
         width: 100% !important;
         max-width: 100% !important;
         min-width: 0 !important;
         align-items: flex-start !important;
     }
 
-    #mainContent.dentist-page-shell.dentist-report-page .dentist-hero-content>.min-w-0 {
+    #mainContent.app-page-shell.dentist-report-page .dentist-hero-content>.min-w-0 {
         flex: 1 1 auto !important;
         width: auto !important;
         max-width: 100% !important;
         min-width: 0 !important;
     }
 
-    #mainContent.dentist-page-shell.dentist-report-page .dentist-hero-icon {
+    #mainContent.app-page-shell.dentist-report-page .dentist-hero-icon {
         align-self: flex-start !important;
         margin-top: 18px !important;
     }
 
-    #mainContent.dentist-page-shell.dentist-report-page .report-hero-meta,
-    #mainContent.dentist-page-shell.dentist-report-page .summary-tag {
+    #mainContent.app-page-shell.dentist-report-page .report-hero-meta,
+    #mainContent.app-page-shell.dentist-report-page .summary-tag {
         max-width: 100% !important;
     }
 }
 
 @media only screen and (min-width: 992px) {
-    #mainContent.dentist-page-shell .dentist-hero-title {
+    #mainContent.app-page-shell .dentist-hero-title {
         font-size: 2rem !important;
     }
 
-    #mainContent.dentist-page-shell .analytics-main-grid {
+    #mainContent.app-page-shell .analytics-main-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
         gap: 18px !important;
     }
 
-    #mainContent.dentist-page-shell .analytics-secondary-grid {
+    #mainContent.app-page-shell .analytics-secondary-grid {
         grid-template-columns: 1.35fr .9fr !important;
         gap: 18px !important;
     }
 }
 
 @media only screen and (min-width: 1200px) {
-    #mainContent.dentist-page-shell {
+    #mainContent.app-page-shell {
         padding-left: 1.5rem !important;
         padding-right: 1.5rem !important;
     }
 
-    #mainContent.dentist-page-shell .dentist-hero {
+    #mainContent.app-page-shell .dentist-hero {
         padding: 24px 30px !important;
     }
 
-    #mainContent.dentist-page-shell .dentist-hero-title {
+    #mainContent.app-page-shell .dentist-hero-title {
         font-size: 2rem !important;
     }
 
-    #mainContent.dentist-page-shell .analytics-main-grid {
+    #mainContent.app-page-shell .analytics-main-grid {
         grid-template-columns: 1.2fr 1.2fr .9fr !important;
         gap: 20px !important;
     }
 
-    #mainContent.dentist-page-shell .analytics-secondary-grid {
+    #mainContent.app-page-shell .analytics-secondary-grid {
         grid-template-columns: 1.5fr .9fr !important;
         gap: 20px !important;
     }
 }
 
-#mainContent.dentist-page-shell .printable-forms-card,
-#mainContent.dentist-page-shell .report-inventory-shell {
+#mainContent.app-page-shell .printable-forms-card,
+#mainContent.app-page-shell .report-inventory-shell {
     overflow: hidden !important;
 }
 
-#mainContent.dentist-page-shell .report-inventory-grid {
+#mainContent.app-page-shell .report-inventory-grid {
     align-items: stretch !important;
 }
 
-#mainContent.dentist-page-shell .inventory-chart-panel,
-#mainContent.dentist-page-shell .low-stock-alert-card {
+#mainContent.app-page-shell .inventory-chart-panel,
+#mainContent.app-page-shell .low-stock-alert-card {
     min-width: 0 !important;
 }
 
-#mainContent.dentist-page-shell .chart-loading.hidden {
+#mainContent.app-page-shell .chart-loading.hidden {
     display: none !important;
 }
 
 @media only screen and (max-width: 600px) {
 
-    #mainContent.dentist-page-shell .printable-forms-card,
-    #mainContent.dentist-page-shell .report-inventory-shell {
+    #mainContent.app-page-shell .printable-forms-card,
+    #mainContent.app-page-shell .report-inventory-shell {
         padding: 14px !important;
         border-radius: 18px !important;
     }
 
-    #mainContent.dentist-page-shell .printable-template-grid,
-    #mainContent.dentist-page-shell .report-inventory-grid {
+    #mainContent.app-page-shell .printable-template-grid,
+    #mainContent.app-page-shell .report-inventory-grid {
         grid-template-columns: 1fr !important;
         gap: 14px !important;
     }
 
-    #mainContent.dentist-page-shell .inventory-chart-panel .relative {
+    #mainContent.app-page-shell .inventory-chart-panel .relative {
         height: 235px !important;
         min-height: 235px !important;
     }
 
-    #mainContent.dentist-page-shell .low-stock-alert-card {
+    #mainContent.app-page-shell .low-stock-alert-card {
         padding: 14px !important;
         border-radius: 16px !important;
     }
@@ -1801,24 +1801,24 @@ hr.section-divider {
 
 @media only screen and (min-width: 600px) {
 
-    #mainContent.dentist-page-shell .printable-template-grid,
-    #mainContent.dentist-page-shell .report-inventory-grid {
+    #mainContent.app-page-shell .printable-template-grid,
+    #mainContent.app-page-shell .report-inventory-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     }
 
-    #mainContent.dentist-page-shell .low-stock-alert-card {
+    #mainContent.app-page-shell .low-stock-alert-card {
         grid-column: 1 / -1 !important;
     }
 }
 
 @media only screen and (min-width: 992px) {
 
-    #mainContent.dentist-page-shell .printable-template-grid,
-    #mainContent.dentist-page-shell .report-inventory-grid {
+    #mainContent.app-page-shell .printable-template-grid,
+    #mainContent.app-page-shell .report-inventory-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
     }
 
-    #mainContent.dentist-page-shell .low-stock-alert-card {
+    #mainContent.app-page-shell .low-stock-alert-card {
         grid-column: auto !important;
     }
 }

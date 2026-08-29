@@ -5,7 +5,7 @@
 @section('title', $pageTitle)
 
 @section('styles')
-    @vite('resources/css/pages/shared/patient-list.css')
+@vite('resources/css/pages/shared/patient-list.css')
 @endsection
 
 @section('content')
@@ -93,15 +93,6 @@ $notifCount = $notifications->count();
                 <div>
                     <h1 class="page-title">Patient List</h1>
                 </div>
-
-                <div class="flex items-center gap-3 flex-shrink-0">
-                    <span class="page-badge">
-                        <span class="page-badge-dot"></span>
-
-                        {{ $allCount }}
-                        {{ \Illuminate\Support\Str::plural('record', $allCount) }}
-                    </span>
-                </div>
             </div>
         </div>
         @endif
@@ -112,85 +103,82 @@ $notifCount = $notifications->count();
                 <div
                     class="table-card patient-table-card rounded-2xl border border-gray-200 shadow-sm overflow-visible">
 
+                    @php
+                    $patientStatusOptions = [
+                    [
+                    'value' => 'all',
+                    'label' => 'All Patients',
+                    'icon' => 'fa-users',
+                    'tone' => 'status-all',
+                    'count' => $allCount ?? 0,
+                    ],
+                    [
+                    'value' => 'today',
+                    'label' => 'Today',
+                    'icon' => 'fa-clock',
+                    'tone' => 'status-today',
+                    'count' => $todayCount ?? 0,
+                    ],
+                    [
+                    'value' => 'upcoming',
+                    'label' => 'Upcoming',
+                    'icon' => 'fa-calendar-check',
+                    'tone' => 'status-upcoming',
+                    'count' => $upcomingCount ?? 0,
+                    ],
+                    [
+                    'value' => 'rescheduled',
+                    'label' => 'Rescheduled',
+                    'icon' => 'fa-calendar-plus',
+                    'tone' => 'status-rescheduled',
+                    'count' => $rescheduledCount ?? 0,
+                    ],
+                    [
+                    'value' => 'completed',
+                    'label' => 'Completed',
+                    'icon' => 'fa-check-double',
+                    'tone' => 'status-completed',
+                    'count' => $completedCount ?? 0,
+                    ],
+                    [
+                    'value' => 'cancelled',
+                    'label' => 'Cancelled',
+                    'icon' => 'fa-calendar-xmark',
+                    'tone' => 'status-cancelled',
+                    'count' => $cancelledCount ?? 0,
+                    ],
+                    ];
+                    @endphp
+
                     <div class="patient-table-toolbar px-4 md:px-6 py-3.5 border-b border-gray-100">
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
 
-                            <div class="order-2 md:order-1">
-                                <span id="rowCount"
-                                    class="text-[11px] md:text-sm font-bold text-gray-400 uppercase tracking-wider">
-                                    0 patients
-                                </span>
-                            </div>
+                        <div class="patient-toolbar-main">
 
-                            <div
-                                class="patient-toolbar-actions flex items-center gap-2 order-1 md:order-2 w-full md:w-auto justify-end">
-
-                                <div class="patient-search-row relative flex-1 md:flex-none flex items-center gap-2">
+                            <div class="patient-search-wrap">
+                                <div class="patient-search-row voice-search-row">
                                     <x-search-bar id="searchInput" placeholder="Search patient"
-                                        callback="handlePatientDirectorySearch" :debounce="250"
-                                        class="flex-1 md:w-64" />
+                                        callback="handlePatientDirectorySearch" :debounce="250" class="flex-1" />
 
                                     <x-voice-input target="#searchInput" status-id="patientSearchVoiceStatus"
                                         label="Use voice search" title="Voice search" />
                                 </div>
+                            </div>
+
+                            <div class="patient-toolbar-actions">
+
                                 <div class="patient-sort-row">
-
-                                    @php
-                                    $patientStatusOptions = [
-                                    [
-                                    'value' => 'all',
-                                    'label' => 'All Patients',
-                                    'icon' => 'fa-users',
-                                    'tone' => 'status-all',
-                                    'count' => $allCount ?? 0,
-                                    ],
-                                    [
-                                    'value' => 'today',
-                                    'label' => 'Today',
-                                    'icon' => 'fa-clock',
-                                    'tone' => 'status-today',
-                                    'count' => $todayCount ?? 0,
-                                    ],
-                                    [
-                                    'value' => 'upcoming',
-                                    'label' => 'Upcoming',
-                                    'icon' => 'fa-calendar-check',
-                                    'tone' => 'status-upcoming',
-                                    'count' => $upcomingCount ?? 0,
-                                    ],
-                                    [
-                                    'value' => 'rescheduled',
-                                    'label' => 'Rescheduled',
-                                    'icon' => 'fa-calendar-plus',
-                                    'tone' => 'status-rescheduled',
-                                    'count' => $rescheduledCount ?? 0,
-                                    ],
-                                    [
-                                    'value' => 'completed',
-                                    'label' => 'Completed',
-                                    'icon' => 'fa-check-double',
-                                    'tone' => 'status-completed',
-                                    'count' => $completedCount ?? 0,
-                                    ],
-                                    [
-                                    'value' => 'cancelled',
-                                    'label' => 'Cancelled',
-                                    'icon' => 'fa-calendar-xmark',
-                                    'tone' => 'status-cancelled',
-                                    'count' => $cancelledCount ?? 0,
-                                    ],
-                                    ];
-                                    @endphp
-
                                     <x-filter-select id="patientStatusFilter" name="patient_status" label="Status"
                                         value="all" :options="$patientStatusOptions"
                                         callback="handlePatientStatusSelect" />
                                 </div>
 
                                 <div class="patient-filter-actions">
-                                    <button id="filterBtn" type="button" class="global-filter-btn">
+                                    <button id="filterBtn" type="button" class="global-filter-btn"
+                                        aria-label="Filter patients" data-tooltip="Filter" data-tooltip-tone="neutral">
                                         <i class="fa-solid fa-sliders"></i>
+
                                         <span>Filter</span>
+
                                         <span id="filterBadge" class="filter-badge" style="display:none;"></span>
                                     </button>
                                 </div>
@@ -199,11 +187,17 @@ $notifCount = $notifications->count();
                                     storage-key="patientListViewMode" list-label="List" grid-label="Grid" />
 
                                 <button id="externalClearFilterBtn" type="button" class="global-filter-reset-btn hidden"
-                                    title="Reset filters">
+                                    aria-label="Reset filters" data-tooltip="Reset filters" data-tooltip-tone="neutral">
                                     <i class="fa-solid fa-rotate-left"></i>
                                 </button>
                             </div>
                         </div>
+                    </div>
+                    
+                    <div class="table-summary-count">
+                        <span id="rowCount">
+                            0 patients
+                        </span>
                     </div>
 
                     <x-pagination-bar id="patientPaginationTopBar" info-id="patientPageInfoTop"
@@ -294,7 +288,8 @@ $notifCount = $notifications->count();
                     <div id="patientContainer" class="space-y-3 px-3 md:px-6 pb-6 pt-4">
 
                         @php
-                        $appointments = collect($appointments)->sort(function ($a, $b) {
+                        $appointments = collect($appointments)
+                        ->sort(function ($a, $b) {
                         $aStatus = strtolower(trim((string) ($a->status ?? 'upcoming')));
                         $bStatus = strtolower(trim((string) ($b->status ?? 'upcoming')));
 
@@ -306,16 +301,23 @@ $notifCount = $notifications->count();
                         return $aIsActive ? -1 : 1;
                         }
 
-                        $aDateTime = Carbon::parse(($a->appointment_date ?? '1970-01-01') . ' ' . ($a->appointment_time
-                        ?? '00:00:00'));
-                        $bDateTime = Carbon::parse(($b->appointment_date ?? '1970-01-01') . ' ' . ($b->appointment_time
-                        ?? '00:00:00'));
+                        $aDateTime = Carbon::parse(
+                        ($a->appointment_date ?? '1970-01-01') .
+                        ' ' .
+                        ($a->appointment_time ?? '00:00:00'),
+                        );
+                        $bDateTime = Carbon::parse(
+                        ($b->appointment_date ?? '1970-01-01') .
+                        ' ' .
+                        ($b->appointment_time ?? '00:00:00'),
+                        );
 
                         if ($aIsActive && $bIsActive) {
                         return $aDateTime <=> $bDateTime;
                             }
                             return $bDateTime <=> $aDateTime;
-                                })->values();
+                                })
+                                ->values();
                                 @endphp
 
                                 @foreach ($appointments as $appt)
@@ -595,8 +597,8 @@ $notifCount = $notifications->count();
                                         </div>
                                     </div>
 
-                                    <div class="patient-grid-card-body flex-1">
-                                        <div class="flex items-start justify-between gap-2 mb-4 pl-1">
+                                    <div class="patient-grid-card-body">
+                                        <div class="mobile-appt-card-head">
                                             <div class="min-w-0">
                                                 <div class="flex items-center gap-2 flex-wrap mb-1">
                                                     <p class="mobile-patient-name" data-patient-name>
@@ -678,7 +680,7 @@ $notifCount = $notifications->count();
                                                 </span>
                                             </div>
                                         </div>
-                                        <div class="mobile-appt-actions ui-action-group mt-2">
+                                        <div class="mobile-appt-actions ui-action-group">
                                             @if ($patientProfileUrl)
                                             <a href="{{ $patientProfileUrl }}" class="ui-action-btn ui-action-view"
                                                 data-tooltip="View profile" aria-label="View profile">
@@ -829,8 +831,20 @@ $notifCount = $notifications->count();
 
         <div class="filter-chip-grid">
 
-            @foreach (['BSIT', 'BSECE', 'BSBA - HRM', 'BSED - ENG', 'BSOA', 'BSPSYCH', 'DIT', 'BSME', 'BSBA - MM', 'BSED
-            - MATH', 'DOMT'] as $course)
+            @foreach ([
+            'BSIT',
+            'BSECE',
+            'BSBA - HRM',
+            'BSED - ENG',
+            'BSOA',
+            'BSPSYCH',
+            'DIT',
+            'BSME',
+            'BSBA - MM',
+            'BSED
+            - MATH',
+            'DOMT',
+            ] as $course)
             <label class="choice-chip">
 
                 <input type="radio" name="course" value="{{ $course }}" class="
@@ -2073,8 +2087,7 @@ $notifCount = $notifications->count();
                         <i class="fa-solid fa-rotate-left"></i>
                         Clear filters
                     </button>
-                ` :
-                        '',
+                ` : '',
                 });
 
                 document

@@ -10,7 +10,7 @@
 
 @section('content')
 
-<main id="mainContent" class="admin-page-shell page-enter mode-list">
+<main id="mainContent" class="app-page-shell page-enter mode-list">
 
     <div class="page-banner">
         <div class="page-banner-inner">

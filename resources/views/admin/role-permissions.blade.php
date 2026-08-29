@@ -15,7 +15,7 @@ $logs = $logs ?? collect([]);
 $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->total() : $logs->count();
 @endphp
 
-<main id="mainContent" class="admin-page-shell page-enter">
+<main id="mainContent" class="app-page-shell page-enter">
     <div class="role-permission-shell">
 
         <div class="page-banner">

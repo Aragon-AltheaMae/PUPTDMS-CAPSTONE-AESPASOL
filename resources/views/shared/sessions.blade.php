@@ -16,10 +16,10 @@
         session-page
         page-enter
         {{ $role === 'admin'
-            ? 'admin-page-shell'
+            ? 'app-page-shell'
             : ($role === 'dentist'
-                ? 'dentist-page-shell'
-                : 'patient-page-shell') }}
+                ? 'app-page-shell'
+                : 'app-page-shell') }}
     ">
     <div class="session-shell">
 
@@ -36,13 +36,6 @@
                     <p class="page-subtitle">
                         Review active devices and recent sign-in activity for your account.
                     </p>
-                </div>
-
-                <div class="page-banner-actions">
-                    <span class="page-badge">
-                        <span class="page-badge-dot"></span>
-                        Security Activity Visible
-                    </span>
                 </div>
 
             </div>

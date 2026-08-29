@@ -9,7 +9,7 @@
 @endsection
 
 @section('content')
-    <main id="mainContent" class="admin-page-shell session-admin-page">
+    <main id="mainContent" class="app-page-shell session-admin-page">
         <div class="w-full">
             <section class="page-banner">
                 <div class="page-banner-inner">
@@ -17,12 +17,6 @@
                         <h1 class="page-title">Session Dashboard</h1>
                     </div>
 
-                    <div class="page-banner-actions">
-                        <span class="page-badge">
-                            <span class="page-badge-dot"></span>
-                            Centralized Session Control
-                        </span>
-                    </div>
                 </div>
             </section>
 

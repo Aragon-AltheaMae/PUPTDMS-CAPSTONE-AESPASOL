@@ -456,14 +456,6 @@ body.role-patient #mainContent.patient-dashboard-page .dashboard-glass {
 }
 
 @media only screen and (min-width: 1200px) {
-    body.role-patient #mainContent.patient-dashboard-page {
-        padding-top: 78px !important;
-    }
-
-    body.role-patient #mainContent.patient-dashboard-page .greeting-row {
-        margin-bottom: 0.75rem !important;
-    }
-
     body.role-patient #mainContent.patient-dashboard-page .dashboard-grid-tight {
         gap: 1.25rem !important;
     }

@@ -16,7 +16,7 @@
         $status = $status ?? 'active';
     @endphp
 
-    <main id="mainContent" class="admin-page-shell system-logs-page page-enter mode-list">
+    <main id="mainContent" class="app-page-shell system-logs-page page-enter mode-list">
         <div class="w-full">
 
             <div class="page-banner rounded-2xl mb-6">

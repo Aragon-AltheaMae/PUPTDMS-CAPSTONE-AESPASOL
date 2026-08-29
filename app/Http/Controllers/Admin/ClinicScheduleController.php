@@ -60,7 +60,7 @@ class ClinicScheduleController extends Controller
         return view('shared.clinic-schedule', [
             'layoutRole' => 'admin',
             'pageTitle' => 'Clinic Schedule',
-            'pageShellClass' => 'admin-page-shell',
+            'pageShellClass' => 'app-page-shell',
             'isDentistView' => false,
 
             'schedules' => $schedules,
