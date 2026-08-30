@@ -780,7 +780,7 @@ class DentistReportController extends Controller
         DocumentTemplate $template
     ): bool {
         $audience =
-            $this->resolveDentalServicesTemplateAudience(
+            $this->getDentalServicesTemplateAudience(
                 $template
             );
 
@@ -807,7 +807,7 @@ class DentistReportController extends Controller
         return true;
     }
 
-    private function resolveDentalServicesTemplateAudience(
+    private function getDentalServicesTemplateAudience(
         DocumentTemplate $template
     ): string {
         $haystack = strtolower(trim(implode(' ', array_filter([
@@ -1139,7 +1139,7 @@ class DentistReportController extends Controller
         DocumentTemplate $template
     ): bool {
         $audience =
-            $this->resolveDailyTreatmentTemplateAudience(
+            $this->getDailyTreatmentTemplateAudience(
                 $template
             );
 
@@ -1163,7 +1163,7 @@ class DentistReportController extends Controller
         return true;
     }
 
-    private function resolveDailyTreatmentTemplateAudience(
+    private function getDailyTreatmentTemplateAudience(
         DocumentTemplate $template
     ): string {
         $code = strtoupper(trim((string) ($template->code ?? '')));
@@ -1664,7 +1664,7 @@ class DentistReportController extends Controller
 
             $groupKey = $this->classifyDentalCasesPatient($patient);
 
-            $diagnosis = $this->resolveDentalCaseDiagnosisLabel(
+            $diagnosis = $this->getDentalCaseDiagnosisLabel(
                 $appointment,
                 $procedureDiagnosisByAppointment
             );
@@ -1738,7 +1738,7 @@ class DentistReportController extends Controller
             $data[$rowKey]['patient_ids'][$patient->id] = true;
 
             $columnKey = $this->classifyMonthlyReportService(
-                $this->resolveMonthlyReportServiceLabel($appointment)
+                $this->getMonthlyReportServiceLabel($appointment)
             );
 
             if ($columnKey && array_key_exists($columnKey, $data[$rowKey])) {
@@ -1916,7 +1916,7 @@ class DentistReportController extends Controller
         return $pages;
     }
 
-    private function resolveDentalCaseDiagnosisLabel(Appointment $appointment, $procedureDiagnosisByAppointment): string
+    private function getDentalCaseDiagnosisLabel(Appointment $appointment, $procedureDiagnosisByAppointment): string
     {
         $diagnosis = '';
 
@@ -1931,13 +1931,13 @@ class DentistReportController extends Controller
         }
 
         if ($diagnosis === '') {
-            $diagnosis = $this->resolveMonthlyReportServiceLabel($appointment);
+            $diagnosis = $this->getMonthlyReportServiceLabel($appointment);
         }
 
         return $this->normalizeReportServiceLabel($diagnosis, 'Dental Service');
     }
 
-    private function resolveMonthlyReportServiceLabel(Appointment $appointment): string
+    private function getMonthlyReportServiceLabel(Appointment $appointment): string
     {
         $service = trim((string) ($appointment->service_type ?? ''));
 
@@ -2198,7 +2198,7 @@ class DentistReportController extends Controller
 
         $adminDept = trim((string) ($patient->faculty_code ?? ''));
 
-        $demographics = $this->resolvePatientDemographics($patient);
+        $demographics = $this->getPatientDemographics($patient);
         $birthdate = $demographics['birthdate_short'];
         $age = $demographics['age'];
         $sex = $demographics['gender'];
@@ -2382,7 +2382,7 @@ class DentistReportController extends Controller
             $this->drawPdfCellAutoFont($pdf, 380, 511, trim((string) ($medicalHistory->emergency_relation ?? '')), 82, 7, 'L', 'Helvetica', '', 7.2, 5.6);
             $this->drawPdfCellAutoFont($pdf, 154, 524, trim((string) ($medicalHistory->emergency_number ?? '')), 108, 7, 'L', 'Helvetica', '', 7.2, 5.6);
 
-            $signaturePath = $this->resolveStoredSignaturePath(
+            $signaturePath = $this->getStoredSignaturePath(
                 $medicalHistory?->patient_signature
             );
 
@@ -3222,7 +3222,7 @@ class DentistReportController extends Controller
             ->through(function (Appointment $appointment) {
                 $patient = $appointment->patient;
                 $procedure = $appointment->procedure;
-                $demographics = $this->resolvePatientDemographics($patient);
+                $demographics = $this->getPatientDemographics($patient);
 
                 $requestedDateTime = '';
 
@@ -3531,7 +3531,7 @@ class DentistReportController extends Controller
                 continue;
             }
 
-            $demographics = $this->resolvePatientDemographics($patient);
+            $demographics = $this->getPatientDemographics($patient);
 
             $gender = $this->normalizeGadGender(
                 $demographics['gender'] ?? null
@@ -3763,7 +3763,7 @@ class DentistReportController extends Controller
     {
         $documentRequest->loadMissing(['patient', 'approvedBy']);
 
-        return match ($this->resolveApprovedDocumentRequestType($documentRequest->document_type)) {
+        return match ($this->getApprovedDocumentRequestType($documentRequest->document_type)) {
             'annual_dental_clearance' => $this->buildAnnualDentalClearancePdfPayload($documentRequest),
             'dental_clearance' => $this->buildDentalClearancePdfPayload($documentRequest),
             'dental_health_record' => $this->buildDentalHealthRecordPdfPayload($documentRequest),
@@ -3771,7 +3771,7 @@ class DentistReportController extends Controller
         };
     }
 
-    private function resolveApprovedDocumentRequestType(?string $documentType): ?string
+    private function getApprovedDocumentRequestType(?string $documentType): ?string
     {
         $normalized = strtolower(trim((string) $documentType));
         $normalized = str_replace(['-', '/'], ' ', $normalized);
@@ -4000,7 +4000,7 @@ class DentistReportController extends Controller
                 $programOrDept = '';
             }
 
-            $demographics = $this->resolvePatientDemographics($patient);
+            $demographics = $this->getPatientDemographics($patient);
             $age = $demographics['age'];
             $gender = strtolower(trim((string) ($demographics['gender'] ?? '')));
             $email = trim((string) ($patient->email ?? ''));
@@ -4030,7 +4030,7 @@ class DentistReportController extends Controller
                 $processingTime .= ((int) $processingTime === 1) ? ' min' : ' mins';
             }
 
-            $signaturePath = $this->resolveStoredSignaturePath($patient?->medicalHistory?->patient_signature);
+            $signaturePath = $this->getStoredSignaturePath($patient?->medicalHistory?->patient_signature);
 
             $pdf->SetFont('Helvetica', '', 5.2);
 
@@ -4407,7 +4407,7 @@ class DentistReportController extends Controller
                 $office = '';
             }
 
-            $demographics = $this->resolvePatientDemographics($patient);
+            $demographics = $this->getPatientDemographics($patient);
             $gender = trim((string) ($demographics['gender'] ?? ''));
             $treatmentDone = trim((string) ($appointment->service_type ?? ''));
 
@@ -4432,7 +4432,7 @@ class DentistReportController extends Controller
                 (int) ($procedure?->procedure_duration_seconds ?? 0)
             );
 
-            $signaturePath = $this->resolveStoredSignaturePath($patient?->medicalHistory?->patient_signature);
+            $signaturePath = $this->getStoredSignaturePath($patient?->medicalHistory?->patient_signature);
 
             $pdf->SetFont('Helvetica', '', $layout['fontSize']);
 
@@ -4764,7 +4764,7 @@ class DentistReportController extends Controller
         return (string) (int) ceil($seconds / 60);
     }
 
-    private function resolveStoredSignaturePath(?string $relativePath): ?string
+    private function getStoredSignaturePath(?string $relativePath): ?string
     {
         $relativePath = trim((string) $relativePath);
 
@@ -4841,7 +4841,7 @@ class DentistReportController extends Controller
         }
     }
 
-    private function resolvePatientDemographics($patient): array
+    private function getPatientDemographics($patient): array
     {
         $birthdateValue = $patient->birthdate ?? $patient->user?->birthdate ?? null;
         $genderValue = trim((string) ($patient->gender ?? $patient->user?->gender ?? ''));

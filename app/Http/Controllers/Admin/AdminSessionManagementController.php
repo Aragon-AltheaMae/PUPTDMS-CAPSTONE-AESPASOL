@@ -27,7 +27,10 @@ class AdminSessionManagementController extends Controller
             : 15;
 
         $filters = [
+            'sort' => (string) $request->input('sort', 'recent'),
             'role' => (string) $request->input('role', 'all'),
+            'device' => (string) $request->input('device', 'all'),
+            'scope' => (string) $request->input('scope', 'all'),
             'search' => (string) $request->input('search', ''),
         ];
 

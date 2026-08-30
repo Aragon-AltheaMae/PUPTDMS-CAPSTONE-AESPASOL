@@ -27,8 +27,8 @@ class SystemSettingsController extends Controller
         'notif_new_appointment',
         'notif_cancellation',
         'notif_document_request',
-        'notif_appointment_completed',
         'notif_rescheduled',
+        'notif_follow_up_scheduled',
         'notif_document_approved',
         'notif_document_rejected',
         'notif_reminder_24h',
@@ -66,15 +66,14 @@ class SystemSettingsController extends Controller
             'notif_new_appointment',
             'notif_cancellation',
             'notif_document_request',
-            'notif_appointment_completed',
             'notif_rescheduled',
+            'notif_follow_up_scheduled',
             'notif_document_approved',
             'notif_document_rejected',
             'notif_reminder_24h',
             'notif_confirmation',
             'notif_follow_up_reminder',
             'notif_follow_up_today_reminder',
-            'notif_channels',
         ],
 
         'backup' => [
@@ -200,12 +199,6 @@ class SystemSettingsController extends Controller
             return $request->boolean($key) ? '1' : '0';
         }
 
-        if ($key === 'notif_channels') {
-            $channels = $validated['notif_channels'] ?? [];
-
-            return empty($channels) ? '' : implode(',', $channels);
-        }
-
         $value = $validated[$key] ?? '';
 
         if (is_array($value)) {
@@ -238,17 +231,14 @@ class SystemSettingsController extends Controller
             'notif_new_appointment' => ['nullable', 'boolean'],
             'notif_cancellation' => ['nullable', 'boolean'],
             'notif_document_request' => ['nullable', 'boolean'],
-            'notif_appointment_completed' => ['nullable', 'boolean'],
             'notif_rescheduled' => ['nullable', 'boolean'],
+            'notif_follow_up_scheduled' => ['nullable', 'boolean'],
             'notif_document_approved' => ['nullable', 'boolean'],
             'notif_document_rejected' => ['nullable', 'boolean'],
             'notif_reminder_24h' => ['nullable', 'boolean'],
             'notif_confirmation' => ['nullable', 'boolean'],
             'notif_follow_up_reminder' => ['nullable', 'boolean'],
             'notif_follow_up_today_reminder' => ['nullable', 'boolean'],
-
-            'notif_channels' => ['nullable', 'array'],
-            'notif_channels.*' => [Rule::in(['Email', 'SMS', 'WhatsApp', 'In-App'])],
 
             'backup_frequency' => ['nullable', Rule::in(['Every 6 hours', 'Daily', 'Weekly', 'Monthly'])],
             'backup_retention_days' => ['nullable', 'integer', 'min:7', 'max:365'],
@@ -268,7 +258,6 @@ class SystemSettingsController extends Controller
             'backup_retention_days.min' => 'Backup retention must be at least 7 days.',
             'backup_retention_days.max' => 'Backup retention cannot exceed 365 days.',
             'backup_time.date_format' => 'Backup time must use the HH:MM format.',
-            'notif_channels.*.in' => 'One or more selected notification channels are invalid.',
         ];
     }
 }

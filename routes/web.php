@@ -992,7 +992,7 @@ Route::prefix('dentist')->middleware(['auth'])->group(function () {
         ->name('dentist.dentist.appointments');
 
     Route::get('/appointments/{appointment}/patient-profile', [DentistAppointmentController::class, 'patientProfile'])
-        ->middleware('permission:view_dental_records')
+        ->middleware('permission:view_patient_profiles,view_dental_records')
         ->name('dentist.dentist.appointments.patientProfile');
 
     Route::put('/appointments/{id}/reschedule', [DentistAppointmentController::class, 'updateReschedule'])
@@ -1058,7 +1058,7 @@ Route::prefix('dentist')->middleware(['auth'])->group(function () {
         ->name('dentist.dentist.patients');
 
     Route::get('/patients/{patient}/profile', [DentistPatientController::class, 'profile'])
-        ->middleware('permission:view_dental_records')
+        ->middleware('permission:view_patient_profiles,view_dental_records')
         ->name('dentist.dentist.patient.profile');
 
     // Report Page
@@ -1207,9 +1207,17 @@ Route::prefix('dentist')->middleware(['auth'])->group(function () {
         ->middleware('permission:create_procedure_records')
         ->name('dentist.odontogram');
 
+    Route::get('/odontogram/{appointment}/saved/edit', [OdontogramController::class, 'editSavedVisit'])
+        ->middleware('permission:create_procedure_records')
+        ->name('dentist.odontogram.saved.edit');
+
     Route::post('/odontogram/{appointment}/save', [OdontogramController::class, 'save'])
         ->middleware('permission:create_procedure_records')
         ->name('dentist.odontogram.save');
+
+    Route::post('/odontogram/{appointment}/saved/update', [OdontogramController::class, 'updateSavedVisit'])
+        ->middleware('permission:create_procedure_records')
+        ->name('dentist.odontogram.saved.update');
 
     // Add Existing Appointment - Odontogram
     Route::get('/odontogram/patient/{patient}/existing-appointment', [OdontogramController::class, 'createExistingAppointment'])

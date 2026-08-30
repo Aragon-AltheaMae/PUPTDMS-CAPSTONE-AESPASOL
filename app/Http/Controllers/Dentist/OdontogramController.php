@@ -65,6 +65,14 @@ class OdontogramController extends Controller
         return route('dentist.dentist.patient.profile', ['patient' => $patient->id]);
     }
 
+    private function savedVisitEditBackUrl(Patient $patient): string
+    {
+        return route('dentist.dentist.patient.profile', [
+            'patient' => $patient->id,
+            'from' => request()->query('from', 'appointments'),
+        ]);
+    }
+
     private function getSavedOdontogramDataForPatient(Patient $patient): array
     {
         $patientOdontogram = PatientOdontogram::where('patient_id', $patient->id)->first();
@@ -1535,6 +1543,131 @@ class OdontogramController extends Controller
             'saved_teeth' => $result['saved_teeth'],
             'status' => 'completed',
             'redirect_url' => route('dentist.dentist.appointments') . '?refresh=' . now()->timestamp,
+        ]);
+    }
+
+    public function editSavedVisit(Request $request, Appointment $appointment)
+    {
+        $activeRole = session('impersonated_role') ?: session('role');
+
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Unauthorized.',
+                ], 403);
+            }
+
+            return redirect('/login');
+        }
+
+        $appointment->load([
+            'patient.user',
+            'procedure',
+        ]);
+
+        $patient = $appointment->patient;
+        $procedure = $appointment->procedure;
+
+        if (!$patient) {
+            abort(404, 'Patient not found for this appointment.');
+        }
+
+        if (!$procedure) {
+            return redirect()
+                ->to($this->savedVisitEditBackUrl($patient))
+                ->with('error', 'No saved odontogram was found for this visit.');
+        }
+
+        return view('dentist.dentist-odontogram', array_merge(
+            [
+                'patient' => $patient,
+                'appointment' => $appointment,
+                'procedure' => $procedure,
+                'layoutRole' => 'dentist',
+                'cancelProcedureRedirectUrl' => $this->savedVisitEditBackUrl($patient),
+                'savedOdontogramData' => $procedure->odontogram_data ?? [],
+                'existingAppointmentMode' => false,
+                'savedVisitEditMode' => true,
+                'saveProcedureUrl' => route('dentist.odontogram.saved.update', [
+                    'appointment' => $appointment->id,
+                    'from' => $request->query('from', 'appointments'),
+                ]),
+                'serviceTypes' => ServiceType::activeForBooking()->orderBy('name')->get(['name']),
+            ],
+            $this->getProcedureWorkspaceContext()
+        ));
+    }
+
+    public function updateSavedVisit(Request $request, Appointment $appointment)
+    {
+        $activeRole = session('impersonated_role') ?: session('role');
+
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
+            return response()->json([
+                'message' => 'Unauthorized.',
+            ], 403);
+        }
+
+        $appointment->load([
+            'patient.user',
+            'procedure',
+        ]);
+
+        $patient = $appointment->patient;
+
+        if (!$patient) {
+            return response()->json([
+                'message' => 'Patient not found for this appointment.',
+            ], 404);
+        }
+
+        $validated = $request->validate([
+            'odontogram_data' => 'present|array',
+            'odontogram_data.*.tooth' => 'nullable|integer|min:1',
+            'odontogram_data.*.status.code' => 'nullable|string|max:20',
+            'odontogram_data.*.status.label' => 'nullable|string|max:255',
+            'odontogram_data.*.status.colorHex' => 'nullable|string|max:30',
+            'odontogram_data.*.threeD.code' => 'nullable|string|max:20',
+            'odontogram_data.*.threeD.label' => 'nullable|string|max:255',
+            'odontogram_data.*.threeD.colorHex' => 'nullable|string|max:30',
+            'odontogram_data.*.surfaces' => 'nullable|array',
+            'odontogram_data.*.surfaces.*.code' => 'nullable|string|max:20',
+            'odontogram_data.*.surfaces.*.label' => 'nullable|string|max:255',
+            'odontogram_data.*.surfaces.*.colorHex' => 'nullable|string|max:30',
+            'oral_examination' => 'nullable|string',
+            'diagnosis' => 'nullable|string',
+            'prescriptions' => 'nullable|string',
+            'completion_action' => 'nullable|in:finished',
+            'has_applied_treatment' => 'required|boolean',
+            'procedure_duration_seconds' => 'nullable|integer|min:0',
+        ]);
+
+        $isOralProphylaxis = strcasecmp(
+            trim((string) $appointment->service_type),
+            'Oral Prophylaxis'
+        ) === 0;
+
+        if (!$isOralProphylaxis && !$request->boolean('has_applied_treatment')) {
+            return response()->json([
+                'message' => 'Please apply at least one treatment to the tooth chart before saving the odontogram.',
+            ], 422);
+        }
+
+        $procedureDurationSeconds = (int) data_get($appointment, 'procedure.procedure_duration_seconds', 0);
+
+        $result = $this->persistProcedureSnapshot(
+            $appointment,
+            array_merge($validated, [
+                'completion_action' => 'finished',
+            ]),
+            max(0, $procedureDurationSeconds)
+        );
+
+        return response()->json([
+            'message' => 'Saved visit odontogram updated successfully.',
+            'saved_teeth' => $result['saved_teeth'],
+            'status' => 'completed',
+            'redirect_url' => $this->savedVisitEditBackUrl($patient) . '&refresh=' . now()->timestamp,
         ]);
     }
 

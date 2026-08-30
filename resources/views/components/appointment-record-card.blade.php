@@ -6,6 +6,7 @@
 'showTimeRange' => true,
 'animationDelay' => null,
 'compact' => false,
+'recordEditUrl' => null,
 ])
 
 @php
@@ -163,6 +164,8 @@ $recordPayload = [
 'odontogram_data' => $odontogram,
 
 'follow_up' => $followUp,
+
+'edit_url' => $recordEditUrl,
 ];
 
 $cardClasses = [

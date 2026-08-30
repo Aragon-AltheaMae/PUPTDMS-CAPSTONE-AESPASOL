@@ -17,7 +17,7 @@
     $initialTotal = isset($transitions) ? $transitions->total() : 0;
     $initialFrom = isset($transitions) ? ($transitions->firstItem() ?? 0) : 0;
     $initialTo = isset($transitions) ? ($transitions->lastItem() ?? 0) : 0;
-    $resolvedSuccessorName = $transition?->defaultSuccessor?->name
+    $successorName = $transition?->defaultSuccessor?->name
         ?? $transition?->items?->first(fn ($item) => $item->successorDentist?->name)?->successorDentist?->name
         ?? 'Not assigned yet';
     $checklistTotal = $transition?->checklistItems?->count() ?? 0;
@@ -529,7 +529,7 @@
                                 </div>
                                 <div class="dt-people-card-copy">
                                     <span>Default Successor</span>
-                                    <strong>{{ $resolvedSuccessorName }}</strong>
+                                    <strong>{{ $successorName }}</strong>
                                 </div>
                             </div>
                             <div class="dt-people-card dt-people-card-warning">

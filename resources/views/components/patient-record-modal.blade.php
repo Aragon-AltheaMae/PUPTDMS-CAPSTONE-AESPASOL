@@ -143,6 +143,11 @@
         </div>
 
         <div class="modal-ft">
+            <a href="#" id="recordModalEditBtn" class="ui-btn ui-btn-primary" hidden>
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>Edit Odontogram</span>
+            </a>
+
             <button type="button" class="btn-close-modal" id="modalCloseFooter">
                 Close
             </button>
