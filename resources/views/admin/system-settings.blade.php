@@ -10,6 +10,15 @@
 
 @section('content')
 
+@php
+    $allowedSettingGroups = $allowedSettingGroups ?? ['general', 'notifications'];
+    $canManageGeneralSettings = in_array('general', $allowedSettingGroups, true);
+    $canManageNotificationSettings = in_array('notifications', $allowedSettingGroups, true);
+    $defaultSettingsTab = $canManageGeneralSettings
+        ? 'general'
+        : ($canManageNotificationSettings ? 'notifications' : 'general');
+@endphp
+
 <main id="mainContent" class="system-settings-page app-page-shell page-enter">
     <div class="w-full">
 
@@ -44,17 +53,21 @@
                                 <p class="settings-sidebar-kicker">Settings Menu</p>
                             </div>
                             <div class="p-2">
-                                <a href="#" class="settings-nav-item active"
+                                @if ($canManageGeneralSettings)
+                                <a href="#" class="settings-nav-item {{ $defaultSettingsTab === 'general' ? 'active' : '' }}"
                                     onclick="switchTab('general', this); return false;"><i
                                         class="fa-solid fa-sliders"></i> General</a>
+                                @endif
                                 {{-- Temporarily hidden: Clinic Info
                                 <a href="#" class="settings-nav-item"
                                     onclick="switchTab('clinic', this); return false;"><i
                                         class="fa-solid fa-hospital"></i> Clinic Info</a>
                                 --}}
-                                <a href="#" class="settings-nav-item"
+                                @if ($canManageNotificationSettings)
+                                <a href="#" class="settings-nav-item {{ $defaultSettingsTab === 'notifications' ? 'active' : '' }}"
                                     onclick="switchTab('notifications', this); return false;"><i
                                         class="fa-solid fa-bell"></i> Notifications</a>
+                                @endif
                                 {{-- Temporarily hidden: Security
                                 <a href="#" class="settings-nav-item"
                                     onclick="switchTab('security', this); return false;"><i
@@ -76,7 +89,8 @@
 
                     <div class="lg:col-span-3 space-y-0">
 
-                        <div id="tab-general" class="settings-section active">
+                        @if ($canManageGeneralSettings)
+                        <div id="tab-general" class="settings-section {{ $defaultSettingsTab === 'general' ? 'active' : '' }}">
                             <div class="section-card">
                                 <div class="section-card-hdr">
                                     <div class="section-card-hdr-left">
@@ -221,6 +235,7 @@
                                 </div>
                             </div>
                         </div>
+                        @endif
 
                         {{-- Temporarily hidden: Clinic Info
                         <div id="tab-clinic" class="settings-section">
@@ -301,7 +316,8 @@
 
                         --}}
 
-                        <div id="tab-notifications" class="settings-section">
+                        @if ($canManageNotificationSettings)
+                        <div id="tab-notifications" class="settings-section {{ $defaultSettingsTab === 'notifications' ? 'active' : '' }}">
                             <div class="section-card">
                                 <div class="section-card-hdr">
                                     <div class="section-card-hdr-left">
@@ -554,6 +570,7 @@
                                 </div>
                             </div>
                         </div>
+                        @endif
 
                         {{-- Temporarily hidden: Security
                         <div id="tab-security" class="settings-section">

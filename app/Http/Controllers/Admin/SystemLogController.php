@@ -12,15 +12,14 @@ class SystemLogController extends Controller
 {
     public function index(Request $request)
     {
-
-        if (!session('admin_logged_in')) {
+        if (!auth()->check()) {
             if ($request->ajax()) {
                 return response()->json([
-                    'message' => 'Your admin session has expired.',
+                    'message' => 'Your session has expired.',
                 ], 401);
             }
 
-            return redirect('/admin/login');
+            return redirect('/login');
         }
 
         $perPageInput = (int) $request->input('per_page', 10);
@@ -140,7 +139,15 @@ class SystemLogController extends Controller
             'errorCount',
             'activeCount',
             'archivedCount'
-        ));
+        ) + [
+            'layoutRole' => $this->resolveLayoutRole(),
+            'routeNames' => [
+                'index' => $this->routeName('index'),
+                'check' => $this->routeName('check'),
+                'archive' => $this->routeName('archive'),
+                'export' => $this->routeName('export'),
+            ],
+        ]);
     }
 
     public function fetchLatest(Request $request)
@@ -195,7 +202,7 @@ class SystemLogController extends Controller
 
     public function archive(Request $request)
     {
-        if (!session('admin_logged_in')) {
+        if (!auth()->check()) {
             return response()->json(['message' => 'Unauthorized.'], 401);
         }
 
@@ -300,7 +307,7 @@ class SystemLogController extends Controller
             }
 
             return redirect()
-                ->route('admin.system_logs', $request->query())
+                ->route($this->routeName('index'), $request->query())
                 ->with(
                     'error',
                     'No logs found for the selected export filters.'
@@ -441,5 +448,29 @@ class SystemLogController extends Controller
     protected function normalizeStatus(?string $status): string
     {
         return in_array($status, ['active', 'archived', 'all'], true) ? $status : 'active';
+    }
+
+    private function resolveLayoutRole(): string
+    {
+        return request()->routeIs('dentist.system_logs*') ? 'dentist' : 'admin';
+    }
+
+    private function routeName(string $action): string
+    {
+        if (request()->routeIs('dentist.system_logs*')) {
+            return match ($action) {
+                'index' => 'dentist.system_logs',
+                'check' => 'dentist.system_logs.check',
+                'archive' => 'dentist.system_logs.archive',
+                'export' => 'dentist.system_logs.export',
+            };
+        }
+
+        return match ($action) {
+            'index' => 'admin.system_logs',
+            'check' => 'admin.system_logs.check',
+            'archive' => 'admin.system_logs.archive',
+            'export' => 'admin.system_logs.export',
+        };
     }
 }

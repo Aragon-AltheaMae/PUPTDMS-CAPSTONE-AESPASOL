@@ -996,8 +996,6 @@ return $aDateTime <=> $bDateTime;
                                             </button>
                                             @endif
 
-                                            @if ($isActiveAppointment)
-
                                             @if ($canStartProcedure)
                                             <button type="button" class="ui-action-btn
                                                            ui-action-success
@@ -1019,9 +1017,13 @@ return $aDateTime <=> $bDateTime;
                                             @endif
 
                                             @if ($canRescheduleAppointment)
-                                            <button type="button" class="ui-action-btn ui-action-warning"
-                                                data-tooltip="Reschedule appointment" data-tooltip-tone="reschedule"
-                                                aria-label="Reschedule appointment" onclick="openRescheduleModal({
+                                            <button type="button"
+                                                class="ui-action-btn ui-action-warning {{ $isActiveAppointment ? '' : 'is-start-locked' }}"
+                                                data-tooltip="{{ $isActiveAppointment ? 'Reschedule appointment' : 'Only upcoming or rescheduled appointments can be changed' }}"
+                                                data-tooltip-tone="{{ $isActiveAppointment ? 'reschedule' : 'locked' }}"
+                                                aria-label="Reschedule appointment"
+                                                {{ $isActiveAppointment ? '' : 'disabled aria-disabled=true' }}
+                                                onclick="@if ($isActiveAppointment) openRescheduleModal({
                                                         id: '{{ $appt->id }}',
                                                         name: @js($patientName),
                                                         datetime: @js($modalDatetime),
@@ -1030,26 +1032,28 @@ return $aDateTime <=> $bDateTime;
                                                             'dentist.dentist.appointments.reschedule.update',
                                                             $appt->id
                                                         ) }}'
-                                                    })">
+                                                    }) @endif">
                                                 <i class="fa-solid fa-rotate-right"></i>
                                             </button>
                                             @endif
 
                                             @if ($canCancelAppointment)
-                                            <button type="button" class="ui-action-btn ui-action-delete"
-                                                data-tooltip="Cancel appointment" data-tooltip-tone="cancel"
-                                                aria-label="Cancel appointment" onclick="cancelAppointmentFromModal(
+                                            <button type="button"
+                                                class="ui-action-btn ui-action-delete {{ $isActiveAppointment ? '' : 'is-start-locked' }}"
+                                                data-tooltip="{{ $isActiveAppointment ? 'Cancel appointment' : 'Only upcoming or rescheduled appointments can be cancelled' }}"
+                                                data-tooltip-tone="{{ $isActiveAppointment ? 'cancel' : 'locked' }}"
+                                                aria-label="Cancel appointment"
+                                                {{ $isActiveAppointment ? '' : 'disabled aria-disabled=true' }}
+                                                onclick="@if ($isActiveAppointment) cancelAppointmentFromModal(
                                                         '{{ route(
                                                             'dentist.dentist.appointments.cancel',
                                                             $appt->id
                                                         ) }}',
                                                         @js($patientName),
                                                         @js($dateLabel . ' | ' . $timeLabel)
-                                                    )">
+                                                    ) @endif">
                                                 <i class="fa-solid fa-xmark"></i>
                                             </button>
-                                            @endif
-
                                             @endif
 
                                         </div>
@@ -1505,8 +1509,6 @@ return $aDateTime <=> $bDateTime;
                                     </a>
                                     @endif
 
-                                    @if ($isActiveAppointment)
-
                                     @if ($canStartProcedure)
                                     <button type="button" class="ui-action-btn
                                                    ui-action-success
@@ -1527,8 +1529,12 @@ return $aDateTime <=> $bDateTime;
                                     @endif
 
                                     @if ($canRescheduleAppointment)
-                                    <button type="button" class="ui-action-btn ui-action-warning"
-                                        data-tooltip="Reschedule appointment" data-tooltip-tone="reschedule" onclick="openRescheduleModal({
+                                    <button type="button"
+                                        class="ui-action-btn ui-action-warning {{ $isActiveAppointment ? '' : 'is-start-locked' }}"
+                                        data-tooltip="{{ $isActiveAppointment ? 'Reschedule appointment' : 'Only upcoming or rescheduled appointments can be changed' }}"
+                                        data-tooltip-tone="{{ $isActiveAppointment ? 'reschedule' : 'locked' }}"
+                                        {{ $isActiveAppointment ? '' : 'disabled aria-disabled=true' }}
+                                        onclick="@if ($isActiveAppointment) openRescheduleModal({
                                                 id: '{{ $appt->id }}',
                                                 name: @js($patientName),
                                                 datetime: @js($modalDatetime),
@@ -1537,25 +1543,27 @@ return $aDateTime <=> $bDateTime;
                                                     'dentist.dentist.appointments.reschedule.update',
                                                     $appt->id
                                                 ) }}'
-                                            })">
+                                            }) @endif">
                                         <i class="fa-solid fa-rotate-right"></i>
                                     </button>
                                     @endif
 
                                     @if ($canCancelAppointment)
-                                    <button type="button" class="ui-action-btn ui-action-delete"
-                                        data-tooltip="Cancel appointment" data-tooltip-tone="cancel" onclick="cancelAppointmentFromModal(
+                                    <button type="button"
+                                        class="ui-action-btn ui-action-delete {{ $isActiveAppointment ? '' : 'is-start-locked' }}"
+                                        data-tooltip="{{ $isActiveAppointment ? 'Cancel appointment' : 'Only upcoming or rescheduled appointments can be cancelled' }}"
+                                        data-tooltip-tone="{{ $isActiveAppointment ? 'cancel' : 'locked' }}"
+                                        {{ $isActiveAppointment ? '' : 'disabled aria-disabled=true' }}
+                                        onclick="@if ($isActiveAppointment) cancelAppointmentFromModal(
                                                 '{{ route(
                                                     'dentist.dentist.appointments.cancel',
                                                     $appt->id
                                                 ) }}',
                                                 @js($patientName),
                                                 @js($dateLabel . ' | ' . $timeLabel)
-                                            )">
+                                            ) @endif">
                                         <i class="fa-solid fa-xmark"></i>
                                     </button>
-                                    @endif
-
                                     @endif
                                 </div>
                             </div>

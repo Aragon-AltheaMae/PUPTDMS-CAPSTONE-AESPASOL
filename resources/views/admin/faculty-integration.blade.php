@@ -5,6 +5,7 @@
 @section('title', 'Faculty Integration')
 
 @section('styles')
+    @php($routePrefix = request()->routeIs('dentist.*') ? 'dentist' : 'admin')
     @vite('resources/css/pages/admin/faculty-integration.css')
 @endsection
 
@@ -47,7 +48,7 @@
                         <span class="entry-badge">Faculty Setup</span>
                     </div>
 
-                    <form id="facultyIntegrationForm" method="POST" action="{{ route('admin.faculty.store') }}"
+                    <form id="facultyIntegrationForm" method="POST" action="{{ route($routePrefix . '.faculty.store') }}"
                         novalidate>
                         @csrf
 

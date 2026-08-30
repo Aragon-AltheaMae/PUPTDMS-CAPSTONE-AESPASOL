@@ -18,10 +18,11 @@ class UserManagementController extends Controller
 {
     private const PASSWORD_LENGTH = 12;
     private const USER_MANAGEMENT_PERMISSIONS = [
-        'manage_user_accounts',
-        'manage_user_roles',
-        'manage_dentist_accounts',
-        'manage_super_admin_accounts',
+        'view_account_details',
+        'create_users',
+        'disable_users',
+        'update_user_role',
+        'update_user_password',
     ];
 
     public function __construct(
@@ -32,8 +33,13 @@ class UserManagementController extends Controller
     {
         $this->authorizeAnyUserManagementAccess();
 
-        $roles = Role::withCount('users')->orderBy('name')->get();
+        $roles = Role::withCount('users')
+            ->orderBy('name')
+            ->get()
+            ->filter(fn(Role $role) => $this->canManageRoleAccounts($role))
+            ->values();
         $roleCounts = $roles->mapWithKeys(fn($role) => [$role->slug => $role->users_count]);
+        $visibleRoleIds = $roles->pluck('id')->all();
 
         $search = trim((string) $request->get('search', ''));
         $roleFilter = trim((string) $request->get('role', ''));
@@ -47,6 +53,12 @@ class UserManagementController extends Controller
         ) ? $perPageInput : 10;
 
         $query = User::with(['role', 'patient']);
+
+        if ($visibleRoleIds === []) {
+            $query->whereRaw('1 = 0');
+        } else {
+            $query->whereIn('role_id', $visibleRoleIds);
+        }
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
@@ -88,21 +100,29 @@ class UserManagementController extends Controller
 
         $notifications = collect([]);
 
-        $allUsersCount = User::count();
-        $adminCount = User::whereHas('role', function ($q) {
+        $countQuery = User::query();
+
+        if ($visibleRoleIds === []) {
+            $countQuery->whereRaw('1 = 0');
+        } else {
+            $countQuery->whereIn('role_id', $visibleRoleIds);
+        }
+
+        $allUsersCount = (clone $countQuery)->count();
+        $adminCount = (clone $countQuery)->whereHas('role', function ($q) {
             $q->where('slug', 'super_admin')->orWhere('name', 'super_admin');
         })->count();
 
-        $dentistCount = User::whereHas('role', function ($q) {
+        $dentistCount = (clone $countQuery)->whereHas('role', function ($q) {
             $q->where('slug', 'dentist')->orWhere('name', 'dentist');
         })->count();
 
-        $patientCount = User::whereHas('role', function ($q) {
+        $patientCount = (clone $countQuery)->whereHas('role', function ($q) {
             $q->where('slug', 'patient')->orWhere('name', 'patient');
         })->count();
 
-        $activeCount = User::where('status', 'active')->count();
-        $inactiveCount = User::where('status', 'inactive')->count();
+        $activeCount = (clone $countQuery)->where('status', 'active')->count();
+        $inactiveCount = (clone $countQuery)->where('status', 'inactive')->count();
 
         // AuditLogger::log(
         //     'view',
@@ -164,7 +184,7 @@ class UserManagementController extends Controller
 
     public function store(Request $request)
     {
-        $this->authorizeUserManagementAccess('manage_user_accounts');
+        $this->authorizeUserManagementAccess('create_users');
 
         $request->merge([
             'phone' => $this->normalizePhoneNumber($request->input('phone')),
@@ -186,6 +206,9 @@ class UserManagementController extends Controller
         $roleId = $this->resolveUserRoleId(
             $request->input('role_id')
         );
+
+        $role = Role::findOrFail($roleId);
+        $this->authorizeRoleAccountAccess($role);
 
         $request->merge([
             'role_id' => $roleId,
@@ -231,7 +254,8 @@ class UserManagementController extends Controller
     }
     public function update(Request $request, User $user)
     {
-        $this->authorizeUserManagementAccess('manage_user_accounts');
+        $this->authorizeUserManagementAccess('update_user_role');
+        $this->authorizeManagedUserAccount($user);
 
         $request->merge([
             'phone' => $this->normalizePhoneNumber($request->input('phone')),
@@ -262,6 +286,7 @@ class UserManagementController extends Controller
         );
 
         $newRole = Role::findOrFail($newRoleId);
+        $this->authorizeRoleAccountAccess($newRole);
         $roleChanged = (string) ($user->role_id ?? '') !== (string) ($newRoleId ?? '');
 
         if ($roleChanged) {
@@ -345,7 +370,7 @@ class UserManagementController extends Controller
 
     private function authorizeRoleChange(Request $request, User $user): void
     {
-        $this->authorizeUserManagementAccess('manage_user_roles');
+        $this->authorizeUserManagementAccess('update_user_role');
 
         $actor = Auth::user();
 
@@ -382,7 +407,8 @@ class UserManagementController extends Controller
 
     public function resetPassword(Request $request, User $user)
     {
-        $this->authorizeUserManagementAccess('manage_user_accounts');
+        $this->authorizeUserManagementAccess('update_user_password');
+        $this->authorizeManagedUserAccount($user);
 
         $request->validate([
             'password' => 'required|min:8|confirmed',
@@ -415,7 +441,8 @@ class UserManagementController extends Controller
 
     public function toggleStatus(User $user)
     {
-        $this->authorizeUserManagementAccess('manage_user_accounts');
+        $this->authorizeUserManagementAccess('disable_users');
+        $this->authorizeManagedUserAccount($user);
 
         $user->status = $user->status === 'active' ? 'inactive' : 'active';
         $user->save();
@@ -441,7 +468,7 @@ class UserManagementController extends Controller
 
     public function updatePatient(Request $request, Patient $patient)
     {
-        $this->authorizeUserManagementAccess('manage_user_accounts');
+        $this->authorizeUserManagementAccess('view_account_details');
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -459,7 +486,7 @@ class UserManagementController extends Controller
 
     public function resetPatientPassword(Request $request, Patient $patient)
     {
-        $this->authorizeUserManagementAccess('manage_user_accounts');
+        $this->authorizeUserManagementAccess('update_user_password');
 
         $request->validate([
             'password' => 'required|min:8|confirmed',
@@ -500,7 +527,7 @@ class UserManagementController extends Controller
 
     public function destroy(User $user)
     {
-        $this->authorizeUserManagementAccess('manage_user_accounts');
+        $this->authorizeManagedUserAccount($user);
 
         $email = $user->email;
 
@@ -542,6 +569,37 @@ class UserManagementController extends Controller
 
         abort_unless($user, 403);
         abort_unless($user->hasPermission($permission), 403, 'Unauthorized.');
+    }
+
+    private function authorizeManagedUserAccount(User $user): void
+    {
+        $role = $user->role;
+
+        abort_unless($role, 403, 'Unauthorized.');
+
+        $this->authorizeRoleAccountAccess($role);
+    }
+
+    private function authorizeRoleAccountAccess(Role $role): void
+    {
+        abort_unless($this->canManageRoleAccounts($role), 403, 'Unauthorized.');
+    }
+
+    private function canManageRoleAccounts(Role $role): bool
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return false;
+        }
+
+        $roleKey = strtolower((string) ($role->slug ?: $role->name));
+
+        return match ($roleKey) {
+            'patient' => $user->hasAnyPermission(['view_account_details', 'create_users', 'disable_users', 'update_user_role', 'update_user_password']),
+            'dentist' => $user->hasAnyPermission(['view_account_details', 'create_users', 'disable_users', 'update_user_role', 'update_user_password']),
+            default => $user->hasAnyPermission(['update_user_role', 'update_user_password']),
+        };
     }
 
     private function routeName(string $action): string

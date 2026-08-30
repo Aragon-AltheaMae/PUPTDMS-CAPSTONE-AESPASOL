@@ -6,11 +6,13 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class AdminAppointmentController extends Controller
 {
     public function index(Request $request)
     {
+        $user = Auth::user();
         $today = Carbon::today()->toDateString();
 
         $appointments = Appointment::with([
@@ -82,9 +84,9 @@ class AdminAppointmentController extends Controller
             'isDentistView' => false,
 
             'canStartProcedure' => false,
-            'canRescheduleAppointment' => false,
-            'canCancelAppointment' => false,
-            'canViewTreatmentRecord' => false,
+            'canRescheduleAppointment' => $user?->hasPermission('reschedule_appointments') ?? false,
+            'canCancelAppointment' => $user?->hasPermission('cancel_appointments') ?? false,
+            'canViewTreatmentRecord' => $user?->hasPermission('view_dental_records') ?? false,
             'canScheduleFollowUp' => false,
 
             'patientProfileRouteName' => 'admin.admin.patient.profile',

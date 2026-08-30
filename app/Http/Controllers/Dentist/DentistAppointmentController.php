@@ -73,6 +73,7 @@ class DentistAppointmentController extends Controller
 
     public function index(Request $request)
     {
+        $user = Auth::user();
 
         $activeRole = session('impersonated_role') ?: session('role');
 
@@ -178,11 +179,11 @@ class DentistAppointmentController extends Controller
 
             'isDentistView' => true,
 
-            'canStartProcedure' => true,
-            'canRescheduleAppointment' => true,
-            'canCancelAppointment' => true,
-            'canViewTreatmentRecord' => true,
-            'canScheduleFollowUp' => true,
+            'canStartProcedure' => $user?->hasPermission('create_procedure_records') ?? false,
+            'canRescheduleAppointment' => $user?->hasPermission('reschedule_appointments') ?? false,
+            'canCancelAppointment' => $user?->hasPermission('cancel_appointments') ?? false,
+            'canViewTreatmentRecord' => $user?->hasPermission('view_dental_records') ?? false,
+            'canScheduleFollowUp' => false,
 
             'patientProfileRouteName' => 'dentist.dentist.patient.profile',
 

@@ -84,7 +84,17 @@ class AcademicPeriodController extends Controller
             'calendarPeriods',
             'activePeriod',
             'holidays'
-        ));
+        ) + [
+            'layoutRole' => $this->resolveLayoutRole(),
+            'routeNames' => [
+                'index' => $this->routeName('index'),
+                'store' => $this->routeName('store'),
+                'update' => $this->routeName('update'),
+                'destroy' => $this->routeName('destroy'),
+                'set_active' => $this->routeName('set_active'),
+                'sync_flss' => $this->routeName('sync_flss'),
+            ],
+        ]);
     }
 
     public function store(Request $request)
@@ -125,7 +135,7 @@ class AcademicPeriodController extends Controller
         );
 
         return redirect()
-            ->route('admin.academic_periods')
+            ->route($this->routeName('index'))
             ->with('success', 'Academic period added successfully.');
     }
 
@@ -168,7 +178,7 @@ class AcademicPeriodController extends Controller
         );
 
         return redirect()
-            ->route('admin.academic_periods')
+            ->route($this->routeName('index'))
             ->with('success', 'Academic period updated successfully.');
     }
 
@@ -182,7 +192,7 @@ class AcademicPeriodController extends Controller
             "Admin deleted academic period ID {$academicPeriod->id}"
         );
         return redirect()
-            ->route('admin.academic_periods')
+            ->route($this->routeName('index'))
             ->with('success', 'Academic period deleted successfully.');
     }
 
@@ -195,7 +205,7 @@ class AcademicPeriodController extends Controller
         ]);
 
         return redirect()
-            ->route('admin.academic_periods')
+            ->route($this->routeName('index'))
             ->with('success', 'Academic period set as active successfully.');
     }
 
@@ -306,7 +316,7 @@ class AcademicPeriodController extends Controller
             }
 
             return redirect()
-                ->route('admin.academic_periods')
+                ->route($this->routeName('index'))
                 ->with(
                     $alreadySynced ? 'info' : 'success',
                     $message
@@ -326,9 +336,37 @@ class AcademicPeriodController extends Controller
             }
 
             return redirect()
-                ->route('admin.academic_periods')
+                ->route($this->routeName('index'))
                 ->with('error', $message);
         }
+    }
+
+    private function resolveLayoutRole(): string
+    {
+        return request()->routeIs('dentist.academic_periods*') ? 'dentist' : 'admin';
+    }
+
+    private function routeName(string $action): string
+    {
+        if (request()->routeIs('dentist.academic_periods*')) {
+            return match ($action) {
+                'index' => 'dentist.academic_periods',
+                'store' => 'dentist.academic_periods.store',
+                'update' => 'dentist.academic_periods.update',
+                'destroy' => 'dentist.academic_periods.destroy',
+                'set_active' => 'dentist.academic_periods.set_active',
+                'sync_flss' => 'dentist.academic_periods.sync_flss',
+            };
+        }
+
+        return match ($action) {
+            'index' => 'admin.academic_periods',
+            'store' => 'admin.academic_periods.store',
+            'update' => 'admin.academic_periods.update',
+            'destroy' => 'admin.academic_periods.destroy',
+            'set_active' => 'admin.academic_periods.set_active',
+            'sync_flss' => 'admin.academic_periods.sync_flss',
+        };
     }
     
     private function ensureAcademicPeriodIsUnique(

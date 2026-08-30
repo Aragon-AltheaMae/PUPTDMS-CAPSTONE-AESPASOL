@@ -162,14 +162,14 @@
         @include('partials.impersonation-banner')
     @endif
 
-    @if ($isDentist)
+    @if ($isDentist || ($isAdmin && View::hasSection('usesAppointmentCalendar')))
         @include('partials.impersonation-banner')
         @include('components.reschedule-modal')
         @include('components.cancel-modal')
         @include('components.patient-record-modal')
     @endif
 
-    @if ($isAdmin)
+    @if ($isAdmin && !View::hasSection('usesAppointmentCalendar'))
         @include('components.patient-record-modal')
     @endif
 
@@ -244,7 +244,7 @@
 
     @include('partials.terms-modal')
 
-    @if ($isDentist && View::hasSection('usesAppointmentCalendar'))
+    @if (($isDentist || $isAdmin) && View::hasSection('usesAppointmentCalendar'))
         @include('components.appointment-calendar-script', [
             'mode' => 'booking',
             'calendarContainerId' => 'calGridWrapReschedule',
@@ -264,6 +264,7 @@
             'datePillId' => 'datePill',
             'dateErrorId' => 'dateError',
             'timeErrorId' => 'timeError',
+            'clearSlotButtonId' => 'clearSlotSelectionBtn',
             'calendarWrapSelector' => '#rescheduleModal .cal-wrap',
             'slotsWrapSelector' => '#rescheduleModal .slots-wrap',
             'slotEndpoint' => route('dentist.appointment.slots'),
@@ -283,6 +284,7 @@
             'useDynamicScheduleRules' => true,
             'renderStyle' => 'dentist',
         ])
+
     @endif
 
     @if ($isPatient && !$hideMobileNav && !$hidePatientModals)

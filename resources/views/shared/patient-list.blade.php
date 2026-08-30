@@ -13,6 +13,13 @@
 @php
 $notifications = collect($notifications ?? []);
 $notifCount = $notifications->count();
+$isBookingMode = $bookingMode ?? request()->routeIs('admin.book_appointments.*');
+$pageHeading = $isDentistView
+    ? 'Patient Directory'
+    : ($pageTitle ?? ($isBookingMode ? 'Select Patient for Booking' : 'Patient List'));
+$pageSubtitle = $isBookingMode
+    ? 'Choose a patient first, then continue to the appointment form.'
+    : 'Review patient records and open their profiles.';
 @endphp
 
 <main id="mainContent" class="{{ $pageShellClass }}
@@ -47,7 +54,7 @@ $notifCount = $notifications->count();
                     </div>
 
                     <h2 class="dentist-hero-title">
-                        Patient Directory
+                        {{ $pageHeading }}
                     </h2>
 
                     <div class="page-summary patient-hero-summary">
@@ -91,7 +98,19 @@ $notifCount = $notifications->count();
         <div class="page-banner mt-2 mb-6">
             <div class="page-banner-inner">
                 <div>
-                    <h1 class="page-title">Patient List</h1>
+                    <h1 class="page-title">{{ $pageHeading }}</h1>
+                    <p class="mt-2 text-sm font-medium text-white/85">
+                        {{ $pageSubtitle }}
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-3 flex-shrink-0">
+                    <span class="page-badge">
+                        <span class="page-badge-dot"></span>
+
+                        {{ $allCount }}
+                        {{ \Illuminate\Support\Str::plural($isBookingMode ? 'patient' : 'record', $allCount) }}
+                    </span>
                 </div>
             </div>
         </div>
@@ -105,58 +124,57 @@ $notifCount = $notifications->count();
 
                     @php
                     $patientStatusOptions = [
-                    [
-                    'value' => 'all',
-                    'label' => 'All Patients',
-                    'icon' => 'fa-users',
-                    'tone' => 'status-all',
-                    'count' => $allCount ?? 0,
-                    ],
-                    [
-                    'value' => 'today',
-                    'label' => 'Today',
-                    'icon' => 'fa-clock',
-                    'tone' => 'status-today',
-                    'count' => $todayCount ?? 0,
-                    ],
-                    [
-                    'value' => 'upcoming',
-                    'label' => 'Upcoming',
-                    'icon' => 'fa-calendar-check',
-                    'tone' => 'status-upcoming',
-                    'count' => $upcomingCount ?? 0,
-                    ],
-                    [
-                    'value' => 'rescheduled',
-                    'label' => 'Rescheduled',
-                    'icon' => 'fa-calendar-plus',
-                    'tone' => 'status-rescheduled',
-                    'count' => $rescheduledCount ?? 0,
-                    ],
-                    [
-                    'value' => 'completed',
-                    'label' => 'Completed',
-                    'icon' => 'fa-check-double',
-                    'tone' => 'status-completed',
-                    'count' => $completedCount ?? 0,
-                    ],
-                    [
-                    'value' => 'cancelled',
-                    'label' => 'Cancelled',
-                    'icon' => 'fa-calendar-xmark',
-                    'tone' => 'status-cancelled',
-                    'count' => $cancelledCount ?? 0,
-                    ],
+                        [
+                            'value' => 'all',
+                            'label' => 'All Patients',
+                            'icon' => 'fa-users',
+                            'tone' => 'status-all',
+                            'count' => $allCount ?? 0,
+                        ],
+                        [
+                            'value' => 'today',
+                            'label' => 'Today',
+                            'icon' => 'fa-clock',
+                            'tone' => 'status-today',
+                            'count' => $todayCount ?? 0,
+                        ],
+                        [
+                            'value' => 'upcoming',
+                            'label' => 'Upcoming',
+                            'icon' => 'fa-calendar-check',
+                            'tone' => 'status-upcoming',
+                            'count' => $upcomingCount ?? 0,
+                        ],
+                        [
+                            'value' => 'rescheduled',
+                            'label' => 'Rescheduled',
+                            'icon' => 'fa-calendar-plus',
+                            'tone' => 'status-rescheduled',
+                            'count' => $rescheduledCount ?? 0,
+                        ],
+                        [
+                            'value' => 'completed',
+                            'label' => 'Completed',
+                            'icon' => 'fa-check-double',
+                            'tone' => 'status-completed',
+                            'count' => $completedCount ?? 0,
+                        ],
+                        [
+                            'value' => 'cancelled',
+                            'label' => 'Cancelled',
+                            'icon' => 'fa-calendar-xmark',
+                            'tone' => 'status-cancelled',
+                            'count' => $cancelledCount ?? 0,
+                        ],
                     ];
                     @endphp
 
                     <div class="patient-table-toolbar px-4 md:px-6 py-3.5 border-b border-gray-100">
-
                         <div class="patient-toolbar-main">
-
                             <div class="patient-search-wrap">
                                 <div class="patient-search-row voice-search-row">
-                                    <x-search-bar id="searchInput" placeholder="Search patient"
+                                    <x-search-bar id="searchInput"
+                                        :placeholder="$isBookingMode ? 'Search patient to book' : 'Search patient'"
                                         callback="handlePatientDirectorySearch" :debounce="250" class="flex-1" />
 
                                     <x-voice-input target="#searchInput" status-id="patientSearchVoiceStatus"
@@ -165,7 +183,6 @@ $notifCount = $notifications->count();
                             </div>
 
                             <div class="patient-toolbar-actions">
-
                                 <div class="patient-sort-row">
                                     <x-filter-select id="patientStatusFilter" name="patient_status" label="Status"
                                         value="all" :options="$patientStatusOptions"
@@ -176,9 +193,7 @@ $notifCount = $notifications->count();
                                     <button id="filterBtn" type="button" class="global-filter-btn"
                                         aria-label="Filter patients" data-tooltip="Filter" data-tooltip-tone="neutral">
                                         <i class="fa-solid fa-sliders"></i>
-
                                         <span>Filter</span>
-
                                         <span id="filterBadge" class="filter-badge" style="display:none;"></span>
                                     </button>
                                 </div>
@@ -193,11 +208,9 @@ $notifCount = $notifications->count();
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="table-summary-count">
-                        <span id="rowCount">
-                            0 patients
-                        </span>
+                        <span id="rowCount">0 patients</span>
                     </div>
 
                     <x-pagination-bar id="patientPaginationTopBar" info-id="patientPageInfoTop"

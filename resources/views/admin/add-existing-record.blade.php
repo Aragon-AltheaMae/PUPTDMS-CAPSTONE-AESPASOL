@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('layout-role', 'dentist')
+@section('layout-role', 'admin')
 
 @section('title', 'Add Existing Record')
 
@@ -9,7 +9,7 @@
 @endsection
 
 @section('content')
-<main id="mainContent" class="app-page-shell existing-record-page page-enter">
+<main id="mainContent" class="dentist-page-shell existing-record-page page-enter">
     <div class="w-full">
         <div class="dentist-hero page-title-row mb-6">
             <div class="dentist-hero-content">
@@ -91,7 +91,7 @@
         const input = document.getElementById('patientSearchInput');
         const patientGrid = document.getElementById('patientGrid');
         const searchEndpoint = @json(route('dentist.walk-in.search-patient'));
-        const recordUrlTemplate = @json(route('dentist.odontogram.existing-appointment.create', ['patient' => '__PATIENT__']));
+        const recordUrlTemplate = @json(route('admin.odontogram.existing-appointment.create', ['patient' => '__PATIENT__']));
 
     let activeRequestId = 0;
     let patientCurrentPage = 1;

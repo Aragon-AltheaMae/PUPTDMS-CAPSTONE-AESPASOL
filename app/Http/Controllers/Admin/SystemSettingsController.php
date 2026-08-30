@@ -10,6 +10,13 @@ use Illuminate\Validation\Rule;
 
 class SystemSettingsController extends Controller
 {
+    private const GROUP_PERMISSIONS = [
+        'general' => ['manage_system_settings'],
+        'clinic' => ['manage_audit_trail'],
+        'notifications' => ['set_notification_rules'],
+        'backup' => ['manage_audit_trail'],
+    ];
+
     private const BOOLEAN_KEYS = [
         'maintenance_mode',
         'debug_mode',
@@ -97,14 +104,24 @@ class SystemSettingsController extends Controller
             'notifications' => $notifications,
             'layoutRole' => $this->resolveLayoutRole(),
             'updateRoute' => $this->routeName('update'),
+            'allowedSettingGroups' => $this->allowedSettingGroups(),
         ]);
     }
 
     public function update(Request $request)
     {
         $validated = $request->validate($this->rules(), $this->messages());
+        $allowedGroups = $this->allowedSettingGroups();
 
         foreach (self::ALLOWED_GROUPS as $group => $keys) {
+            if (!in_array($group, $allowedGroups, true) && $this->requestTouchesAnySetting($request, $keys)) {
+                abort(403, 'You do not have permission to update this settings group.');
+            }
+
+            if (!in_array($group, $allowedGroups, true)) {
+                continue;
+            }
+
             foreach ($keys as $key) {
                 $value = $this->resolveValue($request, $validated, $key);
 
@@ -126,6 +143,40 @@ class SystemSettingsController extends Controller
     private function resolveLayoutRole(): string
     {
         return request()->routeIs('dentist.system_settings*') ? 'dentist' : 'admin';
+    }
+
+    private function allowedSettingGroups(): array
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return [];
+        }
+
+        return collect(self::GROUP_PERMISSIONS)
+            ->filter(function (array $permissions): bool {
+                foreach ($permissions as $permission) {
+                    if (auth()->user()?->hasPermission($permission)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            })
+            ->keys()
+            ->values()
+            ->all();
+    }
+
+    private function requestTouchesAnySetting(Request $request, array $keys): bool
+    {
+        foreach ($keys as $key) {
+            if ($request->has($key)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function routeName(string $action): string

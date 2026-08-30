@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('layout-role', 'dentist')
+@section('layout-role', $layoutRole ?? 'dentist')
 
 @section('hide-sidebar')
 @endsection
@@ -22,7 +22,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 @section('content')
 <main id="mainContent" class="booking-page page-enter">
     <div class="booking-page-inner">
-        <x-booking.workflow-header :back-url="route('dentist.dentist.patient.profile', ['patient' => $patient->id])"
+        <x-booking.workflow-header :back-url="$backUrl ?? route('dentist.dentist.patient.profile', ['patient' => $patient->id])"
             back-label="Back to Patient Profile" form-target="#existingAppointmentForm"
             icon="fa-solid fa-file-circle-plus" title="Add Existing Appointment"
             subtitle="Encode the completed appointment details before continuing to the odontogram."
@@ -33,8 +33,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
             <div class="booking-workflow-card">
                 <div>
                     <form id="existingAppointmentForm" method="POST"
-                        action="{{ route('dentist.odontogram.existing-appointment.intake.store', ['patient' => $patient->id]) }}"
-                        data-history-autosave-url="{{ route('dentist.odontogram.existing-appointment.history.autosave', ['patient' => $patient->id]) }}"
+                        action="{{ $storeIntakeUrl ?? route('dentist.odontogram.existing-appointment.intake.store', ['patient' => $patient->id]) }}"
+                        data-history-autosave-url="{{ $historyAutosaveUrl ?? route('dentist.odontogram.existing-appointment.history.autosave', ['patient' => $patient->id]) }}"
                         data-global-selects data-global-validation data-discard-form
                         data-discard-title="Discard existing appointment?"
                         data-discard-subtitle="You have unsaved appointment information."
@@ -278,7 +278,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 'slotContainerId' => 'slotContainer',
 'selectedSlotDisplayId' => 'selectedSlotDisplay',
 'selectedSlotTextId' => 'selectedSlotText',
-'slotEndpoint' => route('dentist.odontogram.existing-appointment.slots'),
+'slotEndpoint' => $slotEndpoint ?? route('dentist.odontogram.existing-appointment.slots'),
 'scheduleRules' => $schedules ?? [],
 'blockedDates' => $blockedDates ?? [],
 'appointmentCountsPerDay' => $appointmentCountsPerDay ?? [],

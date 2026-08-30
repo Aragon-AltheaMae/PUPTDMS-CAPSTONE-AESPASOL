@@ -5,6 +5,7 @@
 @section('title', 'AI Generated Report')
 
 @section('styles')
+    @php($routePrefix = request()->routeIs('dentist.*') ? 'dentist' : 'admin')
     @vite('resources/css/pages/admin/ai-generated-report.css')
 @endsection
 
@@ -34,7 +35,7 @@
                         </div>
 
                         <div class="air-banner-actions">
-                            <a href="{{ route('admin.reports') }}" class="ui-btn ui-btn-secondary">
+                            <a href="{{ route($routePrefix . '.reports') }}" class="ui-btn ui-btn-secondary">
 
                                 <i class="fa-solid fa-arrow-left"></i>
                                 Back to reports

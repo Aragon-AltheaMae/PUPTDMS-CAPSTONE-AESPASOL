@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('layout-role', 'admin')
+@section('layout-role', $layoutRole ?? 'admin')
 
 @section('title', 'System Logs')
 
@@ -14,6 +14,10 @@
         $logs = $logs ?? collect([]);
         $perPage = $perPage ?? 10;
         $status = $status ?? 'active';
+        $authUser = auth()->user();
+        $canViewSystemLogs = $authUser?->hasPermission('view_system_logs') ?? false;
+        $canExportSystemLogs = $authUser?->hasPermission('export_system_logs') ?? false;
+        $canArchiveSystemLogs = $authUser?->hasPermission('archive_system_logs') ?? false;
     @endphp
 
     <main id="mainContent" class="app-page-shell system-logs-page page-enter mode-list">
@@ -1105,8 +1109,26 @@
         var slExportActionInput = null;
         var slExportConfirmBtn = null;
         var perPageSelect = null;
+        const CAN_VIEW_SYSTEM_LOGS = @json($canViewSystemLogs);
+        const CAN_EXPORT_SYSTEM_LOGS = @json($canExportSystemLogs);
+        const CAN_ARCHIVE_SYSTEM_LOGS = @json($canArchiveSystemLogs);
+
+        function showSystemLogsUnauthorized(actionLabel) {
+            window.showToast?.({
+                type: 'error',
+                title: 'Unauthorized',
+                message: actionLabel ?
+                    `You do not have permission to ${actionLabel}.` :
+                    'You do not have permission to perform this action.'
+            });
+        }
 
         async function exportSystemLogsPdf(exportOptions = {}) {
+            if (!CAN_EXPORT_SYSTEM_LOGS) {
+                showSystemLogsUnauthorized('export system logs');
+                return;
+            }
+
             const button =
                 document.getElementById(
                     'slExportBtn'
@@ -1132,7 +1154,7 @@
                 });
 
             const endpoint =
-                @json(route('admin.system_logs.export'));
+                @json(route($routeNames['export'] ?? 'admin.system_logs.export'));
 
             const url =
                 endpoint +
@@ -1332,6 +1354,11 @@
         }
 
         function handleSlExportButtonClick() {
+            if (!CAN_EXPORT_SYSTEM_LOGS) {
+                showSystemLogsUnauthorized('export system logs');
+                return;
+            }
+
             try {
                 openSlExportModal();
             } catch (error) {
@@ -1352,6 +1379,11 @@
             handleSlExportButtonClick;
 
         function openSlExportModal() {
+            if (!CAN_EXPORT_SYSTEM_LOGS) {
+                showSystemLogsUnauthorized('export system logs');
+                return;
+            }
+
             const modal =
                 document.getElementById(
                     'slExportModal'
@@ -1525,6 +1557,11 @@
         }
 
         async function submitSlExportModal() {
+            if (!CAN_EXPORT_SYSTEM_LOGS) {
+                showSystemLogsUnauthorized('export system logs');
+                return;
+            }
+
             const role =
                 slExportRoleInput?.value || '';
 
@@ -1811,7 +1848,7 @@
                 window.initGlobalRefreshWatcher?.({
                     key: 'system-logs',
 
-                    url: @json(route('admin.system_logs.check')) +
+                    url: @json(route($routeNames['check'] ?? 'admin.system_logs.check')) +
                         '?status=active',
 
                     interval: 5000,
@@ -1878,7 +1915,7 @@
                 try {
                     const response =
                         await fetch(
-                            @json(route('admin.system_logs.check')) +
+                            @json(route($routeNames['check'] ?? 'admin.system_logs.check')) +
                             '?status=active', {
                                 cache: 'no-store',
 
@@ -1929,6 +1966,11 @@
 
             window.handleSystemLogsSearch =
                 function(value) {
+                    if (!CAN_VIEW_SYSTEM_LOGS) {
+                        showSystemLogsUnauthorized('view system logs');
+                        return;
+                    }
+
                     const query =
                         String(value || '')
                         .trim();
@@ -1942,6 +1984,11 @@
                 };
 
             function openSlArchiveModal() {
+                if (!CAN_ARCHIVE_SYSTEM_LOGS) {
+                    showSystemLogsUnauthorized('archive system logs');
+                    return;
+                }
+
                 if (slState.status === "archived") {
                     window.showToast?.({
                         type: 'warning',
@@ -2067,6 +2114,11 @@
             }
 
             function submitSlArchiveModal() {
+                if (!CAN_ARCHIVE_SYSTEM_LOGS) {
+                    showSystemLogsUnauthorized('archive system logs');
+                    return;
+                }
+
                 var olderThanDays = Number(slArchiveDaysInput?.value || '');
 
                 if (
@@ -2119,7 +2171,7 @@
                         archiveForm
                     );
 
-                fetch('{{ route('admin.system_logs.archive') }}', {
+                fetch('{{ route($routeNames['archive'] ?? 'admin.system_logs.archive') }}', {
                         method: 'POST',
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest',
@@ -2699,7 +2751,7 @@
 
                     slDraftCountController = new AbortController();
 
-                    fetch('{{ route('admin.system_logs') }}?' + getSlDraftFilterParams().toString(), {
+                    fetch('{{ route($routeNames['index'] ?? 'admin.system_logs') }}?' + getSlDraftFilterParams().toString(), {
                             headers: {
                                 'X-Requested-With': 'XMLHttpRequest',
                                 'Accept': 'application/json',
@@ -2761,7 +2813,7 @@
                 try {
                     const response =
                         await fetch(
-                            @json(route('admin.system_logs.check')) +
+                            @json(route($routeNames['check'] ?? 'admin.system_logs.check')) +
                             '?status=active', {
                                 cache: 'no-store',
 
@@ -2840,7 +2892,7 @@
                 );
 
                 return fetch(
-                        '{{ route('admin.system_logs') }}?' +
+                        '{{ route($routeNames['index'] ?? 'admin.system_logs') }}?' +
                         params.toString(), {
                             headers: {
                                 'X-Requested-With': 'XMLHttpRequest',

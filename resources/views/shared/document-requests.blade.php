@@ -2697,7 +2697,10 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                 const contentType = res.headers.get('content-type') || '';
 
                 if (!res.ok) {
-                    let message = `Approval failed. Status: ${res.status}`;
+                    let message =
+                        res.status === 403
+                            ? 'Unauthorized.'
+                            : `Approval failed. Status: ${res.status}`;
 
                     if (contentType.includes('application/json')) {
                         const data = await res.json().catch(() => ({}));

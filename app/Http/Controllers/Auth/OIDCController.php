@@ -533,12 +533,18 @@ class OIDCController extends Controller
         foreach (
             [
                 'access_dentist_dashboard' => 'dentist.dentist.dashboard',
-                'manage_appointments' => 'dentist.dentist.appointments',
-                'manage_clinic_schedule' => 'dentist.dentist.clinic_schedule',
-                'manage_patient_profiles' => 'dentist.dentist.patients',
-                'manage_document_requests' => 'dentist.dentist.documentrequests',
-                'manage_inventory' => 'dentist.dentist.inventory',
-                'manage_reports' => 'dentist.dentist.report',
+                'view_appointments' => 'dentist.dentist.appointments',
+                'manage_walk_in_patients' => 'dentist.walk-in.index',
+                'manage_existing_records' => 'dentist.existing-record.index',
+                'view_clinic_schedule' => 'dentist.dentist.clinic_schedule',
+                'view_patient_profiles' => 'dentist.dentist.patients',
+                'view_document_requests' => 'dentist.dentist.documentrequests',
+                'view_inventory' => 'dentist.dentist.inventory',
+                'add_inventory' => 'dentist.dentist.inventory',
+                'update_inventory' => 'dentist.dentist.inventory',
+                'delete_inventory' => 'dentist.dentist.inventory',
+                'view_reports' => 'dentist.dentist.report',
+                'create_report_files' => 'dentist.dentist.report',
             ] as $permission => $route
         ) {
             if ($user->hasPermission($permission)) {

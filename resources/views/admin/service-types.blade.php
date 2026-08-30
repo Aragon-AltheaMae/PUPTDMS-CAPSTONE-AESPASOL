@@ -10,6 +10,15 @@
 
 @section('content')
 
+@php
+    $routePrefix = request()->routeIs('dentist.*') ? 'dentist' : 'admin';
+    $authUser = auth()->user();
+    $canViewServiceTypes = $authUser?->hasPermission('view_service_type') ?? false;
+    $canCreateServiceType = $authUser?->hasPermission('create_service_type') ?? false;
+    $canUpdateServiceType = $authUser?->hasPermission('update_default_service_type') ?? false;
+    $canDeleteServiceType = $authUser?->hasPermission('delete_service_type') ?? false;
+@endphp
+
 <main id="mainContent" class="app-page-shell page-enter mode-list">
 
     <div class="page-banner">
@@ -41,7 +50,7 @@
                         </div>
 
                         <div class="admin-card-pad">
-                            <form id="addServiceForm" method="POST" action="{{ route('admin.service-types.store') }}"
+                            <form id="addServiceForm" method="POST" action="{{ route($routePrefix . '.service-types.store') }}"
                                 data-global-validation novalidate>
                                 @csrf
 
@@ -212,14 +221,16 @@
 
                                             <td class="table-cell-center table-action-cell">
                                                 <div class="ui-action-group">
+                                                    @if ($canUpdateServiceType)
                                                     <button type="button" class="ui-action-btn ui-action-edit"
                                                         data-tooltip="Manage service" data-tooltip-tone="edit"
                                                         aria-label="Manage {{ $service->name }}"
                                                         data-service-action="edit" data-service-id="{{ $service->id }}">
                                                         <i class="fa-solid fa-pen"></i>
                                                     </button>
+                                                    @endif
 
-                                                    @unless ($service->is_default)
+                                                    @if ($canDeleteServiceType && !$service->is_default)
                                                     <button type="button" class="ui-action-btn ui-action-delete"
                                                         data-tooltip="Delete service"
                                                         aria-label="Delete {{ $service->name }}"
@@ -227,14 +238,16 @@
                                                         data-service-id="{{ $service->id }}">
                                                         <i class="fa-solid fa-trash"></i>
                                                     </button>
-                                                    @endunless
+                                                    @endif
 
+                                                    @if ($canViewServiceTypes)
                                                     <button type="button" class="ui-action-btn ui-action-view"
                                                         data-tooltip="View details"
                                                         aria-label="View {{ $service->name }} details"
                                                         data-service-action="view" data-service-id="{{ $service->id }}">
                                                         <i class="fa-solid fa-eye"></i>
                                                     </button>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
@@ -309,29 +322,33 @@
 
                                         <div class="service-grid-footer">
                                             <div class="ui-action-group">
+                                                @if ($canUpdateServiceType)
                                                 <button type="button" class="ui-action-btn ui-action-edit"
                                                     data-tooltip="Manage service" data-tooltip-tone="edit"
                                                     aria-label="Manage {{ $service->name }}" data-service-action="edit"
                                                     data-service-id="{{ $service->id }}">
                                                     <i class="fa-solid fa-pen"></i>
                                                 </button>
+                                                @endif
 
-                                                @unless ($service->is_default)
+                                                @if ($canDeleteServiceType && !$service->is_default)
                                                 <button type="button" class="ui-action-btn ui-action-delete"
                                                     data-tooltip="Delete service"
                                                     aria-label="Delete {{ $service->name }}"
                                                     data-service-action="delete" data-service-id="{{ $service->id }}">
                                                     <i class="fa-solid fa-trash"></i>
                                                 </button>
-                                                @endunless
+                                                @endif
                                             </div>
 
+                                            @if ($canViewServiceTypes)
                                             <button type="button" class="ui-action-btn ui-action-view"
                                                 data-tooltip="View details"
                                                 aria-label="View {{ $service->name }} details"
                                                 data-service-action="view" data-service-id="{{ $service->id }}">
                                                 <i class="fa-solid fa-eye"></i>
                                             </button>
+                                            @endif
                                         </div>
                                     </div>
                                 </article>
@@ -347,8 +364,10 @@
         </div>
 </main>
 
+@if ($canDeleteServiceType)
 <x-delete-confirm-modal id="deleteServiceModal" form-id="deleteServiceForm" name-id="deleteServiceName"
     title="Delete Service Type" helper="This service type will be permanently removed." />
+@endif
 
 <div class="ui-modal modal-theme-edit" id="manageServiceModal" aria-hidden="true">
     <form id="manageServiceForm" method="POST" class="ui-modal-card modal-lg" role="dialog" aria-modal="true"
@@ -646,8 +665,8 @@ return [
 ->values()
 ->toArray();
 
-$serviceTypeUpdateRoute = route('admin.service-types.update', 0);
-$serviceTypeDestroyRoute = route('admin.service-types.destroy', 0);
+$serviceTypeUpdateRoute = route($routePrefix . '.service-types.update', 0);
+$serviceTypeDestroyRoute = route($routePrefix . '.service-types.destroy', 0);
 
 $serviceTypeRoutes = [
 'update' => preg_replace('/0$/', '__SERVICE_ID__', $serviceTypeUpdateRoute),
@@ -841,6 +860,11 @@ $serviceTypeRoutes = [
     };
 
     (() => {
+        const CAN_VIEW_SERVICE_TYPES = @json($canViewServiceTypes);
+        const CAN_CREATE_SERVICE_TYPE = @json($canCreateServiceType);
+        const CAN_UPDATE_SERVICE_TYPE = @json($canUpdateServiceType);
+        const CAN_DELETE_SERVICE_TYPE = @json($canDeleteServiceType);
+
         const initialServices = @json($serviceTypePayload);
 
         let serviceTypeServices = Array.isArray(initialServices) ? [...initialServices] : [];
@@ -892,8 +916,25 @@ $serviceTypeRoutes = [
         }
 
         function actionButtons(service) {
+            const editButton =
+                !CAN_UPDATE_SERVICE_TYPE
+                    ? ''
+                    : `
+                <button
+                    type="button"
+                    class="ui-action-btn ui-action-edit"
+                    data-tooltip="Manage service"
+                    data-tooltip-tone="edit"
+                    aria-label="Manage ${escapeHtml(service.name)}"
+                    data-service-action="edit"
+                    data-service-id="${service.id}"
+                >
+                    <i class="fa-solid fa-pen"></i>
+                </button>
+            `;
+
             const deleteButton =
-                service.is_default
+                !CAN_DELETE_SERVICE_TYPE || service.is_default
                     ? ''
                     : `
                 <button
@@ -908,21 +949,10 @@ $serviceTypeRoutes = [
                 </button>
             `;
 
-            return `
-        <button
-            type="button"
-            class="ui-action-btn ui-action-edit"
-            data-tooltip="Manage service"
-            data-tooltip-tone="edit"
-            aria-label="Manage ${escapeHtml(service.name)}"
-            data-service-action="edit"
-            data-service-id="${service.id}"
-        >
-            <i class="fa-solid fa-pen"></i>
-        </button>
-
-        ${deleteButton}
-
+            const viewButton =
+                !CAN_VIEW_SERVICE_TYPES
+                    ? ''
+                    : `
         <button
             type="button"
             class="ui-action-btn ui-action-view"
@@ -933,6 +963,12 @@ $serviceTypeRoutes = [
         >
             <i class="fa-solid fa-eye"></i>
         </button>
+    `;
+
+            return `
+        ${editButton}
+        ${deleteButton}
+        ${viewButton}
     `;
         }
 
@@ -1090,8 +1126,25 @@ $serviceTypeRoutes = [
         `
                                 : '';
 
+                        const editButton =
+                            !CAN_UPDATE_SERVICE_TYPE
+                                ? ''
+                                : `
+                            <button
+                                type="button"
+                                class="ui-action-btn ui-action-edit"
+                                data-tooltip="Manage service"
+                                data-tooltip-tone="edit"
+                                aria-label="Manage ${escapeHtml(service.name)}"
+                                data-service-action="edit"
+                                data-service-id="${service.id}"
+                            >
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                        `;
+
                         const deleteButton =
-                            service.is_default
+                            !CAN_DELETE_SERVICE_TYPE || service.is_default
                                 ? ''
                                 : `
                             <button
@@ -1110,6 +1163,22 @@ $serviceTypeRoutes = [
                             service.description
                                 ? escapeHtml(service.description)
                                 : 'No description provided.';
+
+                        const viewButton =
+                            !CAN_VIEW_SERVICE_TYPES
+                                ? ''
+                                : `
+                                <button
+                                    type="button"
+                                    class="ui-action-btn ui-action-view"
+                                    data-tooltip="View details"
+                                    aria-label="View ${escapeHtml(service.name)} details"
+                                    data-service-action="view"
+                                    data-service-id="${service.id}"
+                                >
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            `;
 
                         return `
                     <article
@@ -1155,31 +1224,11 @@ $serviceTypeRoutes = [
 
                             <div class="service-grid-footer">
                                 <div class="ui-action-group">
-                                    <button
-                                        type="button"
-                                        class="ui-action-btn ui-action-edit"
-                                        data-tooltip="Manage service"
-                                        data-tooltip-tone="edit"
-                                        aria-label="Manage ${escapeHtml(service.name)}"
-                                        data-service-action="edit"
-                                        data-service-id="${service.id}"
-                                    >
-                                        <i class="fa-solid fa-pen"></i>
-                                    </button>
-
+                                    ${editButton}
                                     ${deleteButton}
                                 </div>
 
-                                <button
-                                    type="button"
-                                    class="ui-action-btn ui-action-view"
-                                    data-tooltip="View details"
-                                    aria-label="View ${escapeHtml(service.name)} details"
-                                    data-service-action="view"
-                                    data-service-id="${service.id}"
-                                >
-                                    <i class="fa-solid fa-eye"></i>
-                                </button>
+                                ${viewButton}
                             </div>
                         </div>
                     </article>
@@ -1296,6 +1345,11 @@ $serviceTypeRoutes = [
         }
 
         window.openManageServiceById = function (id) {
+            if (!CAN_UPDATE_SERVICE_TYPE) {
+                showServiceToast('error', 'Access denied', 'You are not allowed to update service types.');
+                return;
+            }
+
             const service = serviceTypeServices.find((item) => Number(item.id) === Number(id));
 
             if (!service) {
@@ -1315,6 +1369,11 @@ $serviceTypeRoutes = [
         };
 
         window.openDeleteServiceById = function (id) {
+            if (!CAN_DELETE_SERVICE_TYPE) {
+                showServiceToast('error', 'Access denied', 'You are not allowed to delete service types.');
+                return;
+            }
+
             const service = serviceTypeServices.find((item) => Number(item.id) === Number(id));
 
             if (!service) {
@@ -1331,6 +1390,11 @@ $serviceTypeRoutes = [
             serviceName,
             serviceId = null
         ) {
+            if (!CAN_DELETE_SERVICE_TYPE) {
+                showServiceToast('error', 'Access denied', 'You are not allowed to delete service types.');
+                return;
+            }
+
             const form =
                 window.openDeleteConfirmModal?.({
                     modalId:
@@ -1366,6 +1430,10 @@ $serviceTypeRoutes = [
         window.openManageServiceModal = function (actionUrl, serviceName, serviceDescription,
             isActiveForBooking,
             isDefault, serviceId = null) {
+            if (!CAN_UPDATE_SERVICE_TYPE) {
+                showServiceToast('error', 'Access denied', 'You are not allowed to update service types.');
+                return;
+            }
 
             const form = document.getElementById('manageServiceForm');
             const nameInput = document.getElementById('manageServiceName');
@@ -1493,6 +1561,11 @@ $serviceTypeRoutes = [
                         return;
                     }
 
+                    if (!CAN_CREATE_SERVICE_TYPE) {
+                        showServiceToast('error', 'Access denied', 'You are not allowed to create service types.');
+                        return;
+                    }
+
                     const submitButton =
                         addForm.querySelector(
                             '[type="submit"]'
@@ -1590,6 +1663,11 @@ $serviceTypeRoutes = [
                         return;
                     }
 
+                    if (!CAN_UPDATE_SERVICE_TYPE) {
+                        showServiceToast('error', 'Access denied', 'You are not allowed to update service types.');
+                        return;
+                    }
+
                     const submitButton =
                         manageForm.querySelector(
                             '[type="submit"]'
@@ -1643,6 +1721,11 @@ $serviceTypeRoutes = [
                 'submit',
                 async event => {
                     event.preventDefault();
+
+                    if (!CAN_DELETE_SERVICE_TYPE) {
+                        showServiceToast('error', 'Access denied', 'You are not allowed to delete service types.');
+                        return;
+                    }
 
                     const submitButton =
                         deleteForm.querySelector(
@@ -1703,6 +1786,11 @@ $serviceTypeRoutes = [
                 button.dataset.serviceAction ===
                 'view'
             ) {
+                if (!CAN_VIEW_SERVICE_TYPES) {
+                    showServiceToast('error', 'Access denied', 'You are not allowed to view service details.');
+                    return;
+                }
+
                 const service =
                     serviceTypeServices.find(
                         item =>
