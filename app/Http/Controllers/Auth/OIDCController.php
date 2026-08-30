@@ -1050,17 +1050,46 @@ class OIDCController extends Controller
     protected function syncStudentMedicalHistory(Patient $patient, array $personalInfo): void
     {
         $emergencyPerson = $this->cleanStringValue(
-            $personalInfo['emergencyContactName'] ?? $personalInfo['emergency_contact_name'] ?? null
+            $personalInfo['emergencyContactName']
+                ?? $personalInfo['emergency_contact_name']
+                ?? data_get($personalInfo, 'emergencyContact.name')
+                ?? data_get($personalInfo, 'emergency_contact.name')
+                ?? data_get($personalInfo, 'emergency_contact.contact_name')
+                ?? data_get($personalInfo, 'emergencyContact.contactName')
+                ?? null
         );
         $emergencyNumber = $this->cleanStringValue(
-            $personalInfo['emergencyContactNumber'] ?? $personalInfo['emergency_contact_number'] ?? null
+            $personalInfo['emergencyContactNumber']
+                ?? $personalInfo['emergency_contact_number']
+                ?? data_get($personalInfo, 'emergencyContact.number')
+                ?? data_get($personalInfo, 'emergencyContact.contactNumber')
+                ?? data_get($personalInfo, 'emergency_contact.number')
+                ?? data_get($personalInfo, 'emergency_contact.contact_number')
+                ?? null
+        );
+        $emergencyRelation = $this->cleanStringValue(
+            $personalInfo['emergencyContactRelationship']
+                ?? $personalInfo['emergency_contact_relationship']
+                ?? $personalInfo['emergencyContactRelation']
+                ?? $personalInfo['emergency_contact_relation']
+                ?? data_get($personalInfo, 'emergencyContact.relationship')
+                ?? data_get($personalInfo, 'emergencyContact.relation')
+                ?? data_get($personalInfo, 'emergency_contact.relationship')
+                ?? data_get($personalInfo, 'emergency_contact.relation')
+                ?? data_get($personalInfo, 'emergency_contact.relationship_name')
+                ?? data_get($personalInfo, 'emergencyContact.relationshipName')
+                ?? data_get($personalInfo, 'emergencyContactRelationship.name')
+                ?? data_get($personalInfo, 'emergency_contact_relationship.name')
+                ?? null
         );
 
-        if (! $emergencyPerson && ! $emergencyNumber) {
+        if (! $emergencyPerson && ! $emergencyNumber && ! $emergencyRelation) {
             return;
         }
 
         $medicalHistory = MedicalHistory::firstOrNew(['patient_id' => $patient->id]);
+        $currentRelation = strtolower(trim((string) ($medicalHistory->emergency_relation ?? '')));
+        $hasPlaceholderRelation = in_array($currentRelation, ['', 'not specified', '(not specified)', 'n/a', 'na'], true);
 
         if ($emergencyPerson && empty($medicalHistory->emergency_person)) {
             $medicalHistory->emergency_person = $emergencyPerson;
@@ -1068,6 +1097,10 @@ class OIDCController extends Controller
 
         if ($emergencyNumber && empty($medicalHistory->emergency_number)) {
             $medicalHistory->emergency_number = $emergencyNumber;
+        }
+
+        if ($emergencyRelation && $hasPlaceholderRelation) {
+            $medicalHistory->emergency_relation = $emergencyRelation;
         }
 
         if (! $medicalHistory->exists && empty($medicalHistory->emergency_relation)) {

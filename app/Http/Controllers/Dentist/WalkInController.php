@@ -243,7 +243,7 @@ class WalkInController extends Controller
                 ->filter()
                 ->unique(
                     fn(array $patient) =>
-                    $this->resolvePatientIdentityKey(
+                    $this->getPatientIdentityKey(
                         $patient
                     )
                 )
@@ -672,7 +672,7 @@ class WalkInController extends Controller
                         ),
 
                         'avatar_url' =>
-                        $this->resolvePatientAvatarUrl(
+                        $this->getPatientAvatarUrl(
                             $patient,
                             $student['name']
                         ),
@@ -751,7 +751,7 @@ class WalkInController extends Controller
         return trim($normalized);
     }
 
-    private function resolvePatientIdentityKey(array $patient): string
+    private function getPatientIdentityKey(array $patient): string
     {
         $email = strtolower(trim((string) ($patient['email'] ?? '')));
 
@@ -846,19 +846,19 @@ class WalkInController extends Controller
             ->map(function (Patient $patient) {
                 $user = $patient->user;
 
-                $resolvedName = trim(collect([
+                $patientName = trim(collect([
                     $user?->first_name,
                     $user?->middle_name,
                     $user?->last_name,
                     $user?->suffix_name,
                 ])->filter(fn($value) => filled($value))->implode(' '));
 
-                if ($resolvedName === '') {
-                    $resolvedName = trim((string) ($user?->name ?? ''));
+                if ($patientName === '') {
+                    $patientName = trim((string) ($user?->name ?? ''));
                 }
 
-                if ($resolvedName === '') {
-                    $resolvedName = trim((string) ($patient->name ?? ''));
+                if ($patientName === '') {
+                    $patientName = trim((string) ($patient->name ?? ''));
                 }
 
                 $patientType = match ($patient->classification) {
@@ -874,8 +874,8 @@ class WalkInController extends Controller
                     $patient->id,
 
                     'name' =>
-                    $resolvedName !== ''
-                        ? $resolvedName
+                    $patientName !== ''
+                        ? $patientName
                         : 'Patient',
 
                     'gender' =>
@@ -912,9 +912,9 @@ class WalkInController extends Controller
                     $patient->is_pwd,
 
                     'avatar_url' =>
-                    $this->resolvePatientAvatarUrl(
+                    $this->getPatientAvatarUrl(
                         $patient,
-                        $resolvedName
+                        $patientName
                     ),
 
                     'record_url' =>
@@ -1074,7 +1074,7 @@ class WalkInController extends Controller
                     ),
 
                     'avatar_url' =>
-                    $this->resolvePatientAvatarUrl(
+                    $this->getPatientAvatarUrl(
                         $patient,
                         $patient->name
                     ),
@@ -1168,7 +1168,7 @@ class WalkInController extends Controller
                         : $patient->course_name,
                     'record_url' => route('dentist.odontogram.existing-appointment.create', ['patient' => $patient->id]),
                     'avatar_url' =>
-                    $this->resolvePatientAvatarUrl(
+                    $this->getPatientAvatarUrl(
                         $patient,
                         $patient->name
                     ),
@@ -1410,7 +1410,7 @@ class WalkInController extends Controller
                     'is_pwd' => (bool) $patient->is_pwd,
 
                     'avatar_url' =>
-                    $this->resolvePatientAvatarUrl(
+                    $this->getPatientAvatarUrl(
                         $patient,
                         $patient->name
                             ?? optional($patient->user)->name
@@ -2568,7 +2568,7 @@ class WalkInController extends Controller
         return $patient;
     }
 
-    private function resolvePatientAvatarUrl(
+    private function getPatientAvatarUrl(
         Patient $patient,
         ?string $displayName = null
     ): ?string {

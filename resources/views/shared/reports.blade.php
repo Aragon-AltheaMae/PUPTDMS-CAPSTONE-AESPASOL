@@ -1,34 +1,49 @@
 @extends('layouts.app')
 
 @php
-    $resolvedLayoutRole = $layoutRole ?? 'admin';
-    $resolvedIsDentistView = $isDentistView ?? $resolvedLayoutRole === 'dentist';
-    $resolvedPageShellClass = $pageShellClass ?? ($resolvedIsDentistView ? 'dentist-page-shell dentist-report-page' : 'admin-page-shell');
+    $currentLayoutRole = $layoutRole ?? 'admin';
+    $isDentistLayoutView = $isDentistView ?? $currentLayoutRole === 'dentist';
+    $currentPageShellClass = trim((string) ($pageShellClass ?? ''));
+
+    if ($currentPageShellClass === '') {
+        $currentPageShellClass = $isDentistLayoutView
+            ? 'app-page-shell dentist-report-page'
+            : 'app-page-shell';
+    }
+
+    if (!str_contains($currentPageShellClass, 'app-page-shell')) {
+        $currentPageShellClass = 'app-page-shell ' . $currentPageShellClass;
+    }
+
+    if ($isDentistLayoutView && !str_contains($currentPageShellClass, 'dentist-report-page')) {
+        $currentPageShellClass .= ' dentist-report-page';
+    }
+
     $analyticsRoutePrefix = request()->routeIs('dentist.reports*') ? 'dentist' : 'admin';
 @endphp
 
-@section('layout-role', $resolvedLayoutRole)
+@section('layout-role', $currentLayoutRole)
 
 @section('title', $pageTitle ?? 'Reports & Analytics')
 
 @section('styles')
     @vite('resources/css/pages/shared/reports.css')
-    @if ($resolvedIsDentistView && $resolvedLayoutRole === 'admin')
+    @if ($isDentistLayoutView && $currentLayoutRole === 'admin')
         @vite('resources/css/pages/dentist/dentist-shared.css')
     @endif
 @endsection
 
-@section('body-class', $resolvedIsDentistView ? 'bg-[#F9FAFB]' : 'bg-[#F4F4F4]')
+@section('body-class', $isDentistLayoutView ? 'bg-[#F9FAFB]' : 'bg-[#F4F4F4]')
 
 @section('content')
 
 @php
-$layoutRole = $resolvedLayoutRole;
+$layoutRole = $currentLayoutRole;
 
 $isAdminView = $isAdminView ?? $layoutRole === 'admin';
-$isDentistView = $resolvedIsDentistView;
+$isDentistView = $isDentistLayoutView;
 
-$pageShellClass = $pageShellClass ?? ($isDentistView ? 'app-page-shell dentist-report-page' : 'app-page-shell');
+$pageShellClass = $currentPageShellClass;
 
 $pageTitle = $pageTitle ?? 'Reports & Analytics';
 

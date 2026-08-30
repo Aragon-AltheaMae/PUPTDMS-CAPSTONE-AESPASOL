@@ -190,6 +190,7 @@
                             data-role="{{ strtolower((string) $session->role_slug) }}"
                             data-device="{{ strtolower((string) $session->device_type) }}"
                             data-current="{{ $session->is_current ? '1' : '0' }}"
+                            data-last-activity="{{ $session->last_activity_at->getTimestamp() }}"
                         >
                             <div class="session-admin-item-shell">
                                 <div class="session-admin-userblock">
@@ -327,6 +328,7 @@
                             data-role="{{ strtolower((string) $session->role_slug) }}"
                             data-device="{{ strtolower((string) $session->device_type) }}"
                             data-current="{{ $session->is_current ? '1' : '0' }}"
+                            data-last-activity="{{ $session->last_activity_at->getTimestamp() }}"
                         >
                             <div class="table-record-card-layout">
                                 <div class="table-record-content">
@@ -803,6 +805,72 @@
             filterResetButton?.classList.toggle('show', count > 0);
         }
 
+        function normalizeSessionDeviceValue(value) {
+            const normalized =
+                String(value || '')
+                    .trim()
+                    .toLowerCase();
+
+            if (['phone', 'mobile', 'smartphone'].includes(normalized)) {
+                return 'mobile';
+            }
+
+            if (['tablet', 'ipad'].includes(normalized)) {
+                return 'tablet';
+            }
+
+            if (['desktop', 'laptop', 'computer', 'pc'].includes(normalized)) {
+                return 'desktop';
+            }
+
+            return normalized;
+        }
+
+        function getSessionLastActivity(item) {
+            const timestamp = Number.parseInt(
+                item?.dataset?.lastActivity || '0',
+                10
+            );
+
+            return Number.isFinite(timestamp)
+                ? timestamp
+                : 0;
+        }
+
+        function buildSessionUrl() {
+            const url = new URL(window.location.href);
+            url.searchParams.delete('page');
+
+            const filters = {
+                search: searchInput?.value?.trim() || '',
+                sort: sessionFilterState.sort,
+                role: sessionFilterState.role,
+                device: sessionFilterState.device,
+                scope: sessionFilterState.scope,
+            };
+
+            Object.entries(filters).forEach(([key, value]) => {
+                if (value && !['recent', 'all'].includes(value)) {
+                    url.searchParams.set(key, value);
+                    return;
+                }
+
+                if (key === 'search' && value !== '') {
+                    url.searchParams.set(key, value);
+                    return;
+                }
+
+                url.searchParams.delete(key);
+            });
+
+            return url;
+        }
+
+        function syncSessionUrlState() {
+            const url = buildSessionUrl();
+            window.history.replaceState({}, '', url.toString());
+        }
+
         function sessionMatchesFilters(item, state) {
             const role =
                 String(
@@ -810,9 +878,9 @@
                 ).toLowerCase();
 
             const device =
-                String(
+                normalizeSessionDeviceValue(
                     item.dataset.device || ''
-                ).toLowerCase();
+                );
 
             const isCurrent =
                 item.dataset.current === '1';
@@ -830,7 +898,9 @@
             if (state.device !== 'all') {
                 deviceMatch =
                     device ===
-                    state.device.toLowerCase();
+                    normalizeSessionDeviceValue(
+                        state.device
+                    );
             }
 
             if (state.scope === 'current') {
@@ -867,9 +937,7 @@
 
         function updateSessionShowResults() {
             if (!showResultsText) return;
-
-            const count = getSessionDraftResultCount();
-            showResultsText.textContent = `Show ${count} ${count === 1 ? 'result' : 'results'}`;
+            showResultsText.textContent = 'Apply filters';
         }
 
         function renderSessionFilterChips() {
@@ -1095,17 +1163,29 @@
         };
 
         window.applySessionFilters = function () {
+            readSessionDraftFromInputs();
+
             sessionFilterState = {
                 ...sessionFilterDraft
             };
 
+            closeSessionDrawer();
+
+            const targetUrl = buildSessionUrl().toString();
+
+            if (targetUrl !== window.location.href) {
+                window.location.href = targetUrl;
+                return;
+            }
+
             applySessionFilters();
             updateSessionFilterButton();
             updateSessionRoleQuickFilters();
-            closeSessionDrawer();
         };
 
         function applySessionFilters() {
+            syncSessionUrlState();
+
             const query =
                 searchInput
                     ? searchInput.value
@@ -1168,39 +1248,32 @@
                 }
             }
 
-            if (sessionList) {
-                const visibleItems =
-                    Array.from(sessionItems)
-                        .filter(
-                            item =>
-                                item.style.display !==
-                                'none'
-                        );
+            const sortDirection =
+                sessionFilterState.sort === 'oldest'
+                    ? 'asc'
+                    : 'desc';
 
-                visibleItems.sort((a, b) => {
+            const sortVisibleItems = (items, container) => {
+                if (!container) return;
 
-                    if (
-                        sessionFilterState.sort ===
-                        'oldest'
-                    ) {
-                        return -1;
-                    }
+                Array.from(items)
+                    .filter(item => item.style.display !== 'none')
+                    .sort((a, b) => {
+                        const aTimestamp = getSessionLastActivity(a);
+                        const bTimestamp = getSessionLastActivity(b);
 
-                    return 0;
-                });
+                        return sortDirection === 'asc'
+                            ? aTimestamp - bTimestamp
+                            : bTimestamp - aTimestamp;
+                    })
+                    .forEach(item => container.appendChild(item));
+            };
 
-                if (
-                    sessionFilterState.sort ===
-                    'oldest'
-                ) {
-                    visibleItems
-                        .reverse()
-                        .forEach(
-                            item =>
-                                sessionList.appendChild(item)
-                        );
-                }
-            }
+            sortVisibleItems(sessionItems, sessionList);
+            sortVisibleItems(
+                sessionGridItems,
+                document.getElementById('sessionAdminGridView')
+            );
 
             if (visibleCount === 0) {
             const gridView =
@@ -1554,6 +1627,7 @@
 
         updateSessionFilterButton();
         updateSessionRoleQuickFilters();
+        applySessionFilters();
 
         document.querySelectorAll('.trigger-session-logout').forEach(btn => {
             btn.addEventListener('click', function () {

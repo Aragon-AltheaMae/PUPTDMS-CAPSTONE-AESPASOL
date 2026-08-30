@@ -59,6 +59,9 @@ function normalizeRecordData(source) {
                 null
             ),
 
+            editUrl: source.dataset.editUrl ||
+                '',
+
             odontogramData: parseRecordDatasetJson(
                 source.dataset.odontogramData,
                 []
@@ -109,6 +112,10 @@ function normalizeRecordData(source) {
         followUp: source?.follow_up ||
             source?.followUp ||
             null,
+
+        editUrl: source?.edit_url ||
+            source?.editUrl ||
+            '',
 
         odontogramData: source?.odontogram ||
             source?.odontogram_data ||
@@ -587,6 +594,25 @@ function setRecordModalData(
         'm_follow_up',
         formatRecordFollowUp(data.followUp)
     );
+
+    const editBtn =
+        document.getElementById(
+            'recordModalEditBtn'
+        );
+
+    if (editBtn) {
+        const editUrl = String(
+            data.editUrl || ''
+        ).trim();
+
+        if (editUrl) {
+            editBtn.href = editUrl;
+            editBtn.hidden = false;
+        } else {
+            editBtn.href = '#';
+            editBtn.hidden = true;
+        }
+    }
 }
 
 export async function openRecordModal(source) {

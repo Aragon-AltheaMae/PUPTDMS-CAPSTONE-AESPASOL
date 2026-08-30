@@ -20,6 +20,7 @@
 use Carbon\Carbon;
 
 $existingAppointmentMode = (bool) ($existingAppointmentMode ?? false);
+$savedVisitEditMode = (bool) ($savedVisitEditMode ?? false);
 $patientName = $patient->name ?? 'Unknown Patient';
 $patientAvatarUrl = !empty($patient?->profile_image)
 ? asset('storage/' . $patient->profile_image)
@@ -56,23 +57,32 @@ trim((string) $currentServiceType),
 $entrySource = request()->query('from');
 $isWalkInMode = $entrySource === 'walk-in';
 
-$pageEyebrow = 'Dental Procedure Workspace';
-$pageTitle = 'Patient Odontogram';
+$pageEyebrow = $savedVisitEditMode ? 'Saved Dental Record Editor' : 'Dental Procedure Workspace';
+$pageTitle = $savedVisitEditMode ? 'Edit Saved Odontogram' : 'Patient Odontogram';
 $pageSubtitle = '2D / 3D Treatment &amp; Condition Mapping';
 
 $entryContextLabel = $existingAppointmentMode
 ? 'Existing Appointment'
-: ($isWalkInMode ? 'Walk-in Visit' : null);
+: ($savedVisitEditMode ? 'Saved Visit Record' : ($isWalkInMode ? 'Walk-in Visit' : null));
 
 $entryContextMessage = $existingAppointmentMode
 ? 'This odontogram is for an existing appointment. Saving it will store the visit as completed.'
+ : ($savedVisitEditMode
+? 'You are editing a previously saved visit. Any changes here will update the saved 2D and 3D odontogram plus the clinical notes.'
 : ($isWalkInMode
 ? 'This odontogram is being created for a walk-in visit.'
-: null);
+: null));
 
 $existingProcedureDuration = $existingAppointmentMode
 ? data_get($existingAppointmentDraft ?? [], 'procedure_duration_hms', '00:00:00')
-: '00:00:00';
+: ($savedVisitEditMode
+    ? sprintf(
+        '%02d:%02d:%02d',
+        floor((int) data_get($procedure, 'procedure_duration_seconds', 0) / 3600),
+        floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60),
+        (int) data_get($procedure, 'procedure_duration_seconds', 0) % 60
+    )
+    : '00:00:00');
 @endphp
 
 <main id="mainContent" class="odontogram-page">
@@ -86,12 +96,30 @@ $existingProcedureDuration = $existingAppointmentMode
                     <div class="odontogram-hero-main">
 
                         @if ($entryContextLabel)
-                        <div class="alert-warning">
-                            <i class="fa-solid fa-circle-info"></i>
+                        <div class="card" style="position: relative; margin-bottom: 0.95rem; overflow: hidden; border: 1px solid rgba(120, 22, 22, 0.1); border-radius: 1.35rem; background: linear-gradient(135deg, rgba(255, 252, 251, 0.98), rgba(255, 255, 255, 1)); box-shadow: 0 12px 26px rgba(95, 25, 25, 0.08);">
+                            <span style="position: absolute; inset: 0 auto 0 0; width: 0.35rem; background: linear-gradient(180deg, #8b0000 0%, #b4232c 100%);"></span>
 
-                            <strong>{{ $entryContextLabel }}:</strong>
+                            <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem 1.35rem 1rem 1.5rem; font-family: inherit;">
+                                <span style="width: 5rem; height: 5rem; border-radius: 1.1rem; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; background: linear-gradient(145deg, rgba(139, 0, 0, 0.06), rgba(139, 0, 0, 0.025)); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 8px 16px rgba(139, 0, 0, 0.04); color: #9e1c29;">
+                                    <i class="fa-solid fa-shield-halved" style="font-size: 2rem;"></i>
+                                </span>
 
-                            <span>{{ $entryContextMessage }}</span>
+                                <div style="display: flex; flex-direction: column; justify-content: center; gap: 0.35rem; min-width: 0; flex: 1; font-family: inherit;">
+                                    <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
+                                        <h2 style="margin: 0; font: inherit; font-size: clamp(1.2rem, 1.8vw, 1.9rem); font-weight: 800; line-height: 1.08; letter-spacing: -0.03em; color: #1f2937;">
+                                            {{ $entryContextLabel }}
+                                        </h2>
+
+                                        <span style="display: inline-flex; align-items: center; justify-content: center; padding: 0.45rem 0.85rem; border-radius: 0.75rem; background: linear-gradient(135deg, rgba(139, 0, 0, 0.06), rgba(139, 0, 0, 0.1)); color: #a12633; font: inherit; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap;">
+                                            Saved Record
+                                        </span>
+                                    </div>
+
+                                    <p style="margin: 0; max-width: none; color: #5f636d; font: inherit; font-size: clamp(0.88rem, 0.92vw, 1rem); line-height: 1.4; font-weight: 400; white-space: nowrap;">
+                                        {{ $entryContextMessage }}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                         @endif
 
@@ -114,14 +142,15 @@ $existingProcedureDuration = $existingAppointmentMode
 
                             </div>
 
-                            <button type="button" id="cancelProcedureBtn" class="ui-btn ui-btn-danger">
+                            <button type="button" id="cancelProcedureBtn"
+                                class="ui-btn {{ $savedVisitEditMode ? 'ui-btn-primary' : 'ui-btn-danger' }}">
 
                                 <i class="fa-solid fa-xmark"></i>
 
                                 <span>
                                     {{ $existingAppointmentMode
                                     ? 'Cancel Entry'
-                                    : 'Cancel Procedure' }}
+                                    : ($savedVisitEditMode ? 'Cancel Edit' : 'Cancel Procedure') }}
                                 </span>
                             </button>
 
@@ -396,7 +425,7 @@ $existingProcedureDuration = $existingAppointmentMode
 
                                     <textarea id="oralExaminationNotes" rows="4"
                                         class="form-input-custom global-form-textarea"
-                                        placeholder="Record oral examination findings..."></textarea>
+                                        placeholder="Record oral examination findings...">{{ old('oral_examination', $procedure?->oral_examination) }}</textarea>
                                 </div>
 
                                 <div class="global-form-group">
@@ -406,7 +435,7 @@ $existingProcedureDuration = $existingAppointmentMode
 
                                     <textarea id="diagnosisNotes" rows="4"
                                         class="form-input-custom global-form-textarea"
-                                        placeholder="Record the clinical diagnosis..."></textarea>
+                                        placeholder="Record the clinical diagnosis...">{{ old('diagnosis', $procedure?->diagnosis) }}</textarea>
                                 </div>
 
                                 <div class="global-form-group odontogram-prescription-field">
@@ -419,11 +448,11 @@ $existingProcedureDuration = $existingAppointmentMode
 
                                     <textarea id="prescriptionsNotes" rows="3"
                                         class="form-input-custom global-form-textarea"
-                                        placeholder="Add medication or aftercare instructions..."></textarea>
+                                        placeholder="Add medication or aftercare instructions...">{{ old('prescriptions', $procedure?->prescriptions) }}</textarea>
                                 </div>
 
                                 <div class="odontogram-procedure-actions">
-                                    @unless ($existingAppointmentMode)
+                                    @unless ($existingAppointmentMode || $savedVisitEditMode)
                                     <button type="button" id="followUpBtn" class="ui-btn ui-btn-warning">
                                         <i class="fa-solid fa-calendar-plus"></i>
                                         <span>Set Follow-Up Appointment</span>
@@ -436,7 +465,7 @@ $existingProcedureDuration = $existingAppointmentMode
                                         <span>
                                             {{ $existingAppointmentMode
                                             ? 'Save Existing Appointment'
-                                            : 'Finish Procedure' }}
+                                            : ($savedVisitEditMode ? 'Save Changes' : 'Finish Procedure') }}
                                         </span>
                                     </button>
                                 </div>
@@ -537,7 +566,7 @@ $existingProcedureDuration = $existingAppointmentMode
     </div>
 </main>
 
-@unless ($existingAppointmentMode)
+@unless ($existingAppointmentMode || $savedVisitEditMode)
 <x-follow-up-modal :patient-name="$patientName" :patient-avatar-url="$patientAvatarUrl"
     :service-type="$currentServiceType ?: '—'" :appointment-date="$formattedAppointmentDate"
     :appointment-time="$formattedAppointmentTime"
@@ -607,10 +636,12 @@ $existingProcedureDuration = $existingAppointmentMode
 
                 <div class="modal-copy">
                     <h2 id="cancelProcedureModalTitle" class="modal-title">
-                        Cancel Procedure?
+                        {{ $savedVisitEditMode ? 'Cancel Edit?' : 'Cancel Procedure?' }}
                     </h2>
                     <p class="modal-subtitle">
-                        Unsaved changes in this procedure session may be lost.
+                        {{ $savedVisitEditMode
+                            ? 'Unsaved changes in this saved visit editor may be lost.'
+                            : 'Unsaved changes in this procedure session may be lost.' }}
                     </p>
                 </div>
             </div>
@@ -626,10 +657,11 @@ $existingProcedureDuration = $existingAppointmentMode
                 <i class="fa-solid fa-triangle-exclamation"></i>
 
                 <div>
-                    <strong>Leave this procedure?</strong>
+                    <strong>{{ $savedVisitEditMode ? 'Leave this edit?' : 'Leave this procedure?' }}</strong>
                     <span>
-                        Are you sure you want to cancel this procedure? Any unsaved progress in this session may be
-                        lost.
+                        {{ $savedVisitEditMode
+                            ? 'Are you sure you want to cancel this edit? Any unsaved changes in this saved visit may be lost.'
+                            : 'Are you sure you want to cancel this procedure? Any unsaved progress in this session may be lost.' }}
                     </span>
                 </div>
             </div>
@@ -638,12 +670,13 @@ $existingProcedureDuration = $existingAppointmentMode
         <div class="modal-ft">
             <button type="button" id="dismissCancelProcedureBtn" class="ui-btn ui-btn-secondary">
                 <i class="fa-solid fa-arrow-left"></i>
-                <span>Continue Procedure</span>
+                <span>{{ $savedVisitEditMode ? 'Continue Editing' : 'Continue Procedure' }}</span>
             </button>
 
-            <button type="button" id="confirmCancelProcedureBtn" class="ui-btn ui-btn-danger">
+            <button type="button" id="confirmCancelProcedureBtn"
+                class="ui-btn {{ $savedVisitEditMode ? 'ui-btn-primary' : 'ui-btn-danger' }}">
                 <i class="fa-solid fa-ban"></i>
-                <span>Cancel Procedure</span>
+                <span>{{ $savedVisitEditMode ? 'Cancel Edit' : 'Cancel Procedure' }}</span>
             </button>
         </div>
     </div>
@@ -709,7 +742,7 @@ $existingProcedureDuration = $existingAppointmentMode
 @endsection
 
 @section('scripts')
-@unless ($existingAppointmentMode)
+@unless ($existingAppointmentMode || $savedVisitEditMode)
 @include('components.appointment-calendar-script', [
 'mode' => 'booking',
 
@@ -773,6 +806,7 @@ $existingProcedureDuration = $existingAppointmentMode
         const closeCancelProcedureModalBtn = document.getElementById('closeCancelProcedureModalBtn');
         const closeFinishProcedureModalBtn = document.getElementById('closeFinishProcedureModalBtn');
         const existingAppointmentMode = @json($existingAppointmentMode);
+        const savedVisitEditMode = @json($savedVisitEditMode);
         const existingProcedureDuration = @json($existingProcedureDuration);
         const isOralProphylaxis = @json($isOralProphylaxis);
         const cancelProcedureRedirectUrl = @json($cancelProcedureRedirectUrl ?? route('dentist.dentist.patient.profile', $patient -> id ?? 1));
@@ -2802,8 +2836,10 @@ $existingProcedureDuration = $existingAppointmentMode
             const originalButtonHtml = clickedButton.innerHTML;
 
             updateHiddenInput();
+            const cleanOdontogramData = getCleanOdontogramDataForSave();
+            const hasAnySavedTreatment = cleanOdontogramData.length > 0;
 
-            if (!isOralProphylaxis && !hasAppliedTreatmentThisSession) {
+            if (!isOralProphylaxis && !hasAppliedTreatmentThisSession && !(savedVisitEditMode && hasAnySavedTreatment)) {
                 showProcedureToast(
                     'Apply at least one treatment to the tooth chart before finishing the procedure.',
                     'warning',
@@ -2812,8 +2848,6 @@ $existingProcedureDuration = $existingAppointmentMode
 
                 return;
             }
-
-            const cleanOdontogramData = getCleanOdontogramDataForSave();
 
             if (!isOralProphylaxis && cleanOdontogramData.length === 0) {
                 showProcedureToast(
@@ -2832,7 +2866,7 @@ $existingProcedureDuration = $existingAppointmentMode
                 prescriptions: document.getElementById('prescriptionsNotes').value,
                 completion_action: completionAction,
                 has_applied_treatment: isOralProphylaxis || hasAppliedTreatmentThisSession,
-                procedure_duration_seconds: existingAppointmentMode
+                procedure_duration_seconds: (existingAppointmentMode || savedVisitEditMode)
                     ? 0
                     : Math.max(0, Math.floor((Date.now() - procedureStartTimestamp) / 1000)),
             };
@@ -2869,12 +2903,16 @@ $existingProcedureDuration = $existingAppointmentMode
 
                 if (completionAction === 'finished') {
                     openFinishProcedureModal({
-                        title: existingAppointmentMode ? 'Existing Appointment Saved!' : 'Procedure Completed!',
+                        title: existingAppointmentMode
+                            ? 'Existing Appointment Saved!'
+                            : (savedVisitEditMode ? 'Odontogram Updated!' : 'Procedure Completed!'),
                         message: existingAppointmentMode
                             ? 'The existing appointment, notes, duration, and odontogram were saved successfully.'
-                            : 'The odontogram and procedure notes were saved successfully. This appointment has been marked as completed.',
+                            : (savedVisitEditMode
+                                ? 'The saved 2D/3D odontogram and clinical notes were updated successfully.'
+                                : 'The odontogram and procedure notes were saved successfully. This appointment has been marked as completed.'),
                         icon: 'fa-clipboard-check',
-                        buttonText: existingAppointmentMode ? 'Back to Patient Profile' : 'Back to Appointments',
+                        buttonText: (existingAppointmentMode || savedVisitEditMode) ? 'Back to Patient Profile' : 'Back to Appointments',
                         redirectUrl: result.redirect_url || null,
                     });
                 } else {
@@ -2901,11 +2939,13 @@ $existingProcedureDuration = $existingAppointmentMode
 
         finishProcedureBtn.addEventListener('click', function () {
             updateHiddenInput();
+            const cleanOdontogramData = getCleanOdontogramDataForSave();
+            const hasAnySavedTreatment = cleanOdontogramData.length > 0;
 
             if (!isOralProphylaxis &&
                 (
-                    !hasAppliedTreatmentThisSession ||
-                    getCleanOdontogramDataForSave().length === 0
+                    (!hasAppliedTreatmentThisSession && !(savedVisitEditMode && hasAnySavedTreatment)) ||
+                    cleanOdontogramData.length === 0
                 )
             ) {
                 openFinishProcedureModal({
@@ -2921,11 +2961,13 @@ $existingProcedureDuration = $existingAppointmentMode
             openFinishProcedureModal({
                 title: existingAppointmentMode
                     ? 'Save Existing Appointment?'
-                    : 'Finish Procedure?',
+                    : (savedVisitEditMode ? 'Save Odontogram Changes?' : 'Finish Procedure?'),
 
                 message: existingAppointmentMode
                     ? 'Are you sure you want to save this existing appointment? The old visit details, odontogram, and notes will be stored as a completed appointment.'
-                    : 'Are you sure you want to finish this procedure? The odontogram and procedure notes will be saved, and this appointment will be marked as completed.',
+                    : (savedVisitEditMode
+                        ? 'Are you sure you want to update this saved visit? The saved 2D/3D odontogram and procedure notes will be replaced with your latest edits.'
+                        : 'Are you sure you want to finish this procedure? The odontogram and procedure notes will be saved, and this appointment will be marked as completed.'),
 
                 icon: 'fa-circle-question',
                 confirmation: true,
@@ -3249,7 +3291,7 @@ $existingProcedureDuration = $existingAppointmentMode
 
         initLegendPanelResize();
 
-        if (existingAppointmentMode) {
+        if (existingAppointmentMode || savedVisitEditMode) {
             procedureTimer.textContent = existingProcedureDuration || '00:00:00';
         } else {
             updateProcedureTimer();
