@@ -2,8 +2,8 @@
     'label' => 'items',
 ])
 
-<div class="global-show-more-controls" data-show-more-controls>
-    <button type="button" class="ui-btn ui-btn-secondary global-show-more-btn hidden" data-show-more-button
+<div class="global-show-more-controls" data-show-more-controls hidden>
+    <button type="button" class="ui-btn ui-btn-secondary global-show-more-btn" data-show-more-button
         data-show-more-label="{{ $label }}" data-mode="more">
         <span data-show-more-text>
             Show more

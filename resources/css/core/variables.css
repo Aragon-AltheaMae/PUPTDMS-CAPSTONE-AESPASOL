@@ -20,8 +20,6 @@
     --text-primary: #F3F4F6;
     --text-secondary: #C9D1D9;
     --text-muted: #8B949E;
-    --brand-red: #8B0000;
-    --brand-red-soft: rgba(139, 0, 0, 0.18);
     --text-on-brand: #FFFFFF;
 
     --filter-panel-bg: #FFFFFF;
@@ -188,6 +186,7 @@
     --status-pill-dot-size: 6px;
 
     --crimson: #8B0000;
+    --crimson-1: #8B0000;
     --crimson-dark: #6b0000;
     --crimson-light: #fef2f2;
     --crimson-mid: #fce8e8;
@@ -758,6 +757,8 @@
     --text-2: #c9c9c9;
     --text-3: #8f8f8f;
 
+    --crimson: #510101;
+    --crimson-1: #ffc9c9;
     --crimson-light: rgba(139, 0, 0, 0.18);
     --crimson-mid: rgba(139, 0, 0, 0.24);
     --crimson-soft: rgba(139, 0, 0, 0.14);

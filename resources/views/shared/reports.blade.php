@@ -28,8 +28,7 @@ $layoutRole = $resolvedLayoutRole;
 $isAdminView = $isAdminView ?? $layoutRole === 'admin';
 $isDentistView = $resolvedIsDentistView;
 
-$pageShellClass =
-$pageShellClass ?? ($isDentistView ? 'app-page-shell dentist-report-page' : 'app-page-shell');
+$pageShellClass = $pageShellClass ?? ($isDentistView ? 'app-page-shell dentist-report-page' : 'app-page-shell');
 
 $pageTitle = $pageTitle ?? 'Reports & Analytics';
 
@@ -120,29 +119,6 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                     <h2 class="dentist-hero-title">
                         Reports &amp; Analytics
                     </h2>
-
-                    <div class="report-hero-meta">
-                        <span class="summary-tag">
-                            <span class="summary-tag-dot bg-red-700"></span>
-
-                            {{ $totalAppointmentsThisMonth }}
-                            monthly appointments
-                        </span>
-
-                        <span class="summary-tag">
-                            <span class="summary-tag-dot bg-green-500"></span>
-
-                            {{ $completedAppointments }}
-                            completed
-                        </span>
-
-                        <span class="summary-tag">
-                            <span class="summary-tag-dot bg-orange-500"></span>
-
-                            Updated
-                            {{ now()->format('M d, Y h:i A') }}
-                        </span>
-                    </div>
                 </div>
             </div>
 
@@ -690,7 +666,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         Clinic Performance Overview
                     </div>
 
-                    <div class="stat-grid mb-8">
+                    <div class="stat-grid">
 
                         <a href="{{ route('dentist.dentist.patients') }}" class="stat-card s-crimson stat-card-link">
                             <div class="stat-card-info">
@@ -864,10 +840,9 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                                     </div>
                                 </div>
 
-                                <div class="card-header-right global-select-compact">
+                                <div class="card-header-right">
                                     <select id="gadPeriodSelect" class="js-custom-select"
                                         data-placeholder="Select period">
-
                                         @foreach ($cleanPeriods as $opt)
                                         <option value="{{ $opt }}">
                                             {{ $opt }}
@@ -881,7 +856,8 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                                 <div id="gadChartWrap" class="relative flex-1 min-h-[260px]">
                                     <canvas id="gadChart"></canvas>
                                     <div id="gadEmptyState"
-                                        class="empty-state-host absolute inset-0 pointer-events-none"></div>
+                                        class="empty-state-host absolute inset-0 pointer-events-none">
+                                    </div>
                                     <div id="gadLoadingState"
                                         class="chart-loading hidden absolute inset-0 pointer-events-none">
                                         <i class="fa-solid fa-spinner"></i>
@@ -905,10 +881,9 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                                     </div>
                                 </div>
 
-                                <div class="card-header-right global-select-compact">
+                                <div class="card-header-right">
                                     <select id="weeklyPeriodSelect" class="js-custom-select"
                                         data-placeholder="Select period">
-
                                         @foreach ($cleanPeriods as $opt)
                                         <option value="{{ $opt }}">
                                             {{ $opt }}
@@ -921,7 +896,8 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                                 <div id="weeklyChartWrap" class="relative flex-1 min-h-[260px]">
                                     <canvas id="weeklyDentalCasesChart"></canvas>
                                     <div id="weeklyEmptyState"
-                                        class="empty-state-host absolute inset-0 pointer-events-none"></div>
+                                        class="empty-state-host absolute inset-0 pointer-events-none">
+                                    </div>
 
                                     <div id="weeklyLoadingState"
                                         class="chart-loading hidden absolute inset-0 pointer-events-none">
@@ -933,10 +909,17 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 
                         <div class="card">
                             <div class="card-header">
-                                <span class="chart-title">
-                                    <i class="fa-solid fa-user-group"></i>
-                                    Returning vs New Patients
-                                </span>
+                                <div class="card-header-left">
+                                    <span class="card-header-icon">
+                                        <i class="fa-solid fa-user-group"></i>
+                                    </span>
+
+                                    <div>
+                                        <h3 class="card-title">
+                                            Returning vs New Patients
+                                        </h3>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="card-body">
@@ -954,13 +937,23 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                     <div class="analytics-secondary-grid">
                         <div class="card">
                             <div class="card-header">
-                                <div class="flex items-center gap-2 min-w-0">
-                                    <span class="chart-title">
+                                <div class="card-header-left">
+                                    <span class="card-header-icon">
                                         <i class="fa-solid fa-star"></i>
-                                        Top Dental Services
+                                    </span>
+
+                                    <div>
+                                        <h3 class="card-title">
+                                            Top Dental Services
+                                        </h3>
+                                    </div>
+                                </div>
+
+                                <div class="card-header-right">
+                                    <span class="metric-chip">
+                                        Top this month
                                     </span>
                                 </div>
-                                <span class="metric-chip">Top this month</span>
                             </div>
 
                             <div class="card-body">
@@ -1036,7 +1029,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                         </section>
                     </div>
 
-                    <section class="card printable-forms-card mb-8">
+                    <section class="card mb-8">
                         <div class="card-header">
                             <div class="card-header-left">
                                 <span class="card-header-icon">
@@ -1125,32 +1118,59 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                                     @endforeach
                                 </div>
                             </div>
-
                             @else
                             <div id="printableFormsEmptyState" class="empty-state-host"></div>
                             @endif
                         </div>
                     </section>
 
-                    <div class="card report-inventory-shell mb-8">
+                    <div class="card mb-8">
                         <div class="card-header">
-                            <span class="chart-title text-base"><i class="fa-solid fa-boxes-stacked"></i> Inventory
-                                Analytics</span>
-                            <a href="{{ route('dentist.dentist.inventory') }}"
-                                class="ui-btn ui-btn-secondary ui-btn-sm">
-                                <i class="fa-solid fa-boxes-stacked"></i>
-                                Manage Inventory
-                            </a>
+                            <div class="card-header-left">
+                                <span class="card-header-icon">
+                                    <i class="fa-solid fa-boxes-stacked"></i>
+                                </span>
+
+                                <div>
+                                    <h3 class="card-title">
+                                        Inventory Analytics
+                                    </h3>
+
+                                    <p class="card-subtitle">
+                                        Current medicine and dental supply stock overview
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="card-header-right">
+                                <a href="{{ route('dentist.dentist.inventory') }}"
+                                    class="ui-btn ui-btn-secondary ui-btn-sm">
+                                    <i class="fa-solid fa-boxes-stacked"></i>
+                                    <span>Manage Inventory</span>
+                                </a>
+                            </div>
                         </div>
 
                         <div class="card-body">
                             <div class="report-inventory-grid grid grid-cols-1 md:grid-cols-3 gap-8">
 
-                                <div class="col-span-1 inventory-chart-panel">
-                                    <h3
-                                        class="text-center text-[11px] font-bold text-gray-500 mb-4 uppercase tracking-wider">
-                                        Medicine
-                                        Stock</h3>
+                                <div class="inventory-chart-panel">
+                                    <div class="report-panel-heading">
+                                        <span class="card-header-icon">
+                                            <i class="fa-solid fa-capsules"></i>
+                                        </span>
+
+                                        <div>
+                                            <h3 class="card-title">
+                                                Medicine Stock
+                                            </h3>
+
+                                            <p class="card-subtitle">
+                                                Available medicine inventory
+                                            </p>
+                                        </div>
+                                    </div>
+
                                     <div class="report-inventory-content">
                                         @if ($medicineItems->count() > 0)
                                         <canvas id="medicinePieChart"></canvas>
@@ -1160,11 +1180,23 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                                     </div>
                                 </div>
 
-                                <div class="col-span-1 report-inventory-panel">
-                                    <h3
-                                        class="text-center text-[11px] font-bold text-gray-500 mb-4 uppercase tracking-wider">
-                                        Medical
-                                        Supplies</h3>
+                                <div class="report-inventory-panel">
+                                    <div class="report-panel-heading">
+                                        <span class="card-header-icon">
+                                            <i class="fa-solid fa-box-open"></i>
+                                        </span>
+
+                                        <div>
+                                            <h3 class="card-title">
+                                                Medical Supplies
+                                            </h3>
+
+                                            <p class="card-subtitle">
+                                                Available dental and clinic supplies
+                                            </p>
+                                        </div>
+                                    </div>
+
                                     <div class="report-inventory-content">
                                         @if ($suppliesItems->count() > 0)
                                         <canvas id="suppliesPieChart"></canvas>
@@ -1174,12 +1206,21 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                                     </div>
                                 </div>
 
-                                <div class="col-span-1 rounded-xl p-5 low-stock-alert-card">
-                                    <div class="low-stock-alert-header flex items-center gap-2 mb-4">
-                                        <span class="card-header-icon s-danger">
+                                <div class="low-stock-alert-card">
+                                    <div class="report-panel-heading">
+                                        <span class="card-header-icon">
                                             <i class="fa-solid fa-triangle-exclamation"></i>
                                         </span>
-                                        <span class="text-sm font-bold text-gray-800">Low Stock Alerts</span>
+
+                                        <div>
+                                            <h3 class="card-title">
+                                                Low Stock Alerts
+                                            </h3>
+
+                                            <p class="card-subtitle">
+                                                Items that may require restocking
+                                            </p>
+                                        </div>
                                     </div>
 
                                     @if ($lowStockMedicine->count() > 0 || $lowStockSupplies->count() > 0)
@@ -1220,30 +1261,30 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                                                 left</span>
                                         </div>
                                         <div class="stock-bar-bg">
-                                            <div class="stock-bar-fill {{ $barClass }}" style="width:{{ $pct }}%"></div>
+                                            <div class="stock-bar-fill {{ $barClass }}" style="width:{{ $pct }}%">
+                                            </div>
                                         </div>
+
+                                        @endforeach
+                                        @endif
                                 </div>
-                                @endforeach
-                                @endif
                             </div>
+                            @else
+                            @php
+                            $hasAnyInventoryData = $medicineItems->count() > 0 || $suppliesItems->count() > 0;
+                            @endphp
+
+                            @if ($hasAnyInventoryData)
+                            <div id="inventoryHealthyState" class="empty-state-host"></div>
+                            @else
+                            <div id="inventoryRecordsEmptyState" class="empty-state-host"></div>
+                            @endif
+                            @endif
                         </div>
-                        @else
-                        @php
-                        $hasAnyInventoryData = $medicineItems->count() > 0 || $suppliesItems->count() > 0;
-                        @endphp
 
-                        @if ($hasAnyInventoryData)
-                        <div id="inventoryHealthyState" class="empty-state-host"></div>
-                        @else
-                        <div id="inventoryRecordsEmptyState" class="empty-state-host"></div>
                         @endif
-                        @endif
+
                     </div>
-    </div>
-
-    @endif
-
-    </div>
 </main>
 
 @if ($isAdminView)
@@ -2518,14 +2559,14 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                 ).matches;
 
             const outClass =
-                direction > 0
-                    ? 'global-carousel-out-left'
-                    : 'global-carousel-out-right';
+                direction > 0 ?
+                    'global-carousel-out-left' :
+                    'global-carousel-out-right';
 
             const inClass =
-                direction > 0
-                    ? 'global-carousel-in-right'
-                    : 'global-carousel-in-left';
+                direction > 0 ?
+                    'global-carousel-in-right' :
+                    'global-carousel-in-left';
 
             if (reducedMotion) {
                 currentPage =
@@ -3436,21 +3477,20 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             type: 'bar',
             data: {
                 labels,
-                datasets: [
-                    {
-                        label: 'Female',
-                        data: female,
-                        backgroundColor: '#EC4899',
-                        borderColor: '#EC4899',
-                        borderRadius: 4
-                    },
-                    {
-                        label: 'Male',
-                        data: male,
-                        backgroundColor: '#60A5FA',
-                        borderColor: '#60A5FA',
-                        borderRadius: 4
-                    }
+                datasets: [{
+                    label: 'Female',
+                    data: female,
+                    backgroundColor: '#EC4899',
+                    borderColor: '#EC4899',
+                    borderRadius: 4
+                },
+                {
+                    label: 'Male',
+                    data: male,
+                    backgroundColor: '#60A5FA',
+                    borderColor: '#60A5FA',
+                    borderRadius: 4
+                }
                 ]
             },
             options: {
@@ -3693,6 +3733,8 @@ $customReportTemplates = collect($customReportTemplates ?? []);
     document.addEventListener('DOMContentLoaded', async function () {
 
         initPrintableFormsCarousel();
+
+        window.initCustomSelects?.(document);
 
         if (window.EmptyState) {
             renderDentistReportEmptyStates();

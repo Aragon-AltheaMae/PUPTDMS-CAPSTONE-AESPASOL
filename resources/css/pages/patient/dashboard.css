@@ -633,7 +633,7 @@ body.role-patient #mainContent .patient-privacy-toggle {
 }
 
 [data-theme="dark"] .request-doc-card-primary .request-doc-icon {
-    background: var(--brand-red-soft);
+    background: var(--crimson-soft);
     color: #FCA5A5;
 }
 
@@ -643,7 +643,7 @@ body.role-patient #mainContent .patient-privacy-toggle {
 }
 
 [data-theme="dark"] .request-doc-badge-primary {
-    background: var(--brand-red-soft);
+    background: var(--crimson-soft);
     color: #FCA5A5;
 
     border-color:
@@ -1214,7 +1214,7 @@ body.role-patient #mainContent.patient-dashboard-page * {
 }
 
 [data-theme="dark"] .patient-profile-next-visit-icon {
-    background: var(--brand-red-soft);
+    background: var(--crimson-soft);
     color: #FCA5A5;
 }
 
@@ -1309,7 +1309,7 @@ body.role-patient #mainContent.patient-dashboard-page * {
 }
 
 [data-theme="dark"] .patient-profile-summary-icon {
-    background: var(--brand-red-soft);
+    background: var(--crimson-soft);
     color: #FCA5A5;
 }
 
@@ -1691,7 +1691,7 @@ body.role-patient #mainContent.patient-dashboard-page * {
 }
 
 [data-theme="dark"] .dental-record-card.is-latest .dental-record-icon {
-    background: var(--brand-red-soft);
+    background: var(--crimson-soft);
     color: #FCA5A5;
 }
 

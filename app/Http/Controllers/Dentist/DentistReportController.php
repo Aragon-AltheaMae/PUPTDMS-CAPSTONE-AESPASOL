@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use setasign\Fpdi\Fpdi;
+use App\Models\ServiceType;
 
 class DentistReportController extends Controller
 {
@@ -124,10 +125,18 @@ class DentistReportController extends Controller
         $returningPatients = $patientVisitCounts->where('total_visits', '>', 1)->count();
         $newPatients = $patientVisitCounts->where('total_visits', 1)->count();
 
-        $topServices = Appointment::whereYear('appointment_date', $thisYear)
+        $validServiceTypes = ServiceType::query()
+            ->pluck('name');
+
+        $topServices = Appointment::query()
+            ->whereYear('appointment_date', $thisYear)
             ->whereMonth('appointment_date', $thisMonth)
             ->whereNotNull('service_type')
-            ->select('service_type as name', DB::raw('COUNT(*) as total'))
+            ->whereIn('service_type', $validServiceTypes)
+            ->select(
+                'service_type as name',
+                DB::raw('COUNT(*) as total')
+            )
             ->groupBy('service_type')
             ->orderByDesc('total')
             ->limit(5)

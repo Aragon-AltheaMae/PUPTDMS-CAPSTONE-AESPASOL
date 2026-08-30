@@ -862,12 +862,6 @@
     min-width: 42px;
 }
 
-#mainContent.shared-patient-page .view-toggle-container[data-global-view-toggle] {
-    flex: 0 0 auto;
-
-    margin: 0;
-}
-
 #mainContent.shared-patient-page #externalClearFilterBtn {
     flex: 0 0 38px;
 
@@ -961,11 +955,6 @@
     display: none !important;
 }
 
-#mainContent.shared-patient-page .view-toggle-container[data-global-view-toggle] {
-    align-items: center !important;
-    box-sizing: border-box !important;
-}
-
 [data-theme="dark"] #mainContent .patient-search-row .search-input,
 .dark #mainContent .patient-search-row .search-input {
     color: #F8FAFC !important;
@@ -1033,16 +1022,6 @@
 
         width: 42px;
         min-width: 42px;
-    }
-
-    #mainContent.shared-patient-page .view-toggle-container[data-global-view-toggle] {
-        flex: 0 0 88px;
-
-        width: 88px !important;
-        min-width: 88px !important;
-        max-width: 88px !important;
-
-        margin: 0 !important;
     }
 
     #mainContent.shared-patient-page #externalClearFilterBtn {

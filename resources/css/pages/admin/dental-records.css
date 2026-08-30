@@ -31,40 +31,6 @@
     margin-left: auto;
 }
 
-.admin-dental-records-page .record-toolbar-count {
-    flex: 0 0 auto;
-    min-width: 0;
-}
-
-.admin-dental-records-page #recordRowCount {
-    color: var(--table-text-muted);
-    font-size: .82rem;
-    font-weight: 900;
-    letter-spacing: .04em;
-    text-transform: uppercase;
-    white-space: nowrap;
-}
-
-.admin-dental-records-page .record-search-row {
-    position: relative;
-    display: flex;
-    align-items: center;
-    flex: 1 1 auto;
-    width: 100%;
-    min-width: 260px;
-    max-width: 390px;
-}
-
-.admin-dental-records-page .record-search-row .search-wrap.global-search {
-    flex: 1 1 auto;
-    width: 100%;
-    min-width: 0;
-}
-
-.admin-dental-records-page .record-search-row .voice-input-toggle {
-    flex: 0 0 auto;
-}
-
 .admin-dental-records-page .record-view-toggle.view-toggle-container {
     flex: 0 0 auto;
 }
