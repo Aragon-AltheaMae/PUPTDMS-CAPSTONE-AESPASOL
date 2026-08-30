@@ -125,13 +125,6 @@
         0 0 18px rgba(139, 0, 0, 0.14) !important;
 }
 
-#mainContent.shared-appointments-page .appointment-table-grid {
-    grid-template-columns:
-        140px 115px 155px minmax(250px, 1fr) 125px 145px minmax(110px, 150px) !important;
-
-    column-gap: 18px !important;
-}
-
 #mainContent.shared-appointments-page.dentist-appointments-view .appointment-table-grid {
     grid-template-columns:
         140px 115px 150px minmax(220px, 1fr) 110px 125px minmax(150px, 175px) !important;
@@ -239,32 +232,6 @@
     border-color: rgba(252, 165, 165, 0.28) !important;
 }
 
-[data-theme="dark"] #mainContent .service-badge-default,
-.dark #mainContent .service-badge-default {
-    background: rgba(139, 0, 0, 0.18) !important;
-    color: #FCA5A5 !important;
-}
-
-[data-theme="dark"] #mainContent .service-badge-checkup,
-.dark #mainContent .service-badge-checkup {
-    background: rgba(22, 163, 74, 0.16) !important;
-    color: #86EFAC !important;
-}
-
-[data-theme="dark"] #mainContent .service-badge-surgery,
-[data-theme="dark"] #mainContent .service-badge-extraction,
-.dark #mainContent .service-badge-surgery,
-.dark #mainContent .service-badge-extraction {
-    background: rgba(220, 38, 38, 0.16) !important;
-    color: #FCA5A5 !important;
-}
-
-[data-theme="dark"] #mainContent .service-badge-whitening,
-.dark #mainContent .service-badge-whitening {
-    background: rgba(250, 204, 21, 0.16) !important;
-    color: #FDE047 !important;
-}
-
 @media (min-width: 768px) {
     .desktop-appointments-table {
         display: block !important;
@@ -273,76 +240,37 @@
     .mobile-appointments-list {
         display: none !important;
     }
+
+    #mainContent.shared-appointments-page .appointment-table-grid {
+        display: grid;
+        align-items: center;
+
+        grid-template-columns:
+            140px 115px 155px minmax(250px, 1fr) 125px 145px minmax(110px, 150px);
+
+        gap: 0 18px;
+        padding: 0.875rem 1.25rem;
+    }
+
+    #mainContent.shared-appointments-page.dentist-appointments-view .appointment-table-grid {
+        grid-template-columns:
+            140px 115px 150px minmax(220px, 1fr) 110px 125px minmax(150px, 175px);
+
+        column-gap: 14px;
+    }
+
+    .mode-list .desktop-appointments-table .status-pill {
+        min-height: 28px !important;
+        padding: 6px 11px !important;
+        font-size: 11px !important;
+        white-space: nowrap !important;
+    }
 }
 
 .mode-list .desktop-appointments-table {
     display: block !important;
     overflow: visible;
     padding-bottom: 8px;
-}
-
-.service-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 11px;
-    font-weight: 500;
-    padding: 4px 8px;
-    border-radius: 6px;
-    width: fit-content;
-}
-
-.service-badge-default {
-    background: #f9f0f0;
-    color: #8B0000;
-}
-
-.service-badge-surgery {
-    background: #fff0f0;
-    color: #C41E3A;
-}
-
-.service-badge-checkup {
-    background: #ebf5ee;
-    color: #2D7A5E;
-}
-
-.service-badge-whitening {
-    background: #fff3e0;
-    color: #B86C00;
-}
-
-.service-badge-extraction {
-    background: #fff0e8;
-    color: #B85000;
-}
-
-.mode-list .desktop-appointments-table .service-badge {
-    min-height: 32px;
-    padding: 6px 10px;
-    border-radius: 9999px;
-    font-size: 11px;
-    font-weight: 700;
-    line-height: 1.1;
-    white-space: nowrap;
-}
-
-.mode-list .desktop-appointments-table .time-chip {
-    min-height: 32px;
-    padding: 6px 10px;
-    border-radius: 9999px;
-    font-size: 11px;
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-.mode-list .desktop-appointments-table .status-pill {
-    min-height: 28px !important;
-    padding: 6px 11px !important;
-    border-radius: 9999px !important;
-    font-size: 11px !important;
-    font-weight: 850 !important;
-    white-space: nowrap !important;
 }
 
 .appt-patient-cell {
@@ -383,7 +311,14 @@
 
 .appt-program-cell {
     min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
     text-align: left;
+}
+
+.appt-program-mobile {
+    display: none;
 }
 
 .mobile-appointment-date {
@@ -505,32 +440,6 @@
 [data-theme="dark"] #mainContent .desktop-appointments-table>.absolute,
 .dark #mainContent .desktop-appointments-table>.absolute {
     background: linear-gradient(to bottom, rgba(252, 165, 165, 0.30), rgba(252, 165, 165, 0.04)) !important;
-}
-
-.time-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    background: #F5F0EB;
-    border: 1px solid #E8E0D8;
-    border-radius: 7px;
-    padding: 4px 8px;
-    font-size: 12px;
-    font-weight: 500;
-    color: #6B5E52;
-}
-
-[data-theme="dark"] #mainContent .time-chip,
-.dark #mainContent .time-chip {
-    background: rgba(13, 17, 23, 0.58) !important;
-    border-color: rgba(255, 255, 255, 0.12) !important;
-    color: #CBD5E1 !important;
-}
-
-[data-theme="dark"] .time-chip {
-    background: #1c2128;
-    border-color: #21262d;
-    color: #9ca3af;
 }
 
 .timeline-dot {
@@ -1021,6 +930,140 @@
 }
 
 @media (max-width: 767px) {
+    #mainContent.shared-appointments-page.mode-list .desktop-appointments-table {
+        display: block !important;
+
+        width: 100%;
+        min-width: 0;
+
+        padding: 0 !important;
+        overflow: visible;
+    }
+
+    #mainContent.shared-appointments-page.mode-list .appt-table-head {
+        display: none !important;
+    }
+
+    #mainContent.shared-appointments-page.mode-list .appointment-timeline-line {
+        display: none;
+    }
+
+    #mainContent.shared-appointments-page.mode-list .desktop-appointments-table [data-month-list] {
+        display: grid;
+        gap: 0.55rem;
+
+        width: 100%;
+        min-width: 0;
+    }
+
+    #mainContent.shared-appointments-page.mode-list .appt-card {
+        width: 100%;
+        min-width: 0;
+
+        border-radius: 14px;
+        overflow: visible;
+    }
+
+    #mainContent.shared-appointments-page.mode-list .appt-card .appointment-table-grid {
+        display: grid !important;
+
+        grid-template-columns:
+            minmax(0, 1fr) auto !important;
+
+        grid-template-areas:
+            "patient status"
+            "date time"
+            "service service"
+            "actions actions";
+
+        align-items: center;
+
+        gap: 0.5rem 0.65rem !important;
+
+        width: 100%;
+        min-width: 0;
+
+        min-height: 0 !important;
+
+        padding: 0.7rem !important;
+    }
+
+    #mainContent.shared-appointments-page.mode-list .appt-row-date {
+        grid-area: date;
+
+        min-width: 0;
+    }
+
+    #mainContent.shared-appointments-page.mode-list .appointment-table-grid> :nth-child(2) {
+        grid-area: time;
+
+        justify-self: end;
+    }
+
+    #mainContent.shared-appointments-page.mode-list .appt-service-cell {
+        grid-area: service;
+
+        min-width: 0;
+    }
+
+    #mainContent.shared-appointments-page.mode-list .appt-patient-cell {
+        grid-area: patient;
+
+        min-width: 0;
+    }
+
+    #mainContent.shared-appointments-page.mode-list .appt-program-cell {
+        display: none !important;
+    }
+
+    #mainContent.shared-appointments-page.mode-list .appt-program-mobile {
+        display: inline-flex !important;
+    }
+
+    #mainContent.shared-appointments-page.mode-list .appt-status-cell {
+        grid-area: status;
+
+        justify-self: end;
+
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    #mainContent.shared-appointments-page.mode-list .appt-actions-wrap {
+        grid-area: actions;
+
+        width: 100%;
+        margin: 0;
+
+        justify-content: flex-end;
+    }
+
+    #mainContent.shared-appointments-page.mode-list .appt-patient-name {
+        max-width: 100%;
+
+        font-size: 0.72rem;
+        line-height: 1.2;
+    }
+
+    #mainContent.shared-appointments-page.mode-list .appt-patient-name-row {
+        gap: 0.35rem;
+        margin-bottom: 0.3rem;
+    }
+
+    #mainContent.shared-appointments-page.mode-list .appt-row-date .date-main {
+        margin: 0;
+
+        font-size: 0.68rem !important;
+        line-height: 1.2;
+    }
+
+    #mainContent.shared-appointments-page.mode-list .appt-row-date .date-sub {
+        margin: 0.1rem 0 0;
+
+        font-size: 0.6rem !important;
+        line-height: 1.15;
+    }
+
     #mainContent.shared-appointments-page .today-snapshot-card {
         padding: 15px;
         border-radius: 18px;
@@ -1132,6 +1175,67 @@
         flex: 0 0 auto !important;
         font-size: 7px !important;
         margin: 0 !important;
+    }
+
+    #mainContent.shared-appointments-page .appt-month-group {
+        margin-bottom: 0.8rem !important;
+    }
+
+    #mainContent.shared-appointments-page .appt-month-summary {
+        min-height: 48px;
+
+        gap: 0.5rem !important;
+
+        margin-bottom: 0.4rem !important;
+
+        padding:
+            0.5rem 0.65rem !important;
+
+        border-radius: 14px !important;
+    }
+
+    #mainContent.shared-appointments-page .appt-month-left {
+        display: grid !important;
+
+        grid-template-columns:
+            auto minmax(0, 1fr) auto;
+
+        align-items: center;
+
+        gap: 0.5rem !important;
+
+        flex: 1 1 auto;
+    }
+
+    #mainContent.shared-appointments-page .timeline-dot {
+        width: 14px;
+        height: 14px;
+
+        border-width: 2px;
+    }
+
+    #mainContent.shared-appointments-page .appt-month-title {
+        min-width: 0;
+
+        font-size: 0.86rem !important;
+        line-height: 1 !important;
+
+        white-space: nowrap;
+    }
+
+    #mainContent.shared-appointments-page .month-count-pill {
+        min-height: 24px !important;
+
+        padding:
+            0 0.55rem !important;
+
+        font-size: 0.64rem !important;
+    }
+
+    #mainContent.shared-appointments-page .appt-month-chevron {
+        flex: 0 0 auto;
+
+        font-size: 0.65rem !important;
     }
 }
 
@@ -1613,14 +1717,6 @@
 
     .shared-appointments-page .appointment-filter-actions {
         flex: 0 0 42px !important;
-    }
-
-    .shared-appointments-page .view-toggle-container[data-global-view-toggle] {
-        flex: 0 0 88px !important;
-        width: 88px !important;
-        min-width: 88px !important;
-        max-width: 88px !important;
-        margin: 0 !important;
     }
 
     .shared-appointments-page .appointment-status-dropdown {

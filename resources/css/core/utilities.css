@@ -262,30 +262,6 @@
     box-shadow: none;
 }
 
-.btn-add {
-    height: 40px;
-    padding: 0 14px;
-    border-radius: 12px;
-    font-size: 13px;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: all .2s;
-    position: relative;
-    white-space: nowrap;
-    border: none;
-    background: var(--crimson);
-    color: var(--color-white);
-    box-shadow: 0 3px 10px var(--alpha-crimson-18);
-}
-
-.btn-add:hover {
-    background: var(--crimson-hover);
-}
-
 .btn-new-role {
     background: linear-gradient(135deg, var(--crimson) 0%, var(--crimson-dark) 100%);
     color: var(--color-white);
@@ -348,17 +324,6 @@
     transform: translateY(-1px);
 }
 
-.ui-btn-sm {
-    min-height: 32px;
-    padding: 0 12px;
-    gap: 6px;
-    font-size: 11px;
-}
-
-.ui-btn-sm i {
-    font-size: 10px;
-}
-
 .ui-btn-compact {
     min-height: 34px;
     padding: 0 13px;
@@ -378,6 +343,17 @@
     line-height: 1;
     cursor: pointer;
     transition: all .18s ease;
+}
+
+.ui-btn-sm {
+    min-height: 32px;
+    padding: 0 12px;
+    gap: 6px;
+    font-size: 11px;
+}
+
+.ui-btn-sm i {
+    font-size: 10px;
 }
 
 .ui-btn-primary {
@@ -1002,7 +978,7 @@
     font-size: 11px;
     font-weight: 500;
     padding: 4px 8px;
-    border-radius: 6px;
+    border-radius: 999px;
     width: fit-content;
 }
 
@@ -2395,6 +2371,26 @@
     flex: 1 1 auto;
 }
 
+.global-record-name-row {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+
+    width: 100%;
+    min-width: 0;
+}
+
+.global-record-name-row .global-record-name {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.global-record-name-row .badge-role {
+    margin-left: auto;
+
+    flex: 0 0 auto;
+}
+
 .global-record-name {
     margin: 0;
 
@@ -2634,26 +2630,6 @@
     overflow-wrap: anywhere;
 }
 
-.appointment-grid-details .time-chip,
-.appointment-grid-details .service-badge {
-    min-height: 25px;
-
-    max-width: 100%;
-
-    padding: 4px 8px;
-
-    border-radius: 999px;
-
-    font-size: 10px;
-    font-weight: 750;
-    line-height: 1;
-
-    white-space: nowrap;
-
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 .mobile-appt-actions {
     display: flex;
 
@@ -2665,6 +2641,56 @@
     gap: 6px;
 
     margin-top: .65rem;
+}
+
+.global-show-more-controls {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    margin-top: .55rem;
+}
+
+.global-show-more-btn {
+    width: auto;
+    min-width: 0;
+    min-height: 32px;
+
+    margin-left: auto;
+    padding: 0 .75rem;
+
+    gap: .4rem;
+
+    font-size: .7rem;
+    line-height: 1;
+
+    flex: 0 0 auto;
+}
+
+.global-show-more-btn i {
+    font-size: .65rem;
+}
+
+.time-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-2);
+}
+
+[data-theme="dark"] #mainContent .time-chip,
+.dark #mainContent .time-chip {
+    background: rgba(13, 17, 23, 0.58) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #CBD5E1 !important;
 }
 
 [data-theme="dark"] .mobile-appt-card,
@@ -2894,6 +2920,66 @@
 }
 
 @media (max-width: 767px) {
+    .global-record-name-row {
+        gap: .35rem;
+        align-items: center;
+    }
+
+    .global-record-name-row .global-record-name {
+        min-width: 0;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .global-record-name-row .badge-role {
+        margin-left: auto;
+
+        flex-shrink: 0;
+    }
+
+    .badge-role {
+        gap: .25rem;
+        min-height: 20px;
+        padding: .22rem .5rem;
+        font-size: .58rem;
+        line-height: 1;
+        white-space: nowrap;
+        flex: 0 0 auto;
+    }
+
+    .ui-btn.ui-btn-sm {
+        min-height: 28px;
+        padding: 0 10px;
+        gap: 5px;
+
+        font-size: 9px;
+    }
+
+    .ui-btn.ui-btn-sm i {
+        font-size: 8px;
+    }
+
+    .time-chip,
+    .service-badge {
+        min-height: 20px;
+        padding: 3px 6px;
+        gap: 4px;
+
+        font-size: 8px;
+        line-height: 1;
+
+        width: fit-content;
+        max-width: 100%;
+
+        white-space: nowrap;
+    }
+
+    .time-chip i {
+        font-size: 8px;
+    }
+
     .global-info-pill {
         min-height: 20px;
         padding: 3px 6px;
@@ -2936,11 +3022,8 @@
 
     .global-record-profile {
         grid-column: 1 / -1;
-
         width: 100%;
-
         gap: .5rem;
-
         flex: none;
     }
 
@@ -2949,11 +3032,29 @@
     }
 
     .global-record-name {
+        min-width: 0;
+
         font-size: 11px;
         line-height: 1.18;
 
-        white-space: normal;
-        overflow-wrap: anywhere;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        overflow-wrap: normal;
+    }
+
+    .global-record-identity .ui-muted-text {
+        display: block;
+
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        font-size: 9.5px;
     }
 
     .global-record-subline {
@@ -2961,9 +3062,6 @@
 
         margin-top: 4px;
     }
-
-
-    /* Information rows */
 
     .global-record-information {
         grid-column: 1 / -1;
@@ -3029,9 +3127,6 @@
         line-height: 1.15;
     }
 
-
-    /* Actions */
-
     .global-record-actions {
         grid-column: 1 / -1;
 
@@ -3069,11 +3164,6 @@
         gap: 6px;
         white-space: nowrap;
         flex-shrink: 0;
-    }
-
-    .btn-add {
-        width: 100%;
-        height: 42px;
     }
 
     .btn-new-role {
@@ -3147,24 +3237,33 @@
         font-size: 9px;
     }
 
-    .appointment-grid-details .time-chip,
-    .appointment-grid-details .service-badge {
-        min-height: 20px;
-        padding: 3px 5px;
-        font-size: 7.5px;
-    }
-
     .mobile-appt-actions {
         margin-top: .45rem;
     }
 }
 
 @media (max-width: 380px) {
+    .badge-role {
+        min-height: 18px;
+        padding: .18rem .42rem;
+        font-size: .54rem;
+    }
+
+    .ui-btn.ui-btn-sm {
+        min-height: 26px;
+        padding: 0 8px;
+
+        font-size: 8.5px;
+    }
+
+    .ui-btn.ui-btn-sm i {
+        font-size: 7.5px;
+    }
+
     .global-info-pill {
         min-height: 18px;
         padding: 2px 5px;
         gap: 3px;
-
         font-size: 7.5px;
     }
 
@@ -3174,9 +3273,7 @@
 
     .global-record-card-body {
         gap: .5rem;
-
-        padding:
-            .62rem .62rem .62rem .82rem;
+        padding: .62rem .62rem .62rem .82rem;
     }
 
     .global-record-profile {
@@ -3197,9 +3294,7 @@
     }
 
     .global-record-information .global-info-item-inline {
-        grid-template-columns:
-            28px minmax(0, 1fr);
-
+        grid-template-columns: 28px minmax(0, 1fr);
         gap: .45rem;
     }
 
@@ -3207,9 +3302,7 @@
         width: 28px;
         height: 28px;
         min-width: 28px;
-
         flex-basis: 28px;
-
         border-radius: 8px;
     }
 
@@ -3306,15 +3399,6 @@
     .appointment-grid-details .global-info-value {
         font-size: 11px;
     }
-
-    .appointment-grid-details .time-chip,
-    .appointment-grid-details .service-badge {
-        min-height: 23px;
-
-        padding: 4px 7px;
-
-        font-size: 9px;
-    }
 }
 
 @media (min-width: 768px) and (max-width: 1100px) {
@@ -3322,25 +3406,18 @@
     .global-record-card-body {
         align-items: flex-start;
         flex-wrap: wrap;
-
         gap: .75rem;
-
-        padding:
-            .85rem 1rem .85rem 1.15rem;
+        padding: .85rem 1rem .85rem 1.15rem;
     }
 
     .global-record-profile {
         flex: 1 1 240px;
-
         gap: .65rem;
     }
 
     .global-record-information {
-        grid-template-columns:
-            repeat(3, minmax(0, 1fr));
-
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: .65rem;
-
         flex: 1 1 100%;
     }
 
@@ -3352,9 +3429,7 @@
         width: 32px;
         height: 32px;
         min-width: 32px;
-
         flex: 0 0 32px;
-
         border-radius: 10px;
     }
 
@@ -3368,7 +3443,6 @@
 
     .global-record-information .global-info-value {
         margin-top: 3px;
-
         font-size: 11px;
         line-height: 1.2;
     }

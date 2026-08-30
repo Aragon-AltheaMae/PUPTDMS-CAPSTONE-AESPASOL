@@ -417,7 +417,7 @@
     height: 42px;
     border-radius: 14px;
     background: var(--status-bg, var(--crimson-light, #fef2f2));
-    color: var(--status-solid, var(--brand-red, #8B0000));
+    color: var(--status-solid, var(--crimson, #8B0000));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -445,7 +445,7 @@
 
     margin-left: auto;
 
-    color: var(--brand-red, #8B0000) !important;
+    color: var(--crimson, #8B0000) !important;
 
     font-size: .72rem;
     font-weight: 700;
@@ -509,7 +509,7 @@
 }
 
 .card-arrow-btn:hover {
-    color: var(--brand-red, #8B0000);
+    color: var(--crimson, #8B0000);
     background: var(--crimson-light, #fef2f2);
     border-color: rgba(139, 0, 0, 0.18);
 }
@@ -944,7 +944,7 @@
 
     background:
         linear-gradient(135deg,
-            var(--brand-red, #8B0000),
+            var(--crimson, #8B0000),
             #650000);
 
     opacity: 0;
@@ -968,7 +968,7 @@
     border-radius: 14px;
 
     background: var(--crimson-light, #fef2f2);
-    color: var(--brand-red, #8B0000);
+    color: var(--crimson, #8B0000);
 
     box-shadow:
         0 7px 16px rgba(139, 0, 0, .08);
@@ -1485,7 +1485,7 @@
     border-radius: 999px;
 
     background: var(--crimson-light, #fef2f2);
-    color: var(--brand-red, #8B0000);
+    color: var(--crimson, #8B0000);
 
     font-size: .65rem;
     font-weight: 800;

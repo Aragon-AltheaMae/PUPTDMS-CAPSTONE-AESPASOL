@@ -187,12 +187,6 @@ body.role-dentist .table-card>div:first-child {
     border-color: #30363D !important;
 }
 
-[data-theme="dark"] body.role-dentist .table-card>div:first-child,
-.dark body.role-dentist .table-card>div:first-child {
-    background: #161B22 !important;
-    border-bottom-color: #30363D !important;
-}
-
 @media (max-width: 767px) {
     body.role-dentist #mainContent .table-card {
         border-radius: 20px !important;

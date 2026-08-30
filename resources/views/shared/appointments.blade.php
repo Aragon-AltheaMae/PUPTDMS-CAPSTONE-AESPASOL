@@ -7,7 +7,7 @@
 @section('usesAppointmentCalendar', true)
 
 @section('styles')
-    @vite('resources/css/pages/shared/appointments.css')
+@vite('resources/css/pages/shared/appointments.css')
 @endsection
 
 @section('content')
@@ -479,7 +479,7 @@ return $aDateTime <=> $bDateTime;
                                     Time
                                 </div>
 
-                                <div class="appt-program-cell text-left">
+                                <div class="appt-service-heading">
                                     Service
                                 </div>
 
@@ -487,11 +487,11 @@ return $aDateTime <=> $bDateTime;
                                     Patient
                                 </div>
 
-                                <div class="appt-program-cell text-left">
+                                <div class="appt-program-heading">
                                     Program
                                 </div>
 
-                                <div class="appt-program-cell text-left">
+                                <div class="appt-status-heading">
                                     Status
                                 </div>
 
@@ -904,6 +904,12 @@ return $aDateTime <=> $bDateTime;
                                                     <span class="global-info-pill">
                                                         <i class="fa-regular fa-id-card"></i>
                                                         {{ $studentNumber }}
+                                                    </span>
+
+                                                    <span class="global-info-pill appt-program-mobile"
+                                                        title="{{ $programFull }}">
+                                                        <i class="fa-solid fa-graduation-cap"></i>
+                                                        {{ $program }}
                                                     </span>
                                                 </div>
                                             </div>

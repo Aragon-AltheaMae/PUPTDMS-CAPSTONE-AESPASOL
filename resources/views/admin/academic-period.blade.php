@@ -185,9 +185,6 @@ $createAcademicPeriodUnauthorizedMessage = 'You are not authorized to add academ
                             <div class="table-toolbar-title">
                                 <div class="card-header-icon"><i class="fa-solid fa-school"></i></div>
                                 <span class="card-title">All Academic Periods</span>
-                                <span id="entryBadge" class="entry-badge">
-                                    {{ $academicPeriods->total() }}
-                                </span>
                             </div>
 
                             <form method="GET" action="{{ route($routeNames['index'] ?? 'admin.academic_periods') }}" id="filterForm"

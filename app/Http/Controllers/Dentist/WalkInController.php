@@ -107,6 +107,29 @@ class WalkInController extends Controller
                 'show_all'
             );
 
+        $role = strtolower(
+            trim(
+                (string) $request->query(
+                    'role',
+                    ''
+                )
+            )
+        );
+
+        if (
+            !in_array(
+                $role,
+                [
+                    'patient',
+                    'faculty',
+                    'admin',
+                ],
+                true
+            )
+        ) {
+            $role = '';
+        }
+
         $page = max(
             1,
             (int) $request->query('page', 1)
@@ -124,7 +147,7 @@ class WalkInController extends Controller
         )
             ? $perPageInput
             : 10;
-            
+
         $sourceLimit = max(
             20,
             min(
@@ -141,9 +164,51 @@ class WalkInController extends Controller
                 $hasMeaningfulSearch ||
                 $showAll;
 
+            $loadStudents =
+                $shouldLoadConnectedSources &&
+                in_array(
+                    $role,
+                    ['', 'patient'],
+                    true
+                );
+
+            $loadFaculty =
+                $shouldLoadConnectedSources &&
+                in_array(
+                    $role,
+                    ['', 'faculty'],
+                    true
+                );
+
+            $loadAdministrative =
+                $shouldLoadConnectedSources &&
+                in_array(
+                    $role,
+                    ['', 'admin'],
+                    true
+                );
+
+            $localClassifications =
+                match ($role) {
+                    'patient' => [
+                        'student',
+                        'dependent_alumni',
+                    ],
+
+                    'faculty' => [
+                        'faculty',
+                    ],
+
+                    'admin' => [
+                        'administrative',
+                    ],
+
+                    default => null,
+                };
+
             $patients = collect()
                 ->merge(
-                    $shouldLoadConnectedSources
+                    $loadStudents
                         ? $this->searchOgosPatients(
                             $search,
                             $sourceLimit,
@@ -152,7 +217,7 @@ class WalkInController extends Controller
                         : []
                 )
                 ->merge(
-                    $shouldLoadConnectedSources
+                    $loadFaculty
                         ? $this->searchFacultyPatients(
                             $search,
                             $sourceLimit,
@@ -161,7 +226,7 @@ class WalkInController extends Controller
                         : []
                 )
                 ->merge(
-                    $shouldLoadConnectedSources
+                    $loadAdministrative
                         ? $this->searchExternalAdminPatients(
                             $search,
                             $sourceLimit
@@ -171,7 +236,8 @@ class WalkInController extends Controller
                 ->merge(
                     $this->searchLocalPatients(
                         $search,
-                        $sourceLimit
+                        $sourceLimit,
+                        $localClassifications
                     )
                 )
                 ->filter()
@@ -710,7 +776,8 @@ class WalkInController extends Controller
 
     private function searchLocalPatients(
         string $search,
-        int $limit
+        int $limit,
+        ?array $classifications = null
     ): array {
         $userColumns = [
             'id',
@@ -755,6 +822,13 @@ class WalkInController extends Controller
             ])
             ->select($patientColumns)
             ->orderBy('name');
+
+        if ($classifications !== null) {
+            $query->whereIn(
+                'classification',
+                $classifications
+            );
+        }
 
         if ($search !== '') {
             $query->where(function ($builder) use ($search) {

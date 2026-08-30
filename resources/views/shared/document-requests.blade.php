@@ -242,16 +242,10 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
 
             </div>
 
-            <div class="table-summary">
-                <span id="rowCount" class="table-summary-count">
-                    {{ $docRequestStats['all'] }} requests
-                </span>
-            </div>
-
             <x-pagination-bar id="docreqPaginationTopBar" info-id="pageInfoTop" pagination-id="pagControlsTop"
                 position="top" :show-entries="true" page-size-id="docreqPerPageSelect"
                 page-size-callback="selectDocreqPerPage" :page-size-value="$perPage" page-size-label="per page"
-                label="entries" class="docreq-pagebar docreq-pagebar-top" />
+                label="requests" class="docreq-pagebar docreq-pagebar-top" />
 
             <div id="requestListView" class="table-list-view">
                 <div class="table-scroll-wrapper">
@@ -283,7 +277,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
             <div id="docreqEmptyState" class="empty-state-host"></div>
 
             <x-pagination-bar id="docreqPaginationBottomBar" info-id="pageInfo" pagination-id="pagControls"
-                position="bottom" :page-size-value="$perPage" label="entries" />
+                position="bottom" :page-size-value="$perPage" label="requests" />
 
         </div>
     </div>
@@ -1030,14 +1024,6 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                     ? buildDocRequestSkeletonHtml(6)
                     : '';
         }
-
-        const rowCount =
-            document.getElementById('rowCount');
-
-        if (rowCount) {
-            rowCount.textContent =
-                'Loading requests…';
-        }
     }
 
     function updateStats(stats) {
@@ -1341,30 +1327,6 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
         }
     }
 
-    function updateDocreqRowCount() {
-        const rowCount =
-            document.getElementById(
-                'rowCount'
-            );
-
-        if (!rowCount) {
-            return;
-        }
-
-        const total =
-            Number(
-                docreqPagination?.total ??
-                allRequests.length ??
-                0
-            );
-
-        rowCount.textContent =
-            `${total} ${total === 1
-                ? 'request'
-                : 'requests'
-            }`;
-    }
-
     function renderList() {
         const page = getFiltered();
 
@@ -1384,7 +1346,6 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
             document.getElementById('requestGridContainer');
 
         renderDocreqPagebars(docreqPagination);
-        updateDocreqRowCount();
 
         if (!page.length) {
             if (tableHead) {
@@ -2159,7 +2120,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                 ),
             ],
 
-            itemLabel: 'entries',
+            itemLabel: 'requests',
 
             onPageChange(page) {
                 currentPage = page;

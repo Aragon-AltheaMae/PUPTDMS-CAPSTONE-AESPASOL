@@ -112,12 +112,6 @@
 
                 <div class="patient-table-toolbar record-toolbar px-4 md:px-6 py-4 border-b border-gray-100">
                     <div class="record-toolbar-layout">
-                        <div class="record-toolbar-count">
-                            <span id="recordRowCount">
-                                {{ number_format($totalRecordsCount) }}
-                                {{ \Illuminate\Support\Str::plural('dental record', $totalRecordsCount) }}
-                            </span>
-                        </div>
 
                         @php
                         $recordAllCount = $totalRecordsCount;

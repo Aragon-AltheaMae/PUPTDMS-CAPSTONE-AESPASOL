@@ -168,24 +168,46 @@ function refreshShowMore(root) {
             '[data-show-more-text]'
         );
 
+    const controls =
+        root.querySelector(
+            '[data-show-more-controls]'
+        );
+
     if (!button || !text) {
         return;
     }
 
-    if (total <= step) {
-        button.classList.add(
-            'hidden'
-        );
+    const hasMore =
+        total > step;
 
+    if (controls) {
+        controls.hidden =
+            !hasMore;
+    }
+
+    button.hidden =
+        !hasMore;
+
+    if (!hasMore) {
         button.dataset.mode =
             'more';
 
+        text.textContent =
+            'Show more';
+
+        const icon =
+            button.querySelector('i');
+
+        icon?.classList.remove(
+            'fa-chevron-up'
+        );
+
+        icon?.classList.add(
+            'fa-chevron-down'
+        );
+
         return;
     }
-
-    button.classList.remove(
-        'hidden'
-    );
 
     const fullyExpanded =
         currentVisible >= total;

@@ -17,9 +17,6 @@ $isBookingMode = $bookingMode ?? request()->routeIs('admin.book_appointments.*')
 $pageHeading = $isDentistView
     ? 'Patient Directory'
     : ($pageTitle ?? ($isBookingMode ? 'Select Patient for Booking' : 'Patient List'));
-$pageSubtitle = $isBookingMode
-    ? 'Choose a patient first, then continue to the appointment form.'
-    : 'Review patient records and open their profiles.';
 @endphp
 
 <main id="mainContent" class="{{ $pageShellClass }}
@@ -99,18 +96,6 @@ $pageSubtitle = $isBookingMode
             <div class="page-banner-inner">
                 <div>
                     <h1 class="page-title">{{ $pageHeading }}</h1>
-                    <p class="mt-2 text-sm font-medium text-white/85">
-                        {{ $pageSubtitle }}
-                    </p>
-                </div>
-
-                <div class="flex items-center gap-3 flex-shrink-0">
-                    <span class="page-badge">
-                        <span class="page-badge-dot"></span>
-
-                        {{ $allCount }}
-                        {{ \Illuminate\Support\Str::plural($isBookingMode ? 'patient' : 'record', $allCount) }}
-                    </span>
                 </div>
             </div>
         </div>
@@ -207,10 +192,6 @@ $pageSubtitle = $isBookingMode
                                 </button>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="table-summary-count">
-                        <span id="rowCount">0 patients</span>
                     </div>
 
                     <x-pagination-bar id="patientPaginationTopBar" info-id="patientPageInfoTop"
