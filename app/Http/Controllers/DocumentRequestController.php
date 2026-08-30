@@ -315,7 +315,7 @@ class DocumentRequestController extends Controller
         $activeRole = session('impersonated_role') ?: session('role');
 
         if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            return response()->json(['message' => 'Unauthorized.'], 403);
         }
 
         try {
@@ -381,7 +381,7 @@ class DocumentRequestController extends Controller
         $activeRole = session('impersonated_role') ?: session('role');
 
         if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            return response()->json(['message' => 'Unauthorized.'], 403);
         }
 
         $request->validate([

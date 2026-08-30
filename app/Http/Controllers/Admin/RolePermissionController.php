@@ -13,6 +13,119 @@ use App\Helpers\AuditLogger;
 class RolePermissionController extends Controller
 {
     private const CORE_ROLE_SLUGS = ['admin', 'dentist', 'patient'];
+    private const LEGACY_DENTIST_DEFAULT_PERMISSION_SLUGS = [
+        'access_dentist_dashboard',
+        'view_patient_profiles',
+        'view_dental_records',
+        'view_appointments',
+        'reschedule_appointments',
+        'cancel_appointments',
+        'view_clinic_schedule',
+        'update_clinic_schedule',
+        'create_clinic_schedule',
+        'delete_clinic_schedule',
+        'view_inventory',
+        'add_inventory',
+        'update_inventory',
+        'delete_inventory',
+        'view_reports',
+        'create_report_files',
+    ];
+
+    private const LEGACY_DENTIST_DOCUMENT_REQUEST_BACKFILL_SLUGS = [
+        'access_dentist_dashboard',
+        'view_patient_profiles',
+        'view_dental_records',
+        'view_appointments',
+        'reschedule_appointments',
+        'cancel_appointments',
+        'manage_walk_in_patients',
+        'manage_existing_records',
+        'view_document_requests',
+        'view_clinic_schedule',
+        'update_clinic_schedule',
+        'create_clinic_schedule',
+        'delete_clinic_schedule',
+        'view_inventory',
+        'add_inventory',
+        'update_inventory',
+        'delete_inventory',
+        'view_reports',
+        'create_report_files',
+    ];
+    private const LEGACY_PERMISSION_MIGRATIONS = [
+        'create_delete_clinic_schedule' => [
+            'create_clinic_schedule',
+            'delete_clinic_schedule',
+        ],
+        'view_service_types' => [
+            'view_service_type',
+        ],
+        'create_delete_custom_service_types' => [
+            'create_service_type',
+            'delete_service_type',
+        ],
+        'update_service_types' => [
+            'update_default_service_type',
+        ],
+        'create_delete_academic_period' => [
+            'create_academic_period',
+            'delete_academic_period',
+        ],
+        'manage_inventory' => [
+            'view_inventory',
+            'add_inventory',
+            'update_inventory',
+            'delete_inventory',
+        ],
+        'manage_inventory_items' => [
+            'add_inventory',
+            'update_inventory',
+            'delete_inventory',
+        ],
+        'create_disable_users' => [
+            'create_users',
+            'disable_users',
+        ],
+        'update_role_password' => [
+            'update_user_role',
+            'update_user_password',
+        ],
+    ];
+    private const REMOVED_PERMISSION_SLUGS = [
+        'manage_super_admin_accounts',
+        'manage_document_requests',
+        'manage_reports',
+        'manage_user_accounts',
+        'manage_user_roles',
+        'manage_dentist_accounts',
+        'set_academic_year',
+        'manage_cms_users',
+        'set_report_periods',
+        'set_required_fields',
+        'set_export_file_type',
+        'create_delete_clinic_schedule',
+        'view_service_types',
+        'create_delete_custom_service_types',
+        'update_service_types',
+        'create_delete_academic_period',
+        'manage_inventory',
+        'manage_inventory_items',
+        'create_disable_users',
+        'update_role_password',
+        'create_follow_up_appointments',
+        'manage_appointments',
+        'view_appointment_details',
+        'create_procedure_records',
+        'create_dental_records',
+        'create_medical_records',
+        'create_odontograms',
+        'update_odontograms',
+        'manage_audit_trail',
+        'set_archive_records',
+        'update_cms_integration',
+        'update_faculty_integration',
+    ];
 
     private const REQUIRED_PERMISSIONS = [
         ['name' => 'Access Super Admin Dashboard', 'slug' => 'access_super_admin_dashboard', 'module' => 'General Access'],
@@ -20,11 +133,25 @@ class RolePermissionController extends Controller
         ['name' => 'Access Patient Dashboard', 'slug' => 'access_patient_dashboard', 'module' => 'General Access'],
         ['name' => 'Receive Notifications', 'slug' => 'receive_notifications', 'module' => 'General Access'],
         ['name' => 'Manage System Settings', 'slug' => 'manage_system_settings', 'module' => 'System Settings'],
-        ['name' => 'Manage Audit Trail', 'slug' => 'manage_audit_trail', 'module' => 'System Settings'],
-        ['name' => 'Manage User Accounts', 'slug' => 'manage_user_accounts', 'module' => 'User Management'],
-        ['name' => 'Manage User Roles', 'slug' => 'manage_user_roles', 'module' => 'User Management'],
-        ['name' => 'Manage Dentist Accounts', 'slug' => 'manage_dentist_accounts', 'module' => 'User Management'],
-        ['name' => 'Manage Super Admin Accounts', 'slug' => 'manage_super_admin_accounts', 'module' => 'User Management'],
+        ['name' => 'View System Logs', 'slug' => 'view_system_logs', 'module' => 'System Logs'],
+        ['name' => 'Export System Logs', 'slug' => 'export_system_logs', 'module' => 'System Logs'],
+        ['name' => 'Archive System Logs', 'slug' => 'archive_system_logs', 'module' => 'System Logs'],
+        ['name' => 'View Account Details', 'slug' => 'view_account_details', 'module' => 'User Management'],
+        ['name' => 'Create Users', 'slug' => 'create_users', 'module' => 'User Management'],
+        ['name' => 'Disable Users', 'slug' => 'disable_users', 'module' => 'User Management'],
+        ['name' => 'Update User Role', 'slug' => 'update_user_role', 'module' => 'User Management'],
+        ['name' => 'Update User Password', 'slug' => 'update_user_password', 'module' => 'User Management'],
+        ['name' => 'View Roles & Permissions', 'slug' => 'view_roles_permissions', 'module' => 'Role Permissions'],
+        ['name' => 'Create Custom Roles', 'slug' => 'create_custom_roles', 'module' => 'Role Permissions'],
+        ['name' => 'Update Role Permissions', 'slug' => 'update_role_permissions', 'module' => 'Role Permissions'],
+        ['name' => 'Delete Custom Roles', 'slug' => 'delete_custom_roles', 'module' => 'Role Permissions'],
+
+        ['name' => 'View Faculty Integration', 'slug' => 'view_faculty_integration', 'module' => 'Faculty Integration'],
+        ['name' => 'Create Faculty Integration', 'slug' => 'create_faculty_integration', 'module' => 'Faculty Integration'],
+
+        ['name' => 'View CMS Integration', 'slug' => 'view_cms_integration', 'module' => 'CMS Integration'],
+        ['name' => 'Create CMS Integration', 'slug' => 'create_cms_integration', 'module' => 'CMS Integration'],
+
         ['name' => 'View Dentist Transitions', 'slug' => 'view_dentist_transitions', 'module' => 'Dentist Continuity'],
         ['name' => 'Create Dentist Transitions', 'slug' => 'create_dentist_transitions', 'module' => 'Dentist Continuity'],
         ['name' => 'Update Dentist Transitions', 'slug' => 'update_dentist_transitions', 'module' => 'Dentist Continuity'],
@@ -34,22 +161,40 @@ class RolePermissionController extends Controller
         ['name' => 'Extend Dentist Access', 'slug' => 'extend_dentist_access', 'module' => 'Dentist Continuity'],
         ['name' => 'View Dentist Transition Audit Logs', 'slug' => 'view_dentist_transition_audit_logs', 'module' => 'Dentist Continuity'],
         ['name' => 'Manage Document Templates', 'slug' => 'manage_document_templates', 'module' => 'Document Templates'],
-        ['name' => 'Manage Reports', 'slug' => 'manage_reports', 'module' => 'Reports'],
-        ['name' => 'Manage Inventory', 'slug' => 'manage_inventory', 'module' => 'Inventory'],
-        ['name' => 'Set Academic Year', 'slug' => 'set_academic_year', 'module' => 'System Settings'],
-        ['name' => 'Set Archive Records', 'slug' => 'set_archive_records', 'module' => 'System Settings'],
-        ['name' => 'Set Report Periods', 'slug' => 'set_report_periods', 'module' => 'System Settings'],
-        ['name' => 'Set Required Fields', 'slug' => 'set_required_fields', 'module' => 'System Settings'],
+        ['name' => 'View Service Type', 'slug' => 'view_service_type', 'module' => 'Service Types'],
+        ['name' => 'Create Service Type', 'slug' => 'create_service_type', 'module' => 'Service Types'],
+        ['name' => 'Delete Service Type', 'slug' => 'delete_service_type', 'module' => 'Service Types'],
+        ['name' => 'Update Default Service Type', 'slug' => 'update_default_service_type', 'module' => 'Service Types'],
+        ['name' => 'View Reports', 'slug' => 'view_reports', 'module' => 'Reports'],
+        ['name' => 'Create Report Files', 'slug' => 'create_report_files', 'module' => 'Reports'],
+        ['name' => 'View AI Reports', 'slug' => 'view_ai_reports', 'module' => 'Reports'],
+        ['name' => 'Create AI Generative Reports', 'slug' => 'create_ai_generative_reports', 'module' => 'Reports'],
+        ['name' => 'View Inventory', 'slug' => 'view_inventory', 'module' => 'Inventory'],
+        ['name' => 'Add Inventory', 'slug' => 'add_inventory', 'module' => 'Inventory'],
+        ['name' => 'Update Inventory', 'slug' => 'update_inventory', 'module' => 'Inventory'],
+        ['name' => 'Delete Inventory', 'slug' => 'delete_inventory', 'module' => 'Inventory'],
+        ['name' => 'View Academic Periods/PUP Calendar/Time', 'slug' => 'view_academic_periods', 'module' => 'Academic Period'],
+        ['name' => 'Update Academic Period', 'slug' => 'update_academic_period', 'module' => 'Academic Period'],
+        ['name' => 'Create Academic Period', 'slug' => 'create_academic_period', 'module' => 'Academic Period'],
+        ['name' => 'Delete Academic Period', 'slug' => 'delete_academic_period', 'module' => 'Academic Period'],
         ['name' => 'Set Appointment Limit', 'slug' => 'set_appointment_limit', 'module' => 'System Settings'],
         ['name' => 'Set Notification Rules', 'slug' => 'set_notification_rules', 'module' => 'System Settings'],
-        ['name' => 'Set Export File Type', 'slug' => 'set_export_file_type', 'module' => 'System Settings'],
+        ['name' => 'View Dental Records', 'slug' => 'view_dental_records', 'module' => 'Dental Records'],
         ['name' => 'Manage Dental Records', 'slug' => 'manage_dental_records', 'module' => 'Dental Records'],
-        ['name' => 'Manage Appointments', 'slug' => 'manage_appointments', 'module' => 'Appointments'],
+        ['name' => 'View Appointments', 'slug' => 'view_appointments', 'module' => 'Appointments'],
+        ['name' => 'Reschedule Appointments', 'slug' => 'reschedule_appointments', 'module' => 'Appointments'],
+        ['name' => 'Cancel Appointments', 'slug' => 'cancel_appointments', 'module' => 'Appointments'],
         ['name' => 'Manage Walk-in Patients', 'slug' => 'manage_walk_in_patients', 'module' => 'Appointments'],
         ['name' => 'Add Existing Record', 'slug' => 'manage_existing_records', 'module' => 'Appointments'],
-        ['name' => 'Manage Clinic Schedule', 'slug' => 'manage_clinic_schedule', 'module' => 'Appointments'],
+        ['name' => 'View Schedule and Dates', 'slug' => 'view_clinic_schedule', 'module' => 'Clinic Schedule'],
+        ['name' => 'Update Clinic Hours', 'slug' => 'update_clinic_schedule', 'module' => 'Clinic Schedule'],
+        ['name' => 'Create Clinic Hours', 'slug' => 'create_clinic_schedule', 'module' => 'Clinic Schedule'],
+        ['name' => 'Delete Clinic Hours', 'slug' => 'delete_clinic_schedule', 'module' => 'Clinic Schedule'],
+        ['name' => 'View Patient Profiles', 'slug' => 'view_patient_profiles', 'module' => 'Patients'],
         ['name' => 'Manage Patient Profiles', 'slug' => 'manage_patient_profiles', 'module' => 'Patients'],
-        ['name' => 'Manage Document Requests', 'slug' => 'manage_document_requests', 'module' => 'Document Requests'],
+        ['name' => 'View Document Requests', 'slug' => 'view_document_requests', 'module' => 'Document Requests'],
+        ['name' => 'Approve Document Requests', 'slug' => 'approve_document_requests', 'module' => 'Document Requests'],
+        ['name' => 'Reject Document Requests', 'slug' => 'reject_document_requests', 'module' => 'Document Requests'],
         ['name' => 'Book Appointments', 'slug' => 'book_appointments', 'module' => 'Appointments'],
         ['name' => 'View Own Appointments', 'slug' => 'view_own_appointments', 'module' => 'Appointments'],
         ['name' => 'View Own Profile', 'slug' => 'view_own_profile', 'module' => 'Patients'],
@@ -62,11 +207,19 @@ class RolePermissionController extends Controller
             'access_super_admin_dashboard',
             'receive_notifications',
             'manage_system_settings',
-            'manage_audit_trail',
-            'manage_user_accounts',
-            'manage_user_roles',
-            'manage_dentist_accounts',
-            'manage_super_admin_accounts',
+            'set_notification_rules',
+            'view_system_logs',
+            'export_system_logs',
+            'archive_system_logs',
+            'view_account_details',
+            'create_users',
+            'disable_users',
+            'update_user_role',
+            'update_user_password',
+            'view_roles_permissions',
+            'create_custom_roles',
+            'update_role_permissions',
+            'delete_custom_roles',
             'view_dentist_transitions',
             'create_dentist_transitions',
             'update_dentist_transitions',
@@ -74,33 +227,68 @@ class RolePermissionController extends Controller
             'finalize_dentist_transitions',
             'cancel_dentist_transitions',
             'extend_dentist_access',
-            'view_dentist_transition_audit_logs',
             'manage_document_templates',
-            'manage_reports',
-            'manage_inventory',
-            'manage_patient_profiles',
-            'manage_dental_records',
-            'manage_appointments',
-            'manage_clinic_schedule',
-            'manage_document_requests',
-            'set_academic_year',
-            'set_archive_records',
-            'set_report_periods',
-            'set_required_fields',
-            'set_appointment_limit',
-            'set_notification_rules',
-            'set_export_file_type',
+            'view_service_type',
+            'create_service_type',
+            'delete_service_type',
+            'update_default_service_type',
+            'view_ai_reports',
+            'create_ai_generative_reports',
+            'create_ai_generative_reports',
+            'view_inventory',
+            'add_inventory',
+            'update_inventory',
+            'delete_inventory',
+            'view_patient_profiles',
+            'view_dental_records',
+            'view_appointments',
+            'reschedule_appointments',
+            'cancel_appointments',
+            'view_clinic_schedule',
+            'update_clinic_schedule',
+            'create_clinic_schedule',
+            'delete_clinic_schedule',
+            'view_document_requests',
+            'approve_document_requests',
+            'reject_document_requests',
+            'view_academic_periods',
+            'update_academic_period',
+            'create_academic_period',
+            'delete_academic_period',
+            'view_faculty_integration',
+            'create_faculty_integration',
+            'view_cms_integration',
+            'create_cms_integration',
         ],
         'dentist' => [
             'access_dentist_dashboard',
-            'manage_patient_profiles',
-            'manage_appointments',
+            'receive_notifications',
+            'view_patient_profiles',
+            'view_appointments',
+            'reschedule_appointments',
+            'cancel_appointments',
+            'create_follow_up_appointments',
             'manage_walk_in_patients',
             'manage_existing_records',
-            'manage_clinic_schedule',
-            'manage_document_requests',
-            'manage_inventory',
-            'manage_reports',
+            'create_procedure_records',
+            'create_dental_records',
+            'create_medical_records',
+            'create_odontograms',
+            'update_odontograms',
+            'view_clinic_schedule',
+            'update_clinic_schedule',
+            'create_clinic_schedule',
+            'delete_clinic_schedule',
+            'view_document_requests',
+            'approve_document_requests',
+            'reject_document_requests',
+            'request_documents',
+            'view_inventory',
+            'add_inventory',
+            'update_inventory',
+            'delete_inventory',
+            'view_reports',
+            'create_report_files',
         ],
         'patient' => [
             'access_patient_dashboard',
@@ -120,6 +308,7 @@ class RolePermissionController extends Controller
 
         $roles = Role::with('permissions')->get();
         $permissions = Permission::where('slug', '!=', 'manage_backup')
+            ->whereNotIn('slug', self::REMOVED_PERMISSION_SLUGS)
             ->orderBy('module')
             ->orderBy('name')
             ->get();
@@ -127,13 +316,28 @@ class RolePermissionController extends Controller
 
         $highlightRoleId = session('new_role_id') ?? $request->query('highlight_role');
 
+        $authUser = $request->user();
+
+        $canViewAsRole = $authUser?->hasPermission('access_super_admin_dashboard') ?? false;
+        $canCreateRoles = $authUser?->hasPermission('create_custom_roles') ?? false;
+        $canUpdateRolePermissions = $authUser?->hasPermission('update_role_permissions') ?? false;
+        $canDeleteCustomRoles = $authUser?->hasPermission('delete_custom_roles') ?? false;
+
         AuditLogger::log(
             'view',
             'roles_permissions',
             'Admin viewed roles and permissions'
         );
 
-        return view('admin.role-permissions', compact('roles', 'groupedPermissions', 'highlightRoleId'));
+        return view('admin.role-permissions', compact(
+            'roles',
+            'groupedPermissions',
+            'highlightRoleId',
+            'canViewAsRole',
+            'canCreateRoles',
+            'canUpdateRolePermissions',
+            'canDeleteCustomRoles'
+        ));
     }
 
     private function seedDefaultsIfEmpty(): void
@@ -154,6 +358,39 @@ class RolePermissionController extends Controller
                 $permission
             );
         }
+
+        $this->migrateLegacyPermissionAssignments();
+
+        Permission::whereIn('slug', self::REMOVED_PERMISSION_SLUGS)->delete();
+        $this->backfillLegacyDentistDefaults();
+    }
+
+    private function migrateLegacyPermissionAssignments(): void
+    {
+        foreach (self::LEGACY_PERMISSION_MIGRATIONS as $legacySlug => $replacementSlugs) {
+            $legacyPermission = Permission::where('slug', $legacySlug)->first();
+
+            if (! $legacyPermission) {
+                continue;
+            }
+
+            $replacementIds = Permission::whereIn('slug', $replacementSlugs)->pluck('id');
+
+            if ($replacementIds->isEmpty()) {
+                continue;
+            }
+
+            foreach ($legacyPermission->roles as $role) {
+                $mergedPermissionIds = $role->permissions()
+                    ->where('permissions.id', '!=', $legacyPermission->id)
+                    ->pluck('permissions.id')
+                    ->merge($replacementIds)
+                    ->unique()
+                    ->values();
+
+                $role->permissions()->sync($mergedPermissionIds);
+            }
+        }
     }
 
     private function applyDefaults(Role $role, string $slug): void
@@ -162,6 +399,46 @@ class RolePermissionController extends Controller
 
         $ids = Permission::whereIn('slug', self::DEFAULT_ROLE_PERMISSIONS[$slug])->pluck('id');
         $role->permissions()->sync($ids);
+    }
+
+    private function backfillLegacyDentistDefaults(): void
+    {
+        $role = Role::with('permissions')
+            ->where('slug', 'dentist')
+            ->first();
+
+        if (! $role) {
+            return;
+        }
+
+        $currentSlugs = $role->permissions
+            ->pluck('slug')
+            ->sort()
+            ->values()
+            ->all();
+
+        $legacySlugs = collect(self::LEGACY_DENTIST_DEFAULT_PERMISSION_SLUGS)
+            ->sort()
+            ->values()
+            ->all();
+
+        $legacyDocumentRequestBackfillSlugs = collect(self::LEGACY_DENTIST_DOCUMENT_REQUEST_BACKFILL_SLUGS)
+            ->sort()
+            ->values()
+            ->all();
+
+        if ($currentSlugs !== $legacySlugs && $currentSlugs !== $legacyDocumentRequestBackfillSlugs) {
+            return;
+        }
+
+        $updatedSlugs = array_values(array_unique(array_merge(
+            $currentSlugs,
+            self::DEFAULT_ROLE_PERMISSIONS['dentist']
+        )));
+
+        $permissionIds = Permission::whereIn('slug', $updatedSlugs)->pluck('id');
+
+        $role->permissions()->sync($permissionIds);
     }
 
     public function update(Request $request)
@@ -214,7 +491,7 @@ class RolePermissionController extends Controller
             ->toArray();
 
         return redirect()
-            ->route('admin.role_permissions')
+            ->route($this->rolePermissionsRouteName())
             ->with('success', 'Role permissions updated successfully.')
             ->with('saved_view_as', [
                 'role_id'     => $role->id,
@@ -238,10 +515,11 @@ class RolePermissionController extends Controller
                 $role->permissions()->sync([]);
             });
 
-        AuditLogger::log
-            ('update', 
-            'roles_permissions', 
-            'Admin reset all permissions to defaults');
+        AuditLogger::log(
+            'update',
+            'roles_permissions',
+            'Admin reset all permissions to defaults'
+        );
 
         if (request()->expectsJson()) {
             return response()->json([
@@ -250,7 +528,8 @@ class RolePermissionController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Default permissions restored.');
+        return redirect()->route($this->rolePermissionsRouteName())
+            ->with('success', 'Default permissions restored.');
     }
 
     public function storeRole(Request $request)
@@ -299,7 +578,7 @@ class RolePermissionController extends Controller
         }
 
         return redirect()
-            ->route('admin.role_permissions', ['highlight_role' => $role->id])
+            ->route($this->rolePermissionsRouteName(), ['highlight_role' => $role->id])
             ->with('success', $message)
             ->with('new_role_id', $role->id);
     }
@@ -322,7 +601,7 @@ class RolePermissionController extends Controller
                     ], 422);
                 }
 
-                return redirect()->route('admin.role_permissions')
+                return redirect()->route($this->rolePermissionsRouteName())
                     ->with('error', $message);
             }
 
@@ -365,7 +644,7 @@ class RolePermissionController extends Controller
                 ]);
             }
 
-            return redirect()->route('admin.role_permissions')
+            return redirect()->route($this->rolePermissionsRouteName())
                 ->with('success', $message);
         } catch (\Throwable $e) {
             $message = app()->hasDebugModeEnabled() && config('app.debug')
@@ -379,7 +658,7 @@ class RolePermissionController extends Controller
                 ], 500);
             }
 
-            return redirect()->route('admin.role_permissions')
+            return redirect()->route($this->rolePermissionsRouteName())
                 ->with('error', $message);
         }
     }
@@ -395,7 +674,6 @@ class RolePermissionController extends Controller
 
         if (
             str_contains($slug, 'admin') ||
-            str_contains($name, 'admin') ||
             str_contains($slug, 'staff') ||
             str_contains($name, 'staff') ||
             str_contains($slug, 'clinic') ||
@@ -405,5 +683,12 @@ class RolePermissionController extends Controller
         }
 
         return Role::where('slug', 'patient')->firstOrFail();
+    }
+
+    private function rolePermissionsRouteName(): string
+    {
+        return request()->routeIs('dentist.*')
+            ? 'dentist.role_permissions'
+            : 'admin.role_permissions';
     }
 }

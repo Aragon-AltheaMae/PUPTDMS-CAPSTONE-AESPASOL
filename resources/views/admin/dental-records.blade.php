@@ -12,6 +12,10 @@
 
 @php use Carbon\Carbon;
 
+    $routePrefix = request()->routeIs('dentist.*') ? 'dentist' : 'admin';
+    $reportsRouteName = $routePrefix === 'dentist' ? 'dentist.dentist.report' : 'admin.report-files';
+    $appointmentsRouteName = $routePrefix === 'dentist' ? 'dentist.dentist.appointments' : 'admin.admin.appointments';
+
     $recordsSource = $records ?? collect();
 
     $recordItems = $recordsSource instanceof \Illuminate\Pagination\AbstractPaginator
@@ -66,7 +70,7 @@
                 </div>
 
                 <div class="flex items-center gap-3 flex-shrink-0">
-                    <a href="{{ route('admin.reports.index') }}" class="ui-btn ui-btn-primary">
+                    <a href="{{ route($reportsRouteName) }}" class="ui-btn ui-btn-primary">
                         <i class="fa-solid fa-chart-column"></i>
                         <span>View Reports</span>
                     </a>
@@ -527,7 +531,7 @@
                     </div>
 
                     <div class="quick-actions-list">
-                        <a href="{{ route('admin.reports.index') }}" class="quick-action quick-action-card">
+                        <a href="{{ route($reportsRouteName) }}" class="quick-action quick-action-card">
                             <span class="quick-action-icon">
                                 <i class="fa-solid fa-chart-column"></i>
                             </span>
@@ -541,7 +545,7 @@
                             <i class="fa-solid fa-chart-column quick-action-bg-icon"></i>
                         </a>
 
-                        <a href="{{ route('admin.appointments') }}" class="quick-action quick-action-card">
+                        <a href="{{ route($appointmentsRouteName) }}" class="quick-action quick-action-card">
                             <span class="quick-action-icon">
                                 <i class="fa-solid fa-calendar-check"></i>
                             </span>

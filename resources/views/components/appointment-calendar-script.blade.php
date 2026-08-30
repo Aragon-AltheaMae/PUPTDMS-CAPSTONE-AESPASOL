@@ -69,6 +69,7 @@
         datePillId: @json($datePillId ?? 'datePill'),
         dateErrorId: @json($dateErrorId ?? 'dateError'),
         timeErrorId: @json($timeErrorId ?? 'timeError'),
+        clearSlotButtonId: @json($clearSlotButtonId ?? 'clearSlotSelectionBtn'),
         calendarWrapSelector: @json($calendarWrapSelector ?? '.cal-wrap'),
         slotsWrapSelector: @json($slotsWrapSelector ?? '.slots-wrap'),
         slotEndpoint: @json($slotEndpoint),
@@ -1756,7 +1757,7 @@
         const slotGrid = document.getElementById(calendarConfig.slotGridId);
         const timePill = document.getElementById(calendarConfig.selectedTimePillId);
         const timeText = document.getElementById(calendarConfig.selectedTimeTextId);
-        const clearSlotBtn = document.getElementById('clearSlotSelectionBtn');
+        const clearSlotBtn = document.getElementById(calendarConfig.clearSlotButtonId);
 
         selectedDate = null;
         selectedTime = null;

@@ -14,6 +14,12 @@
 $totalUsers = $totalUsers ?? ($allUsersCount ?? ($users->total() ?? 0));
 $activeCount = $activeCount ?? 0;
 $inactiveCount = $inactiveCount ?? 0;
+$authUser = auth()->user();
+$canViewAccounts = $authUser?->hasPermission('view_account_details') ?? false;
+$canCreateUsers = $authUser?->hasPermission('create_users') ?? false;
+$canDisableUsers = $authUser?->hasPermission('disable_users') ?? false;
+$canUpdateUserRole = $authUser?->hasPermission('update_user_role') ?? false;
+$canUpdateUserPassword = $authUser?->hasPermission('update_user_password') ?? false;
 @endphp
 
 <main id="mainContent" class="app-page-shell user-management-page page-enter mode-list">
@@ -25,10 +31,12 @@ $inactiveCount = $inactiveCount ?? 0;
                 </div>
 
                 <div class="flex items-center gap-3 flex-wrap w-full sm:w-auto">
+                    @if ($canCreateUsers)
                     <button type="button" onclick="openModal('addModal', this)" class="ui-btn ui-btn-primary">
                         <i class="fa-solid fa-user-plus"></i>
                         <span>Add New User</span>
                     </button>
+                    @endif
                 </div>
             </div>
         </div>
@@ -275,13 +283,16 @@ $inactiveCount = $inactiveCount ?? 0;
                                             ];
                                             @endphp
                                             <div class="ui-action-group um-action-group">
+                                                @if ($canUpdateUserRole)
                                                 <button type="button" data-user-details='@json($userDetails)'
                                                     onclick="openEditModalFromButton(this, 'users', {{ $user->id }}, @js($displayName), @js($user->email), @js($user->role_id), @js($user->status))"
                                                     class="ui-action-btn ui-action-edit" data-tooltip="Edit account"
                                                     aria-label="Edit account">
                                                     <i class="fa-solid fa-pen text-[11px]"></i>
                                                 </button>
+                                                @endif
 
+                                                @if ($canDisableUsers)
                                                 <button type="button" onclick="openToggleConfirm(
         {{ $user->id }},
         @js($user->status),
@@ -295,7 +306,9 @@ $inactiveCount = $inactiveCount ?? 0;
                                                         class="fa-solid {{ $user->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }}">
                                                     </i>
                                                 </button>
+                                                @endif
 
+                                                @if ($canUpdateUserPassword)
                                                 <button type="button" onclick="openResetModal(
         'users',
         {{ $user->id }},
@@ -304,13 +317,16 @@ $inactiveCount = $inactiveCount ?? 0;
 
                                                     <i class="fa-solid fa-key"></i>
                                                 </button>
+                                                @endif
 
+                                                @if ($canViewAccounts)
                                                 <button type="button" data-user-details='@json($userDetails)'
                                                     onclick="openViewModalFromButton(this)"
                                                     class="ui-action-btn ui-action-view" data-tooltip="View details"
                                                     aria-label="View details">
                                                     <i class="fa-solid fa-eye text-[11px]"></i>
                                                 </button>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>
@@ -443,13 +459,16 @@ $inactiveCount = $inactiveCount ?? 0;
                                         'Never',
                                         ];
                                         @endphp
+                                        @if ($canUpdateUserRole)
                                         <button type="button" data-user-details='@json($userDetails)'
                                             onclick="openEditModalFromButton(this, 'users', {{ $user->id }}, @js($displayName), @js($user->email), @js($user->role_id), @js($user->status))"
                                             class="ui-action-btn ui-action-edit" data-tooltip="Edit account"
                                             aria-label="Edit account">
                                             <i class="fa-solid fa-pen text-[11px]"></i>
                                         </button>
+                                        @endif
 
+                                        @if ($canDisableUsers)
                                         <button type="button" onclick="openToggleConfirm(
         {{ $user->id }},
         @js($user->status),
@@ -462,7 +481,9 @@ $inactiveCount = $inactiveCount ?? 0;
                                                 class="fa-solid {{ $user->status === 'active' ? 'fa-toggle-on' : 'fa-toggle-off' }}">
                                             </i>
                                         </button>
+                                        @endif
 
+                                        @if ($canUpdateUserPassword)
                                         <button type="button" onclick="openResetModal(
                                         'users',
                                         {{ $user->id }},
@@ -472,12 +493,15 @@ $inactiveCount = $inactiveCount ?? 0;
 
                                             <i class="fa-solid fa-key"></i>
                                         </button>
+                                        @endif
 
+                                        @if ($canViewAccounts)
                                         <button type="button" data-user-details='@json($userDetails)'
                                             onclick="openViewModalFromButton(this)" class="ui-action-btn ui-action-view"
                                             data-tooltip="View details" aria-label="View details">
                                             <i class="fa-solid fa-eye text-[11px]"></i>
                                         </button>
+                                        @endif
                                     </div>
                                 </div>
                                 @empty
@@ -1412,6 +1436,12 @@ $inactiveCount = $inactiveCount ?? 0;
 
 @section('scripts')
 <script>
+    const umCanViewAccounts = @json($canViewAccounts);
+    const umCanCreateUsers = @json($canCreateUsers);
+    const umCanDisableUsers = @json($canDisableUsers);
+    const umCanUpdateUserRole = @json($canUpdateUserRole);
+    const umCanUpdateUserPassword = @json($canUpdateUserPassword);
+
     var umState = {
         search: @js($search ?? ''),
         role: @js($roleFilter ?? ''),
@@ -1875,10 +1905,18 @@ $inactiveCount = $inactiveCount ?? 0;
     }
 
     function openEditModalFromButton(button, source, id, name, email, roleId, status) {
+        if (!umCanUpdateUserRole) {
+            return;
+        }
+
         openEditModal(source, id, name, email, roleId, status, parseUserDetailsFromButton(button));
     }
 
     function openViewModalFromButton(button) {
+        if (!umCanViewAccounts) {
+            return;
+        }
+
         openViewModal(parseUserDetailsFromButton(button));
     }
 
@@ -2134,8 +2172,7 @@ $inactiveCount = $inactiveCount ?? 0;
                     'reschedule' :
                     'start';
 
-            return `
-            <div class="ui-action-group um-action-group">
+            const editButton = umCanUpdateUserRole ? `
                 <button
                     type="button"
                     data-user-details="${detailsPayload}"
@@ -2155,7 +2192,9 @@ $inactiveCount = $inactiveCount ?? 0;
 
                     <i class="fa-solid fa-pen"></i>
                 </button>
+            ` : '';
 
+            const toggleButton = umCanCreateOrDisableUsers ? `
                 <button
                     type="button"
                     onclick="openToggleConfirm(
@@ -2170,7 +2209,9 @@ $inactiveCount = $inactiveCount ?? 0;
 
                     <i class="fa-solid ${toggleIcon}"></i>
                 </button>
+            ` : '';
 
+            const resetButton = umCanUpdateUserPassword ? `
                 <button
                     type="button"
                     onclick="openResetModal(
@@ -2185,7 +2226,9 @@ $inactiveCount = $inactiveCount ?? 0;
 
                     <i class="fa-solid fa-key"></i>
                 </button>
+            ` : '';
 
+            const viewButton = umCanViewAccounts ? `
                 <button
                     type="button"
                     data-user-details="${detailsPayload}"
@@ -2197,6 +2240,14 @@ $inactiveCount = $inactiveCount ?? 0;
 
                     <i class="fa-solid fa-eye"></i>
                 </button>
+            ` : '';
+
+            return `
+            <div class="ui-action-group um-action-group">
+                ${editButton}
+                ${toggleButton}
+                ${resetButton}
+                ${viewButton}
             </div>
         `;
         }

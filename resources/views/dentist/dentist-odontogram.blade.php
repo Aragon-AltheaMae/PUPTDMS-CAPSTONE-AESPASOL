@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('layout-role', 'dentist')
+@section('layout-role', $layoutRole ?? 'dentist')
 
 @section('hide-sidebar')
 @endsection
@@ -775,7 +775,7 @@ $existingProcedureDuration = $existingAppointmentMode
         const existingAppointmentMode = @json($existingAppointmentMode);
         const existingProcedureDuration = @json($existingProcedureDuration);
         const isOralProphylaxis = @json($isOralProphylaxis);
-        const cancelProcedureRedirectUrl = @json(route('dentist.dentist.patient.profile', $patient -> id ?? 1));
+        const cancelProcedureRedirectUrl = @json($cancelProcedureRedirectUrl ?? route('dentist.dentist.patient.profile', $patient -> id ?? 1));
         let finishProcedureModalRedirectUrl = null;
 
         const legendResultCount = document.getElementById('legendResultCount');

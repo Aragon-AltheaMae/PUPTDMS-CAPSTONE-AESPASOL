@@ -1,20 +1,32 @@
 @extends('layouts.app')
 
-@section('layout-role', $layoutRole ?? 'admin')
+@php
+    $resolvedLayoutRole = $layoutRole ?? 'admin';
+    $resolvedIsDentistView = $isDentistView ?? $resolvedLayoutRole === 'dentist';
+    $resolvedPageShellClass = $pageShellClass ?? ($resolvedIsDentistView ? 'dentist-page-shell dentist-report-page' : 'admin-page-shell');
+    $analyticsRoutePrefix = request()->routeIs('dentist.reports*') ? 'dentist' : 'admin';
+@endphp
+
+@section('layout-role', $resolvedLayoutRole)
 
 @section('title', $pageTitle ?? 'Reports & Analytics')
 
 @section('styles')
     @vite('resources/css/pages/shared/reports.css')
+    @if ($resolvedIsDentistView && $resolvedLayoutRole === 'admin')
+        @vite('resources/css/pages/dentist/dentist-shared.css')
+    @endif
 @endsection
+
+@section('body-class', $resolvedIsDentistView ? 'bg-[#F9FAFB]' : 'bg-[#F4F4F4]')
 
 @section('content')
 
 @php
-$layoutRole = $layoutRole ?? 'admin';
+$layoutRole = $resolvedLayoutRole;
 
 $isAdminView = $isAdminView ?? $layoutRole === 'admin';
-$isDentistView = $isDentistView ?? $layoutRole === 'dentist';
+$isDentistView = $resolvedIsDentistView;
 
 $pageShellClass =
 $pageShellClass ?? ($isDentistView ? 'app-page-shell dentist-report-page' : 'app-page-shell');
@@ -24,6 +36,8 @@ $pageTitle = $pageTitle ?? 'Reports & Analytics';
 $reportStats = $reportStats ?? [];
 $reportCharts = $reportCharts ?? [];
 $reportInventory = $reportInventory ?? [];
+$canGenerateAiReports = auth()->user()?->hasPermission('create_ai_generative_reports') ?? false;
+$shouldAutoOpenAiReport = request()->query('open') === 'ai' && $canGenerateAiReports;
 
 /* Admin */
 $treatments = $reportStats['treatments'] ?? [
@@ -149,10 +163,12 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                     </h1>
                 </div>
 
-                <button type="button" id="openAiReportConfirmModal" class="ui-btn ui-btn-primary">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    AI Generated Report
-                </button>
+                @if ($canGenerateAiReports)
+                    <button type="button" id="openAiReportConfirmModal" class="ui-btn ui-btn-primary">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        AI Generated Report
+                    </button>
+                @endif
             </div>
         </div>
         @endif
@@ -2148,7 +2164,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             );
 
         const reportUrl =
-            @json(route('admin.reports.ai-generated'));
+            @json(route($analyticsRoutePrefix . '.reports.ai-generated'));
 
         let isGenerating = false;
 
@@ -4000,6 +4016,16 @@ $customReportTemplates = collect($customReportTemplates ?? []);
         });
 
         syncReportQuantityState();
+
+        if (
+            @json($shouldAutoOpenAiReport) &&
+            typeof openAiReportConfirmModal === 'function'
+        ) {
+            window.setTimeout(() => {
+                openAiReportConfirmModal();
+            }, 150);
+        }
+
     });
 </script>
 @endif

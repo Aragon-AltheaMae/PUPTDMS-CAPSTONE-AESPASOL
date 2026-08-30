@@ -35,6 +35,36 @@ use App\Helpers\BookingQuestions;
 
 class OdontogramController extends Controller
 {
+    private function isAdminExistingAppointmentContext(): bool
+    {
+        return request()->routeIs('admin.odontogram.existing-appointment.*');
+    }
+
+    private function existingAppointmentRouteName(string $suffix): string
+    {
+        $prefix = $this->isAdminExistingAppointmentContext()
+            ? 'admin.odontogram.existing-appointment.'
+            : 'dentist.odontogram.existing-appointment.';
+
+        return $prefix . $suffix;
+    }
+
+    private function existingAppointmentLayoutRole(): string
+    {
+        return $this->isAdminExistingAppointmentContext()
+            ? 'admin'
+            : 'dentist';
+    }
+
+    private function existingAppointmentBackUrl(Patient $patient): string
+    {
+        if ($this->isAdminExistingAppointmentContext()) {
+            return route('admin.existing-record.index');
+        }
+
+        return route('dentist.dentist.patient.profile', ['patient' => $patient->id]);
+    }
+
     private function getSavedOdontogramDataForPatient(Patient $patient): array
     {
         $patientOdontogram = PatientOdontogram::where('patient_id', $patient->id)->first();
@@ -867,6 +897,11 @@ class OdontogramController extends Controller
             'dentist.add-existing-appointment',
             [
                 'patient' => $patient,
+                'layoutRole' => $this->existingAppointmentLayoutRole(),
+                'backUrl' => $this->existingAppointmentBackUrl($patient),
+                'storeIntakeUrl' => route($this->existingAppointmentRouteName('intake.store'), ['patient' => $patient->id]),
+                'historyAutosaveUrl' => route($this->existingAppointmentRouteName('history.autosave'), ['patient' => $patient->id]),
+                'slotEndpoint' => route($this->existingAppointmentRouteName('slots')),
 
                 'serviceTypes' =>
                 ServiceType::activeForBooking()
@@ -1065,7 +1100,7 @@ class OdontogramController extends Controller
 
         $odontogramUrl =
             route(
-                'dentist.odontogram.existing-appointment.odontogram',
+                $this->existingAppointmentRouteName('odontogram'),
                 [
                     'patient' =>
                     $patient->id,
@@ -1334,7 +1369,7 @@ class OdontogramController extends Controller
 
         if (!$draft) {
             return redirect()
-                ->route('dentist.odontogram.existing-appointment.create', ['patient' => $patient->id])
+                ->route($this->existingAppointmentRouteName('create'), ['patient' => $patient->id])
                 ->with('error', 'Please complete the existing appointment details first.');
         }
 
@@ -1344,11 +1379,13 @@ class OdontogramController extends Controller
             'patient' => $patient,
             'appointment' => null,
             'procedure' => null,
+            'layoutRole' => $this->existingAppointmentLayoutRole(),
+            'cancelProcedureRedirectUrl' => $this->existingAppointmentBackUrl($patient),
             'savedOdontogramData' => $this->getSavedOdontogramDataForPatient($patient),
             'existingAppointmentMode' => true,
             'existingAppointmentDraft' => $draft,
             'isExistingAppointment' => true,
-            'saveProcedureUrl' => route('dentist.odontogram.existing-appointment.store', $patient->id),
+            'saveProcedureUrl' => route($this->existingAppointmentRouteName('store'), $patient->id),
             'appointmentCountsPerDay' => [],
             'appointmentCountsPerSlot' => [],
             'calendarAppointmentDetails' => [],
@@ -1617,7 +1654,7 @@ class OdontogramController extends Controller
             'message' => 'Existing appointment saved successfully.',
             'saved_teeth' => $result['saved_teeth'],
             'status' => 'completed',
-            'redirect_url' => route('dentist.dentist.patient.profile', ['patient' => $patient->id]) . '?refresh=' . now()->timestamp,
+            'redirect_url' => $this->existingAppointmentBackUrl($patient) . '?refresh=' . now()->timestamp,
         ]);
     }
 }
