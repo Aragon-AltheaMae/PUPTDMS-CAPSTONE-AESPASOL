@@ -13,6 +13,12 @@ use App\Helpers\AuditLogger;
 class RolePermissionController extends Controller
 {
     private const CORE_ROLE_SLUGS = ['admin', 'dentist', 'patient'];
+    private const ADMIN_ONLY_HIDDEN_PERMISSION_SLUGS = [
+        'view_roles_permissions',
+        'create_custom_roles',
+        'update_role_permissions',
+        'delete_custom_roles',
+    ];
     private const LEGACY_DENTIST_DEFAULT_PERMISSION_SLUGS = [
         'access_dentist_dashboard',
         'view_patient_profiles',
@@ -305,10 +311,12 @@ class RolePermissionController extends Controller
     {
         $this->ensureRequiredPermissionsExist();
         $this->seedDefaultsIfEmpty();
+        $this->synchronizeAdminOnlyPermissions();
 
         $roles = Role::with('permissions')->get();
         $permissions = Permission::where('slug', '!=', 'manage_backup')
             ->whereNotIn('slug', self::REMOVED_PERMISSION_SLUGS)
+            ->whereNotIn('slug', self::ADMIN_ONLY_HIDDEN_PERMISSION_SLUGS)
             ->orderBy('module')
             ->orderBy('name')
             ->get();
@@ -455,7 +463,7 @@ class RolePermissionController extends Controller
             $permissionIds = array_map('intval', $request->input("permissions.{$role->id}", []));
         }
 
-        $role->permissions()->sync($permissionIds);
+        $role->permissions()->sync($this->normalizePermissionIdsForRole($role, $permissionIds));
 
         AuditLogger::log(
             'update',
@@ -514,6 +522,8 @@ class RolePermissionController extends Controller
             ->each(function (Role $role): void {
                 $role->permissions()->sync([]);
             });
+
+        $this->synchronizeAdminOnlyPermissions();
 
         AuditLogger::log(
             'update',
@@ -690,5 +700,52 @@ class RolePermissionController extends Controller
         return request()->routeIs('dentist.*')
             ? 'dentist.role_permissions'
             : 'admin.role_permissions';
+    }
+
+    private function normalizePermissionIdsForRole(Role $role, array $permissionIds): array
+    {
+        $adminOnlyPermissionIds = Permission::whereIn('slug', self::ADMIN_ONLY_HIDDEN_PERMISSION_SLUGS)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        $normalizedPermissionIds = array_values(array_unique(array_map('intval', $permissionIds)));
+
+        if ($role->slug === 'admin') {
+            return array_values(array_unique(array_merge($normalizedPermissionIds, $adminOnlyPermissionIds)));
+        }
+
+        return array_values(array_diff($normalizedPermissionIds, $adminOnlyPermissionIds));
+    }
+
+    private function synchronizeAdminOnlyPermissions(): void
+    {
+        $adminOnlyPermissionIds = Permission::whereIn('slug', self::ADMIN_ONLY_HIDDEN_PERMISSION_SLUGS)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        if ($adminOnlyPermissionIds === []) {
+            return;
+        }
+
+        Role::with('permissions')->get()->each(function (Role $role) use ($adminOnlyPermissionIds): void {
+            $currentPermissionIds = $role->permissions
+                ->pluck('id')
+                ->map(fn ($id) => (int) $id)
+                ->all();
+
+            $normalizedPermissionIds = $role->slug === 'admin'
+                ? array_values(array_unique(array_merge($currentPermissionIds, $adminOnlyPermissionIds)))
+                : array_values(array_diff($currentPermissionIds, $adminOnlyPermissionIds));
+
+            sort($currentPermissionIds);
+            $sortedNormalizedPermissionIds = $normalizedPermissionIds;
+            sort($sortedNormalizedPermissionIds);
+
+            if ($currentPermissionIds !== $sortedNormalizedPermissionIds) {
+                $role->permissions()->sync($normalizedPermissionIds);
+            }
+        });
     }
 }

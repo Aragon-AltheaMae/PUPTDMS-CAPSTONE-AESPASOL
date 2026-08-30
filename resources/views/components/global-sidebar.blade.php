@@ -264,13 +264,6 @@
                         'label' => 'Patients',
                     ],
                     [
-                        'route' => 'dentist.dental-records.index',
-                        'permissions_any' => ['view_dental_records', 'manage_dental_records'],
-                        'active' => ['dentist.dental-records*'],
-                        'icon' => 'fa-tooth',
-                        'label' => 'Dental Records',
-                    ],
-                    [
                         'route' => 'dentist.walk-in.index',
                         'permission' => 'manage_walk_in_patients',
                         'active' => ['dentist.walk-in.*'],
