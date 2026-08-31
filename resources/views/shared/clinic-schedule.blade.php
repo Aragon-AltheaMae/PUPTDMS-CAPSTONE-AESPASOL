@@ -16,6 +16,11 @@ $isDentistView = $isDentistView ?? false;
 
 $reservedErrors = $reservedErrors ?? $errors->getBag('reservedPeriod');
 
+$canCreateReservedPeriods = auth()->user()?->hasPermission('create_clinic_schedule') ?? false;
+$canUpdateReservedPeriods = auth()->user()?->hasPermission('update_clinic_schedule') ?? false;
+$canDeleteReservedPeriods = auth()->user()?->hasPermission('delete_clinic_schedule') ?? false;
+$canManageReservedPeriods = $canUpdateReservedPeriods || $canDeleteReservedPeriods;
+
 
 $pageShellClass = $pageShellClass ?? ($isDentistView ? 'app-page-shell' : 'app-page-shell');
 
@@ -660,11 +665,13 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                             <x-view-toggle id="reservedPeriodsViewToggle" storage-key="reservedPeriodsView"
                                 list-view="#reservedPeriodsListView" grid-view="#reservedPeriodsGridView" />
 
+                            @if ($canCreateReservedPeriods)
                             <button type="button" onclick="openReservedPeriodModal()"
                                 class="ui-btn ui-btn-primary ui-btn-xs">
                                 <i class="fa-solid fa-plus"></i>
                                 <span>Add Period</span>
                             </button>
+                            @endif
                         </div>
                     </div>
 
@@ -681,7 +688,9 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                                     <th>Booking</th>
                                     <th>Capacity</th>
                                     <th>Status</th>
+                                    @if ($canManageReservedPeriods)
                                     <th>Actions</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -748,9 +757,10 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                                         <span class="badge-closed">Inactive</span>
                                         @endif
                                     </td>
+                                    @if ($canManageReservedPeriods)
                                     <td data-label="Actions">
                                         <div class="ui-action-group">
-                                            @if (! $isPastPeriod)
+                                            @if ($canUpdateReservedPeriods && ! $isPastPeriod)
                                             <button type="button"
                                                 onclick='openReservedPeriodModal("edit", {{ $period->id }}, @json($periodPayload))'
                                                 class="ui-action-btn ui-action-edit"
@@ -759,6 +769,7 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                                             </button>
                                             @endif
 
+                                            @if ($canDeleteReservedPeriods)
                                             <button type="button" class="ui-action-btn ui-action-delete"
                                                 data-tooltip="Remove reserved period" aria-label="Remove reserved period"
                                                 onclick='openReservedPeriodDeleteModal(
@@ -767,8 +778,10 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                                                 )'>
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
+                                            @endif
                                         </div>
                                     </td>
+                                    @endif
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -852,8 +865,9 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                                 <p class="reserved-period-card-note">{{ $period->notes }}</p>
                                 @endif
 
+                                @if ($canManageReservedPeriods)
                                 <div class="schedule-rule-card-actions ui-action-group">
-                                    @if (! $isPastPeriod)
+                                    @if ($canUpdateReservedPeriods && ! $isPastPeriod)
                                     <button type="button"
                                         onclick='openReservedPeriodModal("edit", {{ $period->id }}, @json($periodPayload))'
                                         class="ui-action-btn ui-action-edit"
@@ -862,6 +876,7 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                                     </button>
                                     @endif
 
+                                    @if ($canDeleteReservedPeriods)
                                     <button type="button" class="ui-action-btn ui-action-delete"
                                         data-tooltip="Remove reserved period" aria-label="Remove reserved period"
                                         onclick='openReservedPeriodDeleteModal(
@@ -870,7 +885,9 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                                         )'>
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
+                                    @endif
                                 </div>
+                                @endif
                             </article>
                             @endforeach
                         </div>
@@ -3214,12 +3231,14 @@ $reservedPeriodUpdateUrlTemplate = route($clinicScheduleRouteNames['reserved_upd
                 title: 'No reserved booking periods yet',
                 message: 'Create a dedicated booking period for a selected patient group.',
                 className: 'empty-state-compact clinic-schedule-empty-state',
+                @if ($canCreateReservedPeriods)
                 actionHtml: `
                     <button type="button" onclick="openReservedPeriodModal()" class="empty-state-btn">
                         <i class="fa-solid fa-plus" aria-hidden="true"></i>
                         <span>Create reserved period</span>
                     </button>
                 `,
+                @endif
             });
         }
     }
