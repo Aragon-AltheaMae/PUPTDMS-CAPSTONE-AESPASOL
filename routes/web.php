@@ -25,6 +25,7 @@ use App\Http\Controllers\Auth\BackupLoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\OIDCController;
 use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\ClinicSchedule\ReservedBookingPeriodController;
 use App\Http\Controllers\Dentist\DentistAppointmentController;
 use App\Http\Controllers\Dentist\DentistClinicScheduleController;
 use App\Http\Controllers\Dentist\DentistDashboardController;
@@ -517,6 +518,18 @@ Route::prefix('admin')
             ->middleware('permission:delete_clinic_schedule')
             ->name('admin.clinic_schedule.destroy');
 
+        Route::post('/clinic-schedule/reserved-periods', [ReservedBookingPeriodController::class, 'store'])
+            ->middleware('permission:manage_clinic_schedule')
+            ->name('admin.clinic_schedule.reserved_periods.store');
+
+        Route::put('/clinic-schedule/reserved-periods/{reservedBookingPeriod}', [ReservedBookingPeriodController::class, 'update'])
+            ->middleware('permission:manage_clinic_schedule')
+            ->name('admin.clinic_schedule.reserved_periods.update');
+
+        Route::delete('/clinic-schedule/reserved-periods/{reservedBookingPeriod}', [ReservedBookingPeriodController::class, 'destroy'])
+            ->middleware('permission:manage_clinic_schedule')
+            ->name('admin.clinic_schedule.reserved_periods.destroy');
+
         Route::post('/clinic-schedule/block-date', [ClinicScheduleController::class, 'blockDate'])
             ->middleware('permission:create_clinic_schedule')
             ->name('admin.clinic_schedule.block');
@@ -853,6 +866,10 @@ Route::middleware(['role:patient'])->group(function () {
         ->middleware('permission:book_appointments')
         ->name('patient.book.appointment');
 
+    Route::get('/book-appointment/reserved/{reservedBookingPeriod}', [AppointmentController::class, 'create'])
+        ->middleware('permission:book_appointments')
+        ->name('book.appointment.reserved');
+
     Route::get('/available-slots', [AppointmentController::class, 'availableSlots'])
         ->middleware('permission:book_appointments')
         ->name('patient.appointments.available-slots');
@@ -1035,6 +1052,18 @@ Route::prefix('dentist')->middleware(['auth'])->group(function () {
     Route::delete('/clinic-schedule/rules/{clinicSchedule}', [DentistClinicScheduleController::class, 'destroy'])
         ->middleware('permission:delete_clinic_schedule')
         ->name('dentist.dentist.clinic_schedule.destroy');
+
+    Route::post('/clinic-schedule/reserved-periods', [ReservedBookingPeriodController::class, 'store'])
+        ->middleware('permission:manage_clinic_schedule')
+        ->name('dentist.dentist.clinic_schedule.reserved_periods.store');
+
+    Route::put('/clinic-schedule/reserved-periods/{reservedBookingPeriod}', [ReservedBookingPeriodController::class, 'update'])
+        ->middleware('permission:manage_clinic_schedule')
+        ->name('dentist.dentist.clinic_schedule.reserved_periods.update');
+
+    Route::delete('/clinic-schedule/reserved-periods/{reservedBookingPeriod}', [ReservedBookingPeriodController::class, 'destroy'])
+        ->middleware('permission:manage_clinic_schedule')
+        ->name('dentist.dentist.clinic_schedule.reserved_periods.destroy');
 
     Route::post('/clinic-schedule/block-date', [DentistClinicScheduleController::class, 'blockDate'])
         ->middleware('permission:create_clinic_schedule')

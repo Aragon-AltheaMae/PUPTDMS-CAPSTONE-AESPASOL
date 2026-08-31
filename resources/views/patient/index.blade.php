@@ -281,6 +281,66 @@ $birthdateDisplay = 'N/A';
             </div>
         </div>
 
+        @if (collect($reservedBookingReminders ?? [])->isNotEmpty())
+        <div class="reserved-dashboard-reminders" aria-label="Reserved booking reminders">
+            @foreach ($reservedBookingReminders as $reservedPeriod)
+            <section class="card reserved-dashboard-reminder">
+                <div class="reserved-dashboard-reminder-header">
+                    <span class="reserved-dashboard-reminder-icon" aria-hidden="true">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </span>
+
+                    <div class="reserved-dashboard-reminder-heading">
+                        <div class="reserved-dashboard-reminder-title-row">
+                            <h2>{{ $reservedPeriod->title }}</h2>
+                            <span class="status-pill status-pending">
+                                <span class="status-dot" aria-hidden="true"></span>
+                                Booking required
+                            </span>
+                        </div>
+
+                        <div class="reserved-dashboard-reminder-meta">
+                            <span>
+                                <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                                {{ $reservedPeriod->reserved_date->format('M d, Y') }}
+                            </span>
+                            <span>
+                                <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                                {{ \Carbon\Carbon::parse($reservedPeriod->start_time)->format('g:i A') }}–{{ \Carbon\Carbon::parse($reservedPeriod->end_time)->format('g:i A') }}
+                            </span>
+                            <span>
+                                <i class="fa-solid fa-users" aria-hidden="true"></i>
+                                {{ $reservedPeriod->target_label }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reserved-dashboard-reminder-body">
+                    <div class="reserved-dashboard-reminder-message">
+                        <span class="reserved-dashboard-reminder-bell" aria-hidden="true">
+                            <i class="fa-regular fa-bell"></i>
+                        </span>
+                        <div>
+                            <strong>Reserved Appointment Reminder</strong>
+                            <p>
+                                This dental appointment period is scheduled for your patient group.
+                                Complete your booking before it reaches capacity.
+                            </p>
+                        </div>
+                    </div>
+
+                    <a href="{{ route('book.appointment.reserved', $reservedPeriod) }}"
+                        class="ui-btn ui-btn-primary reserved-dashboard-reminder-action">
+                        <span>Book Reserved Appointment</span>
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </section>
+            @endforeach
+        </div>
+        @endif
+
         <div id="upcomingAppointmentWrapper" class="skeleton-section">
             <div class="card skeleton-card skeleton-shell skeleton-fade-swap">
 

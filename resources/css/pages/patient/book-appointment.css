@@ -216,6 +216,13 @@ textarea {
     min-height: auto !important;
 }
 
+#mainContent .reserved-slot-grid .slot-chip,
+#mainContent .reserved-slot-grid .slot-chip:hover,
+#mainContent .reserved-slot-grid .slot-chip:focus,
+#mainContent .reserved-slot-grid .slot-chip.selected {
+    box-shadow: none !important;
+}
+
 #mainContent #slotContainer,
 #mainContent #slotGrid,
 #mainContent #dateBanner,

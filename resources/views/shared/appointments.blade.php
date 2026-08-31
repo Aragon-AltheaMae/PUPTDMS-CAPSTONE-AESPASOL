@@ -34,6 +34,27 @@ $canCancelAppointment = $canCancelAppointment ?? false;
 $canViewTreatmentRecord = $canViewTreatmentRecord ?? false;
 $canScheduleFollowUp = $canScheduleFollowUp ?? false;
 
+$resolveStartState = function ($appointment, bool $isToday): array {
+    if (!$isToday) {
+        return [false, 'Start procedure is available on the appointment date only'];
+    }
+
+    if (!$appointment->reserved_booking_period_id) {
+        return [true, 'Start procedure'];
+    }
+
+    if ($appointment->reservedProcedureWindowIsOpen()) {
+        return [true, 'Start reserved procedure'];
+    }
+
+    $period = $appointment->reservedBookingPeriod;
+    $window = $period
+        ? Carbon::parse($period->start_time)->format('g:i A').' to '.Carbon::parse($period->end_time)->format('g:i A')
+        : 'the reserved period';
+
+    return [false, 'Start is available during '.$window];
+};
+
 $upcomingAppointments = collect($upcomingAppointments ?? []);
 $pastAppointments = collect($pastAppointments ?? []);
 $today = $today ?? Carbon::today()->toDateString();
@@ -639,6 +660,8 @@ return $aDateTime <=> $bDateTime;
                                 ($appt->appointment_date ?? null)
                                 === $today;
 
+                                [$canStartThisAppointment, $startTooltip] = $resolveStartState($appt, $isToday);
+
                                 $rawStatus =
                                 strtolower(
                                 trim(
@@ -898,6 +921,16 @@ return $aDateTime <=> $bDateTime;
                                                     </span>
                                                     @endif
 
+                                                    @if ($isDentistView && $appt->reserved_booking_period_id)
+                                                    <span class="status-pill status-today"
+                                                        data-tooltip="Reserved: {{ $appt->reservedBookingPeriod?->title }}"
+                                                        data-tooltip-tone="neutral" aria-label="Reserved appointment"
+                                                        tabindex="0">
+                                                        <i class="fa-solid fa-calendar-check"></i>
+                                                        <span>Reserved</span>
+                                                    </span>
+                                                    @endif
+
                                                 </div>
 
                                                 <div class="global-info-group">
@@ -1005,13 +1038,11 @@ return $aDateTime <=> $bDateTime;
                                             @if ($canStartProcedure)
                                             <button type="button" class="ui-action-btn
                                                            ui-action-success
-                                                           {{ $isToday ? '' : 'is-start-locked' }}"
-                                                data-tooltip="{{ $isToday
-                                                        ? 'Start procedure'
-                                                        : 'Start procedure is available on the appointment date only' }}"
-                                                data-tooltip-tone="{{ $isToday ? 'start' : 'locked' }}"
-                                                data-start-locked="{{ $isToday ? '0' : '1' }}"
-                                                aria-disabled="{{ $isToday ? 'false' : 'true' }}"
+                                                           {{ $canStartThisAppointment ? '' : 'is-start-locked' }}"
+                                                data-tooltip="{{ $startTooltip }}"
+                                                data-tooltip-tone="{{ $canStartThisAppointment ? 'start' : 'locked' }}"
+                                                data-start-locked="{{ $canStartThisAppointment ? '0' : '1' }}"
+                                                aria-disabled="{{ $canStartThisAppointment ? 'false' : 'true' }}"
                                                 onclick="openStartProcedureModal(this)" data-id="{{ $appt->id }}"
                                                 data-name="{{ $patientName }}" data-datetime="{{ $modalDatetime }}"
                                                 data-service="{{ $serviceLabel }}" data-start-url="{{ route(
@@ -1022,7 +1053,7 @@ return $aDateTime <=> $bDateTime;
                                             </button>
                                             @endif
 
-                                            @if ($canRescheduleAppointment)
+                                            @if ($canRescheduleAppointment && !$appt->reserved_booking_period_id)
                                             <button type="button"
                                                 class="ui-action-btn ui-action-warning {{ $isActiveAppointment ? '' : 'is-start-locked' }}"
                                                 data-tooltip="{{ $isActiveAppointment ? 'Reschedule appointment' : 'Only upcoming or rescheduled appointments can be changed' }}"
@@ -1200,6 +1231,8 @@ return $aDateTime <=> $bDateTime;
                             $isToday =
                             ($appt->appointment_date ?? null)
                             === $today;
+
+                            [$canStartThisAppointment, $startTooltip] = $resolveStartState($appt, $isToday);
 
                             $rawStatus =
                             strtolower(
@@ -1387,6 +1420,16 @@ return $aDateTime <=> $bDateTime;
                                                 <i class="fa-solid fa-calendar-plus"></i>
                                             </span>
                                             @endif
+
+                                            @if ($isDentistView && $appt->reserved_booking_period_id)
+                                            <span class="status-pill status-today"
+                                                data-tooltip="Reserved: {{ $appt->reservedBookingPeriod?->title }}"
+                                                data-tooltip-tone="neutral" aria-label="Reserved appointment"
+                                                tabindex="0">
+                                                <i class="fa-solid fa-calendar-check"></i>
+                                                <span>Reserved</span>
+                                            </span>
+                                            @endif
                                         </div>
 
                                         <div class="global-info-group">
@@ -1518,12 +1561,10 @@ return $aDateTime <=> $bDateTime;
                                     @if ($canStartProcedure)
                                     <button type="button" class="ui-action-btn
                                                    ui-action-success
-                                                   {{ $isToday ? '' : 'is-start-locked' }}" data-tooltip="{{ $isToday
-                                                ? 'Start procedure'
-                                                : 'Start procedure is available on the appointment date only' }}"
-                                        data-tooltip-tone="{{ $isToday ? 'start' : 'locked' }}"
-                                        data-start-locked="{{ $isToday ? '0' : '1' }}"
-                                        aria-disabled="{{ $isToday ? 'false' : 'true' }}"
+                                                   {{ $canStartThisAppointment ? '' : 'is-start-locked' }}" data-tooltip="{{ $startTooltip }}"
+                                        data-tooltip-tone="{{ $canStartThisAppointment ? 'start' : 'locked' }}"
+                                        data-start-locked="{{ $canStartThisAppointment ? '0' : '1' }}"
+                                        aria-disabled="{{ $canStartThisAppointment ? 'false' : 'true' }}"
                                         onclick="openStartProcedureModal(this)" data-id="{{ $appt->id }}"
                                         data-name="{{ $patientName }}" data-datetime="{{ $modalDatetime }}"
                                         data-service="{{ $serviceLabel }}" data-start-url="{{ route(
@@ -1534,7 +1575,7 @@ return $aDateTime <=> $bDateTime;
                                     </button>
                                     @endif
 
-                                    @if ($canRescheduleAppointment)
+                                    @if ($canRescheduleAppointment && !$appt->reserved_booking_period_id)
                                     <button type="button"
                                         class="ui-action-btn ui-action-warning {{ $isActiveAppointment ? '' : 'is-start-locked' }}"
                                         data-tooltip="{{ $isActiveAppointment ? 'Reschedule appointment' : 'Only upcoming or rescheduled appointments can be changed' }}"
