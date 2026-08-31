@@ -7,8 +7,10 @@ use App\Models\AuditLog;
 use App\Models\User;
 use App\Support\BrowserDetection;
 use Illuminate\Http\Request;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorContract;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -224,8 +226,10 @@ class ConcurrentSessionService
                     'device_type' => $session->device_type
                         ?? BrowserDetection::detectDeviceType($session->user_agent),
 
-                    'device_label' => $session->device_name
-                        ?? BrowserDetection::detectDeviceName($session->user_agent),
+                    'device_label' => BrowserDetection::deviceNameForDisplay(
+                        $session->device_name ?? null,
+                        $session->user_agent
+                    ),
 
                     'os_label' => $session->os_name
                         ?? BrowserDetection::detectOperatingSystem($session->user_agent),
@@ -341,7 +345,7 @@ class ConcurrentSessionService
         int $perPage = 15,
         array $filters = [],
         ?string $currentSessionId = null
-    ): LengthAwarePaginator {
+    ): LengthAwarePaginatorContract {
         $perPage = in_array($perPage, [10, 15, 20, 50, 100], true) ? $perPage : 15;
         $currentSessionId ??= session()->getId();
 
@@ -374,11 +378,20 @@ class ConcurrentSessionService
             ]);
         }
 
+        $sort = $this->normalizeSessionSort($filters['sort'] ?? 'recent');
         $role = trim((string) ($filters['role'] ?? ''));
+        $device = $this->normalizeSessionDeviceType($filters['device'] ?? 'all');
+        $scope = $this->normalizeSessionScope($filters['scope'] ?? 'all');
         $search = trim((string) ($filters['search'] ?? ''));
 
         if ($role !== '' && $role !== 'all') {
             $query->where('roles.slug', $role);
+        }
+
+        if ($scope === 'current') {
+            $query->where('sessions.id', $currentSessionId);
+        } elseif ($scope === 'others') {
+            $query->where('sessions.id', '!=', $currentSessionId);
         }
 
         if ($search !== '') {
@@ -390,14 +403,15 @@ class ConcurrentSessionService
             });
         }
 
-        $paginator = $query
-            ->orderByDesc('sessions.last_activity')
-            ->paginate($perPage)
-            ->withQueryString();
-
-        $items = collect($paginator->items())
+        $items = $query
+            ->get()
             ->map(function (object $session) use ($currentSessionId) {
                 $role = (string) ($session->role_slug ?: 'unknown');
+                $deviceType = $this->normalizeSessionDeviceType(
+                    $session->device_type ?? null,
+                    $session->user_agent
+                );
+                $lastActivityAt = now()->setTimestamp((int) $session->last_activity);
 
                 return (object) [
                     'reference' => $this->makePublicReference((string) $session->id),
@@ -409,11 +423,12 @@ class ConcurrentSessionService
                     'role_label' => $this->formatRoleLabel($role),
                     'ip_address' => $session->ip_address ?: 'Unknown',
                     'user_agent' => $session->user_agent ?: 'Unknown device',
-                    'device_type' => $session->device_type
-                        ?? BrowserDetection::detectDeviceType($session->user_agent),
+                    'device_type' => $deviceType,
 
-                    'device_label' => $session->device_name
-                        ?? BrowserDetection::detectDeviceName($session->user_agent),
+                    'device_label' => BrowserDetection::deviceNameForDisplay(
+                        $session->device_name ?? null,
+                        $session->user_agent
+                    ),
 
                     'os_label' => $session->os_name
                         ?? BrowserDetection::detectOperatingSystem($session->user_agent),
@@ -422,14 +437,38 @@ class ConcurrentSessionService
                         $session->browser_name ?? null,
                         $session->user_agent
                     ),
-                    'last_activity_at' => now()->setTimestamp((int) $session->last_activity),
-                    'last_activity_label' => now()->setTimestamp((int) $session->last_activity)->diffForHumans(),
+                    'last_activity_at' => $lastActivityAt,
+                    'last_activity_label' => $lastActivityAt->diffForHumans(),
                     'is_current' => hash_equals((string) $session->id, $currentSessionId),
                 ];
-            })
-            ->all();
+            });
 
-        $paginator->setCollection(collect($items));
+        if ($device !== 'all') {
+            $items = $items
+                ->filter(fn(object $session) => $session->device_type === $device)
+                ->values();
+        }
+
+        $items = $sort === 'oldest'
+            ? $items->sortBy(fn(object $session) => $session->last_activity_at->getTimestamp())->values()
+            : $items->sortByDesc(fn(object $session) => $session->last_activity_at->getTimestamp())->values();
+
+        $currentPage = max(1, (int) Paginator::resolveCurrentPage());
+        $total = $items->count();
+        $results = $items
+            ->slice(($currentPage - 1) * $perPage, $perPage)
+            ->values();
+
+        $paginator = new LengthAwarePaginator(
+            $results,
+            $total,
+            $perPage,
+            $currentPage,
+            [
+                'path' => Paginator::resolveCurrentPath(),
+                'query' => request()->query(),
+            ]
+        );
 
         return $paginator;
     }
@@ -630,6 +669,39 @@ class ConcurrentSessionService
         }
 
         return $supportsColumns;
+    }
+
+    protected function normalizeSessionSort(mixed $sort): string
+    {
+        return strtolower(trim((string) $sort)) === 'oldest'
+            ? 'oldest'
+            : 'recent';
+    }
+
+    protected function normalizeSessionScope(mixed $scope): string
+    {
+        $normalized = strtolower(trim((string) $scope));
+
+        return in_array($normalized, ['current', 'others'], true)
+            ? $normalized
+            : 'all';
+    }
+
+    protected function normalizeSessionDeviceType(mixed $deviceType, ?string $userAgent = null): string
+    {
+        $normalized = strtolower(trim((string) $deviceType));
+
+        return match (true) {
+            in_array($normalized, ['phone', 'mobile', 'smartphone'], true) => 'mobile',
+            in_array($normalized, ['tablet', 'ipad'], true) => 'tablet',
+            in_array($normalized, ['desktop', 'laptop', 'computer', 'pc'], true) => 'desktop',
+            $normalized === 'all' => 'all',
+            $normalized !== '' => $normalized,
+            Str::contains((string) $userAgent, ['iPad', 'Tablet'], true) => 'tablet',
+            Str::contains((string) $userAgent, ['iPhone', 'Android', 'Mobile'], true) => 'mobile',
+            Str::contains((string) $userAgent, ['Windows', 'Macintosh', 'Linux', 'CrOS'], true) => 'desktop',
+            default => 'unknown',
+        };
     }
 
     protected function formatRoleLabel(string $role): string

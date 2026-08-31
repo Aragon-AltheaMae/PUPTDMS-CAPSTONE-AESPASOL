@@ -21,6 +21,12 @@
     border-color: var(--status-completed-border) !important;
 }
 
+.cal-pill-blue {
+    background: #e8edff !important;
+    color: #4338ca !important;
+    border-color: #cdd5ff !important;
+}
+
 .cal-pill-red {
     background: var(--status-cancelled-bg) !important;
     color: var(--status-cancelled-text) !important;
@@ -28,9 +34,9 @@
 }
 
 .cal-pill-maroon {
-    background: var(--calendar-appointment-soft) !important;
-    color: var(--calendar-appointment-text) !important;
-    border-color: var(--calendar-appointment-border) !important;
+    background: var(--crimson-light) !important;
+    color: var(--crimson) !important;
+    border-color: var(--crimson-mid) !important;
 }
 
 .cal-pill-yellow {
@@ -795,23 +801,6 @@
     }
 }
 
-@media (max-width: 640px) {
-
-    .dashboard-calendar-availability-header,
-    .dashboard-calendar-availability-actions {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    .dashboard-calendar-status {
-        align-self: flex-start;
-    }
-
-    .dashboard-calendar-book-btn {
-        width: 100%;
-    }
-}
-
 .calendar-main-header {
     display: grid;
     grid-template-columns: 34px minmax(0, 1fr) 34px;
@@ -821,7 +810,7 @@
 }
 
 .dashboard-calendar-shell .calendar-split-picker {
-    width: min(100%, 220px);
+    width: min(100%, 260px);
     margin-inline: auto;
     grid-template-columns: minmax(0, 1fr);
     justify-self: center;
@@ -839,71 +828,37 @@
 }
 
 .dashboard-calendar-shell .calendar-split-picker .custom-select-button {
+    width: 100%;
+    min-width: 0;
     min-height: 46px;
-
-    display: grid;
-    grid-template-columns:
-        22px minmax(0, 1fr) 22px;
-
+    display: flex;
     align-items: center;
-    gap: 8px;
-
+    justify-content: center;
+    gap: .5rem;
     padding: 0 .8rem;
-
     text-align: center;
 }
 
-.dashboard-calendar-shell .calendar-split-picker .custom-select-button .calendar-picker-icon {
-    width: 22px;
-    height: 22px;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    color: var(--crimson);
-
-    font-size: .75rem;
-
-    transform: none;
-}
-
-.dashboard-calendar-shell .calendar-split-picker .custom-select-button .calendar-picker-icon i {
-    display: block;
-
-    color: inherit;
-
-    font-size: inherit;
-
-    transform: none !important;
-    transition: none !important;
-}
-
 .dashboard-calendar-shell .calendar-split-picker .custom-select-button [data-custom-select-value] {
-    width: 100%;
+    width: auto;
     min-width: 0;
-
-    display: block;
-
+    flex: 0 1 auto;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-
     color: var(--text-1);
-
     text-align: center;
 }
 
 .dashboard-calendar-shell .calendar-split-picker .custom-select-button>i {
-    width: 22px;
-
+    width: auto;
+    flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     margin: 0;
-
     color: var(--text-3);
+    font-size: .7rem;
 }
 
 .calendar-split-picker-item {
@@ -1086,107 +1041,6 @@
     background: rgba(245, 158, 11, .14);
     color: #FCD34D;
     border-color: rgba(245, 158, 11, .24);
-}
-
-@media (max-width: 640px) {
-    .calendar-main-header {
-        gap: .5rem;
-    }
-
-    .dashboard-calendar-shell .calendar-split-picker {
-        width: min(100%, 190px);
-    }
-
-    .dashboard-calendar-shell .calendar-split-picker .custom-select-button {
-        min-height: 42px;
-
-        grid-template-columns:
-            20px minmax(0, 1fr) 20px;
-
-        gap: 6px;
-
-        padding: 0 .7rem;
-
-        font-size: .76rem;
-    }
-
-    .dashboard-calendar-shell .calendar-split-picker .custom-select-button .calendar-picker-icon {
-        width: 20px;
-        height: 20px;
-
-        font-size: .7rem;
-    }
-
-    .dashboard-calendar-shell .calendar-split-picker .custom-select-button>i {
-        width: 20px;
-    }
-
-    .calendar-split-picker {
-        grid-template-columns:
-            minmax(0, 1fr) minmax(0, .72fr);
-
-        gap: .55rem;
-    }
-
-    .calendar-split-picker-item:first-child,
-    .calendar-year-picker-wrap {
-        min-width: 0;
-    }
-
-    .calendar-split-picker .custom-select-button {
-        min-height: 44px;
-        padding-left: .75rem;
-        padding-right: .75rem;
-    }
-
-    .dashboard-calendar-filters {
-        width: 100%;
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: .32rem;
-        overflow: visible;
-        padding-bottom: 0;
-    }
-
-    .dashboard-calendar-filters button {
-        width: 100%;
-        min-width: 0;
-        min-height: 29px;
-
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: .25rem;
-
-        padding: 0 .32rem;
-
-        font-size: .58rem;
-        line-height: 1;
-        white-space: nowrap;
-
-        border-radius: 999px;
-    }
-
-    .dashboard-calendar-filters button i {
-        font-size: .56rem;
-        flex: 0 0 auto;
-    }
-}
-
-@media (max-width: 380px) {
-    .dashboard-calendar-filters {
-        gap: .25rem;
-    }
-
-    .dashboard-calendar-filters button {
-        min-height: 28px;
-        padding-inline: .22rem;
-        font-size: .53rem;
-    }
-
-    .dashboard-calendar-filters button i {
-        font-size: .5rem;
-    }
 }
 
 .dashboard-calendar-shell {
@@ -1415,12 +1269,6 @@
 
     .dashboard-calendar-shell .dashboard-calendar-side-panel .dashboard-calendar-preview-slots {
         grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 640px) {
-    .dashboard-calendar-side-panel .dashboard-calendar-preview-slots {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
@@ -1989,28 +1837,6 @@
     color: var(--red-300);
 }
 
-@media (max-width: 640px) {
-    .appointment-time-panel {
-        padding: .85rem;
-        border-radius: 18px;
-    }
-
-    .appointment-slot-grid {
-        gap: .65rem;
-    }
-
-    .appointment-slot-grid .slot-chip {
-        min-height: 52px;
-        padding-inline: .7rem;
-        border-radius: 14px;
-        font-size: .82rem;
-    }
-
-    .appointment-slot-placeholder {
-        min-height: 200px;
-    }
-}
-
 .slot-availability-count {
     margin-left: .5rem;
     font-size: .75rem;
@@ -2021,7 +1847,7 @@
 }
 
 .slot-availability-good {
-    color: var(--calendar-completed-text);
+    color: var(--green-400);
 }
 
 .slot-empty-message {
@@ -2090,4 +1916,389 @@
             var(--border));
 
     color: var(--red-300);
+}
+
+@media (max-width: 640px) {
+
+    .dashboard-calendar-availability-header,
+    .dashboard-calendar-availability-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .dashboard-calendar-status {
+        align-self: flex-start;
+    }
+
+    .dashboard-calendar-book-btn {
+        width: 100%;
+    }
+
+    .dashboard-calendar-side-panel .dashboard-calendar-preview-slots {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .appointment-time-panel {
+        padding: .75rem;
+        border-radius: 16px;
+    }
+
+    .appointment-slot-grid,
+    .appointment-slot-grid.slot-grid-ui {
+        column-gap: .55rem !important;
+        row-gap: .55rem !important;
+        margin-top: .65rem;
+    }
+
+    .appointment-slot-grid .slot-chip {
+        min-height: 44px;
+        padding-inline: .65rem;
+        border-radius: 12px;
+        font-size: .76rem;
+    }
+
+    .appointment-slot-grid .slot-chip i {
+        font-size: .68rem;
+    }
+
+    .appointment-slot-placeholder {
+        min-height: 130px;
+
+        gap: .45rem;
+
+        padding:
+            .9rem .75rem;
+
+        border-radius: 14px;
+    }
+
+    .appointment-slot-placeholder .empty-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        font-size: .72rem;
+    }
+
+    .appointment-slot-placeholder .empty-title {
+        font-size: .76rem;
+        line-height: 1.15;
+    }
+
+    .appointment-slot-placeholder .empty-subtitle {
+        max-width: 220px;
+        font-size: .62rem;
+        line-height: 1.35;
+    }
+
+    .appointment-time-heading {
+        gap: .6rem;
+
+        margin-bottom: .75rem;
+    }
+
+    .appointment-time-heading-icon {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        border-radius: 10px;
+    }
+
+    .appointment-time-heading-icon i {
+        font-size: 11px;
+    }
+
+    .appointment-time-heading h4 {
+        font-size: .8rem;
+    }
+
+    .appointment-time-heading p {
+        margin-top: .15rem;
+        font-size: .65rem;
+        line-height: 1.35;
+    }
+
+    .appointment-selected-slot {
+        margin-top: .65rem;
+        padding: .6rem .7rem;
+        border-radius: 12px;
+        font-size: .7rem;
+    }
+
+    .calendar-main-header {
+        gap: .5rem;
+    }
+
+    .dashboard-calendar-shell .calendar-split-picker {
+        width: min(100%, 220px);
+    }
+
+    .dashboard-calendar-shell .calendar-split-picker .custom-select-button {
+        min-height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .4rem;
+        padding: 0 .6rem;
+        font-size: .72rem;
+    }
+
+    .dashboard-calendar-shell .calendar-split-picker .custom-select-button>i {
+        width: auto;
+        font-size: .65rem;
+    }
+
+    .calendar-split-picker {
+        grid-template-columns:
+            minmax(0, 1fr) minmax(0, .72fr);
+
+        gap: .55rem;
+    }
+
+    .calendar-split-picker-item:first-child,
+    .calendar-year-picker-wrap {
+        min-width: 0;
+    }
+
+    .calendar-split-picker .custom-select-button {
+        min-height: 44px;
+        padding-left: .75rem;
+        padding-right: .75rem;
+    }
+
+    .dashboard-calendar-filters {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: .32rem;
+        overflow: visible;
+        padding-bottom: 0;
+    }
+
+    .dashboard-calendar-filters button {
+        width: 100%;
+        min-width: 0;
+        min-height: 29px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .25rem;
+
+        padding: 0 .32rem;
+
+        font-size: .58rem;
+        line-height: 1;
+        white-space: nowrap;
+
+        border-radius: 999px;
+    }
+
+    .dashboard-calendar-filters button i {
+        font-size: .56rem;
+        flex: 0 0 auto;
+    }
+}
+
+@media (max-width: 767px) {
+
+    .cal-shell {
+        min-height: 0 !important;
+
+        padding: clamp(.75rem, 3vw, 1rem) !important;
+
+        border-radius: 16px;
+
+        margin-top: .75rem;
+    }
+
+    .calendar-main-header {
+        grid-template-columns:
+            auto minmax(0, 1fr) auto;
+
+        gap: .45rem;
+
+        margin-bottom: .7rem;
+    }
+
+    .cal-shell .ui-action-btn {
+        --ui-action-size: clamp(30px, 8.5vw, 34px);
+
+        border-radius: 10px;
+    }
+
+    .cal-shell .ui-action-btn i {
+        font-size: 10px;
+    }
+
+    .cal-month-label {
+        font-size: .92rem !important;
+        line-height: 1.05 !important;
+    }
+
+    .calendar-year-label {
+        margin-top: .12rem !important;
+
+        font-size: .58rem !important;
+        line-height: 1 !important;
+    }
+
+    .cal-shell hr {
+        margin-top: .55rem !important;
+        margin-bottom: .55rem !important;
+    }
+
+    .cal-grid {
+        gap: 1px !important;
+    }
+
+    .cal-grid>.cal-day-label,
+    .cal-grid>.cal-day-weekend {
+        padding-top: .2rem !important;
+        padding-bottom: .35rem !important;
+
+        font-size: .52rem !important;
+        letter-spacing: .08em !important;
+    }
+
+    .cal-cell-wrap {
+        height: clamp(36px, 10vw, 40px);
+        min-height: clamp(36px, 10vw, 40px);
+
+        padding: 1px 0;
+    }
+
+    .cal-cell {
+        width: clamp(30px, 8.7vw, 34px);
+        height: clamp(30px, 8.7vw, 34px);
+
+        border-radius: 10px;
+
+        font-size: clamp(.7rem, 3.2vw, .8rem);
+    }
+
+    .cal-cell-wrap .absolute.-top-1.-right-1 {
+        transform: scale(.82);
+        transform-origin: center;
+    }
+
+    .cal-legend {
+        margin-top: .55rem;
+        padding-top: .55rem;
+
+        gap: .3rem .35rem;
+    }
+
+    .cal-pill {
+        gap: .3rem !important;
+
+        padding:
+            .28rem .52rem !important;
+
+        font-size: .6rem !important;
+    }
+
+    .cal-pill i {
+        font-size: .58rem !important;
+    }
+}
+
+@media (max-width: 390px) {
+
+    .cal-shell {
+        padding: .7rem !important;
+    }
+
+    .calendar-main-header {
+        gap: .3rem;
+
+        margin-bottom: .6rem;
+    }
+
+    .cal-shell .ui-action-btn {
+        --ui-action-size: 30px;
+
+        border-radius: 9px;
+    }
+
+    .cal-month-label {
+        font-size: .86rem !important;
+    }
+
+    .calendar-year-label {
+        font-size: .54rem !important;
+    }
+
+    .cal-cell-wrap {
+        height: 35px;
+        min-height: 35px;
+    }
+
+    .cal-cell {
+        width: 30px;
+        height: 30px;
+
+        border-radius: 9px;
+
+        font-size: .7rem;
+    }
+
+    .cal-grid>.cal-day-label,
+    .cal-grid>.cal-day-weekend {
+        font-size: .48rem !important;
+    }
+
+    .cal-legend {
+        gap: .26rem;
+    }
+
+    .cal-pill {
+        padding:
+            .25rem .45rem !important;
+
+        font-size: .55rem !important;
+    }
+
+    .cal-pill i {
+        font-size: .52rem !important;
+    }
+}
+
+@media (max-width: 380px) {
+    .dashboard-calendar-filters {
+        gap: .25rem;
+    }
+
+    .dashboard-calendar-filters button {
+        min-height: 28px;
+        padding-inline: .22rem;
+        font-size: .53rem;
+    }
+
+    .dashboard-calendar-filters button i {
+        font-size: .5rem;
+    }
+
+    .appointment-slot-placeholder {
+        min-height: 118px;
+        gap: .4rem;
+        padding: .75rem .6rem;
+        border-radius: 13px;
+    }
+
+    .appointment-slot-placeholder .empty-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        font-size: .66rem;
+    }
+
+    .appointment-slot-placeholder .empty-title {
+        font-size: .72rem;
+    }
+
+    .appointment-slot-placeholder .empty-subtitle {
+        max-width: 190px;
+        font-size: .58rem;
+        line-height: 1.3;
+    }
 }

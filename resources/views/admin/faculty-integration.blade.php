@@ -4,9 +4,14 @@
 
 @section('title', 'Faculty Integration')
 
+@section('styles')
+    @php($routePrefix = request()->routeIs('dentist.*') ? 'dentist' : 'admin')
+    @vite('resources/css/pages/admin/faculty-integration.css')
+@endsection
+
 @section('content')
 
-<main id="mainContent" class="admin-page-shell faculty-page page-enter">
+<main id="mainContent" class="app-page-shell faculty-page page-enter">
     <div class="w-full">
         <div class="page-banner faculty-banner" style="display:flex!important; align-items:center!important;
                     justify-content:flex-start!important; text-align:left!important;">
@@ -43,7 +48,7 @@
                         <span class="entry-badge">Faculty Setup</span>
                     </div>
 
-                    <form id="facultyIntegrationForm" method="POST" action="{{ route('admin.faculty.store') }}"
+                    <form id="facultyIntegrationForm" method="POST" action="{{ route($routePrefix . '.faculty.store') }}"
                         novalidate>
                         @csrf
 

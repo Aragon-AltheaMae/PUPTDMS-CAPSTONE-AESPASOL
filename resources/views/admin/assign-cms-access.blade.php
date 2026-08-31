@@ -2,10 +2,15 @@
 
 @section('layout-role', 'admin')
 
+@section('styles')
+    @php($routePrefix = request()->routeIs('dentist.*') ? 'dentist' : 'admin')
+    @vite('resources/css/pages/admin/cms-access.css')
+@endsection
+
 @section('title', 'CMS Access')
 
 @section('content')
-<main id="mainContent" class="admin-page-shell cms-page page-enter">
+<main id="mainContent" class="app-page-shell cms-page page-enter">
     <div class="w-full">
         <div class="page-banner cms-banner" style="display:flex!important;align-items:center!important;
                     justify-content:flex-start!important;text-align:left!important;">
@@ -42,7 +47,7 @@
                         <span class="entry-badge">Access Setup</span>
                     </div>
 
-                    <form id="assignCmsAccessForm" method="POST" action="{{ route('admin.assign-cms-access.store') }}"
+                    <form id="assignCmsAccessForm" method="POST" action="{{ route($routePrefix . '.assign-cms-access.store') }}"
                         novalidate>
                         @csrf
 
@@ -386,6 +391,37 @@
             previewAddress.textContent = '—';
         }
 
+        function resolveExternalAdminId(user) {
+            const directId =
+                String(
+                    user?.admin_id ??
+                    ''
+                ).trim();
+
+            if (directId) {
+                return directId;
+            }
+
+            const emailFallback =
+                String(
+                    user?.email ??
+                    ''
+                ).trim();
+
+            if (emailFallback) {
+                return emailFallback;
+            }
+
+            return [
+                user?.fname ?? '',
+                user?.lname ?? '',
+                user?.office ?? '',
+            ]
+                .map(value => String(value).trim())
+                .filter(Boolean)
+                .join('-');
+        }
+
         function clearFormFields() {
             externalAdminId.value = '';
             fname.value = lname.value = email.value = office.value =
@@ -421,7 +457,7 @@
         }
 
         function fillUser(user) {
-            externalAdminId.value = user.admin_id ?? '';
+            externalAdminId.value = resolveExternalAdminId(user);
             setCmsFieldError(searchInput, '');
             searchInput.value = user.full_name ?? '';
             fname.value = user.fname ?? '';
@@ -532,7 +568,7 @@
                 params.set('search', trimmed);
             }
 
-            const response = await fetch(`/admin/external-admins/search?${params.toString()}`, {
+            const response = await fetch(`{{ $routePrefix === 'dentist' ? '/dentist' : '/admin' }}/external-admins/search?${params.toString()}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',

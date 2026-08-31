@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Dentist;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\Patient;
+use App\Models\ReservedBookingPeriod;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Helpers\PhilippineHolidays;
@@ -40,6 +41,7 @@ class DentistPatientController extends Controller
 
         Appointment::query()
             ->whereIn('status', ['upcoming', 'rescheduled'])
+            ->whereNull('reserved_booking_period_id')
             ->where(function ($query) use ($cutoff) {
                 $query
                     ->whereDate(
@@ -61,6 +63,26 @@ class DentistPatientController extends Controller
                     });
             })
             ->update($updatePayload);
+
+        $expiredReservedPeriodIds = ReservedBookingPeriod::query()
+            ->where(function ($query) use ($cutoff) {
+                $query->whereDate('reserved_date', '<', $cutoff->toDateString())
+                    ->orWhere(function ($sameDay) use ($cutoff) {
+                        $sameDay->whereDate('reserved_date', $cutoff->toDateString())
+                            ->whereTime('end_time', '<', $cutoff->format('H:i:s'));
+                    });
+            })
+            ->pluck('id');
+
+        if ($expiredReservedPeriodIds->isNotEmpty()) {
+            Appointment::query()
+                ->whereIn('status', ['upcoming', 'rescheduled'])
+                ->whereIn('reserved_booking_period_id', $expiredReservedPeriodIds)
+                ->update([
+                    ...$updatePayload,
+                    'reserved_booking_period_slot_id' => null,
+                ]);
+        }
     }
 
     public function index()
@@ -136,7 +158,7 @@ class DentistPatientController extends Controller
         return view('shared.patient-list', [
             'layoutRole' => 'dentist',
             'pageTitle' => 'Patient Directory',
-            'pageShellClass' => 'admin-page-shell dentist-page-shell',
+            'pageShellClass' => 'app-page-shell app-page-shell',
             'isDentistView' => true,
             'patientProfileRouteName' => 'dentist.dentist.patient.profile',
 
@@ -176,7 +198,12 @@ class DentistPatientController extends Controller
 
         $today = Carbon::today()->toDateString();
 
-        $futureVisits = Appointment::with(['procedure', 'followUpAppointments', 'dentist'])
+        $futureVisits = Appointment::with([
+            'procedure',
+            'followUpAppointments',
+            'dentist',
+            'reservedBookingPeriod',
+        ])
             ->where('patient_id', $patient->id)
             ->whereDate('appointment_date', '>=', $today)
             ->whereIn('status', ['upcoming', 'rescheduled'])
@@ -188,6 +215,7 @@ class DentistPatientController extends Controller
             'procedure',
             'followUpAppointments',
             'dentist',
+            'reservedBookingPeriod',
         ])
             ->where('patient_id', $patient->id)
             ->whereIn('status', [

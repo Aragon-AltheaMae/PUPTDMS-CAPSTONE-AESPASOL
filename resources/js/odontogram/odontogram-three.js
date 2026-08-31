@@ -95,10 +95,15 @@ export function createOdontogramThreeScene({
         });
 
     renderer.setPixelRatio(
-        Math.min(
-            window.devicePixelRatio || 1,
-            2
-        )
+        mode === 'preview'
+            ? Math.min(
+                window.devicePixelRatio || 1,
+                1.25
+            )
+            : Math.min(
+                window.devicePixelRatio || 1,
+                2
+            )
     );
 
     renderer.setSize(
@@ -108,10 +113,14 @@ export function createOdontogramThreeScene({
     );
 
     renderer.shadowMap.enabled =
-        true;
+        mode !== 'preview';
 
-    renderer.shadowMap.type =
-        THREE.PCFSoftShadowMap;
+    if (
+        renderer.shadowMap.enabled
+    ) {
+        renderer.shadowMap.type =
+            THREE.PCFSoftShadowMap;
+    }
 
     container
         .querySelectorAll('canvas')
@@ -127,7 +136,7 @@ export function createOdontogramThreeScene({
             renderer.domElement
         );
 
-    controls.enableDamping = true;
+    controls.enableDamping = mode !== 'preview';
     controls.dampingFactor = 0.07;
     controls.minDistance = 2.2;
     controls.maxDistance = 30;
@@ -142,6 +151,20 @@ export function createOdontogramThreeScene({
 
     controls.update();
 
+    const renderScene = () => {
+        renderer.render(
+            scene,
+            camera
+        );
+    };
+
+    if (mode === 'preview') {
+        controls.addEventListener(
+            'change',
+            renderScene
+        );
+    }
+
     const teethMeshes = [];
 
     const state = {
@@ -153,6 +176,7 @@ export function createOdontogramThreeScene({
         renderer,
         controls,
 
+        renderScene,
         teethMeshes,
 
         raycaster:
@@ -198,9 +222,13 @@ export function createOdontogramThreeScene({
         state
     );
 
-    startOdontogramAnimation(
-        state
-    );
+    if (state.mode === 'preview') {
+        state.renderScene();
+    } else {
+        startOdontogramAnimation(
+            state
+        );
+    }
 
     activeOdontogramStates.add(
         state
@@ -299,13 +327,16 @@ function addOdontogramLights(
         10
     );
 
-    keyLight.castShadow = true;
+    keyLight.castShadow =
+        state.mode !== 'preview';
 
-    keyLight.shadow.mapSize.width =
-        1024;
+    if (keyLight.castShadow) {
+        keyLight.shadow.mapSize.width =
+            1024;
 
-    keyLight.shadow.mapSize.height =
-        1024;
+        keyLight.shadow.mapSize.height =
+            1024;
+    }
 
     const backLight =
         new THREE.DirectionalLight(
@@ -378,6 +409,12 @@ export function resizeOdontogramThreeScene(
         height,
         false
     );
+
+    if (
+        state.mode === 'preview'
+    ) {
+        state.renderScene?.();
+    }
 }
 
 function easeInOutCubic(value) {
@@ -787,6 +824,12 @@ export function updateOdontogramThreeScene(
             state.selectedMesh
         );
     }
+
+    if (
+        state.mode === 'preview'
+    ) {
+        state.renderScene?.();
+    }
 }
 
 function applySelectedMeshState(mesh) {
@@ -992,6 +1035,12 @@ function syncOdontogramThreeTheme(
         color,
         1
     );
+
+    if (
+        state.mode === 'preview'
+    ) {
+        state.renderScene?.();
+    }
 }
 
 window.addEventListener(

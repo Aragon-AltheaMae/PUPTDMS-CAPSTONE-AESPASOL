@@ -42,6 +42,7 @@
     };
 @endphp
 
+<div class="section-stack grid gap-4">
 <div class="booking-section-card">
 
     <p class="booking-section-card-title">
@@ -136,7 +137,7 @@
 
 </div>
 
-<div class="booking-section-card">
+<div class="booking-section-card mt-2">
 
     <p class="booking-section-card-title">
         <i class="fa-solid fa-triangle-exclamation text-xs"></i>
@@ -270,7 +271,9 @@
 
 </div>
 
-<div class="booking-section-card">
+</div>
+
+<div class="booking-section-card mt-4">
 
     <p class="booking-section-card-title">
         <i class="fa-solid fa-smoking text-xs"></i>
@@ -396,7 +399,7 @@
 
             <input type="tel" id="emergency_number" name="emergency_number"
                 value="{{ old('emergency_number', $defaults['emergency_number'] ?? '') }}" inputmode="numeric"
-                autocomplete="tel" maxlength="11" pattern="09[0-9]{9}" class="form-input-custom"
+                autocomplete="tel" maxlength="13" pattern="09[0-9]{2}\s?[0-9]{3}\s?[0-9]{4}" class="form-input-custom"
                 placeholder="09XXXXXXXXX" data-validation-rule="philippineMobile"
                 data-required-message="Please enter an emergency contact number."
                 data-pattern-message="Contact number must start with 09 and contain exactly 11 digits." required>

@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use setasign\Fpdi\Fpdi;
+use App\Models\ServiceType;
 
 class DentistReportController extends Controller
 {
@@ -124,10 +125,18 @@ class DentistReportController extends Controller
         $returningPatients = $patientVisitCounts->where('total_visits', '>', 1)->count();
         $newPatients = $patientVisitCounts->where('total_visits', 1)->count();
 
-        $topServices = Appointment::whereYear('appointment_date', $thisYear)
+        $validServiceTypes = ServiceType::query()
+            ->pluck('name');
+
+        $topServices = Appointment::query()
+            ->whereYear('appointment_date', $thisYear)
             ->whereMonth('appointment_date', $thisMonth)
             ->whereNotNull('service_type')
-            ->select('service_type as name', DB::raw('COUNT(*) as total'))
+            ->whereIn('service_type', $validServiceTypes)
+            ->select(
+                'service_type as name',
+                DB::raw('COUNT(*) as total')
+            )
             ->groupBy('service_type')
             ->orderByDesc('total')
             ->limit(5)
@@ -189,7 +198,7 @@ class DentistReportController extends Controller
         return view('shared.reports', [
             'layoutRole' => 'dentist',
             'pageTitle' => 'Reports & Analytics',
-            'pageShellClass' => 'dentist-page-shell dentist-report-page',
+            'pageShellClass' => 'app-page-shell dentist-report-page',
 
             'isAdminView' => false,
             'isDentistView' => true,
@@ -430,12 +439,30 @@ class DentistReportController extends Controller
         $copies = (int) $validated['quantity'];
 
         for ($copy = 1; $copy <= $copies; $copy++) {
-            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-            $pdf->useTemplate($template, 0, 0, $size['width'], $size['height'], true);
+            $pdf->AddPage(
+                $size['orientation'],
+                [
+                    $size['width'],
+                    $size['height'],
+                ]
+            );
 
-            $this->drawGadPdfPage($pdf, $counts, $from, $to);
+            $pdf->useTemplate(
+                $template,
+                0,
+                0,
+                $size['width'],
+                $size['height'],
+                true
+            );
+
+            $this->drawGadPdfPage(
+                $pdf,
+                $counts,
+                $from,
+                $to
+            );
         }
-
         AuditLogger::log(
             'download',
             'dentist_reports',
@@ -716,7 +743,12 @@ class DentistReportController extends Controller
         $size = $pdf->getTemplateSize($template);
 
         $rowsPerPage = 16;
-        $recordChunks = $records->chunk($rowsPerPage);
+
+        $recordChunks =
+            $this->reportPages(
+                $records,
+                $rowsPerPage
+            );
         $copies = (int) $validated['quantity'];
 
         for ($copy = 1; $copy <= $copies; $copy++) {
@@ -748,7 +780,7 @@ class DentistReportController extends Controller
         DocumentTemplate $template
     ): bool {
         $audience =
-            $this->resolveDentalServicesTemplateAudience(
+            $this->getDentalServicesTemplateAudience(
                 $template
             );
 
@@ -760,7 +792,7 @@ class DentistReportController extends Controller
             $appointment->patient;
 
         $patientAudience =
-            $this->resolveDentalServicesPatientAudience(
+            $this->getDentalServicesPatientAudience(
                 $patient
             );
 
@@ -775,7 +807,7 @@ class DentistReportController extends Controller
         return true;
     }
 
-    private function resolveDentalServicesTemplateAudience(
+    private function getDentalServicesTemplateAudience(
         DocumentTemplate $template
     ): string {
         $haystack = strtolower(trim(implode(' ', array_filter([
@@ -805,26 +837,13 @@ class DentistReportController extends Controller
         return 'all';
     }
 
-    private function resolveDentalServicesPatientAudience(
-        $patient
-    ): string {
+    private function getDentalServicesPatientAudience($patient): string
+    {
         if (! $patient) {
             return 'unknown';
         }
 
-        if (filled($patient->faculty_code)) {
-            return 'faculty';
-        }
-
-        if (
-            filled($patient->course_code) ||
-            filled($patient->course_name) ||
-            filled($patient->student_no)
-        ) {
-            return 'student';
-        }
-
-        return 'administrative';
+        return $this->categorizePatientForReports($patient);
     }
 
     public function downloadMedicineInventoryReport(Request $request)
@@ -888,7 +907,12 @@ class DentistReportController extends Controller
         $size = $pdf->getTemplateSize($template);
 
         $rowsPerPage = 34;
-        $itemChunks = $items->chunk($rowsPerPage);
+
+        $itemChunks =
+            $this->reportPages(
+                $items,
+                $rowsPerPage
+            );
         $copies = (int) $validated['quantity'];
 
         for ($copy = 1; $copy <= $copies; $copy++) {
@@ -975,7 +999,12 @@ class DentistReportController extends Controller
         $size = $pdf->getTemplateSize($template);
 
         $rowsPerPage = 34;
-        $itemChunks = $items->chunk($rowsPerPage);
+
+        $itemChunks =
+            $this->reportPages(
+                $items,
+                $rowsPerPage
+            );
         $copies = (int) $validated['quantity'];
 
         for ($copy = 1; $copy <= $copies; $copy++) {
@@ -1070,7 +1099,12 @@ class DentistReportController extends Controller
         $size = $pdf->getTemplateSize($template);
 
         $rowsPerPage = 8;
-        $recordChunks = $records->chunk($rowsPerPage);
+
+        $recordChunks =
+            $this->reportPages(
+                $records,
+                $rowsPerPage
+            );
         $copies = (int) $validated['quantity'];
 
         for ($copy = 1; $copy <= $copies; $copy++) {
@@ -1105,7 +1139,7 @@ class DentistReportController extends Controller
         DocumentTemplate $template
     ): bool {
         $audience =
-            $this->resolveDailyTreatmentTemplateAudience(
+            $this->getDailyTreatmentTemplateAudience(
                 $template
             );
 
@@ -1114,7 +1148,7 @@ class DentistReportController extends Controller
         }
 
         $patientAudience =
-            $this->resolveDailyTreatmentPatientAudience(
+            $this->getDailyTreatmentPatientAudience(
                 $appointment->patient
             );
 
@@ -1129,7 +1163,7 @@ class DentistReportController extends Controller
         return true;
     }
 
-    private function resolveDailyTreatmentTemplateAudience(
+    private function getDailyTreatmentTemplateAudience(
         DocumentTemplate $template
     ): string {
         $code = strtoupper(trim((string) ($template->code ?? '')));
@@ -1164,50 +1198,18 @@ class DentistReportController extends Controller
         return 'all';
     }
 
-    private function resolveDailyTreatmentPatientAudience(
-        $patient
-    ): string {
+    private function getDailyTreatmentPatientAudience($patient): string
+    {
         if (! $patient) {
             return 'unknown';
         }
 
-        $patientType = strtolower(trim((string) (
-            $patient->patient_type
-            ?? $patient->type
-            ?? ''
-        )));
-
-        if (
-            str_contains($patientType, 'admin') ||
-            str_contains($patientType, 'administrative')
-        ) {
-            return 'administrative';
-        }
-
-        if (str_contains($patientType, 'faculty')) {
-            return 'faculty';
-        }
-
-        if (
-            str_contains($patientType, 'student') ||
-            str_contains($patientType, 'guest')
-        ) {
-            return 'student';
-        }
-
-        if (filled($patient->faculty_code)) {
-            return 'faculty';
-        }
-
-        if (
-            filled($patient->course_code) ||
-            filled($patient->course_name) ||
-            filled($patient->student_no)
-        ) {
-            return 'student';
-        }
-
-        return 'administrative';
+        return match ($this->categorizePatientForReports($patient)) {
+            'administrative' => 'administrative',
+            'faculty' => 'faculty',
+            'dependent' => 'dependent',
+            default => 'student',
+        };
     }
 
     public function downloadDentalCasesReport(Request $request)
@@ -1247,7 +1249,7 @@ class DentistReportController extends Controller
             ], 404);
         }
 
-        $appointments = Appointment::with('patient')
+        $appointments = Appointment::with(['patient', 'procedure'])
             ->where('status', 'completed')
             ->whereDate('appointment_date', '>=', $from->toDateString())
             ->whereDate('appointment_date', '<=', $to->toDateString())
@@ -1280,13 +1282,39 @@ class DentistReportController extends Controller
         $template = $pdf->importPage(1);
         $size = $pdf->getTemplateSize($template);
 
+        $casePages = $this->dentalCasesPages(
+            $caseGroups,
+            3
+        );
+
         $copies = (int) $validated['quantity'];
 
         for ($copy = 1; $copy <= $copies; $copy++) {
-            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-            $pdf->useTemplate($template, 0, 0, $size['width'], $size['height'], true);
+            foreach ($casePages as $pageGroups) {
+                $pdf->AddPage(
+                    $size['orientation'],
+                    [
+                        $size['width'],
+                        $size['height'],
+                    ]
+                );
 
-            $this->drawDentalCasesPage($pdf, $caseGroups, $from, $to);
+                $pdf->useTemplate(
+                    $template,
+                    0,
+                    0,
+                    $size['width'],
+                    $size['height'],
+                    true
+                );
+
+                $this->drawDentalCasesPage(
+                    $pdf,
+                    $pageGroups,
+                    $from,
+                    $to
+                );
+            }
         }
 
         AuditLogger::log(
@@ -1345,7 +1373,7 @@ class DentistReportController extends Controller
             ], 404);
         }
 
-        $appointments = Appointment::with('patient')
+        $appointments = Appointment::with(['patient', 'procedure'])
             ->where('status', 'completed')
             ->whereDate('appointment_date', '>=', $from->toDateString())
             ->whereDate('appointment_date', '<=', $to->toDateString())
@@ -1636,13 +1664,10 @@ class DentistReportController extends Controller
 
             $groupKey = $this->classifyDentalCasesPatient($patient);
 
-            $diagnosis = trim((string) ($procedureDiagnosisByAppointment[$appointment->id] ?? ''));
-
-            $diagnosis = trim((string) ($appointment->service_type ?? ''));
-
-            if ($diagnosis === '') {
-                $diagnosis = 'Dental Service';
-            }
+            $diagnosis = $this->getDentalCaseDiagnosisLabel(
+                $appointment,
+                $procedureDiagnosisByAppointment
+            );
 
             if (! isset($groups[$groupKey][$diagnosis])) {
                 $groups[$groupKey][$diagnosis] = 0;
@@ -1659,7 +1684,6 @@ class DentistReportController extends Controller
                     'diagnosis' => $diagnosis,
                     'total' => $total,
                 ])
-                ->take(3)
                 ->values()
                 ->all();
         }
@@ -1713,7 +1737,9 @@ class DentistReportController extends Controller
             $rowKey = $this->classifyMonthlyReportPatient($patient);
             $data[$rowKey]['patient_ids'][$patient->id] = true;
 
-            $columnKey = $this->classifyMonthlyReportService($appointment->service_type ?? '');
+            $columnKey = $this->classifyMonthlyReportService(
+                $this->getMonthlyReportServiceLabel($appointment)
+            );
 
             if ($columnKey && array_key_exists($columnKey, $data[$rowKey])) {
                 $data[$rowKey][$columnKey]++;
@@ -1740,41 +1766,7 @@ class DentistReportController extends Controller
 
     private function classifyMonthlyReportPatient($patient): string
     {
-        $studentNo = strtolower(trim((string) ($patient->student_no ?? '')));
-        $courseCode = strtolower(trim((string) ($patient->course_code ?? '')));
-        $courseName = strtolower(trim((string) ($patient->course_name ?? '')));
-        $yearLevel = strtolower(trim((string) ($patient->year_level ?? '')));
-        $section = strtolower(trim((string) ($patient->section ?? '')));
-        $facultyCode = strtolower(trim((string) ($patient->faculty_code ?? '')));
-
-        $combined = trim(implode(' ', array_filter([
-            $studentNo,
-            $courseCode,
-            $courseName,
-            $yearLevel,
-            $section,
-            $facultyCode,
-        ])));
-
-        if (
-            $studentNo !== '' ||
-            $courseCode !== '' ||
-            $courseName !== '' ||
-            $yearLevel !== '' ||
-            $section !== ''
-        ) {
-            return 'student';
-        }
-
-        if (str_contains($combined, 'admin') || str_contains($combined, 'administrative')) {
-            return 'administrative';
-        }
-
-        if ($facultyCode !== '' || str_contains($combined, 'faculty')) {
-            return 'faculty';
-        }
-
-        return 'dependent';
+        return $this->categorizePatientForReports($patient);
     }
 
     private function classifyMonthlyReportService(?string $serviceType): ?string
@@ -1860,6 +1852,109 @@ class DentistReportController extends Controller
         return 'inquiry';
     }
 
+    private function dentalCasesPages(
+        array $caseGroups,
+        int $rowsPerSection = 3
+    ): array {
+        $largestSectionCount = max(
+            count($caseGroups['students'] ?? []),
+            count($caseGroups['faculty'] ?? []),
+            count($caseGroups['administrative'] ?? []),
+            count($caseGroups['dependents'] ?? [])
+        );
+
+        $pageCount = max(
+            1,
+            (int) ceil(
+                $largestSectionCount /
+                    $rowsPerSection
+            )
+        );
+
+        $pages = [];
+
+        for (
+            $page = 0;
+            $page < $pageCount;
+            $page++
+        ) {
+            $offset =
+                $page *
+                $rowsPerSection;
+
+            $pages[] = [
+                'students' =>
+                array_slice(
+                    $caseGroups['students'] ?? [],
+                    $offset,
+                    $rowsPerSection
+                ),
+
+                'faculty' =>
+                array_slice(
+                    $caseGroups['faculty'] ?? [],
+                    $offset,
+                    $rowsPerSection
+                ),
+
+                'administrative' =>
+                array_slice(
+                    $caseGroups['administrative'] ?? [],
+                    $offset,
+                    $rowsPerSection
+                ),
+
+                'dependents' =>
+                array_slice(
+                    $caseGroups['dependents'] ?? [],
+                    $offset,
+                    $rowsPerSection
+                ),
+            ];
+        }
+
+        return $pages;
+    }
+
+    private function getDentalCaseDiagnosisLabel(Appointment $appointment, $procedureDiagnosisByAppointment): string
+    {
+        $diagnosis = '';
+
+        if ($procedureDiagnosisByAppointment instanceof \Illuminate\Support\Collection) {
+            $diagnosis = trim((string) ($procedureDiagnosisByAppointment->get($appointment->id) ?? ''));
+        } elseif (is_array($procedureDiagnosisByAppointment)) {
+            $diagnosis = trim((string) ($procedureDiagnosisByAppointment[$appointment->id] ?? ''));
+        }
+
+        if ($diagnosis === '' && filled($appointment->procedure?->diagnosis)) {
+            $diagnosis = trim((string) $appointment->procedure->diagnosis);
+        }
+
+        if ($diagnosis === '') {
+            $diagnosis = $this->getMonthlyReportServiceLabel($appointment);
+        }
+
+        return $this->normalizeReportServiceLabel($diagnosis, 'Dental Service');
+    }
+
+    private function getMonthlyReportServiceLabel(Appointment $appointment): string
+    {
+        $service = trim((string) ($appointment->service_type ?? ''));
+
+        if ($service === '' && filled($appointment->procedure?->diagnosis)) {
+            $service = trim((string) $appointment->procedure->diagnosis);
+        }
+
+        return $this->normalizeReportServiceLabel($service, 'Dental Service');
+    }
+
+    private function normalizeReportServiceLabel(?string $value, string $fallback = 'Dental Service'): string
+    {
+        $value = preg_replace('/\s+/', ' ', trim((string) $value)) ?? '';
+
+        return $value !== '' ? $value : $fallback;
+    }
+
     private function drawMonthlyReportPage(Fpdi $pdf, array $reportData, Carbon $from, Carbon $to): void
     {
         $pdf->SetTextColor(0, 0, 0);
@@ -1923,41 +2018,12 @@ class DentistReportController extends Controller
 
     private function classifyDentalCasesPatient($patient): string
     {
-        $studentNo = strtolower(trim((string) ($patient->student_no ?? '')));
-        $courseCode = strtolower(trim((string) ($patient->course_code ?? '')));
-        $courseName = strtolower(trim((string) ($patient->course_name ?? '')));
-        $yearLevel = strtolower(trim((string) ($patient->year_level ?? '')));
-        $section = strtolower(trim((string) ($patient->section ?? '')));
-        $facultyCode = strtolower(trim((string) ($patient->faculty_code ?? '')));
-
-        $combined = trim(implode(' ', array_filter([
-            $studentNo,
-            $courseCode,
-            $courseName,
-            $yearLevel,
-            $section,
-            $facultyCode,
-        ])));
-
-        if (
-            $studentNo !== '' ||
-            $courseCode !== '' ||
-            $courseName !== '' ||
-            $yearLevel !== '' ||
-            $section !== ''
-        ) {
-            return 'students';
-        }
-
-        if (str_contains($combined, 'admin') || str_contains($combined, 'administrative')) {
-            return 'administrative';
-        }
-
-        if ($facultyCode !== '' || str_contains($combined, 'faculty')) {
-            return 'faculty';
-        }
-
-        return 'dependents';
+        return match ($this->categorizePatientForReports($patient)) {
+            'faculty' => 'faculty',
+            'administrative' => 'administrative',
+            'dependent' => 'dependents',
+            default => 'students',
+        };
     }
 
     private function drawDentalCasesPage(Fpdi $pdf, array $caseGroups, Carbon $from, Carbon $to): void
@@ -1977,29 +2043,107 @@ class DentistReportController extends Controller
             10
         );
 
-        $this->drawDentalCasesSection($pdf, $caseGroups['students'] ?? [], 241.0);
-        $this->drawDentalCasesSection($pdf, $caseGroups['faculty'] ?? [], 320.5);
-        $this->drawDentalCasesSection($pdf, $caseGroups['administrative'] ?? [], 415.5);
-        $this->drawDentalCasesSection($pdf, $caseGroups['dependents'] ?? [], 511.5);
+        $this->drawDentalCasesSection(
+            $pdf,
+            $caseGroups['students'] ?? [],
+            236.3
+        );
+
+        $this->drawDentalCasesSection(
+            $pdf,
+            $caseGroups['faculty'] ?? [],
+            328.4
+        );
+
+        $this->drawDentalCasesSection(
+            $pdf,
+            $caseGroups['administrative'] ?? [],
+            420.4
+        );
+
+        $this->drawDentalCasesSection(
+            $pdf,
+            $caseGroups['dependents'] ?? [],
+            513.3
+        );
     }
 
-    private function drawDentalCasesSection(Fpdi $pdf, array $rows, float $firstRowY): void
-    {
-        $rowHeight = 15.5;
+    private function drawDentalCasesSection(
+        Fpdi $pdf,
+        array $rows,
+        float $firstRowY
+    ): void {
+        $rowHeight = 15.4;
 
-        foreach (array_slice($rows, 0, 3) as $index => $row) {
-            $y = $firstRowY + ($index * $rowHeight);
+        foreach (
+            array_slice($rows, 0, 3)
+            as $index => $row
+        ) {
+            $y =
+                $firstRowY +
+                ($index * $rowHeight);
 
-            $diagnosis = trim((string) ($row['diagnosis'] ?? ''));
-            $total = (string) ((int) ($row['total'] ?? 0));
+            $diagnosis =
+                trim(
+                    (string) (
+                        $row['diagnosis']
+                        ?? ''
+                    )
+                );
 
-            $pdf->SetFont('Helvetica', '', 7.2);
+            $total =
+                (string) (
+                    (int) (
+                        $row['total']
+                        ?? 0
+                    )
+                );
 
-            $this->drawPdfCell($pdf, 262, $y, $diagnosis, 210, 8, 'L');
+            $pdf->SetFont(
+                'Helvetica',
+                '',
+                7.2
+            );
 
-            $pdf->SetFont('Helvetica', 'B', 7.2);
-            $this->drawPdfCell($pdf, 430, $y, $total, 88, 8, 'C');
+            $this->drawPdfCellAutoFont(
+                $pdf,
+                259.2,
+                $y,
+                $diagnosis,
+                195,
+                8,
+                'L',
+                'Helvetica',
+                '',
+                7.2,
+                5.5
+            );
+
+            $pdf->SetFont(
+                'Helvetica',
+                'B',
+                7.2
+            );
+
+            $this->drawPdfCell(
+                $pdf,
+                426.4,
+                $y,
+                $total,
+                80,
+                8,
+                'C'
+            );
         }
+    }
+
+    private function reportPages(
+        $items,
+        int $rowsPerPage
+    ) {
+        return collect($items)
+            ->values()
+            ->chunk($rowsPerPage);
     }
 
     private function formatDentalCasesPeriodLabel(Carbon $from, Carbon $to): string
@@ -2054,7 +2198,7 @@ class DentistReportController extends Controller
 
         $adminDept = trim((string) ($patient->faculty_code ?? ''));
 
-        $demographics = $this->resolvePatientDemographics($patient);
+        $demographics = $this->getPatientDemographics($patient);
         $birthdate = $demographics['birthdate_short'];
         $age = $demographics['age'];
         $sex = $demographics['gender'];
@@ -2075,7 +2219,19 @@ class DentistReportController extends Controller
         $this->drawPdfCellAutoFont($pdf, 390, 191, $sex, 95, 8, 'C', 'Helvetica', '', 7.2, 5.4);
         $this->drawDentalHealthOdontogram($pdf, $odontogramData);
 
-        $this->drawPdfCellAutoFont($pdf, 205, 513, $previousDentist, 210, 8, 'L', 'Helvetica', '', 8, 5.8);
+        $this->drawPdfCellAutoFont(
+            $pdf,
+            220,
+            513,
+            $previousDentist,
+            185,
+            8,
+            'L',
+            'Helvetica',
+            '',
+            8,
+            5.8
+        );
         $this->drawPdfCellAutoFont($pdf, 203, 526, $lastDentalVisit, 195, 8, 'L', 'Helvetica', '', 8, 5.8);
 
         $pdf->SetFont('Helvetica', '', 7);
@@ -2226,9 +2382,19 @@ class DentistReportController extends Controller
             $this->drawPdfCellAutoFont($pdf, 380, 511, trim((string) ($medicalHistory->emergency_relation ?? '')), 82, 7, 'L', 'Helvetica', '', 7.2, 5.6);
             $this->drawPdfCellAutoFont($pdf, 154, 524, trim((string) ($medicalHistory->emergency_number ?? '')), 108, 7, 'L', 'Helvetica', '', 7.2, 5.6);
 
-            $signaturePath = $this->resolveStoredSignaturePath($medicalHistory?->patient_signature);
+            $signaturePath = $this->getStoredSignaturePath(
+                $medicalHistory?->patient_signature
+            );
+
             if ($signaturePath) {
-                $this->drawPdfImageInBox($pdf, $signaturePath, 106, 528, 118, 12);
+                $this->drawPdfImageInBox(
+                    $pdf,
+                    $signaturePath,
+                    163,
+                    537,
+                    105,
+                    10
+                );
             }
         }
 
@@ -2952,26 +3118,68 @@ class DentistReportController extends Controller
         }
 
         if ($request->filled('office_type')) {
-            $officeType = (string) $request->input('office_type');
+            $officeType = strtolower(
+                trim((string) $request->input('office_type'))
+            );
 
-            $query->whereHas('patient', function ($patientQuery) use ($officeType) {
-                if ($officeType === 'Faculty') {
-                    $patientQuery->whereNotNull('faculty_code')
-                        ->where('faculty_code', '!=', '');
+            $query->whereHas(
+                'patient',
+                function ($patientQuery) use ($officeType) {
 
-                    return;
+                    if ($officeType === 'student') {
+                        $patientQuery->where(
+                            'classification',
+                            'student'
+                        );
+
+                        return;
+                    }
+
+                    if ($officeType === 'faculty') {
+                        $patientQuery->where(
+                            'classification',
+                            'faculty'
+                        );
+
+                        return;
+                    }
+
+                    if (
+                        in_array(
+                            $officeType,
+                            [
+                                'administrative',
+                                'administrative personnel',
+                            ],
+                            true
+                        )
+                    ) {
+                        $patientQuery->where(
+                            'classification',
+                            'administrative'
+                        );
+
+                        return;
+                    }
+
+                    if (
+                        in_array(
+                            $officeType,
+                            [
+                                'dependent',
+                                'alumni',
+                                'dependent & alumni',
+                            ],
+                            true
+                        )
+                    ) {
+                        $patientQuery->where(
+                            'classification',
+                            'dependent_alumni'
+                        );
+                    }
                 }
-
-                if (in_array($officeType, ['Administrative', 'Dependent'], true)) {
-                    $patientQuery->where(function ($innerQuery) {
-                        $innerQuery->whereNull('course_code')
-                            ->orWhere('course_code', '');
-                    })->where(function ($innerQuery) {
-                        $innerQuery->whereNull('faculty_code')
-                            ->orWhere('faculty_code', '');
-                    });
-                }
-            });
+            );
         }
 
         if ($request->filled('program_code')) {
@@ -3014,7 +3222,7 @@ class DentistReportController extends Controller
             ->through(function (Appointment $appointment) {
                 $patient = $appointment->patient;
                 $procedure = $appointment->procedure;
-                $demographics = $this->resolvePatientDemographics($patient);
+                $demographics = $this->getPatientDemographics($patient);
 
                 $requestedDateTime = '';
 
@@ -3084,29 +3292,24 @@ class DentistReportController extends Controller
 
     private function dailyTreatmentOfficeDisplay($patient): string
     {
-        if (!$patient) {
+        if (! $patient) {
             return '—';
         }
 
-        $patientType = strtolower(trim((string) (
-            $patient->patient_type
-            ?? $patient->type
-            ?? ''
-        )));
+        $category =
+            $this->categorizePatientForReports(
+                $patient
+            );
 
-        if (
-            str_contains($patientType, 'admin') ||
-            str_contains($patientType, 'administrative')
-        ) {
+        if ($category === 'administrative') {
             return trim((string) (
                 $patient->course_name
-                ?? $patient->program_code
-                ?? $patient->faculty_code
-                ?? 'Administrative'
-            )) ?: 'Administrative';
+                ?? $patient->course_code
+                ?? 'Administrative Personnel'
+            )) ?: 'Administrative Personnel';
         }
 
-        if (str_contains($patientType, 'faculty')) {
+        if ($category === 'faculty') {
             return trim((string) (
                 $patient->faculty_code
                 ?? $patient->course_name
@@ -3114,16 +3317,16 @@ class DentistReportController extends Controller
             )) ?: 'Faculty';
         }
 
-        if (filled($patient->faculty_code)) {
-            return trim((string) $patient->faculty_code);
+        if ($category === 'dependent') {
+            return 'Dependent & Alumni';
         }
 
-        if (filled($patient->course_code)) {
-            return trim((string) $patient->course_code);
-        }
-
-        if (filled($patient->course_name)) {
-            return trim((string) $patient->course_name);
+        if ($category === 'student') {
+            return trim((string) (
+                $patient->course_code
+                ?? $patient->course_name
+                ?? 'Student'
+            )) ?: 'Student';
         }
 
         return '—';
@@ -3135,39 +3338,22 @@ class DentistReportController extends Controller
             return '';
         }
 
-        $patientType = strtolower(trim((string) (
-            $patient->patient_type
-            ?? $patient->type
-            ?? ''
-        )));
+        return match ($this->categorizePatientForReports($patient)) {
+            'student' =>
+            'Student',
 
-        if (
-            str_contains($patientType, 'admin') ||
-            str_contains($patientType, 'administrative')
-        ) {
-            return 'Administrative';
-        }
+            'faculty' =>
+            'Faculty',
 
-        if (str_contains($patientType, 'faculty')) {
-            return 'Faculty';
-        }
+            'administrative' =>
+            'Administrative Personnel',
 
-        if (
-            str_contains($patientType, 'student') ||
-            str_contains($patientType, 'guest')
-        ) {
-            return 'Student';
-        }
+            'dependent' =>
+            'Dependent & Alumni',
 
-        if (filled($patient->faculty_code)) {
-            return 'Faculty';
-        }
-
-        if (filled($patient->course_code) || filled($patient->course_name)) {
-            return 'Student';
-        }
-
-        return '';
+            default =>
+            'Dependent & Alumni',
+        };
     }
 
     private function buildGadData(int $year, int $month): array
@@ -3345,7 +3531,7 @@ class DentistReportController extends Controller
                 continue;
             }
 
-            $demographics = $this->resolvePatientDemographics($patient);
+            $demographics = $this->getPatientDemographics($patient);
 
             $gender = $this->normalizeGadGender(
                 $demographics['gender'] ?? null
@@ -3356,30 +3542,7 @@ class DentistReportController extends Controller
             }
 
 
-            if (filled($patient->faculty_code)) {
-                $officeType = 'faculty';
-            } elseif (
-                filled($patient->student_no) ||
-                filled($patient->course_code) ||
-                filled($patient->course_name)
-            ) {
-                $officeType = 'student';
-            } else {
-                $patientType = strtolower(trim((string) (
-                    $patient->patient_type
-                    ?? $patient->type
-                    ?? ''
-                )));
-
-                if (
-                    str_contains($patientType, 'admin') ||
-                    str_contains($patientType, 'administrative')
-                ) {
-                    $officeType = 'administrative';
-                } else {
-                    $officeType = 'dependent';
-                }
-            }
+            $officeType = $this->categorizePatientForReports($patient);
 
             $columnIndex = $columnIndexes[$officeType] ?? 0;
 
@@ -3433,29 +3596,50 @@ class DentistReportController extends Controller
 
     private function normalizeGadOfficeType(?string $officeType): string
     {
-        $officeType = strtolower(trim((string) $officeType));
+        return $this->categorizePatientForReports((object) [
+            'patient_type' => $officeType,
+            'type' => $officeType,
+        ]);
+    }
 
-        if ($officeType === '' || str_contains($officeType, 'student')) {
-            return 'student';
-        }
-
-        if (str_contains($officeType, 'faculty')) {
-            return 'faculty';
-        }
-
-        if (str_contains($officeType, 'admin')) {
-            return 'administrative';
-        }
-
-        if (
-            str_contains($officeType, 'dependent') ||
-            str_contains($officeType, 'guest') ||
-            str_contains($officeType, 'alumni')
-        ) {
+    private function categorizePatientForReports($patient): string
+    {
+        if (! $patient) {
             return 'dependent';
         }
 
-        return 'student';
+        $classification = strtolower(
+            trim((string) ($patient->classification ?? ''))
+        );
+
+        if ($classification !== '') {
+            return match ($classification) {
+                'student' => 'student',
+
+                'faculty' => 'faculty',
+
+                'administrative' => 'administrative',
+
+                'dependent_alumni',
+                'dependent',
+                'alumni' => 'dependent',
+
+                default => 'dependent',
+            };
+        }
+
+        if (
+            filled($patient->student_no) ||
+            filled($patient->student_number)
+        ) {
+            return 'student';
+        }
+
+        if (filled($patient->faculty_code)) {
+            return 'faculty';
+        }
+
+        return 'dependent';
     }
 
     private function recordHasTruthyValue(object $record, array $columns): bool
@@ -3579,7 +3763,7 @@ class DentistReportController extends Controller
     {
         $documentRequest->loadMissing(['patient', 'approvedBy']);
 
-        return match ($this->resolveApprovedDocumentRequestType($documentRequest->document_type)) {
+        return match ($this->getApprovedDocumentRequestType($documentRequest->document_type)) {
             'annual_dental_clearance' => $this->buildAnnualDentalClearancePdfPayload($documentRequest),
             'dental_clearance' => $this->buildDentalClearancePdfPayload($documentRequest),
             'dental_health_record' => $this->buildDentalHealthRecordPdfPayload($documentRequest),
@@ -3587,7 +3771,7 @@ class DentistReportController extends Controller
         };
     }
 
-    private function resolveApprovedDocumentRequestType(?string $documentType): ?string
+    private function getApprovedDocumentRequestType(?string $documentType): ?string
     {
         $normalized = strtolower(trim((string) $documentType));
         $normalized = str_replace(['-', '/'], ' ', $normalized);
@@ -3816,7 +4000,7 @@ class DentistReportController extends Controller
                 $programOrDept = '';
             }
 
-            $demographics = $this->resolvePatientDemographics($patient);
+            $demographics = $this->getPatientDemographics($patient);
             $age = $demographics['age'];
             $gender = strtolower(trim((string) ($demographics['gender'] ?? '')));
             $email = trim((string) ($patient->email ?? ''));
@@ -3846,7 +4030,7 @@ class DentistReportController extends Controller
                 $processingTime .= ((int) $processingTime === 1) ? ' min' : ' mins';
             }
 
-            $signaturePath = $this->resolveStoredSignaturePath($patient?->medicalHistory?->patient_signature);
+            $signaturePath = $this->getStoredSignaturePath($patient?->medicalHistory?->patient_signature);
 
             $pdf->SetFont('Helvetica', '', 5.2);
 
@@ -4223,7 +4407,7 @@ class DentistReportController extends Controller
                 $office = '';
             }
 
-            $demographics = $this->resolvePatientDemographics($patient);
+            $demographics = $this->getPatientDemographics($patient);
             $gender = trim((string) ($demographics['gender'] ?? ''));
             $treatmentDone = trim((string) ($appointment->service_type ?? ''));
 
@@ -4248,7 +4432,7 @@ class DentistReportController extends Controller
                 (int) ($procedure?->procedure_duration_seconds ?? 0)
             );
 
-            $signaturePath = $this->resolveStoredSignaturePath($patient?->medicalHistory?->patient_signature);
+            $signaturePath = $this->getStoredSignaturePath($patient?->medicalHistory?->patient_signature);
 
             $pdf->SetFont('Helvetica', '', $layout['fontSize']);
 
@@ -4580,7 +4764,7 @@ class DentistReportController extends Controller
         return (string) (int) ceil($seconds / 60);
     }
 
-    private function resolveStoredSignaturePath(?string $relativePath): ?string
+    private function getStoredSignaturePath(?string $relativePath): ?string
     {
         $relativePath = trim((string) $relativePath);
 
@@ -4657,7 +4841,7 @@ class DentistReportController extends Controller
         }
     }
 
-    private function resolvePatientDemographics($patient): array
+    private function getPatientDemographics($patient): array
     {
         $birthdateValue = $patient->birthdate ?? $patient->user?->birthdate ?? null;
         $genderValue = trim((string) ($patient->gender ?? $patient->user?->gender ?? ''));

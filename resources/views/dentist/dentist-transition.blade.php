@@ -16,7 +16,7 @@
 
 @section('content')
 @if(isset($transition))
-<main id="mainContent" class="admin-page-shell page-enter mode-list continuity-page mode-show">
+<main id="mainContent" class="app-page-shell page-enter mode-list continuity-page mode-show">
     <div class="w-full dt-wrap">
         <div class="page-banner dt-hero">
             <div class="page-banner-inner">
@@ -378,7 +378,7 @@
     </div>
 </main>
 @else
-<main id="mainContent" class="dentist-page-shell page-enter mode-list">
+<main id="mainContent" class="app-page-shell page-enter mode-list">
     <div class="w-full">
         <section class="dentist-hero mb-5">
             <div class="dentist-hero-content">

@@ -6,6 +6,8 @@
 'showTimeRange' => true,
 'animationDelay' => null,
 'compact' => false,
+'recordEditUrl' => null,
+'showReserved' => false,
 ])
 
 @php
@@ -66,6 +68,12 @@ $get('dentist.name') ??
 ($get('dentist_name') ?? ((is_string($get('dentist')) ? $get('dentist') : null) ?? 'Not assigned')));
 
 $isFollowUp = (bool) ($get('is_follow_up') ?? false) || str_contains(strtolower($serviceLabel), 'follow-up');
+
+$isReserved = (bool) $showReserved && filled($get('reserved_booking_period_id'));
+
+$reservedTitle = $isReserved
+    ? ($get('reservedBookingPeriod.title') ?? $get('reserved_title'))
+    : null;
 
 $isPast = $variant === 'past' || in_array($normalizedStatus, ['completed', 'cancelled'], true);
 
@@ -163,6 +171,8 @@ $recordPayload = [
 'odontogram_data' => $odontogram,
 
 'follow_up' => $followUp,
+
+'edit_url' => $recordEditUrl,
 ];
 
 $cardClasses = [
@@ -217,6 +227,15 @@ $timeLabel .= ' – ' . $apptTime->copy()->addHour()->format('g:i A');
                     <span class="appt-type-icon" data-tooltip="Follow-up appointment" data-tooltip-tone="neutral"
                         aria-label="Follow-up appointment" tabindex="0">
                         <i class="fa-solid fa-calendar-plus"></i>
+                    </span>
+                    @endif
+
+                    @if ($isReserved)
+                    <span class="status-pill status-today"
+                        data-tooltip="Reserved{{ filled($reservedTitle) ? ': ' . $reservedTitle : ' appointment' }}"
+                        data-tooltip-tone="neutral" aria-label="Reserved appointment" tabindex="0">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        <span>Reserved</span>
                     </span>
                     @endif
                 </div>

@@ -71,7 +71,7 @@
                                 Appointment for
                             </span>
 
-                            <strong class="modal-profile-name">
+                            <strong id="followUpPatientName" class="modal-profile-name" data-patient-name>
                                 {{ $patientName }}
                             </strong>
 
@@ -93,7 +93,7 @@
                                     Current Schedule
                                 </span>
 
-                                <strong class="modal-profile-value">
+                                <strong id="followUpCurrentSchedule" class="modal-profile-value">
                                     {{ $appointmentDate }} | {{ $appointmentTime }}
                                 </strong>
 
@@ -113,7 +113,7 @@
                                     Service Type
                                 </span>
 
-                                <strong class="modal-profile-value">
+                                <strong id="followUpServiceType" class="modal-profile-value">
                                     {{ $serviceType }}
                                 </strong>
 
@@ -139,82 +139,48 @@
 
                 <div class="modal-form-grid-2 mb-2 sm:mb-3">
 
-                    <div id="followUpCalendarWrap"
-                        class="cal-wrap follow-up-cal-wrap modal-calendar-panel calendar-shell-no-card"
-                        data-global-field>
+                    <div class="global-form-group" data-global-field>
+                        <div class="global-label-row">
+                            <label for="followUpDatePicker" class="global-form-label">
+                                Follow-Up Date
+                            </label>
+                        </div>
 
-                        <div id="followUpCalGrid"></div>
+                        <input id="followUpDatePicker" type="date" class="form-input-custom"
+                            min="{{ now()->addDay()->toDateString() }}">
 
                         <div id="followUpDateError" class="global-field-error"
                             data-error-for="followup_appointment_date" aria-hidden="true">
                         </div>
-
                     </div>
 
-                    <div id="followUpTimeWrap"
-                        class="slots-wrap follow-up-slots-wrap modal-option-panel appointment-time-panel"
-                        data-global-field>
+                    <div class="global-form-group" data-global-field>
+                        <div class="global-label-row">
+                            <label for="followUpTimePicker" class="global-form-label">
+                                Time Slot
+                            </label>
+                        </div>
 
-                        <div class="modal-section-heading">
+                        <select id="followUpTimePicker" class="form-input-custom" disabled>
+                            <option value="">Select a date first</option>
+                        </select>
 
-                            <span class="modal-section-icon">
-                                <i class="fa-regular fa-clock"></i>
+                        <button type="button" id="followUpClearTimeBtn"
+                            class="ui-btn ui-btn-secondary ui-btn-sm hidden mt-4 mb-2 w-full">
+                            <i class="fa-solid fa-xmark"></i>
+                            Clear selection
+                        </button>
+
+                        <div id="followUpSelectedSlotDisplay" class="hidden appointment-selected-slot">
+                            <i class="fa-solid fa-circle-check"></i>
+                            Selected:
+                            <span id="followUpSelectedSlotText" class="font-bold">
                             </span>
-
-                            <div>
-                                <h4>Time Slot</h4>
-                            </div>
-
-                        </div>
-
-                        <div id="followUpDateBanner" class="hidden appointment-slot-date-banner">
-                        </div>
-
-                        <div id="followUpSlotPlaceholder" class="appointment-slot-placeholder">
-
-                            <div class="empty-icon">
-                                <i class="fa-regular fa-calendar"></i>
-                            </div>
-
-                            <p class="empty-title">
-                                Choose a date
-                            </p>
-
-                            <p class="empty-subtitle">
-                                Select an available day to see time slots.
-                            </p>
-
-                        </div>
-
-                        <div id="followUpSlotContainer" class="hidden">
-
-                            <div id="followUpSlotGrid" class="appointment-slot-grid">
-                            </div>
-
-                            <button type="button" id="followUpClearTimeBtn"
-                                class="ui-btn ui-btn-secondary ui-btn-sm hidden mt-4 mb-2 w-full">
-
-                                <i class="fa-solid fa-xmark"></i>
-                                Clear selection
-                            </button>
-
-                            <div id="followUpSelectedSlotDisplay" class="hidden appointment-selected-slot">
-
-                                <i class="fa-solid fa-circle-check"></i>
-
-                                Selected:
-
-                                <span id="followUpSelectedSlotText" class="font-bold">
-                                </span>
-
-                            </div>
-
                         </div>
 
                         <div id="followUpTimeError" class="global-field-error"
                             data-error-for="followup_appointment_time" aria-hidden="true">
                         </div>
-
                     </div>
 
                 </div>

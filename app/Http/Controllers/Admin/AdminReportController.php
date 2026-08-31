@@ -3,21 +3,204 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\DB;
+use App\Models\Appointment;
+use App\Models\DocumentRequest;
+use App\Models\DocumentTemplate;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use App\Services\OpenAIReportService;
-use Barryvdh\DomPDF\Facade\Pdf;
-use App\Models\DocumentRequest;
+use Illuminate\Support\Facades\DB;
 
 class AdminReportController extends Controller
 {
+    public function reportFiles()
+    {
+        $now = Carbon::now();
+        $thisMonth = $now->month;
+        $thisYear = $now->year;
+        $today = $now->toDateString();
+        $lastMonth = $now->copy()->subMonth();
+
+        $patientsThisMonth = Appointment::whereYear('appointment_date', $thisYear)
+            ->whereMonth('appointment_date', $thisMonth)
+            ->distinct('patient_id')
+            ->count('patient_id');
+
+        $patientsLastMonth = Appointment::whereYear('appointment_date', $lastMonth->year)
+            ->whereMonth('appointment_date', $lastMonth->month)
+            ->distinct('patient_id')
+            ->count('patient_id');
+
+        $patientsDelta = $patientsLastMonth > 0
+            ? round((($patientsThisMonth - $patientsLastMonth) / $patientsLastMonth) * 100)
+            : null;
+
+        $appointmentsToday = Appointment::whereDate('appointment_date', $today)
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->count();
+
+        $yesterday = $now->copy()->subDay()->toDateString();
+        $appointmentsYesterday = Appointment::whereDate('appointment_date', $yesterday)
+            ->whereIn('status', ['pending', 'confirmed', 'completed'])
+            ->count();
+
+        $appointmentsDelta = $appointmentsToday - $appointmentsYesterday;
+
+        $casesThisMonth = Appointment::whereYear('appointment_date', $thisYear)
+            ->whereMonth('appointment_date', $thisMonth)
+            ->where('status', 'completed')
+            ->count();
+
+        $casesLastMonth = Appointment::whereYear('appointment_date', $lastMonth->year)
+            ->whereMonth('appointment_date', $lastMonth->month)
+            ->where('status', 'completed')
+            ->count();
+
+        $casesDelta = $casesLastMonth > 0
+            ? round((($casesThisMonth - $casesLastMonth) / $casesLastMonth) * 100)
+            : null;
+
+        $lowStockItems = DB::table('inventory_items')
+            ->whereRaw('(qty - used) <= (qty * 0.30)')
+            ->count();
+
+        $gadLabels = [];
+        $gadFemale = [];
+        $gadMale = [];
+
+        $weekLabels = [];
+        $weeklyDatasets = [];
+
+        $totalAppointmentsThisMonth = Appointment::whereYear('appointment_date', $thisYear)
+            ->whereMonth('appointment_date', $thisMonth)
+            ->count();
+
+        $cancelledAppointments = Appointment::whereYear('appointment_date', $thisYear)
+            ->whereMonth('appointment_date', $thisMonth)
+            ->where('status', 'cancelled')
+            ->count();
+
+        $cancellationRate = $totalAppointmentsThisMonth > 0
+            ? round(($cancelledAppointments / $totalAppointmentsThisMonth) * 100)
+            : 0;
+
+        $daysElapsedThisMonth = max(1, min($now->day, $now->daysInMonth));
+        $avgPatientsPerDay = round($patientsThisMonth / $daysElapsedThisMonth, 1);
+
+        $patientVisitCounts = Appointment::select('patient_id', DB::raw('COUNT(*) as total_visits'))
+            ->whereNotNull('patient_id')
+            ->groupBy('patient_id')
+            ->get();
+
+        $returningPatients = $patientVisitCounts->where('total_visits', '>', 1)->count();
+        $newPatients = $patientVisitCounts->where('total_visits', 1)->count();
+
+        $topServices = Appointment::whereYear('appointment_date', $thisYear)
+            ->whereMonth('appointment_date', $thisMonth)
+            ->whereNotNull('service_type')
+            ->select('service_type as name', DB::raw('COUNT(*) as total'))
+            ->groupBy('service_type')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get();
+
+        $inventoryItems = DB::table('inventory_items')
+            ->select('category', 'name', 'qty', 'used')
+            ->orderBy('name')
+            ->get();
+
+        $medicineItems = $inventoryItems->where('category', 'Medicine')->values();
+        $suppliesItems = $inventoryItems->where('category', 'Supplies')->values();
+
+        $lowStockRows = DB::table('inventory_items')
+            ->whereRaw('(qty - used) <= (qty * 0.30)')
+            ->orderByRaw('(qty - used) ASC')
+            ->get();
+
+        $lowStockMedicine = $lowStockRows->where('category', 'Medicine')->values();
+        $lowStockSupplies = $lowStockRows->where('category', 'Supplies')->values();
+
+        $periodOptions = [];
+        for ($i = 0; $i < 3; $i++) {
+            $periodOptions[] = $now->copy()->subMonths($i)->format('M Y');
+        }
+
+        $documentTemplates = DocumentTemplate::query()
+            ->active()
+            ->orderBy('name')
+            ->get();
+
+        $customReportTypes = [
+            'dental_services',
+            'daily_treatment_record',
+            'dental_health_record',
+            'annual_dental_clearance',
+            'dental_clearance',
+            'gad_report',
+            'dental_supplies_inventory',
+            'medicine_inventory',
+            'monthly_report',
+            'dental_cases',
+        ];
+
+        $customReportTemplates = DocumentTemplate::query()
+            ->active()
+            ->whereIn('document_type', $customReportTypes)
+            ->get()
+            ->sortBy(function ($template) use ($customReportTypes) {
+                return array_search($template->document_type, $customReportTypes, true);
+            })
+            ->values();
+
+        return view('shared.reports', [
+            'layoutRole' => request()->routeIs('dentist.*') ? 'dentist' : 'admin',
+            'pageTitle' => 'Reports & Analytics',
+            'pageShellClass' => 'dentist-page-shell dentist-report-page',
+            'isAdminView' => false,
+            'isDentistView' => true,
+            'reportStats' => [
+                'patients_this_month' => $patientsThisMonth,
+                'patients_delta' => $patientsDelta,
+                'appointments_today' => $appointmentsToday,
+                'appointments_delta' => $appointmentsDelta,
+                'cases_this_month' => $casesThisMonth,
+                'cases_delta' => $casesDelta,
+                'completed_appointments' => $casesThisMonth,
+                'cancellation_rate' => $cancellationRate,
+                'average_patients_per_day' => $avgPatientsPerDay,
+                'returning_patients' => $returningPatients,
+                'new_patients' => $newPatients,
+                'low_stock_items' => $lowStockItems,
+                'total_appointments_this_month' => $totalAppointmentsThisMonth,
+                'cancelled_appointments' => $cancelledAppointments,
+            ],
+            'reportCharts' => [
+                'gad' => [
+                    'labels' => $gadLabels,
+                    'female' => $gadFemale,
+                    'male' => $gadMale,
+                ],
+                'weekly' => [
+                    'labels' => $weekLabels,
+                    'datasets' => $weeklyDatasets,
+                ],
+            ],
+            'reportInventory' => [
+                'medicine_items' => $medicineItems,
+                'supplies_items' => $suppliesItems,
+                'low_stock_medicine' => $lowStockMedicine,
+                'low_stock_supplies' => $lowStockSupplies,
+            ],
+            'topServices' => $topServices,
+            'periodOptions' => $periodOptions,
+            'documentTemplates' => $documentTemplates,
+            'customReportTemplates' => $customReportTemplates,
+        ]);
+    }
+
     public function index()
     {
         $now = Carbon::now();
-
-        // ---------------------------
-        // PATIENT STATS
-        // ---------------------------
         $totalPatients = DB::table('patients')->count();
 
         $newToday = DB::table('patients')
@@ -62,16 +245,19 @@ class AdminReportController extends Controller
             'avg_visits' => 0,
         ];
 
-        // ---------------------------
-        // TREATMENTS
-        // ---------------------------
         $treatmentRaw = DB::table('appointments')
             ->select('service_type', DB::raw('COUNT(*) as total'))
             ->whereMonth('appointment_date', $now->month)
             ->whereYear('appointment_date', $now->year)
             ->where('status', 'completed')
             ->groupBy('service_type')
-            ->get();
+            ->get()
+            ->map(function ($item) {
+                return (object) [
+                    'service_type' => $item->service_type,
+                    'total' => (int) $item->total,
+                ];
+            });
 
         $totalTreatments = $treatmentRaw->sum('total');
 
@@ -88,9 +274,6 @@ class AdminReportController extends Controller
             'breakdown' => $breakdown,
         ];
 
-        // ---------------------------
-        // APPOINTMENTS
-        // ---------------------------
         $appointmentsTotal = DB::table('appointments')
             ->whereMonth('appointment_date', $now->month)
             ->whereYear('appointment_date', $now->year)
@@ -124,9 +307,6 @@ class AdminReportController extends Controller
             'cancelled_rate' => $appointmentsTotal > 0 ? round(($cancelled / $appointmentsTotal) * 100) : 0,
         ];
 
-        // ---------------------------
-        // INVENTORY
-        // ---------------------------
         $inventoryItems = collect();
         $lowStockCount = 0;
 
@@ -157,9 +337,6 @@ class AdminReportController extends Controller
             'low_stock_count' => $lowStockCount,
         ];
 
-        // ---------------------------
-        // CHARTS
-        // ---------------------------
         $months = collect(range(1, 12))->map(function ($m) {
             return Carbon::create()->month($m)->format('M');
         });
@@ -241,9 +418,9 @@ class AdminReportController extends Controller
         ];
 
         return view('shared.reports', [
-            'layoutRole' => 'admin',
+            'layoutRole' => request()->routeIs('dentist.*') ? 'dentist' : 'admin',
             'pageTitle' => 'Reports & Analytics',
-            'pageShellClass' => 'admin-page-shell',
+            'pageShellClass' => 'app-page-shell',
 
             'isAdminView' => true,
             'isDentistView' => false,
@@ -636,7 +813,7 @@ class AdminReportController extends Controller
 
         if (!$aiReport) {
             return redirect()
-                ->route('admin.reports.ai-generated')
+                ->route(request()->routeIs('dentist.*') ? 'dentist.reports.ai-generated' : 'admin.reports.ai-generated')
                 ->with('error', 'Please generate the AI report first before downloading.');
         }
 

@@ -34,15 +34,22 @@ use App\Services\SignatureAiVerifier;
 use App\Helpers\BookingQuestions;
 use App\Models\AppointmentDraft;
 use App\Models\PatientOdontogram;
+use App\Models\ReservedBookingPeriod;
+use App\Models\ReservedBookingPeriodSlot;
 
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 
 use App\Mail\AppointmentConfirmationMail;
 use App\Mail\AppointmentRescheduleMail;
+use App\Services\StudentApiService;
 
 class AppointmentController extends Controller
 {
+    public function __construct(
+        private readonly StudentApiService $studentApiService
+    ) {
+    }
 
     public function index()
     {
@@ -54,6 +61,8 @@ class AppointmentController extends Controller
 
         $patient = Patient::findOrFail($patientId);
 
+        $this->backfillStudentEmergencyContactIfNeeded($patient);
+
         $now = now();
         $today = $now->toDateString();
         $nowTime = $now->format('H:i:s');
@@ -63,6 +72,7 @@ class AppointmentController extends Controller
             'originalDentist.role',
             'procedure',
             'followUpAppointments',
+            'reservedBookingPeriod',
         ])
             ->where('patient_id', $patientId)
             ->orderBy('appointment_date', 'asc')
@@ -74,6 +84,7 @@ class AppointmentController extends Controller
             'originalDentist.role',
             'procedure',
             'followUpAppointments',
+            'reservedBookingPeriod',
         ])
             ->where('patient_id', $patientId)
             ->whereIn('status', ['upcoming', 'rescheduled'])
@@ -81,7 +92,14 @@ class AppointmentController extends Controller
                 $q->whereDate('appointment_date', '>', $today)
                     ->orWhere(function ($q2) use ($today, $nowTime) {
                         $q2->whereDate('appointment_date', '=', $today)
-                            ->whereTime('appointment_time', '>=', $nowTime);
+                            ->where(function ($sameDay) use ($nowTime) {
+                                $sameDay->where(function ($regular) use ($nowTime) {
+                                    $regular->whereNull('reserved_booking_period_id')
+                                        ->whereTime('appointment_time', '>=', $nowTime);
+                                })->orWhereHas('reservedBookingPeriod', function ($period) use ($nowTime) {
+                                    $period->withTrashed()->whereTime('end_time', '>=', $nowTime);
+                                });
+                            });
                     });
             })
             ->orderBy('appointment_date', 'asc')
@@ -93,6 +111,7 @@ class AppointmentController extends Controller
             'originalDentist.role',
             'procedure',
             'followUpAppointments',
+            'reservedBookingPeriod',
         ])
             ->where('patient_id', $patientId)
             ->where(function ($q) use ($today, $nowTime) {
@@ -100,7 +119,14 @@ class AppointmentController extends Controller
                     ->orWhereDate('appointment_date', '<', $today)
                     ->orWhere(function ($q2) use ($today, $nowTime) {
                         $q2->whereDate('appointment_date', '=', $today)
-                            ->whereTime('appointment_time', '<', $nowTime);
+                            ->where(function ($sameDay) use ($nowTime) {
+                                $sameDay->where(function ($regular) use ($nowTime) {
+                                    $regular->whereNull('reserved_booking_period_id')
+                                        ->whereTime('appointment_time', '<', $nowTime);
+                                })->orWhereHas('reservedBookingPeriod', function ($period) use ($nowTime) {
+                                    $period->withTrashed()->whereTime('end_time', '<', $nowTime);
+                                });
+                            });
                     });
             })
             ->orderBy('appointment_date', 'desc')
@@ -118,6 +144,7 @@ class AppointmentController extends Controller
         ]);
 
         $appointmentCountsPerDay = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
+            ->whereNull('reserved_booking_period_id')
             ->selectRaw('appointment_date, COUNT(*) as count')
             ->groupBy('appointment_date')
             ->pluck('count', 'appointment_date')
@@ -192,7 +219,10 @@ class AppointmentController extends Controller
     }
 
 
-    public function create()
+    public function create(
+        Request $request,
+        ?ReservedBookingPeriod $reservedBookingPeriod = null
+    )
     {
         $patientId = session('impersonated_patient_id') ?: session('patient_id');
 
@@ -201,6 +231,55 @@ class AppointmentController extends Controller
         }
 
         $patient = Patient::findOrFail($patientId);
+        $availableReservedSlots = collect();
+
+        if ($reservedBookingPeriod) {
+            $reservedBookingPeriod->load(['slots.appointment']);
+
+            if (! $this->reservedPeriodIsBookableBy($reservedBookingPeriod, $patient)) {
+                return redirect()->route('homepage')->with(
+                    'error',
+                    'This reserved booking invitation is unavailable or is not assigned to your patient group.'
+                );
+            }
+
+            if ($reservedBookingPeriod->appointments()->where('patient_id', $patient->id)->exists()) {
+                return redirect()->route('patient.appointment.index')->with(
+                    'info',
+                    'You already booked an appointment for this reserved period.'
+                );
+            }
+
+            if ($this->reservedPeriodRemainingCapacity($reservedBookingPeriod) < 1) {
+                return redirect()->route('homepage')->with(
+                    'error',
+                    'This reserved booking period is already full.'
+                );
+            }
+
+            if ($reservedBookingPeriod->booking_mode === 'timeslot') {
+                $availableReservedSlots = $reservedBookingPeriod->slots
+                    ->filter(fn (ReservedBookingPeriodSlot $slot) => ! $slot->appointment
+                        || $slot->appointment->status === 'cancelled')
+                    ->filter(function (ReservedBookingPeriodSlot $slot) use ($reservedBookingPeriod) {
+                        if (! $reservedBookingPeriod->reserved_date->isToday()) {
+                            return true;
+                        }
+
+                        return Carbon::parse(
+                            $reservedBookingPeriod->reserved_date->format('Y-m-d').' '.$slot->slot_time
+                        )->isFuture();
+                    })
+                    ->values();
+
+                if ($availableReservedSlots->isEmpty()) {
+                    return redirect()->route('homepage')->with(
+                        'error',
+                        'All selectable timeslots for this reserved period are already booked.'
+                    );
+                }
+            }
+        }
 
         $patient->load([
             'dentalHistory',
@@ -317,7 +396,7 @@ class AppointmentController extends Controller
             ->whereIn('status', ['upcoming', 'rescheduled'])
             ->exists();
 
-        if ($hasActiveAppointment) {
+        if ($hasActiveAppointment && ! $reservedBookingPeriod) {
             return redirect()->back()->with([
                 'activeAppointmentModal' => true,
                 'activeAppointmentMsg' =>
@@ -326,12 +405,14 @@ class AppointmentController extends Controller
         }
 
         $appointmentCountsPerDay = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
+            ->whereNull('reserved_booking_period_id')
             ->selectRaw('appointment_date, COUNT(*) as count')
             ->groupBy('appointment_date')
             ->pluck('count', 'appointment_date')
             ->toArray();
 
         $appointmentCountsPerSlot = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
+            ->whereNull('reserved_booking_period_id')
             ->selectRaw('appointment_date, appointment_time, COUNT(*) as count')
             ->groupBy('appointment_date', 'appointment_time')
             ->get()
@@ -417,8 +498,42 @@ class AppointmentController extends Controller
             'hasExistingDentalHistory',
             'hasExistingMedicalHistory',
             'hasExistingBookingInformation',
-            'hasReusableSignature'
+            'hasReusableSignature',
+            'reservedBookingPeriod',
+            'availableReservedSlots'
         ));
+    }
+
+    private function reservedPeriodIsBookableBy(
+        ReservedBookingPeriod $period,
+        Patient $patient
+    ): bool {
+        if (! $period->is_active || $period->trashed() || ! $period->isEligiblePatient($patient)) {
+            return false;
+        }
+
+        // Temporarily disabled: reserved periods previously had to be after today.
+        // return Carbon::parse($period->reserved_date)
+        //     ->startOfDay()
+        //     ->isAfter(now()->startOfDay());
+
+        $reservedDate = Carbon::parse($period->reserved_date)->startOfDay();
+
+        if ($reservedDate->isBefore(now()->startOfDay())) {
+            return false;
+        }
+
+        return ! $reservedDate->isToday()
+            || Carbon::parse($period->reserved_date->format('Y-m-d').' '.$period->end_time)->isFuture();
+    }
+
+    private function reservedPeriodRemainingCapacity(ReservedBookingPeriod $period): int
+    {
+        $booked = $period->appointments()
+            ->whereIn('status', ['upcoming', 'rescheduled'])
+            ->count();
+
+        return max(0, (int) $period->max_capacity - $booked);
     }
 
     private function hasExistingDentalHistoryRecord(Patient $patient): bool
@@ -454,12 +569,10 @@ class AppointmentController extends Controller
             return true;
         }
 
-        if (
-            filled($patient->medicalHistory?->emergency_person) ||
-            filled($patient->medicalHistory?->emergency_number) ||
-            filled($patient->medicalHistory?->emergency_relation) ||
-            filled($patient->medicalHistory?->patient_signature)
-        ) {
+        // Student profile synchronization may create a medical history row using
+        // emergency-contact data alone. That partial row does not mean the patient
+        // has completed the medical questionnaire and must not skip its booking step.
+        if (filled($patient->medicalHistory?->patient_signature)) {
             return true;
         }
 
@@ -583,12 +696,71 @@ class AppointmentController extends Controller
     ======================= */
     public function store(Request $request, SignatureAiVerifier $signatureVerifier)
     {
+        $request->merge([
+            'emergency_number' => $this->normalizePhilippineMobile(
+                (string) $request->input('emergency_number', '')
+            ) ?? (string) $request->input('emergency_number', ''),
+        ]);
+
         $patientId = session('impersonated_patient_id') ?: session('patient_id');
 
         if (!$patientId) {
             return redirect()->route('login')
                 ->with('error', 'Please login first!');
         }
+
+        $patient = Patient::with([
+            'dentalHistory',
+            'dentalHistoryDates',
+            'dentalHistoryConcerns',
+            'dentalHistoryAnswers.condition',
+            'medicalHistory.answers.question',
+            'medicalHistory.diseaseAnswers.disease',
+        ])->findOrFail($patientId);
+
+        $reservedBookingPeriod = filled($request->input('reserved_booking_period_id'))
+            ? ReservedBookingPeriod::with('slots')->find($request->integer('reserved_booking_period_id'))
+            : null;
+
+        if (filled($request->input('reserved_booking_period_id')) && ! $reservedBookingPeriod) {
+            return redirect()->back()->withInput()->with('error', 'The reserved booking period no longer exists.');
+        }
+
+        if ($reservedBookingPeriod && ! $this->reservedPeriodIsBookableBy($reservedBookingPeriod, $patient)) {
+            return redirect()->route('homepage')->with(
+                'error',
+                'This reserved booking invitation is unavailable or is not assigned to your patient group.'
+            );
+        }
+
+        $reservedSlot = null;
+
+        if ($reservedBookingPeriod?->booking_mode === 'timeslot') {
+            $reservedSlot = $reservedBookingPeriod->slots
+                ->firstWhere('id', $request->integer('reserved_booking_period_slot_id'));
+
+            if (! $reservedSlot) {
+                return redirect()->back()->withInput()->withErrors([
+                    'appointment_time' => 'Select an available timeslot for this reserved period.',
+                ]);
+            }
+        }
+
+        if ($reservedBookingPeriod) {
+            $request->merge([
+                'appointment_date' => $reservedBookingPeriod->reserved_date->format('Y-m-d'),
+                'appointment_time' => Carbon::parse(
+                    $reservedSlot?->slot_time ?: $reservedBookingPeriod->start_time
+                )->format('g:i A'),
+            ]);
+        }
+
+        $preserveExistingDentalHistory = (bool) $reservedBookingPeriod
+            && $this->hasExistingDentalHistoryRecord($patient)
+            && ! $request->boolean('update_dental_history');
+        $preserveExistingMedicalHistory = (bool) $reservedBookingPeriod
+            && $this->hasExistingMedicalHistoryRecord($patient)
+            && ! $request->boolean('update_medical_history');
 
         $existingMedicalHistory = MedicalHistory::where(
             'patient_id',
@@ -600,8 +772,14 @@ class AppointmentController extends Controller
             $existingMedicalHistory?->signature_review_status !== 'invalid_reupload_required';
 
         $request->validate([
-            'appointment_date'     => 'required|date|after:today',
+            'appointment_date'     => [
+                'required',
+                'date',
+                $reservedBookingPeriod ? 'after_or_equal:today' : 'after:today',
+            ],
             'appointment_time'     => 'required|string', // "1:00 PM"
+            'reserved_booking_period_id' => ['nullable', 'integer'],
+            'reserved_booking_period_slot_id' => ['nullable', 'integer'],
             'service_type' => 'required|string|max:255',
 
             'contact_email' => [
@@ -627,7 +805,7 @@ class AppointmentController extends Controller
                 'max:50',
                 'regex:/^[A-Za-zÑñ\s.\'-]+$/u',
             ],
-            'emergency_number'     => 'required|string|max:15',
+            'emergency_number'     => ['required', 'string', 'size:11', 'regex:/^09\d{9}$/'],
             'emergency_relation' => [
                 'required',
                 'string',
@@ -679,7 +857,6 @@ class AppointmentController extends Controller
                 );
         }
 
-        $patient = Patient::findOrFail($patientId);
         $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
         try {
@@ -693,10 +870,21 @@ class AppointmentController extends Controller
         $date = Carbon::parse($request->appointment_date);
         $dayAbbr = $date->format('D');
 
-        if ($date->isToday()) {
+        if ($date->isToday() && ! $reservedBookingPeriod) {
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Same-day booking is not allowed. Please select a future date.');
+        }
+
+        $mustUseFutureTime = ! $reservedBookingPeriod
+            || $reservedBookingPeriod->booking_mode === 'timeslot';
+
+        if ($date->isToday()
+            && $mustUseFutureTime
+            && Carbon::parse($date->toDateString().' '.$mysqlTime)->lessThanOrEqualTo(now())) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'That appointment time has already passed. Please select a later time.');
         }
 
         if (BlockedDate::whereDate('date', $request->appointment_date)->exists()) {
@@ -749,11 +937,27 @@ class AppointmentController extends Controller
             }
         }
 
+        if (! $reservedBookingPeriod) {
+            $conflictingReservedPeriod = ReservedBookingPeriod::query()
+                ->active()
+                ->whereDate('reserved_date', $request->appointment_date)
+                ->whereTime('start_time', '<=', $mysqlTime)
+                ->whereTime('end_time', '>', $mysqlTime)
+                ->exists();
+
+            if ($conflictingReservedPeriod) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'That time belongs to a reserved booking period. Please select a later available time.');
+            }
+        }
+
         $appointmentCount = Appointment::where('appointment_date', $request->appointment_date)
+            ->whereNull('reserved_booking_period_id')
             ->whereIn('status', ['upcoming', 'rescheduled'])
             ->count();
 
-        if ($appointmentCount >= $schedule->max_slots) {
+        if (! $reservedBookingPeriod && $appointmentCount >= $schedule->max_slots) {
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Sorry, this date is fully booked. Please select another date.');
@@ -764,7 +968,7 @@ class AppointmentController extends Controller
             ->whereIn('status', ['upcoming', 'rescheduled'])
             ->exists();
 
-        if ($timeTaken) {
+        if (! $reservedBookingPeriod && $timeTaken) {
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Sorry, that time slot was already taken. Please choose another time.');
@@ -888,11 +1092,66 @@ class AppointmentController extends Controller
 
         $appointment = null;
 
-        DB::transaction(function () use ($request, $signaturePath, $mysqlTime, $patientId, $signatureReviewStatus, $signatureReviewNotes, $aiResult, &$appointment) {
+        DB::transaction(function () use ($request, $signaturePath, $mysqlTime, $patientId, $patient, $reservedBookingPeriod, $reservedSlot, $preserveExistingDentalHistory, $preserveExistingMedicalHistory, $signatureReviewStatus, $signatureReviewNotes, $aiResult, &$appointment) {
+
+            $lockedReservedPeriod = null;
+
+            if ($reservedBookingPeriod) {
+                $lockedReservedPeriod = ReservedBookingPeriod::query()
+                    ->withTrashed()
+                    ->lockForUpdate()
+                    ->findOrFail($reservedBookingPeriod->id);
+
+                if (! $this->reservedPeriodIsBookableBy($lockedReservedPeriod, $patient)) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'reserved_booking_period_id' => 'This reserved booking period is no longer available to you.',
+                    ]);
+                }
+
+                $bookedCount = Appointment::query()
+                    ->where('reserved_booking_period_id', $lockedReservedPeriod->id)
+                    ->whereIn('status', ['upcoming', 'rescheduled'])
+                    ->count();
+
+                if ($bookedCount >= $lockedReservedPeriod->max_capacity) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'reserved_booking_period_id' => 'This reserved booking period is already full.',
+                    ]);
+                }
+
+                if ($lockedReservedPeriod->booking_mode === 'timeslot') {
+                    $lockedSlot = ReservedBookingPeriodSlot::query()
+                        ->where('reserved_booking_period_id', $lockedReservedPeriod->id)
+                        ->lockForUpdate()
+                        ->find($reservedSlot?->id);
+
+                    $slotTaken = $lockedSlot && Appointment::query()
+                        ->where('reserved_booking_period_slot_id', $lockedSlot->id)
+                        ->whereIn('status', ['upcoming', 'rescheduled'])
+                        ->exists();
+
+                    if (! $lockedSlot || $slotTaken) {
+                        throw \Illuminate\Validation\ValidationException::withMessages([
+                            'appointment_time' => 'That reserved timeslot was just taken. Select another available timeslot.',
+                        ]);
+                    }
+                }
+
+                if (Appointment::query()
+                    ->where('patient_id', $patientId)
+                    ->where('reserved_booking_period_id', $lockedReservedPeriod->id)
+                    ->exists()) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'reserved_booking_period_id' => 'You already booked this reserved period.',
+                    ]);
+                }
+            }
 
             // 1) APPOINTMENT
             $appointment = Appointment::create([
                 'patient_id'       => $patientId,
+                'reserved_booking_period_id' => $lockedReservedPeriod?->id,
+                'reserved_booking_period_slot_id' => $reservedSlot?->id,
                 'service_type'     => $request->service_type,
                 'appointment_date' => $request->appointment_date,
                 'appointment_time' => $mysqlTime,
@@ -924,6 +1183,7 @@ class AppointmentController extends Controller
             }
 
             // 2) DENTAL HISTORY (patient-based)
+            if (! $preserveExistingDentalHistory) {
             DentalHistory::updateOrCreate(
                 ['patient_id' => $patientId],
                 [
@@ -992,8 +1252,10 @@ class AppointmentController extends Controller
                     ]
                 );
             }
+            }
 
             // 3) MEDICAL HISTORY (patient-based)
+            if (! $preserveExistingMedicalHistory) {
             $medicalHistory = MedicalHistory::updateOrCreate(
                 ['patient_id' => $patientId],
                 [
@@ -1152,9 +1414,15 @@ class AppointmentController extends Controller
                     'has_disease'        => true,
                 ]);
             }
+            }
         });
 
         if ($appointment) {
+            if ($reservedBookingPeriod) {
+                app(\App\Services\ReservedBookingInvitationService::class)
+                    ->syncPatient($patient);
+            }
+
             AppointmentDraft::where(
                 'patient_id',
                 $patientId
@@ -1200,7 +1468,9 @@ class AppointmentController extends Controller
             $signatureReviewStatus ===
             'pending_manual_review'
             ? 'Appointment booked successfully! The signature was accepted and flagged for manual review.'
-            : 'Appointment booked successfully!';
+            : ($reservedBookingPeriod
+                ? 'Reserved appointment booked successfully!'
+                : 'Appointment booked successfully!');
 
         return redirect()
             ->route('homepage')
@@ -1285,6 +1555,7 @@ class AppointmentController extends Controller
         }
 
         $bookedSlotCounts = Appointment::where('appointment_date', $iso)
+            ->whereNull('reserved_booking_period_id')
             ->whereIn('status', ['upcoming', 'rescheduled'])
             ->selectRaw('appointment_time, COUNT(*) as cnt')
             ->groupBy('appointment_time')
@@ -1303,8 +1574,32 @@ class AppointmentController extends Controller
             ]);
         }
 
+        $slots = collect($schedule->availableSlots($iso, $bookedSlotCounts));
+
+        $reservedPeriod = ReservedBookingPeriod::query()
+            ->active()
+            ->whereDate('reserved_date', $iso)
+            ->first();
+
+        if ($reservedPeriod) {
+            $reservedStart = Carbon::parse($reservedPeriod->start_time);
+            $reservedEnd = Carbon::parse($reservedPeriod->end_time);
+
+            $slots = $slots->reject(function ($slot) use ($reservedStart, $reservedEnd) {
+                $value = is_array($slot) ? ($slot['time'] ?? null) : $slot;
+
+                if (! $value) {
+                    return false;
+                }
+
+                $time = Carbon::parse($value);
+
+                return $time->greaterThanOrEqualTo($reservedStart) && $time->lessThan($reservedEnd);
+            })->values();
+        }
+
         return response()->json([
-            'slots'      => $schedule->availableSlots($iso, $bookedSlotCounts),
+            'slots'      => $slots,
             'max_slots'  => $schedule->max_slots,
             'booked'     => $totalBooked,
             'remaining'  => max(0, $schedule->max_slots - $totalBooked),
@@ -1523,6 +1818,181 @@ class AppointmentController extends Controller
         if (in_array($v, ['YES', 'Y', 'TRUE', '1', 'ON'], true)) return 'YES';
 
         return 'NO';
+    }
+
+    private function backfillStudentEmergencyContactIfNeeded(Patient $patient): void
+    {
+        $isStudent = ! empty($patient->student_no) || (! empty($patient->email) && ! empty($patient->course_code));
+
+        if (! $isStudent) {
+            return;
+        }
+
+        $medicalHistory = $patient->medicalHistory;
+        $needsBackfill = blank($medicalHistory?->emergency_person)
+            || blank($medicalHistory?->emergency_number)
+            || blank($medicalHistory?->emergency_relation);
+
+        if (! $needsBackfill) {
+            return;
+        }
+
+        try {
+            $studentProfile = [];
+
+            if (! empty($patient->email)) {
+                $studentProfileResponse = $this->studentApiService->getStudentByEmail($patient->email);
+                $studentProfile = is_array($studentProfileResponse['data'] ?? null)
+                    ? $studentProfileResponse['data']
+                    : [];
+            }
+
+            $studentNumber = $patient->student_no
+                ?: data_get($studentProfile, 'studentNumber')
+                ?: data_get($studentProfile, 'student_number');
+
+            if (empty($studentNumber)) {
+                return;
+            }
+
+            $personalInfoResponse = $this->studentApiService->getPersonalInfoByStudentNumber($studentNumber);
+            $personalInfo = is_array($personalInfoResponse['data'] ?? null)
+                ? $personalInfoResponse['data']
+                : [];
+
+            if ($personalInfo === []) {
+                return;
+            }
+
+            $this->syncStudentMedicalHistory($patient, $personalInfo);
+            $patient->unsetRelation('medicalHistory');
+            $patient->load('medicalHistory');
+        } catch (\Throwable $e) {
+            Log::warning('Appointment OGOS medical history backfill failed', [
+                'patient_id' => $patient->id,
+                'student_no' => $patient->student_no,
+                'email' => $patient->email,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function syncStudentMedicalHistory(Patient $patient, array $personalInfo): void
+    {
+        $emergencyPerson = $this->cleanStringValue(
+            $personalInfo['emergencyContactName']
+                ?? $personalInfo['emergency_contact_name']
+                ?? data_get($personalInfo, 'emergencyContact.name')
+                ?? data_get($personalInfo, 'emergency_contact.name')
+                ?? data_get($personalInfo, 'emergency_contact.contact_name')
+                ?? data_get($personalInfo, 'emergencyContact.contactName')
+                ?? null
+        );
+
+        $emergencyNumber = $this->normalizePhilippineMobile(
+            $this->cleanStringValue(
+                $personalInfo['emergencyContactNumber']
+                    ?? $personalInfo['emergency_contact_number']
+                    ?? data_get($personalInfo, 'emergencyContact.number')
+                    ?? data_get($personalInfo, 'emergencyContact.contactNumber')
+                    ?? data_get($personalInfo, 'emergency_contact.number')
+                    ?? data_get($personalInfo, 'emergency_contact.contact_number')
+                    ?? null
+            )
+        );
+
+        $emergencyRelation = $this->normalizeEmergencyRelation(
+            $this->cleanStringValue(
+                $personalInfo['emergencyContactRelationship']
+                    ?? $personalInfo['emergency_contact_relationship']
+                    ?? $personalInfo['emergencyContactRelation']
+                    ?? $personalInfo['emergency_contact_relation']
+                    ?? data_get($personalInfo, 'emergencyContact.relationship')
+                    ?? data_get($personalInfo, 'emergencyContact.relation')
+                    ?? data_get($personalInfo, 'emergency_contact.relationship')
+                    ?? data_get($personalInfo, 'emergency_contact.relation')
+                    ?? data_get($personalInfo, 'emergency_contact.relationship_name')
+                    ?? data_get($personalInfo, 'emergencyContact.relationshipName')
+                    ?? data_get($personalInfo, 'emergencyContactRelationship.name')
+                    ?? data_get($personalInfo, 'emergency_contact_relationship.name')
+                    ?? null
+            )
+        );
+
+        if (! $emergencyPerson && ! $emergencyNumber && ! $emergencyRelation) {
+            return;
+        }
+
+        $medicalHistory = MedicalHistory::firstOrNew(['patient_id' => $patient->id]);
+        $currentRelation = strtolower(trim((string) ($medicalHistory->emergency_relation ?? '')));
+        $hasPlaceholderRelation = in_array($currentRelation, ['', 'not specified', '(not specified)', 'n/a', 'na'], true);
+
+        if ($emergencyPerson && blank($medicalHistory->emergency_person)) {
+            $medicalHistory->emergency_person = $emergencyPerson;
+        }
+
+        if ($emergencyNumber && blank($medicalHistory->emergency_number)) {
+            $medicalHistory->emergency_number = $emergencyNumber;
+        }
+
+        if ($emergencyRelation && $hasPlaceholderRelation) {
+            $medicalHistory->emergency_relation = $emergencyRelation;
+        }
+
+        if (! $medicalHistory->exists && empty($medicalHistory->emergency_relation)) {
+            $medicalHistory->emergency_relation = 'Not specified';
+        }
+
+        if ($medicalHistory->isDirty()) {
+            $medicalHistory->save();
+        }
+    }
+
+    private function cleanStringValue(mixed $value): ?string
+    {
+        if (! is_scalar($value)) {
+            return null;
+        }
+
+        $cleaned = trim((string) $value);
+
+        return $cleaned !== '' ? $cleaned : null;
+    }
+
+    private function normalizePhilippineMobile(?string $value): ?string
+    {
+        $digits = preg_replace('/\D+/', '', (string) $value) ?? '';
+
+        if ($digits === '') {
+            return null;
+        }
+
+        if (str_starts_with($digits, '63') && strlen($digits) === 12) {
+            $digits = '0' . substr($digits, 2);
+        } elseif (str_starts_with($digits, '9') && strlen($digits) === 10) {
+            $digits = '0' . $digits;
+        }
+
+        return preg_match('/^09\d{9}$/', $digits) ? $digits : null;
+    }
+
+    private function normalizeEmergencyRelation(?string $value): ?string
+    {
+        $normalized = strtolower(trim((string) $value));
+
+        return match ($normalized) {
+            'mother', 'mom', 'mama', 'nanay' => 'Mother',
+            'father', 'dad', 'papa', 'tatay' => 'Father',
+            'sibling', 'brother', 'sister', 'kapatid' => 'Sibling',
+            'guardian' => 'Guardian',
+            'spouse', 'wife', 'husband', 'asawa' => 'Spouse',
+            'grandparent', 'grandmother', 'grandfather', 'lola', 'lolo' => 'Grandparent',
+            'aunt', 'tiya', 'tita' => 'Aunt',
+            'uncle', 'tiyo', 'tito' => 'Uncle',
+            'cousin', 'pinsan' => 'Cousin',
+            'child', 'son', 'daughter', 'anak' => 'Child',
+            default => null,
+        };
     }
 
     private function resolveAuthenticatedPatient(): ?Patient

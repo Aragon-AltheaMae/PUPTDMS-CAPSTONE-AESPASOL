@@ -21,7 +21,7 @@ class InventoryController extends Controller
             'notifications' => collect([]),
 
             'layoutRole' => 'dentist',
-            'pageShellClass' => 'dentist-page-shell',
+            'pageShellClass' => 'app-page-shell',
             'isDentistView' => true,
 
             'inventoryRouteNames' => [

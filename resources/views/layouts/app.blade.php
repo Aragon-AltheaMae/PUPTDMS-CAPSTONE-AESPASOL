@@ -14,6 +14,7 @@
     $hideSidebar = View::hasSection('hide-sidebar');
     $hideMobileNav = View::hasSection('hide-mobile-nav');
     $hidePatientModals = View::hasSection('hide-patient-modals');
+    $hideFloatingActions = View::hasSection('hide-floating-actions');
     $hideFooter = View::hasSection('hide-footer');
 
     $showMobileMenu = ($isAdmin || $isDentist) && !$hideSidebar;
@@ -77,48 +78,6 @@
             };
 
             document.documentElement.classList.add('sidebar-preload');
-
-            try {
-                if (localStorage.getItem(sidebarKeys[role]) === '1') {
-                    document.documentElement.classList.add(
-                        'sidebar-collapsed-init'
-                    );
-                }
-            } catch (error) {}
-        })();
-    </script>
-
-    <style>
-        html.accessibility-preload .header,
-        html.accessibility-preload #sidebar,
-        html.accessibility-preload #mainContent,
-        html.accessibility-preload #siteFooter {
-            visibility: hidden !important;
-        }
-    </style>
-
-    <script>
-        (function() {
-            const root = document.documentElement;
-
-            root.classList.add('accessibility-preload');
-
-            const releaseAccessibilityPreload = () => {
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        root.classList.remove(
-                            'accessibility-preload'
-                        );
-                    });
-                });
-            };
-
-            window.releaseAccessibilityPreload =
-                releaseAccessibilityPreload;
-            setTimeout(
-                releaseAccessibilityPreload,
-                1500
-            );
         })();
     </script>
 
@@ -132,7 +91,39 @@
 
     <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
 
+    <style>
+        @keyframes page-enter-critical {
+            from {
+                opacity: .92;
+                transform: translateY(4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-enter {
+            animation: page-enter-critical 180ms ease-out both;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .page-enter {
+                animation: none;
+            }
+        }
+    </style>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    @if ($isAdmin)
+        @vite('resources/css/pages/admin/admin-shared.css')
+    @elseif ($isDentist)
+        @vite('resources/css/pages/dentist/dentist-shared.css')
+    @elseif ($isPatient)
+        @vite('resources/css/pages/patient/patient-shared.css')
+    @endif
 
     @yield('styles')
     @stack('styles')
@@ -143,6 +134,7 @@
         role-{{ $layoutRole }}
         {{ $hideSidebar ? 'layout-no-sidebar' : '' }}
         {{ $hideMobileNav ? 'layout-no-mobile-nav' : '' }}
+        {{ $hideFloatingActions ? 'layout-no-floating-actions' : '' }}
         @yield('body-class', 'bg-[#F4F4F4]')">
 
     @include('partials.header', [
@@ -172,14 +164,14 @@
         @include('partials.impersonation-banner')
     @endif
 
-    @if ($isDentist)
+    @if ($isDentist || ($isAdmin && View::hasSection('usesAppointmentCalendar')))
         @include('partials.impersonation-banner')
         @include('components.reschedule-modal')
         @include('components.cancel-modal')
         @include('components.patient-record-modal')
     @endif
 
-    @if ($isAdmin)
+    @if ($isAdmin && !View::hasSection('usesAppointmentCalendar'))
         @include('components.patient-record-modal')
     @endif
 
@@ -254,7 +246,7 @@
 
     @include('partials.terms-modal')
 
-    @if ($isDentist && View::hasSection('usesAppointmentCalendar'))
+    @if (($isDentist || $isAdmin) && View::hasSection('usesAppointmentCalendar'))
         @include('components.appointment-calendar-script', [
             'mode' => 'booking',
             'calendarContainerId' => 'calGridWrapReschedule',
@@ -274,6 +266,7 @@
             'datePillId' => 'datePill',
             'dateErrorId' => 'dateError',
             'timeErrorId' => 'timeError',
+            'clearSlotButtonId' => 'clearSlotSelectionBtn',
             'calendarWrapSelector' => '#rescheduleModal .cal-wrap',
             'slotsWrapSelector' => '#rescheduleModal .slots-wrap',
             'slotEndpoint' => route('dentist.appointment.slots'),
@@ -316,49 +309,12 @@
     <div id="globalActionTooltip" class="global-action-tooltip" role="tooltip" aria-hidden="true">
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/sienna-accessibility@latest/dist/sienna-accessibility.umd.js"
-        data-position="bottom-right" data-offset="{{ $accessibilityOffset }}" defer></script>
+    @if (!$hideFloatingActions)
+        <script src="https://cdn.jsdelivr.net/npm/sienna-accessibility@latest/dist/sienna-accessibility.umd.js"
+            data-position="bottom-right" data-offset="{{ $accessibilityOffset }}" defer></script>
 
-    <script>
-        document.addEventListener(
-            'DOMContentLoaded',
-            function() {
-                const release = () => {
-                    window.releaseAccessibilityPreload?.();
-                };
-
-                if (document.querySelector('.asw-widget')) {
-                    release();
-                    return;
-                }
-
-                const observer = new MutationObserver(() => {
-                    if (
-                        !document.querySelector(
-                            '.asw-widget'
-                        )
-                    ) {
-                        return;
-                    }
-
-                    observer.disconnect();
-                    release();
-                });
-
-                observer.observe(document.body, {
-                    childList: true,
-                    subtree: true
-                });
-
-                setTimeout(() => {
-                    observer.disconnect();
-                    release();
-                }, 1500);
-            }
-        );
-    </script>
-
-    @include('partials.chatbot')
+        @include('partials.chatbot')
+    @endif
 
     @stack('scripts')
     @yield('scripts')

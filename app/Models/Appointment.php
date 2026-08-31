@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class Appointment extends Model
 {
@@ -11,6 +12,8 @@ class Appointment extends Model
 
     protected $fillable = [
         'patient_id',
+        'reserved_booking_period_id',
+        'reserved_booking_period_slot_id',
         'dentist_id',
         'original_dentist_id',
         'service_type',
@@ -51,6 +54,30 @@ class Appointment extends Model
     public function patient()
     {
         return $this->belongsTo(Patient::class, 'patient_id');
+    }
+
+    public function reservedBookingPeriod()
+    {
+        return $this->belongsTo(ReservedBookingPeriod::class)->withTrashed();
+    }
+
+    public function reservedBookingPeriodSlot()
+    {
+        return $this->belongsTo(ReservedBookingPeriodSlot::class);
+    }
+
+    public function reservedProcedureWindowIsOpen(?Carbon $now = null): bool
+    {
+        if (! $this->reservedBookingPeriod) {
+            return Carbon::parse($this->appointment_date)->isToday();
+        }
+
+        $now ??= now();
+        $date = Carbon::parse($this->reservedBookingPeriod->reserved_date)->toDateString();
+        $start = Carbon::parse($date.' '.$this->reservedBookingPeriod->start_time);
+        $end = Carbon::parse($date.' '.$this->reservedBookingPeriod->end_time);
+
+        return $now->betweenIncluded($start, $end);
     }
 
     public function dentist()

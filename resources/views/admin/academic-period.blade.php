@@ -1,8 +1,12 @@
 @extends('layouts.app')
 
-@section('layout-role', 'admin')
+@section('layout-role', $layoutRole ?? 'admin')
 
 @section('title', 'Academic Period')
+
+@section('styles')
+    @vite('resources/css/pages/admin/academic-period.css')
+@endsection
 
 @section('content')
 
@@ -45,9 +49,13 @@ $activePeriodPayload = $activePeriod
 'is_active' => (bool) $activePeriod->is_active,
 ]
 : null;
+
+$authUser = auth()->user();
+$canCreateAcademicPeriod = $authUser?->hasPermission('create_academic_period') ?? false;
+$createAcademicPeriodUnauthorizedMessage = 'You are not authorized to add academic periods.';
 @endphp
 
-<main id="mainContent" class="admin-page-shell academic-period-page page-enter mode-list">
+<main id="mainContent" class="app-page-shell academic-period-page page-enter mode-list">
     <div class="full">
 
         @if ($errors->any())
@@ -83,7 +91,13 @@ $activePeriodPayload = $activePeriod
                     </button>
 
                     <button id="openAddPeriodBtn" type="button" class="ui-btn ui-btn-secondary"
-                        data-open-modal="addModal">
+                        @if ($canCreateAcademicPeriod)
+                            data-open-modal="addModal"
+                        @else
+                            data-academic-permission-trigger="create"
+                            aria-disabled="true"
+                            title="{{ $createAcademicPeriodUnauthorizedMessage }}"
+                        @endif>
                         <i class="fa-solid fa-plus"></i>
                         <span>Add Period</span>
                     </button>
@@ -155,7 +169,7 @@ $activePeriodPayload = $activePeriod
 
                         <button type="button" id="manageActivePeriodBtn"
                             onclick='@if ($activePeriodPayload) openEditModal(@json($activePeriodPayload)) @endif'
-                            class="ui-btn ui-btn-primary ui-btn-block">
+                            class="ui-btn ui-btn-primary ">
                             <i class="fa-solid fa-gear"></i>
                             <span>Manage Period</span>
                         </button>
@@ -171,12 +185,9 @@ $activePeriodPayload = $activePeriod
                             <div class="table-toolbar-title">
                                 <div class="card-header-icon"><i class="fa-solid fa-school"></i></div>
                                 <span class="card-title">All Academic Periods</span>
-                                <span id="entryBadge" class="entry-badge">
-                                    {{ $academicPeriods->total() }}
-                                </span>
                             </div>
 
-                            <form method="GET" action="{{ route('admin.academic_periods') }}" id="filterForm"
+                            <form method="GET" action="{{ route($routeNames['index'] ?? 'admin.academic_periods') }}" id="filterForm"
                                 class="table-toolbar-actions">
 
                                 <input type="hidden" name="semester" id="semesterFilter"
@@ -266,7 +277,7 @@ $activePeriodPayload = $activePeriod
 
                                     <tr data-record-row data-period-id="{{ $period->id }}"
                                         class="{{ $period->is_active ? 'is-active' : '' }}"
-                                        data-set-active-url="{{ route('admin.academic_periods.set_active', $period) }}"
+                                        data-set-active-url="{{ route($routeNames['set_active'] ?? 'admin.academic_periods.set_active', $period) }}"
                                         data-semester="{{ $period->semester }}" data-status="{{ $period->status }}"
                                         data-search="{{ strtolower($period->academic_year . ' ' . $period->semester . ' ' . $period->status . ' ' . optional($period->start_date)->format('M d, Y') . ' ' . optional($period->end_date)->format('M d, Y')) }}">
                                         <td>
@@ -331,13 +342,13 @@ $activePeriodPayload = $activePeriod
 
                                                 @if (!$period->is_active)
                                                 <form method="POST"
-                                                    action="{{ route('admin.academic_periods.set_active', $period) }}"
+                                                    action="{{ route($routeNames['set_active'] ?? 'admin.academic_periods.set_active', $period) }}"
                                                     class="inline">
                                                     @csrf
                                                     @method('PATCH')
                                                     <button type="button" class="ui-action-btn ui-action-success"
                                                         data-tooltip="Set as active" aria-label="Set as active" onclick="openSetActiveModal(
-        @js(route('admin.academic_periods.set_active', $period)),
+        @js(route($routeNames['set_active'] ?? 'admin.academic_periods.set_active', $period)),
         @js($period->academic_year . ' — ' . str_replace(['1st', '2nd'], ['First', 'Second'], $period->semester))
     )">
 
@@ -365,7 +376,7 @@ $activePeriodPayload = $activePeriod
 
                                                 <button type="button" class="ui-action-btn ui-action-delete"
                                                     data-tooltip="Delete period" aria-label="Delete period"
-                                                    data-delete-url="{{ route('admin.academic_periods.destroy', $period) }}"
+                                                    data-delete-url="{{ route($routeNames['destroy'] ?? 'admin.academic_periods.destroy', $period) }}"
                                                     data-delete-label="{{ $label }}"
                                                     onclick="openDeleteModalFromButton(this)">
 
@@ -436,7 +447,7 @@ $activePeriodPayload = $activePeriod
 
                                 <article data-period-id="{{ $period->id }}" class="table-record-card table-record-card-layout
         {{ $period->is_active ? 'is-active' : '' }}" data-record-card data-semester="{{ $period->semester }}"
-                                    data-set-active-url="{{ route('admin.academic_periods.set_active', $period) }}"
+                                    data-set-active-url="{{ route($routeNames['set_active'] ?? 'admin.academic_periods.set_active', $period) }}"
                                     data-status="{{ $period->status }}" data-search="{{ strtolower(
                                                 $period->academic_year .
                                                     ' ' .
@@ -518,12 +529,12 @@ $activePeriodPayload = $activePeriod
 
                                         @if (!$period->is_active)
                                         <form method="POST"
-                                            action="{{ route('admin.academic_periods.set_active', $period) }}">
+                                            action="{{ route($routeNames['set_active'] ?? 'admin.academic_periods.set_active', $period) }}">
                                             @csrf
                                             @method('PATCH')
                                             <button type="button" class="ui-action-btn ui-action-success"
                                                 data-tooltip="Set as active" aria-label="Set as active" onclick="openSetActiveModal(
-        @js(route('admin.academic_periods.set_active', $period)),
+        @js(route($routeNames['set_active'] ?? 'admin.academic_periods.set_active', $period)),
         @js($period->academic_year . ' — ' . str_replace(['1st', '2nd'], ['First', 'Second'], $period->semester))
     )">
 
@@ -591,7 +602,7 @@ $activePeriodPayload = $activePeriod
 
                         <div class="ap-calendar-footer">
                             <a href="https://www.pup.edu.ph/calendar/" target="_blank" rel="noopener noreferrer"
-                                class="ui-btn ui-btn-secondary ui-btn-block">
+                                class="ui-btn ui-btn-secondary">
 
                                 <i class="fa-solid fa-arrow-up-right-from-square"></i>
 
@@ -662,7 +673,13 @@ $activePeriodPayload = $activePeriod
                         </div>
                         <div class="quick-actions-list">
                             <button id="openAddPeriodQuickBtn" type="button" class="quick-action quick-action-card"
-                                data-open-modal="addModal">
+                                @if ($canCreateAcademicPeriod)
+                                    data-open-modal="addModal"
+                                @else
+                                    data-academic-permission-trigger="create"
+                                    aria-disabled="true"
+                                    title="{{ $createAcademicPeriodUnauthorizedMessage }}"
+                                @endif>
                                 <span class="quick-action-icon">
                                     <i class="fa-solid fa-plus"></i>
                                 </span>
@@ -833,7 +850,7 @@ $activePeriodPayload = $activePeriod
 
 <div id="addModal" class="ui-modal modal-theme-primary" aria-hidden="true">
 
-    <form method="POST" action="{{ route('admin.academic_periods.store') }}"
+    <form method="POST" id="addPeriodForm" action="{{ route($routeNames['store'] ?? 'admin.academic_periods.store') }}"
         class="ui-modal-card modal-xl modal-card-form ap-add-form" data-global-validation
         data-form-validation-rule="academicPeriod" data-discard-form data-discard-title="Discard new academic period?"
         data-discard-subtitle="You have unsaved academic period details."
@@ -1293,7 +1310,7 @@ $activePeriodPayload = $activePeriod
                 </div>
             </div>
 
-            <button type="button" class="modal-x" data-close-modal="setActiveModal"
+            <button type="button" class="modal-x" data-modal-close="setActiveModal"
                 aria-label="Close confirmation modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -1301,12 +1318,13 @@ $activePeriodPayload = $activePeriod
 
         <div class="modal-bd">
             <div class="global-confirm-alert">
-                <i class="fa-solid fa-triangle-exclamation"></i>
+                <i class="fa-solid fa-circle-check"></i>
 
                 <div>
                     <p>
                         Set
-                        <strong id="setActivePeriodName"></strong>
+                        <strong id="setActivePeriodName" class="global-confirm-value">
+                        </strong>
                         as the active academic period?
                     </p>
 
@@ -1318,7 +1336,7 @@ $activePeriodPayload = $activePeriod
         </div>
 
         <div class="modal-ft">
-            <button type="button" class="ui-btn ui-btn-secondary" data-close-modal="setActiveModal">
+            <button type="button" class="ui-btn ui-btn-secondary" data-modal-close="setActiveModal">
                 Cancel
             </button>
 
@@ -1335,7 +1353,7 @@ $activePeriodPayload = $activePeriod
 
 <div id="syncFlssModal" class="ui-modal modal-theme-primary" aria-hidden="true">
 
-    <form id="syncFlssForm" method="POST" action="{{ route('admin.academic_periods.sync_flss') }}"
+    <form id="syncFlssForm" method="POST" action="{{ route($routeNames['sync_flss'] ?? 'admin.academic_periods.sync_flss') }}"
         class="ui-modal-card modal-md modal-card-form">
 
         @csrf
@@ -1357,7 +1375,7 @@ $activePeriodPayload = $activePeriod
                 </div>
             </div>
 
-            <button type="button" class="modal-x" data-close-modal="syncFlssModal" aria-label="Close sync modal">
+            <button type="button" class="modal-x" data-modal-close="syncFlssModal" aria-label="Close sync modal">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -1372,25 +1390,19 @@ $activePeriodPayload = $activePeriod
                     </p>
 
                     <span>
-                        This will fetch the current academic year and semester
-                        from the external FLSS source.
+                        The current academic year and semester will be fetched
+                        from the FLSS source and applied to the system.
                     </span>
                 </div>
             </div>
-
-            <p class="modal-helper-text">
-                <i class="fa-solid fa-shield-halved"></i>
-                Existing records will only be updated based on the FLSS response.
-            </p>
         </div>
 
         <div class="modal-ft">
-            <button type="button" class="ui-btn ui-btn-secondary" data-close-modal="syncFlssModal">
+            <button type="button" class="ui-btn ui-btn-secondary" data-modal-close="syncFlssModal">
                 Cancel
             </button>
 
             <button type="submit" id="syncFlssSubmitBtn" class="ui-btn ui-btn-primary">
-
                 <i class="fa-solid fa-rotate"></i>
                 <span>Sync Now</span>
             </button>
@@ -2359,10 +2371,35 @@ $activePeriodPayload = $activePeriod
         setInterval(updateClock, 1000);
     });
 
+    function showAcademicPermissionToast(message) {
+        window.showToast?.({
+            type: 'error',
+            title: 'Unauthorized',
+            message: message || 'You are not authorized to perform this action.',
+            duration: 4500,
+        });
+    }
+
+    function bindAcademicPermissionTrigger(selector, message) {
+        document.querySelectorAll(selector).forEach(button => {
+            button.addEventListener('click', event => {
+                event.preventDefault();
+                event.stopPropagation();
+                showAcademicPermissionToast(message);
+            });
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         const searchInput =
             document.getElementById(
                 'searchInput'
+            );
+        const canCreateAcademicPeriod = @json($canCreateAcademicPeriod);
+        const createAcademicPeriodUnauthorizedMessage = @json($createAcademicPeriodUnauthorizedMessage);
+        const addPeriodForm =
+            document.getElementById(
+                'addPeriodForm'
             );
 
         const clearBtn =
@@ -2376,6 +2413,21 @@ $activePeriodPayload = $activePeriod
         const semesterFilter = document.getElementById('semesterFilter');
         const statusFilter = document.getElementById('statusFilter');
         let searchTimer = null;
+
+        if (!canCreateAcademicPeriod) {
+            bindAcademicPermissionTrigger(
+                '[data-academic-permission-trigger="create"]',
+                createAcademicPeriodUnauthorizedMessage
+            );
+
+            addPeriodForm?.addEventListener('submit', event => {
+                event.preventDefault();
+                event.stopPropagation();
+                showAcademicPermissionToast(
+                    createAcademicPeriodUnauthorizedMessage
+                );
+            });
+        }
 
         const tableBody = document.getElementById('academicTableBody');
         const gridView = document.getElementById('academicGridView');
@@ -2734,28 +2786,20 @@ $activePeriodPayload = $activePeriod
                     'periods',
 
                 onPageChange:
-                    loadAcademicPeriodPage,
+                    page =>
+                        refreshAcademicPeriods(
+                            page
+                        ),
             });
         }
 
-        async function loadAcademicPeriodPage(
-            page = 1
+        function buildAcademicPeriodUrl(
+            page = null
         ) {
-            if (academicPageLoading) {
-                return;
-            }
-
-            academicPageLoading = true;
-
             const url =
                 new URL(
                     window.location.href
                 );
-
-            url.searchParams.set(
-                'page',
-                String(page)
-            );
 
             const searchValue =
                 searchInput?.value
@@ -2766,6 +2810,13 @@ $activePeriodPayload = $activePeriod
 
             const statusValue =
                 statusFilter?.value || '';
+
+            if (page !== null) {
+                url.searchParams.set(
+                    'page',
+                    String(page)
+                );
+            }
 
             if (searchValue) {
                 url.searchParams.set(
@@ -2799,6 +2850,124 @@ $activePeriodPayload = $activePeriod
                     'status'
                 );
             }
+
+            return url;
+        }
+
+
+        function applyAcademicPeriodResponse(
+            parsed
+        ) {
+            const newTableBody =
+                parsed.getElementById(
+                    'academicTableBody'
+                );
+
+            const newRecordGrid =
+                parsed.querySelector(
+                    '#academicGridView ' +
+                    '.table-record-grid'
+                );
+
+            const newPagebar =
+                parsed.getElementById(
+                    'academicPeriodPagebar'
+                );
+
+            const newEntryBadge =
+                parsed.getElementById(
+                    'entryBadge'
+                );
+
+            if (
+                !newTableBody ||
+                !newRecordGrid ||
+                !newPagebar
+            ) {
+                throw new Error(
+                    'Invalid academic period response.'
+                );
+            }
+
+            tableBody.innerHTML =
+                newTableBody.innerHTML;
+
+            const currentRecordGrid =
+                gridView?.querySelector(
+                    '.table-record-grid'
+                );
+
+            if (currentRecordGrid) {
+                currentRecordGrid.innerHTML =
+                    newRecordGrid.innerHTML;
+            }
+
+            [
+                'currentPage',
+                'lastPage',
+                'total',
+                'from',
+                'to',
+            ].forEach(key => {
+                academicPagebar.dataset[key] =
+                    newPagebar.dataset[key] || '';
+            });
+
+            const entryBadge =
+                document.getElementById(
+                    'entryBadge'
+                );
+
+            if (
+                entryBadge &&
+                newEntryBadge
+            ) {
+                entryBadge.textContent =
+                    newEntryBadge.textContent;
+            }
+        }
+
+
+        function restoreAcademicViewMode() {
+            const activeMode =
+                window.getGlobalViewMode?.(
+                    'academicViewToggle'
+                ) || 'list';
+
+            window.setGlobalViewMode?.(
+                'academicViewToggle',
+                activeMode,
+                {
+                    persist: false,
+                }
+            );
+        }
+
+
+        async function refreshAcademicPeriods(
+            page = null,
+            options = {}
+        ) {
+            if (academicPageLoading) {
+                return false;
+            }
+
+            const {
+                updateUrl = true,
+                showErrorToast = true,
+            } = options;
+
+            academicPageLoading = true;
+
+            const requestedPage =
+                page ??
+                getAcademicPaginationMeta()
+                    .currentPage;
+
+            const url =
+                buildAcademicPeriodUrl(
+                    requestedPage
+                );
 
             try {
                 academicPagebar?.classList.add(
@@ -2838,110 +3007,43 @@ $activePeriodPayload = $activePeriod
                             'text/html'
                         );
 
-                const newTableBody =
-                    parsed.getElementById(
-                        'academicTableBody'
-                    );
-
-                const newRecordGrid =
-                    parsed.querySelector(
-                        '#academicGridView ' +
-                        '.table-record-grid'
-                    );
-
-                const newPagebar =
-                    parsed.getElementById(
-                        'academicPeriodPagebar'
-                    );
-
-                const newEntryBadge =
-                    parsed.getElementById(
-                        'entryBadge'
-                    );
-
-                if (
-                    !newTableBody ||
-                    !newRecordGrid ||
-                    !newPagebar
-                ) {
-                    throw new Error(
-                        'Invalid academic period response.'
-                    );
-                }
-
-                tableBody.innerHTML =
-                    newTableBody.innerHTML;
-
-                const currentRecordGrid =
-                    gridView?.querySelector(
-                        '.table-record-grid'
-                    );
-
-                if (currentRecordGrid) {
-                    currentRecordGrid.innerHTML =
-                        newRecordGrid.innerHTML;
-                }
-
-                [
-                    'currentPage',
-                    'lastPage',
-                    'total',
-                    'from',
-                    'to',
-                ].forEach(key => {
-                    academicPagebar.dataset[key] =
-                        newPagebar.dataset[key] ||
-                        '';
-                });
-
-                const entryBadge =
-                    document.getElementById(
-                        'entryBadge'
-                    );
-
-                if (
-                    entryBadge &&
-                    newentryBadge
-                ) {
-                    entryBadge.textContent =
-                        newentryBadge.textContent;
-                }
-
-                window.history.replaceState(
-                    {},
-                    '',
-                    url.toString()
+                applyAcademicPeriodResponse(
+                    parsed
                 );
+
+                if (updateUrl) {
+                    window.history.replaceState(
+                        {},
+                        '',
+                        url.toString()
+                    );
+                }
 
                 renderAcademicPagination();
                 filterItems();
                 renderAcademicBaseEmptyStates();
+                restoreAcademicViewMode();
 
-                const activeMode =
-                    window.getGlobalViewMode?.(
-                        'academicViewToggle'
-                    ) || 'list';
+                return true;
 
-                window.setGlobalViewMode?.(
-                    'academicViewToggle',
-                    activeMode,
-                    {
-                        persist: false,
-                    }
-                );
             } catch (error) {
-                window.showToast?.({
-                    type: 'error',
+                if (showErrorToast) {
+                    window.showToast?.({
+                        type: 'error',
 
-                    title:
-                        'Unable to load records',
+                        title:
+                            'Unable to load records',
 
-                    message:
-                        error.message ||
-                        'Please try again.',
+                        message:
+                            error.message ||
+                            'Please try again.',
 
-                    duration: 4500,
-                });
+                        duration: 4500,
+                    });
+                }
+
+                return false;
+
             } finally {
                 academicPageLoading = false;
 
@@ -2950,6 +3052,8 @@ $activePeriodPayload = $activePeriod
                 );
             }
         }
+
+        window.refreshAcademicPeriods = refreshAcademicPeriods;
 
         function filterItems() {
             const semesterValue = semesterFilter?.value || '';
@@ -3031,6 +3135,7 @@ $activePeriodPayload = $activePeriod
         statusFilter?.addEventListener('change', filterItems);
 
         filterItems();
+        renderAcademicPagination();
 
         const syncFlssForm =
             document.getElementById('syncFlssForm');
@@ -3148,6 +3253,8 @@ $activePeriodPayload = $activePeriod
 
                     renderCalendar();
 
+                    await refreshAcademicPeriods(1);
+
                     window.closeModal?.(
                         'syncFlssModal'
                     );
@@ -3165,6 +3272,7 @@ $activePeriodPayload = $activePeriod
 
                         duration: 5000,
                     });
+
                 } catch (error) {
                     window.showToast?.({
                         type: 'error',

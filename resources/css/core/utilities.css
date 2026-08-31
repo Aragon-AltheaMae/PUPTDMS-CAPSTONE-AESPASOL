@@ -262,30 +262,6 @@
     box-shadow: none;
 }
 
-.btn-add {
-    height: 40px;
-    padding: 0 14px;
-    border-radius: 12px;
-    font-size: 13px;
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: all .2s;
-    position: relative;
-    white-space: nowrap;
-    border: none;
-    background: var(--crimson);
-    color: var(--color-white);
-    box-shadow: 0 3px 10px var(--alpha-crimson-18);
-}
-
-.btn-add:hover {
-    background: var(--crimson-hover);
-}
-
 .btn-new-role {
     background: linear-gradient(135deg, var(--crimson) 0%, var(--crimson-dark) 100%);
     color: var(--color-white);
@@ -348,17 +324,6 @@
     transform: translateY(-1px);
 }
 
-.ui-btn-sm {
-    min-height: 32px;
-    padding: 0 12px;
-    gap: 6px;
-    font-size: 11px;
-}
-
-.ui-btn-sm i {
-    font-size: 10px;
-}
-
 .ui-btn-compact {
     min-height: 34px;
     padding: 0 13px;
@@ -378,6 +343,17 @@
     line-height: 1;
     cursor: pointer;
     transition: all .18s ease;
+}
+
+.ui-btn-sm {
+    min-height: 32px;
+    padding: 0 12px;
+    gap: 6px;
+    font-size: 11px;
+}
+
+.ui-btn-sm i {
+    font-size: 10px;
 }
 
 .ui-btn-primary {
@@ -502,16 +478,15 @@
 }
 
 .ui-btn-warning {
-    background: var(--status-pending-bg);
-    border-color: var(--status-pending-border);
-    color: var(--status-pending-text);
+    background: var(--amber-600);
+    border-color: var(--amber-600);
+    color: var(--color-white);
 }
 
-.ui-btn-warning:hover,
-.ui-btn-warning:focus-visible {
-    background: var(--status-pending-solid);
-    border-color: var(--status-pending-solid);
-    color: var(--text-on-brand);
+.ui-btn-warning:hover {
+    background: var(--amber-700);
+    border-color: var(--amber-700);
+    color: var(--color-white);
     transform: translateY(-1px);
 }
 
@@ -528,31 +503,40 @@
     transform: translateY(-1px);
 }
 
-.ui-btn-block {
-    width: 100%;
-}
-
 .ui-icon-btn {
     position: relative;
-    width: 38px;
-    height: 38px;
-    min-width: 38px;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
     padding: 0;
-    border-radius: 12px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     border: 1px solid transparent;
+    border-radius: 10px;
+    font-family: inherit;
+    line-height: 1;
     cursor: pointer;
-
     transition:
         transform .18s ease,
         background-color .18s ease,
         border-color .18s ease,
         color .18s ease,
         box-shadow .18s ease;
+}
+
+.ui-icon-btn:disabled {
+    opacity: .45;
+
+    cursor: not-allowed;
+
+    transform: none;
+    box-shadow: none;
+}
+
+.ui-icon-btn:disabled:hover,
+.ui-icon-btn:disabled:focus-visible {
+    transform: none;
 }
 
 .ui-icon-btn i {
@@ -624,7 +608,7 @@
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 5px;
     overflow: visible;
 }
 
@@ -636,20 +620,21 @@
     --action-hover-color: var(--gray-800);
     --action-hover-border: transparent;
     --action-tooltip-bg: var(--gray-700);
-
+    --ui-action-size: 32px;
     position: relative;
     isolation: isolate;
-    width: 38px;
-    height: 38px;
-    min-width: 38px;
+    width: var(--ui-action-size);
+    height: var(--ui-action-size);
+    min-width: var(--ui-action-size);
+    flex: 0 0 var(--ui-action-size);
     padding: 0;
-    border: 1px solid var(--action-border);
-    border-radius: 12px;
-    background: var(--action-bg);
-    color: var(--action-color);
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    border: 1px solid var(--action-border);
+    border-radius: 10px;
+    background: var(--action-bg);
+    color: var(--action-color);
     font-family: inherit;
     line-height: 1;
     cursor: pointer;
@@ -663,7 +648,7 @@
 
 .ui-action-btn i {
     color: currentColor;
-    font-size: 12px;
+    font-size: 11px;
     line-height: 1;
     transition: color .18s ease;
 }
@@ -995,6 +980,68 @@
     border-color: var(--green-600) !important;
 }
 
+.service-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 999px;
+    width: fit-content;
+}
+
+.service-badge-default {
+    background: #f9f0f0;
+    color: #8B0000;
+}
+
+.service-badge-surgery {
+    background: #fff0f0;
+    color: #C41E3A;
+}
+
+.service-badge-checkup {
+    background: #ebf5ee;
+    color: #2D7A5E;
+}
+
+.service-badge-whitening {
+    background: #fff3e0;
+    color: #B86C00;
+}
+
+.service-badge-extraction {
+    background: #fff0e8;
+    color: #B85000;
+}
+
+[data-theme="dark"] .service-badge-default,
+.dark .service-badge-default {
+    background: rgba(139, 0, 0, 0.18) !important;
+    color: #FCA5A5 !important;
+}
+
+[data-theme="dark"] .service-badge-checkup,
+.dark .service-badge-checkup {
+    background: rgba(22, 163, 74, 0.16) !important;
+    color: #86EFAC !important;
+}
+
+[data-theme="dark"] .service-badge-surgery,
+[data-theme="dark"] .service-badge-extraction,
+.dark .service-badge-surgery,
+.dark .service-badge-extraction {
+    background: rgba(220, 38, 38, 0.16) !important;
+    color: #FCA5A5 !important;
+}
+
+[data-theme="dark"] .service-badge-whitening,
+.dark .service-badge-whitening {
+    background: rgba(250, 204, 21, 0.16) !important;
+    color: #FDE047 !important;
+}
+
 :is(.status-pill,
     .status-badge,
     .appointment-status-pill,
@@ -1052,21 +1099,39 @@
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 6px !important;
-    min-height: 28px !important;
+
+    gap: var(--status-pill-gap) !important;
+
+    min-height: var(--status-pill-height) !important;
+
     width: fit-content !important;
     max-width: 100% !important;
-    padding: 0 12px !important;
+
+    padding:
+        0 var(--status-pill-padding-x) !important;
+
     border-radius: 999px !important;
-    font-size: 11px !important;
+
+    font-size:
+        var(--status-pill-font-size) !important;
+
     font-weight: 900 !important;
     line-height: 1 !important;
+
     white-space: nowrap !important;
+
     letter-spacing: -0.01em !important;
 
-    background: var(--status-bg, var(--status-default-bg)) !important;
-    color: var(--status-text, var(--status-default-text)) !important;
-    border: 1px solid var(--status-border, var(--status-default-border)) !important;
+    background:
+        var(--status-bg, var(--status-default-bg)) !important;
+
+    color:
+        var(--status-text, var(--status-default-text)) !important;
+
+    border:
+        1px solid var(--status-border, var(--status-default-border)) !important;
+
+    flex: 0 1 auto !important;
 }
 
 .status-badge::before {
@@ -1077,12 +1142,17 @@
 .pill-dot,
 .status-badge::before,
 .entry-badge::before {
-    width: 6px !important;
-    height: 6px !important;
-    min-width: 6px !important;
-    min-height: 6px !important;
+    width: var(--status-pill-dot-size) !important;
+    height: var(--status-pill-dot-size) !important;
+
+    min-width: var(--status-pill-dot-size) !important;
+    min-height: var(--status-pill-dot-size) !important;
+
     border-radius: 999px !important;
-    background: var(--status-solid, currentColor) !important;
+
+    background:
+        var(--status-solid, currentColor) !important;
+
     flex-shrink: 0 !important;
 }
 
@@ -1418,16 +1488,29 @@
 .urgency-chip {
     display: inline-flex;
     align-items: center;
-    width: max-content;
-    margin-top: 6px;
-    padding: 3px 8px;
+    justify-content: center;
+
+    width: fit-content;
+    max-width: 100%;
+    min-height: var(--status-pill-height);
+
+    margin: 0;
+    padding: 0 var(--status-pill-padding-x);
+
     border-radius: 999px;
-    font-size: 10px;
-    font-weight: 800;
-    line-height: 1;
     border: 1px solid var(--status-border, var(--status-default-border));
+
     background: var(--status-bg, var(--status-default-bg));
     color: var(--status-text, var(--status-default-text));
+
+    font-size: var(--status-pill-font-size);
+    font-weight: 800;
+    line-height: 1;
+
+    white-space: nowrap;
+    box-sizing: border-box;
+
+    flex: 0 0 auto;
 }
 
 .urgency-today {
@@ -1880,26 +1963,6 @@
     border-color: var(--crimson-dark);
 }
 
-@media (max-width: 480px) {
-    .char-counter {
-        font-size: 9px;
-    }
-
-    .field-error {
-        font-size: 9.5px;
-        min-height: 12px;
-    }
-}
-
-@media (max-width: 640px) {
-    .tab-bar {
-        width: 100% !important;
-        display: flex;
-        gap: .25rem;
-        padding: .3rem;
-    }
-}
-
 .auth-theme-toggle {
     width: 44px;
     height: 44px;
@@ -1921,108 +1984,6 @@
     transform: translateY(-1px);
     border-color: var(--alpha-crimson-28);
     box-shadow: 0 14px 28px var(--alpha-crimson-12);
-}
-
-[data-theme="dark"] .tab-btn.active,
-.dark .tab-btn.active {
-    background: var(--crimson) !important;
-    color: var(--color-white) !important;
-}
-
-[data-theme="dark"] .tab-group,
-.dark .tab-group {
-    background: var(--surface);
-    border-color: var(--border);
-}
-
-[data-theme="dark"] .auth-theme-toggle,
-.dark .auth-theme-toggle {
-    background: var(--card);
-    border-color: var(--border);
-    color: var(--text-1);
-
-    box-shadow:
-        0 12px 30px var(--alpha-black-28);
-}
-
-[data-theme="dark"] .auth-theme-toggle:hover {
-    border-color: var(--alpha-white-16);
-    box-shadow: 0 16px 34px var(--alpha-black-34);
-}
-
-@media (max-width: 1279px) {
-
-    .tab-strip {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 768px) {
-    .auth-theme-toggle {
-        width: 40px;
-        height: 40px;
-    }
-}
-
-@media (max-width: 767px) {
-    .tab-btn-toggle {
-        padding: 7px 12px;
-        font-size: 11.5px;
-        gap: 6px;
-        white-space: nowrap;
-        flex-shrink: 0;
-    }
-
-    .btn-add {
-        width: 100%;
-        height: 42px;
-    }
-
-    .btn-new-role {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .btn-collapse,
-    .btn-reset {
-        width: 100%;
-        min-height: 42px;
-        text-align: center;
-        justify-content: center;
-        display: flex;
-        align-items: center;
-    }
-
-    .tab-group {
-        width: 100%;
-        display: flex;
-    }
-
-    .tab-btn {
-        flex: 1;
-        min-width: 0;
-        text-align: center;
-    }
-
-    .tab-strip {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .tab-toggle-wrap {
-        width: fit-content;
-        max-width: 100%;
-        padding: 4px;
-        gap: 3px;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-}
-
-@media (max-width: 480px) {
-    .tab-strip {
-        grid-template-columns: 1fr 1fr;
-        gap: .55rem;
-    }
 }
 
 .modal-theme-primary {
@@ -2101,30 +2062,6 @@
 
 .modal-themed-icon i {
     color: currentColor;
-}
-
-[data-theme="dark"] .modal-themed-header,
-.dark .modal-themed-header {
-    background:
-        radial-gradient(circle at top left,
-            color-mix(in srgb,
-                var(--modal-accent) 20%,
-                transparent),
-            transparent 42%),
-        var(--surface) !important;
-
-    border-bottom-color:
-        color-mix(in srgb,
-            var(--modal-accent) 32%,
-            var(--border)) !important;
-}
-
-[data-theme="dark"] .modal-themed-icon,
-.dark .modal-themed-icon {
-    box-shadow:
-        0 12px 28px color-mix(in srgb,
-            var(--modal-accent) 28%,
-            transparent) !important;
 }
 
 .global-info-grid {
@@ -2330,22 +2267,19 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-
+    align-self: flex-start;
+    width: fit-content;
     min-width: 0;
-    min-height: 28px;
     max-width: 100%;
+    min-height: 28px;
     padding: 5px 10px;
-
     border: 1px solid var(--border);
     border-radius: 999px;
-
     background: var(--surface);
     color: var(--text-2);
-
     font-size: 11px;
     font-weight: 800;
     line-height: 1;
-
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -2369,61 +2303,6 @@
     background: var(--status-bg) !important;
     border-color: var(--status-border) !important;
     color: var(--status-text) !important;
-}
-
-@media (max-width: 640px) {
-    .global-info-grid-2 {
-        grid-template-columns: 1fr;
-    }
-
-    .global-info-item-wide {
-        grid-column: auto;
-    }
-}
-
-[data-theme="dark"] .global-info-item,
-.dark .global-info-item,
-[data-theme="dark"] .global-info-pill,
-.dark .global-info-pill {
-    background: var(--surface);
-    border-color: var(--border);
-}
-
-[data-theme="dark"] .global-info-profile,
-.dark .global-info-profile {
-    background: var(--alpha-crimson-12);
-    border-color: var(--alpha-red-300-16);
-}
-
-[data-theme="dark"] .global-info-value,
-[data-theme="dark"] .global-info-profile-name,
-.dark .global-info-value,
-.dark .global-info-profile-name {
-    color: var(--text-1);
-}
-
-[data-theme="dark"] .global-info-label,
-[data-theme="dark"] .global-info-subvalue,
-.dark .global-info-label,
-.dark .global-info-subvalue {
-    color: var(--text-3);
-}
-
-[data-theme="dark"] .global-info-pill,
-.dark .global-info-pill {
-    color: var(--text-2);
-}
-
-[data-theme="dark"] .global-info-pill i,
-.dark .global-info-pill i {
-    color: var(--red-300);
-}
-
-[data-theme="dark"] .global-info-icon,
-.dark .global-info-icon {
-    background: var(--alpha-crimson-16);
-    border-color: var(--alpha-red-300-18);
-    color: var(--red-300);
 }
 
 .global-record-card {
@@ -2480,8 +2359,7 @@
 .global-record-card-grid {
     display: flex;
     flex-direction: column;
-    gap: .85rem;
-
+    gap: .65rem;
     width: 100%;
     min-width: 0;
     height: 100%;
@@ -2500,6 +2378,26 @@
 .global-record-identity {
     min-width: 0;
     flex: 1 1 auto;
+}
+
+.global-record-name-row {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+
+    width: 100%;
+    min-width: 0;
+}
+
+.global-record-name-row .global-record-name {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.global-record-name-row .badge-role {
+    margin-left: auto;
+
+    flex: 0 0 auto;
 }
 
 .global-record-name {
@@ -2564,54 +2462,6 @@
 .global-record-actions,
 .global-record-footer {
     overflow: visible;
-}
-
-@media (max-width: 1100px) {
-    .global-record-card-body {
-        align-items: flex-start;
-        flex-wrap: wrap;
-    }
-
-    .global-record-profile {
-        flex: 1 1 300px;
-    }
-
-    .global-record-information {
-        flex: 1 1 100%;
-    }
-
-    .global-record-actions {
-        margin-left: auto;
-    }
-}
-
-@media (max-width: 720px) {
-    .global-record-information {
-        grid-template-columns: 1fr;
-    }
-
-    .global-record-name {
-        white-space: normal;
-        overflow-wrap: anywhere;
-    }
-}
-
-[data-theme="dark"] .global-record-card,
-.dark .global-record-card {
-    background: var(--surface);
-    border-color: var(--border);
-    box-shadow: none;
-}
-
-[data-theme="dark"] .global-record-card:hover,
-.dark .global-record-card:hover {
-    border-color: var(--alpha-red-300-20);
-    box-shadow: 0 12px 26px var(--alpha-black-28);
-}
-
-[data-theme="dark"] .global-record-name,
-.dark .global-record-name {
-    color: var(--text-1);
 }
 
 .ui-action-indicator {
@@ -2685,6 +2535,203 @@
     color: var(--gray-600);
 }
 
+.mobile-appt-card {
+    position: relative;
+
+    width: 100%;
+
+    padding: .95rem 1rem;
+
+    box-sizing: border-box;
+
+    overflow: hidden;
+
+    border: 1px solid var(--border);
+    border-radius: 14px;
+
+    background: var(--card);
+
+    transition:
+        box-shadow .2s,
+        border-color .2s;
+}
+
+.mobile-appt-card-head {
+    display: flex;
+
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: .65rem;
+
+    min-width: 0;
+
+    margin-bottom: .7rem;
+}
+
+.mobile-patient-name {
+    margin: 0;
+
+    min-width: 0;
+
+    color: var(--text-1);
+
+    font-size: 14px;
+    font-weight: 850;
+    line-height: 1.2;
+
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.appointment-grid-details {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: .65rem .8rem;
+
+    margin: 0;
+
+    padding: .8rem;
+
+    border: 1px solid var(--border);
+    border-radius: 11px;
+
+    background: var(--surface);
+}
+
+.appointment-grid-detail {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    gap: .35rem;
+}
+
+.appointment-grid-detail-wide {
+    grid-column: 1 / -1;
+}
+
+.appointment-grid-detail-label {
+    color: var(--text-3);
+
+    font-size: 9px;
+    font-weight: 900;
+    line-height: 1;
+
+    letter-spacing: .07em;
+    text-transform: uppercase;
+}
+
+.appointment-grid-details .global-info-value {
+    max-width: 100%;
+
+    color: var(--text-1);
+
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.25;
+
+    overflow-wrap: anywhere;
+}
+
+.mobile-appt-actions {
+    display: flex;
+
+    align-items: center;
+    justify-content: flex-end;
+
+    width: 100%;
+
+    gap: 6px;
+
+    margin-top: .65rem;
+}
+
+.global-show-more-controls {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    margin-top: .55rem;
+}
+
+.global-show-more-btn {
+    width: auto;
+    min-width: 0;
+    min-height: 32px;
+
+    margin-left: auto;
+    padding: 0 .75rem;
+
+    gap: .4rem;
+
+    font-size: .7rem;
+    line-height: 1;
+
+    flex: 0 0 auto;
+}
+
+.global-show-more-btn i {
+    font-size: .65rem;
+}
+
+.time-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-2);
+}
+
+[data-theme="dark"] #mainContent .time-chip,
+.dark #mainContent .time-chip {
+    background: rgba(13, 17, 23, 0.58) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #CBD5E1 !important;
+}
+
+[data-theme="dark"] .mobile-appt-card,
+.dark .mobile-appt-card {
+    background: var(--card) !important;
+    border-color: var(--border) !important;
+    box-shadow:
+        inset 0 1px 0 color-mix(in srgb, var(--text-1) 5%, transparent),
+        0 14px 30px color-mix(in srgb, var(--bg-main) 45%, transparent) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+[data-theme="dark"] .mobile-appt-card:hover,
+.dark .mobile-appt-card:hover {
+    border-color: rgba(252, 165, 165, 0.24) !important;
+    box-shadow:
+        0 18px 38px rgba(0, 0, 0, 0.36),
+        0 0 18px rgba(139, 0, 0, 0.14) !important;
+}
+
+[data-theme="dark"] .appointment-grid-details,
+.dark .appointment-grid-details {
+    background: rgba(13, 17, 23, 0.58) !important;
+    border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+[data-theme="dark"] .mobile-patient-name,
+.dark .mobile-patient-name {
+    color: #F8FAFC !important;
+}
+
 [data-theme="dark"] .badge-role.role-patient,
 [data-theme="dark"] .badge-role.role-student,
 .dark .badge-role.role-patient,
@@ -2734,4 +2781,708 @@
     background: var(--alpha-white-5_5);
     border-color: var(--alpha-white-8_5);
     color: var(--slate-300);
+}
+
+[data-theme="dark"] .global-record-card,
+.dark .global-record-card {
+    background: var(--surface);
+    border-color: var(--border);
+    box-shadow: none;
+}
+
+[data-theme="dark"] .global-record-card:hover,
+.dark .global-record-card:hover {
+    border-color: var(--alpha-red-300-20);
+    box-shadow: 0 12px 26px var(--alpha-black-28);
+}
+
+[data-theme="dark"] .global-record-name,
+.dark .global-record-name {
+    color: var(--text-1);
+}
+
+[data-theme="dark"] .tab-btn.active,
+.dark .tab-btn.active {
+    background: var(--crimson) !important;
+    color: var(--color-white) !important;
+}
+
+[data-theme="dark"] .tab-group,
+.dark .tab-group {
+    background: var(--surface);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .auth-theme-toggle,
+.dark .auth-theme-toggle {
+    background: var(--card);
+    border-color: var(--border);
+    color: var(--text-1);
+
+    box-shadow:
+        0 12px 30px var(--alpha-black-28);
+}
+
+[data-theme="dark"] .auth-theme-toggle:hover {
+    border-color: var(--alpha-white-16);
+    box-shadow: 0 16px 34px var(--alpha-black-34);
+}
+
+[data-theme="dark"] .modal-themed-header,
+.dark .modal-themed-header {
+    background:
+        radial-gradient(circle at top left,
+            color-mix(in srgb,
+                var(--modal-accent) 20%,
+                transparent),
+            transparent 42%),
+        var(--surface) !important;
+
+    border-bottom-color:
+        color-mix(in srgb,
+            var(--modal-accent) 32%,
+            var(--border)) !important;
+}
+
+[data-theme="dark"] .modal-themed-icon,
+.dark .modal-themed-icon {
+    box-shadow:
+        0 12px 28px color-mix(in srgb,
+            var(--modal-accent) 28%,
+            transparent) !important;
+}
+
+[data-theme="dark"] .global-info-item,
+.dark .global-info-item,
+[data-theme="dark"] .global-info-pill,
+.dark .global-info-pill {
+    background: var(--surface);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .global-info-profile,
+.dark .global-info-profile {
+    background: var(--alpha-crimson-12);
+    border-color: var(--alpha-red-300-16);
+}
+
+[data-theme="dark"] .global-info-value,
+[data-theme="dark"] .global-info-profile-name,
+.dark .global-info-value,
+.dark .global-info-profile-name {
+    color: var(--text-1);
+}
+
+[data-theme="dark"] .global-info-label,
+[data-theme="dark"] .global-info-subvalue,
+.dark .global-info-label,
+.dark .global-info-subvalue {
+    color: var(--text-3);
+}
+
+[data-theme="dark"] .global-info-pill,
+.dark .global-info-pill {
+    color: var(--text-2);
+}
+
+[data-theme="dark"] .global-info-pill i,
+.dark .global-info-pill i {
+    color: var(--red-300);
+}
+
+[data-theme="dark"] .global-info-icon,
+.dark .global-info-icon {
+    background: var(--alpha-crimson-16);
+    border-color: var(--alpha-red-300-18);
+    color: var(--red-300);
+}
+
+@media (max-width: 640px) {
+    .tab-bar {
+        width: 100% !important;
+        display: flex;
+        gap: .25rem;
+        padding: .3rem;
+    }
+
+    .global-info-grid-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .global-info-item-wide {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 1279px) {
+
+    .tab-strip {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .auth-theme-toggle {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 767px) {
+    .global-record-name-row {
+        gap: .35rem;
+        align-items: center;
+    }
+
+    .global-record-name-row .global-record-name {
+        min-width: 0;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .global-record-name-row .badge-role {
+        margin-left: auto;
+
+        flex-shrink: 0;
+    }
+
+    .badge-role {
+        gap: .25rem;
+        min-height: 20px;
+        padding: .22rem .5rem;
+        font-size: .58rem;
+        line-height: 1;
+        white-space: nowrap;
+        flex: 0 0 auto;
+    }
+
+    .ui-btn.ui-btn-sm {
+        min-height: 28px;
+        padding: 0 10px;
+        gap: 5px;
+        font-size: 9px;
+    }
+
+    .ui-btn.ui-btn-sm i {
+        font-size: 8px;
+    }
+
+    .time-chip,
+    .service-badge {
+        min-height: 20px;
+        padding: 3px 6px;
+        gap: 4px;
+
+        font-size: 8px;
+        line-height: 1;
+
+        width: fit-content;
+        max-width: 100%;
+
+        white-space: nowrap;
+    }
+
+    .time-chip i {
+        font-size: 8px;
+    }
+
+    .global-info-pill {
+        min-height: 20px;
+        padding: 3px 6px;
+        gap: 4px;
+
+        font-size: 8px;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .global-info-pill i {
+        font-size: 8px;
+    }
+
+    .global-record-card {
+        border-radius: 13px;
+    }
+
+    .global-record-card::before {
+        top: 7px;
+        bottom: 7px;
+
+        width: 3px;
+    }
+
+    .global-record-card-body {
+        display: grid;
+
+        grid-template-columns:
+            minmax(0, 1fr) auto;
+
+        align-items: start;
+
+        gap:
+            .6rem .5rem;
+
+        padding:
+            .7rem .7rem .7rem .9rem;
+    }
+
+    .global-record-profile {
+        grid-column: 1 / -1;
+        width: 100%;
+        gap: .5rem;
+        flex: none;
+    }
+
+    .global-record-identity {
+        min-width: 0;
+    }
+
+    .global-record-name {
+        min-width: 0;
+
+        font-size: 11px;
+        line-height: 1.18;
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        overflow-wrap: normal;
+    }
+
+    .global-record-identity .ui-muted-text {
+        display: block;
+
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        font-size: 9.5px;
+    }
+
+    .global-record-subline {
+        gap: 4px;
+
+        margin-top: 4px;
+    }
+
+    .global-record-information {
+        grid-column: 1 / -1;
+
+        width: 100%;
+
+        grid-template-columns: 1fr;
+
+        gap: .45rem;
+
+        flex: none;
+    }
+
+    .global-record-information .global-info-item-inline {
+        display: grid;
+
+        grid-template-columns:
+            30px minmax(0, 1fr);
+
+        align-items: center;
+
+        gap: .5rem;
+
+        width: 100%;
+    }
+
+    .global-record-information .global-info-icon {
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+
+        flex: 0 0 30px;
+
+        border-radius: 9px;
+    }
+
+    .global-record-information .global-info-icon i {
+        font-size: 10px;
+    }
+
+    .global-record-information .global-info-copy {
+        min-width: 0;
+    }
+
+    .global-record-information .global-info-label {
+        font-size: 7.5px;
+        line-height: 1;
+
+        letter-spacing: .065em;
+    }
+
+    .global-record-information .global-info-value {
+        margin-top: 2px;
+
+        font-size: 10.5px;
+        line-height: 1.2;
+    }
+
+    .global-record-information .global-info-subvalue {
+        margin-top: 1px;
+
+        font-size: 9px;
+        line-height: 1.15;
+    }
+
+    .global-record-actions {
+        grid-column: 1 / -1;
+
+        width: 100%;
+
+        margin-left: 0;
+
+        justify-content: flex-end;
+
+        gap: 5px;
+    }
+
+    .ui-action-group {
+        gap: 5px;
+        flex-wrap: nowrap;
+    }
+
+    .ui-action-btn {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+
+        padding: 0;
+
+        border-radius: 10px;
+    }
+
+    .ui-action-group {
+        gap: 5px;
+        flex-wrap: nowrap;
+    }
+
+    .ui-action-btn {
+        --ui-action-size: clamp(30px, 8.5vw, 32px);
+
+        padding: 0;
+
+        border-radius: clamp(9px, 2.6vw, 10px);
+    }
+
+    .ui-action-btn i {
+        font-size: clamp(9.5px, 2.8vw, 10.5px);
+    }
+
+    .tab-btn-toggle {
+        padding: 7px 12px;
+        font-size: 11.5px;
+        gap: 6px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .btn-new-role {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .btn-collapse,
+    .btn-reset {
+        width: 100%;
+        min-height: 42px;
+        text-align: center;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+    }
+
+    .tab-group {
+        width: 100%;
+        display: flex;
+    }
+
+    .tab-btn {
+        flex: 1;
+        min-width: 0;
+        text-align: center;
+    }
+
+    .tab-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .tab-toggle-wrap {
+        width: fit-content;
+        max-width: 100%;
+        padding: 4px;
+        gap: 3px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .mobile-appt-card {
+        padding: .7rem;
+    }
+
+    .mobile-appt-card-head {
+        gap: .45rem;
+
+        margin-bottom: .5rem;
+    }
+
+    .mobile-patient-name {
+        font-size: 10.5px;
+    }
+
+    .appointment-grid-details {
+        padding: .52rem;
+
+        gap: .4rem .5rem;
+    }
+
+    .appointment-grid-detail {
+        gap: .22rem;
+    }
+
+    .appointment-grid-detail-label {
+        font-size: 6.5px;
+    }
+
+    .appointment-grid-details .global-info-value {
+        font-size: 9px;
+    }
+
+    .mobile-appt-actions {
+        margin-top: .45rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .badge-role {
+        min-height: 18px;
+        padding: .18rem .42rem;
+        font-size: .54rem;
+    }
+
+    .ui-btn.ui-btn-sm {
+        min-height: 26px;
+        padding: 0 8px;
+        font-size: 10px;
+    }
+
+    .ui-btn.ui-btn-sm i {
+        font-size: 8px;
+    }
+
+    .global-info-pill {
+        min-height: 18px;
+        padding: 2px 5px;
+        gap: 3px;
+        font-size: 7.5px;
+    }
+
+    .global-info-pill i {
+        font-size: 7px;
+    }
+
+    .global-record-card-body {
+        gap: .5rem;
+        padding: .62rem .62rem .62rem .82rem;
+    }
+
+    .global-record-profile {
+        gap: .45rem;
+    }
+
+    .global-record-name {
+        font-size: 10.5px;
+    }
+
+    .global-record-subline {
+        gap: 3px;
+        margin-top: 3px;
+    }
+
+    .global-record-information {
+        gap: .4rem;
+    }
+
+    .global-record-information .global-info-item-inline {
+        grid-template-columns: 28px minmax(0, 1fr);
+        gap: .45rem;
+    }
+
+    .global-record-information .global-info-icon {
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        flex-basis: 28px;
+        border-radius: 8px;
+    }
+
+    .global-record-information .global-info-icon i {
+        font-size: 9px;
+    }
+
+    .global-record-information .global-info-label {
+        font-size: 7px;
+    }
+
+    .global-record-information .global-info-value {
+        font-size: 10px;
+    }
+
+    .global-record-information .global-info-subvalue {
+        font-size: 8.5px;
+    }
+
+    .ui-action-group {
+        gap: 4px;
+    }
+
+    .ui-action-btn {
+        --ui-action-size: 30px;
+        border-radius: 9px;
+    }
+
+    .ui-action-btn i {
+        font-size: 10px;
+    }
+
+    .mobile-appt-card {
+        padding: .62rem;
+    }
+
+    .mobile-patient-name {
+        font-size: 10px;
+    }
+
+    .appointment-grid-details {
+        padding: .45rem;
+
+        gap: .35rem;
+    }
+
+    .appointment-grid-detail-label {
+        font-size: 6px;
+    }
+
+    .appointment-grid-details .global-info-value {
+        font-size: 8.5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .char-counter {
+        font-size: 9px;
+    }
+
+    .field-error {
+        font-size: 9.5px;
+        min-height: 12px;
+    }
+
+    .tab-strip {
+        grid-template-columns: 1fr 1fr;
+        gap: .55rem;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1180px) {
+    .ui-action-group {
+        gap: 5px;
+    }
+
+    .ui-action-btn {
+        --ui-action-size: clamp(34px, 4vw, 36px);
+
+        border-radius: 11px;
+    }
+
+    .ui-action-btn i {
+        font-size: 11px;
+    }
+
+    .mobile-appt-card {
+        padding: .85rem;
+    }
+
+    .mobile-patient-name {
+        font-size: 12.5px;
+    }
+
+    .appointment-grid-details {
+        padding: .7rem;
+
+        gap: .55rem .65rem;
+    }
+
+    .appointment-grid-detail-label {
+        font-size: 8px;
+    }
+
+    .appointment-grid-details .global-info-value {
+        font-size: 11px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1100px) {
+
+    .global-record-card-body {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: .75rem;
+        padding: .85rem 1rem .85rem 1.15rem;
+    }
+
+    .global-record-profile {
+        flex: 1 1 240px;
+        gap: .65rem;
+    }
+
+    .global-record-information {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: .65rem;
+        flex: 1 1 100%;
+    }
+
+    .global-record-information .global-info-item-inline {
+        gap: .55rem;
+    }
+
+    .global-record-information .global-info-icon {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        flex: 0 0 32px;
+        border-radius: 10px;
+    }
+
+    .global-record-information .global-info-icon i {
+        font-size: 11px;
+    }
+
+    .global-record-information .global-info-label {
+        font-size: 8px;
+    }
+
+    .global-record-information .global-info-value {
+        margin-top: 3px;
+        font-size: 11px;
+        line-height: 1.2;
+    }
+
+    .global-record-information .global-info-subvalue {
+        font-size: 9.5px;
+    }
+
+    .global-record-actions {
+        margin-left: auto;
+    }
 }

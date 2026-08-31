@@ -12,6 +12,7 @@ class AdminPatientController extends Controller
 {
     public function index()
     {
+        $isBookingMode = request()->routeIs('admin.book_appointments.*');
         $today = Carbon::today()->toDateString();
 
         $appointments = Appointment::with('patient')
@@ -79,9 +80,11 @@ class AdminPatientController extends Controller
         return view('shared.patient-list', [
             'layoutRole' => 'admin',
             'pageTitle' => 'Patient List',
-            'pageShellClass' => 'admin-page-shell',
+            'pageShellClass' => 'app-page-shell',
             'isDentistView' => false,
-            'patientProfileRouteName' => 'admin.admin.patient.profile',
+            'patientProfileRouteName' => $isBookingMode
+                ? 'admin.book_appointments.profile'
+                : 'admin.admin.patient.profile',
 
             'appointments' => $appointments,
             'todayCount' => $todayCount,
@@ -96,6 +99,8 @@ class AdminPatientController extends Controller
 
     public function show(Patient $patient)
     {
+        $isBookingMode = request()->routeIs('admin.book_appointments.*');
+
         $patient->loadMissing([
             'user',
             'odontogram',
@@ -149,6 +154,7 @@ class AdminPatientController extends Controller
             'notifications' => $notifications,
             'profileLayout' => 'layouts.admin',
             'profileMode' => 'admin',
+            'bookingMode' => $isBookingMode,
         ]);
     }
 }

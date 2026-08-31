@@ -170,11 +170,8 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
 ];
 @endphp
 
-<main id="mainContent" class="{{ $isDentist ? 'dentist-page-shell' : 'admin-page-shell' }}
-           page-enter
-           docreq-page
-           mode-list" data-document-request-role="{{ $role }}">
-    <div class="w-full">
+<main id="mainContent" class="app-page-shell page-enter docreq-page mode-list" data-document-request-role="{{ $role }}">
+    <div>
 
         <div class="docreq-header-wrap mb-5">
             @if ($isDentist)
@@ -208,73 +205,79 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
             @endif
         </div>
 
-        <div class="table-card docreq-table-card">
+        <div class="table-card">
 
-            <div class="docreq-toolbar-layer px-4 md:px-6 py-3.5 border-b border-gray-100 bg-[#FAFAFA]/50">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="table-toolbar">
 
-                    <div class="order-2 md:order-1">
-                        <span id="rowCount"
-                            class="text-[11px] md:text-sm font-bold text-gray-400 uppercase tracking-wider">
-                            {{ $docRequestStats['all'] }} requests
-                        </span>
-                    </div>
+                <div class="table-toolbar-search">
+                    <div class="voice-search-row">
+                        <x-search-bar id="searchInput" placeholder="Search document"
+                            callback="handleDocumentRequestSearch" :debounce="350" />
 
-                    <div
-                        class="docreq-toolbar-actions flex items-center gap-2 order-1 md:order-2 w-full md:w-auto justify-end">
-
-                        <div class="docreq-search-wrap flex-1 md:flex-none flex items-center gap-2">
-                            <x-search-bar id="searchInput" placeholder="Search document…"
-                                callback="handleDocumentRequestSearch" :debounce="350" class="flex-1 md:w-64" />
-
-                            <x-voice-input target="#searchInput" status-id="patientSearchVoiceStatus"
-                                label="Use voice search" title="Voice search" />
-                        </div>
-
-                        <x-filter-select id="docreqStatusFilter" name="document_request_status" label="Status"
-                            value="all" :options="$docRequestStatusOptions"
-                            callback="handleDocumentRequestStatusSelect" />
-
-                        <button id="filterBtn" type="button" onclick="openFilterModal()" class="global-filter-btn">
-                            <i class="fa-solid fa-sliders"></i>
-                            <span>Filter</span>
-                            <span id="filterBadge" class="filter-badge" style="display:none;"></span>
-                        </button>
-
-                        <x-view-toggle id="documentRequestsViewToggle" root="#mainContent"
-                            storage-key="documentRequestsViewMode" list-view="#requestListContainer"
-                            grid-view="#requestGridContainer" list-label="List" grid-label="Grid" />
-
-                        <button id="externalClearFilterBtn" type="button" onclick="resetAdvancedFilters()"
-                            class="global-filter-reset-btn hidden" title="Reset filters">
-                            <i class="fa-solid fa-rotate-left"></i>
-                        </button>
+                        <x-voice-input target="#searchInput" status-id="documentRequestVoiceStatus"
+                            label="Use voice search" title="Voice search" />
                     </div>
                 </div>
+
+                <div class="table-toolbar-actions">
+                    <x-filter-select id="docreqStatusFilter" name="document_request_status" label="Status" value="all"
+                        :options="$docRequestStatusOptions" callback="handleDocumentRequestStatusSelect" />
+
+                    <button id="filterBtn" type="button" onclick="openFilterModal()" class="global-filter-btn"
+                        data-tooltip="Filter" data-tooltip-tone="neutral" aria-label="Filter requests">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span>Filter</span>
+                        <span id="filterBadge" class="filter-badge" style="display:none;"></span>
+                    </button>
+
+                    <x-view-toggle id="documentRequestsViewToggle" root="#mainContent"
+                        storage-key="documentRequestsViewMode" list-label="List" grid-label="Grid" />
+
+                    <button id="externalClearFilterBtn" type="button" onclick="resetAdvancedFilters()"
+                        class="global-filter-reset-btn hidden" aria-label="Reset filters" data-tooltip="Reset filters"
+                        data-tooltip-tone="neutral">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                </div>
+
             </div>
 
             <x-pagination-bar id="docreqPaginationTopBar" info-id="pageInfoTop" pagination-id="pagControlsTop"
                 position="top" :show-entries="true" page-size-id="docreqPerPageSelect"
                 page-size-callback="selectDocreqPerPage" :page-size-value="$perPage" page-size-label="per page"
-                label="entries" class="docreq-pagebar docreq-pagebar-top" />
+                label="requests" class="docreq-pagebar docreq-pagebar-top" />
 
-            <div id="docreqTableHead" class="table-list-header docreq-table-head hidden md:grid gap-3 py-3.5 px-6">
-                <div class="text-left">Patient</div>
-                <div class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-[10px]"></i>Date
-                    Requested</div>
-                <div class="text-left">Document</div>
-                <div class="text-left">Purpose</div>
-                <div class="text-left">Status</div>
-                <div class="text-right">Actions</div>
+            <div id="requestListView" class="table-list-view">
+                <div class="table-scroll-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Date Requested</th>
+                                <th>Document</th>
+                                <th>Purpose</th>
+                                <th>Status</th>
+                                <th class="table-cell-center">
+                                    Actions
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="requestListContainer">
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <div id="requestListContainer" class="docreq-list-container"></div>
-            <div id="requestGridContainer" class="docreq-grid requests-grid"></div>
+            <div id="requestGridView" class="table-grid-view" hidden>
+                <div id="requestGridContainer" class="table-record-grid">
+                </div>
+            </div>
 
             <div id="docreqEmptyState" class="empty-state-host"></div>
 
             <x-pagination-bar id="docreqPaginationBottomBar" info-id="pageInfo" pagination-id="pagControls"
-                position="bottom" :page-size-value="$perPage" label="entries" />
+                position="bottom" :page-size-value="$perPage" label="requests" />
 
         </div>
     </div>
@@ -321,46 +324,18 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
 
     <x-filter-group title="Document Details">
 
-        <input type="hidden" id="fDocType" value="">
+        <div data-global-selects>
+            <select id="fDocType" class="js-custom-select" aria-label="Document type">
+                <option value="">
+                    All document types
+                </option>
 
-        <div id="docTypeSelect" class="docreq-custom-select docreq-filter-select">
-            <button type="button" class="docreq-select-button" data-select-button aria-haspopup="listbox"
-                aria-expanded="false" aria-controls="docTypeSelectMenu" onclick="toggleDocreqDropdown('docTypeSelect')">
-                <span class="docreq-select-leading">
-                    <i class="fa-regular fa-file-lines"></i>
-                </span>
-
-                <span class="docreq-select-text">
-                    <span>Document type</span>
-
-                    <strong id="docTypeSelectLabel">
-                        All document types
-                    </strong>
-                </span>
-
-                <i class="fa-solid fa-chevron-down docreq-select-chevron"></i>
-            </button>
-
-            <div id="docTypeSelectMenu" class="docreq-select-menu docreq-doc-type-menu" role="listbox">
-                <button type="button" class="docreq-select-option doc-type-option active" data-value=""
-                    onclick="setDocTypeFilter('', 'All document types')">
-                    <span class="docreq-option-icon doc-type-all">
-                        <i class="fa-solid fa-layer-group"></i>
-                    </span>
-
-                    <span class="docreq-option-copy">
-                        <strong>
-                            All document types
-                        </strong>
-
-                        <small>
-                            No document type filter
-                        </small>
-                    </span>
-
-                    <i class="fa-solid fa-check docreq-option-check"></i>
-                </button>
-            </div>
+                @foreach ($docRequestTypes as $type)
+                <option value="{{ $type }}">
+                    {{ $type }}
+                </option>
+                @endforeach
+            </select>
         </div>
 
     </x-filter-group>
@@ -448,7 +423,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                 <div class="global-info-profile-copy">
                     <span class="global-info-label">Patient</span>
 
-                    <strong id="approvePatientName" class="global-info-profile-name">
+                    <strong id="approvePatientName" class="global-info-profile-name" data-patient-name>
                         —
                     </strong>
                 </div>
@@ -554,7 +529,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                     <div class="global-info-profile-copy">
                         <span class="global-info-label">Patient</span>
 
-                        <strong id="rejectPatientName" class="global-info-profile-name">
+                        <strong id="rejectPatientName" class="global-info-profile-name" data-patient-name>
                             —
                         </strong>
                     </div>
@@ -665,6 +640,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
     let docreqRefreshWatcher = null;
 
     let searchQuery = '';
+    let currentViewMode = 'list';
 
     const DOCREQ_ROUTES = @json($routes ?? []);
     const DOCREQ_METHODS = @json($methods ?? []);
@@ -755,8 +731,10 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
             });
         });
 
-        updateStats(recalculateDocreqStats());
-        renderDocTypeOptions(documentTypeOptions);
+        updateStats(
+            recalculateDocreqStats()
+        );
+
         renderList();
     }
 
@@ -785,10 +763,6 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                             request.document_type
                     )
             );
-
-        renderDocTypeOptions(
-            documentTypeOptions
-        );
 
         updateStats(
             payload.stats ||
@@ -864,23 +838,41 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
     }
 
     function loadData() {
-        allRequests = Array.isArray(ADMIN_DOC_REQUESTS) ?
-            ADMIN_DOC_REQUESTS.map(normalizeDocreqRequest) :
-            [];
+        allRequests =
+            Array.isArray(ADMIN_DOC_REQUESTS)
+                ? ADMIN_DOC_REQUESTS.map(
+                    normalizeDocreqRequest
+                )
+                : [];
 
-        documentTypeOptions = normalizeDocTypes(
-            Array.isArray(ADMIN_DOC_TYPES) && ADMIN_DOC_TYPES.length ?
-                ADMIN_DOC_TYPES :
-                allRequests.map(request => request.document_type)
-        );
+        documentTypeOptions =
+            normalizeDocTypes(
+                Array.isArray(ADMIN_DOC_TYPES) &&
+                    ADMIN_DOC_TYPES.length
+                    ? ADMIN_DOC_TYPES
+                    : allRequests.map(
+                        request =>
+                            request.document_type
+                    )
+            );
 
-        if (filterDocType && !documentTypeOptions.includes(filterDocType)) {
+        if (
+            filterDocType &&
+            !documentTypeOptions.includes(
+                filterDocType
+            )
+        ) {
             filterDocType = '';
         }
 
-        renderDocTypeOptions(documentTypeOptions);
-        updateStats(ADMIN_DOC_STATS || {});
-        renderDocreqPagebars(docreqPagination);
+        updateStats(
+            ADMIN_DOC_STATS || {}
+        );
+
+        renderDocreqPagebars(
+            docreqPagination
+        );
+
         renderList();
     }
 
@@ -965,93 +957,72 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
         ).join('');
     }
 
+    function buildDocRequestListSkeletonHtml(
+        count = 4
+    ) {
+        return Array.from(
+            { length: count },
+            () => `
+            <tr>
+                <td colspan="6">
+                    <div
+                        class="
+                            skeleton-shell
+                            docreq-skeleton-row
+                        "
+                    >
+                    </div>
+                </td>
+            </tr>
+        `
+        ).join('');
+    }
+
     function showSkeleton() {
+        const listView =
+            document.getElementById('requestListView');
+
+        const gridView =
+            document.getElementById('requestGridView');
+
         const listContainer =
-            document.getElementById(
-                'requestListContainer'
-            );
+            document.getElementById('requestListContainer');
 
         const gridContainer =
-            document.getElementById(
-                'requestGridContainer'
-            );
+            document.getElementById('requestGridContainer');
 
-        const tableHead =
-            document.getElementById(
-                'docreqTableHead'
-            );
+        const isGrid =
+            document
+                .getElementById('mainContent')
+                ?.classList
+                .contains('mode-grid');
 
-        const isMobile =
-            window.innerWidth <= 767;
-
-        const useGrid =
-            currentViewMode === 'grid' &&
-            !isMobile;
 
         const skeletonHtml =
             buildDocRequestSkeletonHtml(
-                useGrid ? 6 : 4
+                isGrid ? 6 : 4
             );
 
-        if (tableHead) {
-            tableHead.style.display =
-                useGrid || isMobile
-                    ? 'none'
+        if (listView) {
+            listView.hidden = isGrid;
+        }
+
+        if (gridView) {
+            gridView.hidden = !isGrid;
+        }
+
+        if (listContainer) {
+            listContainer.innerHTML =
+                isGrid
+                    ? ''
+                    : buildDocRequestListSkeletonHtml(4);
+        }
+
+        if (gridContainer) {
+            gridContainer.innerHTML =
+                isGrid
+                    ? buildDocRequestSkeletonHtml(6)
                     : '';
-        }
-
-        if (useGrid) {
-            if (listContainer) {
-                listContainer.innerHTML = '';
-                listContainer.style.display = 'none';
-                listContainer.classList.remove(
-                    'docreq-skeleton-list'
-                );
-            }
-
-            if (gridContainer) {
-                gridContainer.innerHTML =
-                    skeletonHtml;
-
-                gridContainer.style.display =
-                    'grid';
-
-                gridContainer.classList.add(
-                    'docreq-skeleton-grid'
-                );
-            }
-        } else {
-            if (gridContainer) {
-                gridContainer.innerHTML = '';
-                gridContainer.style.display =
-                    'none';
-
-                gridContainer.classList.remove(
-                    'docreq-skeleton-grid'
-                );
-            }
-
-            if (listContainer) {
-                listContainer.innerHTML =
-                    skeletonHtml;
-
-                listContainer.style.display =
-                    'grid';
-
-                listContainer.classList.add(
-                    'docreq-skeleton-list'
-                );
-            }
-        }
-
-        const rowCount =
-            document.getElementById(
-                'rowCount'
-            );
-
-        if (rowCount) {
-            rowCount.textContent =
-                'Loading requests…';
         }
     }
 
@@ -1204,7 +1175,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
         const dateFrom = document.getElementById('fDateFrom');
         const dateTo = document.getElementById('fDateTo');
 
-        setCustomSelectValue('docTypeSelect', '');
+        setDocTypeSelectValue('');
         if (dateFrom) dateFrom.value = '';
         if (dateTo) dateTo.value = '';
 
@@ -1228,7 +1199,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
             window.syncFilterTagGroup('fSortGroup', 'newest');
         }
 
-        setCustomSelectValue('docTypeSelect', '');
+        setDocTypeSelectValue('');
 
         const dateFrom = document.getElementById('fDateFrom');
         const dateTo = document.getElementById('fDateTo');
@@ -1298,7 +1269,6 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
 
             if (Array.isArray(data.types)) {
                 documentTypeOptions = normalizeDocTypes(data.types);
-                renderDocTypeOptions(documentTypeOptions);
             }
 
             if (data.stats) {
@@ -1329,7 +1299,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
             renderList();
             renderFilterChips();
             const activeContainer =
-                currentViewMode === 'grid' && window.innerWidth > 767
+                currentViewMode === 'grid'
                     ? document.getElementById('requestGridContainer')
                     : document.getElementById('requestListContainer');
 
@@ -1357,143 +1327,130 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
         }
     }
 
-    function updateDocreqRowCount() {
-        const rowCount =
-            document.getElementById(
-                'rowCount'
-            );
-
-        if (!rowCount) {
-            return;
-        }
-
-        const total =
-            Number(
-                docreqPagination?.total ??
-                allRequests.length ??
-                0
-            );
-
-        rowCount.textContent =
-            `${total} ${total === 1
-                ? 'request'
-                : 'requests'
-            }`;
-    }
-
     function renderList() {
         const page = getFiltered();
-        const tableHead = document.getElementById('docreqTableHead');
-        const isMobile = window.innerWidth <= 767;
+
+        const tableHead =
+            document.getElementById('docreqTableHead');
+
+        const listView =
+            document.getElementById('requestListView');
+
+        const gridView =
+            document.getElementById('requestGridView');
+
+        const listContainer =
+            document.getElementById('requestListContainer');
+
+        const gridContainer =
+            document.getElementById('requestGridContainer');
 
         renderDocreqPagebars(docreqPagination);
-        updateDocreqRowCount();
-
-        const listContainer = document.getElementById('requestListContainer');
-        const gridContainer = document.getElementById('requestGridContainer');
-
-        if (listContainer) {
-            listContainer.innerHTML = '';
-
-            listContainer.classList.remove(
-                'docreq-skeleton-list'
-            );
-        }
-
-        if (gridContainer) {
-            gridContainer.innerHTML = '';
-
-            gridContainer.classList.remove(
-                'docreq-skeleton-grid'
-            );
-        }
 
         if (!page.length) {
             if (tableHead) {
-                tableHead.style.display =
-                    'none';
+                tableHead.hidden = true;
+            }
+
+            if (listView) {
+                listView.hidden = true;
+            }
+
+            if (gridView) {
+                gridView.hidden = true;
             }
 
             if (listContainer) {
-                listContainer.style.display =
-                    'none';
-
-                listContainer.innerHTML =
-                    '';
+                listContainer.innerHTML = '';
             }
 
             if (gridContainer) {
-                gridContainer.style.display =
-                    'none';
-
-                gridContainer.innerHTML =
-                    '';
+                gridContainer.innerHTML = '';
             }
 
             renderDocreqEmptyState();
 
             return;
         }
-        window.EmptyState?.hide(
-            '#docreqEmptyState'
-        );
 
-        if (isMobile) {
-            if (tableHead) tableHead.style.display = 'none';
+        window.EmptyState?.hide('#docreqEmptyState');
 
-            if (gridContainer) {
-                gridContainer.style.display = 'none';
-                gridContainer.innerHTML = '';
-            }
 
-            if (listContainer) {
-                listContainer.style.display = 'flex';
-                listContainer.innerHTML = page.map(r => buildMobileCard(r)).join('');
-            }
-        } else if (currentViewMode === 'grid') {
-            if (tableHead) tableHead.style.display = 'none';
+        /*
+         * Render BOTH views.
+         * Do not destroy the inactive view.
+         */
 
-            if (listContainer) {
-                listContainer.style.display = 'none';
-                listContainer.innerHTML = '';
-            }
-
-            if (gridContainer) {
-                gridContainer.style.display = 'grid';
-                gridContainer.innerHTML = page.map(r => buildGridCard(r)).join('');
-            }
-        } else {
-            if (tableHead) {
-                tableHead.style.display = '';
-            }
-
-            if (gridContainer) {
-                gridContainer.style.display = 'none';
-                gridContainer.innerHTML = '';
-            }
-
-            if (listContainer) {
-                listContainer.style.display = 'flex';
-                listContainer.innerHTML = page
+        if (listContainer) {
+            listContainer.innerHTML =
+                page
                     .map(request => buildDesktopRow(request))
                     .join('');
-            }
+        }
+
+        if (gridContainer) {
+            gridContainer.innerHTML =
+                page
+                    .map(request => buildGridCard(request))
+                    .join('');
+        }
+
+
+        syncDocumentRequestView();
+    }
+
+    function syncDocumentRequestView() {
+        const mainContent =
+            document.getElementById(
+                'mainContent'
+            );
+
+        const listView =
+            document.getElementById(
+                'requestListView'
+            );
+
+        const gridView =
+            document.getElementById(
+                'requestGridView'
+            );
+
+        if (!mainContent) {
+            return;
+        }
+
+        const isGrid =
+            mainContent.classList.contains(
+                'mode-grid'
+            );
+
+        if (listView) {
+            listView.hidden = isGrid;
+        }
+
+        if (gridView) {
+            gridView.hidden = !isGrid;
         }
     }
 
     function getPatientDisplayName(name) {
-        const raw = String(name || '').trim();
+        const rawName =
+            String(
+                name ||
+                'Unknown Patient'
+            ).trim();
 
-        if (raw.includes(',')) {
-            const [lastName, firstPart] = raw.split(',').map(part => part.trim());
-            return `${firstPart} ${lastName}`.replace(/\s+/g, ' ').trim();
-        }
-
-        return raw;
+        return (
+            window.formatPatientName?.(
+                rawName
+            ) ||
+            rawName
+        );
     }
 
     function buildPatientAvatar(
-        request
+        request,
+        size = 'md'
     ) {
         const displayName =
             getPatientDisplayName(
@@ -1520,7 +1477,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                         '',
 
                     size:
-                        'md',
+                        size,
 
                     escapeHtml:
                         esc,
@@ -1594,37 +1551,48 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
     }
 
     function buildDesktopRow(r) {
-        const accentHex = getDocumentAccent(r.status);
-        const badgeCls = getStatusBadgeClass(r.status);
-        const statusLabel = getStatusLabel(r.status);
-        const displayName = getPatientDisplayName(r.patient_name);
-        const avatarHtml = buildPatientAvatar(r);
-        const identifier = r.sub_label ?
-            esc(r.sub_label) :
-            'No ID set';
+        const badgeCls =
+            getStatusBadgeClass(r.status);
+
+        const statusLabel =
+            getStatusLabel(r.status);
+
+        const displayName =
+            getPatientDisplayName(
+                r.patient_name
+            );
+
+        const avatarHtml =
+            buildPatientAvatar(
+                r,
+                'sm'
+            );
+
+        const identifier =
+            r.sub_label
+                ? esc(r.sub_label)
+                : 'No ID set';
 
         return `
-        <article
-            class="global-record-card desktop-req-row"
+        <tr
             id="row-d-${r.id}"
-            onclick="selectDocumentCard('d', ${r.id})"
-            style="--record-accent:${accentHex};">
-
-            <div class="global-record-card-body">
-
-                <div class="global-record-profile">
+            onclick="
+                selectDocumentCard(
+                    'd',
+                    ${r.id}
+                )
+            "
+        >
+            <td class="table-cell-main">
+                <div class="table-primary">
                     ${avatarHtml}
 
-                    <div class="global-record-identity">
-                        <div class="global-record-name">
+                    <div>
+                        <strong data-patient-name>
                             ${esc(displayName)}
-                        </div>
+                        </strong>
 
-                        <div class="global-record-subline">
-                            <span class="status-badge ${badgeCls}">
-                                ${statusLabel}
-                            </span>
-
+                        <div>
                             <span class="global-info-pill">
                                 <i class="fa-regular fa-id-card"></i>
                                 ${identifier}
@@ -1632,174 +1600,150 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                         </div>
                     </div>
                 </div>
+            </td>
 
-                <div class="global-record-information">
-
-                    <div class="global-info-item global-info-item-inline">
-                        <div class="global-info-icon ${badgeCls}">
-                            <i class="fa-regular fa-calendar"></i>
-                        </div>
-
-                        <div class="global-info-copy">
-                            <span class="global-info-label">
-                                Date &amp; Time Requested
-                            </span>
-
-                            <strong class="global-info-value">
-                                ${esc(r.request_date)}
-                            </strong>
-
-                            <small class="global-info-subvalue">
-                                ${esc(r.request_time)}
-                            </small>
-                        </div>
-                    </div>
-
-                    <div class="global-info-item global-info-item-inline">
-                        <div class="global-info-icon ${badgeCls}">
-                            <i class="fa-regular fa-file-lines"></i>
-                        </div>
-
-                        <div class="global-info-copy">
-                            <span class="global-info-label">
-                                Document
-                            </span>
-
-                            <strong class="global-info-value">
-                                ${esc(r.document_type)}
-                            </strong>
-                        </div>
-                    </div>
-
-                    <div class="global-info-item global-info-item-inline">
-                        <div class="global-info-icon ${badgeCls}">
-                            <i class="fa-solid fa-message"></i>
-                        </div>
-
-                        <div class="global-info-copy">
-                            <span class="global-info-label">
-                                Purpose
-                            </span>
-
-                            <strong class="global-info-value">
-                                ${esc(r.purpose)}
-                            </strong>
-                        </div>
-                    </div>
-
+            <td class="table-cell-main">
+                <div class="table-date">
+                    <i class="fa-regular fa-calendar"></i>
+                    ${esc(r.request_date)}
                 </div>
 
-                <div class="global-record-actions">
-                    ${buildRequestActions(r)}
+                <div class="table-date">
+                    <i class="fa-regular fa-clock"></i>
+                    ${esc(r.request_time)}
                 </div>
+            </td>
 
-            </div>
-        </article>
+            <td class="table-cell-main">
+                <strong>
+                    ${esc(r.document_type)}
+                </strong>
+            </td>
+
+            <td class="table-cell-main">
+                ${esc(r.purpose)}
+            </td>
+
+            <td>
+                <span class="status-badge ${badgeCls}">
+                    ${statusLabel}
+                </span>
+            </td>
+
+            <td class="table-action-cell">
+                ${buildRequestActions(r)}
+            </td>
+        </tr>
     `;
     }
 
     function buildGridCard(r) {
-        const accentHex = getDocumentAccent(r.status);
-        const badgeCls = getStatusBadgeClass(r.status);
-        const statusLabel = getStatusLabel(r.status);
-        const displayName = getPatientDisplayName(r.patient_name);
-        const avatarHtml = buildPatientAvatar(r);
-        const identifier = r.sub_label ?
-            esc(r.sub_label) :
-            'No ID set';
+        const badgeCls =
+            getStatusBadgeClass(r.status);
+
+        const statusLabel =
+            getStatusLabel(r.status);
+
+        const displayName =
+            getPatientDisplayName(
+                r.patient_name
+            );
+
+        const avatarHtml =
+            buildPatientAvatar(
+                r,
+                'sm'
+            );
+
+        const identifier =
+            r.sub_label
+                ? esc(r.sub_label)
+                : 'No ID set';
 
         return `
         <article
-            class="
-                global-record-card
-                global-record-card--grid
-            "
+            class="table-record-card"
             id="row-g-${r.id}"
             onclick="selectDocumentCard('g', ${r.id})"
-            style="--record-accent:${accentHex};">
+        >
+            <div class="table-record-card-layout">
 
-            <div class="global-record-card-grid">
-                
-                <span class="status-badge global-record-grid-status ${badgeCls}">
-                    ${statusLabel}
-                </span>
+                <div class="table-record-content">
 
-                <div class="global-record-profile">
-                    ${avatarHtml}
+                    <div class="table-record-header">
 
-                    <div class="global-record-identity">
-                        <div class="global-record-name">
-                            ${esc(displayName)}
+                        <div class="table-primary">
+                            ${avatarHtml}
+
+                            <div
+                                class="table-record-title"
+                                data-patient-name
+                            >
+                                ${esc(displayName)}
+                            </div>
                         </div>
 
-                        <div class="global-record-subline">
-                            <span class="global-info-pill">
-                                <i class="fa-regular fa-id-card"></i>
-                                ${identifier}
-                            </span>
-                        </div>
-                    </div>
-                </div>
+                        <span class="status-badge ${badgeCls}">
+                            ${statusLabel}
+                        </span>
 
-                <div class="global-info-grid">
-
-                    <div class="global-info-item">
-                        <div class="global-info-icon ${badgeCls}">
-                            <i class="fa-regular fa-calendar"></i>
-                        </div>
-
-                        <div class="global-info-copy">
-                            <span class="global-info-label">
-                                Date &amp; Time Requested
-                            </span>
-
-                            <strong class="global-info-value">
-                                ${esc(r.request_date)}
-                            </strong>
-
-                            <small class="global-info-subvalue">
-                                ${esc(r.request_time)}
-                            </small>
-                        </div>
                     </div>
 
-                    <div class="global-info-item">
-                        <div class="global-info-icon ${badgeCls}">
-                            <i class="fa-regular fa-file-lines"></i>
-                        </div>
+                    <span class="global-info-pill">
+                        <i class="fa-regular fa-id-card"></i>
+                        ${identifier}
+                    </span>
 
-                        <div class="global-info-copy">
-                            <span class="global-info-label">
+                    <div class="table-record-meta">
+
+                        <div class="table-record-row">
+                            <span class="table-record-label">
                                 Document
                             </span>
 
-                            <strong class="global-info-value">
+                            <span class="table-record-value">
                                 ${esc(r.document_type)}
-                            </strong>
-                        </div>
-                    </div>
-
-                    <div class="global-info-item">
-                        <div class="global-info-icon ${badgeCls}">
-                            <i class="fa-solid fa-message"></i>
+                            </span>
                         </div>
 
-                        <div class="global-info-copy">
-                            <span class="global-info-label">
-                                Purpose
+                        <div class="table-record-row">
+                            <span class="table-record-label">
+                                Requested
                             </span>
 
-                            <strong class="global-info-value">
-                                ${esc(r.purpose)}
-                            </strong>
+                            <span class="table-record-value">
+                                <span class="table-date">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    ${esc(r.request_date)}
+                                </span>
+                            </span>
                         </div>
+
+                        <div class="table-record-row">
+                            <span class="table-record-label">
+                                Time
+                            </span>
+
+                            <span class="table-record-value">
+                                <span class="table-date">
+                                    <i class="fa-regular fa-clock"></i>
+                                    ${esc(r.request_time)}
+                                </span>
+                            </span>
+                        </div>
+
                     </div>
 
                 </div>
 
-                <div class="global-record-footer">
-                    ${buildRequestActions(r)}
-                </div>
+                ${normalizeDocreqStatus(r.status) === 'pending'
+                ? `
+                            <div class="table-record-actions">
+                                ${buildRequestActions(r)}
+                            </div>
+                        `
+                : ''
+            }
 
             </div>
         </article>
@@ -1954,63 +1898,6 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
             message:
                 'Incoming patient document requests will appear here once submitted.',
         });
-    }
-
-    function buildMobileCard(r) {
-        const accentHex = getDocumentAccent(r.status);
-        const badgeCls = getStatusBadgeClass(r.status);
-        const statusLabel = getStatusLabel(r.status);
-        const displayName = getPatientDisplayName(r.patient_name);
-        const patientArg = jsStringArg(displayName);
-        const avatarHtml = buildPatientAvatar(r, 'docreq-mobile-avatar');
-        const identifier = r.sub_label ?
-            esc(r.sub_label) :
-            'No identity number';
-
-        const rowClick = `selectDocumentCard('m', ${r.id})`;
-        const mobileActions = buildRequestActions(r, 'mobile');
-
-        return `
-        <article class="docreq-mobile-card" id="row-m-${r.id}" onclick="${rowClick}" style="--card-accent:${accentHex};">
-            <div class="docreq-mobile-head">
-                <div class="docreq-mobile-profile">
-                    ${avatarHtml}
-
-                    <div class="docreq-mobile-person">
-                        <div class="mobile-patient-name">${esc(displayName)}</div>
-                        <span class="docreq-id-pill mobile-sub-label">${identifier}</span>
-                    </div>
-                </div>
-
-                <span class="status-badge docreq-card-status ${badgeCls}">${statusLabel}</span>
-            </div>
-
-            <div class="docreq-mobile-meta">
-    <div class="wide docreq-mobile-date-time">
-        <i class="fa-regular fa-calendar"></i>
-        <span>Date & Time Requested</span>
-        <strong>${esc(r.request_date)}</strong>
-        <small class="docreq-mobile-subvalue">${esc(r.request_time)}</small>
-    </div>
-
-    <div class="wide">
-        <i class="fa-regular fa-file-lines"></i>
-        <span>Document</span>
-        <strong>${esc(r.document_type)}</strong>
-    </div>
-
-    <div class="wide">
-        <i class="fa-solid fa-message"></i>
-        <span>Purpose</span>
-        <strong>${esc(r.purpose)}</strong>
-    </div>
-</div>
-
-            <div class="docreq-mobile-footer docreq-mobile-footer-actions">
-    ${mobileActions}
-</div>
-        </article>
-    `;
     }
 
     function handleDesktopAccordionClick(event, id) {
@@ -2233,7 +2120,7 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                 ),
             ],
 
-            itemLabel: 'entries',
+            itemLabel: 'requests',
 
             onPageChange(page) {
                 currentPage = page;
@@ -2271,45 +2158,6 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
 
     window.docreqGoPage = docreqGoPage;
 
-    function toggleDocreqDropdown(selectId) {
-        const wrap = document.getElementById(selectId);
-        if (!wrap) return;
-
-        const isOpen = wrap.classList.contains('open');
-        closeDocreqDropdowns();
-
-        if (!isOpen) {
-            wrap.classList.add('open');
-            wrap.querySelector('[data-select-button]')?.setAttribute('aria-expanded', 'true');
-        }
-    }
-
-    function closeDocreqDropdowns() {
-        document.querySelectorAll('.docreq-custom-select.open').forEach((wrap) => {
-            wrap.classList.remove('open');
-            wrap.querySelector('[data-select-button]')?.setAttribute('aria-expanded', 'false');
-        });
-    }
-
-    function setCustomSelectValue(selectId, value, label = null) {
-        const wrap = document.getElementById(selectId);
-        if (!wrap) return;
-
-        const hiddenInput = selectId === 'docTypeSelect' ? document.getElementById('fDocType') : null;
-        const selected = wrap.querySelector(`.docreq-select-option[data-value="${CSS.escape(value)}"]`);
-        const finalLabel = label || selected?.querySelector('.docreq-option-copy strong')?.textContent ||
-            'All document types';
-
-        if (hiddenInput) hiddenInput.value = value;
-
-        wrap.querySelectorAll('.docreq-select-option').forEach((option) => {
-            option.classList.toggle('active', option.getAttribute('data-value') === value);
-        });
-
-        const labelEl = document.getElementById(`${selectId}Label`);
-        if (labelEl) labelEl.textContent = finalLabel;
-    }
-
     function formatDocTypeLabel(type = '') {
         return String(type || '')
             .replace(/[_-]+/g, ' ')
@@ -2344,109 +2192,19 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
         return Array.from(typeMap.values());
     }
 
-    function getDocTypeIcon(type = '') {
-        const text = String(type).toLowerCase();
+    function setDocTypeSelectValue(value = '') {
+        const select =
+            document.getElementById('fDocType');
 
-        if (text.includes('annual')) return 'fa-file-signature';
-        if (text.includes('clearance')) return 'fa-clipboard-check';
-        if (text.includes('record')) return 'fa-folder-open';
-        if (text.includes('certificate')) return 'fa-certificate';
-        if (text.includes('case')) return 'fa-briefcase-medical';
-        if (text.includes('treatment')) return 'fa-notes-medical';
-        if (text.includes('referral')) return 'fa-envelope-open-text';
+        if (!select) return;
 
-        return 'fa-file-lines';
-    }
+        select.value = value;
 
-    function getDocTypeTone(type = '') {
-        const tones = [
-            'doc-type-blue',
-            'doc-type-orange',
-            'doc-type-green',
-            'doc-type-red',
-            'doc-type-purple',
-            'doc-type-cyan',
-            'doc-type-amber'
-        ];
-
-        const text = String(type || 'Document');
-        let hash = 0;
-
-        for (let i = 0; i < text.length; i++) {
-            hash = ((hash << 5) - hash) + text.charCodeAt(i);
-            hash |= 0;
-        }
-
-        return tones[Math.abs(hash) % tones.length];
-    }
-
-    function createDocTypeOption(value, label, isAll = false) {
-        const button = document.createElement('button');
-
-        button.type = 'button';
-        button.className = 'docreq-select-option doc-type-option';
-        button.dataset.value = value;
-        button.setAttribute('role', 'option');
-
-        button.addEventListener('click', () => {
-            setDocTypeFilter(value, label);
-        });
-
-        const iconWrap = document.createElement('span');
-        iconWrap.className = `docreq-option-icon ${isAll ? 'doc-type-all' : getDocTypeTone(label)}`;
-
-        const icon = document.createElement('i');
-        icon.className = `fa-solid ${isAll ? 'fa-layer-group' : getDocTypeIcon(label)}`;
-        iconWrap.appendChild(icon);
-
-        const copy = document.createElement('span');
-        copy.className = 'docreq-option-copy';
-
-        const strong = document.createElement('strong');
-        strong.textContent = label;
-
-        const small = document.createElement('small');
-        small.textContent = isAll ? 'No document type filter' : 'From document requests';
-
-        copy.appendChild(strong);
-        copy.appendChild(small);
-
-        const check = document.createElement('i');
-        check.className = 'fa-solid fa-check docreq-option-check';
-
-        button.appendChild(iconWrap);
-        button.appendChild(copy);
-        button.appendChild(check);
-
-        return button;
-    }
-
-    function renderDocTypeOptions(types = []) {
-        const menu = document.getElementById('docTypeSelectMenu');
-        if (!menu) return;
-
-        const cleanTypes = normalizeDocTypes(types);
-
-        menu.innerHTML = '';
-        menu.appendChild(createDocTypeOption('', 'All document types', true));
-
-        cleanTypes.forEach(type => {
-            menu.appendChild(createDocTypeOption(type, type));
-        });
-
-        setCustomSelectValue(
-            'docTypeSelect',
-            filterDocType,
-            filterDocType || 'All document types'
+        select.dispatchEvent(
+            new Event('change', {
+                bubbles: true
+            })
         );
-    }
-
-    function setDocTypeFilter(value, label) {
-        filterDocType = value;
-        setCustomSelectValue('docTypeSelect', value, label);
-        closeDocreqDropdowns();
-        renderFilterChips();
-        updateShowResultsButton();
     }
 
     let docreqSearchTimer = null;
@@ -2546,522 +2304,547 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
         window.DiscardChanges?.captureForm(form);
         window.openModal('rejectModal');
 
-        setTimeout(
-            () => notes?.focus(),
-            80
-        );
-    }
-
-    function openFilterModal() {
-        window.syncFilterTagGroup('fSortGroup', filterSort);
-        setCustomSelectValue('docTypeSelect', filterDocType);
-        document.getElementById('fDateFrom').value = filterDateFrom;
-        document.getElementById('fDateTo').value = filterDateTo;
-        renderFilterChips();
-        updateShowResultsButton();
-
-        if (window.openFilterDrawer) {
-            window.openFilterDrawer('filterModal');
-            return;
-        }
-
-        if (window.openModal) {
-            window.openModal('filterModal');
-            return;
-        }
-
-        document.getElementById('filterModal')?.classList.add('open');
-    }
-
-    function closeFilterModal() {
-        if (window.closeFilterDrawer) {
-            window.closeFilterDrawer('filterModal');
-            return;
-        }
-
-        if (window.closeModal) {
-            window.closeModal('filterModal');
-            return;
-        }
-
-        const modal = document.getElementById('filterModal');
-        if (modal) modal.classList.remove('open', 'closing');
-        document.body.classList.remove('filter-lock');
-        document.documentElement.classList.remove('filter-lock');
-        document.body.style.overflow = '';
-    }
-
-    function applyFilterModal() {
-        filterStatus = activeFilter;
-        const sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
-        filterSort = sortActive ? sortActive.getAttribute('data-val') : 'newest';
-        filterDocType = document.getElementById('fDocType').value;
-        filterDateFrom = document.getElementById('fDateFrom').value;
-        filterDateTo = document.getElementById('fDateTo').value;
-
-        updateFilterBtn();
-        renderFilterChips();
-        currentPage = 1;
-        closeFilterModal();
-        fetchDocRequests();
-    }
-
-    function getDraftDocRequestFilters() {
-        const sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
-
-        return {
-            status: activeFilter,
-            docType: document.getElementById('fDocType')?.value || '',
-            dateFrom: document.getElementById('fDateFrom')?.value || '',
-            dateTo: document.getElementById('fDateTo')?.value || '',
-            sort: sortActive ? sortActive.getAttribute('data-val') : 'newest'
-        };
-    }
-
-    function getDraftFilteredDocRequests() {
-        const oldActiveFilter = activeFilter;
-        const oldFilterStatus = filterStatus;
-        const oldFilterDocType = filterDocType;
-        const oldFilterDateFrom = filterDateFrom;
-        const oldFilterDateTo = filterDateTo;
-        const oldFilterSort = filterSort;
-
-        const draft = getDraftDocRequestFilters();
-
-        activeFilter = draft.status;
-        filterStatus = draft.status;
-        filterDocType = draft.docType;
-        filterDateFrom = draft.dateFrom;
-        filterDateTo = draft.dateTo;
-        filterSort = draft.sort;
-
-        const results = getFiltered();
-
-        activeFilter = oldActiveFilter;
-        filterStatus = oldFilterStatus;
-        filterDocType = oldFilterDocType;
-        filterDateFrom = oldFilterDateFrom;
-        filterDateTo = oldFilterDateTo;
-        filterSort = oldFilterSort;
-
-        return results;
-    }
-
-    function updateShowResultsButton() {
-        const target =
-            document.getElementById(
-                'filterResultsText'
+        if (
+            !window.matchMedia(
+                '(max-width: 767px)'
+            ).matches
+        ) {
+            setTimeout(
+                () => notes?.focus(),
+                80
             );
-
-        if (!target) {
-            return;
         }
-
-        const count =
-            getDraftFilteredDocRequests()
-                .length;
-
-        target.textContent =
-            `Show ${count} ${count === 1
-                ? 'result'
-                : 'results'
-            }`;
     }
+        function openFilterModal() {
+            window.syncFilterTagGroup('fSortGroup', filterSort);
+            setDocTypeSelectValue(
+                filterDocType
+            );
+            document.getElementById('fDateFrom').value = filterDateFrom;
+            document.getElementById('fDateTo').value = filterDateTo;
+            renderFilterChips();
+            updateShowResultsButton();
 
-    function renderFilterChips() {
-        const container = document.getElementById("activeChipsContainer");
-        const section = document.getElementById("activeFiltersSection");
-        if (!container || !section) return;
+            if (window.openFilterDrawer) {
+                window.openFilterDrawer('filterModal');
+                return;
+            }
 
-        container.innerHTML = "";
-        let hasChips = false;
+            if (window.openModal) {
+                window.openModal('filterModal');
+                return;
+            }
 
-        function addChip(label, onRemove) {
-            hasChips = true;
-            const chip = document.createElement("div");
-            chip.className = "filter-chip";
-            chip.innerHTML =
-                `<span>${label}</span><span class="filter-chip-remove"><i class="fa-solid fa-xmark"></i></span>`;
-            chip.querySelector(".filter-chip-remove").addEventListener("click", () => {
-                onRemove();
-                renderFilterChips();
-                updateShowResultsButton();
-            });
-            container.appendChild(chip);
+            document.getElementById('filterModal')?.classList.add('open');
         }
 
-        const docType = document.getElementById('fDocType').value;
-        if (docType) {
-            addChip(`Doc: ${docType}`, () => setCustomSelectValue('docTypeSelect', ''));
+        function closeFilterModal() {
+            if (window.closeFilterDrawer) {
+                window.closeFilterDrawer('filterModal');
+                return;
+            }
+
+            if (window.closeModal) {
+                window.closeModal('filterModal');
+                return;
+            }
+
+            const modal = document.getElementById('filterModal');
+            if (modal) modal.classList.remove('open', 'closing');
+            document.body.classList.remove('filter-lock');
+            document.documentElement.classList.remove('filter-lock');
+            document.body.style.overflow = '';
         }
 
-        const activePresetBtn = document.querySelector('#datePresetGroup .quick-date-chip.active');
-        const fDate = document.getElementById('fDateFrom').value;
-        const tDate = document.getElementById('fDateTo').value;
+        function applyFilterModal() {
+            filterStatus = activeFilter;
+            const sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
+            filterSort = sortActive ? sortActive.getAttribute('data-val') : 'newest';
+            filterDocType = document.getElementById('fDocType').value;
+            filterDateFrom = document.getElementById('fDateFrom').value;
+            filterDateTo = document.getElementById('fDateTo').value;
 
-        if (activePresetBtn) {
-            addChip(`Date: ${activePresetBtn.textContent.trim()}`, () => {
-                activePresetBtn.classList.remove('active');
-                document.getElementById('fDateFrom').value = "";
-                document.getElementById('fDateTo').value = "";
-            });
-        } else if (fDate || tDate) {
-            let lbl = (fDate && tDate) ? `${fDate} to ${tDate}` : (fDate ? `From ${fDate}` : `Until ${tDate}`);
-            addChip(`Date: ${lbl}`, () => {
-                document.getElementById('fDateFrom').value = "";
-                document.getElementById('fDateTo').value = "";
-            });
+            updateFilterBtn();
+            renderFilterChips();
+            currentPage = 1;
+            closeFilterModal();
+            fetchDocRequests();
         }
 
-        const sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
-        if (sortActive && sortActive.getAttribute('data-val') !== 'newest') {
-            addChip(`Sort: ${sortActive.textContent.trim()}`, () => window.syncFilterTagGroup('fSortGroup', 'newest'));
-        }
+        function getDraftDocRequestFilters() {
+            const sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
 
-        if (hasChips) {
-            section.classList.remove("hidden");
-            document.getElementById("clearAllChipsBtn").onclick = () => {
-                setCustomSelectValue('docTypeSelect', '');
-                document.getElementById('fDateFrom').value = "";
-                document.getElementById('fDateTo').value = "";
-
-                document.querySelectorAll('#datePresetGroup .quick-date-chip').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-
-                window.syncFilterTagGroup('fSortGroup', 'newest');
-
-                renderFilterChips();
-                updateShowResultsButton();
+            return {
+                status: activeFilter,
+                docType: document.getElementById('fDocType')?.value || '',
+                dateFrom: document.getElementById('fDateFrom')?.value || '',
+                dateTo: document.getElementById('fDateTo')?.value || '',
+                sort: sortActive ? sortActive.getAttribute('data-val') : 'newest'
             };
-        } else {
-            section.classList.add("hidden");
         }
 
-        updateShowResultsButton();
-    }
+        function getDraftFilteredDocRequests() {
+            const oldActiveFilter = activeFilter;
+            const oldFilterStatus = filterStatus;
+            const oldFilterDocType = filterDocType;
+            const oldFilterDateFrom = filterDateFrom;
+            const oldFilterDateTo = filterDateTo;
+            const oldFilterSort = filterSort;
 
-    function resetFilterModal() {
-        filterDocType = '';
-        filterDateFrom = '';
-        filterDateTo = '';
-        filterSort = 'newest';
+            const draft = getDraftDocRequestFilters();
 
-        window.syncFilterTagGroup('fSortGroup', 'newest');
+            activeFilter = draft.status;
+            filterStatus = draft.status;
+            filterDocType = draft.docType;
+            filterDateFrom = draft.dateFrom;
+            filterDateTo = draft.dateTo;
+            filterSort = draft.sort;
 
-        setCustomSelectValue('docTypeSelect', '');
+            const results = getFiltered();
 
-        const dateFrom = document.getElementById('fDateFrom');
-        const dateTo = document.getElementById('fDateTo');
+            activeFilter = oldActiveFilter;
+            filterStatus = oldFilterStatus;
+            filterDocType = oldFilterDocType;
+            filterDateFrom = oldFilterDateFrom;
+            filterDateTo = oldFilterDateTo;
+            filterSort = oldFilterSort;
 
-        if (dateFrom) dateFrom.value = '';
-        if (dateTo) dateTo.value = '';
+            return results;
+        }
 
-        document.querySelectorAll('#datePresetGroup .quick-date-chip').forEach(btn => {
-            btn.classList.remove('active');
-        });
+        function updateShowResultsButton() {
+            const target =
+                document.getElementById(
+                    'filterResultsText'
+                );
 
-        renderFilterChips();
-        updateShowResultsButton();
-    }
+            if (!target) {
+                return;
+            }
 
-    document.addEventListener("DOMContentLoaded", () => {
+            const count =
+                getDraftFilteredDocRequests()
+                    .length;
 
-        const docreqViewToggle =
-            document.getElementById(
-                'documentRequestsViewToggle'
+            target.textContent =
+                `Show ${count} ${count === 1
+                    ? 'result'
+                    : 'results'
+                }`;
+        }
+
+        function renderFilterChips() {
+            const container = document.getElementById("activeChipsContainer");
+            const section = document.getElementById("activeFiltersSection");
+            if (!container || !section) return;
+
+            container.innerHTML = "";
+            let hasChips = false;
+
+            function addChip(label, onRemove) {
+                hasChips = true;
+                const chip = document.createElement("div");
+                chip.className = "filter-chip";
+                chip.innerHTML =
+                    `<span>${label}</span><span class="filter-chip-remove"><i class="fa-solid fa-xmark"></i></span>`;
+                chip.querySelector(".filter-chip-remove").addEventListener("click", () => {
+                    onRemove();
+                    renderFilterChips();
+                    updateShowResultsButton();
+                });
+                container.appendChild(chip);
+            }
+
+            const docType = document.getElementById('fDocType').value;
+            if (docType) {
+                addChip(
+                    `Doc: ${docType}`,
+                    () =>
+                        setDocTypeSelectValue('')
+                );
+            }
+
+            const activePresetBtn = document.querySelector('#datePresetGroup .quick-date-chip.active');
+            const fDate = document.getElementById('fDateFrom').value;
+            const tDate = document.getElementById('fDateTo').value;
+
+            if (activePresetBtn) {
+                addChip(`Date: ${activePresetBtn.textContent.trim()}`, () => {
+                    activePresetBtn.classList.remove('active');
+                    document.getElementById('fDateFrom').value = "";
+                    document.getElementById('fDateTo').value = "";
+                });
+            } else if (fDate || tDate) {
+                let lbl = (fDate && tDate) ? `${fDate} to ${tDate}` : (fDate ? `From ${fDate}` : `Until ${tDate}`);
+                addChip(`Date: ${lbl}`, () => {
+                    document.getElementById('fDateFrom').value = "";
+                    document.getElementById('fDateTo').value = "";
+                });
+            }
+
+            const sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
+            if (sortActive && sortActive.getAttribute('data-val') !== 'newest') {
+                addChip(`Sort: ${sortActive.textContent.trim()}`, () => window.syncFilterTagGroup('fSortGroup', 'newest'));
+            }
+
+            if (hasChips) {
+                section.classList.remove("hidden");
+                document.getElementById("clearAllChipsBtn").onclick = () => {
+                    setDocTypeSelectValue('');
+                    document.getElementById('fDateFrom').value = "";
+                    document.getElementById('fDateTo').value = "";
+
+                    document.querySelectorAll('#datePresetGroup .quick-date-chip').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+
+                    window.syncFilterTagGroup('fSortGroup', 'newest');
+
+                    renderFilterChips();
+                    updateShowResultsButton();
+                };
+            } else {
+                section.classList.add("hidden");
+            }
+
+            updateShowResultsButton();
+        }
+
+        function resetFilterModal() {
+            filterDocType = '';
+            filterDateFrom = '';
+            filterDateTo = '';
+            filterSort = 'newest';
+
+            window.syncFilterTagGroup('fSortGroup', 'newest');
+
+            setDocTypeSelectValue('');
+
+            const dateFrom = document.getElementById('fDateFrom');
+            const dateTo = document.getElementById('fDateTo');
+
+            if (dateFrom) dateFrom.value = '';
+            if (dateTo) dateTo.value = '';
+
+            document.querySelectorAll('#datePresetGroup .quick-date-chip').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            renderFilterChips();
+            updateShowResultsButton();
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+
+            window.initCustomSelects?.(
+                document.getElementById(
+                    'filterModal'
+                ) || document
             );
 
-        window.initGlobalViewToggles?.(document);
+            const docreqViewToggle =
+                document.getElementById(
+                    'documentRequestsViewToggle'
+                );
 
-        currentViewMode =
-            window.getGlobalViewMode?.(
-                docreqViewToggle
-            ) || 'list';
+            window.initGlobalViewToggles?.(document);
 
-        docreqViewToggle?.addEventListener(
-            'global-view-change',
-            event => {
-                currentViewMode =
-                    event.detail?.mode === 'grid' ?
-                        'grid' :
-                        'list';
+            currentViewMode =
+                window.getGlobalViewMode?.(
+                    docreqViewToggle
+                ) || 'list';
 
-                renderList();
-            }
-        );
+            docreqViewToggle?.addEventListener(
+                'global-view-change',
+                event => {
+                    currentViewMode =
+                        event.detail?.mode === 'grid' ?
+                            'grid' :
+                            'list';
 
-        window.setGlobalFilterSelectValue?.(
-            'docreqStatusFilter',
-            activeFilter,
-            {
-                callback: false,
-                focus: false
-            }
-        );
+                    renderList();
+                }
+            );
 
-        window.addEventListener('resize', renderList);
-        setCustomSelectValue('docTypeSelect', filterDocType);
+            window.setGlobalFilterSelectValue?.(
+                'docreqStatusFilter',
+                activeFilter,
+                {
+                    callback: false,
+                    focus: false
+                }
+            );
 
-        document.addEventListener('click', (event) => {
-            if (!event.target.closest('.docreq-custom-select')) closeDocreqDropdowns();
-        });
+            window.addEventListener('resize', syncDocumentRequestView);
 
-        window.bindQuickDatePresets({
-            groupId: 'datePresetGroup',
-            fromId: 'fDateFrom',
-            toId: 'fDateTo',
-            onChange: () => {
-                renderFilterChips();
-                updateShowResultsButton();
-            }
-        });
+            window.bindQuickDatePresets({
+                groupId: 'datePresetGroup',
+                fromId: 'fDateFrom',
+                toId: 'fDateTo',
+                onChange: () => {
+                    renderFilterChips();
+                    updateShowResultsButton();
+                }
+            });
 
-        window.bindFilterTagGroup({
-            groupId: 'fSortGroup',
-            onChange: () => {
-                renderFilterChips();
-                updateShowResultsButton();
-            }
-        });
+            window.bindFilterTagGroup({
+                groupId: 'fSortGroup',
+                onChange: () => {
+                    renderFilterChips();
+                    updateShowResultsButton();
+                }
+            });
 
-        document.addEventListener('keydown', e => {
-            if (e.key !== 'Escape') return;
-            closeDocreqDropdowns();
+            const docTypeSelect =
+                document.getElementById('fDocType');
+
+            docTypeSelect?.addEventListener(
+                'change',
+                () => {
+                    renderFilterChips();
+                    updateShowResultsButton();
+                }
+            );
+
+            document.addEventListener('keydown', e => {
+                if (e.key !== 'Escape') return;
+                ['approveModal', 'rejectModal', 'filterModal']
+
+                    .forEach(id => {
+                        const m = document.getElementById(id);
+                        if (!m?.classList.contains('open')) return;
+                        if (id === 'filterModal') closeFilterModal();
+                        else window.closeModal(id);
+                    });
+            });
+
             ['approveModal', 'rejectModal', 'filterModal']
 
-                .forEach(id => {
-                    const m = document.getElementById(id);
-                    if (!m?.classList.contains('open')) return;
-                    if (id === 'filterModal') closeFilterModal();
-                    else window.closeModal(id);
-                });
-        });
+                .forEach(id => outside(id));
 
-        ['approveModal', 'rejectModal', 'filterModal']
+            const filterModal = document.getElementById('filterModal');
+            document.getElementById('filterCloseBtn').addEventListener('click', closeFilterModal);
+            document.getElementById('filterCancelBtn').addEventListener('click', closeFilterModal);
+            document.getElementById('filterApplyBtn').addEventListener('click', applyFilterModal);
+            document.getElementById('filterResetBtn').addEventListener('click', () => {
+                resetAdvancedFilters();
+                resetFilterModal();
+                updateShowResultsButton();
+            });
 
-            .forEach(id => outside(id));
+            ['approveCancelBtn', 'approveCancelBtn2'].forEach(id =>
+                document.getElementById(id)?.addEventListener('click', () => window.closeModal('approveModal'))
+            );
 
-        const filterModal = document.getElementById('filterModal');
-        document.getElementById('filterCloseBtn').addEventListener('click', closeFilterModal);
-        document.getElementById('filterCancelBtn').addEventListener('click', closeFilterModal);
-        document.getElementById('filterApplyBtn').addEventListener('click', applyFilterModal);
-        document.getElementById('filterResetBtn').addEventListener('click', () => {
-            resetAdvancedFilters();
-            resetFilterModal();
-            updateShowResultsButton();
-        });
+            document.getElementById('approveConfirmBtn')?.addEventListener('click', async () => {
+                const id = document.getElementById('approveRequestId').value;
+                const btn = document.getElementById('approveConfirmBtn');
 
-        ['approveCancelBtn', 'approveCancelBtn2'].forEach(id =>
-            document.getElementById(id)?.addEventListener('click', () => window.closeModal('approveModal'))
-        );
+                if (!id) return;
 
-        document.getElementById('approveConfirmBtn')?.addEventListener('click', async () => {
-            const id = document.getElementById('approveRequestId').value;
-            const btn = document.getElementById('approveConfirmBtn');
-
-            if (!id) return;
-
-            btn.disabled = true;
-
-            try {
-                const approveUrl = String(
-                    DOCREQ_ROUTES.approve || ''
-                ).replace('__ID__', id);
-
-                const res = await fetch(approveUrl, {
-                    method: DOCREQ_METHODS.approve || 'POST',
-                    headers: {
-                        'Accept': 'application/pdf, application/json',
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': CSRF,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({})
-                });
-
-                const contentType = res.headers.get('content-type') || '';
-
-                if (!res.ok) {
-                    let message = `Approval failed. Status: ${res.status}`;
-
-                    if (contentType.includes('application/json')) {
-                        const data = await res.json().catch(() => ({}));
-                        message = data.message || message;
-                    }
-
-                    throw new Error(message);
-                }
-
-                if (!contentType.toLowerCase().includes('application/pdf')) {
-                    throw new Error('The server did not return a valid PDF file.');
-                }
-
-                const blob = await res.blob();
-                const downloadUrl = URL.createObjectURL(blob);
-
-                let fileName = `approved-document-request-${id}.pdf`;
-                const disposition = res.headers.get('Content-Disposition') || '';
-                const fileNameMatch = disposition.match(/filename="?([^"]+)"?/i);
-
-                if (fileNameMatch?.[1]) {
-                    fileName = fileNameMatch[1];
-                }
-
-                const link = document.createElement('a');
-                link.href = downloadUrl;
-                link.download = fileName;
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-
-                window.setTimeout(() => {
-                    URL.revokeObjectURL(downloadUrl);
-                }, 30000);
-
-                window.closeModal('approveModal');
-                syncLocalDocRequestStatus(id, 'approved');
-
-                docreqToast(
-                    'success',
-                    'Request approved',
-                    res.headers.get('X-Approval-Message') ||
-                    'The document request has been approved. The patient will be notified.'
-                );
-            } catch (error) {
-                console.error('Approve request error:', error);
-
-                docreqToast(
-                    'error',
-                    'Approval failed',
-                    error.message || 'Approval failed because of a network or JavaScript error.'
-                );
-            } finally {
-                btn.disabled = false;
-            }
-        });
-
-        ['rejectCancelBtn', 'rejectCancelBtn2'].forEach(id =>
-            document.getElementById(id)?.addEventListener('click', () => window.closeModal('rejectModal'))
-        );
-
-        document.getElementById(
-            'rejectRequestForm'
-        )?.addEventListener(
-            'submit',
-            async event => {
-                event.preventDefault();
-
-                const form = event.currentTarget;
-
-                const validation =
-                    window.validateGlobalForm?.(
-                        form
-                    );
-
-                if (
-                    validation &&
-                    !validation.valid
-                ) {
-                    return;
-                }
-
-                const id =
-                    document.getElementById(
-                        'rejectRequestId'
-                    ).value;
-
-                const button =
-                    document.getElementById(
-                        'rejectConfirmBtn'
-                    );
-
-                const notes =
-                    document.getElementById(
-                        'rejectNotes'
-                    )?.value.trim() || '';
-
-                if (!id || !button) return;
-
-                button.disabled = true;
-
-                window.DiscardChanges?.markSubmitting(
-                    form
-                );
+                btn.disabled = true;
 
                 try {
-                    const rejectUrl = String(
-                        DOCREQ_ROUTES.reject || ''
+                    const approveUrl = String(
+                        DOCREQ_ROUTES.approve || ''
                     ).replace('__ID__', id);
 
-                    const response = await fetch(
-                        rejectUrl,
-                        {
-                            method: DOCREQ_METHODS.reject || 'POST',
-                            headers: {
-                                Accept: 'application/json',
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': CSRF,
-                                'X-Requested-With': 'XMLHttpRequest'
-                            },
-                            body: JSON.stringify({
-                                reason: notes
-                            })
+                    const res = await fetch(approveUrl, {
+                        method: DOCREQ_METHODS.approve || 'POST',
+                        headers: {
+                            'Accept': 'application/pdf, application/json',
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': CSRF,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({})
+                    });
+
+                    const contentType = res.headers.get('content-type') || '';
+
+                    if (!res.ok) {
+                        let message =
+                            res.status === 403
+                                ? 'Unauthorized.'
+                                : `Approval failed. Status: ${res.status}`;
+
+                        if (contentType.includes('application/json')) {
+                            const data = await res.json().catch(() => ({}));
+                            message = data.message || message;
                         }
-                    );
 
-                    const data =
-                        await response.json()
-                            .catch(() => ({}));
-
-                    if (!response.ok) {
-                        throw new Error(
-                            data.message ||
-                            `Rejection failed. Status: ${response.status}`
-                        );
+                        throw new Error(message);
                     }
 
-                    window.closeModal(
-                        'rejectModal'
-                    );
-
-                    syncLocalDocRequestStatus(
-                        id,
-                        'rejected', {
-                        rejection_reason: notes
+                    if (!contentType.toLowerCase().includes('application/pdf')) {
+                        throw new Error('The server did not return a valid PDF file.');
                     }
-                    );
+
+                    const blob = await res.blob();
+                    const downloadUrl = URL.createObjectURL(blob);
+
+                    let fileName = `approved-document-request-${id}.pdf`;
+                    const disposition = res.headers.get('Content-Disposition') || '';
+                    const fileNameMatch = disposition.match(/filename="?([^"]+)"?/i);
+
+                    if (fileNameMatch?.[1]) {
+                        fileName = fileNameMatch[1];
+                    }
+
+                    const link = document.createElement('a');
+                    link.href = downloadUrl;
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+
+                    window.setTimeout(() => {
+                        URL.revokeObjectURL(downloadUrl);
+                    }, 30000);
+
+                    window.closeModal('approveModal');
+                    syncLocalDocRequestStatus(id, 'approved');
 
                     docreqToast(
                         'success',
-                        'Request rejected',
-                        data.message ||
-                        'The document request has been rejected.'
+                        'Request approved',
+                        res.headers.get('X-Approval-Message') ||
+                        'The document request has been approved. The patient will be notified.'
                     );
                 } catch (error) {
-                    window.DiscardChanges
-                        ?.markNotSubmitting(form);
+                    console.error('Approve request error:', error);
 
                     docreqToast(
                         'error',
-                        'Rejection failed',
-                        error.message ||
-                        'The request could not be rejected.'
+                        'Approval failed',
+                        error.message || 'Approval failed because of a network or JavaScript error.'
                     );
                 } finally {
-                    button.disabled = false;
+                    btn.disabled = false;
                 }
-            }
-        );
+            });
 
-        showSkeleton();
+            ['rejectCancelBtn', 'rejectCancelBtn2'].forEach(id =>
+                document.getElementById(id)?.addEventListener('click', () => window.closeModal('rejectModal'))
+            );
 
-        requestAnimationFrame(() => {
-            setTimeout(() => {
-                loadData();
-                initDocreqRefreshWatcher();
-            }, 350);
+            document.getElementById(
+                'rejectRequestForm'
+            )?.addEventListener(
+                'submit',
+                async event => {
+                    event.preventDefault();
+
+                    const form = event.currentTarget;
+
+                    const validation =
+                        window.validateGlobalForm?.(
+                            form
+                        );
+
+                    if (
+                        validation &&
+                        !validation.valid
+                    ) {
+                        return;
+                    }
+
+                    const id =
+                        document.getElementById(
+                            'rejectRequestId'
+                        ).value;
+
+                    const button =
+                        document.getElementById(
+                            'rejectConfirmBtn'
+                        );
+
+                    const notes =
+                        document.getElementById(
+                            'rejectNotes'
+                        )?.value.trim() || '';
+
+                    if (!id || !button) return;
+
+                    button.disabled = true;
+
+                    window.DiscardChanges?.markSubmitting(
+                        form
+                    );
+
+                    try {
+                        const rejectUrl = String(
+                            DOCREQ_ROUTES.reject || ''
+                        ).replace('__ID__', id);
+
+                        const response = await fetch(
+                            rejectUrl,
+                            {
+                                method: DOCREQ_METHODS.reject || 'POST',
+                                headers: {
+                                    Accept: 'application/json',
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': CSRF,
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                body: JSON.stringify({
+                                    reason: notes
+                                })
+                            }
+                        );
+
+                        const data =
+                            await response.json()
+                                .catch(() => ({}));
+
+                        if (!response.ok) {
+                            throw new Error(
+                                data.message ||
+                                `Rejection failed. Status: ${response.status}`
+                            );
+                        }
+
+                        window.closeModal(
+                            'rejectModal'
+                        );
+
+                        syncLocalDocRequestStatus(
+                            id,
+                            'rejected', {
+                            rejection_reason: notes
+                        }
+                        );
+
+                        docreqToast(
+                            'success',
+                            'Request rejected',
+                            data.message ||
+                            'The document request has been rejected.'
+                        );
+                    } catch (error) {
+                        window.DiscardChanges
+                            ?.markNotSubmitting(form);
+
+                        docreqToast(
+                            'error',
+                            'Rejection failed',
+                            error.message ||
+                            'The request could not be rejected.'
+                        );
+                    } finally {
+                        button.disabled = false;
+                    }
+                }
+            );
+
+            showSkeleton();
+
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    loadData();
+                    initDocreqRefreshWatcher();
+                }, 350);
+            });
         });
-    });
 </script>
 @endsection

@@ -70,7 +70,6 @@
     min-width: 0;
 }
 
-.dashboard-kpi-breakdown,
 .dashboard-live-clock {
     display: flex;
     align-items: center;
@@ -91,14 +90,6 @@
     flex-direction: column;
     align-items: flex-end;
     gap: .65rem;
-}
-
-.clinic-change-btn-mobile {
-    display: none;
-}
-
-.clinic-change-btn-desktop {
-    display: inline-flex;
 }
 
 .row2-grid,
@@ -154,19 +145,14 @@
     border-top: 1px solid var(--border, #ede8e4);
 }
 
-#dentistCalendarContainer {
-    position: relative;
-    z-index: 10;
-    height: 100%;
-    min-height: 0;
+.upcoming-list-area:has(.upcoming-empty-state) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-#dentistCalendarContainer .cal-shell {
-    position: relative;
-    height: 100%;
-    min-height: 420px;
-    margin-top: 0;
-    overflow: visible;
+.upcoming-empty-state {
+    flex: 1;
 }
 
 .dashboard-side-stack,
@@ -280,6 +266,7 @@
 }
 
 .cal-cell-wrap:hover>.day-hover-card,
+.cal-cell-wrap:focus-within>.day-hover-card,
 .day-hover-card:hover {
     opacity: 1;
     visibility: visible;
@@ -292,6 +279,7 @@
 }
 
 .cal-cell-wrap:hover>.day-hover-card.hover-align-center,
+.cal-cell-wrap:focus-within>.day-hover-card.hover-align-center,
 .day-hover-card.hover-align-center:hover {
     transform:
         translateX(-50%) translateY(0) scale(1);
@@ -299,25 +287,40 @@
 
 .cal-cell-wrap:hover>.day-hover-card.hover-align-left,
 .cal-cell-wrap:hover>.day-hover-card.hover-align-right,
+.cal-cell-wrap:focus-within>.day-hover-card.hover-align-left,
+.cal-cell-wrap:focus-within>.day-hover-card.hover-align-right,
 .day-hover-card.hover-align-left:hover,
 .day-hover-card.hover-align-right:hover {
     transform:
         translateY(0) scale(1);
 }
 
+#dentistCalendarContainer {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: visible;
+}
+
+#dentistCalendarContainer .cal-shell {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    margin-top: 0;
+    overflow: visible;
+}
+
+#dentistCalendarContainer .dentist-calendar-title {
+    min-width: 0;
+    text-align: center;
+    transform: translateY(2px);
+}
+
 .scheduled-hover-list {
     display: grid;
     gap: .45rem;
-}
-
-.scheduled-hover-patient-card.global-record-card {
-    border-radius: 13px;
-}
-
-.scheduled-hover-patient-card.global-record-card::before {
-    top: 6px;
-    bottom: 6px;
-    width: 3px;
 }
 
 .scheduled-hover-patient-body.global-record-card-body {
@@ -379,16 +382,6 @@
 .scheduled-modal-list {
     display: grid;
     gap: .55rem;
-}
-
-.scheduled-modal-patient-card {
-    border-radius: 14px;
-}
-
-.scheduled-modal-patient-card::before {
-    top: 6px;
-    bottom: 6px;
-    width: 3px;
 }
 
 .scheduled-modal-patient-body {
@@ -467,11 +460,6 @@
     box-shadow: 0 22px 46px rgba(0, 0, 0, .42);
 }
 
-.greeting-status-meta {
-    text-align: right;
-    color: white;
-}
-
 .greeting-status-eyebrow {
     display: inline-flex;
     align-items: center;
@@ -484,24 +472,59 @@
     margin-bottom: 4px;
 }
 
+.greeting-banner-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    min-width: 0;
+
+    margin-left: auto;
+}
+
+.greeting-clinic-status-group {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: .75rem;
+
+    min-width: 0;
+}
+
+.greeting-status-meta {
+    min-width: 0;
+
+    text-align: right;
+}
+
+.status-btn-wrap {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 10px;
+
+    flex: 0 0 auto;
+
+    padding: 6px;
+
+    border: 1px solid rgba(255, 255, 255, .28);
+    border-radius: 999px;
+
+    background: rgba(255, 215, 0, .08);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .12);
+}
+
 .greeting-status-text {
     font-size: 12px;
     font-weight: 600;
     color: rgba(255, 255, 255, .94);
     white-space: nowrap;
-}
-
-.status-btn-wrap {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 6px;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, .28);
-    background: rgba(255, 215, 0, 0.08);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12);
 }
 
 .status-icon-badge {
@@ -520,15 +543,6 @@
 .status-icon-badge i {
     font-size: 15px;
 }
-
-
-
-
-
-
-
-
-
 
 .dentist-dashboard-page {
     width: 100%;
@@ -560,6 +574,25 @@
         margin-bottom: 1.5rem !important;
         gap: 1.5rem;
         align-items: stretch;
+    }
+
+    .row2-grid>.min-w-0,
+    .row2-grid>.dashboard-side-stack {
+        min-height: 0;
+        height: 100%;
+    }
+
+    #dentistCalendarContainer,
+    #upcomingAppointmentsContainer {
+        min-height: 0;
+        height: 100%;
+    }
+
+    #dentistCalendarContainer>.cal-shell,
+    #upcomingAppointmentsContainer>.upcoming-card {
+        width: 100%;
+        height: 100%;
+        min-height: 0;
     }
 
     .row3-grid {
@@ -624,39 +657,8 @@
         padding-right: clamp(14px, 3vw, 24px) !important;
     }
 
-    .greeting-banner-inner {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 1rem !important;
-    }
-
-    .greeting-banner-copy {
-        width: 100%;
-    }
-
-    .greeting-heading,
-    .greeting-title {
-        font-size: clamp(1.35rem, 4vw, 1.85rem) !important;
-        line-height: 1.15 !important;
-    }
-
-    .greeting-banner-actions {
-        width: 100%;
-        justify-content: space-between !important;
-        align-items: center !important;
-        gap: 0.85rem !important;
-    }
-
-    .greeting-status-meta {
-        text-align: left !important;
-    }
-
     .greeting-status-text {
         white-space: normal !important;
-    }
-
-    .status-btn-wrap {
-        flex-shrink: 0;
     }
 
     .row2-grid,
@@ -670,13 +672,6 @@
         height: auto !important;
     }
 
-    #dentistCalendarContainer .cal-shell {
-        min-height: 360px !important;
-        height: auto !important;
-        padding: 1rem !important;
-        border-radius: 1.1rem !important;
-    }
-
     .dashboard-side-stack {
         height: auto !important;
     }
@@ -688,24 +683,6 @@
     .upcoming-card {
         height: auto !important;
         min-height: 340px !important;
-    }
-
-    .upcoming-date-navigation {
-        grid-template-columns:
-            32px minmax(0, 1fr) 32px;
-        gap: .35rem;
-    }
-
-    .upcoming-date-strip {
-        grid-template-columns:
-            repeat(7, minmax(0, 1fr));
-
-        gap: .3rem;
-    }
-
-    .upcoming-date-btn {
-        min-width: 0 !important;
-        padding: .5rem .2rem;
     }
 
     #medicalSuppliesContainer>div,
@@ -756,6 +733,10 @@
     .row3-grid {
         margin-top: 0 !important;
     }
+
+    #dentistCalendarContainer .dentist-calendar-title {
+        transform: translateY(2px);
+    }
 }
 
 .upcoming-date-navigation {
@@ -784,7 +765,7 @@
 
 .upcoming-range-label {
     margin-top: .15rem;
-    color: #9ca3af;
+    color: var(--gray-400);
     font-size: .62rem;
     font-weight: 650;
 }
@@ -860,7 +841,7 @@
 
 .upcoming-date-btn.active {
     background: var(--status-solid, var(--status-today-solid)) !important;
-    color: #ffffff !important;
+    color: var(--text-on-brand) !important;
     border-color: var(--status-solid, var(--status-today-solid)) !important;
 
     box-shadow:
@@ -876,17 +857,590 @@
     display: flex;
     position: relative;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.85rem 0.5rem;
+
+    gap: .75rem;
+    padding: .85rem .5rem;
+
+    border-radius: .75rem;
+
+    transition:
+        background-color .18s ease;
+}
+
+.upcoming-item:hover {
+    background:
+        color-mix(in srgb,
+            var(--crimson) 4%,
+            transparent);
+}
+
+.upcoming-item-name {
+    min-width: 0;
+
+    color: var(--text-1);
+
+    font-size: .875rem;
+    font-weight: 700;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.upcoming-item-time {
+    flex-shrink: 0;
+
+    color: var(--crimson);
+
+    font-size: .6875rem;
+    font-weight: 700;
+}
+
+.upcoming-item-service {
+    min-width: 0;
+
+    color: var(--text-3);
+
+    font-size: .75rem;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+[data-theme="dark"] #mainContent .upcoming-range-label,
+.dark #mainContent .upcoming-range-label {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] #mainContent .upcoming-date-btn.active,
+.dark #mainContent .upcoming-date-btn.active {
+    background:
+        var(--status-solid, var(--status-today-solid)) !important;
+    color: var(--text-on-brand) !important;
+    border-color:
+        color-mix(in srgb,
+            var(--status-solid, var(--status-today-solid)) 70%,
+            #ffffff) !important;
+}
+
+.gad-chart-shell {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+}
+
+#gadAnalyticsContainer .card-body {
+    display: flex;
+    align-items: center;
+}
+
+.gad-dashboard-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.gad-dashboard-empty-body {
+    flex: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 220px;
+}
+
+.gad-dashboard-empty-body>.empty-state {
+    width: 100%;
+}
+
+.gad-chart-shell {
+    flex: 1;
+}
+
+.gad-chart-shell canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.gad-chip-female {
+    --status-bg: rgba(236, 72, 153, 0.12);
+    --status-text: #EC4899;
+    --status-border: rgba(236, 72, 153, 0.28);
+    --status-solid: #EC4899;
+}
+
+.gad-chip-male {
+    --status-bg: rgba(96, 165, 250, 0.12);
+    --status-text: #60A5FA;
+    --status-border: rgba(96, 165, 250, 0.28);
+    --status-solid: #60A5FA;
+}
+
+.dashboard-lower-stack,
+.inventory-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: row;
+    gap: 1rem;
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+}
+
+.today-progress-card {
+    display: grid;
+    grid-template-rows:
+        auto minmax(0, 1fr);
+
+    height: 100%;
+    min-height: 0;
+}
+
+.today-progress-body {
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+
+    padding: 1rem 1.25rem;
+}
+
+.today-progress-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows:
+        repeat(4, minmax(0, 1fr));
+    gap: .65rem;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+.today-progress-item {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    padding: .75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+}
+
+.today-progress-card>.today-progress-body {
+    height: 100%;
+    min-height: 0;
+    align-self: stretch;
+}
+
+.today-progress-icon {
+    position: relative;
+    z-index: 2;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    background: var(--today-progress-icon-bg);
+    border: 1px solid var(--today-progress-icon-border);
+    color: var(--today-progress-icon-color);
+}
+
+.today-progress-icon i {
+    font-size: .8rem;
+}
+
+.today-progress-bg-icon {
+    position: absolute;
+    z-index: -1;
+    right: .35rem;
+    bottom: -.65rem;
+    font-size: 4.25rem;
+    color: var(--today-progress-icon-color);
+    opacity: .065;
+    pointer-events: none;
+    transform: rotate(-8deg);
+}
+
+.today-progress-label {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: .7rem;
+    min-width: 0;
+    color: var(--text-2);
+    font-size: .8rem;
+    font-weight: 800;
+}
+
+.today-progress-value {
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+    color: var(--text-1);
+    font-size: 1.45rem;
+    font-weight: 900;
+}
+
+.today-progress-completed {
+    --today-progress-icon-color:
+        var(--status-completed-solid);
+
+    --today-progress-icon-bg:
+        var(--status-completed-bg);
+
+    --today-progress-icon-border:
+        var(--status-completed-border);
+}
+
+.today-progress-remaining {
+    --today-progress-icon-color:
+        var(--status-pending-solid);
+
+    --today-progress-icon-bg:
+        var(--status-pending-bg);
+
+    --today-progress-icon-border:
+        var(--status-pending-border);
+}
+
+.today-progress-followup {
+    --today-progress-icon-color:
+        var(--crimson);
+
+    --today-progress-icon-bg:
+        var(--crimson-soft);
+
+    --today-progress-icon-border:
+        var(--border);
+}
+
+.today-progress-walkin {
+    --today-progress-icon-color:
+        var(--text-2);
+
+    --today-progress-icon-bg:
+        var(--surface);
+
+    --today-progress-icon-border:
+        var(--border);
+}
+
+[data-theme="dark"] .today-progress-bg-icon,
+.dark .today-progress-bg-icon {
+    opacity: .09;
+}
+
+[data-theme="dark"] .today-progress-item,
+.dark .today-progress-item {
+    background: var(--surface);
+}
+
+[data-theme="dark"] #mainContent .w-9.h-9,
+[data-theme="dark"] #mainContent .status-icon-badge,
+.dark #mainContent .w-9.h-9,
+.dark #mainContent .status-icon-badge {
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.04),
+        0 0 18px rgba(139, 0, 0, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] #mainContent .animate-pulse,
+.dark #mainContent .animate-pulse {
+    box-shadow:
+        0 0 8px rgba(255, 255, 255, 0.6),
+        0 0 16px rgba(252, 165, 165, 0.6);
+}
+
+.greeting-icon {
+    animation: greetingGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes greetingGlow {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.08);
+        opacity: .82;
+    }
+}
+
+[data-theme="dark"] .upcoming-date-btn.has-appointments,
+.dark .upcoming-date-btn.has-appointments {
+    background: var(--status-upcoming-bg) !important;
+    border-color: var(--status-upcoming-border) !important;
+    color: var(--status-upcoming-text) !important;
+}
+
+[data-theme="dark"] #mainContent #medicalSuppliesContainer .relative.z-10.flex.items-center.justify-between.mb-4 p,
+[data-theme="dark"] #mainContent #medicineSuppliesContainer .relative.z-10.flex.items-center.justify-between.mb-4 p,
+.dark #mainContent #medicalSuppliesContainer .relative.z-10.flex.items-center.justify-between.mb-4 p,
+.dark #mainContent #medicineSuppliesContainer .relative.z-10.flex.items-center.justify-between.mb-4 p {
+    color: var(--text-secondary, #C9D1D9) !important;
+}
+
+@media (max-width: 480px) {
+
+    .appointment-status-badge {
+        max-width: none !important;
+        padding: 0.24rem 0.4rem !important;
+        font-size: 0.48rem !important;
+    }
+
+    #dayAppointmentsModal {
+        padding: 0.75rem !important;
+        align-items: center !important;
+    }
+
+    #dayAppointmentsModalDate {
+        font-size: 0.76rem !important;
+        line-height: 1.15 !important;
+    }
+
+    .dentist-dashboard-page {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .greeting-banner {
+        border-radius: 16px !important;
+    }
+
+    #greetingText {
+        font-size: 0.86rem !important;
+        line-height: 1.08 !important;
+        font-weight: 650 !important;
+    }
+
+    .greeting-line {
+        line-height: 1.08 !important;
+    }
+
+    .greeting-name-prefix,
+    #dentistName {
+        font-size: inherit !important;
+        line-height: inherit !important;
+        white-space: nowrap !important;
+        word-break: keep-all !important;
+        overflow-wrap: normal !important;
+    }
+
+    .gad-metric-chip .w-2\.5.h-2\.5 {
+        width: 0.45rem !important;
+        height: 0.45rem !important;
+    }
+
+    .gad-chart-shell {
+        height: 220px;
+        min-height: 220px;
+    }
+}
+
+@media (max-width: 340px) {
+
+    .upcoming-date-navigation {
+        gap: .12rem;
+    }
+
+    .upcoming-date-navigation>.ui-action-btn {
+        --ui-action-size: 25px;
+
+        border-radius: 7px;
+    }
+
+    .upcoming-date-strip {
+        gap: .06rem;
+    }
+
+    .upcoming-date-btn {
+        padding:
+            .34rem 0;
+
+        border-radius: .55rem;
+    }
+
+    .upcoming-date-btn .text-sm {
+        font-size: .56rem !important;
+    }
+
+    .upcoming-date-btn .text-\[10px\] {
+        font-size: .4rem !important;
+    }
+}
+
+@media (max-width: 320px) {
+    .dentist-dashboard-page {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+
+    #greetingText {
+        font-size: 0.78rem !important;
+        line-height: 1.08 !important;
+    }
 }
 
 @media (max-width: 767px) {
-    .clinic-change-btn-desktop {
-        display: none !important;
+    .greeting-banner-actions {
+        width: 100% !important;
+        min-width: 0 !important;
+
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+
+        margin: 0 !important;
     }
 
-    .clinic-change-btn-mobile {
+    .greeting-clinic-status-group {
+        width: auto !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+
+        display: flex !important;
+        flex-direction: row !important;
+
+        align-items: center !important;
+        justify-content: flex-end !important;
+
+        gap: .45rem !important;
+
+        margin-left: auto !important;
+    }
+
+    .greeting-status-meta {
+        width: auto !important;
+        min-width: 0 !important;
+
+        flex: 0 1 auto !important;
+
+        margin: 0 !important;
+
+        text-align: right !important;
+    }
+
+    .greeting-status-eyebrow {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+
+        gap: 4px !important;
+
+        margin: 0 0 2px !important;
+
+        font-size: 6.5px !important;
+        letter-spacing: .08em !important;
+
+        white-space: nowrap !important;
+    }
+
+    .greeting-status-text {
+        margin: 0 !important;
+
+        font-size: 9px !important;
+        line-height: 1.15 !important;
+
+        text-align: right !important;
+
+        white-space: nowrap !important;
+    }
+
+    .status-btn-wrap {
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: none !important;
+
+        flex: 0 0 auto !important;
+
         display: inline-flex !important;
+        align-items: center !important;
+
+        gap: 4px !important;
+
+        margin: 0 !important;
+        padding: 4px !important;
+    }
+
+    .status-icon-badge {
+        width: 26px !important;
+        height: 26px !important;
+
+        flex: 0 0 26px !important;
+    }
+
+    .status-icon-badge i {
+        font-size: 9px !important;
+    }
+
+    #statusBtn .status-dot {
+        width: 5px !important;
+        height: 5px !important;
+
+        min-width: 5px !important;
+        min-height: 5px !important;
+    }
+
+    #statusLabel {
+        white-space: nowrap !important;
+    }
+
+    .gad-dashboard-empty-body {
+        min-height: 180px;
+    }
+
+    .dashboard-clinic-status-card .dashboard-live-clock {
+        display: inline-flex;
+        align-items: center;
+        flex-wrap: nowrap;
+
+        gap: .25rem;
+
+        white-space: nowrap;
+    }
+
+    .dashboard-clinic-status-card .dashboard-kpi-actions {
+        position: static !important;
+
+        display: block !important;
+
+        width: 0 !important;
+        height: 0 !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .dashboard-clinic-status-card .dashboard-kpi-actions .ui-action-btn {
+        position: absolute;
+
+        right: .65rem;
+        bottom: .65rem;
+
+        z-index: 2;
+    }
+
+    #dentistCalendarContainer .dentist-calendar-title {
+        transform: translateY(3px);
     }
 
     .row2-grid {
@@ -1016,669 +1570,6 @@
         text-align: center !important;
     }
 
-    .dashboard-clinic-status-card {
-        position: relative;
-    }
-
-    .dashboard-clinic-status-card .stat-card-info {
-        padding-right: 0 !important;
-    }
-
-    .dashboard-clinic-status-card .dashboard-kpi-actions {
-        display: flex !important;
-        flex-direction: column !important;
-        align-self: stretch !important;
-        justify-content: space-between !important;
-
-        gap: 0.35rem !important;
-
-        flex: 0 0 auto !important;
-    }
-
-    .dashboard-clinic-status-card .dashboard-live-clock {
-        display: inline-flex !important;
-        align-items: baseline !important;
-        flex-wrap: nowrap !important;
-
-        gap: 0.22rem !important;
-
-        white-space: nowrap !important;
-        margin-top: 0.15rem !important;
-    }
-
-    .dashboard-clinic-status-card #kpi-clock-hhmm {
-        font-size: 0.62rem !important;
-        line-height: 1 !important;
-        white-space: nowrap !important;
-    }
-
-    .dashboard-clinic-status-card #kpi-clock-ampm {
-        font-size: 0.48rem !important;
-        line-height: 1 !important;
-        white-space: nowrap !important;
-    }
-
-    .dashboard-clinic-status-card .dashboard-live-dot {
-        width: 5px !important;
-        height: 5px !important;
-        min-width: 5px !important;
-        min-height: 5px !important;
-    }
-}
-
-[data-theme="dark"] #mainContent .upcoming-range-label,
-.dark #mainContent .upcoming-range-label {
-    color: #8B949E;
-}
-
-[data-theme="dark"] #mainContent .upcoming-date-btn.active,
-.dark #mainContent .upcoming-date-btn.active {
-    background:
-        var(--status-solid, var(--status-today-solid)) !important;
-    color: #ffffff !important;
-    border-color:
-        color-mix(in srgb,
-            var(--status-solid, var(--status-today-solid)) 70%,
-            #ffffff) !important;
-}
-
-.gad-chart-shell {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    min-height: 280px;
-}
-
-#gadAnalyticsContainer .card-body {
-    display: flex;
-    align-items: center;
-}
-
-.gad-chart-shell {
-    flex: 1;
-}
-
-.gad-chart-shell canvas {
-    display: block;
-    width: 100% !important;
-    height: 100% !important;
-}
-
-.gad-chip-female {
-    --status-bg: rgba(236, 72, 153, 0.12);
-    --status-text: #EC4899;
-    --status-border: rgba(236, 72, 153, 0.28);
-    --status-solid: #EC4899;
-}
-
-.gad-chip-male {
-    --status-bg: rgba(96, 165, 250, 0.12);
-    --status-text: #60A5FA;
-    --status-border: rgba(96, 165, 250, 0.28);
-    --status-solid: #60A5FA;
-}
-
-.dashboard-lower-stack,
-.inventory-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: repeat(2, minmax(0, 1fr));
-    grid-auto-flow: row;
-    gap: 1rem;
-    width: 100%;
-    min-width: 0;
-    height: 100%;
-}
-
-.today-progress-card {
-    display: grid;
-    grid-template-rows:
-        auto minmax(0, 1fr);
-
-    height: 100%;
-    min-height: 0;
-}
-
-.today-progress-body {
-    min-height: 0;
-    width: 100%;
-    height: 100%;
-
-    display: flex;
-
-    padding: 1rem 1.25rem;
-}
-
-.today-progress-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows:
-        repeat(4, minmax(0, 1fr));
-    gap: .65rem;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-}
-
-.today-progress-item {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    min-width: 0;
-    min-height: 0;
-    padding: .75rem 1rem;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    background:
-        linear-gradient(135deg,
-            var(--surface),
-            var(--surface-soft));
-}
-
-.today-progress-card>.today-progress-body {
-    height: 100%;
-    min-height: 0;
-    align-self: stretch;
-}
-
-.today-progress-icon {
-    position: relative;
-    z-index: 2;
-    width: 34px;
-    height: 34px;
-    flex: 0 0 34px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 11px;
-    background: var(--today-progress-icon-bg);
-    border: 1px solid var(--today-progress-icon-border);
-    color: var(--today-progress-icon-color);
-}
-
-.today-progress-icon i {
-    font-size: .8rem;
-}
-
-.today-progress-bg-icon {
-    position: absolute;
-    z-index: -1;
-    right: .35rem;
-    bottom: -.65rem;
-    font-size: 4.25rem;
-    color: var(--today-progress-icon-color);
-    opacity: .065;
-    pointer-events: none;
-    transform: rotate(-8deg);
-}
-
-.today-progress-label {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    gap: .7rem;
-    min-width: 0;
-    color: var(--text-2);
-    font-size: .8rem;
-    font-weight: 800;
-}
-
-.today-progress-value {
-    position: relative;
-    z-index: 2;
-    flex-shrink: 0;
-    color: var(--text-1);
-    font-size: 1.45rem;
-    font-weight: 900;
-}
-
-.today-progress-completed {
-    --today-progress-icon-color:
-        var(--status-completed-solid);
-
-    --today-progress-icon-bg:
-        var(--status-completed-bg);
-
-    --today-progress-icon-border:
-        var(--status-completed-border);
-}
-
-.today-progress-remaining {
-    --today-progress-icon-color:
-        var(--status-pending-solid);
-
-    --today-progress-icon-bg:
-        var(--status-pending-bg);
-
-    --today-progress-icon-border:
-        var(--status-pending-border);
-}
-
-.today-progress-followup {
-    --today-progress-icon-color:
-        var(--crimson);
-
-    --today-progress-icon-bg:
-        var(--crimson-soft);
-
-    --today-progress-icon-border:
-        var(--border);
-}
-
-.today-progress-walkin {
-    --today-progress-icon-color:
-        var(--text-2);
-
-    --today-progress-icon-bg:
-        var(--surface-soft);
-
-    --today-progress-icon-border:
-        var(--border);
-}
-
-[data-theme="dark"] .today-progress-bg-icon,
-.dark .today-progress-bg-icon {
-    opacity: .09;
-}
-
-[data-theme="dark"] .today-progress-item,
-.dark .today-progress-item {
-    background:
-        linear-gradient(135deg,
-            var(--surface),
-            var(--surface-soft));
-}
-
-[data-theme="dark"] #mainContent .w-9.h-9,
-[data-theme="dark"] #mainContent .status-icon-badge,
-.dark #mainContent .w-9.h-9,
-.dark #mainContent .status-icon-badge {
-    box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.04),
-        0 0 18px rgba(139, 0, 0, 0.22),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-
-[data-theme="dark"] #mainContent .animate-pulse,
-.dark #mainContent .animate-pulse {
-    box-shadow:
-        0 0 8px rgba(255, 255, 255, 0.6),
-        0 0 16px rgba(252, 165, 165, 0.6);
-}
-
-.greeting-icon {
-    animation: greetingGlow 2.5s ease-in-out infinite;
-}
-
-@keyframes greetingGlow {
-
-    0%,
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-
-    50% {
-        transform: scale(1.08);
-        opacity: .82;
-    }
-}
-
-[data-theme="dark"] .upcoming-date-btn.has-appointments,
-.dark .upcoming-date-btn.has-appointments {
-    background: var(--status-upcoming-bg) !important;
-    border-color: var(--status-upcoming-border) !important;
-    color: var(--status-upcoming-text) !important;
-}
-
-[data-theme="dark"] #mainContent #medicalSuppliesContainer .relative.z-10.flex.items-center.justify-between.mb-4 p,
-[data-theme="dark"] #mainContent #medicineSuppliesContainer .relative.z-10.flex.items-center.justify-between.mb-4 p,
-.dark #mainContent #medicalSuppliesContainer .relative.z-10.flex.items-center.justify-between.mb-4 p,
-.dark #mainContent #medicineSuppliesContainer .relative.z-10.flex.items-center.justify-between.mb-4 p {
-    color: var(--text-secondary, #C9D1D9) !important;
-}
-
-@media (max-width: 480px) {
-    .upcoming-date-navigation {
-        grid-template-columns:
-            28px minmax(0, 1fr) 28px;
-
-        gap: .25rem;
-    }
-
-    .upcoming-date-strip {
-        gap: .2rem;
-        padding-inline: 0;
-    }
-
-    .upcoming-date-btn {
-        min-width: 0 !important;
-        padding: .42rem .1rem;
-        border-radius: .75rem;
-    }
-
-    .upcoming-date-btn .text-sm {
-        font-size: .68rem !important;
-    }
-
-    .upcoming-date-btn .text-\[10px\] {
-        font-size: .5rem !important;
-    }
-
-    .appointment-status-badge {
-        max-width: none !important;
-        padding: 0.24rem 0.4rem !important;
-        font-size: 0.48rem !important;
-    }
-
-    #dayAppointmentsModal {
-        padding: 0.75rem !important;
-        align-items: center !important;
-    }
-
-    #dayAppointmentsModalBox {
-        width: min(100%, 304px) !important;
-        max-width: 304px !important;
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        border-radius: 17px !important;
-    }
-
-    #dayAppointmentsModalBox>div:first-child {
-        padding: 0.88rem 1rem !important;
-    }
-
-    #dayAppointmentsModalBox>div:first-child h3 {
-        font-size: 0.98rem !important;
-        line-height: 1.1 !important;
-    }
-
-    #dayAppointmentsModalDate {
-        font-size: 0.76rem !important;
-        line-height: 1.15 !important;
-    }
-
-    #dayAppointmentsModalBox>div:nth-child(2) {
-        padding: 0.72rem 0.78rem !important;
-        max-height: 54vh !important;
-        max-height: 54dvh !important;
-    }
-
-    #dayAppointmentsModalBox>div:last-child {
-        padding: 0 0.78rem 0.78rem !important;
-    }
-
-    #dayAppointmentsModalBox>div:last-child button {
-        min-height: 32px !important;
-        height: 32px !important;
-        border-radius: 0.7rem !important;
-        font-size: 0.72rem !important;
-    }
-
-    .scheduled-patient-card {
-        padding: 0.58rem !important;
-        border-radius: 13px !important;
-    }
-
-    .scheduled-patient-head {
-        grid-template-columns: 28px minmax(0, 1fr) auto !important;
-        gap: 0.36rem !important;
-    }
-
-    .appointment-status-badge {
-        padding: 0.25rem 0.42rem !important;
-        font-size: 0.5rem !important;
-    }
-
-    .scheduled-patient-name {
-        font-size: 0.68rem !important;
-        line-height: 1.05 !important;
-        letter-spacing: -0.055em !important;
-    }
-
-    .scheduled-patient-meta {
-        font-size: 0.55rem !important;
-        line-height: 1.1 !important;
-    }
-
-    .scheduled-patient-actions {
-        gap: 0.28rem !important;
-        margin-top: 0.54rem !important;
-    }
-
-    .dentist-dashboard-page {
-        padding-left: 10px !important;
-        padding-right: 10px !important;
-    }
-
-    .greeting-row {
-        margin-bottom: 0.75rem !important;
-    }
-
-    .greeting-banner {
-        border-radius: 16px !important;
-    }
-
-    .greeting-banner-inner {
-        min-height: auto !important;
-        padding: 0.62rem !important;
-        gap: 0.48rem !important;
-    }
-
-    .greeting-banner-copy {
-        width: 100% !important;
-    }
-
-    .greeting-heading,
-    .greeting-title {
-        font-size: 0.86rem !important;
-        line-height: 1.08 !important;
-        max-width: 100% !important;
-    }
-
-    #greetingText {
-        font-size: 0.86rem !important;
-        line-height: 1.08 !important;
-        font-weight: 650 !important;
-    }
-
-    .greeting-line {
-        line-height: 1.08 !important;
-    }
-
-    .greeting-name-line {
-        flex-wrap: nowrap !important;
-        white-space: nowrap !important;
-        gap: 0.22rem !important;
-        font-size: clamp(1rem, 5vw, 1.16rem) !important;
-        line-height: 1.04 !important;
-        font-weight: 900 !important;
-    }
-
-    .greeting-name-prefix,
-    #dentistName {
-        font-size: inherit !important;
-        line-height: inherit !important;
-        white-space: nowrap !important;
-        word-break: keep-all !important;
-        overflow-wrap: normal !important;
-    }
-
-    .greeting-name-line i {
-        font-size: 0.78rem !important;
-        margin-top: 0 !important;
-        margin-left: 0.08rem !important;
-        flex-shrink: 0 !important;
-    }
-
-    .greeting-subtitle {
-        font-size: 0.72rem !important;
-        line-height: 1.28 !important;
-        margin-top: 0.55rem !important;
-        max-width: 14rem !important;
-    }
-
-    .greeting-banner-actions {
-        display: grid !important;
-        grid-template-columns: minmax(0, 1fr) clamp(120px, 42vw, 170px) !important;
-        align-items: center !important;
-        gap: 0.5rem !important;
-
-        width: 100% !important;
-        max-width: 100% !important;
-        min-width: 0 !important;
-    }
-
-    .greeting-status-meta {
-        grid-column: 1 !important;
-        grid-row: 1 !important;
-
-        width: 100% !important;
-        min-width: 0 !important;
-        margin: 0 !important;
-        text-align: left !important;
-    }
-
-    .greeting-status-text {
-        white-space: normal !important;
-    }
-
-    .greeting-status-eyebrow {
-        font-size: 6.5px !important;
-        letter-spacing: 0.08em !important;
-        margin-bottom: 1px !important;
-    }
-
-    .greeting-status-text {
-        font-size: 9px !important;
-        line-height: 1.18 !important;
-    }
-
-    .status-btn-wrap {
-        grid-column: 2 !important;
-        grid-row: 1 !important;
-
-        width: auto !important;
-        max-width: none !important;
-        min-width: 0 !important;
-
-        margin: 0 !important;
-
-        justify-self: end !important;
-        align-self: center !important;
-
-        display: inline-flex !important;
-        align-items: center !important;
-
-        gap: 4px !important;
-        padding: 4px !important;
-    }
-
-    #statusBtn.ui-btn {
-        width: auto !important;
-        min-width: 64px !important;
-        min-height: 30px !important;
-
-        padding: 0 11px !important;
-
-        flex: 0 0 auto !important;
-
-        font-size: 10px !important;
-        gap: 5px !important;
-    }
-
-    #statusBtn .status-dot {
-        width: 5px !important;
-        height: 5px !important;
-        min-width: 5px !important;
-        min-height: 5px !important;
-    }
-
-    .status-icon-badge {
-        width: 26px !important;
-        height: 26px !important;
-    }
-
-    .status-icon-badge i {
-        font-size: 9px !important;
-    }
-
-
-    #statusLabel {
-        gap: 6px !important;
-        white-space: nowrap !important;
-    }
-
-    #gadAnalyticsContainer>div {
-        min-height: auto !important;
-        padding: 0.85rem !important;
-        border-radius: 16px !important;
-    }
-
-    .gad-metric-chip .w-2\.5.h-2\.5 {
-        width: 0.45rem !important;
-        height: 0.45rem !important;
-    }
-
-    .gad-chart-shell {
-        height: 220px;
-        min-height: 220px;
-    }
-}
-
-@media (max-width: 320px) {
-    .dentist-dashboard-page {
-        padding-left: 8px !important;
-        padding-right: 8px !important;
-    }
-
-    .greeting-banner-inner {
-        padding: 0.22rem !important;
-    }
-
-    .greeting-heading,
-    .greeting-title {
-        font-size: 0.78rem !important;
-        line-height: 1.08 !important;
-    }
-
-    #greetingText {
-        font-size: 0.78rem !important;
-        line-height: 1.08 !important;
-    }
-
-    .greeting-name-line {
-        font-size: 0.96rem !important;
-        line-height: 1.04 !important;
-        gap: 0.18rem !important;
-        flex-wrap: nowrap !important;
-        white-space: nowrap !important;
-        letter-spacing: -0.065em !important;
-    }
-
-    .greeting-name-line i {
-        font-size: 0.68rem !important;
-        margin-left: 0.05rem !important;
-    }
-
-    .greeting-subtitle {
-        font-size: 0.64rem !important;
-        max-width: 12rem !important;
-    }
-
-    .status-btn-wrap {
-        max-width: 150px !important;
-        padding: 3px !important;
-        grid-template-columns: 26px minmax(78px, 1fr) !important;
-    }
-}
-
-@media (max-width: 767px) {
     .scheduled-modal-list {
         gap: .45rem;
     }
@@ -1691,10 +1582,6 @@
 
         padding:
             .62rem .6rem .62rem .72rem;
-    }
-
-    .scheduled-modal-patient-card .patient-avatar {
-        --patient-avatar-size: 32px;
     }
 
     .scheduled-modal-name-row .global-record-name {
@@ -1720,253 +1607,222 @@
         height: auto !important;
     }
 
-    body.role-dentist #dentistCalendarContainer .cal-shell {
-        min-height: auto !important;
-        padding: 0.72rem !important;
-        border-radius: 15px !important;
+    .upcoming-date-navigation {
+        width: 100%;
+        min-width: 0;
+
+        grid-template-columns:
+            auto minmax(0, 1fr) auto;
+
+        gap: clamp(.18rem, 1vw, .35rem);
+
+        align-items: center;
+
+        margin-bottom: .55rem;
     }
 
-    body.role-dentist #dentistCalendarContainer .cal-grid {
-        gap: 5px 3px !important;
+    .upcoming-date-navigation>.ui-action-btn {
+        --ui-action-size: clamp(27px, 8vw, 31px);
+
+        border-radius: clamp(8px, 2.5vw, 10px);
     }
 
-    body.role-dentist #dentistCalendarContainer .cal-cell-wrap {
-        height: 42px !important;
-        min-height: 42px !important;
-        padding: 2px 0 !important;
+    .upcoming-date-navigation>.ui-action-btn i {
+        font-size: clamp(8px, 2.7vw, 10px);
     }
 
-    body.role-dentist #dentistCalendarContainer .cal-cell {
-        width: 32px !important;
-        height: 32px !important;
-        border-radius: 12px !important;
-        font-size: 0.82rem !important;
+    .upcoming-date-strip {
+        width: 100%;
+        min-width: 0;
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(7, minmax(0, 1fr));
+
+        gap: clamp(.12rem, .7vw, .28rem);
+
+        padding:
+            .55rem clamp(.05rem, .4vw, .12rem) .7rem;
+
+        overflow: visible;
     }
 
-    body.role-dentist #dentistCalendarContainer .cal-day-label {
-        font-size: 0.66rem !important;
-        letter-spacing: 0.04em !important;
+    .upcoming-date-btn {
+        width: 100%;
+        min-width: 0 !important;
+
+        padding:
+            clamp(.38rem, 1.8vw, .5rem) 0;
+
+        border-radius:
+            clamp(.62rem, 2.5vw, .85rem);
+
+        line-height: 1;
     }
 
-    body.role-dentist #dentistCalendarContainer .cal-month-label {
-        font-size: 1.05rem !important;
-        line-height: 1.1 !important;
+    .upcoming-date-btn .text-sm {
+        font-size:
+            clamp(.62rem, 2.8vw, .72rem) !important;
+
+        line-height: 1 !important;
     }
 
-    body.role-dentist #dentistCalendarContainer .cal-legend {
-        gap: 0.35rem !important;
-        margin-top: 0.6rem !important;
-        padding-top: 0.55rem !important;
+    .upcoming-date-btn .text-\[10px\] {
+        margin-top: .18rem;
+
+        font-size:
+            clamp(.45rem, 2vw, .55rem) !important;
+
+        line-height: 1 !important;
+
+        white-space: nowrap;
     }
 
-    body.role-dentist #dentistCalendarContainer .cal-pill {
-        padding: 0.32rem 0.58rem !important;
-        font-size: 0.64rem !important;
-        gap: 0.32rem !important;
+    .upcoming-date-badge {
+        top: -5px;
+        right: -4px;
+
+        min-width: 15px;
+        height: 15px;
+
+        padding: 0 3px;
+
+        border-width: 1.5px;
+
+        font-size: .48rem;
+    }
+
+    .dashboard-lower-stack {
+        display: flex !important;
+        flex-direction: column !important;
+
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+
+        gap: .85rem !important;
+
+        grid-template-columns: none !important;
+        grid-template-rows: none !important;
+        grid-auto-flow: initial !important;
+    }
+
+    #gadAnalyticsContainer,
+    #todayTreatmentProgressContainer {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+
+        flex: 0 0 auto !important;
+    }
+
+    #gadAnalyticsContainer>.card,
+    #todayTreatmentProgressContainer>.card {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
     }
 }
 
 @media (max-width: 380px) {
-    body.role-dentist #dentistCalendarContainer .cal-shell {
-        padding: 0.6rem !important;
+    .greeting-banner-actions {
+        gap: .35rem !important;
     }
 
-    body.role-dentist #dentistCalendarContainer .cal-grid {
-        gap: 4px 2px !important;
+    .greeting-status-eyebrow {
+        font-size: 6px !important;
     }
 
-    body.role-dentist #dentistCalendarContainer .cal-cell-wrap {
-        height: 39px !important;
-        min-height: 39px !important;
+    .greeting-status-text {
+        font-size: 8px !important;
     }
 
-    body.role-dentist #dentistCalendarContainer .cal-cell {
-        width: 29px !important;
-        height: 29px !important;
-        border-radius: 10px !important;
-        font-size: 0.76rem !important;
+    .status-btn-wrap {
+        gap: 3px !important;
+        padding: 3px !important;
     }
 
-    body.role-dentist #dentistCalendarContainer .cal-pill {
-        font-size: 0.6rem !important;
-        padding: 0.3rem 0.5rem !important;
-    }
-}
+    .status-icon-badge {
+        width: 24px !important;
+        height: 24px !important;
 
-#dayAppointmentsModal {
-    overscroll-behavior: contain;
-}
-
-#dayAppointmentsModalBox {
-    display: flex !important;
-    flex-direction: column !important;
-
-    max-height: min(86vh, 620px) !important;
-
-    max-height: min(86dvh, 620px) !important;
-}
-
-#dayAppointmentsModalBox>div:nth-child(2) {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    overflow-y: auto !important;
-}
-
-#dayAppointmentsModalBox>div:last-child {
-    padding: 0 0.85rem 0.85rem !important;
-}
-
-#dayAppointmentsModalBox>div:last-child button {
-    min-height: 34px !important;
-    height: 34px !important;
-    border-radius: 0.75rem !important;
-    font-size: 0.76rem !important;
-    line-height: 1 !important;
-}
-
-.scheduled-patient-card {
-    border: 1px solid #f1e3e3 !important;
-    border-radius: 14px !important;
-    padding: 0.62rem !important;
-    background: #ffffff !important;
-    overflow: hidden !important;
-}
-
-.scheduled-patient-head {
-    display: grid !important;
-    grid-template-columns: 28px minmax(0, 1fr) auto !important;
-    align-items: start !important;
-    gap: 0.42rem !important;
-    min-width: 0 !important;
-}
-
-.scheduled-patient-info {
-    min-width: 0 !important;
-    overflow: hidden !important;
-}
-
-.scheduled-patient-name {
-    display: block !important;
-    max-width: 100% !important;
-    font-size: clamp(0.62rem, 2.9vw, 0.74rem) !important;
-    font-weight: 850 !important;
-    line-height: 1.05 !important;
-    letter-spacing: -0.045em !important;
-    color: #1f2937 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: clip !important;
-    word-break: keep-all !important;
-    overflow-wrap: normal !important;
-}
-
-.scheduled-patient-name:hover {
-    color: #8B0000 !important;
-}
-
-.scheduled-patient-meta {
-    display: flex !important;
-    align-items: flex-start !important;
-    gap: 0.24rem !important;
-    margin-top: 0.12rem !important;
-    font-size: 0.58rem !important;
-    line-height: 1.12 !important;
-    color: #374151 !important;
-    min-width: 0 !important;
-}
-
-.scheduled-patient-meta i {
-    flex-shrink: 0 !important;
-    margin-top: 0.08rem !important;
-    font-size: 0.54rem !important;
-    color: #6b7280 !important;
-}
-
-.scheduled-patient-meta-lines {
-    display: flex !important;
-    flex-direction: column !important;
-    min-width: 0 !important;
-    gap: 0.03rem !important;
-}
-
-.scheduled-patient-service,
-.scheduled-patient-schedule {
-    display: block !important;
-    line-height: 1.12 !important;
-    white-space: normal !important;
-    overflow: visible !important;
-    text-overflow: clip !important;
-}
-
-.scheduled-patient-service {
-    font-weight: 650 !important;
-    color: #4b5563 !important;
-}
-
-.scheduled-patient-schedule {
-    font-weight: 650 !important;
-    color: #8B0000 !important;
-}
-
-.scheduled-patient-actions {
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 0.32rem !important;
-    margin-top: 0.58rem !important;
-    width: 100% !important;
-}
-
-[data-theme="dark"] .sched-patient-name,
-.dark .sched-patient-name {
-    color: #F8FAFC !important;
-    background: rgba(23, 23, 23, 0.12) !important;
-    font-weight: 700 !important;
-}
-
-[data-theme="dark"] .sched-time,
-.dark .sched-time,
-[data-theme="dark"] .sched-service,
-.dark .sched-service {
-    color: #CBD5E1 !important;
-    background: rgba(23, 23, 23, 0.12) !important;
-}
-
-
-html {
-    -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
-}
-
-.upcoming-date-strip,
-.upcoming-list-area,
-#dayAppointmentsModalBox>div:nth-child(2),
-#medicalSuppliesContainer .relative.z-10.overflow-y-auto,
-#medicineSuppliesContainer .relative.z-10.overflow-y-auto {
-    -webkit-overflow-scrolling: touch;
-}
-
-@media (hover: none),
-(pointer: coarse) {
-
-    #medicalSuppliesContainer a:hover,
-    #medicineSuppliesContainer a:hover {
-        transform: none !important;
-    }
-}
-
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-
-    .status-btn-wrap,
-    .gad-chart-shell {
-        background: rgba(255, 255, 255, 0.96) !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
+        flex-basis: 24px !important;
     }
 
-    [data-theme="dark"] .status-btn-wrap,
-    [data-theme="dark"] .gad-chart-shell,
-    .dark .status-btn-wrap,
-    .dark .gad-chart-shell {
-        background: rgba(22, 27, 34, 0.96) !important;
+    #dentistCalendarContainer .dentist-calendar-title {
+        transform: translateY(3px);
+    }
+
+    .upcoming-date-navigation {
+        gap: .16rem;
+    }
+
+    .upcoming-date-navigation>.ui-action-btn {
+        --ui-action-size: 27px;
+
+        border-radius: 8px;
+    }
+
+    .upcoming-date-navigation>.ui-action-btn i {
+        font-size: 8px;
+    }
+
+    .upcoming-date-strip {
+        gap: .1rem;
+
+        padding:
+            .5rem 0 .65rem;
+    }
+
+    .upcoming-date-btn {
+        padding:
+            .38rem 0;
+
+        border-radius: .62rem;
+    }
+
+    .upcoming-date-btn .text-sm {
+        font-size: .6rem !important;
+    }
+
+    .upcoming-date-btn .text-\[10px\] {
+        margin-top: .16rem;
+
+        font-size: .43rem !important;
+    }
+
+    .upcoming-date-badge {
+        top: -4px;
+        right: -3px;
+
+        min-width: 14px;
+        height: 14px;
+
+        font-size: .44rem;
+    }
+
+    .greeting-clinic-status-group {
+        gap: .3rem !important;
+    }
+
+    .greeting-status-eyebrow {
+        font-size: 6px !important;
+    }
+
+    .greeting-status-text {
+        font-size: 8px !important;
+    }
+
+    .status-btn-wrap {
+        gap: 3px !important;
+        padding: 3px !important;
+    }
+
+    .status-icon-badge {
+        width: 24px !important;
+        height: 24px !important;
+
+        flex: 0 0 24px !important;
     }
 }

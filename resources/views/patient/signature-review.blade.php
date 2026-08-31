@@ -5,7 +5,7 @@
 @section('title', 'Re-upload Signature')
 
 @section('content')
-    <main id="mainContent" class="patient-page-shell page-enter patient-signature-review-page">
+    <main id="mainContent" class="app-page-shell page-enter patient-signature-review-page">
         <div class="mx-auto w-full max-w-[1480px] px-4 md:px-5 xl:px-6">
             <div
                 class="relative overflow-hidden rounded-[32px] border border-[#f0dfd7] bg-[radial-gradient(circle_at_top_left,_rgba(139,0,0,0.08),_transparent_35%),linear-gradient(180deg,_#fffdfc_0%,_#fff8f5_100%)] shadow-[0_24px_60px_rgba(90,40,24,0.08)]">

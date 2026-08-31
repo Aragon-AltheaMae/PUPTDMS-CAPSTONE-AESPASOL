@@ -4,6 +4,10 @@
 
 @section('body-class', 'auth-guest-body auth-landing-body')
 
+@section('styles')
+    @vite('resources/css/pages/auth/login.css')
+@endsection
+
 @section('content')
 <div class="auth-landing-page">
   <header class="auth-landing-header">
@@ -63,10 +67,12 @@
         <i class="fa-solid fa-arrow-right-to-bracket"></i>
         Login with SSO
       </a>
+      @unless ($idpAvailable ?? true)
       <a href="{{ route('backup.login') }}" class="auth-landing-mobile-local">
         <i class="fa-solid fa-key"></i>
         Login Locally
       </a>
+      @endunless
     </div>
   </div>
 
@@ -95,6 +101,7 @@
               <i class="fa-solid fa-arrow-right auth-landing-action-arrow"></i>
             </a>
 
+            @unless ($idpAvailable ?? true)
             <a href="{{ route('backup.login') }}" class="auth-landing-secondary-login">
               <span class="auth-landing-action-icon">
                 <i class="fa-solid fa-key"></i>
@@ -104,6 +111,7 @@
                 Login Locally
               </span>
             </a>
+            @endunless
           </div>
 
           <div class="auth-landing-trust-row">

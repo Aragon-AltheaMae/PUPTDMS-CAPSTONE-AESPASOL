@@ -16,6 +16,7 @@ use App\Helpers\PhilippineHolidays;
 use App\Notifications\AppointmentCancelledNotification;
 use App\Notifications\AppointmentRescheduledNotification;
 use App\Models\ServiceType;
+use App\Models\ReservedBookingPeriod;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -48,6 +49,7 @@ class DentistAppointmentController extends Controller
 
         Appointment::query()
             ->whereIn('status', ['upcoming', 'rescheduled'])
+            ->whereNull('reserved_booking_period_id')
             ->where(function ($query) use ($cutoff) {
                 $query
                     ->whereDate(
@@ -69,10 +71,31 @@ class DentistAppointmentController extends Controller
                     });
             })
             ->update($updatePayload);
+
+        $expiredReservedPeriodIds = ReservedBookingPeriod::query()
+            ->where(function ($query) use ($cutoff) {
+                $query->whereDate('reserved_date', '<', $cutoff->toDateString())
+                    ->orWhere(function ($sameDay) use ($cutoff) {
+                        $sameDay->whereDate('reserved_date', $cutoff->toDateString())
+                            ->whereTime('end_time', '<', $cutoff->format('H:i:s'));
+                    });
+            })
+            ->pluck('id');
+
+        if ($expiredReservedPeriodIds->isNotEmpty()) {
+            Appointment::query()
+                ->whereIn('status', ['upcoming', 'rescheduled'])
+                ->whereIn('reserved_booking_period_id', $expiredReservedPeriodIds)
+                ->update([
+                    ...$updatePayload,
+                    'reserved_booking_period_slot_id' => null,
+                ]);
+        }
     }
 
     public function index(Request $request)
     {
+        $user = Auth::user();
 
         $activeRole = session('impersonated_role') ?: session('role');
 
@@ -84,7 +107,7 @@ class DentistAppointmentController extends Controller
 
         $today = Carbon::today()->toDateString();
 
-        $upcomingAppointments = Appointment::with(['patient', 'procedure', 'followUpAppointments'])
+        $upcomingAppointments = Appointment::with(['patient', 'procedure', 'followUpAppointments', 'reservedBookingPeriod'])
             ->whereIn('status', ['upcoming', 'rescheduled'])
             ->whereDate('appointment_date', '>=', $today)
             ->orderBy('appointment_date', 'asc')
@@ -93,7 +116,7 @@ class DentistAppointmentController extends Controller
 
         $appointments = $upcomingAppointments;
 
-        $pastAppointments = Appointment::with(['patient', 'procedure', 'followUpAppointments',])
+        $pastAppointments = Appointment::with(['patient', 'procedure', 'followUpAppointments', 'reservedBookingPeriod'])
             ->whereIn('status', ['completed', 'cancelled',])
             ->orderBy('appointment_date', 'desc')
             ->orderBy('appointment_time', 'desc')
@@ -174,15 +197,15 @@ class DentistAppointmentController extends Controller
         return view('shared.appointments', [
             'layoutRole' => 'dentist',
             'pageTitle' => 'Appointments',
-            'pageShellClass' => 'dentist-page-shell',
+            'pageShellClass' => 'app-page-shell',
 
             'isDentistView' => true,
 
-            'canStartProcedure' => true,
-            'canRescheduleAppointment' => true,
-            'canCancelAppointment' => true,
-            'canViewTreatmentRecord' => true,
-            'canScheduleFollowUp' => true,
+            'canStartProcedure' => $user?->hasPermission('create_procedure_records') ?? false,
+            'canRescheduleAppointment' => $user?->hasPermission('reschedule_appointments') ?? false,
+            'canCancelAppointment' => $user?->hasPermission('cancel_appointments') ?? false,
+            'canViewTreatmentRecord' => $user?->hasPermission('view_dental_records') ?? false,
+            'canScheduleFollowUp' => false,
 
             'patientProfileRouteName' => 'dentist.dentist.patient.profile',
 
@@ -305,7 +328,7 @@ class DentistAppointmentController extends Controller
 
         $this->syncOverdueAppointmentsToCancelled();
 
-        $appointment = Appointment::with('patient')->findOrFail($id);
+        $appointment = Appointment::with(['patient', 'reservedBookingPeriod'])->findOrFail($id);
 
         if (!$appointment->patient) {
             return redirect()
@@ -331,6 +354,12 @@ class DentistAppointmentController extends Controller
                 );
         }
 
+        if ($appointment->reserved_booking_period_id && ! $appointment->reservedProcedureWindowIsOpen()) {
+            return redirect()
+                ->route('dentist.dentist.appointments')
+                ->with('error', 'Reserved appointments can be started anytime from the beginning until the end of their reserved period.');
+        }
+
         AuditLogger::log(
             'view',
             'dentist_appointments',
@@ -353,6 +382,7 @@ class DentistAppointmentController extends Controller
         $appointment->update([
             'status' => 'cancelled',
             'cancellation_reason' => $request->reason,
+            'reserved_booking_period_slot_id' => null,
         ]);
 
         $patientUser = optional($appointment->patient)->user;
@@ -415,6 +445,13 @@ class DentistAppointmentController extends Controller
         }
 
         $appointment = Appointment::with('patient.user')->findOrFail($id);
+
+        if ($appointment->reserved_booking_period_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Reserved appointments must stay within their assigned period and cannot be rescheduled individually.',
+            ], 422);
+        }
 
         $mysqlTime = Carbon::createFromFormat('g:i A', trim($request->new_appointment_time))->format('H:i:s');
 

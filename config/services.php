@@ -42,6 +42,10 @@ return [
 
     'idp' => [
         'login_url' => env('IDP_LOGIN_URL'),
+        'health_url' => env('IDP_HEALTH_URL', env('IDP_LOGIN_URL')),
+        'health_timeout' => env('IDP_HEALTH_TIMEOUT', 3),
+        'health_cache_seconds' => env('IDP_HEALTH_CACHE_SECONDS', 30),
+        'force_down' => env('IDP_FORCE_DOWN', false),
     ],
 
     'openai' => [

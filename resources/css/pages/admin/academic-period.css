@@ -505,11 +505,6 @@
     }
 }
 
-[data-theme="dark"] #mainContent.academic-period-page,
-.dark #mainContent.academic-period-page {
-    background: #020c16 !important;
-}
-
 [data-theme="dark"] .active-banner {
     background: linear-gradient(145deg, rgba(22, 27, 34, .90), rgba(13, 17, 23, .82)) !important;
     border-color: rgba(255, 255, 255, .10) !important;
@@ -572,12 +567,6 @@
     max-width: 100%;
 }
 
-[data-theme="dark"] #mainContent.academic-period-page,
-.dark #mainContent.academic-period-page {
-    background: #0d0f12 !important;
-    color: #E5E7EB !important;
-}
-
 [data-theme="dark"] .academic-period-page .active-banner,
 .dark .academic-period-page .active-banner {
     background:
@@ -632,8 +621,9 @@
 
 #mainContent.academic-period-page .ap-content-layout {
     display: grid !important;
-    grid-template-columns: minmax(0, 1fr) minmax(390px, 420px) !important;
-    gap: 1.5rem !important;
+    grid-template-columns: minmax(0, 1.14fr) minmax(320px, 360px) !important;
+    gap: 1.25rem !important;
+    align-items: start !important;
 }
 
 #mainContent.academic-period-page .ap-periods-column {
@@ -644,13 +634,6 @@
     #mainContent.academic-period-page .ap-content-layout {
         grid-template-columns: 1fr !important;
     }
-}
-
-[data-theme="dark"] #addModal .ap-add-body,
-[data-theme="dark"] #editModal .ap-add-body,
-.dark #addModal .ap-add-body,
-.dark #editModal .ap-add-body {
-    background: #0c111b !important;
 }
 
 [data-theme="dark"] #addModal .ap-panel-soft,
@@ -690,12 +673,6 @@
     color: #E5E7EB !important;
 }
 
-[data-theme="dark"] #mainContent.academic-period-page,
-.dark #mainContent.academic-period-page {
-    background: #0d0f12 !important;
-    color: #E5E7EB !important;
-}
-
 [data-theme="dark"] #mainContent.academic-period-page #liveAmPm,
 [data-theme="dark"] #mainContent.academic-period-page #liveDay,
 .dark #mainContent.academic-period-page #liveAmPm,
@@ -706,13 +683,6 @@
 [data-theme="dark"] #mainContent.academic-period-page #liveDate,
 .dark #mainContent.academic-period-page #liveDate {
     color: #E5E7EB !important;
-}
-
-[data-theme="dark"] #addModal .ap-add-body,
-[data-theme="dark"] #editModal .ap-add-body,
-.dark #addModal .ap-add-body,
-.dark #editModal .ap-add-body {
-    background: #0c111b !important;
 }
 
 [data-theme="dark"] #editModal .ap-panel,

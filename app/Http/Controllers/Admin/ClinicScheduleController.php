@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\BlockedDate;
 use App\Models\ClinicSchedule;
 use App\Models\Appointment;
+use App\Models\ReservedBookingPeriod;
+use App\Services\StudentTargetOptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Helpers\PhilippineHolidays;
@@ -13,10 +15,16 @@ use App\Helpers\PhilippineHolidays;
 class ClinicScheduleController extends Controller
 {
     private const ALL_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    public function index()
+    public function index(StudentTargetOptionService $studentTargetOptionService)
     {
         $schedules    = ClinicSchedule::active()->orderBy('id')->get();
         $blockedDates = BlockedDate::orderBy('date')->get();
+        $reservedBookingPeriods = ReservedBookingPeriod::query()
+            ->with(['creator:id,name', 'slots'])
+            ->orderBy('reserved_date')
+            ->orderBy('start_time')
+            ->get();
+        $studentTargetOptions = $studentTargetOptionService->get();
 
         $startDate = Carbon::now()->startOfMonth()->subMonth();
         $endDate   = Carbon::now()->endOfMonth()->addMonths(3);
@@ -60,11 +68,13 @@ class ClinicScheduleController extends Controller
         return view('shared.clinic-schedule', [
             'layoutRole' => 'admin',
             'pageTitle' => 'Clinic Schedule',
-            'pageShellClass' => 'admin-page-shell',
+            'pageShellClass' => 'app-page-shell',
             'isDentistView' => false,
 
             'schedules' => $schedules,
             'blockedDates' => $blockedDates,
+            'reservedBookingPeriods' => $reservedBookingPeriods,
+            'studentTargetOptions' => $studentTargetOptions,
             'appointmentCountsPerDay' => $appointmentCountsPerDay,
             'weeklyAppointments' => $weeklyAppointments,
             'philippineHolidays' => $philippineHolidays,
@@ -76,6 +86,9 @@ class ClinicScheduleController extends Controller
                 'destroy' => 'admin.clinic_schedule.destroy',
                 'block' => 'admin.clinic_schedule.block',
                 'unblock' => 'admin.clinic_schedule.unblock',
+                'reserved_store' => 'admin.clinic_schedule.reserved_periods.store',
+                'reserved_update' => 'admin.clinic_schedule.reserved_periods.update',
+                'reserved_destroy' => 'admin.clinic_schedule.reserved_periods.destroy',
             ],
         ]);
     }

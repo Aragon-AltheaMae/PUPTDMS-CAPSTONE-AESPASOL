@@ -11,7 +11,7 @@
 }
 
 .global-filter-select.is-open {
-    z-index: 100;
+    z-index: 200;
 }
 
 .global-filter-select-trigger {
@@ -224,7 +224,7 @@
         opacity .16s ease,
         visibility .16s ease,
         transform .16s ease;
-    z-index: 101;
+    z-index: 201;
 }
 
 .global-filter-select[data-menu-align="right"] .global-filter-select-menu {
@@ -537,17 +537,127 @@
 @media (max-width: 767px) {
 
     .global-filter-select {
-        width: 100%;
-        max-width: 100%;
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: none !important;
+
+        flex: 1 1 auto !important;
     }
 
     .global-filter-select-trigger {
-        width: 100%;
+        width: 100% !important;
+
+        height: 36px;
+        min-height: 36px;
+
+        padding: 3px 8px;
+        gap: 7px;
+
+        border-radius: 11px;
+    }
+
+    .global-filter-select-main {
+        gap: 6px;
+    }
+
+    .global-filter-select-icon {
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+
+        flex-basis: 24px;
+
+        border-radius: 7px;
+
+        font-size: 9px;
+    }
+
+    .global-filter-select-label {
+        font-size: 6.5px;
+    }
+
+    .global-filter-select-value {
+        font-size: 10.5px;
+    }
+
+    .global-filter-select-meta {
+        gap: 5px;
+    }
+
+    .global-filter-select-count {
+        min-width: 18px;
+        height: 18px;
+
+        padding: 0 4px;
+
+        font-size: 7.5px;
+    }
+
+    .global-filter-select-chevron {
+        font-size: 8px;
     }
 
     .global-filter-select-menu {
-        width: 100%;
-        min-width: 100%;
-        max-width: 100%;
+        width: max(100%, 190px) !important;
+        min-width: 190px !important;
+
+        max-width:
+            min(250px,
+                calc(100vw - 24px)) !important;
+
+        padding: 4px;
+
+        border-radius: 11px;
+    }
+
+    .global-filter-select-option {
+        min-height: 32px;
+
+        padding: 4px 6px;
+
+        border-radius: 8px;
+    }
+
+    .global-filter-select-option-icon {
+        width: 22px;
+        height: 22px;
+        min-width: 22px;
+
+        flex-basis: 22px;
+
+        font-size: 8px;
+    }
+
+    .global-filter-select-option-label {
+        font-size: 10px;
+    }
+
+    .global-filter-select-option-count {
+        min-width: 18px;
+        height: 18px;
+
+        font-size: 7.5px;
+    }
+}
+
+@media (max-width: 380px) {
+
+    .global-filter-select-trigger {
+        height: 34px;
+        min-height: 34px;
+
+        border-radius: 10px;
+    }
+
+    .global-filter-select-icon {
+        width: 22px;
+        height: 22px;
+        min-width: 22px;
+
+        flex-basis: 22px;
+    }
+
+    .global-filter-select-value {
+        font-size: 10px;
     }
 }

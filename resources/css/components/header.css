@@ -104,7 +104,7 @@
     border-radius: 999px;
     background: #fff;
     color: #980000;
-    font-size: 0.65rem;
+    font-size: 10px;
     font-weight: 800;
     line-height: 18px;
     text-align: center;
@@ -156,7 +156,7 @@
 }
 
 .header-name {
-    font-size: 0.8rem;
+    font-size: 13px;
     font-weight: 700;
     line-height: 1.1;
     color: #fff;
@@ -165,7 +165,7 @@
 }
 
 .header-role {
-    font-size: 0.65rem;
+    font-size: 10px;
     color: rgba(255, 255, 255, 0.8);
     line-height: 1.1;
     margin-top: 2px;
@@ -381,7 +381,7 @@ header-notif-item:hover {
     width: 34px;
     height: 34px;
     border-radius: 12px;
-    background: var(--brand-red-soft);
+    background: var(--crimson-soft);
     color: var(--crimson);
     display: inline-flex;
     align-items: center;
@@ -664,8 +664,12 @@ header-notif-item:hover {
 }
 
 @media (max-width: 768px) {
+    :root {
+        --header-h: 68px;
+    }
+
     .header {
-        height: 68px;
+        height: var(--header-h);
         padding: 0 12px;
     }
 
@@ -675,7 +679,7 @@ header-notif-item:hover {
     }
 
     .header-title {
-        font-size: 0.84rem;
+        font-size: 13px;
         max-width: 140px;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -857,7 +861,7 @@ header-notif-item:hover {
 
 [data-theme="dark"] .header-notif-pill,
 .dark .header-notif-pill {
-    background: var(--brand-red-soft) !important;
+    background: var(--crimson-soft) !important;
     color: #FCA5A5 !important;
     border: 1px solid rgba(252, 165, 165, 0.18) !important;
 }

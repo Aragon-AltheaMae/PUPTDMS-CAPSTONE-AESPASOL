@@ -275,7 +275,7 @@
 
 .patient-summary-cover {
     height: 92px;
-    background: var(--brand-red, #8b0000);
+    background: var(--crimson, #8b0000);
 }
 
 .patient-summary-avatar-wrap {
@@ -444,7 +444,7 @@
 
 [data-theme="dark"] .patient-summary-cover,
 .dark .patient-summary-cover {
-    background: var(--brand-red, #8b0000);
+    background: var(--crimson, #8b0000);
 }
 
 [data-theme="dark"] .patient-summary-avatar,

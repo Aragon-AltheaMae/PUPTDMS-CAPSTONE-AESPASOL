@@ -456,14 +456,6 @@ body.role-patient #mainContent.patient-dashboard-page .dashboard-glass {
 }
 
 @media only screen and (min-width: 1200px) {
-    body.role-patient #mainContent.patient-dashboard-page {
-        padding-top: 78px !important;
-    }
-
-    body.role-patient #mainContent.patient-dashboard-page .greeting-row {
-        margin-bottom: 0.75rem !important;
-    }
-
     body.role-patient #mainContent.patient-dashboard-page .dashboard-grid-tight {
         gap: 1.25rem !important;
     }
@@ -641,7 +633,7 @@ body.role-patient #mainContent .patient-privacy-toggle {
 }
 
 [data-theme="dark"] .request-doc-card-primary .request-doc-icon {
-    background: var(--brand-red-soft);
+    background: var(--crimson-soft);
     color: #FCA5A5;
 }
 
@@ -651,7 +643,7 @@ body.role-patient #mainContent .patient-privacy-toggle {
 }
 
 [data-theme="dark"] .request-doc-badge-primary {
-    background: var(--brand-red-soft);
+    background: var(--crimson-soft);
     color: #FCA5A5;
 
     border-color:
@@ -689,6 +681,142 @@ body.role-patient #mainContent.patient-dashboard-page .greeting-insight-chip:hov
 body.role-patient #mainContent.patient-dashboard-page,
 body.role-patient #mainContent.patient-dashboard-page * {
     min-width: 0;
+}
+
+.reserved-dashboard-reminders {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.reserved-dashboard-reminder {
+    overflow: hidden;
+    border-color: rgba(185, 28, 28, .16);
+}
+
+.reserved-dashboard-reminder-header {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #f3e8e8;
+    background: linear-gradient(90deg, #fff, #fff8f8);
+}
+
+.reserved-dashboard-reminder-icon,
+.reserved-dashboard-reminder-bell {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 2.85rem;
+    height: 2.85rem;
+    border: 1px solid #fecaca;
+    border-radius: .85rem;
+    background: #fff7f7;
+    color: #a40000;
+}
+
+.reserved-dashboard-reminder-heading {
+    flex: 1 1 auto;
+}
+
+.reserved-dashboard-reminder-title-row,
+.reserved-dashboard-reminder-meta,
+.reserved-dashboard-reminder-body,
+.reserved-dashboard-reminder-message {
+    display: flex;
+    align-items: center;
+}
+
+.reserved-dashboard-reminder-title-row {
+    flex-wrap: wrap;
+    gap: .55rem;
+}
+
+.reserved-dashboard-reminder-title-row h2 {
+    margin: 0;
+    color: #1f2937;
+    font-size: .95rem;
+    font-weight: 800;
+}
+
+.reserved-dashboard-reminder-meta {
+    flex-wrap: wrap;
+    gap: .35rem 1rem;
+    margin-top: .35rem;
+    color: #6b7280;
+    font-size: .78rem;
+}
+
+.reserved-dashboard-reminder-meta > span {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+}
+
+.reserved-dashboard-reminder-body {
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+}
+
+.reserved-dashboard-reminder-message {
+    flex: 1 1 auto;
+    gap: .8rem;
+    padding: .8rem 1rem;
+    border: 1px solid #f1e4e4;
+    border-radius: .9rem;
+    background: #fff;
+}
+
+.reserved-dashboard-reminder-message strong {
+    display: block;
+    color: #1f2937;
+    font-size: .84rem;
+}
+
+.reserved-dashboard-reminder-message p {
+    margin: .15rem 0 0;
+    color: #6b7280;
+    font-size: .78rem;
+    line-height: 1.45;
+}
+
+.reserved-dashboard-reminder-action {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+[data-theme="dark"] .reserved-dashboard-reminder-header {
+    border-bottom-color: rgba(255, 255, 255, .08);
+    background: linear-gradient(90deg, rgba(255, 255, 255, .04), rgba(127, 29, 29, .12));
+}
+
+[data-theme="dark"] .reserved-dashboard-reminder-title-row h2,
+[data-theme="dark"] .reserved-dashboard-reminder-message strong {
+    color: #f3f4f6;
+}
+
+[data-theme="dark"] .reserved-dashboard-reminder-message {
+    border-color: rgba(255, 255, 255, .08);
+    background: rgba(255, 255, 255, .035);
+}
+
+@media (max-width: 767px) {
+    .reserved-dashboard-reminder-header,
+    .reserved-dashboard-reminder-body {
+        padding: .9rem;
+    }
+
+    .reserved-dashboard-reminder-body {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .reserved-dashboard-reminder-action {
+        width: 100%;
+    }
 }
 
 .request-doc-card h3,
@@ -1222,7 +1350,7 @@ body.role-patient #mainContent.patient-dashboard-page * {
 }
 
 [data-theme="dark"] .patient-profile-next-visit-icon {
-    background: var(--brand-red-soft);
+    background: var(--crimson-soft);
     color: #FCA5A5;
 }
 
@@ -1317,7 +1445,7 @@ body.role-patient #mainContent.patient-dashboard-page * {
 }
 
 [data-theme="dark"] .patient-profile-summary-icon {
-    background: var(--brand-red-soft);
+    background: var(--crimson-soft);
     color: #FCA5A5;
 }
 
@@ -1699,7 +1827,7 @@ body.role-patient #mainContent.patient-dashboard-page * {
 }
 
 [data-theme="dark"] .dental-record-card.is-latest .dental-record-icon {
-    background: var(--brand-red-soft);
+    background: var(--crimson-soft);
     color: #FCA5A5;
 }
 

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Patient extends Model
 {
@@ -20,6 +21,7 @@ class Patient extends Model
         'height_m',
         'weight_kg',
         'faculty_code',
+        'classification',
         'student_no',
         'course_code',
         'course_name',
@@ -43,6 +45,23 @@ class Patient extends Model
         'is_pwd' => 'boolean',
         'is_senior' => 'boolean',
     ];
+
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                if (!$value) {
+                    return $value;
+                }
+
+                return mb_convert_case(
+                    mb_strtolower(trim($value), 'UTF-8'),
+                    MB_CASE_TITLE,
+                    'UTF-8'
+                );
+            }
+        );
+    }
 
     public function user()
     {
