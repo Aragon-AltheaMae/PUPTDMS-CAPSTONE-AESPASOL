@@ -1,25 +1,25 @@
 @extends('layouts.app')
 
 @php
-    $currentLayoutRole = $layoutRole ?? 'admin';
-    $isDentistLayoutView = $isDentistView ?? $currentLayoutRole === 'dentist';
-    $currentPageShellClass = trim((string) ($pageShellClass ?? ''));
+$currentLayoutRole = $layoutRole ?? 'admin';
+$isDentistLayoutView = $isDentistView ?? $currentLayoutRole === 'dentist';
+$currentPageShellClass = trim((string) ($pageShellClass ?? ''));
 
-    if ($currentPageShellClass === '') {
-        $currentPageShellClass = $isDentistLayoutView
-            ? 'app-page-shell dentist-report-page'
-            : 'app-page-shell';
-    }
+if ($currentPageShellClass === '') {
+$currentPageShellClass = $isDentistLayoutView
+? 'app-page-shell dentist-report-page'
+: 'app-page-shell';
+}
 
-    if (!str_contains($currentPageShellClass, 'app-page-shell')) {
-        $currentPageShellClass = 'app-page-shell ' . $currentPageShellClass;
-    }
+if (!str_contains($currentPageShellClass, 'app-page-shell')) {
+$currentPageShellClass = 'app-page-shell ' . $currentPageShellClass;
+}
 
-    if ($isDentistLayoutView && !str_contains($currentPageShellClass, 'dentist-report-page')) {
-        $currentPageShellClass .= ' dentist-report-page';
-    }
+if ($isDentistLayoutView && !str_contains($currentPageShellClass, 'dentist-report-page')) {
+$currentPageShellClass .= ' dentist-report-page';
+}
 
-    $analyticsRoutePrefix = request()->routeIs('dentist.reports*') ? 'dentist' : 'admin';
+$analyticsRoutePrefix = request()->routeIs('dentist.reports*') ? 'dentist' : 'admin';
 @endphp
 
 @section('layout-role', $currentLayoutRole)
@@ -27,10 +27,10 @@
 @section('title', $pageTitle ?? 'Reports & Analytics')
 
 @section('styles')
-    @vite('resources/css/pages/shared/reports.css')
-    @if ($isDentistLayoutView && $currentLayoutRole === 'admin')
-        @vite('resources/css/pages/dentist/dentist-shared.css')
-    @endif
+@vite('resources/css/pages/shared/reports.css')
+@if ($isDentistLayoutView && $currentLayoutRole === 'admin')
+@vite('resources/css/pages/dentist/dentist-shared.css')
+@endif
 @endsection
 
 @section('body-class', $isDentistLayoutView ? 'bg-[#F9FAFB]' : 'bg-[#F4F4F4]')
@@ -155,10 +155,10 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                 </div>
 
                 @if ($canGenerateAiReports)
-                    <button type="button" id="openAiReportConfirmModal" class="ui-btn ui-btn-primary">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                        AI Generated Report
-                    </button>
+                <button type="button" id="openAiReportConfirmModal" class="ui-btn ui-btn-primary">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    AI Generated Report
+                </button>
                 @endif
             </div>
         </div>
@@ -1303,7 +1303,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
 </main>
 
 @if ($isAdminView)
-<div id="aiReportConfirmModal" class="ui-modal" aria-hidden="true">
+<div id="aiReportConfirmModal" class="ui-modal modal-theme-primary" aria-hidden="true">
     <div class="ui-modal-card modal-md" role="dialog" aria-modal="true" aria-labelledby="aiReportConfirmTitle"
         onclick="event.stopPropagation()">
 
@@ -1335,10 +1335,9 @@ $customReportTemplates = collect($customReportTemplates ?? []);
                 <i class="fa-solid fa-circle-info"></i>
 
                 <div>
-                    <p>
-                        Generate the latest
-                        <strong>AI clinic report</strong>?
-                    </p>
+                    <strong>
+                        Generate the latest AI clinic report?
+                    </strong>
 
                     <span>
                         The system will analyze available patient,
@@ -2220,7 +2219,7 @@ $customReportTemplates = collect($customReportTemplates ?? []);
             );
 
         const reportUrl =
-            @json(route($analyticsRoutePrefix . '.reports.ai-generated'));
+            @json(route($analyticsRoutePrefix. '.reports.ai-generated'));
 
         let isGenerating = false;
 

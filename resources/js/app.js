@@ -365,31 +365,21 @@ async function ensureSearchBarReady(
         );
 }
 
-document.addEventListener(
-    'focusin',
-    event => {
-        const wrapper =
-            event.target.closest?.(
-                '[data-global-search-bar]'
+if (
+    hasAny(
+        '[data-global-search-bar]'
+    )
+) {
+    ensureSearchBarReady(
+        document
+    )
+        .catch(error => {
+            console.error(
+                'Unable to initialize search bars.',
+                error
             );
-
-        if (!wrapper) {
-            return;
-        }
-
-        ensureSearchBarReady(
-            wrapper.parentElement ||
-            document
-        )
-            .catch(error => {
-                console.error(
-                    'Unable to initialize search bar.',
-                    error
-                );
-            });
-    },
-    true
-);
+        });
+}
 
 if (
     hasAny(
@@ -909,7 +899,31 @@ if (
         });
 }
 
-import './ui/pagination-bar';
+function loadPaginationBarModule() {
+    return loadFeature(
+        'pagination-bar',
+        () =>
+            import(
+                './ui/pagination-bar'
+            )
+    );
+}
+
+window.loadPaginationBarModule = loadPaginationBarModule;
+
+if (
+    hasAny(
+        '.global-pagebar'
+    )
+) {
+    loadPaginationBarModule()
+        .catch(error => {
+            console.error(
+                'Unable to initialize pagination.',
+                error
+            );
+        });
+}
 
 let chartJsPromise =
     null;

@@ -5,7 +5,7 @@
 @section('title', 'Document Templates')
 
 @section('styles')
-    @vite('resources/css/pages/admin/document-templates.css')
+@vite('resources/css/pages/admin/document-templates.css')
 @endsection
 
 @section('content')
@@ -15,12 +15,7 @@
         <section class="page-banner document-template-banner">
             <div class="page-banner-inner">
                 <div>
-                    <div class="page-greeting">
-                        <i class="fa-solid fa-file-shield"></i>
-                        Template Management
-                    </div>
                     <h1 class="page-title">Document Templates</h1>
-                    <p class="page-subtitle">Manage default printable templates used by the dental clinic.</p>
                 </div>
 
                 <div class="admin-banner-actions">
@@ -77,15 +72,18 @@
                 <div class="table-toolbar-actions">
 
                     <div class="voice-search-row table-toolbar-search">
+
                         <x-search-bar id="templateSearch" placeholder="Search templates..."
-                            clear-label="Clear template search" />
+                            clear-label="Clear template search" callback="handleTemplateSearch" :debounce="300" />
 
                         <x-voice-input target="#templateSearch" status-id="templateVoiceStatus"
                             label="Voice search document templates" title="Voice search" />
+
                     </div>
 
                     <button id="templateFilterBtn" type="button" class="global-filter-btn"
-                        onclick="openTemplateFilterDrawer()">
+                        onclick="openTemplateFilterDrawer()" aria-label="Filter templates" data-tooltip="Filter"
+                        data-tooltip-tone="neutral">
                         <i class="fa-solid fa-sliders"></i>
                         <span>Filter</span>
 
@@ -93,144 +91,146 @@
                     </button>
 
                     <button id="templateFilterResetBtn" type="button" class="global-filter-reset-btn hidden"
-                        onclick="resetTemplateFilters()" aria-label="Clear template filters">
+                        onclick="resetTemplateFilters()" aria-label="Clear template filters"
+                        data-tooltip="Reset filters" data-tooltip-tone="neutral">
                         <i class="fa-solid fa-rotate-left"></i>
                     </button>
 
                 </div>
 
             </div>
+
+            <x-pagination-bar id="templatePaginationTopBar" info-id="templatePageInfoTop"
+                pagination-id="templatePaginationTop" page-size-id="templatePageSize"
+                page-size-callback="changeTemplatePageSize" position="top" :show-entries="true"
+                :page-size-value="$templates->perPage()" label="templates"
+                data-current-page="{{ $templates->currentPage() }}" data-last-page="{{ $templates->lastPage() }}"
+                data-total="{{ $templates->total() }}" data-from="{{ $templates->firstItem() ?? 0 }}"
+                data-to="{{ $templates->lastItem() ?? 0 }}" data-per-page="{{ $templates->perPage() }}" />
+
+            <div id="templateResultsRegion">
+                @if (!empty($templates) && $templates->isNotEmpty())
+                <section class="templates-grid" id="templatesGrid" aria-label="Document template cards">
+                    @foreach ($templates as $tpl)
+                    @php
+                    $category = strtolower(trim((string) ($tpl->category ?? '')));
+                    $dt = strtolower((string) ($tpl->document_type ?? ''));
+
+                    if ($category === '') {
+                    if (str_contains($dt, 'clearance')) {
+                    $category = 'clearance';
+                    } elseif (str_contains($dt, 'record')) {
+                    $category = 'record';
+                    } elseif (str_contains($dt, 'report')) {
+                    $category = 'report';
+                    } elseif (str_contains($dt, 'inventory')) {
+                    $category = 'inventory';
+                    } else {
+                    $category = 'other';
+                    }
+                    }
+
+                    if (!in_array($category, ['clearance', 'record', 'report', 'inventory'], true)) {
+                    $category = 'other';
+                    }
+
+                    $templateCode = $tpl->code ?? 'TPL-' . str_pad($tpl->id, 4, '0', STR_PAD_LEFT);
+                    $statusClass = $tpl->status === 'active' ? 'status-active' : 'status-archived';
+                    @endphp
+
+                    <article class="template-card status-{{ $tpl->status }}" data-id="{{ $tpl->id }}"
+                        data-name="{{ strtolower((string) $tpl->name) }}"
+                        data-type="{{ strtolower((string) $tpl->document_type) }}" data-category="{{ $category }}"
+                        data-status="{{ $tpl->status }}" data-template-name="{{ e($tpl->name) }}"
+                        data-archive-url="{{ route(($routeNames['archive'] ?? 'admin.document-template.archive'), $tpl->id) }}"
+                        data-activate-url="{{ route(($routeNames['activate'] ?? 'admin.document-template.activate'), $tpl->id) }}"
+                        tabindex="0" role="button" aria-label="Preview {{ $tpl->name }}"
+                        onclick="openTemplatePreview({{ $tpl->id }})">
+                        <div class="template-card-top">
+                            <div class="template-top-row">
+                                <div class="template-doc-icon">
+                                    @if ($category === 'clearance')
+                                    <i class="fa-solid fa-file-circle-check"></i>
+                                    @elseif($category === 'record')
+                                    <i class="fa-solid fa-folder-open"></i>
+                                    @elseif($category === 'report')
+                                    <i class="fa-solid fa-chart-line"></i>
+                                    @elseif($category === 'inventory')
+                                    <i class="fa-solid fa-boxes-stacked"></i>
+                                    @else
+                                    <i class="fa-solid fa-file-lines"></i>
+                                    @endif
+                                </div>
+
+                                <div class="template-badge-stack">
+                                    <span class="status-badge {{ $statusClass }}" data-template-status-badge>
+                                        {{ ucfirst($tpl->status) }}
+                                    </span>
+
+                                    @if ($tpl->is_default)
+                                    <span class="status-badge status-default" data-template-default-badge>
+                                        Default
+                                    </span>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="template-title-block">
+                                <h2 class="template-name">{{ $tpl->name }}</h2>
+                                <div class="template-code">{{ $templateCode }}</div>
+                            </div>
+                        </div>
+
+                        <div class="template-card-body">
+                            <p class="template-description">
+                                {{ $tpl->description ?? ($tpl->notes ?? 'Default system template.') }}
+                            </p>
+
+                            <div class="template-meta-row">
+                                <span class="template-meta-item">
+                                    <i class="fa-solid fa-tag template-meta-icon"></i>
+                                    <span>{{ ucwords(str_replace('_', ' ', $tpl->document_type)) }}</span>
+                                </span>
+
+                                <div class="template-actions" data-template-actions>
+                                    <button type="button" class="ui-action-btn ui-action-view"
+                                        data-tooltip="Preview template" data-tooltip-tone="view"
+                                        aria-label="Preview template"
+                                        onclick="event.stopPropagation(); openTemplatePreview({{ $tpl->id }})">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </button>
+
+                                    @if ($tpl->status === 'active')
+                                    <button type="button" class="ui-action-btn ui-action-warning"
+                                        data-tooltip="Archive template" aria-label="Archive template"
+                                        data-template-action="archive" data-template-id="{{ $tpl->id }}"
+                                        onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
+                                        <i class="fa-solid fa-box-archive"></i>
+                                    </button>
+                                    @elseif ($tpl->status === 'archived')
+                                    <button type="button" class="ui-action-btn ui-action-success"
+                                        data-tooltip="Activate template" aria-label="Activate template"
+                                        data-template-action="activate" data-template-id="{{ $tpl->id }}"
+                                        onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                    </button>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                    @endforeach
+                </section>
+                @endif
+                <div id="templateEmptyState" class="empty-state-host"></div>
+            </div>
+
+            <x-pagination-bar id="templatePaginationBottomBar" info-id="templatePageInfoBottom"
+                pagination-id="templatePaginationBottom" position="bottom" label="templates"
+                data-current-page="{{ $templates->currentPage() }}" data-last-page="{{ $templates->lastPage() }}"
+                data-total="{{ $templates->total() }}" data-from="{{ $templates->firstItem() ?? 0 }}"
+                data-to="{{ $templates->lastItem() ?? 0 }}" data-per-page="{{ $templates->perPage() }}" />
         </section>
-
-        <div id="templateResultsRegion">
-            @if (empty($templates) || $templates->isEmpty())
-            <section class="section-card template-empty-card">
-                <div id="templateBaseEmptyState" class="empty-state-host"></div>
-            </section>
-            @else
-            <section class="templates-grid" id="templatesGrid" aria-label="Document template cards">
-                @foreach ($templates as $tpl)
-                @php
-                $category = strtolower(trim((string) ($tpl->category ?? '')));
-                $dt = strtolower((string) ($tpl->document_type ?? ''));
-
-                if ($category === '') {
-                if (str_contains($dt, 'clearance')) {
-                $category = 'clearance';
-                } elseif (str_contains($dt, 'record')) {
-                $category = 'record';
-                } elseif (str_contains($dt, 'report')) {
-                $category = 'report';
-                } elseif (str_contains($dt, 'inventory')) {
-                $category = 'inventory';
-                } else {
-                $category = 'other';
-                }
-                }
-
-                if (!in_array($category, ['clearance', 'record', 'report', 'inventory'], true)) {
-                $category = 'other';
-                }
-
-                $templateCode = $tpl->code ?? 'TPL-' . str_pad($tpl->id, 4, '0', STR_PAD_LEFT);
-                $statusClass = $tpl->status === 'active' ? 'status-active' : 'status-archived';
-                @endphp
-
-                <article class="template-card status-{{ $tpl->status }}" data-id="{{ $tpl->id }}"
-                    data-name="{{ strtolower((string) $tpl->name) }}"
-                    data-type="{{ strtolower((string) $tpl->document_type) }}" data-category="{{ $category }}"
-                    data-status="{{ $tpl->status }}" data-template-name="{{ e($tpl->name) }}"
-                    data-archive-url="{{ route(($routeNames['archive'] ?? 'admin.document-template.archive'), $tpl->id) }}"
-                    data-activate-url="{{ route(($routeNames['activate'] ?? 'admin.document-template.activate'), $tpl->id) }}" tabindex="0"
-                    role="button" aria-label="Preview {{ $tpl->name }}" onclick="openTemplatePreview({{ $tpl->id }})">
-                    <div class="template-card-top">
-                        <div class="template-top-row">
-                            <div class="template-doc-icon">
-                                @if ($category === 'clearance')
-                                <i class="fa-solid fa-file-circle-check"></i>
-                                @elseif($category === 'record')
-                                <i class="fa-solid fa-folder-open"></i>
-                                @elseif($category === 'report')
-                                <i class="fa-solid fa-chart-line"></i>
-                                @elseif($category === 'inventory')
-                                <i class="fa-solid fa-boxes-stacked"></i>
-                                @else
-                                <i class="fa-solid fa-file-lines"></i>
-                                @endif
-                            </div>
-
-                            <div class="template-badge-stack">
-                                <span class="status-badge {{ $statusClass }}" data-template-status-badge>
-                                    {{ ucfirst($tpl->status) }}
-                                </span>
-
-                                @if ($tpl->is_default)
-                                <span class="status-badge status-default" data-template-default-badge>
-                                    Default
-                                </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="template-title-block">
-                            <h2 class="template-name">{{ $tpl->name }}</h2>
-                            <div class="template-code">{{ $templateCode }}</div>
-                        </div>
-                    </div>
-
-                    <div class="template-card-body">
-                        <p class="template-description">
-                            {{ $tpl->description ?? ($tpl->notes ?? 'Default system template.') }}
-                        </p>
-
-                        <div class="template-meta-row">
-                            <span class="template-meta-item">
-                                <i class="fa-solid fa-tag template-meta-icon"></i>
-                                <span>{{ ucwords(str_replace('_', ' ', $tpl->document_type)) }}</span>
-                            </span>
-
-                            <div class="template-actions" data-template-actions>
-                                <button type="button" class="ui-action-btn ui-action-view"
-                                    data-tooltip="Preview template" data-tooltip-tone="view"
-                                    aria-label="Preview template"
-                                    onclick="event.stopPropagation(); openTemplatePreview({{ $tpl->id }})">
-                                    <i class="fa-solid fa-eye"></i>
-                                </button>
-
-                                @if ($tpl->status === 'active')
-                                <button type="button" class="ui-action-btn ui-action-warning"
-                                    data-tooltip="Archive template" aria-label="Archive template"
-                                    data-template-action="archive" data-template-id="{{ $tpl->id }}"
-                                    onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
-                                    <i class="fa-solid fa-box-archive"></i>
-                                </button>
-                                @elseif ($tpl->status === 'archived')
-                                <button type="button" class="ui-action-btn ui-action-success"
-                                    data-tooltip="Activate template" aria-label="Activate template"
-                                    data-template-action="activate" data-template-id="{{ $tpl->id }}"
-                                    onclick="event.stopPropagation(); window.handleTemplateActionClick(this)">
-                                    <i class="fa-solid fa-circle-check"></i>
-                                </button>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                </article>
-                @endforeach
-            </section>
-
-            <section id="templateClientEmpty" class="section-card template-empty-card template-client-empty" hidden>
-                <div id="templateDynamicEmptyState" class="empty-state-host"></div>
-            </section>
-            @endif
-        </div>
-
-        <x-pagination-bar id="templatePagebar" info-id="templatePageInfo" pagination-id="templatePagination"
-            page-size-id="templatePageSize" position="bottom" :show-entries="true" label="templates"
-            data-current-page="{{ $templates->currentPage() }}" data-last-page="{{ $templates->lastPage() }}"
-            data-total="{{ $templates->total() }}" data-from="{{ $templates->firstItem() ?? 0 }}"
-            data-to="{{ $templates->lastItem() ?? 0 }}" data-per-page="{{ $templates->perPage() }}" />
-
     </div>
 </main>
 
@@ -828,17 +828,30 @@
     let appliedTemplateCategory = '';
     let appliedTemplateStatus = '';
     let templatePageLoading = false;
-    let templateSearchTimer = null;
 
     let templatePerPage =
         Number(
             document
                 .getElementById(
-                    'templatePagebar'
+                    'templatePaginationTopBar'
                 )
                 ?.dataset
                 .perPage
         ) || 10;
+
+    window.changeTemplatePageSize =
+        function (value) {
+            const nextSize =
+                Number(value);
+
+            templatePerPage =
+                [10, 20, 50, 100]
+                    .includes(nextSize)
+                    ? nextSize
+                    : 10;
+
+            loadTemplatePage(1);
+        };
 
     function getTemplateFilterCount() {
         return (
@@ -901,51 +914,120 @@
             return;
         }
 
-        const chips = [];
+        const preview =
+            getTemplatePreviewFilters();
 
-        if (appliedTemplateCategory) {
-            chips.push({
-                key: 'category',
-                label: appliedTemplateCategory
-                    .charAt(0)
-                    .toUpperCase() +
-                    appliedTemplateCategory.slice(1),
-            });
-        }
+        host.replaceChildren();
 
-        if (appliedTemplateStatus) {
-            chips.push({
-                key: 'status',
-                label: appliedTemplateStatus
-                    .charAt(0)
-                    .toUpperCase() +
-                    appliedTemplateStatus.slice(1),
-            });
-        }
+        let hasChips =
+            false;
 
-        section.classList.toggle(
-            'hidden',
-            chips.length === 0
-        );
+        function addChip(
+            label,
+            onRemove
+        ) {
+            hasChips = true;
 
-        host.innerHTML = chips
-            .map(chip => `
-            <span class="filter-chip">
-                <span>
-                    ${templateEscapeHtml(chip.label)}
-                </span>
+            const chip =
+                document.createElement(
+                    'div'
+                );
 
-                <button
-                    type="button"
-                    class="filter-chip-remove"
-                    data-template-filter-remove="${chip.key}"
-                    aria-label="Remove ${chip.label} filter"
-                >
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+            chip.className =
+                'filter-chip';
+
+            chip.innerHTML = `
+            <span>
+                ${templateEscapeHtml(label)}
             </span>
-        `)
-            .join('');
+
+            <span
+                class="filter-chip-remove"
+                role="button"
+                tabindex="0"
+                aria-label="Remove ${templateEscapeHtml(label)} filter"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </span>
+        `;
+
+            chip
+                .querySelector(
+                    '.filter-chip-remove'
+                )
+                ?.addEventListener(
+                    'click',
+                    () => {
+                        onRemove();
+
+                        renderTemplateFilterChips();
+                    }
+                );
+
+            host.appendChild(
+                chip
+            );
+        }
+
+        if (preview.category) {
+            const label =
+                preview.category
+                    .charAt(0)
+                    .toUpperCase() +
+                preview.category.slice(1);
+
+            addChip(
+                `Category: ${label}`,
+                () => {
+                    const allCategory =
+                        document.querySelector(
+                            'input[name="template_filter_category"][value=""]'
+                        );
+
+                    if (allCategory) {
+                        allCategory.checked = true;
+
+                        allCategory.dispatchEvent(
+                            new Event(
+                                'change',
+                                {
+                                    bubbles: true,
+                                }
+                            )
+                        );
+                    }
+                }
+                }
+            );
+    }
+
+    if (preview.status) {
+        const label =
+            preview.status
+                .charAt(0)
+                .toUpperCase() +
+            preview.status.slice(1);
+
+        addChip(
+            `Status: ${label}`,
+            () => {
+                const allStatus =
+                    document.querySelector(
+                        'input[name="template_filter_status"][value=""]'
+                    );
+
+                if (allStatus) {
+                    allStatus.checked =
+                        true;
+                }
+            }
+        );
+    }
+
+    section.classList.toggle(
+        'hidden',
+        !hasChips
+    );
     }
 
     function updateTemplateFilterUi() {
@@ -992,6 +1074,7 @@
     window.openTemplateFilterDrawer =
         function () {
             syncTemplateFilterRadios();
+            renderTemplateFilterChips();
 
             window.openFilterDrawer?.(
                 'templateFilterDrawer'
@@ -1086,7 +1169,7 @@
                 Number(
                     document
                         .getElementById(
-                            'templatePagebar'
+                            'templatePaginationTopBar'
                         )
                         ?.dataset
                         .currentPage
@@ -1143,10 +1226,30 @@
     function renderTemplateEmptyState() {
         const host =
             document.getElementById(
-                'templateBaseEmptyState'
+                'templateEmptyState'
+            );
+
+        const grid =
+            document.getElementById(
+                'templatesGrid'
             );
 
         if (!host) {
+            return;
+        }
+
+        const hasTemplates =
+            Boolean(
+                grid?.querySelector(
+                    '.template-card'
+                )
+            );
+
+        if (hasTemplates) {
+            window.EmptyState?.hide(
+                '#templateEmptyState'
+            );
+
             return;
         }
 
@@ -1160,11 +1263,10 @@
                 searchInput?.value || ''
             ).trim();
 
-
         if (query) {
             window.EmptyState?.renderSearch({
                 host:
-                    '#templateBaseEmptyState',
+                    '#templateEmptyState',
 
                 input:
                     '#templateSearch',
@@ -1178,14 +1280,13 @@
             return;
         }
 
-
         if (
             appliedTemplateCategory ||
             appliedTemplateStatus
         ) {
             window.EmptyState?.render({
                 host:
-                    '#templateBaseEmptyState',
+                    '#templateEmptyState',
 
                 icon:
                     'fa-sliders',
@@ -1211,10 +1312,9 @@
             return;
         }
 
-
         window.EmptyState?.render({
             host:
-                '#templateBaseEmptyState',
+                '#templateEmptyState',
 
             icon:
                 'fa-file-circle-xmark',
@@ -1228,74 +1328,99 @@
     }
 
     function renderTemplatePagination() {
-        const pagebar =
+        const topBar =
             document.getElementById(
-                'templatePagebar'
+                'templatePaginationTopBar'
             );
 
-        const info =
+        const bottomBar =
             document.getElementById(
-                'templatePageInfo'
+                'templatePaginationBottomBar'
             );
 
-        const pagination =
-            document.getElementById(
-                'templatePagination'
-            );
-
-        if (
-            !pagebar ||
-            !info ||
-            !pagination
-        ) {
+        if (!topBar) {
             return;
         }
 
+        const currentPage =
+            Number(
+                topBar.dataset.currentPage
+            ) || 1;
+
+        const lastPage =
+            Number(
+                topBar.dataset.lastPage
+            ) || 1;
+
+        const total =
+            Number(
+                topBar.dataset.total
+            ) || 0;
+
+        const from =
+            Number(
+                topBar.dataset.from
+            ) || 0;
+
+        const to =
+            Number(
+                topBar.dataset.to
+            ) || 0;
 
         window.renderGlobalPagination?.({
-            currentPage:
-                Number(
-                    pagebar.dataset.currentPage
-                ) || 1,
-
-            lastPage:
-                Number(
-                    pagebar.dataset.lastPage
-                ) || 1,
-
-            total:
-                Number(
-                    pagebar.dataset.total
-                ) || 0,
-
-            from:
-                Number(
-                    pagebar.dataset.from
-                ) || 0,
-
-            to:
-                Number(
-                    pagebar.dataset.to
-                ) || 0,
+            currentPage,
+            lastPage,
+            total,
+            from,
+            to,
 
             containers: [
-                pagination
+                document.getElementById(
+                    'templatePaginationTop'
+                ),
+                document.getElementById(
+                    'templatePaginationBottom'
+                ),
             ],
 
             infoElements: [
-                info
+                document.getElementById(
+                    'templatePageInfoTop'
+                ),
+                document.getElementById(
+                    'templatePageInfoBottom'
+                ),
             ],
 
             bars: [
-                pagebar
+                topBar,
+                bottomBar,
             ],
 
             itemLabel:
-                'templates',
+                total === 1
+                    ? 'template'
+                    : 'templates',
 
-            onPageChange:
-                loadTemplatePage,
+            onPageChange(page) {
+                loadTemplatePage(page);
+            },
         });
+
+        const pageSize =
+            document.getElementById(
+                'templatePageSize'
+            );
+
+        if (pageSize) {
+            pageSize.value =
+                String(templatePerPage);
+
+            window.syncGlobalPageSizeSelect?.(
+                pageSize,
+                templatePerPage
+            );
+        }
     }
 
     async function loadTemplatePage(
@@ -1312,16 +1437,26 @@
                 'templateSearch'
             );
 
-        const pagebar =
+        const topBar =
             document.getElementById(
-                'templatePagebar'
+                'templatePaginationTopBar'
             );
+
+        const bottomBar =
+            document.getElementById(
+                'templatePaginationBottomBar'
+            );
+
+        const pagebars =
+            [
+                topBar,
+                bottomBar,
+            ].filter(Boolean);
 
         const url =
             new URL(
                 window.location.href
             );
-
 
         url.searchParams.set(
             'page',
@@ -1333,12 +1468,10 @@
             String(templatePerPage)
         );
 
-
         const searchValue =
             String(
                 searchInput?.value || ''
             ).trim();
-
 
         if (searchValue) {
             url.searchParams.set(
@@ -1351,7 +1484,6 @@
             );
         }
 
-
         if (appliedTemplateCategory) {
             url.searchParams.set(
                 'category',
@@ -1362,7 +1494,6 @@
                 'category'
             );
         }
-
 
         if (appliedTemplateStatus) {
             url.searchParams.set(
@@ -1375,12 +1506,14 @@
             );
         }
 
-
         try {
-            pagebar?.classList.add(
-                'is-loading'
+            pagebars.forEach(
+                bar => {
+                    bar.classList.add(
+                        'is-loading'
+                    );
+                }
             );
-
 
             const response =
                 await fetch(
@@ -1399,17 +1532,14 @@
                     }
                 );
 
-
             if (!response.ok) {
                 throw new Error(
                     'Unable to load document templates.'
                 );
             }
 
-
             const payload =
                 await response.json();
-
 
             if (
                 !payload.success ||
@@ -1420,14 +1550,12 @@
                 );
             }
 
-
             const parsed =
                 new DOMParser()
                     .parseFromString(
                         payload.results_html,
                         'text/html'
                     );
-
 
             const newRegion =
                 parsed.getElementById(
@@ -1439,7 +1567,6 @@
                     'templateResultsRegion'
                 );
 
-
             if (
                 !newRegion ||
                 !currentRegion
@@ -1449,60 +1576,57 @@
                 );
             }
 
-
             currentRegion.innerHTML =
                 newRegion.innerHTML;
-
 
             const pagination =
                 payload.pagination || {};
 
+            pagebars.forEach(
+                bar => {
+                    bar.dataset.currentPage =
+                        String(
+                            pagination.current_page
+                            ?? 1
+                        );
 
-            if (pagebar) {
-                pagebar.dataset.currentPage =
-                    String(
-                        pagination.current_page
-                        ?? 1
-                    );
+                    bar.dataset.lastPage =
+                        String(
+                            pagination.last_page
+                            ?? 1
+                        );
 
-                pagebar.dataset.lastPage =
-                    String(
-                        pagination.last_page
-                        ?? 1
-                    );
+                    bar.dataset.total =
+                        String(
+                            pagination.total
+                            ?? 0
+                        );
 
-                pagebar.dataset.total =
-                    String(
-                        pagination.total
-                        ?? 0
-                    );
+                    bar.dataset.from =
+                        String(
+                            pagination.from
+                            ?? 0
+                        );
 
-                pagebar.dataset.from =
-                    String(
-                        pagination.from
-                        ?? 0
-                    );
+                    bar.dataset.to =
+                        String(
+                            pagination.to
+                            ?? 0
+                        );
 
-                pagebar.dataset.to =
-                    String(
-                        pagination.to
-                        ?? 0
-                    );
-
-                pagebar.dataset.perPage =
-                    String(
-                        pagination.per_page
-                        ?? templatePerPage
-                    );
-            }
-
+                    bar.dataset.perPage =
+                        String(
+                            pagination.per_page
+                            ?? templatePerPage
+                        );
+                }
+            );
 
             if (payload.stats) {
                 updateStats(
                     payload.stats
                 );
             }
-
 
             window.history.replaceState(
                 {},
@@ -1512,7 +1636,6 @@
 
             renderTemplateEmptyState();
             renderTemplatePagination();
-
 
         } catch (error) {
             window.showToast?.({
@@ -1531,60 +1654,89 @@
             templatePageLoading =
                 false;
 
-            pagebar?.classList.remove(
-                'is-loading'
+            pagebars.forEach(
+                bar => {
+                    bar.classList.remove(
+                        'is-loading'
+                    );
+                }
             );
         }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
 
-        document.getElementById('closeTemplatePreview')?.addEventListener('click', closePreviewModal);
+        window.initGlobalPageSizeSelects?.();
 
-        const templateSearch =
-            document.getElementById(
-                'templateSearch'
-            );
-
-        templateSearch
-            ?.addEventListener(
-                'input',
-                () => {
-                    clearTimeout(
-                        templateSearchTimer
+        document
+            .querySelectorAll(
+                [
+                    'input[name="template_filter_category"]',
+                    'input[name="template_filter_status"]',
+                ].join(',')
+            )
+            .forEach(
+                input => {
+                    input.addEventListener(
+                        'change',
+                        () => {
+                            renderTemplateFilterChips();
+                        }
                     );
-
-                    templateSearchTimer =
-                        window.setTimeout(
-                            () => {
-                                loadTemplatePage(1);
-                            },
-                            300
-                        );
                 }
             );
 
         document
             .getElementById(
-                'templatePageSize'
+                'clearTemplateFilterChips'
             )
             ?.addEventListener(
-                'change',
-                event => {
-                    const value =
-                        Number(
-                            event.target.value
+                'click',
+                () => {
+                    const allCategory =
+                        document.querySelector(
+                            'input[name="template_filter_category"][value=""]'
                         );
 
-                    templatePerPage =
-                        [10, 20, 50, 100]
-                            .includes(value)
-                            ? value
-                            : 10;
+                    const allStatus =
+                        document.querySelector(
+                            'input[name="template_filter_status"][value=""]'
+                        );
 
-                    loadTemplatePage(1);
+                    if (allCategory) {
+                        allCategory.checked =
+                            true;
+                    }
+
+                    if (allStatus) {
+                        allStatus.checked =
+                            true;
+                    }
+
+                    renderTemplateFilterChips();
                 }
             );
+
+        document.getElementById('closeTemplatePreview')?.addEventListener('click', closePreviewModal);
+
+        window.handleTemplateSearch =
+            function () {
+                loadTemplatePage(1);
+            };
+
+        window.handleTemplatePageSizeChange =
+            function (value) {
+                const parsed =
+                    Number(value);
+
+                templatePerPage =
+                    [10, 20, 50, 100]
+                        .includes(parsed)
+                        ? parsed
+                        : 10;
+
+                loadTemplatePage(1);
+            };
 
         document.addEventListener('keydown', function (event) {
             if (event.key !== 'Escape') return;
@@ -1656,49 +1808,6 @@
                 }
             );
 
-        document
-            .getElementById(
-                'clearTemplateFilterChips'
-            )
-            ?.addEventListener(
-                'click',
-                resetTemplateFilters
-            );
-
-        document
-            .getElementById(
-                'templateFilterChips'
-            )
-            ?.addEventListener(
-                'click',
-                event => {
-                    const button =
-                        event.target.closest(
-                            '[data-template-filter-remove]'
-                        );
-
-                    if (!button) {
-                        return;
-                    }
-
-                    const key =
-                        button.dataset
-                            .templateFilterRemove;
-
-                    if (key === 'category') {
-                        appliedTemplateCategory = '';
-                    }
-
-                    if (key === 'status') {
-                        appliedTemplateStatus = '';
-                    }
-
-                    syncTemplateFilterRadios();
-                    updateTemplateFilterUi();
-
-                    loadTemplatePage(1);
-                }
-            );
         renderTemplateEmptyState();
         updateTemplateFilterUi();
         renderTemplatePagination();

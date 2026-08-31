@@ -415,16 +415,6 @@
     color: #fff;
 }
 
-.page-banner-title {
-    font-size: 2rem;
-    font-weight: 900;
-    color: #fff;
-}
-
-.page-banner-title span {
-    color: #ffdede;
-}
-
 .page-banner-subtitle {
     font-size: .8rem;
     color: rgba(255, 255, 255, .7);

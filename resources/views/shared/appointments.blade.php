@@ -454,8 +454,8 @@ return $aDateTime <=> $bDateTime;
 
                 @php
                 $monthLabel = \Carbon\Carbon::createFromFormat(
-                'Y-m',
-                $monthKey
+                    'Y-m-d',
+                    $monthKey . '-01'
                 )->format('F Y');
                 @endphp
 

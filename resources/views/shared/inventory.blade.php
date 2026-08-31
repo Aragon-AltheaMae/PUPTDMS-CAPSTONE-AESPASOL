@@ -59,7 +59,7 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
         <div class="page-banner inventory-admin-banner">
             <div class="page-banner-inner">
                 <div class="min-w-0">
-                    <h1 class="page-banner-title">
+                    <h1 class="page-title">
                         Admin Inventory
                     </h1>
                 </div>

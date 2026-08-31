@@ -673,65 +673,64 @@
 }
 
 @media (max-width: 767px) {
+
     .stat-grid {
-        gap: .45rem !important;
-        margin-bottom: .85rem;
+        gap: .65rem !important;
+        margin-bottom: 1rem;
+    }
+
+    .stat-grid:has(> :nth-child(1):last-child) {
+        grid-template-columns: 1fr !important;
+    }
+
+    .stat-grid:has(> :nth-child(2):last-child),
+    .stat-grid:has(> :nth-child(3):last-child),
+    .stat-grid:has(> :nth-child(4):last-child) {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
     }
 
     .stat-grid .stat-card {
         min-width: 0;
-
-        min-height: 0;
+        min-height: 110px;
         height: auto;
-
-        padding: .55rem .5rem .5rem;
-
-        border-radius: 14px;
-
+        padding: .8rem .75rem .7rem;
+        border-radius: 16px;
         display: block;
-
         gap: 0;
     }
 
     .stat-grid .stat-card-info {
         width: 100%;
         min-width: 0;
-
         display: flex;
         flex-direction: column;
-
-        gap: 2px;
-
-        padding-right: 24px;
+        gap: 4px;
+        padding-right: 38px;
     }
 
     .stat-grid .stat-icon,
     .stat-grid .stat-icon-wrapper {
-        width: 24px;
-        height: 24px;
-        min-width: 24px;
-        min-height: 24px;
-
         position: absolute;
-        top: .5rem;
-        right: .45rem;
-        font-size: 9px;
-
-        border-radius: 8px;
+        top: .7rem;
+        right: .65rem;
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+        border-radius: 10px;
+        font-size: 11px;
     }
 
     .stat-grid .stat-label {
-        max-width: calc(100% - 28px);
-
-        font-size: 5.8px;
-        line-height: 1;
-
-        letter-spacing: .025em;
-
-        white-space: nowrap;
-        overflow: hidden;
+        width: 100%;
+        max-width: calc(100% - 36px);
+        font-size: 8px;
+        line-height: 1.1;
+        letter-spacing: .045em;
+        white-space: normal;
+        overflow: visible;
         text-overflow: clip;
-
         overflow-wrap: normal;
         word-break: normal;
     }
@@ -740,40 +739,37 @@
     .stat-grid .stat-num,
     .stat-grid .stat-count {
         margin: 0;
-
-        font-size: 1.05rem;
+        font-size: 1.35rem;
         line-height: 1;
     }
 
     .stat-grid .stat-footer {
-        margin: 1px 0 0;
-
-        font-size: .46rem;
-        line-height: 1.1;
-
-        gap: 2px;
+        margin-top: 2px;
+        font-size: .58rem;
+        line-height: 1.15;
+        gap: 3px;
     }
 
     .stat-grid .stat-footer i {
-        font-size: .44rem;
+        font-size: .55rem;
+    }
+
+    .stat-grid .dashboard-kpi-breakdown {
+        gap: .25rem;
     }
 
     .stat-grid .dashboard-kpi-breakdown span {
-        min-height: 18px;
-
-        padding: .18rem .35rem;
-
-        font-size: .48rem;
+        min-height: 20px;
+        padding: .2rem .42rem;
+        font-size: .55rem;
     }
 
     .stat-card-link-indicator {
-        width: 22px;
-        height: 22px;
-
-        right: 7px;
-        bottom: 7px;
-
-        font-size: .5rem;
+        width: 26px;
+        height: 26px;
+        right: 9px;
+        bottom: 9px;
+        font-size: .55rem;
     }
 }
 
@@ -785,11 +781,8 @@
     .stat-grid .stat-card {
         min-width: 0;
         min-height: 96px;
-
         padding: .8rem;
-
         border-radius: 16px;
-
         gap: .6rem;
     }
 
@@ -799,11 +792,8 @@
         height: 36px;
         min-width: 36px;
         min-height: 36px;
-
         flex-basis: 36px;
-
         border-radius: 12px;
-
         font-size: 13px;
     }
 
@@ -824,61 +814,54 @@
 }
 
 @media (max-width: 380px) {
+
     .stat-grid {
-        gap: .35rem !important;
+        gap: .55rem !important;
     }
 
     .stat-grid .stat-card {
-        min-height: 0;
-        height: auto;
-
-        padding: .48rem .4rem .44rem;
-
-        border-radius: 12px;
+        min-height: 104px;
+        padding: .7rem .65rem .65rem;
+        border-radius: 14px;
     }
 
     .stat-grid .stat-card-info {
-        padding-right: 21px;
-        gap: 1px;
+        padding-right: 34px;
+        gap: 3px;
     }
 
     .stat-grid .stat-icon,
     .stat-grid .stat-icon-wrapper {
-        width: 21px;
-        height: 21px;
-        min-width: 21px;
-        min-height: 21px;
-
-        top: .44rem;
-        right: .38rem;
-
-        border-radius: 6px;
-
-        font-size: 8px;
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        min-height: 30px;
+        top: .62rem;
+        right: .58rem;
+        border-radius: 9px;
+        font-size: 10px;
     }
 
     .stat-grid .stat-label {
-        max-width: calc(100% - 22px);
-
-        font-size: 5.1px;
-        line-height: 1;
-
-        letter-spacing: .015em;
-
-        white-space: nowrap;
-        overflow: hidden;
-
-        overflow-wrap: normal;
-        word-break: normal;
+        max-width: calc(100% - 32px);
+        font-size: 7px;
+        line-height: 1.08;
+        letter-spacing: .035em;
     }
 
     .stat-grid .stat-value,
     .stat-grid .stat-num,
     .stat-grid .stat-count {
-        font-size: .95rem;
+        font-size: 1.22rem;
     }
 
     .stat-grid .stat-footer {
-        font-size: .4rem;
+        font-size: .54rem;
+    }
+
+    .stat-grid .dashboard-kpi-breakdown span {
+        min-height: 18px;
+        padding: .17rem .35rem;
+        font-size: .5rem;
     }
 }

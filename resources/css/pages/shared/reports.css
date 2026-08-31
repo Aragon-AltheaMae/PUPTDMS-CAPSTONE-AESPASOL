@@ -1663,7 +1663,7 @@ hr.section-divider {
     height: 42px;
     border-radius: 13px;
     background: var(--crimson);
-    color: var(--crimson-1);
+    color: var(--text-primary);
 }
 
 .printable-template-copy {

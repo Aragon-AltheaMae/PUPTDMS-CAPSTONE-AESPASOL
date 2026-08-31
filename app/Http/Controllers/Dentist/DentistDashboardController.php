@@ -34,11 +34,26 @@ class DentistDashboardController extends Controller
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        $startOfMonth = $now->copy()->startOfMonth()->toDateString();
-        $endOfMonth = $now->copy()->endOfMonth()->toDateString();
+        $calendarStartDate =
+            Carbon::today()
+            ->startOfMonth()
+            ->toDateString();
 
-        $calendarAppointments = Appointment::with('patient')
-            ->whereBetween('appointment_date', [$startOfMonth, $endOfMonth])
+        $calendarEndDate =
+            Carbon::today()
+            ->addDays(90)
+            ->endOfMonth()
+            ->toDateString();
+
+        $calendarAppointments =
+            Appointment::with('patient')
+            ->whereBetween(
+                'appointment_date',
+                [
+                    $calendarStartDate,
+                    $calendarEndDate,
+                ]
+            )
             ->whereIn('status', [
                 'pending',
                 'confirmed',
@@ -46,8 +61,14 @@ class DentistDashboardController extends Controller
                 'rescheduled',
                 'completed',
             ])
-            ->orderBy('appointment_date', 'asc')
-            ->orderBy('appointment_time', 'asc')
+            ->orderBy(
+                'appointment_date',
+                'asc'
+            )
+            ->orderBy(
+                'appointment_time',
+                'asc'
+            )
             ->get();
 
         $appointmentCountsPerDay = $calendarAppointments

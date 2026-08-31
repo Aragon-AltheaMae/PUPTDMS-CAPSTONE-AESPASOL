@@ -551,6 +551,35 @@
     background: radial-gradient(circle, rgba(192, 57, 43, 0.08) 0%, rgba(192, 57, 43, 0.03) 50%, transparent 72%);
 }
 
+.card-header.card-header-inline {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    flex-wrap: nowrap;
+
+    gap: .75rem;
+}
+
+.card-header.card-header-inline .card-header-left {
+    width: auto;
+
+    min-width: 0;
+    flex: 1 1 auto;
+}
+
+.card-header.card-header-inline> :last-child {
+    width: auto;
+
+    margin-left: auto;
+
+    flex: 0 0 auto;
+}
+
+.card-header.card-header-inline>.card-link {
+    align-self: center;
+}
+
 .card-subtitle {
     font-size: .78rem;
     color: #757575;
@@ -806,7 +835,6 @@
 .greeting-banner-copy p {
     color: rgba(255, 255, 255, .92);
     font-size: 0.95rem;
-    margin-top: 0.45rem;
     font-weight: 500;
 }
 
@@ -1317,7 +1345,6 @@
     body.role-patient #mainContent #greetingSmartMessage,
     #mainContent .dashboard-greeting-copy p,
     #mainContent .greeting-banner-copy p {
-        margin-top: 0.5rem !important;
         font-size: 0.72rem !important;
         line-height: 1.32 !important;
         max-width: 100% !important;
@@ -1427,6 +1454,44 @@
         padding-right: .7rem;
 
         font-size: .72rem;
+    }
+
+    .card-header.card-header-inline {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: nowrap !important;
+        gap: .5rem;
+    }
+
+    .card-header.card-header-inline .card-header-left {
+        width: auto !important;
+        min-width: 0 !important;
+        flex: 1 1 auto !important;
+    }
+
+    .card-header.card-header-inline> :last-child {
+        width: auto !important;
+        margin-left: auto !important;
+        align-self: center !important;
+        flex: 0 0 auto !important;
+    }
+
+    .card-header.card-header-inline>.card-link {
+        width: auto !important;
+        margin-left: auto !important;
+        align-self: center !important;
+        white-space: nowrap;
+    }
+
+    .card-header.card-header-inline>.status-pill {
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
+    }
+
+    .card-header.card-header-inline>.ui-btn {
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
     }
 
 }

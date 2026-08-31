@@ -319,10 +319,11 @@
                                             'error' => 's-failed',
                                             default => 's-neutral',
                                         };
-                                        $actionLabel = ($moduleName === 'inventory' &&
-                                            in_array($actionClass, ['create', 'delete'], true))
-                                            ? ucfirst($actionClass)
-                                            : ucwords(str_replace('_', ' ', $log->action));
+                                        $actionLabel =
+                                            $moduleName === 'inventory' &&
+                                            in_array($actionClass, ['create', 'delete'], true)
+                                                ? ucfirst($actionClass)
+                                                : ucwords(str_replace('_', ' ', $log->action));
                                     @endphp
                                     <tr data-role="{{ $role }}" data-action="{{ $actionClass }}">
                                         <td><span class="sl-id">#{{ str_pad($log->id, 3, '0', STR_PAD_LEFT) }}</span>
@@ -435,10 +436,10 @@
                                     'error' => 's-failed',
                                     default => 's-neutral',
                                 };
-                                $actionLabel = ($moduleName === 'inventory' &&
-                                    in_array($actionClass, ['create', 'delete'], true))
-                                    ? ucfirst($actionClass)
-                                    : ucwords(str_replace('_', ' ', $log->action));
+                                $actionLabel =
+                                    $moduleName === 'inventory' && in_array($actionClass, ['create', 'delete'], true)
+                                        ? ucfirst($actionClass)
+                                        : ucwords(str_replace('_', ' ', $log->action));
                             @endphp
                             <article class="table-record-card" data-role="{{ $role }}"
                                 data-action="{{ $actionClass }}">
@@ -547,6 +548,7 @@
                     pagination-id="systemLogsPaginationBottom" position="bottom" :page-size-value="$perPage" label="entries" />
 
             </div>
+        </div>
     </main>
 
     <x-filter-drawer id="filterModal" title="Filters" close-callback="closeSlFilterPanel()"
@@ -854,7 +856,7 @@
         <div class="ui-modal-card modal-lg modal-report-like" role="dialog" aria-modal="true"
             aria-labelledby="slExportModalTitle">
 
-            <form id="slExportForm" class="modal-card-form" data-discard-form
+            <form id="slExportForm" class="modal-card-form" data-global-validation data-discard-form
                 data-discard-title="Discard export settings?" data-discard-subtitle="You have unsaved export settings."
                 data-discard-message="Closing this modal will reset the export options you selected. Do you want to discard these changes?">
 
@@ -909,19 +911,16 @@
 
                             </div>
 
-
                             <div class="sl-export-filter-grid">
 
-
-                                {{-- Role --}}
-                                <div class="modal-field sl-export-filter-field">
-
+                                <div class="modal-field sl-export-filter-field" data-global-field>
                                     <label class="global-form-label" for="slExportRole">
                                         Role
                                         <span class="required-mark">*</span>
                                     </label>
 
-                                    <select id="slExportRole" name="role" class="js-custom-select">
+                                    <select id="slExportRole" name="role" class="js-custom-select"
+                                        data-field-label="Role" data-required-message="Please select a role." required>
                                         <option value="" selected disabled>
                                             Select role
                                         </option>
@@ -943,18 +942,19 @@
                                         </option>
                                     </select>
 
+                                    <div class="global-field-error" data-error-for="slExportRole" aria-live="polite"
+                                        aria-hidden="true"></div>
                                 </div>
 
-
-                                {{-- Action --}}
-                                <div class="modal-field sl-export-filter-field">
-
+                                <div class="modal-field sl-export-filter-field" data-global-field>
                                     <label class="global-form-label" for="slExportAction">
                                         Action
                                         <span class="required-mark">*</span>
                                     </label>
 
-                                    <select id="slExportAction" name="action_type" class="js-custom-select">
+                                    <select id="slExportAction" name="action_type" class="js-custom-select"
+                                        data-field-label="Action" data-required-message="Please select an action."
+                                        required>
                                         <option value="" selected disabled>
                                             Select action
                                         </option>
@@ -980,18 +980,15 @@
                                         </option>
                                     </select>
 
+                                    <div class="global-field-error" data-error-for="slExportAction" aria-live="polite"
+                                        aria-hidden="true"></div>
                                 </div>
-
 
                             </div>
                         </div>
 
-
-                        {{-- Date Range --}}
                         <div class="modal-field modal-field-full report-date-range-section" data-global-field>
-
                             <div class="report-date-range-heading">
-
                                 <div>
                                     <div class="report-date-range-title">
                                         Date Range
@@ -1001,14 +998,10 @@
                                         Select a single date or define a custom range.
                                     </p>
                                 </div>
-
                             </div>
-
 
                             <div class="report-date-range-grid">
 
-
-                                {{-- From --}}
                                 <div class="modal-field" data-global-field>
 
                                     <label class="global-form-label" for="slExportDateFrom">
@@ -1024,17 +1017,15 @@
                                         <input id="slExportDateFrom" name="date_from" type="text"
                                             class="form-input-custom js-flatpickr-date-max-today"
                                             placeholder="Select start date" data-field-label="From Date"
-                                            data-required-message="Please select a start date." readonly
-                                            autocomplete="off">
+                                            data-required-message="Please select a start date."
+                                            data-validation-rule="notFutureDate" readonly autocomplete="off" required>
 
                                         <i class="fa-regular fa-calendar fp-date-icon" aria-hidden="true"></i>
-
                                     </div>
-
+                                    <div class="global-field-error" data-error-for="slExportDateFrom" aria-live="polite"
+                                        aria-hidden="true"></div>
                                 </div>
 
-
-                                {{-- To --}}
                                 <div class="modal-field" data-global-field>
 
                                     <label class="global-form-label" for="slExportDateTo">
@@ -1049,17 +1040,17 @@
 
                                         <input id="slExportDateTo" name="date_to" type="text"
                                             class="form-input-custom js-flatpickr-date-max-today"
-                                            placeholder="Select end date" data-field-label="To Date" readonly
-                                            autocomplete="off">
+                                            placeholder="Select end date" data-field-label="To Date"
+                                            data-validation-rule="notFutureDate" readonly autocomplete="off">
 
                                         <i class="fa-regular fa-calendar fp-date-icon" aria-hidden="true"></i>
 
                                     </div>
-
+                                    <div class="global-field-error" data-error-for="slExportDateTo" aria-live="polite"
+                                        aria-hidden="true"></div>
                                 </div>
 
                             </div>
-
 
                             <p class="report-date-range-helper">
                                 <i class="fa-solid fa-circle-info"></i>
@@ -1069,10 +1060,8 @@
 
                         </div>
 
-
                     </div>
                 </div>
-
 
                 <div class="modal-ft">
 
@@ -1088,9 +1077,7 @@
                             Export PDF
                         </span>
                     </button>
-
                 </div>
-
             </form>
         </div>
     </div>
@@ -1099,7 +1086,6 @@
 
 @section('scripts')
     <script>
-        var searchInput = null;
         var slArchiveDaysInput = null;
         var slArchiveError = null;
         var slArchiveConfirmBtn = null;
@@ -1395,6 +1381,11 @@
                 );
             }
 
+            const exportForm =
+                document.getElementById(
+                    'slExportForm'
+                );
+
             if (slExportRoleInput) {
                 slExportRoleInput.value = '';
 
@@ -1432,6 +1423,18 @@
                     ._flatpickr
                     ?.clear();
             }
+            
+            exportForm
+                ?.querySelectorAll(
+                    'input, select, textarea'
+                )
+                .forEach(field => {
+                    window
+                        .showFormInputValidationMessage?.(
+                            field,
+                            ''
+                        );
+                });
 
             [
                 slExportDateFromInput,
@@ -1558,7 +1561,31 @@
 
         async function submitSlExportModal() {
             if (!CAN_EXPORT_SYSTEM_LOGS) {
-                showSystemLogsUnauthorized('export system logs');
+                showSystemLogsUnauthorized(
+                    'export system logs'
+                );
+
+                return;
+            }
+
+            const form =
+                document.getElementById(
+                    'slExportForm'
+                );
+
+            if (!form) {
+                return;
+            }
+
+            const validation =
+                window.validateGlobalForm?.(
+                    form
+                );
+
+            if (
+                validation &&
+                !validation.valid
+            ) {
                 return;
             }
 
@@ -1574,42 +1601,30 @@
             const dateTo =
                 slExportDateToInput?.value || '';
 
-            if (!role) {
-                window.showToast?.({
-                    type: 'error',
-                    title: 'Required field',
-                    message: 'Please select a role first.'
-                });
-
-                slExportRoleInput?.focus();
-                return;
-            }
-
-            if (!rawActionType) {
-                window.showToast?.({
-                    type: 'error',
-                    title: 'Required field',
-                    message: 'Please select an action first.'
-                });
-
-                slExportActionInput?.focus();
-                return;
-            }
-
             if (
                 dateFrom &&
                 dateTo &&
                 dateFrom > dateTo
             ) {
-                window.showToast?.({
-                    type: 'error',
-                    title: 'Invalid date range',
-                    message: 'Date From must be earlier than or equal to Date To.'
-                });
+                window
+                    .showFormInputValidationMessage?.(
+                        slExportDateToInput,
+                        'End date must be the same as or later than the start date.'
+                    );
 
-                slExportDateFromInput?.focus();
+                window
+                    .focusGlobalInvalidField?.(
+                        slExportDateToInput
+                    );
+
                 return;
             }
+
+            window
+                .showFormInputValidationMessage?.(
+                    slExportDateToInput,
+                    ''
+                );
 
             const actionType =
                 rawActionType === 'all' ?
@@ -1727,31 +1742,63 @@
             syncSlFilterChoiceControls();
             updateSlShowResultsButton();
 
-            @if (method_exists($logs, 'total') && $logs->total() > 0)
-                slRenderPagebar({
+            const initialSystemLogsPagination = {
+                @if (method_exists($logs, 'total') && $logs->total() > 0)
+
                     total: {{ (int) $logs->total() }},
+
                     from: {{ (int) ($logs->firstItem() ?? 0) }},
+
                     to: {{ (int) ($logs->lastItem() ?? 0) }},
+
                     current_page: {{ (int) $logs->currentPage() }},
+
                     last_page: {{ (int) $logs->lastPage() }},
+
                     per_page: {{ (int) $logs->perPage() }},
-                });
-            @else
-                slRenderPagebar({
+                @else
+
                     total: {{ method_exists($logs, 'count') ? (int) $logs->count() : 0 }},
+
                     from: 0,
+
                     to: 0,
+
                     current_page: 1,
+
                     last_page: 1,
+
                     per_page: {{ (int) ($perPage ?? 10) }},
-                });
-            @endif
+                @endif
+            };
+
+            if (
+                typeof window.loadPaginationBarModule ===
+                'function'
+            ) {
+                window
+                    .loadPaginationBarModule()
+                    .then(() => {
+                        slRenderPagebar(
+                            initialSystemLogsPagination
+                        );
+                    })
+                    .catch(error => {
+                        console.error(
+                            'Unable to initialize system logs pagination.',
+                            error
+                        );
+                    });
+            } else {
+                slRenderPagebar(
+                    initialSystemLogsPagination
+                );
+            }
 
             @if (method_exists($logs, 'count') && $logs->count() === 0)
                 showEmptyState(slState.search);
             @endif
 
-            searchInput = document.getElementById('slSearch');
             slArchiveDaysInput = document.getElementById('slArchiveDaysInput');
             slArchiveError = document.getElementById('slArchiveError');
             slArchiveConfirmBtn = document.getElementById('slArchiveConfirmBtn');
@@ -1830,8 +1877,6 @@
                     perPageSelect,
                     slState.perPage || 10
                 );
-
-                window.initGlobalPageSizeSelects?.();
             }
 
             if (slArchiveDaysInput) {
@@ -2257,19 +2302,6 @@
                             active
                         );
                     });
-            }
-
-            function slSetTab(el, role) {
-                slState.role =
-                    role || 'all';
-
-                slState.page = 1;
-
-                syncSlRoleTab(
-                    slState.role
-                );
-
-                return slFetch();
             }
 
             function slSetTab(el, role) {
@@ -2751,15 +2783,16 @@
 
                     slDraftCountController = new AbortController();
 
-                    fetch('{{ route($routeNames['index'] ?? 'admin.system_logs') }}?' + getSlDraftFilterParams().toString(), {
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                    ?.content ?? ''
-                            },
-                            signal: slDraftCountController.signal
-                        })
+                    fetch('{{ route($routeNames['index'] ?? 'admin.system_logs') }}?' +
+                            getSlDraftFilterParams().toString(), {
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                        ?.content ?? ''
+                                },
+                                signal: slDraftCountController.signal
+                            })
                         .then(function(res) {
                             if (!res.ok) throw new Error('Draft count request failed');
                             return res.json();
@@ -3088,8 +3121,9 @@
                         default: 's-neutral'
                     };
 
-                    var isInventoryCrudLabel = String(log.module || '').toLowerCase() === 'inventory' &&
-                        ['create', 'delete'].includes(actionClass);
+                    var isInventoryCrudLabel = String(log.module || '').toLowerCase() === 'inventory' && [
+                        'create', 'delete'
+                    ].includes(actionClass);
                     var actionStatusClass = isInventoryCrudLabel ?
                         's-neutral' :
                         (actionStatusClasses[actionClass] || 's-neutral');

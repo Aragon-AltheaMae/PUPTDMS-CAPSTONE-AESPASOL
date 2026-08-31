@@ -26,7 +26,7 @@
             <div class="page-banner-inner">
 
                 <div>
-                    <h1 class="page-title page-banner-title">System Settings</h1>
+                    <h1 class="page-title">System Settings</h1>
                     <p class="page-subtitle">Manage notification preferences, backups, and system behavior.</p>
                 </div>
 

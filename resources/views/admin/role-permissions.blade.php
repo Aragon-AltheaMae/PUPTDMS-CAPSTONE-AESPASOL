@@ -32,7 +32,7 @@
             <div class="page-banner">
                 <div class="page-banner-inner">
                     <div>
-                        <h1 class="page-title page-banner-title">Roles & Permissions</h1>
+                        <h1 class="page-title">Roles & Permissions</h1>
                         <p class="page-subtitle">Manage role access and permission groups across the system.</p>
                     </div>
 
