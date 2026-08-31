@@ -118,16 +118,6 @@
 }
 
 @media (max-width: 768px) {
-    .signature-methods-grid {
-        grid-template-columns:
-            1fr;
-    }
-
-    .signature-upload-card,
-    .signature-draw-card {
-        min-height: 300px;
-    }
-
     .app-page-shell.booking-page {
         width: 100% !important;
         max-width: none !important;
@@ -1628,6 +1618,18 @@
 .dark .signature-upload-icon {
     background: rgba(139, 0, 0, .18);
     color: #fca5a5;
+}
+
+@media (max-width: 768px) {
+
+    .signature-methods-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .signature-upload-card,
+    .signature-draw-card {
+        min-height: 300px;
+    }
 }
 
 @media (max-width: 480px) {
