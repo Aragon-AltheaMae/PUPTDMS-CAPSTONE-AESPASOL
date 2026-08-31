@@ -1201,6 +1201,7 @@ textarea.form-input-custom.global-form-textarea {
 }
 
 .form-input-custom[class*="js-flatpickr-"][readonly],
+.form-input-custom.flatpickr-time-display[readonly],
 .form-input-custom.js-flatpickr-date[readonly],
 .form-input-custom.js-flatpickr-date-min-today[readonly],
 .form-input-custom.js-flatpickr-date-max-today[readonly],
@@ -1217,12 +1218,24 @@ textarea.form-input-custom.global-form-textarea {
     background: #fffdfd !important;
 }
 
+.form-input-custom.flatpickr-time-display[readonly]:hover {
+    border-color: #d3c7c7 !important;
+    background: #fffdfd !important;
+}
+
 .form-input-custom[class*="js-flatpickr-"][readonly]:focus {
     border-color: var(--crimson, #8b0000) !important;
     box-shadow: 0 0 0 3px rgba(139, 0, 0, .10) !important;
 }
 
+.form-input-custom.flatpickr-time-display[readonly]:focus {
+    border-color: var(--crimson, #8b0000) !important;
+    box-shadow: 0 0 0 3px rgba(139, 0, 0, .10) !important;
+}
+
 [data-theme="dark"] .form-input-custom[class*="js-flatpickr-"][readonly],
+.dark .form-input-custom.flatpickr-time-display[readonly],
+[data-theme="dark"] .form-input-custom.flatpickr-time-display[readonly],
 .dark .form-input-custom[class*="js-flatpickr-"][readonly] {
     background: var(--card) !important;
     border-color: var(--border) !important;

@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use App\Helpers\PhilippineHolidays;
 use App\Helpers\AuditLogger;
 use App\Services\StudentApiService;
+use App\Services\ReservedBookingInvitationService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
@@ -18,7 +19,8 @@ class HomepageController extends Controller
     const MAX_APPOINTMENTS_PER_DAY = 5;
 
     public function __construct(
-        private readonly StudentApiService $studentApiService
+        private readonly StudentApiService $studentApiService,
+        private readonly ReservedBookingInvitationService $reservedBookingInvitationService
     ) {
     }
 
@@ -33,6 +35,8 @@ class HomepageController extends Controller
         $patient = Patient::findOrFail($patientId);
 
         $this->backfillStudentProfileIfNeeded($patient);
+        $patient = $patient->fresh();
+        $reservedBookingReminders = $this->reservedBookingInvitationService->syncPatient($patient);
         $patient->load('medicalHistory');
 
         if (!session('impersonated_patient_id')) {
@@ -90,7 +94,8 @@ class HomepageController extends Controller
             'unavailableDates',
             'philippineHolidays',
             'records',
-            'notifications'
+            'notifications',
+            'reservedBookingReminders'
         ));
     }
 

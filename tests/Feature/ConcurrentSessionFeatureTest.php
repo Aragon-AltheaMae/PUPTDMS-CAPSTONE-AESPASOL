@@ -166,6 +166,15 @@ class ConcurrentSessionFeatureTest extends TestCase
         );
     }
 
+    public function test_reduced_android_user_agent_does_not_display_k_as_the_device_name(): void
+    {
+        $userAgent = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 '
+            . '(KHTML, like Gecko) Chrome/138.0.0.0 Mobile Safari/537.36';
+
+        $this->assertSame('Android Phone', BrowserDetection::detectDeviceName($userAgent));
+        $this->assertSame('Android Phone', BrowserDetection::deviceNameForDisplay('K', $userAgent));
+    }
+
     private function makeUser(string $email, string $roleSlug): User
     {
         $role = Role::firstOrCreate(

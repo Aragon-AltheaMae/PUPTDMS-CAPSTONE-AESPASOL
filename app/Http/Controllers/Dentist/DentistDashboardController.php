@@ -106,7 +106,10 @@ class DentistDashboardController extends Controller
             })
             ->toArray();
 
-        $dashboardAppointmentWindow = Appointment::with('patient')
+        $dashboardAppointmentWindow = Appointment::with([
+            'patient',
+            'reservedBookingPeriod',
+        ])
             ->whereBetween('appointment_date', [
                 Carbon::today()->toDateString(),
                 Carbon::today()->addDays(90)->toDateString(),
@@ -144,6 +147,8 @@ class DentistDashboardController extends Controller
                         'date' => Carbon::parse($appointment->appointment_date)->format('Y-m-d'),
                         'is_walk_in' => (bool) ($appointment->is_walk_in ?? false),
                         'is_follow_up' => (bool) ($appointment->is_follow_up ?? false),
+                        'is_reserved' => filled($appointment->reserved_booking_period_id),
+                        'reserved_title' => $appointment->reservedBookingPeriod?->title,
 
                         'patientPhotoUrl' =>
                         optional($appointment->patient)->profile_photo_url

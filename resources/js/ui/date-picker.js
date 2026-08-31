@@ -169,11 +169,7 @@ window.buildFlatpickrCalendarOptions = function buildFlatpickrCalendarOptions(co
     return createCalendarSource(config).buildFlatpickrOptions(overrides);
 };
 
-function decorateFlatpickrDays(instance) {
-    if (!instance?.calendarContainer) {
-        return;
-    }
-
+function decorateFlatpickrDay(instance, dayElem) {
     const minDate =
         normalizeDateOnly(
             instance.config?.minDate
@@ -184,49 +180,65 @@ function decorateFlatpickrDays(instance) {
             instance.config?.maxDate
         );
 
+    dayElem.removeAttribute('data-tooltip');
+    dayElem.removeAttribute('data-tooltip-tone');
+
+    if (!dayElem.dateObj) {
+        return;
+    }
+
+    const dayDate = normalizeDateOnly(dayElem.dateObj);
+
+    if (!dayDate) {
+        return;
+    }
+
+    if (minDate && dayDate < minDate) {
+        dayElem.setAttribute(
+            'data-tooltip',
+            "You can't select previous date"
+        );
+
+        return;
+    }
+
+    if (maxDate && dayDate > maxDate) {
+        dayElem.setAttribute(
+            'data-tooltip',
+            "You can't select future date"
+        );
+
+        return;
+    }
+
+    const disabledDateTooltip = String(
+        instance.input?.dataset?.flatpickrDisabledDateTooltip || ''
+    ).trim();
+
+    if (!disabledDateTooltip) {
+        return;
+    }
+
+    const disabledDates = new Set(
+        normalizeCalendarDays(
+            instance.input?.dataset?.flatpickrDisabledDates
+        ).map(value => String(value).trim()).filter(Boolean)
+    );
+
+    if (disabledDates.has(toIsoDate(dayDate))) {
+        dayElem.setAttribute('data-tooltip', disabledDateTooltip);
+        dayElem.setAttribute('data-tooltip-tone', 'locked');
+    }
+}
+
+function decorateFlatpickrDays(instance) {
+    if (!instance?.calendarContainer) {
+        return;
+    }
+
     instance.calendarContainer
         .querySelectorAll('.flatpickr-day')
-        .forEach(dayElem => {
-
-            dayElem.removeAttribute(
-                'data-tooltip'
-            );
-
-            if (!dayElem.dateObj) {
-                return;
-            }
-
-            const dayDate =
-                normalizeDateOnly(
-                    dayElem.dateObj
-                );
-
-            if (!dayDate) {
-                return;
-            }
-
-            if (
-                minDate &&
-                dayDate < minDate
-            ) {
-                dayElem.setAttribute(
-                    'data-tooltip',
-                    "You can't select previous date"
-                );
-
-                return;
-            }
-
-            if (
-                maxDate &&
-                dayDate > maxDate
-            ) {
-                dayElem.setAttribute(
-                    'data-tooltip',
-                    "You can't select future date"
-                );
-            }
-        });
+        .forEach(dayElem => decorateFlatpickrDay(instance, dayElem));
 }
 
 function syncFlatpickrHeader(instance) {
@@ -418,6 +430,9 @@ function initGlobalFlatpickr() {
         onReady: (_dates, _str, instance) => refreshFlatpickr(instance),
         onMonthChange: (_dates, _str, instance) => refreshFlatpickr(instance),
         onYearChange: (_dates, _str, instance) => refreshFlatpickr(instance),
+        onDayCreate: (_dates, _str, instance, dayElem) => {
+            decorateFlatpickrDay(instance, dayElem);
+        },
 
         onOpen: (_dates, _str, instance) => {
             refreshFlatpickr(instance);
@@ -443,9 +458,15 @@ function initGlobalFlatpickr() {
             'dialog, .ui-modal, .modal-overlay'
         );
 
-        options.appendTo = parentPopup || document.body;
+        const shouldPortalToBody = el.hasAttribute(
+            'data-flatpickr-append-to-body'
+        );
 
-        if (parentPopup) {
+        options.appendTo = shouldPortalToBody
+            ? document.body
+            : (parentPopup || document.body);
+
+        if (parentPopup && !shouldPortalToBody) {
             options.positionElement = el;
         }
 
@@ -455,6 +476,32 @@ function initGlobalFlatpickr() {
 
         if (el.max) {
             options.maxDate = el.max;
+        }
+
+        const disabledDates = (() => {
+            const rawValue = el.dataset.flatpickrDisabledDates;
+
+            if (!rawValue) return [];
+
+            try {
+                const parsed = JSON.parse(rawValue);
+
+                return Array.isArray(parsed)
+                    ? parsed.map(value => String(value).trim()).filter(Boolean)
+                    : [];
+            } catch (_) {
+                return rawValue
+                    .split(',')
+                    .map(value => value.trim())
+                    .filter(Boolean);
+            }
+        })();
+
+        if (disabledDates.length) {
+            options.disable = [
+                ...(Array.isArray(options.disable) ? options.disable : []),
+                ...disabledDates,
+            ];
         }
 
         if (el.classList.contains('js-flatpickr-date-min-today')) {
@@ -477,9 +524,11 @@ function initGlobalFlatpickr() {
     timeInputs.forEach(el => {
         if (el._flatpickr) return;
 
-        const parentPopup = el.closest(
-            'dialog, .ui-modal, .modal-overlay'
-        );
+        const initialTime = String(el.value || '').trim();
+        const visibleInputClass = el.className
+            .split(/\s+/)
+            .filter(className => className && className !== 'js-flatpickr-time')
+            .join(' ');
 
         const options = {
             enableTime: true,
@@ -487,13 +536,29 @@ function initGlobalFlatpickr() {
             dateFormat: "H:i",
             altInput: true,
             altFormat: "h:i K",
+            // Never copy the initializer class to Flatpickr's generated
+            // display input. Otherwise a later global/modal scan treats that
+            // display field as a new picker source and initializes it again.
+            altInputClass: `${visibleInputClass} flatpickr-time-display form-control input`,
             time_24hr: false,
             minuteIncrement: 5,
+            defaultDate: /^([01]\d|2[0-3]):[0-5]\d$/.test(initialTime)
+                ? initialTime
+                : undefined,
             allowInput: false,
             clickOpens: true,
             disableMobile: true,
             position: "auto center",
-            appendTo: parentPopup || document.body,
+            // Time pickers use the same top-level popup host everywhere.
+            // Keeping the calendar outside modal scrolling/stacking contexts
+            // makes reserved-period fields behave exactly like Add Existing.
+            appendTo: document.body,
+
+            onReady: (_dates, _str, instance) => {
+                if (/^([01]\d|2[0-3]):[0-5]\d$/.test(initialTime)) {
+                    instance.setDate(initialTime, false, 'H:i');
+                }
+            },
 
             onOpen: (_dates, _str, instance) => {
                 openFlatpickrSheet(instance);
@@ -503,10 +568,6 @@ function initGlobalFlatpickr() {
                 closeFlatpickrSheet(instance);
             },
         };
-
-        if (parentPopup) {
-            options.positionElement = el;
-        }
 
         window.flatpickr(el, options);
     });

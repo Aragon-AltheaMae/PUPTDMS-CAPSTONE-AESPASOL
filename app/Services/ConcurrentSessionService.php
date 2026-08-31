@@ -226,8 +226,10 @@ class ConcurrentSessionService
                     'device_type' => $session->device_type
                         ?? BrowserDetection::detectDeviceType($session->user_agent),
 
-                    'device_label' => $session->device_name
-                        ?? BrowserDetection::detectDeviceName($session->user_agent),
+                    'device_label' => BrowserDetection::deviceNameForDisplay(
+                        $session->device_name ?? null,
+                        $session->user_agent
+                    ),
 
                     'os_label' => $session->os_name
                         ?? BrowserDetection::detectOperatingSystem($session->user_agent),
@@ -423,8 +425,10 @@ class ConcurrentSessionService
                     'user_agent' => $session->user_agent ?: 'Unknown device',
                     'device_type' => $deviceType,
 
-                    'device_label' => $session->device_name
-                        ?? BrowserDetection::detectDeviceName($session->user_agent),
+                    'device_label' => BrowserDetection::deviceNameForDisplay(
+                        $session->device_name ?? null,
+                        $session->user_agent
+                    ),
 
                     'os_label' => $session->os_name
                         ?? BrowserDetection::detectOperatingSystem($session->user_agent),

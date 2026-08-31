@@ -14,6 +14,9 @@ $layoutRole = $layoutRole ?? 'admin';
 
 $isDentistView = $isDentistView ?? false;
 
+$reservedErrors = $reservedErrors ?? $errors->getBag('reservedPeriod');
+
+
 $pageShellClass = $pageShellClass ?? ($isDentistView ? 'app-page-shell' : 'app-page-shell');
 
 $pageTitle = $pageTitle ?? 'Clinic Schedule';
@@ -277,6 +280,7 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                         </div>
                     </div>
 
+
                     <div class="bg-white rounded-xl shadow border border-gray-100 overflow-hidden">
                         <div class="px-5 py-4 flex items-center justify-between cs-rules-card-header">
                             <div class="weekly-toolbar flex items-center gap-2">
@@ -466,15 +470,8 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                             </div>
                         </div>
                         @else
-                        <div class="text-center py-10">
-                            <i class="fa-solid fa-calendar-xmark text-3xl text-gray-300 mb-2 block"></i>
-                            <p class="text-gray-400 text-sm">
-                                No rules yet.
-                                <button onclick="openRuleModal()"
-                                    class="text-[#8B0000] font-semibold hover:underline">Add
-                                    one.</button>
-                            </p>
-                        </div>
+                        <div id="scheduleRulesEmptyState"
+                            class="empty-state-host clinic-schedule-empty-state-host"></div>
                         @endif
                     </div>
                 </div>
@@ -646,6 +643,244 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
                     </div>
 
                 </div>
+                <section class="card lg:col-span-3 reserved-periods-wide-card">
+                    <div class="card-header cs-rules-card-header">
+                        <div class="card-header-left">
+                            <span class="card-header-icon" aria-hidden="true">
+                                <i class="fa-solid fa-calendar-check"></i>
+                            </span>
+                            <h2 class="card-title">Reserved Booking Periods</h2>
+                        </div>
+                        <div class="card-header-right cs-rules-header-actions reserved-period-header-actions">
+                            <span class="cs-rules-count">
+                                {{ $reservedBookingPeriods->count() }}
+                                {{ \Illuminate\Support\Str::plural('period', $reservedBookingPeriods->count()) }}
+                            </span>
+
+                            <x-view-toggle id="reservedPeriodsViewToggle" storage-key="reservedPeriodsView"
+                                list-view="#reservedPeriodsListView" grid-view="#reservedPeriodsGridView" />
+
+                            <button type="button" onclick="openReservedPeriodModal()"
+                                class="ui-btn ui-btn-primary ui-btn-xs">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>Add Period</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card-body reserved-periods-card-body">
+                    @if ($reservedBookingPeriods->count())
+                    <div id="reservedPeriodsListView" class="reserved-periods-view">
+                        <div class="overflow-x-auto px-2 pb-2 sm:px-0 sm:pb-0">
+                        <table class="data-table sched-table reserved-period-table">
+                            <thead>
+                                <tr>
+                                    <th>Schedule</th>
+                                    <th>Purpose</th>
+                                    <th>Target Group</th>
+                                    <th>Booking</th>
+                                    <th>Capacity</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($reservedBookingPeriods as $period)
+                                @php
+                                    $isPastPeriod = \Carbon\Carbon::parse($period->reserved_date)
+                                        ->startOfDay()
+                                        ->lt(\Carbon\Carbon::today());
+                                    $periodPayload = [
+                                        'id' => $period->id,
+                                        'title' => $period->title,
+                                        'reserved_date' => optional($period->reserved_date)->format('Y-m-d'),
+                                        'start_time' => $period->start_time,
+                                        'end_time' => $period->end_time,
+                                        'target_patient_type' => $period->target_patient_type,
+                                        'program_code' => $period->program_code,
+                                        'year_level' => $period->year_level,
+                                        'section' => $period->section,
+                                        'max_capacity' => $period->max_capacity,
+                                        'timeslot_duration_minutes' => $period->timeslot_duration_minutes,
+                                        'notes' => $period->notes,
+                                        'booking_mode' => $period->booking_mode,
+                                        'timeslots' => $period->slots->map(fn($slot) => ['time' => $slot->slot_time])->values()->all(),
+                                    ];
+                                @endphp
+                                <tr>
+                                    <td data-label="Schedule" class="reserved-period-schedule-cell">
+                                        <strong class="text-gray-800">{{ \Carbon\Carbon::parse($period->reserved_date)->format('M d, Y') }}</strong>
+                                        <div class="reserved-period-time">
+                                            <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                                            {{ date('g:i A', strtotime($period->start_time)) }}–{{ date('g:i A', strtotime($period->end_time)) }}
+                                        </div>
+                                    </td>
+                                    <td data-label="Purpose">
+                                        <div class="font-semibold text-gray-800">{{ $period->title }}</div>
+                                        @if ($period->notes)
+                                        <div class="text-xs text-gray-400 mt-0.5 reserved-period-note">
+                                            {{ $period->notes }}
+                                        </div>
+                                        @endif
+                                    </td>
+                                    <td data-label="Target Group">
+                                        <span class="reserved-target-badge">{{ $period->target_label }}</span>
+                                    </td>
+                                    <td data-label="Booking">
+                                        {{ $period->booking_mode === 'timeslot' ? 'Date + timeslot' : 'Date only' }}
+                                        @if ($period->booking_mode === 'timeslot')
+                                        <div class="text-xs text-gray-400 mt-0.5">
+                                            {{ $period->slots->count() }} selectable {{ \Illuminate\Support\Str::plural('slot', $period->slots->count()) }}
+                                            · {{ $period->timeslot_duration_minutes }} min each
+                                        </div>
+                                        @endif
+                                    </td>
+                                    <td data-label="Capacity">
+                                        <strong class="text-[#8B0000]">{{ $period->max_capacity }}</strong>
+                                        <span class="text-xs text-gray-400">patients</span>
+                                    </td>
+                                    <td data-label="Status">
+                                        @if ($isPastPeriod)
+                                        <span class="badge-closed">Past</span>
+                                        @elseif ($period->is_active)
+                                        <span class="badge-open">Active</span>
+                                        @else
+                                        <span class="badge-closed">Inactive</span>
+                                        @endif
+                                    </td>
+                                    <td data-label="Actions">
+                                        <div class="ui-action-group">
+                                            @if (! $isPastPeriod)
+                                            <button type="button"
+                                                onclick='openReservedPeriodModal("edit", {{ $period->id }}, @json($periodPayload))'
+                                                class="ui-action-btn ui-action-edit"
+                                                data-tooltip="Edit reserved period" aria-label="Edit reserved period">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </button>
+                                            @endif
+
+                                            <button type="button" class="ui-action-btn ui-action-delete"
+                                                data-tooltip="Remove reserved period" aria-label="Remove reserved period"
+                                                onclick='openReservedPeriodDeleteModal(
+                                                    @json(route($clinicScheduleRouteNames['reserved_destroy'], $period)),
+                                                    @json($period->title)
+                                                )'>
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    </div>
+
+                    <div id="reservedPeriodsGridView" class="reserved-periods-view" hidden>
+                        <div class="schedule-rules-grid reserved-periods-grid">
+                            @foreach ($reservedBookingPeriods as $period)
+                            @php
+                                $isPastPeriod = \Carbon\Carbon::parse($period->reserved_date)
+                                    ->startOfDay()
+                                    ->lt(\Carbon\Carbon::today());
+                                $periodPayload = [
+                                    'id' => $period->id,
+                                    'title' => $period->title,
+                                    'reserved_date' => optional($period->reserved_date)->format('Y-m-d'),
+                                    'start_time' => $period->start_time,
+                                    'end_time' => $period->end_time,
+                                    'target_patient_type' => $period->target_patient_type,
+                                    'program_code' => $period->program_code,
+                                    'year_level' => $period->year_level,
+                                    'section' => $period->section,
+                                    'max_capacity' => $period->max_capacity,
+                                    'timeslot_duration_minutes' => $period->timeslot_duration_minutes,
+                                    'notes' => $period->notes,
+                                    'booking_mode' => $period->booking_mode,
+                                    'timeslots' => $period->slots->map(fn($slot) => ['time' => $slot->slot_time])->values()->all(),
+                                ];
+                            @endphp
+                            <article class="schedule-rule-card reserved-period-card">
+                                <div class="schedule-rule-card-top">
+                                    <div class="reserved-period-card-heading">
+                                        <span class="reserved-period-card-date">
+                                            <i class="fa-regular fa-calendar"></i>
+                                            {{ \Carbon\Carbon::parse($period->reserved_date)->format('M d, Y') }}
+                                        </span>
+                                        <h3 class="schedule-rule-card-title">{{ $period->title }}</h3>
+                                    </div>
+
+                                    @if ($isPastPeriod)
+                                    <span class="badge-closed">Past</span>
+                                    @elseif ($period->is_active)
+                                    <span class="badge-open">Active</span>
+                                    @else
+                                    <span class="badge-closed">Inactive</span>
+                                    @endif
+                                </div>
+
+                                <span class="reserved-target-badge">{{ $period->target_label }}</span>
+
+                                <div class="schedule-rule-card-meta reserved-period-card-meta">
+                                    <div>
+                                        <div class="schedule-rule-card-label">Reserved Time</div>
+                                        <div class="schedule-rule-card-value reserved-period-card-value">
+                                            <i class="fa-regular fa-clock"></i>
+                                            {{ date('g:i A', strtotime($period->start_time)) }}–{{ date('g:i A', strtotime($period->end_time)) }}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="schedule-rule-card-label">Booking</div>
+                                        <div class="schedule-rule-card-value">
+                                            {{ $period->booking_mode === 'timeslot' ? 'Date + timeslot' : 'Date only' }}
+                                            @if ($period->booking_mode === 'timeslot')
+                                            <span class="reserved-period-card-sub">
+                                                {{ $period->slots->count() }} slots · {{ $period->timeslot_duration_minutes }} min
+                                            </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="schedule-rule-card-label">Capacity</div>
+                                        <div class="schedule-rule-card-value">
+                                            <strong class="text-[#8B0000]">{{ $period->max_capacity }}</strong> patients
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @if ($period->notes)
+                                <p class="reserved-period-card-note">{{ $period->notes }}</p>
+                                @endif
+
+                                <div class="schedule-rule-card-actions ui-action-group">
+                                    @if (! $isPastPeriod)
+                                    <button type="button"
+                                        onclick='openReservedPeriodModal("edit", {{ $period->id }}, @json($periodPayload))'
+                                        class="ui-action-btn ui-action-edit"
+                                        data-tooltip="Edit reserved period" aria-label="Edit reserved period">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </button>
+                                    @endif
+
+                                    <button type="button" class="ui-action-btn ui-action-delete"
+                                        data-tooltip="Remove reserved period" aria-label="Remove reserved period"
+                                        onclick='openReservedPeriodDeleteModal(
+                                            @json(route($clinicScheduleRouteNames['reserved_destroy'], $period)),
+                                            @json($period->title)
+                                        )'>
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </article>
+                            @endforeach
+                        </div>
+                    </div>
+                    @else
+                    <div id="reservedPeriodsEmptyState"
+                        class="empty-state-host clinic-schedule-empty-state-host"></div>
+                    @endif
+                    </div>
+                </section>
             </div>
         </div>
     </div>
@@ -1117,8 +1352,332 @@ $breakSchedule = $openRules->first(fn($s) => $s->break_time && $s->break_time !=
     </form>
 </div>
 
+<div id="reservedPeriodModalBackdrop" class="ui-modal cs-modal modal-theme-primary" aria-hidden="true">
+    <div class="ui-modal-card cs-modal-card cs-reserved-modal-card" onclick="event.stopPropagation()">
+        <div class="modal-hd">
+            <div class="modal-heading">
+                <div class="modal-icon">
+                    <i id="reservedPeriodModalIcon" class="fa-solid fa-calendar-check"></i>
+                </div>
+
+                <div class="modal-copy">
+                    <h3 id="reservedPeriodModalTitle" class="modal-title">Create Reserved Booking Period</h3>
+                    <p id="reservedPeriodModalSubtitle" class="modal-subtitle">
+                        Reserve part of a clinic day for a selected patient group.
+                    </p>
+                </div>
+            </div>
+
+            <button type="button" class="modal-x" data-discard-close="reservedPeriodModalBackdrop"
+                aria-label="Close reserved period modal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="modal-bd modal-form-body">
+            <form id="reservedPeriodForm" method="POST"
+                action="{{ route($clinicScheduleRouteNames['reserved_store']) }}"
+                data-discard-form>
+                @csrf
+                <div id="reservedPeriodMethodField"></div>
+                <input id="reservedPeriodId" type="hidden" name="reserved_period_id">
+
+                <div class="reserved-period-form-grid">
+                    <div class="modal-section">
+                        <div class="modal-section-head">
+                            <div class="modal-section-icon">
+                                <i class="fa-solid fa-calendar-day"></i>
+                            </div>
+                            <div>
+                                <div class="modal-section-title">Period Details</div>
+                                <div class="modal-section-sub">Set the purpose, date, and reserved hours.</div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div data-global-field>
+                                <label for="reservedTitle" class="form-label">Purpose <span class="text-red-500">*</span></label>
+                                <div class="global-voice-row" data-voice-field>
+                                    <div class="global-voice-control">
+                                        <input id="reservedTitle" name="title" type="text" maxlength="120" required
+                                            class="form-ctrl @error('title', 'reservedPeriod') is-invalid @enderror"
+                                            placeholder="e.g. Mandatory Oral Check-up">
+                                    </div>
+
+                                    <x-voice-input target="#reservedTitle" status-id="reservedTitleVoiceStatus"
+                                        label="Voice input for reserved period purpose" title="Voice input" />
+                                </div>
+                                @error('title', 'reservedPeriod')
+                                <p class="global-field-error show">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div data-global-field>
+                                <label for="reservedDate" class="form-label">Date <span class="text-red-500">*</span></label>
+                                <div class="global-control-wrap" data-flatpickr-trigger>
+                                    <i class="fa-regular fa-calendar global-control-icon" aria-hidden="true"></i>
+                                    <input id="reservedDate" name="reserved_date" type="text" required readonly
+                                        class="form-ctrl global-control-with-icon js-flatpickr-date-min-today @error('reserved_date', 'reservedPeriod') is-invalid @enderror"
+                                        data-flatpickr-append-to-body
+                                        data-flatpickr-disabled-date-tooltip="This date already has an active reserved booking period"
+                                        data-flatpickr-disabled-dates='@json(
+                                            $reservedBookingPeriods
+                                                ->where('is_active', true)
+                                                ->pluck('reserved_date')
+                                                ->map(fn ($date) => optional($date)->format('Y-m-d'))
+                                                ->filter()
+                                                ->values()
+                                        )'
+                                        placeholder="Select date">
+                                </div>
+                                @error('reserved_date', 'reservedPeriod')
+                                <p class="global-field-error show">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="reserved-time-grid">
+                                <div data-global-field>
+                                    <label for="reservedStartTime" class="form-label">Start Time <span class="text-red-500">*</span></label>
+                                    <div class="global-control-wrap reserved-time-control" data-flatpickr-trigger>
+                                        <i class="fa-regular fa-clock global-control-icon" aria-hidden="true"></i>
+                                        <input id="reservedStartTime" name="start_time" type="text" required readonly
+                                            class="form-ctrl global-control-with-icon js-flatpickr-time @error('start_time', 'reservedPeriod') is-invalid @enderror"
+                                            placeholder="Select start time">
+                                    </div>
+                                    @error('start_time', 'reservedPeriod')
+                                    <p class="global-field-error show">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div data-global-field>
+                                    <label for="reservedEndTime" class="form-label">End Time <span class="text-red-500">*</span></label>
+                                    <div class="global-control-wrap reserved-time-control" data-flatpickr-trigger>
+                                        <i class="fa-regular fa-clock global-control-icon" aria-hidden="true"></i>
+                                        <input id="reservedEndTime" name="end_time" type="text" required readonly
+                                            class="form-ctrl global-control-with-icon js-flatpickr-time @error('end_time', 'reservedPeriod') is-invalid @enderror"
+                                            placeholder="Select end time">
+                                    </div>
+                                    @error('end_time', 'reservedPeriod')
+                                    <p class="global-field-error show">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <div data-global-field>
+                                <span class="form-label">Patient chooses <span class="text-red-500">*</span></span>
+                                <div class="reserved-booking-mode-grid">
+                                    <label class="reserved-booking-mode-card">
+                                        <input type="radio" name="booking_mode" value="timeslot" required
+                                            onchange="setReservedBookingMode(this.value)">
+                                        <span class="reserved-booking-mode-icon"><i class="fa-regular fa-clock"></i></span>
+                                        <span>
+                                            <strong>Date & timeslot</strong>
+                                            <small>Patient selects an available time.</small>
+                                        </span>
+                                    </label>
+                                    <label class="reserved-booking-mode-card">
+                                        <input type="radio" name="booking_mode" value="date_only" required
+                                            onchange="setReservedBookingMode(this.value)">
+                                        <span class="reserved-booking-mode-icon"><i class="fa-solid fa-list-ol"></i></span>
+                                        <span>
+                                            <strong>Date only</strong>
+                                            <small>Queue-based within the period.</small>
+                                        </span>
+                                    </label>
+                                </div>
+                                @error('booking_mode', 'reservedPeriod')
+                                <p class="global-field-error show">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-section">
+                        <div class="modal-section-head">
+                            <div class="modal-section-icon">
+                                <i class="fa-solid fa-users"></i>
+                            </div>
+                            <div>
+                                <div class="modal-section-title">Target & Capacity</div>
+                                <div class="modal-section-sub">Choose who may book and limit the available places.</div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div data-global-field>
+                                <label for="reservedPatientType" class="form-label">Patient Type <span class="text-red-500">*</span></label>
+                                <select id="reservedPatientType" name="target_patient_type" required
+                                    class="form-ctrl form-sel js-custom-select" data-placeholder="Select patient type"
+                                    onchange="toggleReservedStudentFields(this.value)">
+                                    <option value="student">Student</option>
+                                    <option value="faculty">Faculty</option>
+                                    <option value="administrative">Administrative</option>
+                                    <option value="guest">Guest</option>
+                                </select>
+                                @error('target_patient_type', 'reservedPeriod')
+                                <p class="global-field-error show">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div id="reservedStudentFields" class="reserved-student-fields">
+                                <div data-global-field>
+                                    <label for="reservedProgramCode" class="form-label">Program <span class="text-red-500">*</span></label>
+                                    <select id="reservedProgramCode" name="program_code"
+                                        class="form-ctrl form-sel js-custom-select" data-placeholder="Select program"
+                                        onchange="updateReservedStudentTargetDropdowns(this.value, '', '')">
+                                        <option value="">Select program</option>
+                                        @foreach ($studentTargetOptions->unique('course_code') as $studentOption)
+                                        <option value="{{ $studentOption['course_code'] }}">
+                                            {{ $studentOption['course_code'] }}{{ $studentOption['course_name'] && $studentOption['course_name'] !== $studentOption['course_code'] ? ' — '.$studentOption['course_name'] : '' }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                    <p class="form-help">Programs are loaded from the student information system.</p>
+                                    @error('program_code', 'reservedPeriod')
+                                    <p class="global-field-error show">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="reserved-student-row">
+                                    <div data-global-field>
+                                        <label for="reservedYearLevel" class="form-label">Year Level <span class="text-red-500">*</span></label>
+                                        <select id="reservedYearLevel" name="year_level"
+                                            class="form-ctrl form-sel js-custom-select" data-placeholder="Select year level"
+                                            onchange="updateReservedStudentTargetDropdowns(document.getElementById('reservedProgramCode').value, this.value, '')">
+                                            <option value="">Select year</option>
+                                            @foreach ($studentTargetOptions->pluck('year_level')->filter()->unique()->sort() as $year)
+                                            <option value="{{ $year }}">Year {{ $year }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('year_level', 'reservedPeriod')
+                                        <p class="global-field-error show">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <div data-global-field>
+                                        <label for="reservedSection" class="form-label">Section <span class="text-red-500">*</span></label>
+                                        <select id="reservedSection" name="section"
+                                            class="form-ctrl form-sel js-custom-select" data-placeholder="Select section">
+                                            <option value="">Select section</option>
+                                            @foreach ($studentTargetOptions->pluck('section')->filter()->unique() as $sectionOption)
+                                            <option value="{{ $sectionOption }}">{{ $sectionOption }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('section', 'reservedPeriod')
+                                        <p class="global-field-error show">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="reservedOverallCapacityField" data-global-field hidden>
+                                <label for="reservedMaxCapacity" class="form-label">Maximum Capacity <span class="text-red-500">*</span></label>
+                                <div class="global-number-stepper reserved-capacity-stepper" data-global-number-stepper>
+                                    <button type="button" class="global-number-stepper-btn" data-number-step="-1"
+                                        aria-label="Decrease maximum capacity">
+                                        <i class="fa-solid fa-minus"></i>
+                                    </button>
+                                    <input id="reservedMaxCapacity" name="max_capacity" type="number" min="1"
+                                        max="{{ \App\Models\ReservedBookingPeriod::MAX_CAPACITY }}"
+                                        step="1" required class="global-number-stepper-input" value="10"
+                                        inputmode="numeric" data-number-stepper-input>
+                                    <button type="button" class="global-number-stepper-btn" data-number-step="1"
+                                        aria-label="Increase maximum capacity">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </button>
+                                </div>
+                                <p class="form-help">Maximum eligible patients who can book this period, up to {{ \App\Models\ReservedBookingPeriod::MAX_CAPACITY }}.</p>
+                                @error('max_capacity', 'reservedPeriod')
+                                <p class="global-field-error show">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div data-global-field>
+                                <label for="reservedNotes" class="form-label">Notes (optional)</label>
+                                <textarea id="reservedNotes" name="notes" maxlength="500" rows="3"
+                                    class="form-ctrl resize-none" placeholder="Internal instructions for this reserved period."></textarea>
+                                @error('notes', 'reservedPeriod')
+                                <p class="global-field-error show">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="reservedTimeslotBuilder" class="modal-section reserved-timeslot-section">
+                    <div class="modal-section-head reserved-timeslot-heading">
+                        <div class="modal-section-icon">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div>
+                            <div class="modal-section-title">Selectable Timeslots</div>
+                            <div class="modal-section-sub">Create up to {{ \App\Models\ReservedBookingPeriod::MAX_CAPACITY }} times patients can choose. Each timeslot is for one patient.</div>
+                        </div>
+                        <div class="reserved-timeslot-total">
+                            <span id="reservedTimeslotTotal">0</span>
+                            <small>total patients</small>
+                        </div>
+                    </div>
+
+                    <div class="reserved-timeslot-add-row">
+                        <div data-global-field>
+                            <label for="reservedSlotDuration" class="form-label">Duration (minutes)</label>
+                            <input id="reservedSlotDuration" name="timeslot_duration_minutes" type="number"
+                                min="5" max="240" step="5" required class="form-ctrl" value="30"
+                                inputmode="numeric" onchange="updateReservedSlotDuration()">
+                            @error('timeslot_duration_minutes', 'reservedPeriod')
+                            <p class="global-field-error show">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div data-global-field>
+                            <label for="reservedNewSlotTime" class="form-label">Timeslot</label>
+                            <div class="global-control-wrap reserved-time-control" data-flatpickr-trigger>
+                                <i class="fa-regular fa-clock global-control-icon" aria-hidden="true"></i>
+                                <input id="reservedNewSlotTime" type="text" readonly
+                                    class="form-ctrl global-control-with-icon js-flatpickr-time"
+                                    value="09:00" placeholder="Select timeslot">
+                            </div>
+                        </div>
+                        <button id="reservedAddTimeslotButton" type="button"
+                            class="ui-btn ui-btn-primary reserved-add-timeslot-btn"
+                            onclick="addReservedTimeslot()">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Add Timeslot</span>
+                        </button>
+                    </div>
+
+                    <div id="reservedTimeslotList" class="reserved-timeslot-list"></div>
+                    <p id="reservedTimeslotEmpty" class="reserved-timeslot-empty">
+                        <i class="fa-regular fa-clock"></i>
+                        No timeslots yet. Add the first selectable time above.
+                    </p>
+                    @if ($reservedErrors->has('timeslots') || $reservedErrors->has('timeslots.*.time'))
+                    <p class="global-field-error show">
+                        {{ $reservedErrors->first('timeslots') ?: $reservedErrors->first('timeslots.*.time') }}
+                    </p>
+                    @endif
+                </div>
+
+                <div class="modal-ft px-0 pb-0 mt-5">
+                    <button type="button" class="ui-btn ui-btn-secondary" data-discard-close="reservedPeriodModalBackdrop">
+                        Cancel
+                    </button>
+                    <button id="reservedPeriodSubmitButton" type="submit" class="ui-btn ui-btn-primary">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span id="reservedPeriodSubmitText">Save Reserved Period</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <x-delete-confirm-modal id="scheduleDeleteModal" form-id="scheduleDeleteForm" name-id="scheduleDeleteName"
     title="Delete Schedule Rule" helper="This schedule rule will be permanently removed." />
+
+<x-delete-confirm-modal id="reservedPeriodDeleteModal" form-id="reservedPeriodDeleteForm"
+    name-id="reservedPeriodDeleteName" title="Remove Reserved Booking Period"
+    helper="The period remains in database history but will no longer be available for booking." />
 @endsection
 
 @section('scripts')
@@ -1129,6 +1688,12 @@ $clinicScheduleStoreUrl = route($clinicScheduleRouteNames['store']);
 $clinicScheduleUpdateUrlTemplate = route($clinicScheduleRouteNames['update'], [
 'clinicSchedule' => '__RULE_ID__',
 ]);
+
+$reservedPeriodStoreUrl = route($clinicScheduleRouteNames['reserved_store']);
+
+$reservedPeriodUpdateUrlTemplate = route($clinicScheduleRouteNames['reserved_update'], [
+'reservedBookingPeriod' => '__PERIOD_ID__',
+]);
 @endphp
 
 <script>
@@ -1137,8 +1702,42 @@ $clinicScheduleUpdateUrlTemplate = route($clinicScheduleRouteNames['update'], [
         update: @json($clinicScheduleUpdateUrlTemplate),
     };
 
+    const reservedPeriodRoutes = {
+        store: @json($reservedPeriodStoreUrl),
+        update: @json($reservedPeriodUpdateUrlTemplate),
+    };
+    const reservedPeriodValidationFailed = @json($reservedErrors->any());
+    const reservedPeriodOldInput = @json(old());
+    const reservedPeriodMaxCapacity = @json(\App\Models\ReservedBookingPeriod::MAX_CAPACITY);
+    const reservedStudentTargetOptions = @json($studentTargetOptions->values());
+
     const scheduleRules = @json($schedules);
     const weeklyAppointments = @json($weeklyAppointments ?? []);
+    const reservedBookingPeriods = @json($reservedBookingPeriods);
+
+    function syncReservedDateAvailability(ignorePeriodId = null) {
+        const dateInput = document.getElementById('reservedDate');
+
+        if (!dateInput) return;
+
+        const disabledDates = reservedBookingPeriods
+            .filter(period => {
+                const isActive = period?.is_active === true
+                    || period?.is_active === 1
+                    || period?.is_active === '1';
+
+                return isActive && String(period.id) !== String(ignorePeriodId ?? '');
+            })
+            .map(period => String(period.reserved_date || '').slice(0, 10))
+            .filter(Boolean);
+
+        dateInput.dataset.flatpickrDisabledDates = JSON.stringify(disabledDates);
+
+        if (dateInput._flatpickr) {
+            dateInput._flatpickr.set('disable', disabledDates);
+            dateInput._flatpickr.redraw();
+        }
+    }
 
     function clearFieldError(errorId, inputId = null, groupId = null) {
         const errorEl = document.getElementById(errorId);
@@ -1256,6 +1855,33 @@ $clinicScheduleUpdateUrlTemplate = route($clinicScheduleRouteNames['update'], [
         );
     }
 
+    function getReservedPeriodsForSlot(isoDate, hour) {
+        return reservedBookingPeriods.filter(period => {
+            if (!period?.is_active || period.reserved_date !== isoDate) {
+                return false;
+            }
+
+            const [startHour, startMinute] = normalizeToHourMinute(period.start_time)
+                .split(':')
+                .map(Number);
+            const [endHour, endMinute] = normalizeToHourMinute(period.end_time)
+                .split(':')
+                .map(Number);
+            const start = startHour * 60 + startMinute;
+            const end = endHour * 60 + endMinute;
+            const rowStart = hour * 60;
+            const rowEnd = rowStart + 60;
+
+            return start < rowEnd && end > rowStart;
+        });
+    }
+
+    function escapeCalendarText(value) {
+        const element = document.createElement('div');
+        element.textContent = String(value ?? '');
+        return element.innerHTML;
+    }
+
     function getServiceColor(serviceType) {
         const service = (serviceType || '').toLowerCase();
 
@@ -1318,12 +1944,22 @@ $clinicScheduleUpdateUrlTemplate = route($clinicScheduleRouteNames['update'], [
                 const abbr = d.toLocaleDateString('en-US', {
                     weekday: 'short'
                 }).replace('.', '');
+                const slotReservedPeriods = getReservedPeriodsForSlot(isoDate, h);
                 const state = i >= 5 ? 'wk-weekend' :
-                    slotState(abbr, h) === 'break' ? 'wk-break' :
-                        slotState(abbr, h) === 'closed' ? 'wk-closed' : '';
+                    slotReservedPeriods.length ? 'wk-reserved' :
+                        slotState(abbr, h) === 'break' ? 'wk-break' :
+                            slotState(abbr, h) === 'closed' ? 'wk-closed' : '';
 
                 let inner = '';
-                if (state === 'wk-break') inner = '<span class="slot-label">BREAK</span>';
+                if (state === 'wk-reserved') {
+                    inner = slotReservedPeriods.map(period => `
+                        <div class="reserved-calendar-block" title="Reserved booking period">
+                            <strong>${escapeCalendarText(period.title)}</strong>
+                            <span>${escapeCalendarText(period.target_label || period.target_patient_type)}</span>
+                        </div>
+                    `).join('');
+                }
+                else if (state === 'wk-break') inner = '<span class="slot-label">BREAK</span>';
                 else if (state === 'wk-closed' || state === 'wk-weekend') inner =
                     '<span class="slot-label">CLOSED</span>';
                 else {
@@ -2065,5 +2701,548 @@ $clinicScheduleUpdateUrlTemplate = route($clinicScheduleRouteNames['update'], [
         document.getElementById('blockNote')?.addEventListener('input', () => clearFieldError('blockNoteError',
             'blockNote'));
     });
+
+    function replaceReservedTargetSelectOptions(select, options, placeholder, selectedValue = '') {
+        if (!select) return;
+
+        const wrapper = select.closest('.custom-select');
+        if (wrapper) {
+            wrapper.parentNode.insertBefore(select, wrapper);
+            wrapper.remove();
+        }
+
+        delete select.dataset.customSelectReady;
+        select.classList.remove('custom-select-native');
+        select.innerHTML = '';
+        const placeholderOption = new Option(placeholder, '');
+        placeholderOption.disabled = true;
+        placeholderOption.hidden = true;
+        select.appendChild(placeholderOption);
+
+        options.forEach(option => {
+            select.appendChild(new Option(option.label, option.value));
+        });
+
+        const normalizedSelected = String(selectedValue ?? '');
+        select.value = Array.from(select.options).some(option => option.value === normalizedSelected)
+            ? normalizedSelected
+            : '';
+
+        window.initCustomSelects?.(select.parentElement);
+    }
+
+    function updateReservedStudentTargetDropdowns(program = '', year = '', section = '') {
+        const programSelect = document.getElementById('reservedProgramCode');
+        const yearSelect = document.getElementById('reservedYearLevel');
+        const sectionSelect = document.getElementById('reservedSection');
+        const selectedProgram = String(program || '').toUpperCase();
+        const selectedYear = String(year || '');
+        const selectedSection = String(section || '').toUpperCase();
+
+        const uniqueOptions = (items, valueKey, labelBuilder) => {
+            const seen = new Set();
+
+            return items.reduce((options, item) => {
+                const value = String(item[valueKey] ?? '').trim();
+                const key = value.toLowerCase();
+                if (!value || seen.has(key)) return options;
+
+                seen.add(key);
+                options.push({ value, label: labelBuilder(item, value) });
+                return options;
+            }, []);
+        };
+
+        const programs = uniqueOptions(
+            reservedStudentTargetOptions,
+            'course_code',
+            (item, value) => item.course_name && item.course_name !== value
+                ? `${value} — ${item.course_name}`
+                : value
+        );
+        const matchingProgram = reservedStudentTargetOptions.filter(
+            item => String(item.course_code || '').toUpperCase() === selectedProgram
+        );
+        const years = uniqueOptions(
+            matchingProgram,
+            'year_level',
+            (_item, value) => `Year ${value}`
+        ).sort((a, b) => Number(a.value) - Number(b.value));
+        const matchingYear = matchingProgram.filter(
+            item => String(item.year_level || '') === selectedYear
+        );
+        const sections = uniqueOptions(
+            matchingYear,
+            'section',
+            (_item, value) => value
+        ).sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true }));
+
+        replaceReservedTargetSelectOptions(programSelect, programs, 'Select program', selectedProgram);
+        replaceReservedTargetSelectOptions(yearSelect, years, 'Select year', selectedYear);
+        replaceReservedTargetSelectOptions(sectionSelect, sections, 'Select section', selectedSection);
+
+        yearSelect.disabled = !selectedProgram;
+        sectionSelect.disabled = !selectedProgram || !selectedYear;
+
+        const yearCustomSelect = yearSelect.closest('.custom-select');
+        const sectionCustomSelect = sectionSelect.closest('.custom-select');
+
+        if (yearCustomSelect) {
+            window.syncCustomSelect?.(yearCustomSelect);
+        }
+
+        if (sectionCustomSelect) {
+            window.syncCustomSelect?.(sectionCustomSelect);
+        }
+    }
+
+    function toggleReservedStudentFields(patientType) {
+        const studentFields = document.getElementById('reservedStudentFields');
+        const isStudent = patientType === 'student';
+
+        if (!studentFields) return;
+
+        studentFields.hidden = !isStudent;
+
+        ['reservedProgramCode', 'reservedYearLevel', 'reservedSection'].forEach(id => {
+            const field = document.getElementById(id);
+            if (!field) return;
+
+            const selectedProgram = document.getElementById('reservedProgramCode')?.value || '';
+            const selectedYear = document.getElementById('reservedYearLevel')?.value || '';
+            field.disabled = !isStudent
+                || (id === 'reservedYearLevel' && !selectedProgram)
+                || (id === 'reservedSection' && (!selectedProgram || !selectedYear));
+            field.required = isStudent;
+
+            if (!isStudent) {
+                field.value = '';
+            }
+
+            const customSelect = field.closest('.custom-select');
+            if (customSelect) {
+                customSelect.classList.toggle('is-disabled', !isStudent);
+                window.syncCustomSelect?.(customSelect);
+            }
+        });
+    }
+
+    let reservedTimeslots = [];
+
+    function setReservedBookingMode(mode) {
+        const normalizedMode = mode === 'date_only' ? 'date_only' : 'timeslot';
+        const timeslotBuilder = document.getElementById('reservedTimeslotBuilder');
+        const capacityField = document.getElementById('reservedOverallCapacityField');
+        const capacityInput = document.getElementById('reservedMaxCapacity');
+        const durationInput = document.getElementById('reservedSlotDuration');
+
+        document.querySelectorAll('input[name="booking_mode"]').forEach(input => {
+            input.checked = input.value === normalizedMode;
+        });
+
+        if (timeslotBuilder) {
+            timeslotBuilder.hidden = normalizedMode !== 'timeslot';
+            timeslotBuilder.querySelectorAll('input[name^="timeslots["]').forEach(input => {
+                input.disabled = normalizedMode !== 'timeslot';
+            });
+        }
+
+        if (capacityField) capacityField.hidden = normalizedMode === 'timeslot';
+        if (capacityInput) {
+            capacityInput.disabled = normalizedMode === 'timeslot';
+            capacityInput.required = normalizedMode === 'date_only';
+        }
+        if (durationInput) {
+            durationInput.disabled = normalizedMode !== 'timeslot';
+            durationInput.required = normalizedMode === 'timeslot';
+        }
+    }
+
+    function getReservedSlotDuration() {
+        return Math.min(
+            240,
+            Math.max(5, Number(document.getElementById('reservedSlotDuration')?.value) || 30)
+        );
+    }
+
+    function updateReservedSlotDuration() {
+        const durationInput = document.getElementById('reservedSlotDuration');
+        const duration = getReservedSlotDuration();
+
+        if (durationInput) durationInput.value = duration;
+        renderReservedTimeslots();
+    }
+
+    function renderReservedTimeslots() {
+        const list = document.getElementById('reservedTimeslotList');
+        const empty = document.getElementById('reservedTimeslotEmpty');
+        const total = document.getElementById('reservedTimeslotTotal');
+        const addButton = document.getElementById('reservedAddTimeslotButton');
+
+        if (!list || !empty || !total) return;
+
+        list.querySelectorAll('.js-flatpickr-time').forEach(input => {
+            input._flatpickr?.destroy();
+        });
+
+        list.innerHTML = reservedTimeslots.map((slot, index) => `
+            <div class="reserved-timeslot-item">
+                <span class="reserved-timeslot-item-icon"><i class="fa-regular fa-clock"></i></span>
+                <div data-global-field>
+                    <label class="form-label" for="reservedSlotTime${index}">Time</label>
+                    <div class="global-control-wrap reserved-time-control" data-flatpickr-trigger>
+                        <i class="fa-regular fa-clock global-control-icon" aria-hidden="true"></i>
+                        <input id="reservedSlotTime${index}" name="timeslots[${index}][time]" type="text"
+                            required readonly class="form-ctrl global-control-with-icon js-flatpickr-time"
+                            value="${slot.time}" placeholder="Select time"
+                            onchange="updateReservedTimeslot(${index}, 'time', this.value)">
+                    </div>
+                </div>
+                <span class="reserved-timeslot-one-patient">
+                    <i class="fa-solid fa-user"></i> 1 patient · ${getReservedSlotDuration()} min
+                </span>
+                <button type="button" class="reserved-remove-timeslot" onclick="removeReservedTimeslot(${index})"
+                    aria-label="Remove timeslot" title="Remove timeslot">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            </div>
+        `).join('');
+
+        empty.hidden = reservedTimeslots.length > 0;
+        total.textContent = reservedTimeslots.length;
+
+        if (addButton) {
+            const atCapacity = reservedTimeslots.length >= reservedPeriodMaxCapacity;
+
+            addButton.disabled = atCapacity;
+
+            if (atCapacity) {
+                addButton.dataset.tooltip = `Maximum of ${reservedPeriodMaxCapacity} timeslots reached`;
+                addButton.dataset.tooltipTone = 'locked';
+            } else {
+                addButton.removeAttribute('data-tooltip');
+                addButton.removeAttribute('data-tooltip-tone');
+            }
+        }
+
+        setReservedBookingMode(
+            document.querySelector('input[name="booking_mode"]:checked')?.value || 'timeslot'
+        );
+    }
+
+    function updateReservedTimeslot(index, field, value) {
+        if (!reservedTimeslots[index]) return;
+
+        reservedTimeslots[index][field] = String(value).slice(0, 5);
+    }
+
+    function removeReservedTimeslot(index) {
+        reservedTimeslots.splice(index, 1);
+        renderReservedTimeslots();
+    }
+
+    function reportReservedTimeValidity(field, message) {
+        if (!field) return;
+
+        const visibleInput = field._flatpickr?.altInput || field;
+        field.setCustomValidity(message || '');
+        visibleInput.setCustomValidity(message || '');
+        visibleInput.reportValidity();
+    }
+
+    function addReservedTimeslot() {
+        const timeInput = document.getElementById('reservedNewSlotTime');
+        const time = timeInput?.value || '';
+
+        timeInput?.setCustomValidity('');
+
+        if (!time) {
+            reportReservedTimeValidity(timeInput, 'Choose a time before adding the timeslot.');
+            return;
+        }
+
+        if (reservedTimeslots.some(slot => slot.time === time)) {
+            reportReservedTimeValidity(timeInput, 'This timeslot has already been added.');
+            return;
+        }
+
+        if (reservedTimeslots.length >= reservedPeriodMaxCapacity) {
+            reportReservedTimeValidity(
+                timeInput,
+                `A reserved period cannot have more than ${reservedPeriodMaxCapacity} timeslots.`
+            );
+            return;
+        }
+
+        reservedTimeslots.push({ time });
+        reservedTimeslots.sort((a, b) => a.time.localeCompare(b.time));
+        renderReservedTimeslots();
+
+        if (timeInput) {
+            const [hours, minutes] = time.split(':').map(Number);
+            const nextMinutes = (hours * 60) + minutes + getReservedSlotDuration();
+            const end = document.getElementById('reservedEndTime')?.value || '';
+            const nextTime = `${String(Math.floor(nextMinutes / 60)).padStart(2, '0')}:${String(nextMinutes % 60).padStart(2, '0')}`;
+            if (nextMinutes < 24 * 60 && (!end || nextTime < end)) {
+                if (timeInput._flatpickr) {
+                    timeInput._flatpickr.setDate(nextTime, false, 'H:i');
+                } else {
+                    timeInput.value = nextTime;
+                }
+            }
+        }
+    }
+
+    function openReservedPeriodModal(mode = 'create', periodId = null, period = null) {
+        const modal = document.getElementById('reservedPeriodModalBackdrop');
+        const form = document.getElementById('reservedPeriodForm');
+        const methodField = document.getElementById('reservedPeriodMethodField');
+        const idField = document.getElementById('reservedPeriodId');
+        const modalTitle = document.getElementById('reservedPeriodModalTitle');
+        const modalSubtitle = document.getElementById('reservedPeriodModalSubtitle');
+        const modalIcon = document.getElementById('reservedPeriodModalIcon');
+        const submitButton = document.getElementById('reservedPeriodSubmitButton');
+        const submitText = document.getElementById('reservedPeriodSubmitText');
+
+        if (!modal || !form || !methodField || !idField) {
+            return;
+        }
+
+        form.reset();
+        form.action = reservedPeriodRoutes.store;
+        methodField.innerHTML = '';
+        idField.value = '';
+
+        modal.classList.remove('modal-theme-primary', 'modal-theme-edit');
+        modal.classList.add('modal-theme-primary');
+
+        modalTitle.textContent = 'Create Reserved Booking Period';
+        modalSubtitle.textContent = 'Reserve part of a clinic day for a selected patient group.';
+        modalIcon.className = 'fa-solid fa-calendar-check';
+        submitButton.className = 'ui-btn ui-btn-primary';
+        submitText.textContent = 'Save Reserved Period';
+
+        document.getElementById('reservedDate').value = '';
+        document.getElementById('reservedStartTime').value = '09:00';
+        document.getElementById('reservedEndTime').value = '13:00';
+        document.getElementById('reservedPatientType').value = 'student';
+        document.getElementById('reservedMaxCapacity').value = '10';
+        document.getElementById('reservedSlotDuration').value = '30';
+        document.getElementById('reservedNewSlotTime').value = '09:00';
+        reservedTimeslots = [];
+
+        const values = period || {};
+
+        if (mode === 'edit' && periodId) {
+            modal.classList.remove('modal-theme-primary');
+            modal.classList.add('modal-theme-edit');
+            form.action = reservedPeriodRoutes.update.replace('__PERIOD_ID__', periodId);
+            methodField.innerHTML = '<input type="hidden" name="_method" value="PUT">';
+            idField.value = periodId;
+
+            modalTitle.textContent = 'Edit Reserved Booking Period';
+            modalSubtitle.textContent = 'Update the window, target group, booking mode, or capacity.';
+            modalIcon.className = 'fa-solid fa-pen-to-square';
+            submitButton.className = 'ui-btn ui-btn-edit';
+            submitText.textContent = 'Update Reserved Period';
+        }
+
+        const setValue = (id, value, fallback = '') => {
+            const field = document.getElementById(id);
+            if (!field) return;
+
+            field.value = value ?? fallback;
+
+            if (field._flatpickr) {
+                if (field.value) {
+                    const valueFormat = field.classList.contains('js-flatpickr-time')
+                        ? 'H:i'
+                        : 'Y-m-d';
+                    field._flatpickr.setDate(field.value, false, valueFormat);
+                } else {
+                    field._flatpickr.clear(false);
+                }
+            }
+
+            const customSelect = field.closest('.custom-select');
+            if (customSelect) {
+                window.syncCustomSelect?.(customSelect);
+            }
+        };
+
+        syncReservedDateAvailability(
+            mode === 'edit' ? periodId : null
+        );
+
+        setValue('reservedTitle', values.title);
+        setValue(
+            'reservedDate',
+            values.reserved_date ? String(values.reserved_date).slice(0, 10) : ''
+        );
+        setValue('reservedStartTime', values.start_time ? String(values.start_time).slice(0, 5) : '09:00');
+        setValue('reservedEndTime', values.end_time ? String(values.end_time).slice(0, 5) : '13:00');
+        setValue('reservedPatientType', values.target_patient_type, 'student');
+        updateReservedStudentTargetDropdowns(
+            values.program_code,
+            values.year_level,
+            values.section
+        );
+        setValue('reservedMaxCapacity', values.max_capacity, '10');
+        setValue('reservedSlotDuration', values.timeslot_duration_minutes, '30');
+        setValue('reservedNewSlotTime', '09:00');
+        setValue('reservedNotes', values.notes);
+
+        reservedTimeslots = Array.from(values.timeslots || values.slots || []).map(slot => ({
+            time: String(slot.time || slot.slot_time || '').slice(0, 5),
+        })).filter(slot => slot.time);
+        renderReservedTimeslots();
+        updateReservedSlotDuration();
+        setReservedBookingMode(values.booking_mode || 'timeslot');
+
+        toggleReservedStudentFields(
+            document.getElementById('reservedPatientType').value
+        );
+
+        window.openModal('reservedPeriodModalBackdrop');
+    }
+
+    function openReservedPeriodDeleteModal(action, title) {
+        const form = document.getElementById('reservedPeriodDeleteForm');
+        const name = document.getElementById('reservedPeriodDeleteName');
+
+        if (!form || !name) return;
+
+        form.action = action;
+        name.textContent = title || 'Reserved booking period';
+        window.openModal('reservedPeriodDeleteModal');
+    }
+
+    document.getElementById('reservedPeriodForm')?.addEventListener('submit', event => {
+        const start = document.getElementById('reservedStartTime')?.value || '';
+        const end = document.getElementById('reservedEndTime')?.value || '';
+        const bookingMode = document.querySelector('input[name="booking_mode"]:checked')?.value;
+        const slotPrompt = document.getElementById('reservedNewSlotTime');
+
+        if (start && end && end <= start) {
+            event.preventDefault();
+            reportReservedTimeValidity(
+                document.getElementById('reservedEndTime'),
+                'End time must be later than start time.'
+            );
+            return;
+        }
+
+        if (bookingMode === 'timeslot') {
+            const duration = getReservedSlotDuration();
+            const toMinutes = time => {
+                const [hours, minutes] = String(time).split(':').map(Number);
+                return (hours * 60) + minutes;
+            };
+            const endMinutes = toMinutes(end);
+            const sortedMinutes = reservedTimeslots
+                .map(slot => toMinutes(slot.time))
+                .sort((a, b) => a - b);
+            const hasInvalidSlot = reservedTimeslots.some(
+                slot => !slot.time || slot.time < start || (toMinutes(slot.time) + duration) > endMinutes
+            );
+            const slotTimes = reservedTimeslots.map(slot => slot.time);
+            const hasDuplicateSlot = new Set(slotTimes).size !== slotTimes.length;
+            const hasOverlappingSlot = sortedMinutes.some(
+                (minutes, index) => index > 0 && minutes < (sortedMinutes[index - 1] + duration)
+            );
+            const exceedsCapacity = reservedTimeslots.length > reservedPeriodMaxCapacity;
+
+            if (!reservedTimeslots.length || exceedsCapacity || hasInvalidSlot || hasDuplicateSlot || hasOverlappingSlot) {
+                event.preventDefault();
+                const message = !reservedTimeslots.length
+                    ? 'Add at least one timeslot for patients to select.'
+                    : exceedsCapacity
+                        ? `A reserved period cannot have more than ${reservedPeriodMaxCapacity} timeslots.`
+                    : hasDuplicateSlot
+                        ? 'Each timeslot must have a unique time.'
+                        : hasOverlappingSlot
+                            ? 'Timeslots cannot overlap based on the selected duration.'
+                            : 'Every timeslot, including its duration, must fit within the reserved period.';
+                slotPrompt?.setCustomValidity(message);
+                reportReservedTimeValidity(slotPrompt, message);
+                return;
+            }
+        }
+
+        document.getElementById('reservedEndTime')?.setCustomValidity('');
+        document.getElementById('reservedEndTime')?._flatpickr?.altInput?.setCustomValidity('');
+        slotPrompt?.setCustomValidity('');
+        slotPrompt?._flatpickr?.altInput?.setCustomValidity('');
+        window.DiscardChanges?.markSubmitting(event.currentTarget);
+    });
+
+    ['input', 'change'].forEach(eventName => {
+        document.getElementById('reservedEndTime')?.addEventListener(eventName, event => {
+            event.currentTarget.setCustomValidity('');
+            event.currentTarget._flatpickr?.altInput?.setCustomValidity('');
+        });
+    });
+
+    document.getElementById('reservedNewSlotTime')?.addEventListener('input', event => {
+        event.currentTarget.setCustomValidity('');
+        event.currentTarget._flatpickr?.altInput?.setCustomValidity('');
+    });
+
+    function renderClinicScheduleEmptyStates() {
+        if (!window.EmptyState) return;
+
+        if (document.getElementById('scheduleRulesEmptyState')) {
+            window.EmptyState.render({
+                host: '#scheduleRulesEmptyState',
+                icon: 'fa-calendar-xmark',
+                title: 'No schedule rules yet',
+                message: 'Add clinic hours and availability rules to begin scheduling appointments.',
+                className: 'empty-state-compact clinic-schedule-empty-state',
+                actionHtml: `
+                    <button type="button" onclick="openRuleModal()" class="empty-state-btn">
+                        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                        <span>Add schedule rule</span>
+                    </button>
+                `,
+            });
+        }
+
+        if (document.getElementById('reservedPeriodsEmptyState')) {
+            window.EmptyState.render({
+                host: '#reservedPeriodsEmptyState',
+                icon: 'fa-calendar-plus',
+                title: 'No reserved booking periods yet',
+                message: 'Create a dedicated booking period for a selected patient group.',
+                className: 'empty-state-compact clinic-schedule-empty-state',
+                actionHtml: `
+                    <button type="button" onclick="openReservedPeriodModal()" class="empty-state-btn">
+                        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                        <span>Create reserved period</span>
+                    </button>
+                `,
+            });
+        }
+    }
+
+    function initializeClinicScheduleDynamicUi() {
+        renderClinicScheduleEmptyStates();
+
+        if (!reservedPeriodValidationFailed) return;
+
+        const periodId = reservedPeriodOldInput.reserved_period_id || null;
+
+        openReservedPeriodModal(
+            periodId ? 'edit' : 'create',
+            periodId,
+            reservedPeriodOldInput
+        );
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeClinicScheduleDynamicUi, { once: true });
+    } else {
+        initializeClinicScheduleDynamicUi();
+    }
+
 </script>
 @endsection

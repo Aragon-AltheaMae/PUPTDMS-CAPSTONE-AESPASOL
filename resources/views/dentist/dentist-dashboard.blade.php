@@ -866,6 +866,21 @@ ${buildAvatar(
 
             ${buildAppointmentTypeIcons(appt)}
 
+            ${appt.is_reserved ? `
+                <span class="status-pill status-today"
+                    data-tooltip="${escHtml(
+                        appt.reserved_title
+                            ? `Reserved: ${appt.reserved_title}`
+                            : 'Reserved appointment'
+                    )}"
+                    data-tooltip-tone="neutral"
+                    aria-label="Reserved appointment"
+                    tabindex="0">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <span>Reserved</span>
+                </span>
+            ` : ''}
+
         </div>
 
         <span

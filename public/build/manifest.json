@@ -60,7 +60,7 @@
     "src": "node_modules/flatpickr/dist/flatpickr.min.css"
   },
   "resources/css/app.css": {
-    "file": "assets/app-CJae-sBW.css",
+    "file": "assets/app-B3b3cpxY.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -78,7 +78,7 @@
     ]
   },
   "resources/css/pages/admin/admin-dashboard.css": {
-    "file": "assets/admin-dashboard-C-Rx45l8.css",
+    "file": "assets/admin-dashboard-CZqLZLON.css",
     "src": "resources/css/pages/admin/admin-dashboard.css",
     "isEntry": true,
     "name": "admin-dashboard",
@@ -87,7 +87,7 @@
     ]
   },
   "resources/css/pages/admin/admin-shared.css": {
-    "file": "assets/admin-shared-CONQMhZX.css",
+    "file": "assets/admin-shared-Deaf-net.css",
     "src": "resources/css/pages/admin/admin-shared.css",
     "isEntry": true,
     "name": "admin-shared",
@@ -114,7 +114,7 @@
     ]
   },
   "resources/css/pages/admin/dental-records.css": {
-    "file": "assets/dental-records-C1fCL8EE.css",
+    "file": "assets/dental-records-cScq2STX.css",
     "src": "resources/css/pages/admin/dental-records.css",
     "isEntry": true,
     "name": "dental-records",
@@ -123,7 +123,7 @@
     ]
   },
   "resources/css/pages/admin/dentist-continuity.css": {
-    "file": "assets/dentist-continuity-BXOKyjUb.css",
+    "file": "assets/dentist-continuity-BuQRKT5W.css",
     "src": "resources/css/pages/admin/dentist-continuity.css",
     "isEntry": true,
     "name": "dentist-continuity",
@@ -150,7 +150,7 @@
     ]
   },
   "resources/css/pages/admin/role-permissions.css": {
-    "file": "assets/role-permissions-smZ0N3tu.css",
+    "file": "assets/role-permissions-C3qskqz-.css",
     "src": "resources/css/pages/admin/role-permissions.css",
     "isEntry": true,
     "name": "role-permissions",
@@ -159,7 +159,7 @@
     ]
   },
   "resources/css/pages/admin/service-types.css": {
-    "file": "assets/service-types-BoYZIAAs.css",
+    "file": "assets/service-types-g5H-5bTH.css",
     "src": "resources/css/pages/admin/service-types.css",
     "isEntry": true,
     "name": "service-types",
@@ -186,7 +186,7 @@
     ]
   },
   "resources/css/pages/admin/system-settings.css": {
-    "file": "assets/system-settings-C8BvNnTG.css",
+    "file": "assets/system-settings-DWq4Jwva.css",
     "src": "resources/css/pages/admin/system-settings.css",
     "isEntry": true,
     "name": "system-settings",
@@ -231,7 +231,7 @@
     ]
   },
   "resources/css/pages/dentist/add-existing-record.css": {
-    "file": "assets/add-existing-record-hRUkWBge.css",
+    "file": "assets/add-existing-record-ilO0K9CH.css",
     "src": "resources/css/pages/dentist/add-existing-record.css",
     "isEntry": true,
     "name": "add-existing-record",
@@ -258,7 +258,7 @@
     ]
   },
   "resources/css/pages/dentist/dentist-dashboard.css": {
-    "file": "assets/dentist-dashboard-CwTUZB6N.css",
+    "file": "assets/dentist-dashboard-BEgVLkNx.css",
     "src": "resources/css/pages/dentist/dentist-dashboard.css",
     "isEntry": true,
     "name": "dentist-dashboard",
@@ -267,7 +267,7 @@
     ]
   },
   "resources/css/pages/dentist/dentist-shared.css": {
-    "file": "assets/dentist-shared-C9LKA1L_.css",
+    "file": "assets/dentist-shared-Cg3LzImf.css",
     "src": "resources/css/pages/dentist/dentist-shared.css",
     "isEntry": true,
     "name": "dentist-shared",
@@ -293,6 +293,15 @@
       "odontogram.css"
     ]
   },
+  "resources/css/pages/error-pages.css": {
+    "file": "assets/error-pages-C3-uLWRd.css",
+    "src": "resources/css/pages/error-pages.css",
+    "isEntry": true,
+    "name": "error-pages",
+    "names": [
+      "error-pages.css"
+    ]
+  },
   "resources/css/pages/patient/about-us.css": {
     "file": "assets/about-us-DE6Vb1yg.css",
     "src": "resources/css/pages/patient/about-us.css",
@@ -312,7 +321,7 @@
     ]
   },
   "resources/css/pages/patient/book-appointment.css": {
-    "file": "assets/book-appointment-CAloVOqV.css",
+    "file": "assets/book-appointment-hAEXvg4Z.css",
     "src": "resources/css/pages/patient/book-appointment.css",
     "isEntry": true,
     "name": "book-appointment",
@@ -321,7 +330,7 @@
     ]
   },
   "resources/css/pages/patient/dashboard.css": {
-    "file": "assets/dashboard-Bo6ktb3Q.css",
+    "file": "assets/dashboard-DvxHEovm.css",
     "src": "resources/css/pages/patient/dashboard.css",
     "isEntry": true,
     "name": "dashboard",
@@ -330,7 +339,7 @@
     ]
   },
   "resources/css/pages/patient/patient-profile.css": {
-    "file": "assets/patient-profile-DuVFunLC.css",
+    "file": "assets/patient-profile-ajN-4u9T.css",
     "src": "resources/css/pages/patient/patient-profile.css",
     "isEntry": true,
     "name": "patient-profile",
@@ -339,7 +348,7 @@
     ]
   },
   "resources/css/pages/patient/patient-shared.css": {
-    "file": "assets/patient-shared-CAkhrDzl.css",
+    "file": "assets/patient-shared-Hdktlmo9.css",
     "src": "resources/css/pages/patient/patient-shared.css",
     "isEntry": true,
     "name": "patient-shared",
@@ -348,7 +357,7 @@
     ]
   },
   "resources/css/pages/patient/records.css": {
-    "file": "assets/records-C_hPAJ0a.css",
+    "file": "assets/records-CNnxe2Kt.css",
     "src": "resources/css/pages/patient/records.css",
     "isEntry": true,
     "name": "records",
@@ -357,7 +366,7 @@
     ]
   },
   "resources/css/pages/shared/active-sessions.css": {
-    "file": "assets/active-sessions-EWLZBLHi.css",
+    "file": "assets/active-sessions-F8Mbn7ZR.css",
     "src": "resources/css/pages/shared/active-sessions.css",
     "isEntry": true,
     "name": "active-sessions",
@@ -366,7 +375,7 @@
     ]
   },
   "resources/css/pages/shared/appointments.css": {
-    "file": "assets/appointments-D3Eju4gX.css",
+    "file": "assets/appointments-DkVInCEm.css",
     "src": "resources/css/pages/shared/appointments.css",
     "isEntry": true,
     "name": "appointments",
@@ -375,7 +384,7 @@
     ]
   },
   "resources/css/pages/shared/clinic-schedule.css": {
-    "file": "assets/clinic-schedule-BvSzohNO.css",
+    "file": "assets/clinic-schedule-C8p_9x71.css",
     "src": "resources/css/pages/shared/clinic-schedule.css",
     "isEntry": true,
     "name": "clinic-schedule",
@@ -384,7 +393,7 @@
     ]
   },
   "resources/css/pages/shared/document-requests.css": {
-    "file": "assets/document-requests-yNoFtX39.css",
+    "file": "assets/document-requests-B9rkeXOO.css",
     "src": "resources/css/pages/shared/document-requests.css",
     "isEntry": true,
     "name": "document-requests",
@@ -393,7 +402,7 @@
     ]
   },
   "resources/css/pages/shared/inventory.css": {
-    "file": "assets/inventory-BaCwZeuo.css",
+    "file": "assets/inventory-CQjt6EDf.css",
     "src": "resources/css/pages/shared/inventory.css",
     "isEntry": true,
     "name": "inventory",
@@ -402,7 +411,7 @@
     ]
   },
   "resources/css/pages/shared/patient-list.css": {
-    "file": "assets/patient-list-AJao3NjN.css",
+    "file": "assets/patient-list-bmRqSEBP.css",
     "src": "resources/css/pages/shared/patient-list.css",
     "isEntry": true,
     "name": "patient-list",
@@ -411,7 +420,7 @@
     ]
   },
   "resources/css/pages/shared/reports.css": {
-    "file": "assets/reports-D1bVFXd-.css",
+    "file": "assets/reports-CmodNJWu.css",
     "src": "resources/css/pages/shared/reports.css",
     "isEntry": true,
     "name": "reports",
@@ -420,7 +429,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-BdRQfZll.js",
+    "file": "assets/app-C7kErWem.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -431,6 +440,7 @@
       "resources/js/ui/voice-logic.js",
       "resources/js/forms/booking-workflow.js",
       "resources/js/ui/skeleton.js",
+      "resources/js/records/patient-records-page.js",
       "resources/js/forms/booking-signature.js",
       "resources/js/ui/search-bar.js",
       "resources/js/ui/show-more.js",
@@ -477,7 +487,7 @@
     "isDynamicEntry": true
   },
   "resources/js/odontogram/odontogram-preview.js": {
-    "file": "assets/odontogram-preview-nAc4MgeU.js",
+    "file": "assets/odontogram-preview-C4yShoSO.js",
     "name": "odontogram-preview",
     "src": "resources/js/odontogram/odontogram-preview.js",
     "isDynamicEntry": true,
@@ -495,19 +505,25 @@
     "isDynamicEntry": true
   },
   "resources/js/records/patient-record-modal.js": {
-    "file": "assets/patient-record-modal-BaZWBFxY.js",
+    "file": "assets/patient-record-modal-BxvYkPgq.js",
     "name": "patient-record-modal",
     "src": "resources/js/records/patient-record-modal.js",
     "isDynamicEntry": true
   },
+  "resources/js/records/patient-records-page.js": {
+    "file": "assets/patient-records-page-DdECs7Rp.js",
+    "name": "patient-records-page",
+    "src": "resources/js/records/patient-records-page.js",
+    "isDynamicEntry": true
+  },
   "resources/js/ui/custom-select.js": {
-    "file": "assets/custom-select-KvXmW6lx.js",
+    "file": "assets/custom-select-DbTH9lxu.js",
     "name": "custom-select",
     "src": "resources/js/ui/custom-select.js",
     "isDynamicEntry": true
   },
   "resources/js/ui/date-picker.js": {
-    "file": "assets/date-picker-Ct3EaLbY.js",
+    "file": "assets/date-picker-CV9yJ7yr.js",
     "name": "date-picker",
     "src": "resources/js/ui/date-picker.js",
     "isDynamicEntry": true,
@@ -543,7 +559,7 @@
     "isDynamicEntry": true
   },
   "resources/js/ui/header-controls.js": {
-    "file": "assets/header-controls-CoauyH5P.js",
+    "file": "assets/header-controls-Bme7KdHx.js",
     "name": "header-controls",
     "src": "resources/js/ui/header-controls.js",
     "isDynamicEntry": true
@@ -585,7 +601,7 @@
     "isDynamicEntry": true
   },
   "resources/js/ui/show-more.js": {
-    "file": "assets/show-more-C_jrMgEb.js",
+    "file": "assets/show-more-B5BZW-1W.js",
     "name": "show-more",
     "src": "resources/js/ui/show-more.js",
     "isDynamicEntry": true

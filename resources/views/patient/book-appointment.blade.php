@@ -21,6 +21,7 @@
 $notifications = collect($notifications ?? []);
 $notifCount = $notifications->count();
 $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
+$isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
 @endphp
 
 @section('content')
@@ -44,6 +45,15 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                         data-discard-subtitle="You have unsaved appointment information."
                         data-discard-message="Leaving this page will remove the appointment details you entered. Do you want to discard your changes?">
                         @csrf
+                        <input type="hidden" id="update_dental_history" name="update_dental_history" value="0">
+                        <input type="hidden" id="update_medical_history" name="update_medical_history" value="0">
+
+                        @if ($isReservedBooking)
+                            <input type="hidden" name="reserved_booking_period_id"
+                                value="{{ $reservedBookingPeriod->id }}">
+                            <input type="hidden" id="reserved_booking_period_slot_id"
+                                name="reserved_booking_period_slot_id" value="">
+                        @endif
 
                         <input type="hidden" id="contact_email" name="contact_email"
                             value="{{ old('contact_email', $patient->email ?? '') }}">
@@ -65,9 +75,94 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                 </div>
 
                                 <div class="booking-step-body">
-                                    <input type="hidden" id="appointment_date" name="appointment_date" required>
-                                    <input type="hidden" id="appointment_time" name="appointment_time" required>
+                                    <input type="hidden" id="appointment_date" name="appointment_date" required
+                                        value="{{ $isReservedBooking ? $reservedBookingPeriod->reserved_date->format('Y-m-d') : '' }}">
+                                    <input type="hidden" id="appointment_time" name="appointment_time" required
+                                        value="{{ $isReservedBooking && $reservedBookingPeriod->booking_mode === 'date_only' ? \Carbon\Carbon::parse($reservedBookingPeriod->start_time)->format('g:i A') : '' }}">
 
+                                    @if ($isReservedBooking)
+                                        <div class="booking-section-card space-y-5">
+                                            <div class="flex flex-wrap items-start justify-between gap-4">
+                                                <div>
+                                                    <span class="cal-pill cal-pill-maroon inline-flex mb-3">
+                                                        <i class="fa-solid fa-calendar-check"></i>
+                                                        Reserved appointment
+                                                    </span>
+                                                    <h3 class="text-xl font-bold text-[#303846]">
+                                                        {{ $reservedBookingPeriod->title }}
+                                                    </h3>
+                                                    <p class="mt-1 text-sm text-[#697386]">
+                                                        This schedule is exclusively available to {{ $reservedBookingPeriod->target_label }}.
+                                                    </p>
+                                                </div>
+
+                                                <div class="text-sm text-[#4b5563] sm:text-right">
+                                                    <p class="font-bold">
+                                                        {{ $reservedBookingPeriod->reserved_date->format('F j, Y') }}
+                                                    </p>
+                                                    <p>
+                                                        {{ \Carbon\Carbon::parse($reservedBookingPeriod->start_time)->format('g:i A') }}
+                                                        &ndash;
+                                                        {{ \Carbon\Carbon::parse($reservedBookingPeriod->end_time)->format('g:i A') }}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            @if ($reservedBookingPeriod->booking_mode === 'timeslot')
+                                                <div class="time-panel appointment-time-panel" data-global-field>
+                                                    <div class="appointment-time-heading">
+                                                        <span class="appointment-time-heading-icon">
+                                                            <i class="fa-regular fa-clock"></i>
+                                                        </span>
+                                                        <div>
+                                                            <h4>Pick a Reserved Timeslot</h4>
+                                                            <p>Each timeslot can be selected by one patient only.</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div id="slotGrid" class="appointment-slot-grid slot-grid-ui reserved-slot-grid">
+                                                        @foreach ($availableReservedSlots as $slot)
+                                                            @php($slotLabel = \Carbon\Carbon::parse($slot->slot_time)->format('g:i A'))
+                                                            <button type="button"
+                                                                class="slot-chip flex items-center gap-2.5 px-4 py-2.5 rounded-xl border font-semibold text-sm cursor-pointer"
+                                                                data-reserved-slot-id="{{ $slot->id }}"
+                                                                data-reserved-slot-time="{{ $slotLabel }}"
+                                                                aria-pressed="false">
+                                                                <i class="text-xs opacity-70 fa-regular fa-clock"></i>
+                                                                <span>{{ $slotLabel }}</span>
+                                                            </button>
+                                                        @endforeach
+                                                    </div>
+
+                                                    <button type="button" id="clearSlotSelectionBtn"
+                                                        class="ui-btn ui-btn-secondary ui-btn-sm hidden mt-4 mb-2 w-full"
+                                                        aria-hidden="true">
+                                                        <i class="fa-solid fa-xmark"></i>
+                                                        Clear selection
+                                                    </button>
+
+                                                    <div id="selectedSlotDisplay" class="hidden appointment-selected-slot mt-4">
+                                                        <i class="fa-solid fa-circle-check"></i>
+                                                        Selected: <span id="selectedSlotText" class="font-bold"></span>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                <div class="appointment-selected-slot">
+                                                    <i class="fa-solid fa-list-ol"></i>
+                                                    <span>
+                                                        No individual timeslot is required. You may be attended in queue order
+                                                        anytime within the reserved period.
+                                                    </span>
+                                                </div>
+                                            @endif
+
+                                            @if ($reservedBookingPeriod->notes)
+                                                <p class="text-sm text-[#697386]">
+                                                    <strong>Clinic note:</strong> {{ $reservedBookingPeriod->notes }}
+                                                </p>
+                                            @endif
+                                        </div>
+                                    @else
                                     <div class="cal-time-layout grid gap-5 lg:gap-6 mx-auto w-full">
 
                                         <div class="calendar-shell-no-card" data-global-field>
@@ -138,6 +233,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                                         </div>
 
                                     </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -381,6 +477,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     <span id="miniTabText">Please complete all required fields.</span>
 </div>
 
+@if (! $isReservedBooking)
 @include('components.appointment-calendar-script', [
 'mode' => 'booking',
 'renderStyle' => 'patient',
@@ -402,6 +499,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 'disallowToday' => true,
 'allowToggleOffDate' => true,
 ])
+@endif
 
 @endsection
 
@@ -410,7 +508,64 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 <script>
     const diseaseLabelByCode = @json($diseases -> pluck('label', 'code'));
     const isFemalePatient = @json($isFemalePatient);
-    const DRAFT_KEY = "appointmentDraft:v1";
+    const isReservedBooking = @json((bool) $isReservedBooking);
+    const reservedBookingPeriodId = @json($isReservedBooking ? $reservedBookingPeriod->id : null);
+    const reservedBookingDate = @json($isReservedBooking ? $reservedBookingPeriod->reserved_date->format('Y-m-d') : null);
+    const reservedDateOnlyTime = @json(
+        $isReservedBooking && $reservedBookingPeriod->booking_mode === 'date_only'
+            ? \Carbon\Carbon::parse($reservedBookingPeriod->start_time)->format('g:i A')
+            : null
+    );
+    const DRAFT_KEY = isReservedBooking
+        ? `appointmentDraft:reserved:${reservedBookingPeriodId}`
+        : "appointmentDraft:v1";
+
+    function enforceReservedSchedule() {
+        if (!isReservedBooking) return;
+
+        const dateInput = document.getElementById('appointment_date');
+        const timeInput = document.getElementById('appointment_time');
+
+        if (dateInput) dateInput.value = reservedBookingDate || '';
+        if (reservedDateOnlyTime && timeInput) timeInput.value = reservedDateOnlyTime;
+    }
+
+    function initializeReservedSlotPicker() {
+        if (!isReservedBooking) return;
+
+        enforceReservedSchedule();
+
+        document.querySelectorAll('[data-reserved-slot-id]').forEach(chip => {
+            if (chip.dataset.reservedPickerReady === '1') return;
+            chip.dataset.reservedPickerReady = '1';
+
+            chip.addEventListener('click', () => {
+                const slotIdInput = document.getElementById('reserved_booking_period_slot_id');
+                const timeInput = document.getElementById('appointment_time');
+                const selectedDisplay = document.getElementById('selectedSlotDisplay');
+                const selectedText = document.getElementById('selectedSlotText');
+                const clearSlotButton = document.getElementById('clearSlotSelectionBtn');
+
+                document.querySelectorAll('[data-reserved-slot-id]').forEach(option => {
+                    option.classList.remove('selected');
+                    option.setAttribute('aria-pressed', 'false');
+                });
+
+                chip.classList.add('selected');
+                chip.setAttribute('aria-pressed', 'true');
+
+                if (slotIdInput) slotIdInput.value = chip.dataset.reservedSlotId || '';
+                if (timeInput) {
+                    timeInput.value = chip.dataset.reservedSlotTime || '';
+                    timeInput.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+                if (selectedText) selectedText.textContent = chip.dataset.reservedSlotTime || '';
+                selectedDisplay?.classList.remove('hidden');
+                clearSlotButton?.classList.remove('hidden');
+                clearSlotButton?.removeAttribute('aria-hidden');
+            });
+        });
+    }
 
     const DRAFT_SHOW_URL = @json(route('book.appointment.draft.show'));
     const DRAFT_SAVE_URL = @json(route('book.appointment.draft.save'));
@@ -1132,7 +1287,17 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                     )
                     ?.value;
 
-            if (restoredDate) {
+            if (isReservedBooking) {
+                enforceReservedSchedule();
+                initializeReservedSlotPicker();
+
+                const restoredSlotId = String(obj.reserved_booking_period_slot_id || '');
+                const restoredSlotChip = Array.from(
+                    document.querySelectorAll('[data-reserved-slot-id]')
+                ).find(chip => chip.dataset.reservedSlotId === restoredSlotId);
+
+                restoredSlotChip?.click();
+            } else if (restoredDate) {
                 const appointmentCount =
                     appointmentCountsPerDay[
                     restoredDate
@@ -1253,8 +1418,11 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
     let step5ConfirmationActive = false;
 
-    const hasExistingBookingInformation =
-        @json($hasExistingBookingInformation ?? false);
+    const hasExistingDentalHistory =
+        @json($hasExistingDentalHistory ?? false);
+
+    const hasExistingMedicalHistory =
+        @json($hasExistingMedicalHistory ?? false);
 
     const hasReusableSignature =
         @json($hasReusableSignature ?? false);
@@ -1580,9 +1748,19 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                         return false;
                     }
 
+                    if (currentStep === 4 && !editingHistoryFromReview) {
+                        if (!hasExistingMedicalHistory) {
+                            return true;
+                        }
+
+                        bookingWorkflow.goTo(hasExistingDentalHistory ? 1 : 2);
+
+                        return false;
+                    }
+
                     if (
-                        hasExistingBookingInformation &&
-                        currentStep === 4 &&
+                        currentStep === 3 &&
+                        hasExistingDentalHistory &&
                         !editingHistoryFromReview
                     ) {
                         bookingWorkflow.goTo(1);
@@ -1598,15 +1776,27 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
                         return false;
                     }
 
-                    if (
-                        hasExistingBookingInformation &&
-                        currentStep === 1 &&
-                        !editingHistoryFromReview
-                    ) {
+                    if (currentStep === 1 && !editingHistoryFromReview && hasExistingDentalHistory) {
                         bookingWorkflow.markComplete(1);
                         bookingWorkflow.markComplete(2);
-                        bookingWorkflow.markComplete(3);
 
+                        if (hasExistingMedicalHistory) {
+                            bookingWorkflow.markComplete(3);
+                            bookingWorkflow.goTo(4);
+                        } else {
+                            bookingWorkflow.goTo(3);
+                        }
+
+                        return false;
+                    }
+
+                    if (
+                        currentStep === 2 &&
+                        hasExistingMedicalHistory &&
+                        !editingHistoryFromReview
+                    ) {
+                        bookingWorkflow.markComplete(2);
+                        bookingWorkflow.markComplete(3);
                         bookingWorkflow.goTo(4);
 
                         return false;
@@ -2026,6 +2216,9 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     }
 
     function editDentalHistoryFromReview() {
+        const updateDentalInput = document.getElementById('update_dental_history');
+        if (updateDentalInput) updateDentalInput.value = '1';
+
         editingHistoryFromReview = 'dental';
 
         resetStep5View();
@@ -2036,6 +2229,9 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     function openMedicalHistoryEditorFromReview({
         focusSignature = false
     } = {}) {
+
+        const updateMedicalInput = document.getElementById('update_medical_history');
+        if (updateMedicalInput) updateMedicalInput.value = '1';
 
         editingHistoryFromReview = 'medical';
 
@@ -2870,6 +3066,9 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
         const selectedSlotText =
             document.getElementById("selectedSlotText");
 
+        const reservedSlotIdInput =
+            document.getElementById("reserved_booking_period_slot_id");
+
         if (timeInput) {
             timeInput.value = "";
 
@@ -2882,6 +3081,10 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 
         if (selectedSlotText) {
             selectedSlotText.textContent = "";
+        }
+
+        if (reservedSlotIdInput) {
+            reservedSlotIdInput.value = "";
         }
 
         selectedSlotDisplay?.classList.add("hidden");
@@ -3103,6 +3306,7 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
     }
 
     initIntroBookingModal();
+    initializeReservedSlotPicker();
 
     window.addEventListener("resize", () => {
         document.querySelectorAll(".sm-grid-1col").forEach(el => {

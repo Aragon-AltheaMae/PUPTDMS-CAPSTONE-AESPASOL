@@ -809,7 +809,7 @@ class OdontogramController extends Controller
             'appointment' => $appointment->id,
         ]);
     }
-    public function show(Appointment $appointment)
+    public function show(Request $request, Appointment $appointment)
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
@@ -817,10 +817,20 @@ class OdontogramController extends Controller
             return redirect('/login');
         }
 
-        $appointment->load('patient');
+        $appointment->load(['patient', 'reservedBookingPeriod']);
 
         if (!$appointment->patient) {
             abort(404, 'Patient not found for this appointment.');
+        }
+
+        if (
+            $request->boolean('start_procedure')
+            && $appointment->reserved_booking_period_id
+            && ! $appointment->reservedProcedureWindowIsOpen()
+        ) {
+            return redirect()
+                ->route('dentist.dentist.appointments')
+                ->with('error', 'This reserved appointment can only be started during its reserved period.');
         }
 
         $patient = $appointment->patient;

@@ -670,6 +670,21 @@ window.syncCustomSelect =
         );
     };
 
+if (hasAny(customSelectSelectors)) {
+    loadCustomSelectModule()
+        .then(module => {
+            module.initCustomSelects(
+                document
+            );
+        })
+        .catch(error => {
+            console.error(
+                'Unable to initialize custom selects.',
+                error
+            );
+        });
+}
+
 function loadDatePickerModule() {
     return loadFeature(
         'date-picker',
@@ -694,7 +709,8 @@ async function ensureDatePickerReady(
         );
 
     const instance =
-        input?._flatpickr;
+        input?._flatpickr ||
+        input?.previousElementSibling?._flatpickr;
 
     if (
         instance &&
@@ -707,8 +723,16 @@ async function ensureDatePickerReady(
 document.addEventListener(
     'pointerdown',
     event => {
-        const input =
+        const pickerTarget =
             event.target.closest?.(
+                `${flatpickrSelectors}, [data-flatpickr-trigger]`
+            );
+
+        const input = pickerTarget?.matches?.(
+            flatpickrSelectors
+        )
+            ? pickerTarget
+            : pickerTarget?.querySelector?.(
                 flatpickrSelectors
             );
 
@@ -925,6 +949,30 @@ document.addEventListener(
         const modal =
             event.detail?.modal ||
             document;
+
+        if (
+            hasAny(
+                flatpickrSelectors,
+                modal
+            )
+        ) {
+            try {
+                await loadCustomSelectModule();
+
+                const datePickerModule =
+                    await loadDatePickerModule();
+
+                await datePickerModule
+                    .initGlobalDatePickers(
+                        modal
+                    );
+            } catch (error) {
+                console.error(
+                    'Unable to initialize modal date pickers.',
+                    error
+                );
+            }
+        }
 
         if (
             hasAny(
