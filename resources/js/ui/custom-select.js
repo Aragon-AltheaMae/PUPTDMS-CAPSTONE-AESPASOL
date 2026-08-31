@@ -278,20 +278,32 @@ export function initCustomSelects(root = document) {
 
                 if (select.disabled) return;
 
-                select.selectedIndex = option.index;
-
-                select.dispatchEvent(
-                    new Event('input', { bubbles: true })
-                );
-
-                select.dispatchEvent(
-                    new Event('change', { bubbles: true })
-                );
-
-                wrapper.classList.remove('is-open', 'drop-up');
-                button.setAttribute('aria-expanded', 'false');
+                select.selectedIndex =
+                    option.index;
 
                 syncCustomSelect(wrapper);
+
+                wrapper.classList.remove(
+                    'is-open',
+                    'drop-up'
+                );
+
+                button.setAttribute(
+                    'aria-expanded',
+                    'false'
+                );
+
+                select.dispatchEvent(
+                    new Event('input', {
+                        bubbles: true
+                    })
+                );
+
+                select.dispatchEvent(
+                    new Event('change', {
+                        bubbles: true
+                    })
+                );
             });
 
             menu.appendChild(item);
