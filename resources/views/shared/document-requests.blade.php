@@ -2304,542 +2304,547 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
         window.DiscardChanges?.captureForm(form);
         window.openModal('rejectModal');
 
-        setTimeout(
-            () => notes?.focus(),
-            80
-        );
-    }
-
-    function openFilterModal() {
-        window.syncFilterTagGroup('fSortGroup', filterSort);
-        setDocTypeSelectValue(
-            filterDocType
-        );
-        document.getElementById('fDateFrom').value = filterDateFrom;
-        document.getElementById('fDateTo').value = filterDateTo;
-        renderFilterChips();
-        updateShowResultsButton();
-
-        if (window.openFilterDrawer) {
-            window.openFilterDrawer('filterModal');
-            return;
-        }
-
-        if (window.openModal) {
-            window.openModal('filterModal');
-            return;
-        }
-
-        document.getElementById('filterModal')?.classList.add('open');
-    }
-
-    function closeFilterModal() {
-        if (window.closeFilterDrawer) {
-            window.closeFilterDrawer('filterModal');
-            return;
-        }
-
-        if (window.closeModal) {
-            window.closeModal('filterModal');
-            return;
-        }
-
-        const modal = document.getElementById('filterModal');
-        if (modal) modal.classList.remove('open', 'closing');
-        document.body.classList.remove('filter-lock');
-        document.documentElement.classList.remove('filter-lock');
-        document.body.style.overflow = '';
-    }
-
-    function applyFilterModal() {
-        filterStatus = activeFilter;
-        const sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
-        filterSort = sortActive ? sortActive.getAttribute('data-val') : 'newest';
-        filterDocType = document.getElementById('fDocType').value;
-        filterDateFrom = document.getElementById('fDateFrom').value;
-        filterDateTo = document.getElementById('fDateTo').value;
-
-        updateFilterBtn();
-        renderFilterChips();
-        currentPage = 1;
-        closeFilterModal();
-        fetchDocRequests();
-    }
-
-    function getDraftDocRequestFilters() {
-        const sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
-
-        return {
-            status: activeFilter,
-            docType: document.getElementById('fDocType')?.value || '',
-            dateFrom: document.getElementById('fDateFrom')?.value || '',
-            dateTo: document.getElementById('fDateTo')?.value || '',
-            sort: sortActive ? sortActive.getAttribute('data-val') : 'newest'
-        };
-    }
-
-    function getDraftFilteredDocRequests() {
-        const oldActiveFilter = activeFilter;
-        const oldFilterStatus = filterStatus;
-        const oldFilterDocType = filterDocType;
-        const oldFilterDateFrom = filterDateFrom;
-        const oldFilterDateTo = filterDateTo;
-        const oldFilterSort = filterSort;
-
-        const draft = getDraftDocRequestFilters();
-
-        activeFilter = draft.status;
-        filterStatus = draft.status;
-        filterDocType = draft.docType;
-        filterDateFrom = draft.dateFrom;
-        filterDateTo = draft.dateTo;
-        filterSort = draft.sort;
-
-        const results = getFiltered();
-
-        activeFilter = oldActiveFilter;
-        filterStatus = oldFilterStatus;
-        filterDocType = oldFilterDocType;
-        filterDateFrom = oldFilterDateFrom;
-        filterDateTo = oldFilterDateTo;
-        filterSort = oldFilterSort;
-
-        return results;
-    }
-
-    function updateShowResultsButton() {
-        const target =
-            document.getElementById(
-                'filterResultsText'
-            );
-
-        if (!target) {
-            return;
-        }
-
-        const count =
-            getDraftFilteredDocRequests()
-                .length;
-
-        target.textContent =
-            `Show ${count} ${count === 1
-                ? 'result'
-                : 'results'
-            }`;
-    }
-
-    function renderFilterChips() {
-        const container = document.getElementById("activeChipsContainer");
-        const section = document.getElementById("activeFiltersSection");
-        if (!container || !section) return;
-
-        container.innerHTML = "";
-        let hasChips = false;
-
-        function addChip(label, onRemove) {
-            hasChips = true;
-            const chip = document.createElement("div");
-            chip.className = "filter-chip";
-            chip.innerHTML =
-                `<span>${label}</span><span class="filter-chip-remove"><i class="fa-solid fa-xmark"></i></span>`;
-            chip.querySelector(".filter-chip-remove").addEventListener("click", () => {
-                onRemove();
-                renderFilterChips();
-                updateShowResultsButton();
-            });
-            container.appendChild(chip);
-        }
-
-        const docType = document.getElementById('fDocType').value;
-        if (docType) {
-            addChip(
-                `Doc: ${docType}`,
-                () =>
-                    setDocTypeSelectValue('')
+        if (
+            !window.matchMedia(
+                '(max-width: 767px)'
+            ).matches
+        ) {
+            setTimeout(
+                () => input?.focus(),
+                80
             );
         }
 
-        const activePresetBtn = document.querySelector('#datePresetGroup .quick-date-chip.active');
-        const fDate = document.getElementById('fDateFrom').value;
-        const tDate = document.getElementById('fDateTo').value;
+        function openFilterModal() {
+            window.syncFilterTagGroup('fSortGroup', filterSort);
+            setDocTypeSelectValue(
+                filterDocType
+            );
+            document.getElementById('fDateFrom').value = filterDateFrom;
+            document.getElementById('fDateTo').value = filterDateTo;
+            renderFilterChips();
+            updateShowResultsButton();
 
-        if (activePresetBtn) {
-            addChip(`Date: ${activePresetBtn.textContent.trim()}`, () => {
-                activePresetBtn.classList.remove('active');
-                document.getElementById('fDateFrom').value = "";
-                document.getElementById('fDateTo').value = "";
-            });
-        } else if (fDate || tDate) {
-            let lbl = (fDate && tDate) ? `${fDate} to ${tDate}` : (fDate ? `From ${fDate}` : `Until ${tDate}`);
-            addChip(`Date: ${lbl}`, () => {
-                document.getElementById('fDateFrom').value = "";
-                document.getElementById('fDateTo').value = "";
-            });
+            if (window.openFilterDrawer) {
+                window.openFilterDrawer('filterModal');
+                return;
+            }
+
+            if (window.openModal) {
+                window.openModal('filterModal');
+                return;
+            }
+
+            document.getElementById('filterModal')?.classList.add('open');
         }
 
-        const sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
-        if (sortActive && sortActive.getAttribute('data-val') !== 'newest') {
-            addChip(`Sort: ${sortActive.textContent.trim()}`, () => window.syncFilterTagGroup('fSortGroup', 'newest'));
+        function closeFilterModal() {
+            if (window.closeFilterDrawer) {
+                window.closeFilterDrawer('filterModal');
+                return;
+            }
+
+            if (window.closeModal) {
+                window.closeModal('filterModal');
+                return;
+            }
+
+            const modal = document.getElementById('filterModal');
+            if (modal) modal.classList.remove('open', 'closing');
+            document.body.classList.remove('filter-lock');
+            document.documentElement.classList.remove('filter-lock');
+            document.body.style.overflow = '';
         }
 
-        if (hasChips) {
-            section.classList.remove("hidden");
-            document.getElementById("clearAllChipsBtn").onclick = () => {
-                setDocTypeSelectValue('');
-                document.getElementById('fDateFrom').value = "";
-                document.getElementById('fDateTo').value = "";
+        function applyFilterModal() {
+            filterStatus = activeFilter;
+            const sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
+            filterSort = sortActive ? sortActive.getAttribute('data-val') : 'newest';
+            filterDocType = document.getElementById('fDocType').value;
+            filterDateFrom = document.getElementById('fDateFrom').value;
+            filterDateTo = document.getElementById('fDateTo').value;
 
-                document.querySelectorAll('#datePresetGroup .quick-date-chip').forEach(btn => {
-                    btn.classList.remove('active');
-                });
+            updateFilterBtn();
+            renderFilterChips();
+            currentPage = 1;
+            closeFilterModal();
+            fetchDocRequests();
+        }
 
-                window.syncFilterTagGroup('fSortGroup', 'newest');
+        function getDraftDocRequestFilters() {
+            const sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
 
-                renderFilterChips();
-                updateShowResultsButton();
+            return {
+                status: activeFilter,
+                docType: document.getElementById('fDocType')?.value || '',
+                dateFrom: document.getElementById('fDateFrom')?.value || '',
+                dateTo: document.getElementById('fDateTo')?.value || '',
+                sort: sortActive ? sortActive.getAttribute('data-val') : 'newest'
             };
-        } else {
-            section.classList.add("hidden");
         }
 
-        updateShowResultsButton();
-    }
+        function getDraftFilteredDocRequests() {
+            const oldActiveFilter = activeFilter;
+            const oldFilterStatus = filterStatus;
+            const oldFilterDocType = filterDocType;
+            const oldFilterDateFrom = filterDateFrom;
+            const oldFilterDateTo = filterDateTo;
+            const oldFilterSort = filterSort;
 
-    function resetFilterModal() {
-        filterDocType = '';
-        filterDateFrom = '';
-        filterDateTo = '';
-        filterSort = 'newest';
+            const draft = getDraftDocRequestFilters();
 
-        window.syncFilterTagGroup('fSortGroup', 'newest');
+            activeFilter = draft.status;
+            filterStatus = draft.status;
+            filterDocType = draft.docType;
+            filterDateFrom = draft.dateFrom;
+            filterDateTo = draft.dateTo;
+            filterSort = draft.sort;
 
-        setDocTypeSelectValue('');
+            const results = getFiltered();
 
-        const dateFrom = document.getElementById('fDateFrom');
-        const dateTo = document.getElementById('fDateTo');
+            activeFilter = oldActiveFilter;
+            filterStatus = oldFilterStatus;
+            filterDocType = oldFilterDocType;
+            filterDateFrom = oldFilterDateFrom;
+            filterDateTo = oldFilterDateTo;
+            filterSort = oldFilterSort;
 
-        if (dateFrom) dateFrom.value = '';
-        if (dateTo) dateTo.value = '';
+            return results;
+        }
 
-        document.querySelectorAll('#datePresetGroup .quick-date-chip').forEach(btn => {
-            btn.classList.remove('active');
-        });
+        function updateShowResultsButton() {
+            const target =
+                document.getElementById(
+                    'filterResultsText'
+                );
 
-        renderFilterChips();
-        updateShowResultsButton();
-    }
+            if (!target) {
+                return;
+            }
 
-    document.addEventListener("DOMContentLoaded", () => {
+            const count =
+                getDraftFilteredDocRequests()
+                    .length;
 
-        window.initCustomSelects?.(
-            document.getElementById(
-                'filterModal'
-            ) || document
-        );
+            target.textContent =
+                `Show ${count} ${count === 1
+                    ? 'result'
+                    : 'results'
+                }`;
+        }
 
-        const docreqViewToggle =
-            document.getElementById(
-                'documentRequestsViewToggle'
+        function renderFilterChips() {
+            const container = document.getElementById("activeChipsContainer");
+            const section = document.getElementById("activeFiltersSection");
+            if (!container || !section) return;
+
+            container.innerHTML = "";
+            let hasChips = false;
+
+            function addChip(label, onRemove) {
+                hasChips = true;
+                const chip = document.createElement("div");
+                chip.className = "filter-chip";
+                chip.innerHTML =
+                    `<span>${label}</span><span class="filter-chip-remove"><i class="fa-solid fa-xmark"></i></span>`;
+                chip.querySelector(".filter-chip-remove").addEventListener("click", () => {
+                    onRemove();
+                    renderFilterChips();
+                    updateShowResultsButton();
+                });
+                container.appendChild(chip);
+            }
+
+            const docType = document.getElementById('fDocType').value;
+            if (docType) {
+                addChip(
+                    `Doc: ${docType}`,
+                    () =>
+                        setDocTypeSelectValue('')
+                );
+            }
+
+            const activePresetBtn = document.querySelector('#datePresetGroup .quick-date-chip.active');
+            const fDate = document.getElementById('fDateFrom').value;
+            const tDate = document.getElementById('fDateTo').value;
+
+            if (activePresetBtn) {
+                addChip(`Date: ${activePresetBtn.textContent.trim()}`, () => {
+                    activePresetBtn.classList.remove('active');
+                    document.getElementById('fDateFrom').value = "";
+                    document.getElementById('fDateTo').value = "";
+                });
+            } else if (fDate || tDate) {
+                let lbl = (fDate && tDate) ? `${fDate} to ${tDate}` : (fDate ? `From ${fDate}` : `Until ${tDate}`);
+                addChip(`Date: ${lbl}`, () => {
+                    document.getElementById('fDateFrom').value = "";
+                    document.getElementById('fDateTo').value = "";
+                });
+            }
+
+            const sortActive = document.querySelector('#fSortGroup .ftag.ftag-active');
+            if (sortActive && sortActive.getAttribute('data-val') !== 'newest') {
+                addChip(`Sort: ${sortActive.textContent.trim()}`, () => window.syncFilterTagGroup('fSortGroup', 'newest'));
+            }
+
+            if (hasChips) {
+                section.classList.remove("hidden");
+                document.getElementById("clearAllChipsBtn").onclick = () => {
+                    setDocTypeSelectValue('');
+                    document.getElementById('fDateFrom').value = "";
+                    document.getElementById('fDateTo').value = "";
+
+                    document.querySelectorAll('#datePresetGroup .quick-date-chip').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+
+                    window.syncFilterTagGroup('fSortGroup', 'newest');
+
+                    renderFilterChips();
+                    updateShowResultsButton();
+                };
+            } else {
+                section.classList.add("hidden");
+            }
+
+            updateShowResultsButton();
+        }
+
+        function resetFilterModal() {
+            filterDocType = '';
+            filterDateFrom = '';
+            filterDateTo = '';
+            filterSort = 'newest';
+
+            window.syncFilterTagGroup('fSortGroup', 'newest');
+
+            setDocTypeSelectValue('');
+
+            const dateFrom = document.getElementById('fDateFrom');
+            const dateTo = document.getElementById('fDateTo');
+
+            if (dateFrom) dateFrom.value = '';
+            if (dateTo) dateTo.value = '';
+
+            document.querySelectorAll('#datePresetGroup .quick-date-chip').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            renderFilterChips();
+            updateShowResultsButton();
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+
+            window.initCustomSelects?.(
+                document.getElementById(
+                    'filterModal'
+                ) || document
             );
 
-        window.initGlobalViewToggles?.(document);
+            const docreqViewToggle =
+                document.getElementById(
+                    'documentRequestsViewToggle'
+                );
 
-        currentViewMode =
-            window.getGlobalViewMode?.(
-                docreqViewToggle
-            ) || 'list';
+            window.initGlobalViewToggles?.(document);
 
-        docreqViewToggle?.addEventListener(
-            'global-view-change',
-            event => {
-                currentViewMode =
-                    event.detail?.mode === 'grid' ?
-                        'grid' :
-                        'list';
+            currentViewMode =
+                window.getGlobalViewMode?.(
+                    docreqViewToggle
+                ) || 'list';
 
-                renderList();
-            }
-        );
+            docreqViewToggle?.addEventListener(
+                'global-view-change',
+                event => {
+                    currentViewMode =
+                        event.detail?.mode === 'grid' ?
+                            'grid' :
+                            'list';
 
-        window.setGlobalFilterSelectValue?.(
-            'docreqStatusFilter',
-            activeFilter,
-            {
-                callback: false,
-                focus: false
-            }
-        );
+                    renderList();
+                }
+            );
 
-        window.addEventListener('resize', syncDocumentRequestView);
+            window.setGlobalFilterSelectValue?.(
+                'docreqStatusFilter',
+                activeFilter,
+                {
+                    callback: false,
+                    focus: false
+                }
+            );
 
-        window.bindQuickDatePresets({
-            groupId: 'datePresetGroup',
-            fromId: 'fDateFrom',
-            toId: 'fDateTo',
-            onChange: () => {
-                renderFilterChips();
-                updateShowResultsButton();
-            }
-        });
+            window.addEventListener('resize', syncDocumentRequestView);
 
-        window.bindFilterTagGroup({
-            groupId: 'fSortGroup',
-            onChange: () => {
-                renderFilterChips();
-                updateShowResultsButton();
-            }
-        });
+            window.bindQuickDatePresets({
+                groupId: 'datePresetGroup',
+                fromId: 'fDateFrom',
+                toId: 'fDateTo',
+                onChange: () => {
+                    renderFilterChips();
+                    updateShowResultsButton();
+                }
+            });
 
-        const docTypeSelect =
-            document.getElementById('fDocType');
+            window.bindFilterTagGroup({
+                groupId: 'fSortGroup',
+                onChange: () => {
+                    renderFilterChips();
+                    updateShowResultsButton();
+                }
+            });
 
-        docTypeSelect?.addEventListener(
-            'change',
-            () => {
-                renderFilterChips();
-                updateShowResultsButton();
-            }
-        );
+            const docTypeSelect =
+                document.getElementById('fDocType');
 
-        document.addEventListener('keydown', e => {
-            if (e.key !== 'Escape') return;
+            docTypeSelect?.addEventListener(
+                'change',
+                () => {
+                    renderFilterChips();
+                    updateShowResultsButton();
+                }
+            );
+
+            document.addEventListener('keydown', e => {
+                if (e.key !== 'Escape') return;
+                ['approveModal', 'rejectModal', 'filterModal']
+
+                    .forEach(id => {
+                        const m = document.getElementById(id);
+                        if (!m?.classList.contains('open')) return;
+                        if (id === 'filterModal') closeFilterModal();
+                        else window.closeModal(id);
+                    });
+            });
+
             ['approveModal', 'rejectModal', 'filterModal']
 
-                .forEach(id => {
-                    const m = document.getElementById(id);
-                    if (!m?.classList.contains('open')) return;
-                    if (id === 'filterModal') closeFilterModal();
-                    else window.closeModal(id);
-                });
-        });
+                .forEach(id => outside(id));
 
-        ['approveModal', 'rejectModal', 'filterModal']
+            const filterModal = document.getElementById('filterModal');
+            document.getElementById('filterCloseBtn').addEventListener('click', closeFilterModal);
+            document.getElementById('filterCancelBtn').addEventListener('click', closeFilterModal);
+            document.getElementById('filterApplyBtn').addEventListener('click', applyFilterModal);
+            document.getElementById('filterResetBtn').addEventListener('click', () => {
+                resetAdvancedFilters();
+                resetFilterModal();
+                updateShowResultsButton();
+            });
 
-            .forEach(id => outside(id));
+            ['approveCancelBtn', 'approveCancelBtn2'].forEach(id =>
+                document.getElementById(id)?.addEventListener('click', () => window.closeModal('approveModal'))
+            );
 
-        const filterModal = document.getElementById('filterModal');
-        document.getElementById('filterCloseBtn').addEventListener('click', closeFilterModal);
-        document.getElementById('filterCancelBtn').addEventListener('click', closeFilterModal);
-        document.getElementById('filterApplyBtn').addEventListener('click', applyFilterModal);
-        document.getElementById('filterResetBtn').addEventListener('click', () => {
-            resetAdvancedFilters();
-            resetFilterModal();
-            updateShowResultsButton();
-        });
+            document.getElementById('approveConfirmBtn')?.addEventListener('click', async () => {
+                const id = document.getElementById('approveRequestId').value;
+                const btn = document.getElementById('approveConfirmBtn');
 
-        ['approveCancelBtn', 'approveCancelBtn2'].forEach(id =>
-            document.getElementById(id)?.addEventListener('click', () => window.closeModal('approveModal'))
-        );
+                if (!id) return;
 
-        document.getElementById('approveConfirmBtn')?.addEventListener('click', async () => {
-            const id = document.getElementById('approveRequestId').value;
-            const btn = document.getElementById('approveConfirmBtn');
-
-            if (!id) return;
-
-            btn.disabled = true;
-
-            try {
-                const approveUrl = String(
-                    DOCREQ_ROUTES.approve || ''
-                ).replace('__ID__', id);
-
-                const res = await fetch(approveUrl, {
-                    method: DOCREQ_METHODS.approve || 'POST',
-                    headers: {
-                        'Accept': 'application/pdf, application/json',
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': CSRF,
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({})
-                });
-
-                const contentType = res.headers.get('content-type') || '';
-
-                if (!res.ok) {
-                    let message =
-                        res.status === 403
-                            ? 'Unauthorized.'
-                            : `Approval failed. Status: ${res.status}`;
-
-                    if (contentType.includes('application/json')) {
-                        const data = await res.json().catch(() => ({}));
-                        message = data.message || message;
-                    }
-
-                    throw new Error(message);
-                }
-
-                if (!contentType.toLowerCase().includes('application/pdf')) {
-                    throw new Error('The server did not return a valid PDF file.');
-                }
-
-                const blob = await res.blob();
-                const downloadUrl = URL.createObjectURL(blob);
-
-                let fileName = `approved-document-request-${id}.pdf`;
-                const disposition = res.headers.get('Content-Disposition') || '';
-                const fileNameMatch = disposition.match(/filename="?([^"]+)"?/i);
-
-                if (fileNameMatch?.[1]) {
-                    fileName = fileNameMatch[1];
-                }
-
-                const link = document.createElement('a');
-                link.href = downloadUrl;
-                link.download = fileName;
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-
-                window.setTimeout(() => {
-                    URL.revokeObjectURL(downloadUrl);
-                }, 30000);
-
-                window.closeModal('approveModal');
-                syncLocalDocRequestStatus(id, 'approved');
-
-                docreqToast(
-                    'success',
-                    'Request approved',
-                    res.headers.get('X-Approval-Message') ||
-                    'The document request has been approved. The patient will be notified.'
-                );
-            } catch (error) {
-                console.error('Approve request error:', error);
-
-                docreqToast(
-                    'error',
-                    'Approval failed',
-                    error.message || 'Approval failed because of a network or JavaScript error.'
-                );
-            } finally {
-                btn.disabled = false;
-            }
-        });
-
-        ['rejectCancelBtn', 'rejectCancelBtn2'].forEach(id =>
-            document.getElementById(id)?.addEventListener('click', () => window.closeModal('rejectModal'))
-        );
-
-        document.getElementById(
-            'rejectRequestForm'
-        )?.addEventListener(
-            'submit',
-            async event => {
-                event.preventDefault();
-
-                const form = event.currentTarget;
-
-                const validation =
-                    window.validateGlobalForm?.(
-                        form
-                    );
-
-                if (
-                    validation &&
-                    !validation.valid
-                ) {
-                    return;
-                }
-
-                const id =
-                    document.getElementById(
-                        'rejectRequestId'
-                    ).value;
-
-                const button =
-                    document.getElementById(
-                        'rejectConfirmBtn'
-                    );
-
-                const notes =
-                    document.getElementById(
-                        'rejectNotes'
-                    )?.value.trim() || '';
-
-                if (!id || !button) return;
-
-                button.disabled = true;
-
-                window.DiscardChanges?.markSubmitting(
-                    form
-                );
+                btn.disabled = true;
 
                 try {
-                    const rejectUrl = String(
-                        DOCREQ_ROUTES.reject || ''
+                    const approveUrl = String(
+                        DOCREQ_ROUTES.approve || ''
                     ).replace('__ID__', id);
 
-                    const response = await fetch(
-                        rejectUrl,
-                        {
-                            method: DOCREQ_METHODS.reject || 'POST',
-                            headers: {
-                                Accept: 'application/json',
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': CSRF,
-                                'X-Requested-With': 'XMLHttpRequest'
-                            },
-                            body: JSON.stringify({
-                                reason: notes
-                            })
+                    const res = await fetch(approveUrl, {
+                        method: DOCREQ_METHODS.approve || 'POST',
+                        headers: {
+                            'Accept': 'application/pdf, application/json',
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': CSRF,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({})
+                    });
+
+                    const contentType = res.headers.get('content-type') || '';
+
+                    if (!res.ok) {
+                        let message =
+                            res.status === 403
+                                ? 'Unauthorized.'
+                                : `Approval failed. Status: ${res.status}`;
+
+                        if (contentType.includes('application/json')) {
+                            const data = await res.json().catch(() => ({}));
+                            message = data.message || message;
                         }
-                    );
 
-                    const data =
-                        await response.json()
-                            .catch(() => ({}));
-
-                    if (!response.ok) {
-                        throw new Error(
-                            data.message ||
-                            `Rejection failed. Status: ${response.status}`
-                        );
+                        throw new Error(message);
                     }
 
-                    window.closeModal(
-                        'rejectModal'
-                    );
-
-                    syncLocalDocRequestStatus(
-                        id,
-                        'rejected', {
-                        rejection_reason: notes
+                    if (!contentType.toLowerCase().includes('application/pdf')) {
+                        throw new Error('The server did not return a valid PDF file.');
                     }
-                    );
+
+                    const blob = await res.blob();
+                    const downloadUrl = URL.createObjectURL(blob);
+
+                    let fileName = `approved-document-request-${id}.pdf`;
+                    const disposition = res.headers.get('Content-Disposition') || '';
+                    const fileNameMatch = disposition.match(/filename="?([^"]+)"?/i);
+
+                    if (fileNameMatch?.[1]) {
+                        fileName = fileNameMatch[1];
+                    }
+
+                    const link = document.createElement('a');
+                    link.href = downloadUrl;
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+
+                    window.setTimeout(() => {
+                        URL.revokeObjectURL(downloadUrl);
+                    }, 30000);
+
+                    window.closeModal('approveModal');
+                    syncLocalDocRequestStatus(id, 'approved');
 
                     docreqToast(
                         'success',
-                        'Request rejected',
-                        data.message ||
-                        'The document request has been rejected.'
+                        'Request approved',
+                        res.headers.get('X-Approval-Message') ||
+                        'The document request has been approved. The patient will be notified.'
                     );
                 } catch (error) {
-                    window.DiscardChanges
-                        ?.markNotSubmitting(form);
+                    console.error('Approve request error:', error);
 
                     docreqToast(
                         'error',
-                        'Rejection failed',
-                        error.message ||
-                        'The request could not be rejected.'
+                        'Approval failed',
+                        error.message || 'Approval failed because of a network or JavaScript error.'
                     );
                 } finally {
-                    button.disabled = false;
+                    btn.disabled = false;
                 }
-            }
-        );
+            });
 
-        showSkeleton();
+            ['rejectCancelBtn', 'rejectCancelBtn2'].forEach(id =>
+                document.getElementById(id)?.addEventListener('click', () => window.closeModal('rejectModal'))
+            );
 
-        requestAnimationFrame(() => {
-            setTimeout(() => {
-                loadData();
-                initDocreqRefreshWatcher();
-            }, 350);
+            document.getElementById(
+                'rejectRequestForm'
+            )?.addEventListener(
+                'submit',
+                async event => {
+                    event.preventDefault();
+
+                    const form = event.currentTarget;
+
+                    const validation =
+                        window.validateGlobalForm?.(
+                            form
+                        );
+
+                    if (
+                        validation &&
+                        !validation.valid
+                    ) {
+                        return;
+                    }
+
+                    const id =
+                        document.getElementById(
+                            'rejectRequestId'
+                        ).value;
+
+                    const button =
+                        document.getElementById(
+                            'rejectConfirmBtn'
+                        );
+
+                    const notes =
+                        document.getElementById(
+                            'rejectNotes'
+                        )?.value.trim() || '';
+
+                    if (!id || !button) return;
+
+                    button.disabled = true;
+
+                    window.DiscardChanges?.markSubmitting(
+                        form
+                    );
+
+                    try {
+                        const rejectUrl = String(
+                            DOCREQ_ROUTES.reject || ''
+                        ).replace('__ID__', id);
+
+                        const response = await fetch(
+                            rejectUrl,
+                            {
+                                method: DOCREQ_METHODS.reject || 'POST',
+                                headers: {
+                                    Accept: 'application/json',
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': CSRF,
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                body: JSON.stringify({
+                                    reason: notes
+                                })
+                            }
+                        );
+
+                        const data =
+                            await response.json()
+                                .catch(() => ({}));
+
+                        if (!response.ok) {
+                            throw new Error(
+                                data.message ||
+                                `Rejection failed. Status: ${response.status}`
+                            );
+                        }
+
+                        window.closeModal(
+                            'rejectModal'
+                        );
+
+                        syncLocalDocRequestStatus(
+                            id,
+                            'rejected', {
+                            rejection_reason: notes
+                        }
+                        );
+
+                        docreqToast(
+                            'success',
+                            'Request rejected',
+                            data.message ||
+                            'The document request has been rejected.'
+                        );
+                    } catch (error) {
+                        window.DiscardChanges
+                            ?.markNotSubmitting(form);
+
+                        docreqToast(
+                            'error',
+                            'Rejection failed',
+                            error.message ||
+                            'The request could not be rejected.'
+                        );
+                    } finally {
+                        button.disabled = false;
+                    }
+                }
+            );
+
+            showSkeleton();
+
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    loadData();
+                    initDocreqRefreshWatcher();
+                }, 350);
+            });
         });
-    });
 </script>
 @endsection

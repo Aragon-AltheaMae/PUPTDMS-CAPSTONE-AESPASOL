@@ -22,6 +22,25 @@ function openModal(id) {
         'modal-lock'
     );
 
+    if (
+        window.matchMedia(
+            '(max-width: 767px)'
+        ).matches
+    ) {
+        const activeElement =
+            document.activeElement;
+
+        if (
+            activeElement &&
+            modal.contains(activeElement) &&
+            activeElement.matches(
+                'input, textarea, select, [contenteditable="true"]'
+            )
+        ) {
+            activeElement.blur();
+        }
+    }
+
     document.dispatchEvent(
         new CustomEvent(
             'ui-modal:opened',

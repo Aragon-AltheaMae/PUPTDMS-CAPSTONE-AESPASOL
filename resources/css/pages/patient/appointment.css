@@ -305,72 +305,60 @@
     border-color: var(--border) !important;
 }
 
-@media (max-width: 767px) {
-    .services-grid {
-        grid-template-columns: 1fr;
-        gap: .65rem;
-    }
-
-    .appointment-service-card-body {
-        grid-template-columns: 38px minmax(0, 1fr);
-        gap: .3rem .7rem;
-
-        padding: .8rem;
-    }
-
-    .appointment-service-icon {
-        width: 38px;
-        height: 38px;
-
-        border-radius: 12px;
-
-        font-size: .85rem;
-    }
-
-    .appointment-service-title {
-        font-size: .84rem;
-    }
-
-    .appointment-service-desc {
-        font-size: .69rem;
-        line-height: 1.4;
-    }
-
-    .appointment-service-status {
-        margin-top: .18rem;
-
-        font-size: 9px;
-    }
-}
-
 @media (max-width: 720px) {
     .appointment-services-section {
-        margin-top: 1.5rem;
+        margin-top: 1.2rem;
     }
 
     .appointment-services-heading {
-        align-items: flex-start;
-        gap: .7rem;
+        align-items: center;
 
-        margin-bottom: .85rem;
+        gap: .6rem;
+
+        margin-bottom: .7rem;
     }
 
     .appointment-services-heading-icon {
-        width: 40px;
-        height: 40px;
-        min-width: 40px;
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
 
-        border-radius: 12px;
+        border-radius: 11px;
 
-        font-size: .9rem;
-    }
-
-    .appointment-services-heading h2 {
-        font-size: 1.4rem;
+        font-size: .8rem;
     }
 
     .appointment-services-heading p {
-        font-size: .76rem;
+        margin-top: .18rem;
+
+        font-size: .68rem;
+        line-height: 1.25;
+    }
+
+    .appt-list-heading {
+        gap: .6rem;
+    }
+
+    .appt-list-heading-icon {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+
+        border-radius: 11px;
+
+        font-size: .8rem;
+    }
+
+    .appt-list-heading h2 {
+        font-size: 1.12rem;
+        line-height: 1.1;
+    }
+
+    .appt-list-heading p {
+        margin-top: .18rem;
+
+        font-size: .68rem;
+        line-height: 1.25;
     }
 
     .appt-appointments-section {
@@ -462,6 +450,36 @@
     padding: 0.7rem 0.85rem;
 }
 
+.appt-calendar-eyebrow {
+    margin: 0;
+
+    color: var(--crimson);
+
+    font-size: .68rem;
+    font-weight: 850;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+.appt-calendar-title {
+    margin: .25rem 0 0;
+
+    color: var(--text-1);
+
+    font-size: 1.1rem;
+    font-weight: 850;
+    line-height: 1.15;
+}
+
+.appt-calendar-subtitle {
+    margin: .25rem 0 0;
+
+    color: var(--text-3);
+
+    font-size: .78rem;
+    line-height: 1.4;
+}
+
 .appt-highlight-service {
     display: flex;
     align-items: center;
@@ -530,14 +548,6 @@
     min-width: 0;
 }
 
-.appointment-services-heading h2 {
-    margin: 0;
-    color: var(--crimson);
-    font-size: clamp(1.45rem, 3vw, 2rem);
-    font-weight: 900;
-    line-height: 1.1;
-}
-
 .appointment-services-heading p {
     margin: .3rem 0 0;
     color: var(--text-2);
@@ -549,11 +559,6 @@
 .dark .appointment-services-heading-icon {
     background: var(--crimson-soft);
     border-color: rgba(252, 165, 165, .16);
-    color: #fca5a5;
-}
-
-[data-theme="dark"] .appointment-services-heading h2,
-.dark .appointment-services-heading h2 {
     color: #fca5a5;
 }
 
@@ -700,6 +705,37 @@
     box-shadow: 0 10px 22px rgba(139, 0, 0, .20);
 }
 
+.appt-summary-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.appt-summary-copy {
+    min-width: 0;
+}
+
+.appt-summary-label {
+    margin: 0;
+
+    color: var(--text-3);
+
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+.appt-summary-value {
+    margin: .2rem 0 0;
+
+    color: var(--text-1);
+
+    font-size: 1.1rem;
+    font-weight: 850;
+    line-height: 1.15;
+}
+
 .appt-tip-card {
     border-radius: 1.15rem;
     padding: 0.75rem 0.95rem;
@@ -736,6 +772,49 @@
     animation: apptFloat 3s ease-in-out infinite;
 }
 
+.appt-tip-content {
+    min-width: 0;
+
+    display: flex;
+    align-items: flex-start;
+
+    gap: .75rem;
+}
+
+.appt-tip-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+
+    flex: 0 0 2.5rem;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 999px;
+
+    color: var(--crimson);
+    background: var(--crimson-soft);
+}
+
+.appt-tip-title {
+    margin: 0;
+
+    color: var(--text-1);
+
+    font-size: .82rem;
+    font-weight: 850;
+}
+
+.appt-tip-text {
+    margin: .15rem 0 0;
+
+    color: var(--text-3);
+
+    font-size: .78rem;
+    line-height: 1.4;
+}
+
 [data-theme="dark"] #mainContent .appt-summary-card,
 [data-theme="dark"] #mainContent .appt-empty-state,
 [data-theme="dark"] #mainContent .appt-tip-card {
@@ -765,12 +844,6 @@
 @media (min-width: 768px) {
     .appt-summary-grid {
         gap: 0.9rem;
-    }
-}
-
-@media (max-width: 767px) {
-    .appt-summary-grid {
-        grid-template-columns: 1fr;
     }
 }
 
@@ -904,6 +977,56 @@
 
 .appt-record-accordion summary::-webkit-details-marker {
     display: none;
+}
+
+.appt-calendar-stat-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: .75rem;
+}
+
+.appt-calendar-stat-label {
+    color: var(--text-3);
+
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.appt-calendar-stat-value {
+    flex: 0 0 auto;
+
+    font-size: .72rem;
+    font-weight: 850;
+
+    text-align: right;
+}
+
+.appt-calendar-stat-value-info {
+    color: var(--blue-text);
+}
+
+.appt-calendar-stat-value-warning {
+    color: var(--warning-text);
+}
+
+.appt-calendar-hint {
+    margin: -.2rem .25rem 0;
+
+    color: var(--text-3);
+
+    font-size: .7rem;
+}
+
+.appt-calendar-stats {
+    display: grid;
+
+    gap: .6rem;
+
+    margin-top: 1rem;
 }
 
 .appt-record-chevron {
@@ -1201,6 +1324,59 @@
 }
 
 @media (max-width: 480px) {
+    .appt-calendar-title {
+        font-size: 0.7rem;
+    }
+
+    .appt-tip-card {
+        flex-direction: column;
+        align-items: stretch;
+
+        gap: .6rem;
+
+        margin-top: .7rem;
+    }
+
+    .appt-tip-content {
+        gap: .6rem;
+    }
+
+    .appt-tip-icon {
+        width: 2rem;
+        height: 2rem;
+
+        flex-basis: 2rem;
+
+        font-size: .72rem;
+    }
+
+    .appt-tip-title {
+        font-size: .72rem;
+    }
+
+    .appt-tip-text {
+        font-size: .68rem;
+        line-height: 1.3;
+    }
+
+    .appt-tip-card .ui-btn {
+        width: 100%;
+    }
+
+    .appt-summary-content {
+        gap: .6rem;
+    }
+
+    .appt-summary-label {
+        font-size: .56rem;
+        letter-spacing: .1em;
+    }
+
+    .appt-summary-value {
+        margin-top: .08rem;
+
+        font-size: .9rem;
+    }
 
     .appt-section-reveal {
         margin-bottom: .9rem !important;
@@ -1208,60 +1384,57 @@
 
     .appt-summary-grid {
         grid-template-columns: 1fr;
-        gap: .65rem;
+        gap: .5rem;
     }
 
     .appt-summary-card {
-        padding: .75rem .8rem;
-        border-radius: .95rem;
-        min-height: unset;
+        padding: .6rem .7rem;
+        border-radius: .85rem;
+        min-height: 0;
     }
 
     .appt-summary-card .flex {
-        gap: .75rem !important;
+        gap: .6rem !important;
     }
 
     .appt-summary-icon {
-        width: 2.15rem;
-        height: 2.15rem;
-        border-radius: .7rem;
-        font-size: .8rem;
+        width: 2rem;
+        height: 2rem;
+        border-radius: .65rem;
+        font-size: .72rem;
         flex-shrink: 0;
     }
 
     .appt-summary-card p {
-        font-size: .62rem !important;
-        letter-spacing: .13em !important;
+        font-size: .56rem !important;
+        letter-spacing: .1em !important;
     }
 
     .appt-summary-card h3 {
-        font-size: 1rem !important;
-        line-height: 1.15;
+        margin-top: .08rem !important;
+        font-size: .9rem !important;
+        line-height: 1.1;
     }
 
     .appt-tip-card {
-        padding: .8rem;
-        border-radius: .95rem;
-        gap: .75rem !important;
+        padding: .65rem .7rem;
+        border-radius: .85rem;
+        gap: .6rem !important;
     }
 
     .appt-tip-card .w-10 {
-        width: 2.15rem !important;
-        height: 2.15rem !important;
-        font-size: .8rem;
+        width: 2rem !important;
+        height: 2rem !important;
+        font-size: .72rem;
     }
 
     .appt-tip-card p.text-sm {
-        font-size: .78rem !important;
-        line-height: 1.35;
+        font-size: .68rem !important;
+        line-height: 1.3;
     }
 
-    .fade-up {
-        animation-duration: .42s;
-    }
-
-    .services-grid {
-        gap: .65rem;
+    .appt-tip-card .ui-btn {
+        width: 100%;
     }
 }
 
@@ -1389,6 +1562,52 @@
     box-shadow: 0 12px 26px rgba(0, 0, 0, .16);
 }
 
+.appt-activity-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: .5rem;
+}
+
+.appt-activity-title {
+    margin: 0;
+
+    color: var(--text-1);
+
+    font-size: .72rem;
+    font-weight: 850;
+}
+
+.appt-activity-legend {
+    display: flex;
+    align-items: center;
+
+    gap: .5rem;
+
+    font-size: .62rem;
+    font-weight: 700;
+}
+
+.appt-activity-legend-item {
+    display: inline-flex;
+    align-items: center;
+
+    gap: .25rem;
+}
+
+.appt-activity-legend-item i {
+    font-size: .45rem;
+}
+
+.appt-activity-legend-item.completed {
+    color: var(--status-completed-text);
+}
+
+.appt-activity-legend-item.cancelled {
+    color: var(--status-cancelled-text);
+}
+
 [data-theme="dark"] .appt-timeline-empty {
     background:
         radial-gradient(circle at 50% 0%, rgba(139, 0, 0, .25), transparent 38%),
@@ -1416,7 +1635,6 @@
     box-shadow: 0 0 0 8px rgba(139, 0, 0, .25) !important;
 }
 
-/* text contrast fix */
 [data-theme="dark"] .appt-timeline-step p:first-of-type {
     color: #F3F4F6 !important;
 }
@@ -1426,6 +1644,73 @@
 }
 
 @media (max-width: 767px) {
+    .appt-activity-title {
+        font-size: .66rem;
+    }
+
+    .appt-activity-legend {
+        gap: .35rem;
+
+        font-size: .54rem;
+    }
+
+    .appt-calendar-stats {
+        gap: .45rem;
+        margin-top: .7rem;
+    }
+
+    .appt-calendar-eyebrow {
+        font-size: .58rem;
+        letter-spacing: .1em;
+    }
+
+    .appt-calendar-title {
+        font-size: 1rem;
+    }
+
+    .appt-calendar-subtitle {
+        font-size: .68rem;
+        line-height: 1.3;
+    }
+
+    .appt-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .services-grid {
+        grid-template-columns: 1fr;
+        gap: .65rem;
+    }
+
+    .appointment-service-card-body {
+        grid-template-columns: 34px minmax(0, 1fr);
+        gap: .25rem .55rem;
+        padding: .65rem .7rem;
+    }
+
+    .appointment-service-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        font-size: .75rem;
+    }
+
+    .appointment-service-title {
+        font-size: .78rem;
+        line-height: 1.2;
+    }
+
+    .appointment-service-desc {
+        margin-top: .18rem;
+        font-size: .63rem;
+        line-height: 1.3;
+    }
+
+    .appointment-service-status {
+        margin-top: .12rem;
+        font-size: 8px;
+    }
+
     .appt-timeline-empty {
         padding: 1rem;
         border-radius: 1.05rem;

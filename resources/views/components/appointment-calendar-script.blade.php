@@ -2657,40 +2657,203 @@
         });
     };
 
-    document.addEventListener("DOMContentLoaded", function() {
-        const queryDate = new URLSearchParams(window.location.search).get('date');
-        const queryDateState = queryDate ? getCalendarDateStateFromIso(queryDate) : null;
+    function monthHasBookableDate(
+        year,
+        month,
+        startFromToday = false
+    ) {
+        const totalDays =
+            new Date(
+                year,
+                month + 1,
+                0
+            ).getDate();
 
-        if (calendarConfig.mode === 'patient-dashboard') {
-            currentYear = todayDate.getFullYear();
-            currentMonth = todayDate.getMonth();
-        }
+        let startDay = 1;
 
         if (
-            calendarConfig.mode === 'booking' &&
-            queryDateState &&
-            !queryDateState.isDisabled
+            startFromToday &&
+            year === todayDate.getFullYear() &&
+            month === todayDate.getMonth()
         ) {
-            currentYear = queryDateState.cellDate.getFullYear();
-            currentMonth = queryDateState.cellDate.getMonth();
-            selectedDate = queryDateState.iso;
-            focusedDateIso = queryDateState.iso;
+
+            startDay =
+                todayDate.getDate() +
+                (
+                    calendarConfig.disallowToday ?
+                    1 :
+                    0
+                );
         }
 
-        if (calendarConfig.mode !== 'booking') {
-            renderCalendarLoading();
+        for (
+            let day = startDay; day <= totalDays; day++
+        ) {
+            const state =
+                resolveCalendarDayState(
+                    year,
+                    month,
+                    day
+                );
+
+            if (!state.isDisabled) {
+                return true;
+            }
         }
 
-        setTimeout(async () => {
-            renderCalendar();
+        return false;
+    }
+
+
+    function findFirstBookableMonth() {
+        const {
+            minimum,
+            maximum
+        } = getMonthBounds();
+
+        const cursor =
+            new Date(
+                todayDate.getFullYear(),
+                todayDate.getMonth(),
+                1
+            );
+
+        if (cursor < minimum) {
+            cursor.setTime(
+                minimum.getTime()
+            );
+        }
+
+        while (cursor <= maximum) {
+            const year =
+                cursor.getFullYear();
+
+            const month =
+                cursor.getMonth();
+
+            const isCurrentMonth =
+                year ===
+                todayDate.getFullYear() &&
+                month ===
+                todayDate.getMonth();
 
             if (
-                calendarConfig.mode === 'booking' &&
-                queryDateState &&
-                !queryDateState.isDisabled
+                monthHasBookableDate(
+                    year,
+                    month,
+                    isCurrentMonth
+                )
             ) {
-                await selectDate(queryDateState.iso);
+                return {
+                    year,
+                    month
+                };
             }
-        }, calendarConfig.mode === 'booking' ? 0 : 650);
-    });
+
+            cursor.setMonth(
+                cursor.getMonth() + 1
+            );
+        }
+
+        return null;
+    }
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function() {
+
+            const queryDate =
+                new URLSearchParams(
+                    window.location.search
+                ).get('date');
+
+            const queryDateState =
+                queryDate ?
+                getCalendarDateStateFromIso(
+                    queryDate
+                ) :
+                null;
+
+            if (
+                calendarConfig.mode ===
+                'patient-dashboard'
+            ) {
+                currentYear =
+                    todayDate.getFullYear();
+
+                currentMonth =
+                    todayDate.getMonth();
+            }
+
+            if (
+                calendarConfig.mode ===
+                'booking'
+            ) {
+
+                if (
+                    queryDateState &&
+                    !queryDateState.isDisabled
+                ) {
+                    currentYear =
+                        queryDateState
+                        .cellDate
+                        .getFullYear();
+
+                    currentMonth =
+                        queryDateState
+                        .cellDate
+                        .getMonth();
+
+                    selectedDate =
+                        queryDateState.iso;
+
+                    focusedDateIso =
+                        queryDateState.iso;
+
+                } else {
+
+                    const firstBookableMonth =
+                        findFirstBookableMonth();
+
+                    if (firstBookableMonth) {
+                        currentYear =
+                            firstBookableMonth.year;
+
+                        currentMonth =
+                            firstBookableMonth.month;
+                    }
+                }
+            }
+
+            if (
+                calendarConfig.mode !==
+                'booking'
+            ) {
+                renderCalendarLoading();
+            }
+
+            setTimeout(
+                async () => {
+
+                        renderCalendar();
+
+                        if (
+                            calendarConfig.mode ===
+                            'booking' &&
+                            queryDateState &&
+                            !queryDateState.isDisabled
+                        ) {
+                            await selectDate(
+                                queryDateState.iso
+                            );
+                        }
+
+                    },
+                    calendarConfig.mode ===
+                    'booking' ?
+                    0 :
+                    650
+            );
+        }
+    );
 </script>

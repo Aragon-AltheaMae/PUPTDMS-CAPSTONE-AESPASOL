@@ -801,23 +801,6 @@
     }
 }
 
-@media (max-width: 640px) {
-
-    .dashboard-calendar-availability-header,
-    .dashboard-calendar-availability-actions {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    .dashboard-calendar-status {
-        align-self: flex-start;
-    }
-
-    .dashboard-calendar-book-btn {
-        width: 100%;
-    }
-}
-
 .calendar-main-header {
     display: grid;
     grid-template-columns: 34px minmax(0, 1fr) 34px;
@@ -1320,12 +1303,6 @@
 
     .dashboard-calendar-shell .dashboard-calendar-side-panel .dashboard-calendar-preview-slots {
         grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 640px) {
-    .dashboard-calendar-side-panel .dashboard-calendar-preview-slots {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
@@ -1894,28 +1871,6 @@
     color: var(--red-300);
 }
 
-@media (max-width: 640px) {
-    .appointment-time-panel {
-        padding: .85rem;
-        border-radius: 18px;
-    }
-
-    .appointment-slot-grid {
-        gap: .65rem;
-    }
-
-    .appointment-slot-grid .slot-chip {
-        min-height: 52px;
-        padding-inline: .7rem;
-        border-radius: 14px;
-        font-size: .82rem;
-    }
-
-    .appointment-slot-placeholder {
-        min-height: 200px;
-    }
-}
-
 .slot-availability-count {
     margin-left: .5rem;
     font-size: .75rem;
@@ -1998,6 +1953,111 @@
 }
 
 @media (max-width: 640px) {
+
+    .dashboard-calendar-availability-header,
+    .dashboard-calendar-availability-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .dashboard-calendar-status {
+        align-self: flex-start;
+    }
+
+    .dashboard-calendar-book-btn {
+        width: 100%;
+    }
+
+    .dashboard-calendar-side-panel .dashboard-calendar-preview-slots {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .appointment-time-panel {
+        padding: .75rem;
+        border-radius: 16px;
+    }
+
+    .appointment-slot-grid,
+    .appointment-slot-grid.slot-grid-ui {
+        column-gap: .55rem !important;
+        row-gap: .55rem !important;
+        margin-top: .65rem;
+    }
+
+    .appointment-slot-grid .slot-chip {
+        min-height: 44px;
+        padding-inline: .65rem;
+        border-radius: 12px;
+        font-size: .76rem;
+    }
+
+    .appointment-slot-grid .slot-chip i {
+        font-size: .68rem;
+    }
+
+    .appointment-slot-placeholder {
+        min-height: 130px;
+
+        gap: .45rem;
+
+        padding:
+            .9rem .75rem;
+
+        border-radius: 14px;
+    }
+
+    .appointment-slot-placeholder .empty-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        font-size: .72rem;
+    }
+
+    .appointment-slot-placeholder .empty-title {
+        font-size: .76rem;
+        line-height: 1.15;
+    }
+
+    .appointment-slot-placeholder .empty-subtitle {
+        max-width: 220px;
+        font-size: .62rem;
+        line-height: 1.35;
+    }
+
+    .appointment-time-heading {
+        gap: .6rem;
+
+        margin-bottom: .75rem;
+    }
+
+    .appointment-time-heading-icon {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        border-radius: 10px;
+    }
+
+    .appointment-time-heading-icon i {
+        font-size: 11px;
+    }
+
+    .appointment-time-heading h4 {
+        font-size: .8rem;
+    }
+
+    .appointment-time-heading p {
+        margin-top: .15rem;
+        font-size: .65rem;
+        line-height: 1.35;
+    }
+
+    .appointment-selected-slot {
+        margin-top: .65rem;
+        padding: .6rem .7rem;
+        border-radius: 12px;
+        font-size: .7rem;
+    }
+
     .calendar-main-header {
         gap: .5rem;
     }
@@ -2259,5 +2319,29 @@
 
     .dashboard-calendar-filters button i {
         font-size: .5rem;
+    }
+
+    .appointment-slot-placeholder {
+        min-height: 118px;
+        gap: .4rem;
+        padding: .75rem .6rem;
+        border-radius: 13px;
+    }
+
+    .appointment-slot-placeholder .empty-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        font-size: .66rem;
+    }
+
+    .appointment-slot-placeholder .empty-title {
+        font-size: .72rem;
+    }
+
+    .appointment-slot-placeholder .empty-subtitle {
+        max-width: 190px;
+        font-size: .58rem;
+        line-height: 1.3;
     }
 }

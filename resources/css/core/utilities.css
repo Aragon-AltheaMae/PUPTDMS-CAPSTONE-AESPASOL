@@ -481,7 +481,6 @@
     background: var(--amber-600);
     border-color: var(--amber-600);
     color: var(--color-white);
-    box-shadow: 0 8px 18px var(--alpha-amber-600-22);
 }
 
 .ui-btn-warning:hover {
@@ -2927,7 +2926,6 @@
         min-height: 28px;
         padding: 0 10px;
         gap: 5px;
-
         font-size: 9px;
     }
 
@@ -3239,12 +3237,11 @@
     .ui-btn.ui-btn-sm {
         min-height: 26px;
         padding: 0 8px;
-
-        font-size: 8.5px;
+        font-size: 10px;
     }
 
     .ui-btn.ui-btn-sm i {
-        font-size: 7.5px;
+        font-size: 8px;
     }
 
     .global-info-pill {
