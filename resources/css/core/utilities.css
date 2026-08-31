@@ -503,6 +503,42 @@
     transform: translateY(-1px);
 }
 
+.ui-icon-btn {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-family: inherit;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+        transform .18s ease,
+        background-color .18s ease,
+        border-color .18s ease,
+        color .18s ease,
+        box-shadow .18s ease;
+}
+
+.ui-icon-btn:disabled {
+    opacity: .45;
+
+    cursor: not-allowed;
+
+    transform: none;
+    box-shadow: none;
+}
+
+.ui-icon-btn:disabled:hover,
+.ui-icon-btn:disabled:focus-visible {
+    transform: none;
+}
+
 .ui-icon-btn i {
     color: currentColor;
     font-size: 13px;

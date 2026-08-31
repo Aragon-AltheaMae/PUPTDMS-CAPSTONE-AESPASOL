@@ -737,12 +737,23 @@
 }
 
 .appt-tip-card {
-    border-radius: 1.15rem;
-    padding: 0.75rem 0.95rem;
-    background:
-        radial-gradient(circle at top left, rgba(245, 158, 11, .13), transparent 28%),
-        linear-gradient(145deg, #fffaf0, #fff7f7);
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: .8rem .95rem;
     border: 1px solid rgba(245, 158, 11, .22);
+    border-radius: 1.15rem;
+    background:
+        radial-gradient(circle at top left,
+            rgba(245, 158, 11, .13),
+            transparent 28%),
+        linear-gradient(145deg,
+            #fffaf0,
+            #fff7f7);
 }
 
 .appt-empty-state {

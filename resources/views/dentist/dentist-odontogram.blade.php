@@ -11,7 +11,7 @@
 @section('title', 'Patient Odontogram')
 
 @section('styles')
-    @vite('resources/css/pages/dentist/odontogram.css')
+@vite('resources/css/pages/dentist/odontogram.css')
 @endsection
 
 @section('content')
@@ -57,6 +57,30 @@ trim((string) $currentServiceType),
 $entrySource = request()->query('from');
 $isWalkInMode = $entrySource === 'walk-in';
 
+$entryContextLabel = $existingAppointmentMode
+? 'Existing Appointment'
+: (
+$savedVisitEditMode
+? 'Saved Visit Record'
+: (
+$isWalkInMode
+? 'Walk-in Visit'
+: null
+)
+);
+
+$entryContextMessage = $existingAppointmentMode
+? 'This odontogram is for an existing appointment. Saving it will store the visit as completed.'
+: (
+$savedVisitEditMode
+? 'You are editing a previously saved visit. Any changes here will update the saved odontogram and clinical notes.'
+: (
+$isWalkInMode
+? 'This odontogram is being created for a walk-in visit.'
+: null
+)
+);
+
 $pageEyebrow = $savedVisitEditMode ? 'Saved Dental Record Editor' : 'Dental Procedure Workspace';
 $pageTitle = $savedVisitEditMode ? 'Edit Saved Odontogram' : 'Patient Odontogram';
 $pageSubtitle = '2D / 3D Treatment &amp; Condition Mapping';
@@ -64,13 +88,13 @@ $pageSubtitle = '2D / 3D Treatment &amp; Condition Mapping';
 $existingProcedureDuration = $existingAppointmentMode
 ? data_get($existingAppointmentDraft ?? [], 'procedure_duration_hms', '00:00:00')
 : ($savedVisitEditMode
-    ? sprintf(
-        '%02d:%02d:%02d',
-        floor((int) data_get($procedure, 'procedure_duration_seconds', 0) / 3600),
-        floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60),
-        (int) data_get($procedure, 'procedure_duration_seconds', 0) % 60
-    )
-    : '00:00:00');
+? sprintf(
+'%02d:%02d:%02d',
+floor((int) data_get($procedure, 'procedure_duration_seconds', 0) / 3600),
+floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60),
+(int) data_get($procedure, 'procedure_duration_seconds', 0) % 60
+)
+: '00:00:00');
 @endphp
 
 <main id="mainContent" class="odontogram-page">
@@ -82,6 +106,39 @@ $existingProcedureDuration = $existingAppointmentMode
 
                 <div class="odontogram-hero">
                     <div class="odontogram-hero-main">
+
+                        @if ($entryContextLabel)
+                        <div class="global-info-profile">
+
+                            <span class="global-info-profile-icon">
+                                <i class="fa-solid fa-circle-info"></i>
+                            </span>
+
+                            <div class="global-info-profile-copy">
+
+                                <div class="global-info-group">
+
+                                    <strong class="global-info-profile-name">
+                                        {{ $entryContextLabel }}
+                                    </strong>
+
+                                    @if ($savedVisitEditMode)
+                                    <span class="global-info-pill">
+                                        <i class="fa-solid fa-floppy-disk"></i>
+                                        Saved Record
+                                    </span>
+                                    @endif
+
+                                </div>
+
+                                <span class="global-info-subvalue">
+                                    {{ $entryContextMessage }}
+                                </span>
+
+                            </div>
+
+                        </div>
+                        @endif
 
                         <div class="card hero-title-card">
 
@@ -600,8 +657,8 @@ $existingProcedureDuration = $existingAppointmentMode
                     </h2>
                     <p class="modal-subtitle">
                         {{ $savedVisitEditMode
-                            ? 'Unsaved changes in this saved visit editor may be lost.'
-                            : 'Unsaved changes in this procedure session may be lost.' }}
+                        ? 'Unsaved changes in this saved visit editor may be lost.'
+                        : 'Unsaved changes in this procedure session may be lost.' }}
                     </p>
                 </div>
             </div>
@@ -620,8 +677,10 @@ $existingProcedureDuration = $existingAppointmentMode
                     <strong>{{ $savedVisitEditMode ? 'Leave this edit?' : 'Leave this procedure?' }}</strong>
                     <span>
                         {{ $savedVisitEditMode
-                            ? 'Are you sure you want to cancel this edit? Any unsaved changes in this saved visit may be lost.'
-                            : 'Are you sure you want to cancel this procedure? Any unsaved progress in this session may be lost.' }}
+                        ? 'Are you sure you want to cancel this edit? Any unsaved changes in this saved visit may be
+                        lost.'
+                        : 'Are you sure you want to cancel this procedure? Any unsaved progress in this session may be
+                        lost.' }}
                     </span>
                 </div>
             </div>
