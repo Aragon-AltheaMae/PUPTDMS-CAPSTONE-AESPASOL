@@ -1225,6 +1225,23 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                             `[name="${CSS.escape(name)}"]`
                         )
                         .forEach(el => {
+                            const shouldPreserveEmergencyValue =
+                                [
+                                    "emergency_person",
+                                    "emergency_number",
+                                    "emergency_relation",
+                                ].includes(name) &&
+                                String(value ?? "").trim() === "" &&
+                                String(
+                                    el.type === "checkbox" || el.type === "radio"
+                                        ? (el.checked ? el.value : "")
+                                        : el.value ?? ""
+                                ).trim() !== "";
+
+                            if (shouldPreserveEmergencyValue) {
+                                return;
+                            }
+
                             if (
                                 el.type ===
                                 "radio"

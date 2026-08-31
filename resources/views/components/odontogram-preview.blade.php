@@ -1,5 +1,6 @@
 @php
     $previewOdontogramData = $odontogramData ?? [];
+    $showEditButton = $showEditButton ?? false;
 @endphp
 
 <div class="odontogram-preview" data-odontogram-preview data-odontogram='@json($previewOdontogramData, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT)'>
@@ -10,6 +11,15 @@
                 Click any tooth to view its saved markings.
             </p>
         </div>
+
+        @if ($showEditButton)
+            <a href="#" id="recordModalEditBtn"
+                class="ui-btn ui-btn-primary ui-btn-sm odontogram-preview-head-edit-btn"
+                hidden>
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>Edit Odontogram</span>
+            </a>
+        @endif
     </div>
 
     <div class="odontogram-preview-layout">

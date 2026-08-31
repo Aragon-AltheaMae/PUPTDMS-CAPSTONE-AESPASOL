@@ -131,10 +131,10 @@
                     <span>Odontogram</span>
                 </div>
 
-                <div id="m_odontogram" class="record-modal-odontogram">
-
+                <div id="m_odontogram" class="record-modal-odontogram relative">
                     @include('components.odontogram-preview', [
                         'odontogramData' => [],
+                        'showEditButton' => true,
                     ])
 
                 </div>
@@ -143,11 +143,6 @@
         </div>
 
         <div class="modal-ft">
-            <a href="#" id="recordModalEditBtn" class="ui-btn ui-btn-primary" hidden>
-                <i class="fa-solid fa-pen-to-square"></i>
-                <span>Edit Odontogram</span>
-            </a>
-
             <button type="button" class="btn-close-modal" id="modalCloseFooter">
                 Close
             </button>

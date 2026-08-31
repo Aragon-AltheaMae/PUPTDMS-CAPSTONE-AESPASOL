@@ -111,7 +111,8 @@ class HomepageController extends Controller
             || blank($patient->gender)
             || blank($patient->address)
             || ! optional($patient->medicalHistory)->emergency_person
-            || ! optional($patient->medicalHistory)->emergency_number;
+            || ! optional($patient->medicalHistory)->emergency_number
+            || ! optional($patient->medicalHistory)->emergency_relation;
 
         if (! $needsBackfill) {
             return;
@@ -202,17 +203,50 @@ class HomepageController extends Controller
     private function syncStudentMedicalHistory(Patient $patient, array $personalInfo): void
     {
         $emergencyPerson = $this->cleanStringValue(
-            $personalInfo['emergencyContactName'] ?? $personalInfo['emergency_contact_name'] ?? null
+            $personalInfo['emergencyContactName']
+                ?? $personalInfo['emergency_contact_name']
+                ?? data_get($personalInfo, 'emergencyContact.name')
+                ?? data_get($personalInfo, 'emergency_contact.name')
+                ?? data_get($personalInfo, 'emergency_contact.contact_name')
+                ?? data_get($personalInfo, 'emergencyContact.contactName')
+                ?? null
         );
-        $emergencyNumber = $this->cleanStringValue(
-            $personalInfo['emergencyContactNumber'] ?? $personalInfo['emergency_contact_number'] ?? null
+        $emergencyNumber = $this->normalizePhilippineMobile(
+            $this->cleanStringValue(
+                $personalInfo['emergencyContactNumber']
+                    ?? $personalInfo['emergency_contact_number']
+                    ?? data_get($personalInfo, 'emergencyContact.number')
+                    ?? data_get($personalInfo, 'emergencyContact.contactNumber')
+                    ?? data_get($personalInfo, 'emergency_contact.number')
+                    ?? data_get($personalInfo, 'emergency_contact.contact_number')
+                    ?? null
+            )
+        );
+        $emergencyRelation = $this->normalizeEmergencyRelation(
+            $this->cleanStringValue(
+                $personalInfo['emergencyContactRelationship']
+                    ?? $personalInfo['emergency_contact_relationship']
+                    ?? $personalInfo['emergencyContactRelation']
+                    ?? $personalInfo['emergency_contact_relation']
+                    ?? data_get($personalInfo, 'emergencyContact.relationship')
+                    ?? data_get($personalInfo, 'emergencyContact.relation')
+                    ?? data_get($personalInfo, 'emergency_contact.relationship')
+                    ?? data_get($personalInfo, 'emergency_contact.relation')
+                    ?? data_get($personalInfo, 'emergency_contact.relationship_name')
+                    ?? data_get($personalInfo, 'emergencyContact.relationshipName')
+                    ?? data_get($personalInfo, 'emergencyContactRelationship.name')
+                    ?? data_get($personalInfo, 'emergency_contact_relationship.name')
+                    ?? null
+            )
         );
 
-        if (! $emergencyPerson && ! $emergencyNumber) {
+        if (! $emergencyPerson && ! $emergencyNumber && ! $emergencyRelation) {
             return;
         }
 
         $medicalHistory = MedicalHistory::firstOrNew(['patient_id' => $patient->id]);
+        $currentRelation = strtolower(trim((string) ($medicalHistory->emergency_relation ?? '')));
+        $hasPlaceholderRelation = in_array($currentRelation, ['', 'not specified', '(not specified)', 'n/a', 'na'], true);
 
         if ($emergencyPerson && empty($medicalHistory->emergency_person)) {
             $medicalHistory->emergency_person = $emergencyPerson;
@@ -220,6 +254,10 @@ class HomepageController extends Controller
 
         if ($emergencyNumber && empty($medicalHistory->emergency_number)) {
             $medicalHistory->emergency_number = $emergencyNumber;
+        }
+
+        if ($emergencyRelation && $hasPlaceholderRelation) {
+            $medicalHistory->emergency_relation = $emergencyRelation;
         }
 
         if (! $medicalHistory->exists && empty($medicalHistory->emergency_relation)) {
@@ -281,6 +319,46 @@ class HomepageController extends Controller
         $cleaned = trim((string) $value);
 
         return $cleaned !== '' ? $cleaned : null;
+    }
+
+    private function normalizePhilippineMobile(?string $value): ?string
+    {
+        $digits = preg_replace('/\D+/', '', (string) $value) ?? '';
+
+        if ($digits === '') {
+            return null;
+        }
+
+        if (str_starts_with($digits, '63') && strlen($digits) === 12) {
+            $digits = '0' . substr($digits, 2);
+        } elseif (str_starts_with($digits, '9') && strlen($digits) === 10) {
+            $digits = '0' . $digits;
+        }
+
+        if (! preg_match('/^09\d{9}$/', $digits)) {
+            return null;
+        }
+
+        return $digits;
+    }
+
+    private function normalizeEmergencyRelation(?string $value): ?string
+    {
+        $normalized = strtolower(trim((string) $value));
+
+        return match ($normalized) {
+            'mother', 'mom', 'mama', 'nanay' => 'Mother',
+            'father', 'dad', 'papa', 'tatay' => 'Father',
+            'sibling', 'brother', 'sister', 'kapatid' => 'Sibling',
+            'guardian' => 'Guardian',
+            'spouse', 'wife', 'husband', 'asawa' => 'Spouse',
+            'grandparent', 'grandmother', 'grandfather', 'lola', 'lolo' => 'Grandparent',
+            'aunt', 'tiya', 'tita' => 'Aunt',
+            'uncle', 'tiyo', 'tito' => 'Uncle',
+            'cousin', 'pinsan' => 'Cousin',
+            'child', 'son', 'daughter', 'anak' => 'Child',
+            default => null,
+        };
     }
 
     private function formatStudentAddress(array $addresses): ?string

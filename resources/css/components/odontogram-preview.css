@@ -12,37 +12,42 @@
 .odontogram-preview-head {
     padding: .75rem 1rem;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 1rem;
     border-bottom: 1px solid var(--border);
 }
 
+.odontogram-preview-head > div {
+    min-width: 0;
+}
+
 .odontogram-preview-subtitle {
-    margin: .2rem 0 0;
+    margin: 0;
     color: var(--text-2);
     font-size: .76rem;
     font-weight: 650;
 }
 
-.odontogram-preview-stage {
-    position: relative;
-    width: 100%;
-    min-width: 0;
-    height: 360px;
-    overflow: hidden;
-    background: var(--surface);
+.odontogram-preview-head-edit-btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    box-shadow: var(--shadow-lg);
 }
 
 .odontogram-preview-canvas {
     width: 100%;
     height: 100%;
     min-height: 360px;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .odontogram-preview-canvas canvas {
     width: 100% !important;
     height: 100% !important;
+    max-width: 100% !important;
     display: block;
 }
 
@@ -356,5 +361,17 @@
 
     .odontogram-preview-panel-empty {
         min-height: 300px;
+    }
+}
+
+@media (max-width: 640px) {
+    .odontogram-preview-head {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .odontogram-preview-head-edit-btn {
+        width: 100%;
+        justify-content: center;
     }
 }

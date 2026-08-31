@@ -507,7 +507,18 @@
 #canvas-container {
     position: relative;
     flex: 1;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
     min-height: 520px;
+    overflow: hidden;
+}
+
+#canvas-container canvas {
+    display: block;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
 }
 
 #canvas-container:active {
@@ -1887,12 +1898,14 @@ body.layout-no-sidebar #mainContent.odontogram-page {
 }
 
 .odontogram-left-panel {
-    overflow: visible;
+    overflow: hidden;
     box-shadow: none;
 }
 
 .odontogram-left-panel>.card-body {
     padding: 1rem;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .odontogram-patient-card {

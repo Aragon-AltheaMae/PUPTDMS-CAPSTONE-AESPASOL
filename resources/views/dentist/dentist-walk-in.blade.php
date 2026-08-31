@@ -549,6 +549,7 @@
     let selectedWalkInPatient = null;
     let selectedPatientBookingInformation = null;
     let patientHasExistingBookingInformation = false;
+    let patientHasAnyAutofillData = false;
     let patientHasReusableSignature = false;
     let patientExistingSignatureUrl = '';
     let formIsDirty = false;
@@ -624,6 +625,43 @@
             'input[name="guest_is_pwd"]'
         );
     const walkInPatientGroup = document.querySelector('[data-walkin-patient-group]');
+    const emergencyPersonField = document.getElementById("emergency_person");
+    const emergencyNumberField = document.getElementById("emergency_number");
+    const emergencyRelationField = document.getElementById("emergency_relation");
+
+    function setEmergencyContactFieldLockState({
+        lockPerson = false,
+        lockNumber = false,
+        lockRelation = false,
+    } = {}) {
+        if (emergencyPersonField) {
+            emergencyPersonField.readOnly = lockPerson;
+            emergencyPersonField.dataset.autofilled = lockPerson ? "1" : "0";
+        }
+
+        if (emergencyNumberField) {
+            emergencyNumberField.readOnly = lockNumber;
+            emergencyNumberField.dataset.autofilled = lockNumber ? "1" : "0";
+        }
+
+        if (emergencyRelationField) {
+            emergencyRelationField.dataset.autofilled = lockRelation ? "1" : "0";
+
+            const relationWrapper =
+                emergencyRelationField.closest(
+                    ".custom-select"
+                );
+
+            relationWrapper?.classList.toggle(
+                "is-autofilled",
+                lockRelation
+            );
+
+            window.syncCustomSelect?.(
+                relationWrapper
+            );
+        }
+    }
 
     function setGuestFieldsEnabled(enabled) {
         const guestFields = [
@@ -955,6 +993,9 @@
         patientHasExistingBookingInformation =
             false;
 
+        patientHasAnyAutofillData =
+            false;
+
         patientHasReusableSignature =
             false;
 
@@ -965,6 +1006,7 @@
                 reusable: false,
                 url: '',
             });
+        setEmergencyContactFieldLockState();
 
         updateWomenSection(null);
 
@@ -1059,6 +1101,7 @@
         guestPanel?.classList.toggle("active", isGuest);
 
         setGuestFieldsEnabled(isGuest);
+        setEmergencyContactFieldLockState();
 
         if (isGuest && shouldClearSelected) {
             clearSelectedPatientUI({
@@ -1290,6 +1333,21 @@
             selectedWalkInPatient.address =
                 data.contact.address || "";
         }
+
+        setEmergencyContactFieldLockState({
+            lockPerson: Boolean(
+                patientModeInput?.value === "existing" &&
+                String(data?.medical?.emergency_person || "").trim()
+            ),
+            lockNumber: Boolean(
+                patientModeInput?.value === "existing" &&
+                String(data?.medical?.emergency_number || "").trim()
+            ),
+            lockRelation: Boolean(
+                patientModeInput?.value === "existing" &&
+                String(data?.medical?.emergency_relation || "").trim()
+            ),
+        });
     }
 
     async function loadPatientBookingInformation(
@@ -1337,6 +1395,12 @@
                     data.has_existing_booking_information
                 );
 
+            patientHasAnyAutofillData =
+                Boolean(
+                    data.has_autofill_data ??
+                    data.has_existing_booking_information
+                );
+
             patientHasReusableSignature =
                 Boolean(
                     data.has_reusable_signature
@@ -1368,6 +1432,9 @@
                 null;
 
             patientHasExistingBookingInformation =
+                false;
+
+            patientHasAnyAutofillData =
                 false;
 
             patientHasReusableSignature =
@@ -1459,12 +1526,14 @@
         );
 
         if (
-            patientHasExistingBookingInformation
+            patientHasAnyAutofillData
         ) {
             window.showToast?.({
                 type: 'success',
                 title: 'Patient Information Loaded',
-                message: 'The saved dental and medical history will be reused.',
+                message: patientHasExistingBookingInformation
+                    ? 'The patient\'s saved dental and medical history were reused in the walk-in form.'
+                    : 'Available patient information was loaded.',
             });
         }
 
@@ -4490,6 +4559,9 @@ ${summaryCard(
     }
 
     emergencyNumber?.addEventListener("input", (e) => {
+        if (e.target.readOnly) {
+            return;
+        }
 
         let digits = e.target.value.replace(/\D/g, "");
 

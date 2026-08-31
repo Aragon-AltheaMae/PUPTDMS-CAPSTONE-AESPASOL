@@ -392,14 +392,14 @@
                         </div>
 
                         <div class="quick-actions-list">
-                            <a href="{{ route('admin.reports') }}" class="quick-action quick-action-card">
+                            <a href="{{ route('admin.reports.ai-generated') }}" class="quick-action quick-action-card">
                                 <span class="quick-action-icon">
                                     <i class="fa-solid fa-chart-column"></i>
                                 </span>
 
                                 <span class="quick-action-copy">
-                                    <span class="quick-action-title">Reports</span>
-                                    <span class="quick-action-sub">View analytics and summaries</span>
+                                    <span class="quick-action-title">AI Reports</span>
+                                    <span class="quick-action-sub">View AI-generated analytics and summaries</span>
                                 </span>
 
                                 <i class="fa-solid fa-chevron-right quick-action-arrow"></i>
