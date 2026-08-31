@@ -144,6 +144,125 @@ class ReservedBookingPeriodFeatureTest extends TestCase
         ]);
     }
 
+    public function test_reserved_period_actions_use_the_granular_clinic_schedule_permissions(): void
+    {
+        $role = Role::create([
+            'name' => 'Admin',
+            'slug' => 'admin',
+        ]);
+
+        $permissions = collect([
+            'view_clinic_schedule' => 'View Schedule and Dates',
+            'create_clinic_schedule' => 'Create Clinic Hours',
+            'update_clinic_schedule' => 'Update Clinic Hours',
+            'delete_clinic_schedule' => 'Delete Clinic Hours',
+        ])->mapWithKeys(function (string $name, string $slug) {
+            $permission = Permission::create([
+                'name' => $name,
+                'slug' => $slug,
+                'module' => 'Clinic Schedule',
+            ]);
+
+            return [$slug => $permission];
+        });
+
+        $role->permissions()->attach($permissions['view_clinic_schedule']);
+
+        $admin = User::create([
+            'name' => 'Granular Schedule Admin',
+            'email' => 'granular-schedule-admin@example.com',
+            'password' => bcrypt('password'),
+            'role_id' => $role->id,
+            'status' => 'active',
+        ]);
+
+        $this->actingAs($admin)
+            ->withSession(['role' => 'admin'])
+            ->get(route('admin.clinic_schedule'))
+            ->assertOk()
+            ->assertSee('Reserved Booking Periods')
+            ->assertDontSee('>Add Period<', false)
+            ->assertDontSee('aria-label="Edit reserved period"', false)
+            ->assertDontSee('aria-label="Remove reserved period"', false);
+
+        $this->actingAs($admin)
+            ->withSession(['role' => 'admin'])
+            ->post(
+                route('admin.clinic_schedule.reserved_periods.store'),
+                $this->studentPayload()
+            )
+            ->assertForbidden();
+
+        $role->permissions()->attach($permissions['create_clinic_schedule']);
+
+        $this->actingAs($admin)
+            ->withSession(['role' => 'admin'])
+            ->post(
+                route('admin.clinic_schedule.reserved_periods.store'),
+                $this->studentPayload()
+            )
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        $period = ReservedBookingPeriod::firstOrFail();
+
+        $role->permissions()->detach($permissions['create_clinic_schedule']);
+        $role->permissions()->attach($permissions['update_clinic_schedule']);
+
+        $this->actingAs($admin)
+            ->withSession(['role' => 'admin'])
+            ->get(route('admin.clinic_schedule'))
+            ->assertOk()
+            ->assertSee('aria-label="Edit reserved period"', false)
+            ->assertDontSee('aria-label="Remove reserved period"', false);
+
+        $this->actingAs($admin)
+            ->withSession(['role' => 'admin'])
+            ->put(
+                route('admin.clinic_schedule.reserved_periods.update', $period),
+                [...$this->studentPayload(), 'title' => 'Permission Updated Period']
+            )
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        $role->permissions()->detach($permissions['update_clinic_schedule']);
+        $role->permissions()->attach($permissions['delete_clinic_schedule']);
+
+        $this->actingAs($admin)
+            ->withSession(['role' => 'admin'])
+            ->get(route('admin.clinic_schedule'))
+            ->assertOk()
+            ->assertDontSee('aria-label="Edit reserved period"', false)
+            ->assertSee('aria-label="Remove reserved period"', false);
+
+        $this->actingAs($admin)
+            ->withSession(['role' => 'admin'])
+            ->delete(route('admin.clinic_schedule.reserved_periods.destroy', $period))
+            ->assertRedirect()
+            ->assertSessionHas('success');
+
+        $this->assertSoftDeleted('reserved_booking_periods', ['id' => $period->id]);
+    }
+
+    public function test_admin_and_dentist_reserved_routes_share_the_clinic_hour_permissions(): void
+    {
+        $expectedMiddleware = [
+            'admin.clinic_schedule.reserved_periods.store' => 'permission:create_clinic_schedule',
+            'admin.clinic_schedule.reserved_periods.update' => 'permission:update_clinic_schedule',
+            'admin.clinic_schedule.reserved_periods.destroy' => 'permission:delete_clinic_schedule',
+            'dentist.dentist.clinic_schedule.reserved_periods.store' => 'permission:create_clinic_schedule',
+            'dentist.dentist.clinic_schedule.reserved_periods.update' => 'permission:update_clinic_schedule',
+            'dentist.dentist.clinic_schedule.reserved_periods.destroy' => 'permission:delete_clinic_schedule',
+        ];
+
+        foreach ($expectedMiddleware as $routeName => $middleware) {
+            $route = app('router')->getRoutes()->getByName($routeName);
+
+            $this->assertNotNull($route);
+            $this->assertContains($middleware, $route->gatherMiddleware());
+        }
+    }
+
     public function test_admin_and_dentist_can_render_the_shared_reserved_period_setup(): void
     {
         foreach (['admin', 'dentist'] as $roleSlug) {
