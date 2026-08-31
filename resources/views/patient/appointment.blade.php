@@ -351,18 +351,18 @@ $appt->procedure?->prescriptions
                 </div>
 
                 <div class="appt-quick-actions">
-                    <a href="{{ route('patient.book.appointment') }}" class="ui-btn ui-btn-secondary ui-btn-block">
+                    <a href="{{ route('patient.book.appointment') }}" class="ui-btn ui-btn-secondary ">
                         <i class="fa-solid fa-calendar-plus"></i>
                         <span>Rebook Appointment</span>
                     </a>
 
-                    <button type="button" class="ui-btn ui-btn-secondary ui-btn-block"
+                    <button type="button" class="ui-btn ui-btn-secondary "
                         onclick="apptShowPast(); document.getElementById('apptPastPanel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });">
                         <i class="fa-solid fa-clock-rotate-left"></i>
                         <span>View Past Visits</span>
                     </button>
 
-                    <button type="button" class="ui-btn ui-btn-secondary ui-btn-block"
+                    <button type="button" class="ui-btn ui-btn-secondary "
                         onclick="scrollToAppointmentCalendar()">
                         <i class="fa-solid fa-calendar-days"></i>
                         <span>Focus Calendar</span>

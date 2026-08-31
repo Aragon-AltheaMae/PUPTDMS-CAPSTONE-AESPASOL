@@ -1200,7 +1200,7 @@
             panelFoot.classList.remove('hidden');
             panelFoot.classList.add('flex');
             panelFoot.innerHTML = `
-                <button type="button" class="ui-btn ui-btn-primary ui-btn-block" onclick="openDentalRecordDetailsModal()">
+                <button type="button" class="ui-btn ui-btn-primary " onclick="openDentalRecordDetailsModal()">
                     <i class="fa-solid fa-eye"></i>
                     <span>View Record Details</span>
                 </button>`;

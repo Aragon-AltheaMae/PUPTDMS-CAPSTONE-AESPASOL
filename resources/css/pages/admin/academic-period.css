@@ -505,11 +505,6 @@
     }
 }
 
-[data-theme="dark"] #mainContent.academic-period-page,
-.dark #mainContent.academic-period-page {
-    background: #020c16 !important;
-}
-
 [data-theme="dark"] .active-banner {
     background: linear-gradient(145deg, rgba(22, 27, 34, .90), rgba(13, 17, 23, .82)) !important;
     border-color: rgba(255, 255, 255, .10) !important;
@@ -570,12 +565,6 @@
 
 .academic-period-page .admin-page-container {
     max-width: 100%;
-}
-
-[data-theme="dark"] #mainContent.academic-period-page,
-.dark #mainContent.academic-period-page {
-    background: #0d0f12 !important;
-    color: #E5E7EB !important;
 }
 
 [data-theme="dark"] .academic-period-page .active-banner,
@@ -647,13 +636,6 @@
     }
 }
 
-[data-theme="dark"] #addModal .ap-add-body,
-[data-theme="dark"] #editModal .ap-add-body,
-.dark #addModal .ap-add-body,
-.dark #editModal .ap-add-body {
-    background: #0c111b !important;
-}
-
 [data-theme="dark"] #addModal .ap-panel-soft,
 [data-theme="dark"] #editModal .ap-panel-soft,
 .dark #addModal .ap-panel-soft,
@@ -691,12 +673,6 @@
     color: #E5E7EB !important;
 }
 
-[data-theme="dark"] #mainContent.academic-period-page,
-.dark #mainContent.academic-period-page {
-    background: #0d0f12 !important;
-    color: #E5E7EB !important;
-}
-
 [data-theme="dark"] #mainContent.academic-period-page #liveAmPm,
 [data-theme="dark"] #mainContent.academic-period-page #liveDay,
 .dark #mainContent.academic-period-page #liveAmPm,
@@ -707,13 +683,6 @@
 [data-theme="dark"] #mainContent.academic-period-page #liveDate,
 .dark #mainContent.academic-period-page #liveDate {
     color: #E5E7EB !important;
-}
-
-[data-theme="dark"] #addModal .ap-add-body,
-[data-theme="dark"] #editModal .ap-add-body,
-.dark #addModal .ap-add-body,
-.dark #editModal .ap-add-body {
-    background: #0c111b !important;
 }
 
 [data-theme="dark"] #editModal .ap-panel,

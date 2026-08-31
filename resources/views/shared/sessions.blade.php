@@ -29,7 +29,7 @@
             <div class="page-banner-inner">
 
                 <div>
-                    <h1 class="page-title page-banner-title">
+                    <h1 class="page-title">
                         Account Sessions
                     </h1>
 

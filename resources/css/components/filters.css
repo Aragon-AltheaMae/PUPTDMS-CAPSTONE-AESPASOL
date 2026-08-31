@@ -101,7 +101,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    color: var(--filter-primary-bg);
+    color: var(--filter-title-text);
 }
 
 .filter-drawer-title h2 {
@@ -109,24 +109,6 @@
     font-size: 1.25rem;
     font-weight: 800;
     line-height: 1.2;
-}
-
-.filter-clear-btn {
-    color: var(--filter-danger-text) !important;
-}
-
-.filter-clear-btn:hover {
-    color: var(--filter-primary-bg-hover) !important;
-}
-
-[data-theme="dark"] .filter-section-title,
-.dark .filter-section-title {
-    color: #F8FAFC !important;
-}
-
-[data-theme="dark"] .filter-soft-divider,
-.dark .filter-soft-divider {
-    background: #30363D !important;
 }
 
 [data-theme="dark"] .filter-date-input-wrap input,
@@ -257,51 +239,82 @@
     color: var(--filter-chip-hover-text) !important;
 }
 
+.filter-drawer-wrapper .choice-chip:has(input:checked),
 .filter-drawer-wrapper .ftag.ftag-active,
-.filter-drawer-wrapper .quick-date-chip.active,
-#filterModal .choice-chip:has(input:checked),
-#filterPanel .ftag.ftag-active,
-#filterPanel .quick-date-chip.active,
-#filterPanel .choice-chip:has(input:checked) {
-    background: var(--filter-chip-active-bg) !important;
-    border-color: var(--filter-chip-active-border) !important;
-    color: var(--filter-chip-active-text) !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45) !important;
+.filter-drawer-wrapper .quick-date-chip.active {
+    background:
+        var(--filter-chip-active-bg) !important;
+
+    border-color:
+        var(--filter-chip-active-border) !important;
+
+    color:
+        var(--filter-chip-active-text) !important;
+
+    box-shadow:
+        inset 0 1px 0 var(--alpha-white-12) !important;
 }
 
-#filterModal .choice-chip .chip-radio,
-#filterModal .choice-chip input[type="radio"].chip-radio {
+.filter-drawer-wrapper .choice-chip .chip-radio,
+.filter-drawer-wrapper .choice-chip input[type="radio"].chip-radio {
     appearance: none !important;
     -webkit-appearance: none !important;
+
     width: 14px !important;
     height: 14px !important;
+
     min-width: 14px !important;
     min-height: 14px !important;
+
     max-width: 14px !important;
     max-height: 14px !important;
+
     flex: 0 0 14px !important;
+
     margin: 0 !important;
     padding: 0 !important;
-    border-radius: 999px !important;
-    background: transparent !important;
+
     display: inline-grid !important;
     place-content: center !important;
-}
 
-#filterModal .choice-chip .chip-radio::before,
-#filterModal .choice-chip input[type="radio"].chip-radio::before {
-    content: "" !important;
-    width: 8px !important;
-    height: 8px !important;
+    border:
+        2px solid var(--filter-chip-border) !important;
+
     border-radius: 999px !important;
-    background: #e17e7e !important;
-    transform: scale(0) !important;
-    transition: transform .14s ease !important;
+
+    background:
+        transparent !important;
 }
 
-#filterModal .choice-chip .chip-radio:checked::before,
-#filterModal .choice-chip input[type="radio"].chip-radio:checked::before {
-    transform: scale(1) !important;
+.filter-drawer-wrapper .choice-chip .chip-radio::before,
+.filter-drawer-wrapper .choice-chip input[type="radio"].chip-radio::before {
+    content: "";
+
+    width: 6px !important;
+    height: 6px !important;
+
+    border-radius: 999px !important;
+
+    background:
+        var(--filter-chip-active-text) !important;
+
+    transform:
+        scale(0);
+
+    transition:
+        transform .14s ease;
+}
+
+.filter-drawer-wrapper .choice-chip .chip-radio:checked,
+.filter-drawer-wrapper .choice-chip input[type="radio"].chip-radio:checked {
+    border-color:
+        var(--filter-chip-active-text) !important;
+}
+
+.filter-drawer-wrapper .choice-chip .chip-radio:checked::before,
+.filter-drawer-wrapper .choice-chip input[type="radio"].chip-radio:checked::before {
+    transform:
+        scale(1);
 }
 
 #filterModal .choice-chip:has(input:disabled) {
@@ -348,15 +361,6 @@
     font-size: 13px !important;
     pointer-events: none !important;
     z-index: 2 !important;
-}
-
-.filter-drawer-wrapper .filter-clear-btn {
-    color: var(--filter-danger-text) !important;
-    font-weight: 900 !important;
-}
-
-.filter-drawer-wrapper .filter-clear-btn:hover {
-    color: var(--filter-primary-bg-hover) !important;
 }
 
 .btn-clear-filter {

@@ -2071,16 +2071,6 @@
         padding: 0 !important;
     }
 
-    #mainContent.shared-appointments-page.admin-appointments-view .view-toggle-container[data-global-view-toggle] {
-        width: 88px !important;
-        min-width: 88px !important;
-        max-width: 88px !important;
-
-        flex: 0 0 88px !important;
-
-        margin: 0 !important;
-    }
-
     #mainContent.shared-appointments-page.admin-appointments-view.mode-list .desktop-appointments-table {
         display: block !important;
     }

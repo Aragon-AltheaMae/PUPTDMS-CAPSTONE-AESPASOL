@@ -1094,107 +1094,6 @@
     border-color: rgba(245, 158, 11, .24);
 }
 
-@media (max-width: 640px) {
-    .calendar-main-header {
-        gap: .5rem;
-    }
-
-    .dashboard-calendar-shell .calendar-split-picker {
-        width: min(100%, 190px);
-    }
-
-    .dashboard-calendar-shell .calendar-split-picker .custom-select-button {
-        min-height: 42px;
-
-        grid-template-columns:
-            20px minmax(0, 1fr) 20px;
-
-        gap: 6px;
-
-        padding: 0 .7rem;
-
-        font-size: .76rem;
-    }
-
-    .dashboard-calendar-shell .calendar-split-picker .custom-select-button .calendar-picker-icon {
-        width: 20px;
-        height: 20px;
-
-        font-size: .7rem;
-    }
-
-    .dashboard-calendar-shell .calendar-split-picker .custom-select-button>i {
-        width: 20px;
-    }
-
-    .calendar-split-picker {
-        grid-template-columns:
-            minmax(0, 1fr) minmax(0, .72fr);
-
-        gap: .55rem;
-    }
-
-    .calendar-split-picker-item:first-child,
-    .calendar-year-picker-wrap {
-        min-width: 0;
-    }
-
-    .calendar-split-picker .custom-select-button {
-        min-height: 44px;
-        padding-left: .75rem;
-        padding-right: .75rem;
-    }
-
-    .dashboard-calendar-filters {
-        width: 100%;
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: .32rem;
-        overflow: visible;
-        padding-bottom: 0;
-    }
-
-    .dashboard-calendar-filters button {
-        width: 100%;
-        min-width: 0;
-        min-height: 29px;
-
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: .25rem;
-
-        padding: 0 .32rem;
-
-        font-size: .58rem;
-        line-height: 1;
-        white-space: nowrap;
-
-        border-radius: 999px;
-    }
-
-    .dashboard-calendar-filters button i {
-        font-size: .56rem;
-        flex: 0 0 auto;
-    }
-}
-
-@media (max-width: 380px) {
-    .dashboard-calendar-filters {
-        gap: .25rem;
-    }
-
-    .dashboard-calendar-filters button {
-        min-height: 28px;
-        padding-inline: .22rem;
-        font-size: .53rem;
-    }
-
-    .dashboard-calendar-filters button i {
-        font-size: .5rem;
-    }
-}
-
 .dashboard-calendar-shell {
     min-height: 0;
 }
@@ -2096,4 +1995,269 @@
             var(--border));
 
     color: var(--red-300);
+}
+
+@media (max-width: 640px) {
+    .calendar-main-header {
+        gap: .5rem;
+    }
+
+    .dashboard-calendar-shell .calendar-split-picker {
+        width: min(100%, 190px);
+    }
+
+    .dashboard-calendar-shell .calendar-split-picker .custom-select-button {
+        min-height: 42px;
+
+        grid-template-columns:
+            20px minmax(0, 1fr) 20px;
+
+        gap: 6px;
+
+        padding: 0 .7rem;
+
+        font-size: .76rem;
+    }
+
+    .dashboard-calendar-shell .calendar-split-picker .custom-select-button .calendar-picker-icon {
+        width: 20px;
+        height: 20px;
+
+        font-size: .7rem;
+    }
+
+    .dashboard-calendar-shell .calendar-split-picker .custom-select-button>i {
+        width: 20px;
+    }
+
+    .calendar-split-picker {
+        grid-template-columns:
+            minmax(0, 1fr) minmax(0, .72fr);
+
+        gap: .55rem;
+    }
+
+    .calendar-split-picker-item:first-child,
+    .calendar-year-picker-wrap {
+        min-width: 0;
+    }
+
+    .calendar-split-picker .custom-select-button {
+        min-height: 44px;
+        padding-left: .75rem;
+        padding-right: .75rem;
+    }
+
+    .dashboard-calendar-filters {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: .32rem;
+        overflow: visible;
+        padding-bottom: 0;
+    }
+
+    .dashboard-calendar-filters button {
+        width: 100%;
+        min-width: 0;
+        min-height: 29px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .25rem;
+
+        padding: 0 .32rem;
+
+        font-size: .58rem;
+        line-height: 1;
+        white-space: nowrap;
+
+        border-radius: 999px;
+    }
+
+    .dashboard-calendar-filters button i {
+        font-size: .56rem;
+        flex: 0 0 auto;
+    }
+}
+
+@media (max-width: 767px) {
+
+    .cal-shell {
+        min-height: 0 !important;
+
+        padding: clamp(.75rem, 3vw, 1rem) !important;
+
+        border-radius: 16px;
+
+        margin-top: .75rem;
+    }
+
+    .calendar-main-header {
+        grid-template-columns:
+            auto minmax(0, 1fr) auto;
+
+        gap: .45rem;
+
+        margin-bottom: .7rem;
+    }
+
+    .cal-shell .ui-action-btn {
+        --ui-action-size: clamp(30px, 8.5vw, 34px);
+
+        border-radius: 10px;
+    }
+
+    .cal-shell .ui-action-btn i {
+        font-size: 10px;
+    }
+
+    .cal-month-label {
+        font-size: .92rem !important;
+        line-height: 1.05 !important;
+    }
+
+    .calendar-year-label {
+        margin-top: .12rem !important;
+
+        font-size: .58rem !important;
+        line-height: 1 !important;
+    }
+
+    .cal-shell hr {
+        margin-top: .55rem !important;
+        margin-bottom: .55rem !important;
+    }
+
+    .cal-grid {
+        gap: 1px !important;
+    }
+
+    .cal-grid>.cal-day-label,
+    .cal-grid>.cal-day-weekend {
+        padding-top: .2rem !important;
+        padding-bottom: .35rem !important;
+
+        font-size: .52rem !important;
+        letter-spacing: .08em !important;
+    }
+
+    .cal-cell-wrap {
+        height: clamp(36px, 10vw, 40px);
+        min-height: clamp(36px, 10vw, 40px);
+
+        padding: 1px 0;
+    }
+
+    .cal-cell {
+        width: clamp(30px, 8.7vw, 34px);
+        height: clamp(30px, 8.7vw, 34px);
+
+        border-radius: 10px;
+
+        font-size: clamp(.7rem, 3.2vw, .8rem);
+    }
+
+    .cal-cell-wrap .absolute.-top-1.-right-1 {
+        transform: scale(.82);
+        transform-origin: center;
+    }
+
+    .cal-legend {
+        margin-top: .55rem;
+        padding-top: .55rem;
+
+        gap: .3rem .35rem;
+    }
+
+    .cal-pill {
+        gap: .3rem !important;
+
+        padding:
+            .28rem .52rem !important;
+
+        font-size: .6rem !important;
+    }
+
+    .cal-pill i {
+        font-size: .58rem !important;
+    }
+}
+
+@media (max-width: 390px) {
+
+    .cal-shell {
+        padding: .7rem !important;
+    }
+
+    .calendar-main-header {
+        gap: .3rem;
+
+        margin-bottom: .6rem;
+    }
+
+    .cal-shell .ui-action-btn {
+        --ui-action-size: 30px;
+
+        border-radius: 9px;
+    }
+
+    .cal-month-label {
+        font-size: .86rem !important;
+    }
+
+    .calendar-year-label {
+        font-size: .54rem !important;
+    }
+
+    .cal-cell-wrap {
+        height: 35px;
+        min-height: 35px;
+    }
+
+    .cal-cell {
+        width: 30px;
+        height: 30px;
+
+        border-radius: 9px;
+
+        font-size: .7rem;
+    }
+
+    .cal-grid>.cal-day-label,
+    .cal-grid>.cal-day-weekend {
+        font-size: .48rem !important;
+    }
+
+    .cal-legend {
+        gap: .26rem;
+    }
+
+    .cal-pill {
+        padding:
+            .25rem .45rem !important;
+
+        font-size: .55rem !important;
+    }
+
+    .cal-pill i {
+        font-size: .52rem !important;
+    }
+}
+
+@media (max-width: 380px) {
+    .dashboard-calendar-filters {
+        gap: .25rem;
+    }
+
+    .dashboard-calendar-filters button {
+        min-height: 28px;
+        padding-inline: .22rem;
+        font-size: .53rem;
+    }
+
+    .dashboard-calendar-filters button i {
+        font-size: .5rem;
+    }
 }

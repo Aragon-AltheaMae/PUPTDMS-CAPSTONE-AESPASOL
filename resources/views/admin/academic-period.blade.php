@@ -169,7 +169,7 @@ $createAcademicPeriodUnauthorizedMessage = 'You are not authorized to add academ
 
                         <button type="button" id="manageActivePeriodBtn"
                             onclick='@if ($activePeriodPayload) openEditModal(@json($activePeriodPayload)) @endif'
-                            class="ui-btn ui-btn-primary ui-btn-block">
+                            class="ui-btn ui-btn-primary ">
                             <i class="fa-solid fa-gear"></i>
                             <span>Manage Period</span>
                         </button>
@@ -602,7 +602,7 @@ $createAcademicPeriodUnauthorizedMessage = 'You are not authorized to add academ
 
                         <div class="ap-calendar-footer">
                             <a href="https://www.pup.edu.ph/calendar/" target="_blank" rel="noopener noreferrer"
-                                class="ui-btn ui-btn-secondary ui-btn-block">
+                                class="ui-btn ui-btn-secondary">
 
                                 <i class="fa-solid fa-arrow-up-right-from-square"></i>
 
