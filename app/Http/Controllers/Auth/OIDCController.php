@@ -530,14 +530,23 @@ class OIDCController extends Controller
 
     private function clinicalLandingRoute(User $user): ?string
     {
-        foreach ([
-            'access_dentist_dashboard' => 'dentist.dentist.dashboard',
-            'manage_appointments' => 'dentist.dentist.appointments',
-            'manage_patient_profiles' => 'dentist.dentist.patients',
-            'manage_document_requests' => 'dentist.dentist.documentrequests',
-            'manage_inventory' => 'dentist.dentist.inventory',
-            'manage_reports' => 'dentist.dentist.report',
-        ] as $permission => $route) {
+        foreach (
+            [
+                'access_dentist_dashboard' => 'dentist.dentist.dashboard',
+                'view_appointments' => 'dentist.dentist.appointments',
+                'manage_walk_in_patients' => 'dentist.walk-in.index',
+                'manage_existing_records' => 'dentist.existing-record.index',
+                'view_clinic_schedule' => 'dentist.dentist.clinic_schedule',
+                'view_patient_profiles' => 'dentist.dentist.patients',
+                'view_document_requests' => 'dentist.dentist.documentrequests',
+                'view_inventory' => 'dentist.dentist.inventory',
+                'add_inventory' => 'dentist.dentist.inventory',
+                'update_inventory' => 'dentist.dentist.inventory',
+                'delete_inventory' => 'dentist.dentist.inventory',
+                'view_reports' => 'dentist.dentist.report',
+                'create_report_files' => 'dentist.dentist.report',
+            ] as $permission => $route
+        ) {
             if ($user->hasPermission($permission)) {
                 return $route;
             }
@@ -557,7 +566,7 @@ class OIDCController extends Controller
         ?Faculty $facultyAccess
     ): Patient {
         $phone = $this->extractStudentPhone($studentData);
-        $facultyCode = null;
+        $facultyCode = $patient?->faculty_code;
         $studentNo = $this->extractStudentNumber($studentData) ?: $patient?->student_no;
         $programCode = $this->extractStudentProgramCode($studentData) ?: $patient?->course_code;
         $programName = $this->extractStudentProgramName($studentData) ?: $patient?->course_name;
@@ -746,6 +755,36 @@ class OIDCController extends Controller
             'address' => $address,
         ]);
 
+        $existingClassification = strtolower(trim((string) (
+            $patient?->classification ?? ''
+        )));
+
+        $classification = 'dependent_alumni';
+
+        if (
+            $facultyAccess ||
+            filled($facultyCode)
+        ) {
+            $classification = 'faculty';
+        } elseif (filled($studentNo)) {
+            $classification = 'student';
+        } elseif ($assignedAccess) {
+            $classification = 'administrative';
+        } elseif (
+            in_array(
+                $existingClassification,
+                [
+                    'student',
+                    'faculty',
+                    'administrative',
+                    'dependent_alumni',
+                ],
+                true
+            )
+        ) {
+            $classification = $existingClassification;
+        }
+
         $user->phone = $phone ?: $user->phone;
         $user->birthdate = $birthdate ?: $user->birthdate;
         $user->gender = $gender ?: $user->gender;
@@ -770,6 +809,7 @@ class OIDCController extends Controller
                 $patient->weight_kg = $weightKg ?? $patient->weight_kg;
             }
             $patient->faculty_code = $facultyCode ?: $patient->faculty_code;
+            $patient->classification = $classification;
             $patient->student_no = $studentNo ?: $patient->student_no;
             $patient->course_code = $programCode ?: $patient->course_code;
             $patient->course_name = $programName ?: $patient->course_name;
@@ -798,6 +838,7 @@ class OIDCController extends Controller
             'gender' => $gender,
             'password' => Hash::make(Str::random(16)),
             'faculty_code' => $facultyCode,
+            'classification' => $classification,
             'student_no' => $studentNo,
             'course_code' => $programCode,
             'course_name' => $programName,
@@ -1009,17 +1050,46 @@ class OIDCController extends Controller
     protected function syncStudentMedicalHistory(Patient $patient, array $personalInfo): void
     {
         $emergencyPerson = $this->cleanStringValue(
-            $personalInfo['emergencyContactName'] ?? $personalInfo['emergency_contact_name'] ?? null
+            $personalInfo['emergencyContactName']
+                ?? $personalInfo['emergency_contact_name']
+                ?? data_get($personalInfo, 'emergencyContact.name')
+                ?? data_get($personalInfo, 'emergency_contact.name')
+                ?? data_get($personalInfo, 'emergency_contact.contact_name')
+                ?? data_get($personalInfo, 'emergencyContact.contactName')
+                ?? null
         );
         $emergencyNumber = $this->cleanStringValue(
-            $personalInfo['emergencyContactNumber'] ?? $personalInfo['emergency_contact_number'] ?? null
+            $personalInfo['emergencyContactNumber']
+                ?? $personalInfo['emergency_contact_number']
+                ?? data_get($personalInfo, 'emergencyContact.number')
+                ?? data_get($personalInfo, 'emergencyContact.contactNumber')
+                ?? data_get($personalInfo, 'emergency_contact.number')
+                ?? data_get($personalInfo, 'emergency_contact.contact_number')
+                ?? null
+        );
+        $emergencyRelation = $this->cleanStringValue(
+            $personalInfo['emergencyContactRelationship']
+                ?? $personalInfo['emergency_contact_relationship']
+                ?? $personalInfo['emergencyContactRelation']
+                ?? $personalInfo['emergency_contact_relation']
+                ?? data_get($personalInfo, 'emergencyContact.relationship')
+                ?? data_get($personalInfo, 'emergencyContact.relation')
+                ?? data_get($personalInfo, 'emergency_contact.relationship')
+                ?? data_get($personalInfo, 'emergency_contact.relation')
+                ?? data_get($personalInfo, 'emergency_contact.relationship_name')
+                ?? data_get($personalInfo, 'emergencyContact.relationshipName')
+                ?? data_get($personalInfo, 'emergencyContactRelationship.name')
+                ?? data_get($personalInfo, 'emergency_contact_relationship.name')
+                ?? null
         );
 
-        if (! $emergencyPerson && ! $emergencyNumber) {
+        if (! $emergencyPerson && ! $emergencyNumber && ! $emergencyRelation) {
             return;
         }
 
         $medicalHistory = MedicalHistory::firstOrNew(['patient_id' => $patient->id]);
+        $currentRelation = strtolower(trim((string) ($medicalHistory->emergency_relation ?? '')));
+        $hasPlaceholderRelation = in_array($currentRelation, ['', 'not specified', '(not specified)', 'n/a', 'na'], true);
 
         if ($emergencyPerson && empty($medicalHistory->emergency_person)) {
             $medicalHistory->emergency_person = $emergencyPerson;
@@ -1027,6 +1097,10 @@ class OIDCController extends Controller
 
         if ($emergencyNumber && empty($medicalHistory->emergency_number)) {
             $medicalHistory->emergency_number = $emergencyNumber;
+        }
+
+        if ($emergencyRelation && $hasPlaceholderRelation) {
+            $medicalHistory->emergency_relation = $emergencyRelation;
         }
 
         if (! $medicalHistory->exists && empty($medicalHistory->emergency_relation)) {

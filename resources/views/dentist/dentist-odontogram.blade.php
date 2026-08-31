@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('layout-role', 'dentist')
+@section('layout-role', $layoutRole ?? 'dentist')
 
 @section('hide-sidebar')
 @endsection
@@ -10,12 +10,17 @@
 
 @section('title', 'Patient Odontogram')
 
+@section('styles')
+@vite('resources/css/pages/dentist/odontogram.css')
+@endsection
+
 @section('content')
 
 @php
 use Carbon\Carbon;
 
 $existingAppointmentMode = (bool) ($existingAppointmentMode ?? false);
+$savedVisitEditMode = (bool) ($savedVisitEditMode ?? false);
 $patientName = $patient->name ?? 'Unknown Patient';
 $patientAvatarUrl = !empty($patient?->profile_image)
 ? asset('storage/' . $patient->profile_image)
@@ -31,10 +36,6 @@ $appointmentTimeValue = $existingAppointmentMode
 ? data_get($existingAppointmentDraft ?? [], 'appointment_time')
 : $appointment?->appointment_time;
 
-$appointmentStatusValue = $existingAppointmentMode
-? 'Completed Record'
-: ucfirst((string) ($appointment?->status ?? 'Ongoing'));
-
 $formattedAppointmentDate = filled($appointmentDateValue)
 ? Carbon::parse($appointmentDateValue)->format('M d, Y')
 : '—';
@@ -42,8 +43,6 @@ $formattedAppointmentDate = filled($appointmentDateValue)
 $formattedAppointmentTime = filled($appointmentTimeValue)
 ? Carbon::parse($appointmentTimeValue)->format('h:i A')
 : '—';
-
-$today = Carbon::now()->format('F d, Y');
 
 $currentServiceType = $existingAppointmentMode
 ? data_get($existingAppointmentDraft ?? [], 'service_type', '')
@@ -55,20 +54,47 @@ trim((string) $currentServiceType),
 'Oral Prophylaxis'
 ) === 0;
 
-$pageEyebrow =
-$existingAppointmentMode
-? 'Add Existing Appointment'
-: 'Dental Procedure Workspace';
+$entrySource = request()->query('from');
+$isWalkInMode = $entrySource === 'walk-in';
 
-$pageTitle =
-$existingAppointmentMode
-? 'Existing Appointment Odontogram'
-: 'Patient Odontogram';
+$entryContextLabel = $existingAppointmentMode
+? 'Existing Appointment'
+: (
+$savedVisitEditMode
+? 'Saved Visit Record'
+: (
+$isWalkInMode
+? 'Walk-in Visit'
+: null
+)
+);
 
-$pageSubtitle =
-$existingAppointmentMode
-? 'Complete the odontogram and clinical notes for the existing appointment.'
-: '2D / 3D Treatment &amp; Condition Mapping';
+$entryContextMessage = $existingAppointmentMode
+? 'This odontogram is for an existing appointment. Saving it will store the visit as completed.'
+: (
+$savedVisitEditMode
+? 'You are editing a previously saved visit. Any changes here will update the saved odontogram and clinical notes.'
+: (
+$isWalkInMode
+? 'This odontogram is being created for a walk-in visit.'
+: null
+)
+);
+
+$pageEyebrow = $savedVisitEditMode ? 'Saved Dental Record Editor' : 'Dental Procedure Workspace';
+$pageTitle = $savedVisitEditMode ? 'Edit Saved Odontogram' : 'Patient Odontogram';
+$pageSubtitle = '2D / 3D Treatment &amp; Condition Mapping';
+
+$existingProcedureDuration = $existingAppointmentMode
+? data_get($existingAppointmentDraft ?? [], 'procedure_duration_hms', '00:00:00')
+: ($savedVisitEditMode
+? sprintf(
+'%02d:%02d:%02d',
+floor((int) data_get($procedure, 'procedure_duration_seconds', 0) / 3600),
+floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60),
+(int) data_get($procedure, 'procedure_duration_seconds', 0) % 60
+)
+: '00:00:00');
 @endphp
 
 <main id="mainContent" class="odontogram-page">
@@ -80,6 +106,40 @@ $existingAppointmentMode
 
                 <div class="odontogram-hero">
                     <div class="odontogram-hero-main">
+
+                        @if ($entryContextLabel)
+                        <div class="global-info-profile">
+
+                            <span class="global-info-profile-icon">
+                                <i class="fa-solid fa-circle-info"></i>
+                            </span>
+
+                            <div class="global-info-profile-copy">
+
+                                <div class="global-info-group">
+
+                                    <strong class="global-info-profile-name">
+                                        {{ $entryContextLabel }}
+                                    </strong>
+
+                                    @if ($savedVisitEditMode)
+                                    <span class="global-info-pill">
+                                        <i class="fa-solid fa-floppy-disk"></i>
+                                        Saved Record
+                                    </span>
+                                    @endif
+
+                                </div>
+
+                                <span class="global-info-subvalue">
+                                    {{ $entryContextMessage }}
+                                </span>
+
+                            </div>
+
+                        </div>
+                        @endif
+
                         <div class="card hero-title-card">
 
                             <div class="hero-title-icon">
@@ -96,16 +156,18 @@ $existingAppointmentMode
                                 <p class="hero-subtitle">
                                     {!! $pageSubtitle !!}
                                 </p>
+
                             </div>
 
-                            <button type="button" id="cancelProcedureBtn" class="ui-btn ui-btn-danger">
+                            <button type="button" id="cancelProcedureBtn"
+                                class="ui-btn {{ $savedVisitEditMode ? 'ui-btn-primary' : 'ui-btn-danger' }}">
 
                                 <i class="fa-solid fa-xmark"></i>
 
                                 <span>
                                     {{ $existingAppointmentMode
                                     ? 'Cancel Entry'
-                                    : 'Cancel Procedure' }}
+                                    : ($savedVisitEditMode ? 'Cancel Edit' : 'Cancel Procedure') }}
                                 </span>
                             </button>
 
@@ -123,7 +185,7 @@ $existingAppointmentMode
                                         Patient
                                     </span>
 
-                                    <h2 class="odontogram-patient-name">
+                                    <h2 class="odontogram-patient-name" data-patient-name>
                                         {{ $patientName }}
                                     </h2>
 
@@ -174,11 +236,11 @@ $existingAppointmentMode
 
                                     <div>
                                         <span class="odontogram-appointment-meta-label">
-                                            {{ $existingAppointmentMode ? 'Session Timer' : 'Procedure Time' }}
+                                            {{ $existingAppointmentMode ? 'Procedure Duration' : 'Session Timer' }}
                                         </span>
 
                                         <strong id="procedureTimer" class="odontogram-appointment-meta-value">
-                                            00:00:00
+                                            {{ $existingAppointmentMode ? $existingProcedureDuration : '00:00:00' }}
                                         </strong>
                                     </div>
                                 </div>
@@ -223,8 +285,8 @@ $existingAppointmentMode
                             </div>
                         </div>
                     </div>
-
-                    <div id="odontogramToolbarSentinel" class="odontogram-toolbar-sentinel" aria-hidden="true"></div>
+                    <div id="odontogramToolbarSentinel" class="odontogram-toolbar-sentinel" aria-hidden="true">
+                    </div>
                 </div>
 
                 <div class="odontogram-workspace-grid">
@@ -380,7 +442,7 @@ $existingAppointmentMode
 
                                     <textarea id="oralExaminationNotes" rows="4"
                                         class="form-input-custom global-form-textarea"
-                                        placeholder="Record oral examination findings..."></textarea>
+                                        placeholder="Record oral examination findings...">{{ old('oral_examination', $procedure?->oral_examination) }}</textarea>
                                 </div>
 
                                 <div class="global-form-group">
@@ -390,7 +452,7 @@ $existingAppointmentMode
 
                                     <textarea id="diagnosisNotes" rows="4"
                                         class="form-input-custom global-form-textarea"
-                                        placeholder="Record the clinical diagnosis..."></textarea>
+                                        placeholder="Record the clinical diagnosis...">{{ old('diagnosis', $procedure?->diagnosis) }}</textarea>
                                 </div>
 
                                 <div class="global-form-group odontogram-prescription-field">
@@ -403,11 +465,11 @@ $existingAppointmentMode
 
                                     <textarea id="prescriptionsNotes" rows="3"
                                         class="form-input-custom global-form-textarea"
-                                        placeholder="Add medication or aftercare instructions..."></textarea>
+                                        placeholder="Add medication or aftercare instructions...">{{ old('prescriptions', $procedure?->prescriptions) }}</textarea>
                                 </div>
 
                                 <div class="odontogram-procedure-actions">
-                                    @unless ($existingAppointmentMode)
+                                    @unless ($existingAppointmentMode || $savedVisitEditMode)
                                     <button type="button" id="followUpBtn" class="ui-btn ui-btn-warning">
                                         <i class="fa-solid fa-calendar-plus"></i>
                                         <span>Set Follow-Up Appointment</span>
@@ -420,90 +482,16 @@ $existingAppointmentMode
                                         <span>
                                             {{ $existingAppointmentMode
                                             ? 'Save Existing Appointment'
-                                            : 'Finish Procedure' }}
+                                            : ($savedVisitEditMode ? 'Save Changes' : 'Finish Procedure') }}
                                         </span>
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    @if ($existingAppointmentMode)
-                    <div class="odontogram-existing-appointment-panel odontogram-workspace-full">
-                        <section class="card right-section-card">
-                            <div class="right-section-head">
-                                <div>
-                                    <p class="right-section-eyebrow">
-                                        Existing Appointment
-                                    </p>
-
-                                    <h3 class="right-section-title">
-                                        Appointment Details
-                                    </h3>
-                                </div>
-                            </div>
-
-                            <div class="right-section-body existing-appointment-body">
-                                <div class="existing-appointment-intro-card">
-                                    Review the existing appointment details below.
-                                    When you save this odontogram,
-                                    the appointment will be stored as a completed visit
-                                    in the system.
-                                </div>
-
-                                <div class="existing-appointment-grid">
-                                    <div>
-                                        <p class="global-form-label">
-                                            Service Type
-                                        </p>
-
-                                        <div class="existing-appointment-summary-card">
-                                            {{ data_get($existingAppointmentDraft ?? [], 'service_type', '—') }}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <p class="global-form-label">
-                                            Appointment Date
-                                        </p>
-
-                                        <div class="existing-appointment-summary-card">
-                                            {{ data_get($existingAppointmentDraft ?? [], 'appointment_date', '—') }}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <p class="global-form-label">
-                                            Appointment Time
-                                        </p>
-
-                                        <div class="existing-appointment-summary-card">
-                                            {{ data_get($existingAppointmentDraft ?? [], 'appointment_time', '—') }}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <p class="global-form-label">
-                                            Procedure Duration
-                                        </p>
-
-                                        <div class="existing-appointment-summary-card">
-                                            {{ data_get($existingAppointmentDraft ?? [], 'procedure_duration_hms', '—')
-                                            }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-                    </div>
-                    @endif
-
                     <input type="hidden" id="odontogramData" name="odontogram_data" value="[]">
-
-                </div> {{-- odontogram-workspace-grid --}}
-
-            </div> {{-- fade-in --}}
-        </section> {{-- odontogram-dock-main --}}
+                </div>
+        </section>
 
         <div id="legendResizeHandle" class="odontogram-legend-resizer" role="separator" aria-orientation="vertical"
             aria-label="Resize Treatment Legend panel"></div>
@@ -595,7 +583,7 @@ $existingAppointmentMode
     </div>
 </main>
 
-@unless ($existingAppointmentMode)
+@unless ($existingAppointmentMode || $savedVisitEditMode)
 <x-follow-up-modal :patient-name="$patientName" :patient-avatar-url="$patientAvatarUrl"
     :service-type="$currentServiceType ?: '—'" :appointment-date="$formattedAppointmentDate"
     :appointment-time="$formattedAppointmentTime"
@@ -648,7 +636,7 @@ $existingAppointmentMode
 
             <button type="button" id="confirmResetTreatmentBtn" class="ui-btn ui-btn-danger">
                 <i class="fa-solid fa-eraser"></i>
-                <span>Yes, Reset</span>
+                <span>Reset Treatment</span>
             </button>
         </div>
     </div>
@@ -665,10 +653,12 @@ $existingAppointmentMode
 
                 <div class="modal-copy">
                     <h2 id="cancelProcedureModalTitle" class="modal-title">
-                        Cancel Procedure?
+                        {{ $savedVisitEditMode ? 'Cancel Edit?' : 'Cancel Procedure?' }}
                     </h2>
                     <p class="modal-subtitle">
-                        Unsaved changes in this procedure session may be lost.
+                        {{ $savedVisitEditMode
+                        ? 'Unsaved changes in this saved visit editor may be lost.'
+                        : 'Unsaved changes in this procedure session may be lost.' }}
                     </p>
                 </div>
             </div>
@@ -684,10 +674,13 @@ $existingAppointmentMode
                 <i class="fa-solid fa-triangle-exclamation"></i>
 
                 <div>
-                    <strong>Leave this procedure?</strong>
+                    <strong>{{ $savedVisitEditMode ? 'Leave this edit?' : 'Leave this procedure?' }}</strong>
                     <span>
-                        Are you sure you want to cancel this procedure? Any unsaved progress in this session may be
-                        lost.
+                        {{ $savedVisitEditMode
+                        ? 'Are you sure you want to cancel this edit? Any unsaved changes in this saved visit may be
+                        lost.'
+                        : 'Are you sure you want to cancel this procedure? Any unsaved progress in this session may be
+                        lost.' }}
                     </span>
                 </div>
             </div>
@@ -696,12 +689,13 @@ $existingAppointmentMode
         <div class="modal-ft">
             <button type="button" id="dismissCancelProcedureBtn" class="ui-btn ui-btn-secondary">
                 <i class="fa-solid fa-arrow-left"></i>
-                <span>No, Stay</span>
+                <span>{{ $savedVisitEditMode ? 'Continue Editing' : 'Continue Procedure' }}</span>
             </button>
 
-            <button type="button" id="confirmCancelProcedureBtn" class="ui-btn ui-btn-danger">
+            <button type="button" id="confirmCancelProcedureBtn"
+                class="ui-btn {{ $savedVisitEditMode ? 'ui-btn-primary' : 'ui-btn-danger' }}">
                 <i class="fa-solid fa-ban"></i>
-                <span>Yes, Cancel</span>
+                <span>{{ $savedVisitEditMode ? 'Cancel Edit' : 'Cancel Procedure' }}</span>
             </button>
         </div>
     </div>
@@ -747,12 +741,12 @@ $existingAppointmentMode
         <div id="finishProcedureConfirmActions" class="modal-ft hidden">
             <button type="button" id="dismissFinishProcedureBtn" class="ui-btn ui-btn-secondary">
                 <i class="fa-solid fa-arrow-left"></i>
-                <span>No, Review</span>
+                <span>Back to Review</span>
             </button>
 
-            <button type="button" id="confirmFinishProcedureBtn" class="ui-btn ui-btn-success">
+            <button type="button" id="confirmFinishProcedureBtn" class="ui-btn ui-btn-warning">
                 <i class="fa-solid fa-check"></i>
-                <span>Yes, Finish Procedure</span>
+                <span>Finish Procedure</span>
             </button>
         </div>
 
@@ -764,12 +758,10 @@ $existingAppointmentMode
         </div>
     </div>
 </div>
-
-
 @endsection
 
 @section('scripts')
-@unless ($existingAppointmentMode)
+@unless ($existingAppointmentMode || $savedVisitEditMode)
 @include('components.appointment-calendar-script', [
 'mode' => 'booking',
 
@@ -833,8 +825,10 @@ $existingAppointmentMode
         const closeCancelProcedureModalBtn = document.getElementById('closeCancelProcedureModalBtn');
         const closeFinishProcedureModalBtn = document.getElementById('closeFinishProcedureModalBtn');
         const existingAppointmentMode = @json($existingAppointmentMode);
+        const savedVisitEditMode = @json($savedVisitEditMode);
+        const existingProcedureDuration = @json($existingProcedureDuration);
         const isOralProphylaxis = @json($isOralProphylaxis);
-        const cancelProcedureRedirectUrl = @json(route('dentist.dentist.patient.profile', $patient -> id ?? 1));
+        const cancelProcedureRedirectUrl = @json($cancelProcedureRedirectUrl ?? route('dentist.dentist.patient.profile', $patient -> id ?? 1));
         let finishProcedureModalRedirectUrl = null;
 
         const legendResultCount = document.getElementById('legendResultCount');
@@ -892,7 +886,6 @@ $existingAppointmentMode
         let selectedTargetType = null;
         let selectedSurfaceKey = null;
         let selectedMesh = null;
-        let hoveredMesh = null;
         let pendingResetPayload = null;
         let hasAppliedTreatmentThisSession = false;
 
@@ -1055,10 +1048,37 @@ $existingAppointmentMode
 
         const odontogramState = {};
 
-        function initThreeScene() {
-            if (
-                odontogramThreeState
-            ) {
+        async function initThreeScene() {
+            if (odontogramThreeState) {
+                return;
+            }
+
+            if (!window.Odontogram3D) {
+                try {
+                    await window.loadOdontogramThreeModule?.();
+                } catch (error) {
+                    console.error(
+                        'Unable to load odontogram 3D module.',
+                        error
+                    );
+
+                    showProcedureToast(
+                        'Unable to load the 3D odontogram.',
+                        'error',
+                        '3D View Unavailable'
+                    );
+
+                    return;
+                }
+            }
+
+            if (!window.Odontogram3D) {
+                showProcedureToast(
+                    'The 3D odontogram module is unavailable.',
+                    'error',
+                    '3D View Unavailable'
+                );
+
                 return;
             }
 
@@ -1080,8 +1100,6 @@ $existingAppointmentMode
                             mesh,
                             event
                         ) => {
-                            hoveredMesh =
-                                mesh;
 
                             if (!toothNumber) {
                                 toothHoverLabel
@@ -1185,23 +1203,6 @@ $existingAppointmentMode
                         )
                 }
             );
-        }
-
-        function focusCameraOnTooth(
-            mesh
-        ) {
-            if (
-                !odontogramThreeState ||
-                !mesh
-            ) {
-                return;
-            }
-
-            window.Odontogram3D
-                .focusTooth(
-                    odontogramThreeState,
-                    mesh
-                );
         }
 
         function resetCameraToFull3DView() {
@@ -1439,7 +1440,16 @@ $existingAppointmentMode
             confirmation = false,
         }) {
             finishProcedureModalTitle.textContent = title;
-            finishProcedureModalMessage.textContent = message;
+            finishProcedureModalMessage.textContent =
+                confirmation
+                    ? 'Confirm before completing this dental procedure.'
+                    : (
+                        redirectUrl
+                            ? 'The procedure was completed successfully.'
+                            : title === 'Treatment Required'
+                                ? 'A treatment entry is required before this procedure can be completed.'
+                                : message
+                    );
             finishProcedureModalIcon.className = `fa-solid ${icon}`;
             finishProcedureModalRedirectUrl = redirectUrl;
 
@@ -1474,9 +1484,16 @@ $existingAppointmentMode
                     : (redirectUrl ? 'modal-theme-success' : 'modal-theme-danger')
             );
 
-            finishProcedureModalAlertTitle.textContent = confirmation
-                ? 'Confirm procedure completion'
-                : (redirectUrl ? 'Procedure saved successfully' : 'Action required');
+            finishProcedureModalAlertTitle.textContent =
+                confirmation
+                    ? 'This action will complete the appointment'
+                    : (
+                        redirectUrl
+                            ? 'Appointment completed'
+                            : title === 'Treatment Required'
+                                ? 'Add a treatment first'
+                                : 'Action required'
+                    );
 
             finishProcedureModalAlertMessage.textContent = message;
 
@@ -1925,12 +1942,6 @@ $existingAppointmentMode
             return null;
         }
 
-        function getStatusBoxDisplaySurfaceKey(state) {
-            if (!state || !state.surfaces) return null;
-
-            return getPreferredSurfaceKey(state);
-        }
-
         function applyDividedStatusBoxVisual(statusBox, record) {
             const colorPart = document.createElement('span');
             const codePart = document.createElement('span');
@@ -2126,15 +2137,23 @@ $existingAppointmentMode
             const payload = createLegendPayload(code);
             hasAppliedTreatmentThisSession = true;
 
-            if (selectedTargetType === 'status') {
-                state.status = payload;
+            if (
+                selectedTargetType === 'surface' &&
+                selectedSurfaceKey
+            ) {
+                state.surfaces[selectedSurfaceKey] =
+                    payload;
+
                 sync3DFrom2D(selectedTooth);
-            } else if (selectedTargetType === 'surface' && selectedSurfaceKey) {
-                state.surfaces[selectedSurfaceKey] = payload;
-                sync3DFrom2D(selectedTooth);
-            } else if (selectedTargetType === '3d') {
+            } else if (
+                selectedTargetType === '3d'
+            ) {
                 state.threeD = payload;
-                fillAll2DSurfacesFromLegend(state, payload);
+
+                fillAll2DSurfacesFromLegend(
+                    state,
+                    payload
+                );
             }
 
             updateHiddenInput();
@@ -2365,7 +2384,7 @@ $existingAppointmentMode
             board2d.appendChild(row4);
         }
 
-        function switchView(view) {
+        async function switchView(view) {
             const previousView = currentView;
             currentView = view;
 
@@ -2394,7 +2413,7 @@ $existingAppointmentMode
                 }
 
                 if (!odontogramThreeState) {
-                    initThreeScene();
+                    await initThreeScene();
                 } else {
                     handleResize();
                     renderThreeVisuals();
@@ -2422,17 +2441,6 @@ $existingAppointmentMode
 
         view2dBtn.addEventListener('click', () => switchView('2d'));
         view3dBtn.addEventListener('click', () => switchView('3d'));
-
-        function getOdontogramTheme() {
-            const root = document.documentElement;
-
-            return (
-                root.getAttribute('data-theme') === 'dark' ||
-                root.classList.contains('dark')
-            )
-                ? 'dark'
-                : 'light';
-        }
 
         function showTooltip(event, mesh) {
             const toothNumber = mesh.userData.tooth;
@@ -2847,8 +2855,10 @@ $existingAppointmentMode
             const originalButtonHtml = clickedButton.innerHTML;
 
             updateHiddenInput();
+            const cleanOdontogramData = getCleanOdontogramDataForSave();
+            const hasAnySavedTreatment = cleanOdontogramData.length > 0;
 
-            if (!isOralProphylaxis && !hasAppliedTreatmentThisSession) {
+            if (!isOralProphylaxis && !hasAppliedTreatmentThisSession && !(savedVisitEditMode && hasAnySavedTreatment)) {
                 showProcedureToast(
                     'Apply at least one treatment to the tooth chart before finishing the procedure.',
                     'warning',
@@ -2857,8 +2867,6 @@ $existingAppointmentMode
 
                 return;
             }
-
-            const cleanOdontogramData = getCleanOdontogramDataForSave();
 
             if (!isOralProphylaxis && cleanOdontogramData.length === 0) {
                 showProcedureToast(
@@ -2877,7 +2885,7 @@ $existingAppointmentMode
                 prescriptions: document.getElementById('prescriptionsNotes').value,
                 completion_action: completionAction,
                 has_applied_treatment: isOralProphylaxis || hasAppliedTreatmentThisSession,
-                procedure_duration_seconds: existingAppointmentMode
+                procedure_duration_seconds: (existingAppointmentMode || savedVisitEditMode)
                     ? 0
                     : Math.max(0, Math.floor((Date.now() - procedureStartTimestamp) / 1000)),
             };
@@ -2914,12 +2922,16 @@ $existingAppointmentMode
 
                 if (completionAction === 'finished') {
                     openFinishProcedureModal({
-                        title: existingAppointmentMode ? 'Existing Appointment Saved!' : 'Procedure Completed!',
+                        title: existingAppointmentMode
+                            ? 'Existing Appointment Saved!'
+                            : (savedVisitEditMode ? 'Odontogram Updated!' : 'Procedure Completed!'),
                         message: existingAppointmentMode
                             ? 'The existing appointment, notes, duration, and odontogram were saved successfully.'
-                            : 'The odontogram and procedure notes were saved successfully. This appointment has been marked as completed.',
+                            : (savedVisitEditMode
+                                ? 'The saved 2D/3D odontogram and clinical notes were updated successfully.'
+                                : 'The odontogram and procedure notes were saved successfully. This appointment has been marked as completed.'),
                         icon: 'fa-clipboard-check',
-                        buttonText: existingAppointmentMode ? 'Back to Patient Profile' : 'Back to Appointments',
+                        buttonText: (existingAppointmentMode || savedVisitEditMode) ? 'Back to Patient Profile' : 'Back to Appointments',
                         redirectUrl: result.redirect_url || null,
                     });
                 } else {
@@ -2946,18 +2958,21 @@ $existingAppointmentMode
 
         finishProcedureBtn.addEventListener('click', function () {
             updateHiddenInput();
+            const cleanOdontogramData = getCleanOdontogramDataForSave();
+            const hasAnySavedTreatment = cleanOdontogramData.length > 0;
 
             if (!isOralProphylaxis &&
                 (
-                    !hasAppliedTreatmentThisSession ||
-                    getCleanOdontogramDataForSave().length === 0
+                    (!hasAppliedTreatmentThisSession && !(savedVisitEditMode && hasAnySavedTreatment)) ||
+                    cleanOdontogramData.length === 0
                 )
             ) {
                 openFinishProcedureModal({
                     title: 'Treatment Required',
-                    message: 'Please apply at least one treatment to the tooth chart before finishing the procedure.',
+                    message:
+                        'Select a tooth surface and apply at least one treatment before completing this procedure.',
                     icon: 'fa-tooth',
-                    buttonText: 'Review Procedure',
+                    buttonText: 'Back to Odontogram',
                 });
                 return;
             }
@@ -2965,11 +2980,13 @@ $existingAppointmentMode
             openFinishProcedureModal({
                 title: existingAppointmentMode
                     ? 'Save Existing Appointment?'
-                    : 'Finish Procedure?',
+                    : (savedVisitEditMode ? 'Save Odontogram Changes?' : 'Finish Procedure?'),
 
                 message: existingAppointmentMode
                     ? 'Are you sure you want to save this existing appointment? The old visit details, odontogram, and notes will be stored as a completed appointment.'
-                    : 'Are you sure you want to finish this procedure? The odontogram and procedure notes will be saved, and this appointment will be marked as completed.',
+                    : (savedVisitEditMode
+                        ? 'Are you sure you want to update this saved visit? The saved 2D/3D odontogram and procedure notes will be replaced with your latest edits.'
+                        : 'Are you sure you want to finish this procedure? The odontogram and procedure notes will be saved, and this appointment will be marked as completed.'),
 
                 icon: 'fa-circle-question',
                 confirmation: true,
@@ -3292,8 +3309,13 @@ $existingAppointmentMode
         }
 
         initLegendPanelResize();
-        updateProcedureTimer();
-        setInterval(updateProcedureTimer, 1000);
+
+        if (existingAppointmentMode || savedVisitEditMode) {
+            procedureTimer.textContent = existingProcedureDuration || '00:00:00';
+        } else {
+            updateProcedureTimer();
+            setInterval(updateProcedureTimer, 1000);
+        }
 
         renderLegendButtons('');
         updateHiddenInput();

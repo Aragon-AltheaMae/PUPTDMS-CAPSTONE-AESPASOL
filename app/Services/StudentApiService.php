@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 class StudentApiService
 {
     private const DIRECTORY_CACHE_KEY = 'ogos_student_directory_cache';
+    private const FULL_DIRECTORY_CACHE_KEY = 'ogos_student_complete_directory_v1';
 
     protected string $baseUrl;
     protected string $tokenUrl;
@@ -192,6 +193,92 @@ class StudentApiService
             }
 
             throw $e;
+        }
+    }
+
+    public function getAllStudents(int $pageSize = 80, int $maxPages = 100): array
+    {
+        $pageSize = max(1, min($pageSize, 80));
+        $maxPages = max(1, min($maxPages, 100));
+        $cachedStudents = Cache::get(self::FULL_DIRECTORY_CACHE_KEY);
+
+        if (is_array($cachedStudents) && $cachedStudents !== []) {
+            return $cachedStudents;
+        }
+
+        try {
+            $token = $this->getAccessToken();
+            $url = $this->baseUrl.$this->studentSearchPath;
+            $students = [];
+            $lastPageWasFull = false;
+
+            for ($page = 1; $page <= $maxPages; $page++) {
+                $response = Http::acceptJson()
+                    ->withToken($token)
+                    ->timeout(20)
+                    ->get($url, [
+                        'page' => $page,
+                        'page_size' => $pageSize,
+                    ]);
+
+                if (! $response->successful()) {
+                    throw new Exception(sprintf(
+                        'Student directory page %d failed with status %d.',
+                        $page,
+                        $response->status()
+                    ));
+                }
+
+                $payload = $response->json();
+                if (! is_array($payload)) {
+                    throw new Exception("Student directory page {$page} returned an invalid payload.");
+                }
+
+                $pageStudents = $this->extractStudentList($payload);
+
+                Log::info('Student API directory page loaded', [
+                    'page' => $page,
+                    'count' => count($pageStudents),
+                ]);
+
+                if ($pageStudents === []) {
+                    $lastPageWasFull = false;
+                    break;
+                }
+
+                array_push($students, ...$pageStudents);
+                $lastPageWasFull = count($pageStudents) >= $pageSize;
+
+                if (! $lastPageWasFull) {
+                    break;
+                }
+            }
+
+            if ($lastPageWasFull) {
+                throw new Exception('Student directory pagination exceeded its safety limit.');
+            }
+
+            if ($students === []) {
+                throw new Exception('Student API returned an empty directory.');
+            }
+
+            $this->cacheStudentDirectory($students);
+            Cache::put(self::FULL_DIRECTORY_CACHE_KEY, $students, now()->addHour());
+
+            return $students;
+        } catch (\Throwable $exception) {
+            $fallbackStudents = $this->fallbackStudentDirectory(null, PHP_INT_MAX);
+
+            if ($fallbackStudents !== []) {
+                Log::warning('Complete student directory is using the cached fallback.', [
+                    'count' => count($fallbackStudents),
+                    'message' => $exception->getMessage(),
+                ]);
+
+                return $fallbackStudents;
+            }
+
+            throw $exception;
         }
     }
 

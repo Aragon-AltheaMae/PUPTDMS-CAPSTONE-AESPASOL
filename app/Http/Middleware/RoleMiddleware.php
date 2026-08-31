@@ -57,13 +57,39 @@ class RoleMiddleware
             return $next($request);
         }
 
-        if (!$userRole || !in_array($userRole, $roles, true)) {
+        $hasRoleMatch = $userRole && in_array($userRole, $roles, true);
+        $hasPermissionAreaAccess = false;
+
+        foreach ($roles as $role) {
+            if ($role === 'admin' && $user->canAccessAdminArea($userRole)) {
+                $hasPermissionAreaAccess = true;
+                break;
+            }
+
+            if ($role === 'dentist' && $user->canAccessClinicalArea($userRole)) {
+                $hasPermissionAreaAccess = true;
+                break;
+            }
+
+            if ($role === 'patient' && $user->canAccessPatientArea($userRole)) {
+                $hasPermissionAreaAccess = true;
+                break;
+            }
+        }
+
+        if (!$hasRoleMatch && !$hasPermissionAreaAccess) {
             abort(403, 'Unauthorized access.');
         }
 
-        // If viewing as patient, make sure patient data exists
-        if ($userRole === 'patient') {
-            $patientId = session('impersonated_patient_id') ?: session('patient_id');
+        
+        if (in_array('patient', $roles, true)) {
+            $patientId = session('impersonated_patient_id')
+                ?: session('patient_id')
+                ?: $user?->patient?->id;
+
+            if ($patientId && !session()->has('patient_id') && !session()->has('impersonated_patient_id')) {
+                session(['patient_id' => $patientId]);
+            }
 
             if (!$patientId) {
                 if (session()->has('impersonator_role')) {

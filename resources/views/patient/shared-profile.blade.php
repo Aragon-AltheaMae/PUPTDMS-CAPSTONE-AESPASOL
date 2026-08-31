@@ -2,6 +2,10 @@
 $profileMode = $profileMode ?? 'dentist';
 
 $layoutRole = $profileMode === 'admin' ? 'admin' : 'dentist';
+$canBookAppointment =
+auth()->check() &&
+auth()->user()->hasPermission('book_appointments');
+$bookingMode = $bookingMode ?? false;
 @endphp
 
 @extends('layouts.app')
@@ -12,6 +16,10 @@ $layoutRole = $profileMode === 'admin' ? 'admin' : 'dentist';
 
 @section('usesPatientProfile', true)
 
+@section('styles')
+    @vite('resources/css/pages/patient/patient-profile.css')
+@endsection
+
 @section('content')
 
 @php
@@ -20,7 +28,7 @@ use Illuminate\Support\Str;
 $isDentistProfile = $profileMode === 'dentist';
 
 $patientName = $patient->name ?? 'Unknown Patient';
-$displayName = ucwords(strtolower($patient->name ?? 'Guest'));
+$displayName = $patient->name ?? 'Guest';
 $age = $patient->birthdate ? Carbon::parse($patient->birthdate)->age : null;
 $birthdateFormatted = $patient->birthdate ? Carbon::parse($patient->birthdate)->format('M d, Y') : 'N/A';
 
@@ -35,17 +43,23 @@ $signaturePath = optional($patient->medicalHistory)->patient_signature;
 $signatureUrl = $signaturePath ? asset('storage/' . $signaturePath) : null;
 $isPendingManualReview = $signatureReviewStatus === 'pending_manual_review';
 $isInvalidSignature = $signatureReviewStatus === 'invalid_reupload_required';
+$canReviewSignature = auth()->user()?->hasPermission('create_medical_records') ?? false;
 $showManualSignatureReview =
 in_array($profileMode, ['admin', 'dentist'], true) &&
 in_array($signatureReviewStatus, ['pending_manual_review', 'invalid_reupload_required'], true) &&
-!empty($signaturePath);
+!empty($signaturePath) &&
+$canReviewSignature;
 
 $from = request('from');
 
 if ($profileMode === 'admin') {
-$backUrl = $from === 'patients' ? route('admin.admin.patients') : route('admin.admin.appointments');
+$backUrl = $bookingMode
+? route('admin.book_appointments.start')
+: ($from === 'patients' ? route('admin.admin.patients') : route('admin.admin.appointments'));
 
-$backLabel = $from === 'patients' ? 'Patients' : 'Appointments';
+$backLabel = $bookingMode
+? 'Select Patient'
+: ($from === 'patients' ? 'Patients' : 'Appointments');
 } else {
 $backUrl =
 $from === 'dashboard' ? route('dentist.dentist.dashboard') : route('dentist.dentist.appointments');
@@ -135,12 +149,20 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                 </div>
             </div>
 
-            @if ($isDentistProfile)
+            @if ($isDentistProfile || ($profileMode === 'admin' && $canBookAppointment))
             <div class="flex items-center gap-2">
+                @if ($profileMode === 'admin' && $canBookAppointment)
+                <a href="{{ route('admin.book_appointments.patient', ['patient' => $patient->id]) }}"
+                    class="ui-btn ui-btn-primary">
+                    <i class="fa-solid fa-calendar-plus text-xs"></i> Book Appointment
+                </a>
+                @endif
+                @if ($isDentistProfile)
                 <a href="{{ route('dentist.odontogram.existing-appointment.create', ['patient' => $patient->id]) }}"
                     class="ui-btn ui-btn-secondary">
                     <i class="fa-solid fa-clock-rotate-left text-xs"></i> Add Existing Appointment
                 </a>
+                @endif
                 @if ($canStartProcedure)
                 <button type="button" onclick="openStartModal()" class="ui-btn ui-btn-success">
                     <i class="fa-solid fa-play"></i>
@@ -163,7 +185,7 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
 
                         <div class="patient-summary-heading">
                             <div class="patient-summary-name-row">
-                                <h2 class="patient-summary-name">
+                                <h2 class="patient-summary-name" data-patient-name>
                                     {{ $displayName }}
                                 </h2>
 
@@ -341,7 +363,7 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                                             Open Full Signature
                                         </a>
 
-                                        @if ($isPendingManualReview)
+                                        @if ($isPendingManualReview && $canReviewSignature)
                                         <form method="POST"
                                             action="{{ $profileMode === 'admin' ? route('admin.patient.signature.invalid', $patient) : route('dentist.patient.signature.invalid', $patient) }}"
                                             onsubmit="return confirm('Mark this uploaded signature as invalid and notify the patient to upload a new one?');"
@@ -472,6 +494,7 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
 
                                     <x-appointment-record-card :appointment="$visit" variant="upcoming"
                                         :show-details="false" :show-countdown="true" :show-time-range="false"
+                                        :show-reserved="$isDentistProfile"
                                         data-show-more-item />
 
                                     @empty
@@ -505,7 +528,12 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                                     @forelse($pastVisits ?? [] as $visit)
 
                                     <x-appointment-record-card :appointment="$visit" variant="past" :show-details="true"
-                                        :show-countdown="false" :show-time-range="false" data-show-more-item />
+                                        :show-countdown="false" :show-time-range="false"
+                                        :show-reserved="$isDentistProfile"
+                                        :record-edit-url="$isDentistProfile && !empty(data_get($visit, 'procedure.odontogram_data'))
+                                            ? route('dentist.odontogram.saved.edit', ['appointment' => $visit->id, 'from' => 'appointments'])
+                                            : null"
+                                        data-show-more-item />
 
                                     @empty
 

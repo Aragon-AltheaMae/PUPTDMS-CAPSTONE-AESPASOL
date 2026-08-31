@@ -1,8 +1,12 @@
 @extends('layouts.app')
 
-@section('layout-role', 'admin')
+@section('layout-role', $layoutRole ?? 'admin')
 
 @section('title', 'System Logs')
+
+@section('styles')
+    @vite('resources/css/pages/admin/system-logs.css')
+@endsection
 
 @section('content')
 
@@ -10,9 +14,13 @@
         $logs = $logs ?? collect([]);
         $perPage = $perPage ?? 10;
         $status = $status ?? 'active';
+        $authUser = auth()->user();
+        $canViewSystemLogs = $authUser?->hasPermission('view_system_logs') ?? false;
+        $canExportSystemLogs = $authUser?->hasPermission('export_system_logs') ?? false;
+        $canArchiveSystemLogs = $authUser?->hasPermission('archive_system_logs') ?? false;
     @endphp
 
-    <main id="mainContent" class="admin-page-shell system-logs-page page-enter mode-list">
+    <main id="mainContent" class="app-page-shell system-logs-page page-enter mode-list">
         <div class="w-full">
 
             <div class="page-banner rounded-2xl mb-6">
@@ -192,12 +200,51 @@
                 </div>
 
                 <div class="sl-role-tabs">
-                    @foreach ([['key' => 'all', 'label' => 'All', 'icon' => 'fa-layer-group', 'count' => $totalCount], ['key' => 'admin', 'label' => 'Admin', 'icon' => 'fa-user-tie', 'count' => $adminCount], ['key' => 'dentist', 'label' => 'Dentist', 'icon' => 'fa-user-doctor', 'count' => $dentistCount], ['key' => 'patient', 'label' => 'Patient', 'icon' => 'fa-user', 'count' => $patientCount], ['key' => 'login', 'label' => 'Logins', 'icon' => 'fa-right-to-bracket', 'count' => $loginCount], ['key' => 'error', 'label' => 'Errors', 'icon' => 'fa-triangle-exclamation', 'count' => $errorCount ?? 0]] as $tab)
-                        <button class="tab-btn {{ $activeRole === $tab['key'] ? 'active' : '' }}"
+                    @foreach ([
+            [
+                'key' => 'all',
+                'label' => 'All',
+                'icon' => 'fa-layer-group',
+                'count' => $totalCount,
+            ],
+            [
+                'key' => 'admin',
+                'label' => 'Admin',
+                'icon' => 'fa-user-tie',
+                'count' => $adminCount,
+            ],
+            [
+                'key' => 'dentist',
+                'label' => 'Dentist',
+                'icon' => 'fa-user-doctor',
+                'count' => $dentistCount,
+            ],
+            [
+                'key' => 'patient',
+                'label' => 'Patient',
+                'icon' => 'fa-user',
+                'count' => $patientCount,
+            ],
+            [
+                'key' => 'login',
+                'label' => 'Logins',
+                'icon' => 'fa-right-to-bracket',
+                'count' => $loginCount,
+            ],
+            [
+                'key' => 'error',
+                'label' => 'Errors',
+                'icon' => 'fa-triangle-exclamation',
+                'count' => $errorCount ?? 0,
+            ],
+        ] as $tab)
+                        <button type="button" class="tab-btn {{ $activeRole === $tab['key'] ? 'active' : '' }}"
                             onclick="slSetTab(this, '{{ $tab['key'] }}')">
-                            <i class="fa-solid {{ $tab['icon'] }} mr-1 text-[0.7rem]"></i>{{ $tab['label'] }}
-                            <span
-                                class="tab-count {{ $activeRole === $tab['key'] ? 'bg-red-200 text-[#8B0000]' : 'bg-gray-200 text-gray-500' }} text-[0.62rem] font-bold px-1.5 py-0.5 rounded-full ml-1">
+                            <i class="fa-solid {{ $tab['icon'] }} mr-1 text-[0.7rem]"></i>
+
+                            {{ $tab['label'] }}
+
+                            <span class="tab-count {{ $activeRole === $tab['key'] ? 'active' : '' }}">
                                 {{ $tab['count'] }}
                             </span>
                         </button>
@@ -228,6 +275,7 @@
                                     @php
                                         $role = strtolower($log->actor_role ?? 'other');
                                         $action = strtolower($log->action ?? '');
+                                        $moduleName = strtolower($log->module ?? '');
                                         $actionClass = match (true) {
                                             str_contains($action, 'error') ||
                                                 str_contains($action, 'failed') ||
@@ -265,12 +313,17 @@
                                         $actionStatusClass = match ($actionClass) {
                                             'login' => 's-active',
                                             'logout' => 's-ended',
-                                            'create' => 's-upcoming',
+                                            'create' => 's-neutral',
                                             'update' => 's-rescheduled',
                                             'delete' => 's-cancelled',
                                             'error' => 's-failed',
                                             default => 's-neutral',
                                         };
+                                        $actionLabel =
+                                            $moduleName === 'inventory' &&
+                                            in_array($actionClass, ['create', 'delete'], true)
+                                                ? ucfirst($actionClass)
+                                                : ucwords(str_replace('_', ' ', $log->action));
                                     @endphp
                                     <tr data-role="{{ $role }}" data-action="{{ $actionClass }}">
                                         <td><span class="sl-id">#{{ str_pad($log->id, 3, '0', STR_PAD_LEFT) }}</span>
@@ -304,7 +357,7 @@
                                                     class="fa-solid {{ $actionIcon }}
         {{ $actionClass === 'error' ? 'sl-action-alert' : '' }}"></i>
 
-                                                {{ ucwords(str_replace('_', ' ', $log->action)) }}
+                                                {{ $actionLabel }}
                                             </span>
                                             @if ($log->is_archived)
                                                 <span class="status-pill s-archived"
@@ -339,6 +392,7 @@
                             @php
                                 $role = strtolower($log->actor_role ?? 'other');
                                 $action = strtolower($log->action ?? '');
+                                $moduleName = strtolower($log->module ?? '');
                                 $actionClass = match (true) {
                                     str_contains($action, 'error') ||
                                         str_contains($action, 'failed') ||
@@ -376,12 +430,16 @@
                                 $actionStatusClass = match ($actionClass) {
                                     'login' => 's-active',
                                     'logout' => 's-ended',
-                                    'create' => 's-upcoming',
+                                    'create' => 's-neutral',
                                     'update' => 's-rescheduled',
                                     'delete' => 's-cancelled',
                                     'error' => 's-failed',
                                     default => 's-neutral',
                                 };
+                                $actionLabel =
+                                    $moduleName === 'inventory' && in_array($actionClass, ['create', 'delete'], true)
+                                        ? ucfirst($actionClass)
+                                        : ucwords(str_replace('_', ' ', $log->action));
                             @endphp
                             <article class="table-record-card" data-role="{{ $role }}"
                                 data-action="{{ $actionClass }}">
@@ -402,7 +460,7 @@
                         {{ $actionClass === 'error' ? 'sl-action-alert' : '' }}">
                                             </i>
 
-                                            {{ ucwords(str_replace('_', ' ', $log->action)) }}
+                                            {{ $actionLabel }}
                                         </span>
                                     </div>
 
@@ -490,6 +548,7 @@
                     pagination-id="systemLogsPaginationBottom" position="bottom" :page-size-value="$perPage" label="entries" />
 
             </div>
+        </div>
     </main>
 
     <x-filter-drawer id="filterModal" title="Filters" close-callback="closeSlFilterPanel()"
@@ -797,24 +856,28 @@
         <div class="ui-modal-card modal-lg modal-report-like" role="dialog" aria-modal="true"
             aria-labelledby="slExportModalTitle">
 
-            <form id="slExportForm" class="modal-card-form" data-discard-form
+            <form id="slExportForm" class="modal-card-form" data-global-validation data-discard-form
                 data-discard-title="Discard export settings?" data-discard-subtitle="You have unsaved export settings."
                 data-discard-message="Closing this modal will reset the export options you selected. Do you want to discard these changes?">
 
                 <div class="modal-hd">
+
                     <div class="modal-heading">
+
                         <div class="modal-icon">
                             <i class="fa-solid fa-file-pdf"></i>
                         </div>
 
                         <div class="modal-copy">
+
                             <h3 id="slExportModalTitle" class="modal-title">
                                 Export System Logs
                             </h3>
 
                             <p class="modal-subtitle">
-                                Export all matching logs, or narrow the PDF with a date range.
+                                Select which system logs you want to include in the PDF.
                             </p>
+
                         </div>
                     </div>
 
@@ -822,10 +885,107 @@
                         aria-label="Close export modal">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
+
                 </div>
 
+
                 <div class="modal-bd">
+
                     <div class="modal-form-grid">
+
+
+                        {{-- Export Filters --}}
+                        <div class="modal-field modal-field-full sl-export-filter-section">
+
+                            <div class="report-date-range-heading">
+
+                                <div>
+                                    <div class="report-date-range-title">
+                                        Filter Logs
+                                    </div>
+
+                                    <p class="report-date-range-subtitle">
+                                        Select the role and action to include in the exported PDF.
+                                    </p>
+                                </div>
+
+                            </div>
+
+                            <div class="sl-export-filter-grid">
+
+                                <div class="modal-field sl-export-filter-field" data-global-field>
+                                    <label class="global-form-label" for="slExportRole">
+                                        Role
+                                        <span class="required-mark">*</span>
+                                    </label>
+
+                                    <select id="slExportRole" name="role" class="js-custom-select"
+                                        data-field-label="Role" data-required-message="Please select a role." required>
+                                        <option value="" selected disabled>
+                                            Select role
+                                        </option>
+
+                                        <option value="all">
+                                            All Roles
+                                        </option>
+
+                                        <option value="admin">
+                                            Admin
+                                        </option>
+
+                                        <option value="dentist">
+                                            Dentist
+                                        </option>
+
+                                        <option value="patient">
+                                            Patient
+                                        </option>
+                                    </select>
+
+                                    <div class="global-field-error" data-error-for="slExportRole" aria-live="polite"
+                                        aria-hidden="true"></div>
+                                </div>
+
+                                <div class="modal-field sl-export-filter-field" data-global-field>
+                                    <label class="global-form-label" for="slExportAction">
+                                        Action
+                                        <span class="required-mark">*</span>
+                                    </label>
+
+                                    <select id="slExportAction" name="action_type" class="js-custom-select"
+                                        data-field-label="Action" data-required-message="Please select an action."
+                                        required>
+                                        <option value="" selected disabled>
+                                            Select action
+                                        </option>
+
+                                        <option value="all">
+                                            All Actions
+                                        </option>
+
+                                        <option value="login">
+                                            Login
+                                        </option>
+
+                                        <option value="view">
+                                            View
+                                        </option>
+
+                                        <option value="book">
+                                            Book
+                                        </option>
+
+                                        <option value="logout">
+                                            Logout
+                                        </option>
+                                    </select>
+
+                                    <div class="global-field-error" data-error-for="slExportAction" aria-live="polite"
+                                        aria-hidden="true"></div>
+                                </div>
+
+                            </div>
+                        </div>
 
                         <div class="modal-field modal-field-full report-date-range-section" data-global-field>
                             <div class="report-date-range-heading">
@@ -841,51 +1001,70 @@
                             </div>
 
                             <div class="report-date-range-grid">
+
                                 <div class="modal-field" data-global-field>
+
                                     <label class="global-form-label" for="slExportDateFrom">
                                         From
-                                        <span class="required-mark">*</span>
+
+                                        <span class="required-mark">
+                                            *
+                                        </span>
                                     </label>
 
                                     <div class="fp-date-input-wrap">
+
                                         <input id="slExportDateFrom" name="date_from" type="text"
                                             class="form-input-custom js-flatpickr-date-max-today"
                                             placeholder="Select start date" data-field-label="From Date"
-                                            data-required-message="Please select a start date." readonly
-                                            autocomplete="off">
+                                            data-required-message="Please select a start date."
+                                            data-validation-rule="notFutureDate" readonly autocomplete="off" required>
 
                                         <i class="fa-regular fa-calendar fp-date-icon" aria-hidden="true"></i>
                                     </div>
+                                    <div class="global-field-error" data-error-for="slExportDateFrom" aria-live="polite"
+                                        aria-hidden="true"></div>
                                 </div>
 
                                 <div class="modal-field" data-global-field>
+
                                     <label class="global-form-label" for="slExportDateTo">
                                         To
+
                                         <span class="modal-helper-text">
                                             (optional)
                                         </span>
                                     </label>
 
                                     <div class="fp-date-input-wrap">
+
                                         <input id="slExportDateTo" name="date_to" type="text"
                                             class="form-input-custom js-flatpickr-date-max-today"
-                                            placeholder="Select end date" data-field-label="To Date" readonly
-                                            autocomplete="off">
+                                            placeholder="Select end date" data-field-label="To Date"
+                                            data-validation-rule="notFutureDate" readonly autocomplete="off">
 
                                         <i class="fa-regular fa-calendar fp-date-icon" aria-hidden="true"></i>
+
                                     </div>
+                                    <div class="global-field-error" data-error-for="slExportDateTo" aria-live="polite"
+                                        aria-hidden="true"></div>
                                 </div>
+
                             </div>
 
                             <p class="report-date-range-helper">
                                 <i class="fa-solid fa-circle-info"></i>
+
                                 Leave "To" empty to export a single date.
                             </p>
+
                         </div>
+
                     </div>
                 </div>
 
                 <div class="modal-ft">
+
                     <button type="button" class="ui-btn ui-btn-secondary" data-discard-close="slExportModal">
                         Cancel
                     </button>
@@ -893,7 +1072,10 @@
                     <button type="button" id="slExportConfirmBtn" class="ui-btn ui-btn-primary"
                         onclick="submitSlExportModal()">
                         <i class="fa-solid fa-file-pdf"></i>
-                        <span>Export PDF</span>
+
+                        <span>
+                            Export PDF
+                        </span>
                     </button>
                 </div>
             </form>
@@ -904,17 +1086,35 @@
 
 @section('scripts')
     <script>
-        var searchInput = null;
         var slArchiveDaysInput = null;
         var slArchiveError = null;
         var slArchiveConfirmBtn = null;
         var slExportDateFromInput = null;
         var slExportDateToInput = null;
+        var slExportRoleInput = null;
+        var slExportActionInput = null;
         var slExportConfirmBtn = null;
         var perPageSelect = null;
-        var slExportRole = @json($role ?? 'all');
+        const CAN_VIEW_SYSTEM_LOGS = @json($canViewSystemLogs);
+        const CAN_EXPORT_SYSTEM_LOGS = @json($canExportSystemLogs);
+        const CAN_ARCHIVE_SYSTEM_LOGS = @json($canArchiveSystemLogs);
+
+        function showSystemLogsUnauthorized(actionLabel) {
+            window.showToast?.({
+                type: 'error',
+                title: 'Unauthorized',
+                message: actionLabel ?
+                    `You do not have permission to ${actionLabel}.` :
+                    'You do not have permission to perform this action.'
+            });
+        }
 
         async function exportSystemLogsPdf(exportOptions = {}) {
+            if (!CAN_EXPORT_SYSTEM_LOGS) {
+                showSystemLogsUnauthorized('export system logs');
+                return;
+            }
+
             const button =
                 document.getElementById(
                     'slExportBtn'
@@ -926,37 +1126,21 @@
 
             const params =
                 new URLSearchParams({
-                    role: exportOptions.role ||
-                        slExportRole ||
-                        slState.role ||
-                        'all',
+                    role: exportOptions.role || 'all',
 
-                    search: slState.search ||
-                        '',
+                    status: slState.status || 'active',
 
-                    status: slState.status ||
-                        'active',
+                    sort: 'desc',
 
-                    sort: slState.sort ||
-                        'desc',
+                    date_from: exportOptions.dateFrom || '',
 
-                    date_from: (exportOptions.dateFrom ??
-                            slState.dateFrom) ||
-                        '',
+                    date_to: exportOptions.dateTo || '',
 
-                    date_to: (exportOptions.dateTo ??
-                            slState.dateTo) ||
-                        '',
-
-                    action_type: slState.actionType ||
-                        '',
-
-                    module: slState.module ||
-                        ''
+                    action_type: exportOptions.actionType || ''
                 });
 
             const endpoint =
-                @json(route('admin.system_logs.export'));
+                @json(route($routeNames['export'] ?? 'admin.system_logs.export'));
 
             const url =
                 endpoint +
@@ -1156,6 +1340,11 @@
         }
 
         function handleSlExportButtonClick() {
+            if (!CAN_EXPORT_SYSTEM_LOGS) {
+                showSystemLogsUnauthorized('export system logs');
+                return;
+            }
+
             try {
                 openSlExportModal();
             } catch (error) {
@@ -1172,7 +1361,15 @@
             }
         }
 
+        window.handleSlExportButtonClick =
+            handleSlExportButtonClick;
+
         function openSlExportModal() {
+            if (!CAN_EXPORT_SYSTEM_LOGS) {
+                showSystemLogsUnauthorized('export system logs');
+                return;
+            }
+
             const modal =
                 document.getElementById(
                     'slExportModal'
@@ -1184,15 +1381,60 @@
                 );
             }
 
+            const exportForm =
+                document.getElementById(
+                    'slExportForm'
+                );
+
+            if (slExportRoleInput) {
+                slExportRoleInput.value = '';
+
+                window.syncCustomSelect?.(
+                    slExportRoleInput.closest(
+                        '.custom-select'
+                    )
+                );
+            }
+
+            if (slExportActionInput) {
+                slExportActionInput.value = '';
+
+                window.syncCustomSelect?.(
+                    slExportActionInput.closest(
+                        '.custom-select'
+                    )
+                );
+            }
+
             if (slExportDateFromInput) {
                 slExportDateFromInput.value =
-                    slState.dateFrom || '';
+                    '';
+
+                slExportDateFromInput
+                    ._flatpickr
+                    ?.clear();
             }
 
             if (slExportDateToInput) {
                 slExportDateToInput.value =
-                    slState.dateTo || '';
+                    '';
+
+                slExportDateToInput
+                    ._flatpickr
+                    ?.clear();
             }
+            
+            exportForm
+                ?.querySelectorAll(
+                    'input, select, textarea'
+                )
+                .forEach(field => {
+                    window
+                        .showFormInputValidationMessage?.(
+                            field,
+                            ''
+                        );
+                });
 
             [
                 slExportDateFromInput,
@@ -1209,34 +1451,71 @@
             });
 
             try {
-                if (typeof window.openModal === 'function') {
+
+                if (
+                    typeof window.openModal ===
+                    'function'
+                ) {
                     window.openModal(
                         'slExportModal'
                     );
 
-                    window.initGlobalNumberSteppers?.(
-                        document.getElementById(
-                            'slExportModal'
-                        )
+                    window.initCustomSelects?.(
+                        modal
                     );
+
                 } else {
-                    modal.classList.add('open');
-                    modal.setAttribute('aria-hidden', 'false');
-                    document.documentElement.classList.add('modal-open');
-                    document.body.classList.add('modal-open');
+
+                    modal.classList.add(
+                        'open'
+                    );
+
+                    modal.setAttribute(
+                        'aria-hidden',
+                        'false'
+                    );
+
+                    document.documentElement
+                        .classList.add(
+                            'modal-open'
+                        );
+
+                    document.body
+                        .classList.add(
+                            'modal-open'
+                        );
                 }
+
             } catch (error) {
+
                 console.error(
                     'System logs export modal open failed:',
                     error
                 );
 
-                modal.classList.add('open');
-                modal.setAttribute('aria-hidden', 'false');
-                document.documentElement.classList.add('modal-open');
-                document.body.classList.add('modal-open');
+                modal.classList.add(
+                    'open'
+                );
+
+                modal.setAttribute(
+                    'aria-hidden',
+                    'false'
+                );
+
+                document.documentElement
+                    .classList.add(
+                        'modal-open'
+                    );
+
+                document.body
+                    .classList.add(
+                        'modal-open'
+                    );
             }
         }
+
+        window.openSlExportModal =
+            openSlExportModal;
 
         function closeSlExportModal() {
             const modal =
@@ -1281,6 +1560,41 @@
         }
 
         async function submitSlExportModal() {
+            if (!CAN_EXPORT_SYSTEM_LOGS) {
+                showSystemLogsUnauthorized(
+                    'export system logs'
+                );
+
+                return;
+            }
+
+            const form =
+                document.getElementById(
+                    'slExportForm'
+                );
+
+            if (!form) {
+                return;
+            }
+
+            const validation =
+                window.validateGlobalForm?.(
+                    form
+                );
+
+            if (
+                validation &&
+                !validation.valid
+            ) {
+                return;
+            }
+
+            const role =
+                slExportRoleInput?.value || '';
+
+            const rawActionType =
+                slExportActionInput?.value || '';
+
             const dateFrom =
                 slExportDateFromInput?.value || '';
 
@@ -1292,28 +1606,43 @@
                 dateTo &&
                 dateFrom > dateTo
             ) {
-                window.showToast?.({
-                    type: 'error',
-                    title: 'Invalid date range',
-                    message: 'Date From must be earlier than or equal to Date To.'
-                });
+                window
+                    .showFormInputValidationMessage?.(
+                        slExportDateToInput,
+                        'End date must be the same as or later than the start date.'
+                    );
 
-                slExportDateFromInput?.focus();
+                window
+                    .focusGlobalInvalidField?.(
+                        slExportDateToInput
+                    );
+
                 return;
             }
+
+            window
+                .showFormInputValidationMessage?.(
+                    slExportDateToInput,
+                    ''
+                );
+
+            const actionType =
+                rawActionType === 'all' ?
+                '' :
+                rawActionType;
+
             closeSlExportModal();
 
             await exportSystemLogsPdf({
+                role,
+                actionType,
                 dateFrom,
                 dateTo,
             });
         }
 
-        function setSlExportRole(role) {
-            slExportRole = role ||
-                slState.role ||
-                'all';
-        }
+        window.submitSlExportModal =
+            submitSlExportModal;
 
         function handleSystemLogsPerPageChange(value) {
             const nextPerPage = Number(value) || 10;
@@ -1354,7 +1683,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             syncSlFilterInputs();
             updateSlClearFilterButton();
-            setSlExportRole(slState.role);
 
             window.initGlobalVoiceInputs?.();
 
@@ -1414,37 +1742,130 @@
             syncSlFilterChoiceControls();
             updateSlShowResultsButton();
 
-            @if (method_exists($logs, 'total') && $logs->total() > 0)
-                slRenderPagebar({
+            const initialSystemLogsPagination = {
+                @if (method_exists($logs, 'total') && $logs->total() > 0)
+
                     total: {{ (int) $logs->total() }},
+
                     from: {{ (int) ($logs->firstItem() ?? 0) }},
+
                     to: {{ (int) ($logs->lastItem() ?? 0) }},
+
                     current_page: {{ (int) $logs->currentPage() }},
+
                     last_page: {{ (int) $logs->lastPage() }},
+
                     per_page: {{ (int) $logs->perPage() }},
-                });
-            @else
-                slRenderPagebar({
+                @else
+
                     total: {{ method_exists($logs, 'count') ? (int) $logs->count() : 0 }},
+
                     from: 0,
+
                     to: 0,
+
                     current_page: 1,
+
                     last_page: 1,
+
                     per_page: {{ (int) ($perPage ?? 10) }},
-                });
-            @endif
+                @endif
+            };
+
+            if (
+                typeof window.loadPaginationBarModule ===
+                'function'
+            ) {
+                window
+                    .loadPaginationBarModule()
+                    .then(() => {
+                        slRenderPagebar(
+                            initialSystemLogsPagination
+                        );
+                    })
+                    .catch(error => {
+                        console.error(
+                            'Unable to initialize system logs pagination.',
+                            error
+                        );
+                    });
+            } else {
+                slRenderPagebar(
+                    initialSystemLogsPagination
+                );
+            }
 
             @if (method_exists($logs, 'count') && $logs->count() === 0)
                 showEmptyState(slState.search);
             @endif
 
-            searchInput = document.getElementById('slSearch');
             slArchiveDaysInput = document.getElementById('slArchiveDaysInput');
             slArchiveError = document.getElementById('slArchiveError');
             slArchiveConfirmBtn = document.getElementById('slArchiveConfirmBtn');
-            slExportDateFromInput = document.getElementById('slExportDateFrom');
-            slExportDateToInput = document.getElementById('slExportDateTo');
-            slExportConfirmBtn = document.getElementById('slExportConfirmBtn');
+            slExportRoleInput =
+                document.getElementById('slExportRole');
+
+            slExportActionInput =
+                document.getElementById('slExportAction');
+
+            slExportRoleInput?.addEventListener(
+                'change',
+                syncSlExportActionOptions
+            );
+
+            function syncSlExportActionOptions() {
+                if (
+                    !slExportRoleInput ||
+                    !slExportActionInput
+                ) {
+                    return;
+                }
+
+                const selectedRole =
+                    slExportRoleInput.value || 'all';
+
+                const bookOption =
+                    slExportActionInput.querySelector(
+                        'option[value="book"]'
+                    );
+
+                if (!bookOption) {
+                    return;
+                }
+
+                const allowBook =
+                    selectedRole === 'all' ||
+                    selectedRole === 'patient';
+
+                bookOption.disabled = !allowBook;
+
+                if (
+                    !allowBook &&
+                    slExportActionInput.value === 'book'
+                ) {
+                    slExportActionInput.value = '';
+                }
+
+                const wrapper =
+                    slExportActionInput.closest(
+                        '.custom-select'
+                    );
+
+                if (wrapper) {
+                    window.syncCustomSelect?.(
+                        wrapper
+                    );
+                }
+            }
+
+            slExportDateFromInput =
+                document.getElementById('slExportDateFrom');
+
+            slExportDateToInput =
+                document.getElementById('slExportDateTo');
+
+            slExportConfirmBtn =
+                document.getElementById('slExportConfirmBtn');
             perPageSelect =
                 document.getElementById('perPageSelect');
 
@@ -1456,8 +1877,6 @@
                     perPageSelect,
                     slState.perPage || 10
                 );
-
-                window.initGlobalPageSizeSelects?.();
             }
 
             if (slArchiveDaysInput) {
@@ -1474,7 +1893,7 @@
                 window.initGlobalRefreshWatcher?.({
                     key: 'system-logs',
 
-                    url: @json(route('admin.system_logs.check')) +
+                    url: @json(route($routeNames['check'] ?? 'admin.system_logs.check')) +
                         '?status=active',
 
                     interval: 5000,
@@ -1541,7 +1960,7 @@
                 try {
                     const response =
                         await fetch(
-                            @json(route('admin.system_logs.check')) +
+                            @json(route($routeNames['check'] ?? 'admin.system_logs.check')) +
                             '?status=active', {
                                 cache: 'no-store',
 
@@ -1590,42 +2009,13 @@
                     .replaceAll("'", '&#039;');
             }
 
-            function syncSlRoleTab(
-                role = 'all'
-            ) {
-                document
-                    .querySelectorAll(
-                        '.sl-role-tabs .tab-btn'
-                    )
-                    .forEach(button => {
-                        const onclick =
-                            button.getAttribute(
-                                'onclick'
-                            ) || '';
-
-                        const isActive =
-                            onclick.includes(
-                                `'${role}'`
-                            );
-
-                        button.classList.toggle(
-                            'active',
-                            isActive
-                        );
-
-                        button
-                            .querySelector(
-                                '.tab-count'
-                            )
-                            ?.classList.toggle(
-                                'active',
-                                isActive
-                            );
-                    });
-            }
-
             window.handleSystemLogsSearch =
                 function(value) {
+                    if (!CAN_VIEW_SYSTEM_LOGS) {
+                        showSystemLogsUnauthorized('view system logs');
+                        return;
+                    }
+
                     const query =
                         String(value || '')
                         .trim();
@@ -1635,40 +2025,15 @@
 
                     slState.page = 1;
 
-                    if (query) {
-                        slState.role =
-                            'all';
-
-                        setSlExportRole(
-                            'all'
-                        );
-
-                        syncSlRoleTab(
-                            'all'
-                        );
-                    }
-
                     return slFetch();
                 };
 
-            function slSetTab(el, role) {
-                slState.role =
-                    role || 'all';
-
-                setSlExportRole(
-                    slState.role
-                );
-
-                slState.page = 1;
-
-                syncSlRoleTab(
-                    slState.role
-                );
-
-                return slFetch();
-            }
-
             function openSlArchiveModal() {
+                if (!CAN_ARCHIVE_SYSTEM_LOGS) {
+                    showSystemLogsUnauthorized('archive system logs');
+                    return;
+                }
+
                 if (slState.status === "archived") {
                     window.showToast?.({
                         type: 'warning',
@@ -1794,6 +2159,11 @@
             }
 
             function submitSlArchiveModal() {
+                if (!CAN_ARCHIVE_SYSTEM_LOGS) {
+                    showSystemLogsUnauthorized('archive system logs');
+                    return;
+                }
+
                 var olderThanDays = Number(slArchiveDaysInput?.value || '');
 
                 if (
@@ -1846,7 +2216,7 @@
                         archiveForm
                     );
 
-                fetch('{{ route('admin.system_logs.archive') }}', {
+                fetch('{{ route($routeNames['archive'] ?? 'admin.system_logs.archive') }}', {
                         method: 'POST',
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest',
@@ -1901,22 +2271,82 @@
                     });
             }
 
-            function slSetStatus(el, status) {
-                slState.status = status || 'active';
-                slState.role = 'all';
+            function syncSlRoleTab(role = 'all') {
+                document
+                    .querySelectorAll(
+                        '.sl-role-tabs .tab-btn'
+                    )
+                    .forEach(function(button) {
+                        const onclick =
+                            button.getAttribute(
+                                'onclick'
+                            ) || '';
+
+                        const active =
+                            onclick.includes(
+                                "'" + role + "'"
+                            );
+
+                        button.classList.toggle(
+                            'active',
+                            active
+                        );
+
+                        const count =
+                            button.querySelector(
+                                '.tab-count'
+                            );
+
+                        count?.classList.toggle(
+                            'active',
+                            active
+                        );
+                    });
+            }
+
+            function slSetTab(el, role) {
+                slState.role =
+                    role || 'all';
+
                 slState.page = 1;
+
+                syncSlRoleTab(
+                    slState.role
+                );
+
+                return slFetch();
+            }
+
+            function slSetStatus(el, status) {
+                slState.status =
+                    status || 'active';
+
+                slState.role =
+                    'all';
+
+                slState.page =
+                    1;
+
+                syncSlRoleTab(
+                    'all'
+                );
 
                 document
                     .querySelectorAll('.sl-status-tab')
                     .forEach(function(button) {
-                        button.classList.remove('active');
+                        button.classList.remove(
+                            'active'
+                        );
                     });
 
-                el?.classList.add('active');
+                el?.classList.add(
+                    'active'
+                );
 
-                syncSlRoleTab('all');
-
-                if (slState.status === 'archived') {
+                if (
+                    slState.status ===
+                    'archived'
+                ) {
                     systemLogsRefreshWatcher?.stop();
                 } else {
                     initializeSystemLogsRefreshWatcher();
@@ -2353,15 +2783,16 @@
 
                     slDraftCountController = new AbortController();
 
-                    fetch('{{ route('admin.system_logs') }}?' + getSlDraftFilterParams().toString(), {
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                    ?.content ?? ''
-                            },
-                            signal: slDraftCountController.signal
-                        })
+                    fetch('{{ route($routeNames['index'] ?? 'admin.system_logs') }}?' +
+                            getSlDraftFilterParams().toString(), {
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'Accept': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                        ?.content ?? ''
+                                },
+                                signal: slDraftCountController.signal
+                            })
                         .then(function(res) {
                             if (!res.ok) throw new Error('Draft count request failed');
                             return res.json();
@@ -2415,7 +2846,7 @@
                 try {
                     const response =
                         await fetch(
-                            @json(route('admin.system_logs.check')) +
+                            @json(route($routeNames['check'] ?? 'admin.system_logs.check')) +
                             '?status=active', {
                                 cache: 'no-store',
 
@@ -2494,7 +2925,7 @@
                 );
 
                 return fetch(
-                        '{{ route('admin.system_logs') }}?' +
+                        '{{ route($routeNames['index'] ?? 'admin.system_logs') }}?' +
                         params.toString(), {
                             headers: {
                                 'X-Requested-With': 'XMLHttpRequest',
@@ -2690,19 +3121,24 @@
                         default: 's-neutral'
                     };
 
-                    var actionStatusClass =
-                        actionStatusClasses[actionClass] ||
-                        's-neutral';
+                    var isInventoryCrudLabel = String(log.module || '').toLowerCase() === 'inventory' && [
+                        'create', 'delete'
+                    ].includes(actionClass);
+                    var actionStatusClass = isInventoryCrudLabel ?
+                        's-neutral' :
+                        (actionStatusClasses[actionClass] || 's-neutral');
 
                     var actionIconHtml = '<i class="fa-solid ' + actionIcon + (actionClass === 'error' ?
                         ' sl-action-alert' : '') + '"></i>';
                     var roleIcon = roleIcons[role] || 'fa-circle-user';
                     var letter = escapeSlHtml((log.actor_name || role).charAt(0).toUpperCase());
                     var idPadded = '#' + String(log.id || '').padStart(3, '0');
-                    var actionLabel = escapeSlHtml((log.action || '').replace(/_/g, ' ').replace(/\b\w/g,
-                        function(c) {
-                            return c.toUpperCase();
-                        }));
+                    var actionLabel = isInventoryCrudLabel ?
+                        escapeSlHtml(actionClass.charAt(0).toUpperCase() + actionClass.slice(1)) :
+                        escapeSlHtml((log.action || '').replace(/_/g, ' ').replace(/\b\w/g,
+                            function(c) {
+                                return c.toUpperCase();
+                            }));
                     var moduleLabel = escapeSlHtml((log.module || '').replace(/_/g, ' ').replace(/\b\w/g,
                         function(c) {
                             return c.toUpperCase();
@@ -3231,7 +3667,6 @@
 
             window.slSetTab = slSetTab;
             window.slSetStatus = slSetStatus;
-
             window.openSlFilterPanel = openSlFilterPanel;
             window.closeSlFilterPanel = closeSlFilterPanel;
             window.applySlFilters = applySlFilters;
@@ -3250,8 +3685,7 @@
             window.openSlExportModal =
                 openSlExportModal;
 
-            window.setSlExportRole =
-                setSlExportRole;
+
             window.handleSlExportButtonClick =
                 handleSlExportButtonClick;
             window.closeSlExportModal =

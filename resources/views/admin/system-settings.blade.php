@@ -4,16 +4,29 @@
 
 @section('title', 'System Settings')
 
+@section('styles')
+    @vite('resources/css/pages/admin/system-settings.css')
+@endsection
+
 @section('content')
 
-<main id="mainContent" class="system-settings-page admin-page-shell page-enter">
+@php
+    $allowedSettingGroups = $allowedSettingGroups ?? ['general', 'notifications'];
+    $canManageGeneralSettings = in_array('general', $allowedSettingGroups, true);
+    $canManageNotificationSettings = in_array('notifications', $allowedSettingGroups, true);
+    $defaultSettingsTab = $canManageGeneralSettings
+        ? 'general'
+        : ($canManageNotificationSettings ? 'notifications' : 'general');
+@endphp
+
+<main id="mainContent" class="system-settings-page app-page-shell page-enter">
     <div class="w-full">
 
         <div class="page-banner">
             <div class="page-banner-inner">
 
                 <div>
-                    <h1 class="page-title page-banner-title">System Settings</h1>
+                    <h1 class="page-title">System Settings</h1>
                     <p class="page-subtitle">Manage notification preferences, backups, and system behavior.</p>
                 </div>
 
@@ -40,17 +53,21 @@
                                 <p class="settings-sidebar-kicker">Settings Menu</p>
                             </div>
                             <div class="p-2">
-                                <a href="#" class="settings-nav-item active"
+                                @if ($canManageGeneralSettings)
+                                <a href="#" class="settings-nav-item {{ $defaultSettingsTab === 'general' ? 'active' : '' }}"
                                     onclick="switchTab('general', this); return false;"><i
                                         class="fa-solid fa-sliders"></i> General</a>
+                                @endif
                                 {{-- Temporarily hidden: Clinic Info
                                 <a href="#" class="settings-nav-item"
                                     onclick="switchTab('clinic', this); return false;"><i
                                         class="fa-solid fa-hospital"></i> Clinic Info</a>
                                 --}}
-                                <a href="#" class="settings-nav-item"
+                                @if ($canManageNotificationSettings)
+                                <a href="#" class="settings-nav-item {{ $defaultSettingsTab === 'notifications' ? 'active' : '' }}"
                                     onclick="switchTab('notifications', this); return false;"><i
                                         class="fa-solid fa-bell"></i> Notifications</a>
+                                @endif
                                 {{-- Temporarily hidden: Security
                                 <a href="#" class="settings-nav-item"
                                     onclick="switchTab('security', this); return false;"><i
@@ -72,7 +89,8 @@
 
                     <div class="lg:col-span-3 space-y-0">
 
-                        <div id="tab-general" class="settings-section active">
+                        @if ($canManageGeneralSettings)
+                        <div id="tab-general" class="settings-section {{ $defaultSettingsTab === 'general' ? 'active' : '' }}">
                             <div class="section-card">
                                 <div class="section-card-hdr">
                                     <div class="section-card-hdr-left">
@@ -217,6 +235,7 @@
                                 </div>
                             </div>
                         </div>
+                        @endif
 
                         {{-- Temporarily hidden: Clinic Info
                         <div id="tab-clinic" class="settings-section">
@@ -297,7 +316,8 @@
 
                         --}}
 
-                        <div id="tab-notifications" class="settings-section">
+                        @if ($canManageNotificationSettings)
+                        <div id="tab-notifications" class="settings-section {{ $defaultSettingsTab === 'notifications' ? 'active' : '' }}">
                             <div class="section-card">
                                 <div class="section-card-hdr">
                                     <div class="section-card-hdr-left">
@@ -360,23 +380,6 @@
 
                                         <div class="setting-row">
                                             <div class="setting-row-info">
-                                                <div class="setting-row-label">Appointment Completed</div>
-                                                <div class="setting-row-desc">Notify patient when an appointment is
-                                                    marked as completed</div>
-                                            </div>
-                                            <label class="toggle-wrap">
-                                                <input type="hidden" name="notif_appointment_completed" value="0">
-                                                <input type="checkbox" name="notif_appointment_completed" value="1" {{
-                                                    old('notif_appointment_completed',
-                                                    $settings['notif_appointment_completed']->value ?? '1') === '1'
-                                                ? 'checked'
-                                                : '' }}>
-                                                <span class="toggle-slider"></span>
-                                            </label>
-                                        </div>
-
-                                        <div class="setting-row">
-                                            <div class="setting-row-info">
                                                 <div class="setting-row-label">Appointment Rescheduled</div>
                                                 <div class="setting-row-desc">Notify patient when an appointment
                                                     schedule is changed</div>
@@ -385,6 +388,21 @@
                                                 <input type="hidden" name="notif_rescheduled" value="0">
                                                 <input type="checkbox" name="notif_rescheduled" value="1" {{
                                                     old('notif_rescheduled', $settings['notif_rescheduled']->value ??
+                                                '1') === '1' ? 'checked' : '' }}>
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                        </div>
+
+                                        <div class="setting-row">
+                                            <div class="setting-row-info">
+                                                <div class="setting-row-label">Appointment Confirmation</div>
+                                                <div class="setting-row-desc">Notify patient immediately after a
+                                                    booking is successfully recorded</div>
+                                            </div>
+                                            <label class="toggle-wrap">
+                                                <input type="hidden" name="notif_confirmation" value="0">
+                                                <input type="checkbox" name="notif_confirmation" value="1" {{
+                                                    old('notif_confirmation', $settings['notif_confirmation']->value ??
                                                 '1') === '1' ? 'checked' : '' }}>
                                                 <span class="toggle-slider"></span>
                                             </label>
@@ -447,9 +465,10 @@
 
                                         <div class="setting-row">
                                             <div class="setting-row-info">
-                                                <div class="setting-row-label">Appointment Reminder (24h before)</div>
-                                                <div class="setting-row-desc">Send an email/SMS to patient 24 hours
-                                                    before their slot</div>
+                                                <div class="setting-row-label">Appointment Reminder (24 Hours Before
+                                                    Appointment)</div>
+                                                <div class="setting-row-desc">Notify the patient 24 hours before the
+                                                    scheduled appointment time</div>
                                             </div>
                                             <label class="toggle-wrap">
                                                 <input type="hidden" name="notif_reminder_24h" value="0">
@@ -462,23 +481,9 @@
 
                                         <div class="setting-row">
                                             <div class="setting-row-info">
-                                                <div class="setting-row-label">Appointment Confirmation</div>
-                                                <div class="setting-row-desc">Send confirmation email immediately after
-                                                    booking</div>
-                                            </div>
-                                            <label class="toggle-wrap">
-                                                <input type="hidden" name="notif_confirmation" value="0">
-                                                <input type="checkbox" name="notif_confirmation" value="1" {{
-                                                    old('notif_confirmation', $settings['notif_confirmation']->value ??
-                                                '1') === '1' ? 'checked' : '' }}>
-                                                <span class="toggle-slider"></span>
-                                            </label>
-                                        </div>
-
-                                        <div class="setting-row">
-                                            <div class="setting-row-info">
-                                                <div class="setting-row-label">Follow-up Reminder (2 days before)</div>
-                                                <div class="setting-row-desc">Notify patient 2 days before their
+                                                <div class="setting-row-label">Follow-up Reminder (48 Hours Before
+                                                    Appointment)</div>
+                                                <div class="setting-row-desc">Notify the patient 48 hours before the
                                                     scheduled follow-up appointment</div>
                                             </div>
                                             <label class="toggle-wrap">
@@ -494,8 +499,9 @@
 
                                         <div class="setting-row">
                                             <div class="setting-row-info">
-                                                <div class="setting-row-label">Follow-up Reminder (same day)</div>
-                                                <div class="setting-row-desc">Notify patient on the day of their
+                                                <div class="setting-row-label">Follow-up Reminder (On the Day of the
+                                                    Appointment)</div>
+                                                <div class="setting-row-desc">Notify the patient on the day of their
                                                     scheduled follow-up appointment</div>
                                             </div>
                                             <label class="toggle-wrap">
@@ -509,47 +515,10 @@
                                             </label>
                                         </div>
                                     </div>
-
-                                    <div class="mt-4">
-                                        <label class="form-label">Notification Channels</label>
-                                        <p class="text-xs text-gray-400 mb-2">Click to toggle. Selected channels will
-                                            be saved.</p>
-                                        @php
-                                        $savedChannels = old(
-                                        'notif_channels',
-                                        $settings['notif_channels']->value ?? 'Email,SMS,In-App',
-                                        );
-                                        $savedChannelsArray = is_array($savedChannels)
-                                        ? $savedChannels
-                                        : array_filter(
-                                        array_map('trim', explode(',', (string) $savedChannels)),
-                                        );
-                                        @endphp
-                                        <div class="flex flex-wrap gap-2 mt-1">
-                                            @foreach (['Email', 'SMS', 'WhatsApp', 'In-App'] as $channel)
-                                            <label
-                                                class="permission-chip {{ in_array($channel, $savedChannelsArray, true) ? 'active' : '' }}">
-                                                <input type="checkbox" name="notif_channels[]" value="{{ $channel }}"
-                                                    class="hidden" {{ in_array($channel, $savedChannelsArray, true)
-                                                    ? 'checked' : '' }}
-                                                    onchange="this.closest('label').classList.toggle('active', this.checked)">
-                                                @if ($channel === 'Email')
-                                                <i class="fa-solid fa-envelope text-[10px]"></i>
-                                                @elseif($channel === 'SMS')
-                                                <i class="fa-solid fa-mobile-screen text-[10px]"></i>
-                                                @elseif($channel === 'WhatsApp')
-                                                <i class="fa-brands fa-whatsapp text-[10px]"></i>
-                                                @else
-                                                <i class="fa-solid fa-bell text-[10px]"></i>
-                                                @endif
-                                                {{ $channel }}
-                                            </label>
-                                            @endforeach
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
+                        @endif
 
                         {{-- Temporarily hidden: Security
                         <div id="tab-security" class="settings-section">
@@ -934,15 +903,14 @@
         notif_new_appointment: '1',
         notif_cancellation: '1',
         notif_document_request: '1',
-        notif_appointment_completed: '1',
         notif_rescheduled: '1',
+        notif_follow_up_scheduled: '1',
         notif_document_approved: '1',
         notif_document_rejected: '1',
         notif_reminder_24h: '1',
         notif_confirmation: '1',
         notif_follow_up_reminder: '1',
         notif_follow_up_today_reminder: '1',
-        notif_channels: ['Email', 'SMS', 'In-App'],
 
         backup_frequency: 'Daily',
         backup_retention_days: '30',

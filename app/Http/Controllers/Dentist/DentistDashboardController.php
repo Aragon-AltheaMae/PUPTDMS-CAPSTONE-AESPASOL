@@ -34,11 +34,26 @@ class DentistDashboardController extends Controller
             ->orderBy('appointment_time', 'asc')
             ->get();
 
-        $startOfMonth = $now->copy()->startOfMonth()->toDateString();
-        $endOfMonth = $now->copy()->endOfMonth()->toDateString();
+        $calendarStartDate =
+            Carbon::today()
+            ->startOfMonth()
+            ->toDateString();
 
-        $calendarAppointments = Appointment::with('patient')
-            ->whereBetween('appointment_date', [$startOfMonth, $endOfMonth])
+        $calendarEndDate =
+            Carbon::today()
+            ->addDays(90)
+            ->endOfMonth()
+            ->toDateString();
+
+        $calendarAppointments =
+            Appointment::with('patient')
+            ->whereBetween(
+                'appointment_date',
+                [
+                    $calendarStartDate,
+                    $calendarEndDate,
+                ]
+            )
             ->whereIn('status', [
                 'pending',
                 'confirmed',
@@ -46,8 +61,14 @@ class DentistDashboardController extends Controller
                 'rescheduled',
                 'completed',
             ])
-            ->orderBy('appointment_date', 'asc')
-            ->orderBy('appointment_time', 'asc')
+            ->orderBy(
+                'appointment_date',
+                'asc'
+            )
+            ->orderBy(
+                'appointment_time',
+                'asc'
+            )
             ->get();
 
         $appointmentCountsPerDay = $calendarAppointments
@@ -106,7 +127,10 @@ class DentistDashboardController extends Controller
             })
             ->toArray();
 
-        $dashboardAppointmentWindow = Appointment::with('patient')
+        $dashboardAppointmentWindow = Appointment::with([
+            'patient',
+            'reservedBookingPeriod',
+        ])
             ->whereBetween('appointment_date', [
                 Carbon::today()->toDateString(),
                 Carbon::today()->addDays(90)->toDateString(),
@@ -144,6 +168,8 @@ class DentistDashboardController extends Controller
                         'date' => Carbon::parse($appointment->appointment_date)->format('Y-m-d'),
                         'is_walk_in' => (bool) ($appointment->is_walk_in ?? false),
                         'is_follow_up' => (bool) ($appointment->is_follow_up ?? false),
+                        'is_reserved' => filled($appointment->reserved_booking_period_id),
+                        'reserved_title' => $appointment->reservedBookingPeriod?->title,
 
                         'patientPhotoUrl' =>
                         optional($appointment->patient)->profile_photo_url
@@ -263,17 +289,13 @@ class DentistDashboardController extends Controller
         $gadMale = [];
 
         foreach ($gadLabels as $label) {
-            $key = $label === 'Student'
-                ? null
-                : $label;
-
             $gadFemale[] = (int) $gadRaw
-                ->where('office_type', $key)
+                ->filter(fn($row) => $this->normalizeDashboardOfficeType($row->office_type) === strtolower($label))
                 ->where('gender', 'Female')
                 ->sum('total');
 
             $gadMale[] = (int) $gadRaw
-                ->where('office_type', $key)
+                ->filter(fn($row) => $this->normalizeDashboardOfficeType($row->office_type) === strtolower($label))
                 ->where('gender', 'Male')
                 ->sum('total');
         }
@@ -391,5 +413,39 @@ class DentistDashboardController extends Controller
         }
 
         return User::where('patient_id', $patient->id)->first();
+    }
+
+    private function normalizeDashboardOfficeType(?string $officeType): string
+    {
+        $officeType = strtolower(trim((string) $officeType));
+
+        if (
+            $officeType === '' ||
+            str_contains($officeType, 'student')
+        ) {
+            return 'student';
+        }
+
+        if (str_contains($officeType, 'faculty')) {
+            return 'faculty';
+        }
+
+        if (
+            str_contains($officeType, 'admin') ||
+            str_contains($officeType, 'administrative') ||
+            str_contains($officeType, 'personnel')
+        ) {
+            return 'administrative';
+        }
+
+        if (
+            str_contains($officeType, 'dependent') ||
+            str_contains($officeType, 'alumni') ||
+            str_contains($officeType, 'guest')
+        ) {
+            return 'dependent';
+        }
+
+        return 'student';
     }
 }

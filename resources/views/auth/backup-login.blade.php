@@ -4,6 +4,10 @@
 
 @section('body-class', 'auth-guest-body backup-login-body')
 
+@section('styles')
+    @vite('resources/css/pages/auth/backup-login.css')
+@endsection
+
 @section('content')
 <div class="backup-page">
   <section class="backup-shell">
@@ -68,7 +72,7 @@
 
           <h2 class="backup-form-title">Sign in with your local admin account.</h2>
           <p class="backup-form-copy">
-            Sign in using your local administrator credentials.
+            {{ $idpStatusMessage ?? 'Primary SSO is temporarily unavailable.' }} Sign in using your local administrator credentials.
           </p>
 
           <form method="POST" action="{{ route('login.store') }}" class="backup-form">

@@ -17,6 +17,39 @@ const gumMaterialProps = {
     emissiveIntensity: 0.025
 };
 
+const sharedOdontogramGeometries = {
+    crown:
+        new THREE.SphereGeometry(
+            1,
+            32,
+            22
+        ),
+
+    cusp:
+        new THREE.SphereGeometry(
+            0.105,
+            18,
+            12
+        ),
+
+    hit:
+        new THREE.SphereGeometry(
+            1,
+            16,
+            12
+        )
+};
+
+const sharedOdontogramMaterials = {
+    hit:
+        new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.001,
+            depthWrite: false
+        })
+};
+
 export function getOdontogramToothType(
     toothNumber
 ) {
@@ -111,14 +144,31 @@ function addVisualPart(group, mesh, visualParts, colorableParts = null) {
     return mesh;
 }
 
-function createSoftCusp(x, y, z, scale, material) {
-    const cusp = new THREE.Mesh(
-        new THREE.SphereGeometry(0.105 * scale, 18, 12),
-        material.clone()
+function createSoftCusp(
+    x,
+    y,
+    z,
+    scale,
+    material
+) {
+    const cusp =
+        new THREE.Mesh(
+            sharedOdontogramGeometries
+                .cusp,
+            material.clone()
+        );
+
+    cusp.scale.set(
+        1.05 * scale,
+        0.50 * scale,
+        0.85 * scale
     );
 
-    cusp.scale.set(1.05, 0.50, 0.85);
-    cusp.position.set(x, y, z);
+    cusp.position.set(
+        x,
+        y,
+        z
+    );
 
     return cusp;
 }
@@ -145,10 +195,12 @@ export function createOdontogramTooth(
     const crownDirection = isUpper ? -1 : 1;
     const gumDirection = isUpper ? 1 : -1;
 
-    const crown = new THREE.Mesh(
-        new THREE.SphereGeometry(1, 32, 22),
-        enamelMaterial.clone()
-    );
+    const crown =
+        new THREE.Mesh(
+            sharedOdontogramGeometries
+                .crown,
+            enamelMaterial.clone()
+        );
 
     crown.scale.set(size.width, size.height, size.depth);
     crown.position.set(0, crownDirection * 0.22, 0);
@@ -161,9 +213,6 @@ export function createOdontogramTooth(
 
     neck.position.set(0, gumDirection * 0.08, 0);
     addVisualPart(toothGroup, neck, visualParts, colorableParts);
-
-    if (type === 'incisor') {
-    }
 
     if (type === 'canine') {
         const point = new THREE.Mesh(
@@ -204,15 +253,13 @@ export function createOdontogramTooth(
         });
     }
 
-    const hitGeometry = new THREE.SphereGeometry(1, 16, 12);
-    const hitMaterial = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-        transparent: true,
-        opacity: 0.001,
-        depthWrite: false
-    });
-
-    const hitMesh = new THREE.Mesh(hitGeometry, hitMaterial);
+    const hitMesh =
+        new THREE.Mesh(
+            sharedOdontogramGeometries
+                .hit,
+            sharedOdontogramMaterials
+                .hit
+        );
     hitMesh.scale.set(size.hitWidth, size.hitHeight, size.hitDepth);
     hitMesh.position.set(0, crownDirection * 0.25, 0);
 

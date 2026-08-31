@@ -4,6 +4,10 @@
 
 @section('title', 'Appointments')
 
+@section('styles')
+@vite('resources/css/pages/patient/appointment.css')
+@endsection
+
 @section('content')
 
 @php
@@ -133,7 +137,7 @@ $appt->procedure?->prescriptions
     window.apptActivityChartData = @json($appointmentActivityChart ?? []);
 </script>
 
-<main id="mainContent" class="patient-page-shell page-enter">
+<main id="mainContent" class="app-page-shell page-enter">
     <div id="appointmentPage" class="w-full">
 
         @php
@@ -143,15 +147,32 @@ $appt->procedure?->prescriptions
         ? \Carbon\Carbon::parse($latestPastVisit->appointment_date)->format('M d, Y')
         : 'No record yet';
 
-        $allAppointments = collect($appointments ?? [])->filter(fn($appt) => !empty($appt->appointment_date));
+        $completedRegularVisits = collect($appointments ?? [])
+        ->filter(function ($appt) {
+        return
+        !empty($appt->appointment_date) &&
+        strtolower(trim((string) ($appt->status ?? ''))) === 'completed' &&
+        !((bool) ($appt->is_follow_up ?? false));
+        });
 
-        $serviceStats = $allAppointments
-        ->groupBy(fn($appt) => trim((string)($appt->service_type ?? 'General Consultation')))
+        $serviceStats = $completedRegularVisits
+        ->groupBy(function ($appt) {
+        return trim(
+        (string) (
+        $appt->service_type
+        ?? 'General Consultation'
+        )
+        );
+        })
         ->map(fn($group) => $group->count())
         ->sortDesc();
 
-        $mostVisitedService = $serviceStats->keys()->first() ?: 'No visit yet';
-        $mostVisitedCount = (int) ($serviceStats->first() ?? 0);
+        $mostVisitedService =
+        $serviceStats->keys()->first()
+        ?: 'No visit yet';
+
+        $mostVisitedCount =
+        (int) ($serviceStats->first() ?? 0);
 
         $latestCompleted = collect($pastVisits ?? [])
         ->filter(function ($appt) {
@@ -172,84 +193,95 @@ $appt->procedure?->prescriptions
         $nextRecommendedText = $nextRecommendedDate->format('M d, Y');
         $daysUntilRecommended = \Carbon\Carbon::today()->diffInDays($nextRecommendedDate->copy()->startOfDay(), false);
         $recommendedHint =
-            $daysUntilRecommended < 0
-                ? 'Due now'
-                : (
-                    $daysUntilRecommended === 0
-                        ? 'Due today'
-                        : 'In ' . $daysUntilRecommended . ' days'
-                );
-        @endphp
+        $daysUntilRecommended < 0 ? 'Due now' : ( $daysUntilRecommended===0 ? 'Due today' : 'In ' .
+            $daysUntilRecommended . ' days' ); @endphp
+            <section class="appt-section-reveal mb-5">
+                <div class="appt-summary-grid">
+                    <div class="appt-summary-card">
+                        <div class="appt-summary-content">
 
-        <section class="appt-section-reveal mb-5">
-            <div class="appt-summary-grid">
-                <div class="appt-summary-card">
-                    <div class="flex items-center gap-4">
-                        <div class="appt-summary-icon">
-                            <i class="fa-regular fa-calendar-check"></i>
+                            <div class="appt-summary-icon">
+                                <i class="fa-regular fa-calendar-check"></i>
+                            </div>
+
+                            <div class="appt-summary-copy">
+                                <p class="appt-summary-label">
+                                    Next Visit
+                                </p>
+
+                                <h3 class="appt-summary-value">
+                                    {{ $futureVisits->count()
+                                    ? \Carbon\Carbon::parse(
+                                    $futureVisits->first()->appointment_date
+                                    )->format('M d, Y')
+                                    : 'None'
+                                    }}
+                                </h3>
+                            </div>
+
                         </div>
-                        <div>
-                            <p class="text-[11px] font-extrabold uppercase tracking-[0.16em] text-gray-400">Next Visit
-                            </p>
-                            <h3 class="mt-1 text-lg font-extrabold text-gray-900 dark:text-gray-100">
-                                {{ $futureVisits->count()
-                                ? \Carbon\Carbon::parse($futureVisits->first()->appointment_date)->format('M d, Y')
-                                : 'None' }}
-                            </h3>
+                    </div>
+
+                    <div class="appt-summary-card">
+                        <div class="appt-summary-content">
+                            <div class="appt-summary-icon">
+                                <i class="fa-solid fa-tooth"></i>
+                            </div>
+                            <div class="appt-summary-copy">
+                                <p class="appt-summary-label">
+                                    Total Visits
+                                </p>
+                                <h3 class="appt-summary-value">
+                                    {{ $pastVisits->count() }}
+                                </h3>
+                            </div>
                         </div>
+                    </div>
+
+                    <div class="appt-summary-card">
+                        <div class="appt-summary-content">
+                            <div class="appt-summary-icon">
+                                <i class="fa-regular fa-clock"></i>
+                            </div>
+                            <div class="appt-summary-copy">
+                                <p class="appt-summary-label">
+                                    Last Visit
+                                </p>
+                                <h3 class="appt-summary-value">
+                                    {{ $latestPastDate }}
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="appt-tip-card">
+
+                        <div class="appt-tip-content">
+
+                            <div class="appt-tip-icon">
+                                <i class="fa-solid fa-lightbulb"></i>
+                            </div>
+
+                            <div class="appt-tip-copy">
+                                <p class="appt-tip-title">
+                                    Dental Care Tip
+                                </p>
+
+                                <p class="appt-tip-text">
+                                    Regular check-ups are recommended every 6 months
+                                    to keep your oral health on track.
+                                </p>
+                            </div>
+
+                        </div>
+
+                        <button type="button" class="ui-btn ui-btn-secondary ui-btn-sm" onclick="handleScheduleCheckup()">
+                            <i class="fa-solid fa-calendar-plus"></i>
+                            <span>Schedule Check-Up</span>
+                        </button>
+
                     </div>
                 </div>
-
-                <div class="appt-summary-card">
-                    <div class="flex items-center gap-4">
-                        <div class="appt-summary-icon">
-                            <i class="fa-solid fa-tooth"></i>
-                        </div>
-                        <div>
-                            <p class="text-[11px] font-extrabold uppercase tracking-[0.16em] text-gray-400">Total Visits
-                            </p>
-                            <h3 class="mt-1 text-lg font-extrabold text-gray-900 dark:text-gray-100">
-                                {{ $pastVisits->count() }}
-                            </h3>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="appt-summary-card">
-                    <div class="flex items-center gap-4">
-                        <div class="appt-summary-icon">
-                            <i class="fa-regular fa-clock"></i>
-                        </div>
-                        <div>
-                            <p class="text-[11px] font-extrabold uppercase tracking-[0.16em] text-gray-400">Last Visit
-                            </p>
-                            <h3 class="mt-1 text-lg font-extrabold text-gray-900 dark:text-gray-100">
-                                {{ $latestPastDate }}
-                            </h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="appt-tip-card mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div class="flex items-start gap-3">
-                    <div
-                        class="w-10 h-10 rounded-full bg-[#8B0000]/10 text-[#8B0000] dark:text-[#FCA5A5] flex items-center justify-center flex-shrink-0">
-                        <i class="fa-solid fa-lightbulb"></i>
-                    </div>
-                    <div>
-                        <p class="text-sm font-extrabold text-gray-900 dark:text-gray-100">Dental Care Tip</p>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
-                            Regular check-ups are recommended every 6 months to keep your oral health on track.
-                        </p>
-                    </div>
-                </div>
-
-                <button type="button" class="ui-btn ui-btn-secondary" onclick="handleScheduleCheckup()">
-                    <i class="fa-solid fa-calendar-plus"></i>
-                    <span>Schedule Check-Up</span>
-                </button>
-            </div>
             </section>
 
             <section class="fade-up mb-6 sm:mb-8">
@@ -257,16 +289,19 @@ $appt->procedure?->prescriptions
                     <div class="xl:col-span-4">
                         <div class="appt-calendar-side">
                             <div class="appt-calendar-side-card">
-                                <p
-                                    class="text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#8B0000] dark:text-[#FCA5A5]">
+                                <p class="appt-calendar-eyebrow">
                                     Monthly Highlights
                                 </p>
-                                <h3 class="mt-1 text-lg font-extrabold text-gray-900 dark:text-gray-100">Your Visit
-                                    Patterns</h3>
-                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Personalized summary based on
-                                    your appointment history.</p>
 
-                                <div class="mt-4 space-y-2.5">
+                                <h3 class="appt-calendar-title">
+                                    Your Visit Patterns
+                                </h3>
+
+                                <p class="appt-calendar-subtitle">
+                                    Personalized summary based on your appointment history.
+                                </p>
+
+                                <div class="appt-calendar-stats">
                                     <div class="appt-calendar-side-stat appt-highlight-service">
                                         <div class="appt-highlight-service-copy">
                                             <span class="appt-highlight-label">
@@ -289,38 +324,54 @@ $appt->procedure?->prescriptions
                                         </span>
                                     </div>
 
-                                    <div class="appt-calendar-side-stat flex items-center justify-between">
-                                        <span
-                                            class="text-xs font-bold uppercase tracking-[0.1em] text-gray-500 dark:text-gray-400">Last
-                                            Completed Visit</span>
-                                        <span class="text-xs font-extrabold text-blue-700 dark:text-blue-300">{{
-                                            $latestCompletedText }}</span>
+                                    <div class="appt-calendar-side-stat appt-calendar-stat-row">
+
+                                        <span class="appt-calendar-stat-label">
+                                            Last Completed Visit
+                                        </span>
+
+                                        <span class="appt-calendar-stat-value appt-calendar-stat-value-info">
+                                            {{ $latestCompletedText }}
+                                        </span>
+
                                     </div>
 
-                                    <div class="appt-calendar-side-stat flex items-center justify-between">
-                                        <span
-                                            class="text-xs font-bold uppercase tracking-[0.1em] text-gray-500 dark:text-gray-400">Next
-                                            Recommended Checkup</span>
-                                        <span class="text-xs font-extrabold text-amber-700 dark:text-amber-300">{{
-                                            $nextRecommendedText }}</span>
+                                    <div class="appt-calendar-side-stat appt-calendar-stat-row">
+
+                                        <span class="appt-calendar-stat-label">
+                                            Next Recommended Checkup
+                                        </span>
+
+                                        <span class="appt-calendar-stat-value appt-calendar-stat-value-warning">
+                                            {{ $nextRecommendedText }}
+                                        </span>
+
                                     </div>
-                                    <p class="px-1 -mt-1 text-xs text-gray-500 dark:text-gray-400">{{ $recommendedHint
-                                        }}</p>
+                                    <p class="appt-calendar-hint">
+                                        {{ $recommendedHint }}
+                                    </p>
                                 </div>
                             </div>
 
                             <div class="appt-calendar-side-card">
-                                <div class="flex items-center justify-between gap-2">
-                                    <p class="text-xs font-extrabold text-gray-800 dark:text-gray-200">6-Month Activity
+                                <div class="appt-activity-header">
+
+                                    <p class="appt-activity-title">
+                                        6-Month Activity
                                     </p>
-                                    <div class="flex items-center gap-2 text-[10px] font-bold">
-                                        <span
-                                            class="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-300"><i
-                                                class="fa-solid fa-circle text-[8px]"></i>Completed</span>
-                                        <span
-                                            class="inline-flex items-center gap-1 text-orange-700 dark:text-orange-300"><i
-                                                class="fa-solid fa-circle text-[8px]"></i>Cancelled</span>
+
+                                    <div class="appt-activity-legend">
+                                        <span class="appt-activity-legend-item completed">
+                                            <i class="fa-solid fa-circle"></i>
+                                            Completed
+                                        </span>
+
+                                        <span class="appt-activity-legend-item cancelled">
+                                            <i class="fa-solid fa-circle"></i>
+                                            Cancelled
+                                        </span>
                                     </div>
+
                                 </div>
 
                                 <div class="appt-mini-chart">
@@ -338,19 +389,18 @@ $appt->procedure?->prescriptions
                 </div>
 
                 <div class="appt-quick-actions">
-                    <a href="{{ route('patient.book.appointment') }}" class="ui-btn ui-btn-secondary ui-btn-block">
+                    <a href="{{ route('patient.book.appointment') }}" class="ui-btn ui-btn-secondary ">
                         <i class="fa-solid fa-calendar-plus"></i>
                         <span>Rebook Appointment</span>
                     </a>
 
-                    <button type="button" class="ui-btn ui-btn-secondary ui-btn-block"
+                    <button type="button" class="ui-btn ui-btn-secondary "
                         onclick="apptShowPast(); document.getElementById('apptPastPanel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });">
                         <i class="fa-solid fa-clock-rotate-left"></i>
                         <span>View Past Visits</span>
                     </button>
 
-                    <button type="button" class="ui-btn ui-btn-secondary ui-btn-block"
-                        onclick="scrollToAppointmentCalendar()">
+                    <button type="button" class="ui-btn ui-btn-secondary " onclick="scrollToAppointmentCalendar()">
                         <i class="fa-solid fa-calendar-days"></i>
                         <span>Focus Calendar</span>
                     </button>
@@ -460,7 +510,8 @@ $appt->procedure?->prescriptions
                                         <span class="appt-timeline-dot active">
                                             <i class="fa-solid fa-user-check"></i>
                                         </span>
-                                        <p class="text-sm font-extrabold text-gray-900 dark:text-gray-100">Profile ready
+                                        <p class="text-sm font-extrabold text-gray-900 dark:text-gray-100">Profile
+                                            ready
                                         </p>
                                         <p class="text-xs text-gray-500 dark:text-gray-400">Your patient account is
                                             ready
@@ -472,9 +523,11 @@ $appt->procedure?->prescriptions
                                         <span class="appt-timeline-dot">
                                             <i class="fa-regular fa-calendar-plus"></i>
                                         </span>
-                                        <p class="text-sm font-extrabold text-gray-900 dark:text-gray-100">Choose a date
+                                        <p class="text-sm font-extrabold text-gray-900 dark:text-gray-100">Choose a
+                                            date
                                         </p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">Pick an available schedule
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Pick an available
+                                            schedule
                                             from
                                             the
                                             clinic calendar.</p>
@@ -487,7 +540,8 @@ $appt->procedure?->prescriptions
                                         <p class="text-sm font-extrabold text-gray-900 dark:text-gray-100">Visit the
                                             clinic
                                         </p>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">Your confirmed appointment
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">Your confirmed
+                                            appointment
                                             will
                                             appear here.</p>
                                     </div>
@@ -582,9 +636,11 @@ $appt->procedure?->prescriptions
 
             return match (true) {
             str_contains($name, 'clean') || str_contains($name, 'prophy') => 'fa-solid fa-broom',
-            str_contains($name, 'check') || str_contains($name, 'consult') || str_contains($name, 'oral') => 'fa-solid
+            str_contains($name, 'check') || str_contains($name, 'consult') || str_contains($name, 'oral') =>
+            'fa-solid
             fa-stethoscope',
-            str_contains($name, 'restor') || str_contains($name, 'filling') || str_contains($name, 'crown') => 'fa-solid
+            str_contains($name, 'restor') || str_contains($name, 'filling') || str_contains($name, 'crown') =>
+            'fa-solid
             fa-tooth',
             str_contains($name, 'surgery') || str_contains($name, 'extraction') || str_contains($name, 'extract') =>
             'fa-solid fa-kit-medical',
@@ -595,14 +651,13 @@ $appt->procedure?->prescriptions
             @endphp
 
             <section class="appointment-services-section">
-                <div class="appointment-services-heading">
-                    <div class="appointment-services-heading-icon">
+                <div class="appt-list-heading">
+                    <div class="appt-list-heading-icon">
                         <i class="fa-solid fa-tooth"></i>
                     </div>
 
-                    <div class="appointment-services-heading-copy">
+                    <div class="appt-list-heading-copy">
                         <h2>Services Offered</h2>
-
                         <p>
                             Available dental care services at the clinic.
                         </p>
@@ -707,11 +762,40 @@ isset($scheduleRules)
 <script>
     let apptActivityChartInstance = null;
 
-    function initAppointmentActivityChart() {
-        const canvas = document.getElementById('apptActivityChart');
-        if (!canvas || typeof Chart === 'undefined') return;
+    async function initAppointmentActivityChart() {
+        const canvas =
+            document.getElementById(
+                'apptActivityChart'
+            );
 
-        const dataRows = Array.isArray(window.apptActivityChartData) ? window.apptActivityChartData : [];
+        if (!canvas) {
+            return;
+        }
+
+        let Chart;
+
+        try {
+            Chart =
+                await window.loadChartJs?.();
+        } catch (error) {
+            console.error(
+                'Unable to load appointment activity chart.',
+                error
+            );
+
+            return;
+        }
+
+        if (!Chart) {
+            return;
+        }
+
+        const dataRows =
+            Array.isArray(
+                window.apptActivityChartData
+            )
+                ? window.apptActivityChartData
+                : [];
         const labels = dataRows.map(row => row.label || '');
         const completed = dataRows.map(row => Number(row.completed || 0));
         const cancelled = dataRows.map(row => Number(row.cancelled || 0));
@@ -960,10 +1044,13 @@ isset($scheduleRules)
         }, 310);
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        initApptAccordions();
-        initAppointmentActivityChart();
-    });
+    document.addEventListener(
+        'DOMContentLoaded',
+        function () {
+            initApptAccordions();
+            initAppointmentActivityChart();
+        }
+    );
 
     let viewOdontogramData = [];
 

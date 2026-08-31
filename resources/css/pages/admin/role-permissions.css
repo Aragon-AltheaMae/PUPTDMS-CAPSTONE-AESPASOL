@@ -80,10 +80,18 @@
     cursor: pointer;
 }
 
+.role-delete-action {
+    position: absolute;
+    top: .85rem;
+    right: .85rem;
+    z-index: 3;
+}
+
 .role-card-header {
     display: flex;
     align-items: center;
     gap: .75rem;
+    padding-right: 3rem;
 }
 
 .role-card-copy {
@@ -728,14 +736,6 @@
 }
 
 @media (max-width: 900px) {
-    .admin-page-shell {
-        padding-inline: 1rem !important;
-    }
-
-    .main-grid {
-        grid-template-columns: 1fr !important;
-        gap: 1rem !important;
-    }
 
     .page-banner-inner {
         flex-direction: column !important;
@@ -812,19 +812,6 @@
 }
 
 @media (max-width: 767px) {
-    .admin-page-shell {
-        padding-inline: .85rem !important;
-        padding-bottom: 7.5rem !important;
-        overflow-x: hidden !important;
-    }
-
-    .main-grid {
-        display: grid !important;
-        grid-template-columns: 1fr !important;
-        gap: 1rem !important;
-        width: 100% !important;
-        min-width: 0 !important;
-    }
 
     .role-permission-shell>.page-banner {
         margin-bottom: 1rem !important;

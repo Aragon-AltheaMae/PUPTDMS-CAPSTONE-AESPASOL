@@ -7,6 +7,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Services\FacultyApiService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -37,6 +38,11 @@ class FacultyController extends Controller
 
     public function store(Request $request)
     {
+        abort_unless(
+            Auth::user()?->hasPermission('create_faculty_integration'),
+            403
+        );
+
         $request->validate([
             'faculty_json'   => 'required',
             'cms_role'       => 'required|in:patient,admin,dentist',

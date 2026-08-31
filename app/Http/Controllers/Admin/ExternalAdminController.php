@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
@@ -28,6 +29,11 @@ class ExternalAdminController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        abort_unless(
+            Auth::user()?->hasPermission('create_cms_integration'),
+            403
+        );
+
         $validated = $request->validate([
             'external_admin_id' => 'required|string|max:255',
             'fname' => 'nullable|string|max:255',
@@ -61,7 +67,7 @@ class ExternalAdminController extends Controller
             );
 
             return redirect()
-                ->route('admin.assign-cms-access')
+                ->route(request()->routeIs('dentist.*') ? 'dentist.assign-cms-access' : 'admin.assign-cms-access')
                 ->with('success', 'CMS access saved successfully.');
         } catch (\Throwable $e) {
             Log::error('Failed to save CMS access', [
@@ -241,9 +247,18 @@ class ExternalAdminController extends Controller
         $fname = trim((string) ($item['first_name'] ?? ''));
         $lname = trim((string) ($item['last_name'] ?? ''));
         $fullName = trim((string) ($item['name'] ?? trim($fname . ' ' . $lname)));
+        $externalAdminId = collect([
+            $item['admin_id'] ?? null,
+            $item['external_admin_id'] ?? null,
+            $item['user_id'] ?? null,
+            $item['id'] ?? null,
+            $item['email'] ?? null,
+        ])
+            ->map(fn($value) => is_scalar($value) ? trim((string) $value) : '')
+            ->first(fn($value) => $value !== '');
 
         return [
-            'admin_id' => $item['admin_id'] ?? null,
+            'admin_id' => $externalAdminId,
             'fname' => $fname,
             'lname' => $lname,
             'full_name' => $fullName,
@@ -256,6 +271,7 @@ class ExternalAdminController extends Controller
             'civil_status' => $item['civil_status'] ?? '',
             'access_level' => $item['access_level'] ?? '',
             'contact_number' => $item['emergency_contact_no'] ?? '',
+            'senior_pwd' => $item['senior_pwd'] ?? '',
             'emergency_contact_person' => $item['emergency_contact_person'] ?? '',
             'last_updated' => $item['last_updated'] ?? null,
         ];

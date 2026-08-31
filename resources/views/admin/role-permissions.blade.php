@@ -1,31 +1,48 @@
 @extends('layouts.app')
 
+@php
+$routePrefix = request()->routeIs('dentist.*') ? 'dentist' : 'admin';
+$rolePermissionsBasePath = $routePrefix === 'dentist' ? '/dentist/role-permissions' : '/admin/role-permissions';
+@endphp
+
 @section('layout-role', 'admin')
 
 @section('title', 'Roles & Permissions')
+
+@section('styles')
+@vite('resources/css/pages/admin/role-permissions.css')
+@endsection
 
 @section('content')
 
 @php
 $logs = $logs ?? collect([]);
 $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $logs->total() : $logs->count();
+
+$authUser = auth()->user();
+$canViewAsRole = $authUser?->hasPermission('access_super_admin_dashboard') ?? false;
+$canCreateRoles = $authUser?->hasPermission('create_custom_roles') ?? false;
+$canUpdateRolePermissions = $authUser?->hasPermission('update_role_permissions') ?? false;
+$canDeleteCustomRoles = $authUser?->hasPermission('delete_custom_roles') ?? false;
 @endphp
 
-<main id="mainContent" class="admin-page-shell page-enter">
+<main id="mainContent" class="app-page-shell page-enter">
     <div class="role-permission-shell">
 
         <div class="page-banner">
             <div class="page-banner-inner">
                 <div>
-                    <h1 class="page-title page-banner-title">Roles & Permissions</h1>
+                    <h1 class="page-title">Roles & Permissions</h1>
                     <p class="page-subtitle">Manage role access and permission groups across the system.</p>
                 </div>
 
                 <div class="page-banner-actions">
+                    @if ($canCreateRoles)
                     <button type="button" class="ui-btn ui-btn-primary" onclick="openNewRoleModal()">
                         <i class="fa-solid fa-plus"></i>
                         <span>New Role</span>
                     </button>
+                    @endif
                 </div>
             </div>
         </div>
@@ -39,8 +56,12 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                 $n = strtolower($name);
                 $s = strtolower($slug);
 
-                if (str_contains($n, 'super') || str_contains($s, 'super') || $s === 'admin') {
-                return ['badgeColor' => '#7B0D0D', 'label' => 'Full Access'];
+                if (str_contains($n, 'super') || str_contains($s, 'super')) {
+                return ['badgeColor' => '#7B0D0D', 'label' => 'Protected'];
+                }
+
+                if ($s === 'admin') {
+                return ['badgeColor' => '#7B0D0D', 'label' => 'Configured'];
                 }
 
                 if (str_contains($n, 'dentist') || str_contains($s, 'dentist')) {
@@ -92,7 +113,7 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                         data-total="{{ $totalPerms }}" data-pct="{{ $pct }}" data-slug="{{ $role->slug }}"
                         data-is-super="{{ $isSuperRole ? '1' : '0' }}" onclick="selectRole(this)">
 
-                        @if (!$isProtectedRole)
+                        @if (!$isProtectedRole && $canDeleteCustomRoles)
                         <button type="button" class="ui-action-btn ui-action-delete role-delete-action" onclick="event.stopPropagation(); openDeleteModal(
         '{{ $role->id }}',
         @js($role->name)
@@ -186,6 +207,7 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
 
                             <div class="card-header-actions role-permission-actions">
 
+                                @if ($canViewAsRole)
                                 <button type="button" class="ui-action-btn ui-action-view role-view-as-action"
                                     id="globalViewAsBtn" onclick="openViewAs()" data-tooltip="View as role"
                                     data-tooltip-tone="view" aria-label="View as role">
@@ -195,6 +217,7 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                                         0
                                     </span>
                                 </button>
+                                @endif
 
                                 <button type="button" class="ui-btn ui-btn-secondary ui-btn-sm" id="collapseBtn"
                                     onclick="toggleAllGroups()">
@@ -221,8 +244,8 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                         <i class="fa-solid fa-shield-halved" style="font-size:24px; color:#d97706;"></i>
                         <div>
                             <div style="font-weight:800; font-size:13px; color:#92400e;">Protected Role</div>
-                            <div style="font-size:12px; color:#b45309;">Admin has unrestricted access and
-                                cannot be modified.</div>
+                            <div style="font-size:12px; color:#b45309;">System roles stay protected from deletion, but
+                                permissions remain explicitly defined.</div>
                         </div>
                     </div>
 
@@ -313,7 +336,8 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                                             <input type="checkbox" class="global-switch-input group-master"
                                                 data-role="{{ $role->id }}" data-module="{{ $mSlug }}"
                                                 data-discard-ignore="true" {{ $allOn ? 'checked' : '' }} {{ $isSuperRole
-                                                ? 'disabled' : '' }} onchange="onGroupMasterChange(this)">
+                                                || !$canUpdateRolePermissions ? 'disabled' : '' }}
+                                                onchange="onGroupMasterChange(this)">
 
                                             <span class="global-switch-track"></span>
                                         </label>
@@ -334,8 +358,6 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                                         <thead>
                                             <tr>
                                                 <th>Permission</th>
-                                                <th>Slug</th>
-
                                                 <th class="table-cell-center">
                                                     Status
                                                 </th>
@@ -348,19 +370,15 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
 
                                         <tbody>
                                             @foreach ($permissions as $permission)
-
                                             @php
-                                            $isGranted =
-                                            $role->permissions->contains(
+                                            $isGranted = $role->permissions->contains(
                                             'id',
-                                            $permission->id
+                                            $permission->id,
                                             );
                                             @endphp
 
-                                            <tr class="perm-row" data-perm-search="{{ strtolower(
-                $permission->name . ' ' .
-                $permission->slug
-            ) }}">
+                                            <tr class="perm-row"
+                                                data-perm-search="{{ strtolower($permission->name . ' ' . $permission->slug) }}">
                                                 <td class="table-cell-main">
 
                                                     <span class="table-primary">
@@ -371,20 +389,13 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
 
                                                 </td>
 
-                                                <td>
-                                                    {{ $permission->slug }}
-                                                </td>
-
                                                 <td class="table-cell-center">
 
-                                                    <span class="status-pill {{ $isGranted
-        ? 'status-granted'
-        : 'status-denied' }}">
+                                                    <span
+                                                        class="status-pill {{ $isGranted ? 'status-granted' : 'status-denied' }}">
                                                         <span class="status-dot"></span>
 
-                                                        {{ $isGranted
-                                                        ? 'Granted'
-                                                        : 'Denied' }}
+                                                        {{ $isGranted ? 'Granted' : 'Denied' }}
                                                     </span>
 
                                                 </td>
@@ -400,7 +411,8 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                                                             data-color="{{ $icol }}"
                                                             data-perm-name="{{ $permission->name }}"
                                                             data-perm-slug="{{ $permission->slug }}" {{ $isGranted
-                                                            ? 'checked' : '' }} {{ $isSuperRole ? 'disabled' : '' }}
+                                                            ? 'checked' : '' }} {{ $isSuperRole ||
+                                                            !$canUpdateRolePermissions ? 'disabled' : '' }}
                                                             onchange="onPermChange(this)">
 
                                                         <span class="global-switch-track"></span>
@@ -410,7 +422,6 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                                                 </td>
 
                                             </tr>
-
                                             @endforeach
 
                                         </tbody>
@@ -438,6 +449,7 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                     </div>
 
                     <div class="fsb-actions">
+                        @if ($canViewAsRole)
                         <button type="button" class="ui-action-btn ui-action-view fsb-view-as" onclick="openViewAs()"
                             data-tooltip="View as role" data-tooltip-tone="view" aria-label="View as role">
                             <i class="fa-solid fa-eye"></i>
@@ -446,6 +458,7 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                                 0
                             </span>
                         </button>
+                        @endif
 
                         <button type="button" class="ui-btn ui-btn-secondary btn-discard"
                             onclick="requestDiscardRoleChanges('{{ $role->id }}')">
@@ -471,6 +484,7 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
     </div>
 </main>
 
+@if ($canCreateRoles)
 <div id="newRoleModal" class="ui-modal modal-theme-primary" aria-hidden="true">
 
     <div class="ui-modal-card modal-md">
@@ -497,7 +511,7 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
             </button>
         </div>
 
-        <form id="createRoleForm" action="{{ route('admin.role_permissions.store_role') }}" method="POST"
+        <form id="createRoleForm" action="{{ route($routePrefix . '.role_permissions.store_role') }}" method="POST"
             class="modal-card-form" data-global-validation data-form-validation-rule="createRole" data-discard-form
             data-discard-title="Discard new role?" data-discard-subtitle="You have unsaved role information."
             data-discard-message="Closing this modal will remove the role information you entered. Do you want to discard these changes?"
@@ -555,61 +569,13 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
         </form>
     </div>
 </div>
+@endif
 
-<div id="deleteRoleModal" class="ui-modal modal-theme-danger" aria-hidden="true">
-
-    <div class="ui-modal-card modal-sm">
-        <div class="modal-hd">
-            <div class="modal-heading">
-                <div class="modal-icon">
-                    <i class="fa-solid fa-trash-can"></i>
-                </div>
-
-                <div class="modal-copy">
-                    <h3 class="modal-title">Delete Role</h3>
-                    <p class="modal-subtitle">
-                        Permanently remove the selected role.
-                    </p>
-                </div>
-            </div>
-
-            <button type="button" onclick="closeDeleteModal()" class="modal-x" aria-label="Close delete role modal">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <div class="modal-bd">
-            <div class="global-confirm-alert">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-
-                <p>
-                    Delete
-                    <strong id="deleteRoleName"></strong>?
-
-                    <span id="deleteRoleFallbackNote">
-                        Affected users will be reassigned to a default role.
-                    </span>
-                </p>
-            </div>
-        </div>
-
-        <div class="modal-ft">
-            <button type="button" onclick="closeDeleteModal()" class="ui-btn ui-btn-secondary">
-                Cancel
-            </button>
-
-            <form id="deleteRoleForm" method="POST">
-                @csrf
-                @method('DELETE')
-
-                <button type="submit" class="ui-btn ui-btn-danger">
-                    <i class="fa-solid fa-trash-can"></i>
-                    <span>Delete</span>
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
+@if ($canDeleteCustomRoles)
+<x-delete-confirm-modal id="deleteRoleModal" form-id="deleteRoleForm" name-id="deleteRoleName" title="Delete Role"
+    subtitle="This action requires confirmation" message="Are you sure you want to delete"
+    helper="This role will be permanently removed." close-callback="closeDeleteModal()" />
+@endif
 
 <div id="resetConfirmModal" class="ui-modal modal-theme-warning" aria-hidden="true">
     <div class="ui-modal-card modal-sm" role="dialog" aria-modal="true" aria-labelledby="resetConfirmTitle"
@@ -650,10 +616,7 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
 
                 <div>
                     <p>
-                        Reset permissions for
-                        <strong>
-                            Admin, Dentist, and Patient
-                        </strong>?
+                        Reset permissions for <strong>Admin, Dentist, and Patient?</strong>
                     </p>
 
                     <span>
@@ -918,17 +881,14 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                         savedGrants[
                             roleId
                         ].push({
-                            name:
-                                input.dataset
-                                    .permName || '',
+                            name: input.dataset
+                                .permName || '',
 
-                            slug:
-                                input.dataset
-                                    .permSlug || '',
+                            slug: input.dataset
+                                .permSlug || '',
 
-                            color:
-                                input.dataset
-                                    .color ||
+                            color: input.dataset
+                                .color ||
                                 '#4b5563'
                         });
                     }
@@ -1156,6 +1116,27 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
         updateFABVisibility();
     }
 
+    function hasActiveRolePermissionModal() {
+        const modalIds = [
+            'newRoleModal',
+            'deleteRoleModal',
+            'resetConfirmModal',
+            'vaOverlay',
+            'patientPickerOverlay'
+        ];
+
+        return modalIds.some(id => {
+            const modal = document.getElementById(id);
+            if (!modal) return false;
+
+            const ariaHidden = modal.getAttribute('aria-hidden');
+            return ariaHidden === 'false' ||
+                modal.classList.contains('show') ||
+                modal.classList.contains('open') ||
+                !modal.hidden;
+        });
+    }
+
     function updateFABVisibility() {
         document.querySelectorAll('.floating-save-bar').forEach(b => b.classList.remove('show'));
 
@@ -1163,7 +1144,7 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
         const bar = document.getElementById('footer-bar-' + activeRoleId);
         if (!bar) return;
 
-        if (isModalActive) {
+        if (isModalActive && hasActiveRolePermissionModal()) {
             return;
         }
 
@@ -1432,10 +1413,9 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                 '.chevron'
             );
 
-        const willCollapse =
-            !body.classList.contains(
-                'collapsed'
-            );
+        const willCollapse = !body.classList.contains(
+            'collapsed'
+        );
 
         body.classList.toggle(
             'collapsed',
@@ -1454,16 +1434,15 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                 'collapseBtn'
             );
 
-        const form =
-            [
-                ...document.querySelectorAll(
-                    '.role-form'
-                )
-            ].find(
-                form =>
-                    form.style.display ===
-                    'block'
-            );
+        const form = [
+            ...document.querySelectorAll(
+                '.role-form'
+            )
+        ].find(
+            form =>
+                form.style.display ===
+                'block'
+        );
 
         if (
             !form ||
@@ -1472,8 +1451,7 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
             return;
         }
 
-        allExpanded =
-            !allExpanded;
+        allExpanded = !allExpanded;
 
         form
             .querySelectorAll(
@@ -1509,12 +1487,12 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
             });
 
         button.innerHTML =
-            allExpanded
-                ? `
+            allExpanded ?
+                `
                 <i class="fa-solid fa-angles-up"></i>
                 <span>Collapse All</span>
-            `
-                : `
+            ` :
+                `
                 <i class="fa-solid fa-angles-down"></i>
                 <span>Expand All</span>
             `;
@@ -1716,7 +1694,7 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
         btn.disabled = true;
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
 
-        fetch('{{ route('admin.role_permissions.update') }}', {
+        fetch('{{ route($routePrefix . '.role_permissions.update') }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1784,16 +1762,15 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
             .toLowerCase()
             .trim();
 
-        const form =
-            [
-                ...document.querySelectorAll(
-                    '.role-form'
-                )
-            ].find(
-                form =>
-                    form.style.display ===
-                    'block'
-            );
+        const form = [
+            ...document.querySelectorAll(
+                '.role-form'
+            )
+        ].find(
+            form =>
+                form.style.display ===
+                'block'
+        );
 
         if (!form) {
             return;
@@ -1842,16 +1819,15 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                         )
                             .toLowerCase();
 
-                    const matches =
-                        !q ||
+                    const matches = !q ||
                         searchable.includes(
                             q
                         );
 
                     row.style.display =
-                        matches
-                            ? ''
-                            : 'none';
+                        matches ?
+                            '' :
+                            'none';
 
                     if (matches) {
                         hasVisibleRow =
@@ -1860,9 +1836,9 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
                 });
 
                 moduleCard.style.display =
-                    hasVisibleRow
-                        ? ''
-                        : 'none';
+                    hasVisibleRow ?
+                        '' :
+                        'none';
 
                 if (hasVisibleRow) {
                     visibleGroups++;
@@ -1905,13 +1881,11 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
             window.EmptyState
                 ?.renderSearch({
                     host: empty,
-                    input:
-                        document.getElementById(
-                            'permSearch'
-                        ),
+                    input: document.getElementById(
+                        'permSearch'
+                    ),
                     query: q,
-                    message:
-                        'Try a different permission name or slug.',
+                    message: 'Try a different permission name or slug.',
                 });
 
             return;
@@ -2146,9 +2120,7 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
         updateFABVisibility();
 
         document.getElementById('deleteRoleName').textContent = roleName;
-        document.getElementById('deleteRoleFallbackNote').textContent =
-            `Affected users will be reassigned to the default ${getFallbackRoleName(roleName, slug)} role.`;
-        document.getElementById('deleteRoleForm').action = `/admin/role-permissions/${roleId}/destroy`;
+        document.getElementById('deleteRoleForm').action = `${@json($rolePermissionsBasePath)}/${roleId}/destroy`;
         window.openModal?.('deleteRoleModal');
     }
 
@@ -2275,7 +2247,7 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
     <span>Resetting...</span>
 `;
 
-        fetch('/admin/role-permissions/reset', {
+        fetch('{{ $rolePermissionsBasePath }}/reset', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -2317,22 +2289,21 @@ $totalCount = $logs instanceof \Illuminate\Pagination\LengthAwarePaginator ? $lo
 
                             document.dispatchEvent(
                                 new CustomEvent(
-                                    'voice:refresh',
-                                    {
-                                        detail: {
-                                            root: currentGrid
-                                        }
+                                    'voice:refresh', {
+                                    detail: {
+                                        root: currentGrid
                                     }
+                                }
                                 )
                             );
 
                             const roleCard =
                                 (
-                                    previousRoleId
-                                        ? document.querySelector(
+                                    previousRoleId ?
+                                        document.querySelector(
                                             `.role-card[data-role-id="${previousRoleId}"]`
-                                        )
-                                        : null
+                                        ) :
+                                        null
                                 ) ||
                                 document.querySelector(
                                     '.role-card'

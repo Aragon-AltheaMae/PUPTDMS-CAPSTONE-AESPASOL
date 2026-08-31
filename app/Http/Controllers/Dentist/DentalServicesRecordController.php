@@ -198,6 +198,20 @@ class DentalServicesRecordController extends Controller
             return '';
         }
 
+        $patientType = strtolower(trim((string) (
+            $patient->patient_type
+            ?? $patient->type
+            ?? ''
+        )));
+
+        if (
+            str_contains($patientType, 'dependent') ||
+            str_contains($patientType, 'alumni') ||
+            str_contains($patientType, 'guest')
+        ) {
+            return 'Dependent';
+        }
+
         if (filled($patient->faculty_code)) {
             return 'Faculty';
         }

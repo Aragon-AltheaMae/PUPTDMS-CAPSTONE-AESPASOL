@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\BlockedDate;
 use App\Models\ClinicSchedule;
+use App\Models\ReservedBookingPeriod;
+use App\Services\StudentTargetOptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -14,10 +16,16 @@ class DentistClinicScheduleController extends Controller
 {
     private const ALL_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
-    public function index()
+    public function index(StudentTargetOptionService $studentTargetOptionService)
     {
         $schedules = ClinicSchedule::active()->orderBy('id')->get();
         $blockedDates = BlockedDate::orderBy('date')->get();
+        $reservedBookingPeriods = ReservedBookingPeriod::query()
+            ->with(['creator:id,name', 'slots'])
+            ->orderBy('reserved_date')
+            ->orderBy('start_time')
+            ->get();
+        $studentTargetOptions = $studentTargetOptionService->get();
 
         $startDate = Carbon::now()->startOfMonth()->subMonth();
         $endDate = Carbon::now()->endOfMonth()->addMonths(3);
@@ -61,13 +69,15 @@ class DentistClinicScheduleController extends Controller
         return view('shared.clinic-schedule', [
             'schedules' => $schedules,
             'blockedDates' => $blockedDates,
+            'reservedBookingPeriods' => $reservedBookingPeriods,
+            'studentTargetOptions' => $studentTargetOptions,
             'appointmentCountsPerDay' => $appointmentCountsPerDay,
             'weeklyAppointments' => $weeklyAppointments,
             'philippineHolidays' => $philippineHolidays,
             'notifications' => $notifications,
 
             'layoutRole' => 'dentist',
-            'pageShellClass' => 'dentist-page-shell',
+            'pageShellClass' => 'app-page-shell',
             'isDentistView' => true,
 
             'clinicScheduleRouteNames' => [
@@ -76,6 +86,9 @@ class DentistClinicScheduleController extends Controller
                 'destroy' => 'dentist.dentist.clinic_schedule.destroy',
                 'block' => 'dentist.dentist.clinic_schedule.block',
                 'unblock' => 'dentist.dentist.clinic_schedule.unblock',
+                'reserved_store' => 'dentist.dentist.clinic_schedule.reserved_periods.store',
+                'reserved_update' => 'dentist.dentist.clinic_schedule.reserved_periods.update',
+                'reserved_destroy' => 'dentist.dentist.clinic_schedule.reserved_periods.destroy',
             ],
         ]);
     }

@@ -4,6 +4,10 @@
 
 @section('title', 'Dashboard')
 
+@section('styles')
+    @vite('resources/css/pages/patient/dashboard.css')
+@endsection
+
 @section('content')
 
 @php
@@ -134,9 +138,10 @@ $completedCalendarAppointments[$dateKey][] = [
 ];
 }
 
-$dashboardDisplayName = ucwords(
-strtolower(optional($patient)->name ?? (auth()->user()->name ?? 'Patient User')),
-);
+$dashboardDisplayName =
+optional($patient)->name
+?? auth()->user()->name
+?? 'Patient User';
 $dashboardPatientImage = optional($patient)->profile_image ?? null;
 $dashboardUserImage = auth()->user()->profile_image ?? null;
 
@@ -195,7 +200,7 @@ $birthdateDisplay = 'N/A';
 }
 @endphp
 
-<main id="mainContent" class="patient-page-shell patient-dashboard-page page-enter">
+<main id="mainContent" class="app-page-shell patient-dashboard-page page-enter">
     <div class="w-full">
 
         <x-dashboard-loading-status />
@@ -213,7 +218,7 @@ $birthdateDisplay = 'N/A';
                                 <span id="greetingText"></span>
                             </span>
                             <span class="greeting-line greeting-name-line">
-                                <span id="patientName"></span>
+                                <span id="patientName" data-patient-name></span>
                                 <i class="fa-solid fa-hand text-yellow-300 wave-hand"></i>
                             </span>
                         </h1>
@@ -275,6 +280,66 @@ $birthdateDisplay = 'N/A';
                 </div>
             </div>
         </div>
+
+        @if (collect($reservedBookingReminders ?? [])->isNotEmpty())
+        <div class="reserved-dashboard-reminders" aria-label="Reserved booking reminders">
+            @foreach ($reservedBookingReminders as $reservedPeriod)
+            <section class="card reserved-dashboard-reminder">
+                <div class="reserved-dashboard-reminder-header">
+                    <span class="reserved-dashboard-reminder-icon" aria-hidden="true">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </span>
+
+                    <div class="reserved-dashboard-reminder-heading">
+                        <div class="reserved-dashboard-reminder-title-row">
+                            <h2>{{ $reservedPeriod->title }}</h2>
+                            <span class="status-pill status-pending">
+                                <span class="status-dot" aria-hidden="true"></span>
+                                Booking required
+                            </span>
+                        </div>
+
+                        <div class="reserved-dashboard-reminder-meta">
+                            <span>
+                                <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                                {{ $reservedPeriod->reserved_date->format('M d, Y') }}
+                            </span>
+                            <span>
+                                <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                                {{ \Carbon\Carbon::parse($reservedPeriod->start_time)->format('g:i A') }}–{{ \Carbon\Carbon::parse($reservedPeriod->end_time)->format('g:i A') }}
+                            </span>
+                            <span>
+                                <i class="fa-solid fa-users" aria-hidden="true"></i>
+                                {{ $reservedPeriod->target_label }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reserved-dashboard-reminder-body">
+                    <div class="reserved-dashboard-reminder-message">
+                        <span class="reserved-dashboard-reminder-bell" aria-hidden="true">
+                            <i class="fa-regular fa-bell"></i>
+                        </span>
+                        <div>
+                            <strong>Reserved Appointment Reminder</strong>
+                            <p>
+                                This dental appointment period is scheduled for your patient group.
+                                Complete your booking before it reaches capacity.
+                            </p>
+                        </div>
+                    </div>
+
+                    <a href="{{ route('book.appointment.reserved', $reservedPeriod) }}"
+                        class="ui-btn ui-btn-primary reserved-dashboard-reminder-action">
+                        <span>Book Reserved Appointment</span>
+                        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+            </section>
+            @endforeach
+        </div>
+        @endif
 
         <div id="upcomingAppointmentWrapper" class="skeleton-section">
             <div class="card skeleton-card skeleton-shell skeleton-fade-swap">
@@ -692,7 +757,14 @@ $appointmentConfirmation = session('appointment_confirmation');
 
         if (!nameEl || !greetingEl || !iconEl) return;
 
-        nameEl.textContent = "{{ auth()->user()->name ?? 'Patient' }}";
+        const rawPatientName =
+            @json($patient -> name ?? auth() -> user() -> name ?? 'Patient');
+
+        nameEl.textContent =
+            window.formatPatientName?.(
+                rawPatientName
+            ) ||
+            rawPatientName;
 
         const h = new Date().getHours();
 
@@ -766,7 +838,7 @@ $appointmentConfirmation = session('appointment_confirmation');
     var NEXT_VISIT = @json($nextVisitText);
 
     var PROFILE_DATA = {
-        name: "{{ ucwords(strtolower($patient->name ?? 'Guest')) }}",
+        name: @json($patient -> name ?? 'Guest'),
         roleLabel: "{{ $patient->faculty_code ? 'Faculty' : ($patient->student_no ? 'Student' : 'Patient') }}",
         facultyCode: "{{ $patient->faculty_code ?? '' }}",
         studentNo: "{{ $patient->student_no ?? '' }}",
@@ -776,8 +848,8 @@ $appointmentConfirmation = session('appointment_confirmation');
         contact: "{{ $patient->phone ?? 'N/A' }}",
         email: "{{ $patient->email ?? 'N/A' }}",
         emergencyName: "{{ optional($patient->medicalHistory)->emergency_person ?? 'Not specified' }}",
-        emergencyNumber: "{{ optional($patient->medicalHistory)->emergency_number ?? 'N/A' }}",
-        emergencyRelation: "{{ optional($patient->medicalHistory)->emergency_relation ?? '' }}",
+        emergencyNumber: @json(optional($patient -> medicalHistory) -> emergency_number ?? 'N/A'),
+        emergencyRelation: @json(optional($patient -> medicalHistory) -> emergency_relation ?? ''),
         hasAlert: @json(
             (isset($patient -> medicalHistory -> diseaseAnswers) && $patient -> medicalHistory -> diseaseAnswers -> count() > 0) ||
             (isset($patient -> medicalHistoryAnswers) &&
@@ -814,7 +886,6 @@ $appointmentConfirmation = session('appointment_confirmation');
         );
 
         renderGreeting();
-        initRecordModal();
 
         if (quickAction === 'record') {
             setTimeout(() => {

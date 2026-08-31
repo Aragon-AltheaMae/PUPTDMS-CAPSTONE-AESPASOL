@@ -10,6 +10,13 @@ use Illuminate\Validation\Rule;
 
 class SystemSettingsController extends Controller
 {
+    private const GROUP_PERMISSIONS = [
+        'general' => ['manage_system_settings'],
+        'clinic' => ['manage_audit_trail'],
+        'notifications' => ['set_notification_rules'],
+        'backup' => ['manage_audit_trail'],
+    ];
+
     private const BOOLEAN_KEYS = [
         'maintenance_mode',
         'debug_mode',
@@ -20,8 +27,8 @@ class SystemSettingsController extends Controller
         'notif_new_appointment',
         'notif_cancellation',
         'notif_document_request',
-        'notif_appointment_completed',
         'notif_rescheduled',
+        'notif_follow_up_scheduled',
         'notif_document_approved',
         'notif_document_rejected',
         'notif_reminder_24h',
@@ -59,15 +66,14 @@ class SystemSettingsController extends Controller
             'notif_new_appointment',
             'notif_cancellation',
             'notif_document_request',
-            'notif_appointment_completed',
             'notif_rescheduled',
+            'notif_follow_up_scheduled',
             'notif_document_approved',
             'notif_document_rejected',
             'notif_reminder_24h',
             'notif_confirmation',
             'notif_follow_up_reminder',
             'notif_follow_up_today_reminder',
-            'notif_channels',
         ],
 
         'backup' => [
@@ -97,14 +103,24 @@ class SystemSettingsController extends Controller
             'notifications' => $notifications,
             'layoutRole' => $this->resolveLayoutRole(),
             'updateRoute' => $this->routeName('update'),
+            'allowedSettingGroups' => $this->allowedSettingGroups(),
         ]);
     }
 
     public function update(Request $request)
     {
         $validated = $request->validate($this->rules(), $this->messages());
+        $allowedGroups = $this->allowedSettingGroups();
 
         foreach (self::ALLOWED_GROUPS as $group => $keys) {
+            if (!in_array($group, $allowedGroups, true) && $this->requestTouchesAnySetting($request, $keys)) {
+                abort(403, 'You do not have permission to update this settings group.');
+            }
+
+            if (!in_array($group, $allowedGroups, true)) {
+                continue;
+            }
+
             foreach ($keys as $key) {
                 $value = $this->resolveValue($request, $validated, $key);
 
@@ -128,6 +144,40 @@ class SystemSettingsController extends Controller
         return request()->routeIs('dentist.system_settings*') ? 'dentist' : 'admin';
     }
 
+    private function allowedSettingGroups(): array
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return [];
+        }
+
+        return collect(self::GROUP_PERMISSIONS)
+            ->filter(function (array $permissions): bool {
+                foreach ($permissions as $permission) {
+                    if (auth()->user()?->hasPermission($permission)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            })
+            ->keys()
+            ->values()
+            ->all();
+    }
+
+    private function requestTouchesAnySetting(Request $request, array $keys): bool
+    {
+        foreach ($keys as $key) {
+            if ($request->has($key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function routeName(string $action): string
     {
         if (request()->routeIs('dentist.system_settings*')) {
@@ -147,12 +197,6 @@ class SystemSettingsController extends Controller
     {
         if (in_array($key, self::BOOLEAN_KEYS, true)) {
             return $request->boolean($key) ? '1' : '0';
-        }
-
-        if ($key === 'notif_channels') {
-            $channels = $validated['notif_channels'] ?? [];
-
-            return empty($channels) ? '' : implode(',', $channels);
         }
 
         $value = $validated[$key] ?? '';
@@ -187,17 +231,14 @@ class SystemSettingsController extends Controller
             'notif_new_appointment' => ['nullable', 'boolean'],
             'notif_cancellation' => ['nullable', 'boolean'],
             'notif_document_request' => ['nullable', 'boolean'],
-            'notif_appointment_completed' => ['nullable', 'boolean'],
             'notif_rescheduled' => ['nullable', 'boolean'],
+            'notif_follow_up_scheduled' => ['nullable', 'boolean'],
             'notif_document_approved' => ['nullable', 'boolean'],
             'notif_document_rejected' => ['nullable', 'boolean'],
             'notif_reminder_24h' => ['nullable', 'boolean'],
             'notif_confirmation' => ['nullable', 'boolean'],
             'notif_follow_up_reminder' => ['nullable', 'boolean'],
             'notif_follow_up_today_reminder' => ['nullable', 'boolean'],
-
-            'notif_channels' => ['nullable', 'array'],
-            'notif_channels.*' => [Rule::in(['Email', 'SMS', 'WhatsApp', 'In-App'])],
 
             'backup_frequency' => ['nullable', Rule::in(['Every 6 hours', 'Daily', 'Weekly', 'Monthly'])],
             'backup_retention_days' => ['nullable', 'integer', 'min:7', 'max:365'],
@@ -217,7 +258,6 @@ class SystemSettingsController extends Controller
             'backup_retention_days.min' => 'Backup retention must be at least 7 days.',
             'backup_retention_days.max' => 'Backup retention cannot exceed 365 days.',
             'backup_time.date_format' => 'Backup time must use the HH:MM format.',
-            'notif_channels.*.in' => 'One or more selected notification channels are invalid.',
         ];
     }
 }

@@ -17,7 +17,7 @@
     $initialTotal = isset($transitions) ? $transitions->total() : 0;
     $initialFrom = isset($transitions) ? ($transitions->firstItem() ?? 0) : 0;
     $initialTo = isset($transitions) ? ($transitions->lastItem() ?? 0) : 0;
-    $resolvedSuccessorName = $transition?->defaultSuccessor?->name
+    $successorName = $transition?->defaultSuccessor?->name
         ?? $transition?->items?->first(fn ($item) => $item->successorDentist?->name)?->successorDentist?->name
         ?? 'Not assigned yet';
     $checklistTotal = $transition?->checklistItems?->count() ?? 0;
@@ -94,11 +94,11 @@
 @section('title', $pageTitle)
 
 @section('styles')
-@vite('resources/css/pages/admin/dentist-continuity.css')
+    @vite('resources/css/pages/admin/dentist-continuity.css')
 @endsection
 
 @section('content')
-<main id="mainContent" class="admin-page-shell page-enter mode-list continuity-page mode-{{ $pageMode }}">
+<main id="mainContent" class="app-page-shell page-enter mode-list continuity-page mode-{{ $pageMode }}">
     <div class="w-full dt-wrap">
         <div class="page-banner dt-hero">
             <div class="page-banner-inner">
@@ -529,7 +529,7 @@
                                 </div>
                                 <div class="dt-people-card-copy">
                                     <span>Default Successor</span>
-                                    <strong>{{ $resolvedSuccessorName }}</strong>
+                                    <strong>{{ $successorName }}</strong>
                                 </div>
                             </div>
                             <div class="dt-people-card dt-people-card-warning">

@@ -4,7 +4,7 @@
 $layoutRole = $layoutRole ?? 'admin';
 $isDentistView = $isDentistView ?? false;
 
-$pageShellClass = $pageShellClass ?? ($isDentistView ? 'dentist-page-shell' : 'admin-page-shell');
+$pageShellClass = $pageShellClass ?? ($isDentistView ? 'app-page-shell' : 'app-page-shell');
 
 $inventoryRouteNames = $inventoryRouteNames ?? [
 'data' => 'admin.inventory.data',
@@ -17,6 +17,10 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
 @section('layout-role', $layoutRole)
 
 @section('title', 'Inventory')
+
+@section('styles')
+@vite('resources/css/pages/shared/inventory.css')
+@endsection
 
 @section('content')
 
@@ -55,16 +59,9 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
         <div class="page-banner inventory-admin-banner">
             <div class="page-banner-inner">
                 <div class="min-w-0">
-                    <h1 class="page-banner-title">
+                    <h1 class="page-title">
                         Admin Inventory
                     </h1>
-                </div>
-
-                <div class="page-banner-actions">
-                    <span class="page-badge">
-                        <i class="fa-solid fa-shield-heart"></i>
-                        Admin Control
-                    </span>
                 </div>
             </div>
         </div>
@@ -107,70 +104,71 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                 </div>
             </div>
 
-            <div class="table-card inventory-table-card">
+            <div class="table-card">
 
-                <div class="table-toolbar inventory-table-toolbar">
-                    <div
-                        class="inventory-toolbar-shell flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                <div class="table-toolbar">
 
-                        <div
-                            class="inventory-category-row flex items-center justify-between sm:justify-start gap-3 w-full lg:w-auto">
-                            <div class="tab-group w-full sm:w-auto flex" role="tablist" aria-label="Inventory category">
-                                <button type="button" data-tab="all" aria-selected="true"
-                                    class="tab-btn active flex-1 sm:flex-none" onclick="setTab('all',this)">All</button>
+                    <div class="table-toolbar-title">
+                        <div class="tab-group" role="tablist" aria-label="Inventory category">
 
-                                <button type="button" data-tab="medicine" aria-selected="false"
-                                    class="tab-btn flex-1 sm:flex-none"
-                                    onclick="setTab('medicine',this)">Medicine</button>
+                            <button type="button" data-tab="all" aria-selected="true" class="tab-btn active"
+                                onclick="setTab('all', this)">
+                                All
+                            </button>
 
-                                <button type="button" data-tab="supplies" aria-selected="false"
-                                    class="tab-btn flex-1 sm:flex-none"
-                                    onclick="setTab('supplies',this)">Supplies</button>
-                            </div>
+                            <button type="button" data-tab="medicine" aria-selected="false" class="tab-btn"
+                                onclick="setTab('medicine', this)">
+                                Medicine
+                            </button>
 
-                            <span id="inventoryEntryBadge" class="entry-badge js-row-count" aria-live="polite">
-                                0 items
-                            </span>
-                        </div>
+                            <button type="button" data-tab="supplies" aria-selected="false" class="tab-btn"
+                                onclick="setTab('supplies', this)">
+                                Supplies
+                            </button>
 
-                        <div
-                            class="toolbar-actions flex flex-col lg:flex-row lg:items-center lg:justify-end gap-3 w-full lg:w-auto lg:flex-1">
-
-                            <div
-                                class="inventory-search-row voice-search-row flex items-center gap-3 w-full lg:w-[340px] lg:flex-none">
-                                <x-search-bar id="searchInput" placeholder="Search Stock No."
-                                    callback="handleInventorySearch" :debounce="250" class="flex-1" />
-
-                                <x-voice-input target="#searchInput" status-id="invVoiceStatus"
-                                    label="Voice search inventory" title="Voice search" />
-                            </div>
-
-                            <div class="inventory-mobile-actions flex items-center gap-2 flex-nowrap lg:flex-none">
-
-                                <button id="filterBtn" type="button" onclick="openFilterPanel()"
-                                    class="global-filter-btn">
-                                    <i class="fa-solid fa-sliders"></i>
-                                    <span>Filter</span>
-                                    <span id="filterBadge" class="filter-badge"></span>
-                                </button>
-
-                                <x-view-toggle id="inventoryViewToggle" root="#mainContent"
-                                    storage-key="inventoryViewMode" />
-
-                                <button id="externalClearFilterBtn" type="button" onclick="clearFilterPanel()"
-                                    class="global-filter-reset-btn hidden" title="Reset filters">
-                                    <i class="fa-solid fa-rotate-left"></i>
-                                </button>
-
-                                <button type="button" onclick="openAddModal()"
-                                    class="btn-add inventory-add-btn justify-center">
-                                    <span class="add-icon"><i class="fa-solid fa-plus"></i></span>
-                                    <span>Add Item</span>
-                                </button>
-
-                            </div>
                         </div>
                     </div>
+
+                    <div class="table-toolbar-search">
+                        <div class="voice-search-row">
+
+                            <x-search-bar id="searchInput" placeholder="Search Stock No."
+                                callback="handleInventorySearch" :debounce="250" class="flex-1" />
+
+                            <x-voice-input target="#searchInput" status-id="invVoiceStatus"
+                                label="Voice search inventory" title="Voice search" />
+
+                        </div>
+                    </div>
+
+                    <div class="table-toolbar-actions">
+
+                        <button id="filterBtn" type="button" onclick="openFilterDrawer('filterModal')"
+                            class="global-filter-btn">
+
+                            <i class="fa-solid fa-sliders"></i>
+                            <span>Filter</span>
+                            <span id="filterBadge" class="filter-badge">
+                            </span>
+                        </button>
+
+                        <x-view-toggle id="inventoryViewToggle" root="#mainContent" storage-key="inventoryViewMode" />
+
+                        <button id="externalClearFilterBtn" type="button" onclick="clearFilterPanel()"
+                            class="global-filter-reset-btn hidden" title="Reset filters">
+
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+
+                        <button type="button" onclick="openAddModal()"
+                            class="ui-btn ui-btn-primary ui-btn-sm table-toolbar-primary-action">
+
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Add Item</span>
+                        </button>
+
+                    </div>
+
                 </div>
 
                 <x-pagination-bar id="inventoryPaginationTopBar" info-id="inventoryPageInfoTop"
@@ -178,8 +176,9 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                     page-size-id="inventoryPerPageSelect" page-size-callback="handleInventoryPerPageChange"
                     :page-size-value="10" page-size-label="per page" label="entries" />
 
-                <div id="tableWrapper" class="table-scroll inventory-table-wrap">
-                    <table class="data-table inventory-data-table">
+                <div id="tableWrapper" class="table-scroll table-list-view">
+
+                    <table class="data-table">
                         <thead>
                             <tr>
                                 <th>Date</th>
@@ -197,7 +196,12 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                     </table>
                 </div>
 
-                <div id="inventoryGrid" class="inventory-grid"></div>
+                <div id="inventoryGridView" class="table-grid-view" hidden>
+
+                    <div id="inventoryGrid" class="table-record-grid">
+                    </div>
+
+                </div>
                 <div id="emptyState" class="empty-state-host"></div>
 
                 <x-pagination-bar id="inventoryPaginationBottomBar" info-id="inventoryPageInfoBottom"
@@ -1142,12 +1146,11 @@ $inventoryDestroyUrlTemplate = route($inventoryRouteNames['destroy'], ['inventor
 
         document.dispatchEvent(
             new CustomEvent(
-                'voice:refresh',
-                {
-                    detail: {
-                        root: modal
-                    }
+                'voice:refresh', {
+                detail: {
+                    root: modal
                 }
+            }
             )
         );
     }
@@ -1663,6 +1666,11 @@ aria-label="Delete inventory item"
                 'tableBody'
             );
 
+        const gridView =
+            document.getElementById(
+                'inventoryGridView'
+            );
+
         const grid =
             document.getElementById(
                 'inventoryGrid'
@@ -1686,13 +1694,6 @@ aria-label="Delete inventory item"
 
         if (grid) {
             grid.replaceChildren();
-            grid.hidden = false;
-            grid.style.removeProperty(
-                'display'
-            );
-            grid.style.removeProperty(
-                'visibility'
-            );
         }
 
         if (tableWrapper) {
@@ -1958,7 +1959,7 @@ aria-label="Delete inventory item"
                 bar.style.removeProperty('display');
             }
         });
-        
+
         if (!data.length) {
             if (!window.EmptyState) {
                 requestAnimationFrame(() => {
@@ -1977,13 +1978,8 @@ aria-label="Delete inventory item"
                 );
             }
 
-            if (grid) {
-                grid.hidden = true;
-                grid.style.setProperty(
-                    'display',
-                    'none',
-                    'important'
-                );
+            if (gridView) {
+                gridView.hidden = true;
             }
 
             var isSearching =
@@ -2091,54 +2087,18 @@ aria-label="Delete inventory item"
         if (currentViewMode === 'grid') {
             if (tableWrapper) {
                 tableWrapper.hidden = true;
-
-                tableWrapper.style.setProperty(
-                    'display',
-                    'none',
-                    'important'
-                );
             }
 
-            if (grid) {
-                grid.hidden = false;
-
-                grid.style.setProperty(
-                    'display',
-                    'grid',
-                    'important'
-                );
-
-                grid.style.setProperty(
-                    'visibility',
-                    'visible',
-                    'important'
-                );
+            if (gridView) {
+                gridView.hidden = false;
             }
         } else {
-            if (grid) {
-                grid.hidden = true;
-
-                grid.style.setProperty(
-                    'display',
-                    'none',
-                    'important'
-                );
+            if (gridView) {
+                gridView.hidden = true;
             }
 
             if (tableWrapper) {
                 tableWrapper.hidden = false;
-
-                tableWrapper.style.setProperty(
-                    'display',
-                    'block',
-                    'important'
-                );
-
-                tableWrapper.style.setProperty(
-                    'visibility',
-                    'visible',
-                    'important'
-                );
             }
         }
 
@@ -2148,126 +2108,144 @@ aria-label="Delete inventory item"
                 n(item.used);
 
             var balLabel =
-                balance <= 0
-                    ? 'Out of stock'
-                    : balance <= 5
-                        ? 'Low stock'
-                        : 'In stock';
+                balance <= 0 ?
+                    'Out of stock' :
+                    balance <= 5 ?
+                        'Low stock' :
+                        'In stock';
 
             var balStatusClass =
-                balance <= 0
-                    ? 'status-out-of-stock'
-                    : balance <= 5
-                        ? 'status-low-stock'
-                        : 'status-in-stock';
+                balance <= 0 ?
+                    'status-out-of-stock' :
+                    balance <= 5 ?
+                        'status-low-stock' :
+                        'status-in-stock';
 
             var catStatusClass =
-                item.category === 'Medicine'
-                    ? 'status-medicine'
-                    : 'status-supplies';
+                item.category === 'Medicine' ?
+                    'status-medicine' :
+                    'status-supplies';
 
             var cardStockClass =
-                balance <= 0
-                    ? 'out-stock'
-                    : balance <= 5
-                        ? 'low-stock'
-                        : '';
+                balance <= 0 ?
+                    'out-stock' :
+                    balance <= 5 ?
+                        'low-stock' :
+                        '';
 
             if (currentViewMode === 'grid') {
                 grid.innerHTML += `
-        <div class="inventory-card ${cardStockClass}">
+    <article class="table-record-card">
 
-            <div class="inventory-card-top">
+        <div class="table-record-card-layout">
 
-    <div class="min-w-0">
+            <div class="table-record-content">
 
-        <div class="inventory-card-name">
-            ${item.name || ''}
-        </div>
+                <div class="table-record-header inventory-grid-card-header">
 
-        <div class="inventory-card-tags">
-            <span class="stock-no">
-                ${item.stock_no || ''}
-            </span>
-        </div>
+                    <h3 class="table-record-title">
+                        ${item.name || ''}
+                    </h3>
 
-    </div>
+                    <span class="global-info-pill inventory-grid-stock-no">
+                        <i class="fa-solid fa-boxes-packing"></i>
+                        ${item.stock_no || ''}
+                    </span>
 
-    <div class="inventory-card-statuses">
-
-        <span class="status-pill ${catStatusClass}">
-            <span class="status-dot"></span>
-            ${item.category || ''}
-        </span>
-
-        <span class="status-pill ${balStatusClass}">
-            <span class="status-dot"></span>
-            ${balance} · ${balLabel}
-        </span>
-
-    </div>
-
-</div>
-
-            <div class="inventory-card-meta">
-
-                <div>
-                    <div class="inventory-card-label">
-                        Date
-                    </div>
-
-                    <div class="inventory-card-value">
-                        ${item.formatted_date || ''}
-                    </div>
                 </div>
 
-                <div>
-                    <div class="inventory-card-label">
-                        Unit
+                <div class="table-record-meta">
+
+                    <div class="table-record-row">
+                        <span class="table-record-label">
+                            Balance
+                        </span>
+
+                        <span class="table-record-value">
+                            <span class="status-pill ${balStatusClass}">
+                                <span class="status-dot"></span>
+                                ${balance} · ${balLabel}
+                            </span>
+                        </span>
                     </div>
 
-                    <div class="inventory-card-value">
-                        ${item.unit || ''}
-                    </div>
-                </div>
+                    <div class="table-record-row">
+                        <span class="table-record-label">
+                            Category
+                        </span>
 
-                <div>
-                    <div class="inventory-card-label">
-                        Qty
-                    </div>
-
-                    <div class="inventory-card-value">
-                        ${item.qty || 0}
-                    </div>
-                </div>
-
-                <div>
-                    <div class="inventory-card-label">
-                        Used
+                        <span class="table-record-value">
+                            ${item.category || '—'}
+                        </span>
                     </div>
 
-                    <div class="inventory-card-value">
-                        ${item.used || 0}
+                    <div class="table-record-row">
+                        <span class="table-record-label">
+                            Date
+                        </span>
+
+                        <span class="table-record-value">
+                            ${item.formatted_date || '—'}
+                        </span>
                     </div>
+
+                    <div class="table-record-row">
+                        <span class="table-record-label">
+                            Unit
+                        </span>
+
+                        <span class="table-record-value">
+                            ${item.unit || '—'}
+                        </span>
+                    </div>
+
+                    <div class="table-record-row">
+                        <span class="table-record-label">
+                            Quantity
+                        </span>
+
+                        <span class="table-record-value">
+                            ${item.qty || 0}
+                        </span>
+                    </div>
+
+                    <div class="table-record-row">
+                        <span class="table-record-label">
+                            Used
+                        </span>
+
+                        <span class="table-record-value">
+                            ${item.used || 0}
+                        </span>
+                    </div>
+
                 </div>
 
             </div>
 
-            <div class="ui-action-group inventory-card-actions">
-                ${inventoryActionButtons(item.id)}
+            <div class="table-record-actions">
+                <div class="ui-action-group">
+                    ${inventoryActionButtons(item.id)}
+                </div>
             </div>
 
         </div>
-    `;
+
+    </article>
+`;
             } else {
                 tbody.innerHTML += `
     <tr>
-        <td class="inventory-date-cell">
-            ${item.formatted_date || ''}
+       <td>
+            <span class="table-date">
+                <i class="fa-solid fa-calendar"></i>
+                ${item.formatted_date || ''}
+            </span>
         </td>
 
         <td>
-            <span class="stock-no">
+           <span class="table-tag table-tag-neutral">
+                <i class="fa-solid fa-boxes-packing"></i>
                 ${item.stock_no || ''}
             </span>
         </td>
@@ -2285,15 +2263,15 @@ aria-label="Delete inventory item"
     </span>
 </td>
 
-<td class="inventory-muted-cell">
+<td class="table-cell">
     ${item.unit || ''}
 </td>
 
-        <td class="inventory-strong-cell">
+        <td class="table-cell">
             ${item.qty || 0}
         </td>
 
-        <td class="inventory-muted-cell">
+        <td class="table-cell">
             ${item.used || 0}
         </td>
 
@@ -2707,12 +2685,11 @@ aria-label="Delete inventory item"
 
         document.dispatchEvent(
             new CustomEvent(
-                'voice:refresh',
-                {
-                    detail: {
-                        root: editModal
-                    }
+                'voice:refresh', {
+                detail: {
+                    root: editModal
                 }
+            }
             )
         );
     }
