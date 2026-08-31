@@ -424,6 +424,7 @@ function initGlobalFlatpickr() {
         dateFormat: "Y-m-d",
         allowInput: false,
         clickOpens: true,
+        closeOnSelect: true,
         disableMobile: true,
         position: "auto center",
 
@@ -432,6 +433,28 @@ function initGlobalFlatpickr() {
         onYearChange: (_dates, _str, instance) => refreshFlatpickr(instance),
         onDayCreate: (_dates, _str, instance, dayElem) => {
             decorateFlatpickrDay(instance, dayElem);
+        },
+
+        onChange: (
+            selectedDates,
+            _dateString,
+            instance
+        ) => {
+            if (!selectedDates.length) {
+                return;
+            }
+
+            if (
+                window.matchMedia(
+                    '(max-width: 640px)'
+                ).matches
+            ) {
+                requestAnimationFrame(
+                    () => {
+                        instance.close();
+                    }
+                );
+            }
         },
 
         onOpen: (_dates, _str, instance) => {
@@ -454,20 +477,33 @@ function initGlobalFlatpickr() {
         }
         let options = { ...baseOptions };
 
-        const parentPopup = el.closest(
-            'dialog, .ui-modal, .modal-overlay'
-        );
+        const parentPopup =
+            el.closest(
+                'dialog, .ui-modal, .modal-overlay'
+            );
 
-        const shouldPortalToBody = el.hasAttribute(
-            'data-flatpickr-append-to-body'
-        );
+        const isMobileFlatpickr =
+            window.matchMedia(
+                '(max-width: 640px)'
+            ).matches;
 
-        options.appendTo = shouldPortalToBody
-            ? document.body
-            : (parentPopup || document.body);
+        const shouldPortalToBody =
+            isMobileFlatpickr ||
+            el.hasAttribute(
+                'data-flatpickr-append-to-body'
+            );
 
-        if (parentPopup && !shouldPortalToBody) {
-            options.positionElement = el;
+        options.appendTo =
+            shouldPortalToBody
+                ? document.body
+                : (parentPopup || document.body);
+
+        if (
+            parentPopup &&
+            !shouldPortalToBody
+        ) {
+            options.positionElement =
+                el;
         }
 
         if (el.min) {
@@ -549,9 +585,6 @@ function initGlobalFlatpickr() {
             clickOpens: true,
             disableMobile: true,
             position: "auto center",
-            // Time pickers use the same top-level popup host everywhere.
-            // Keeping the calendar outside modal scrolling/stacking contexts
-            // makes reserved-period fields behave exactly like Add Existing.
             appendTo: document.body,
 
             onReady: (_dates, _str, instance) => {
@@ -592,6 +625,11 @@ function initMonthOnlyFlatpickr(root = document) {
         const limitToToday =
             el.hasAttribute('data-month-max-today');
 
+        const isMobileFlatpickr =
+            window.matchMedia(
+                '(max-width: 640px)'
+            ).matches;
+
         window.flatpickr(el, {
             dateFormat: 'Y-m',
             altInput: true,
@@ -603,8 +641,16 @@ function initMonthOnlyFlatpickr(root = document) {
             clickOpens: true,
             disableMobile: true,
             position: 'auto center',
-            appendTo: parentPopup || document.body,
-            positionElement: parentPopup ? el : undefined,
+            appendTo:
+                isMobileFlatpickr
+                    ? document.body
+                    : (parentPopup || document.body),
+
+            positionElement:
+                parentPopup &&
+                    !isMobileFlatpickr
+                    ? el
+                    : undefined,
 
             onReady: (_dates, _str, instance) => {
                 instance.calendarContainer.classList.add('flatpickr-month-only');
@@ -750,49 +796,161 @@ if (
 let activeFlatpickrInstance = null;
 
 function ensureFlatpickrBackdrop() {
-    let backdrop = document.querySelector('.flatpickr-mobile-backdrop');
+    let backdrop =
+        document.querySelector(
+            '.flatpickr-mobile-backdrop'
+        );
 
     if (!backdrop) {
-        backdrop = document.createElement('div');
-        backdrop.className = 'flatpickr-mobile-backdrop';
-        document.body.appendChild(backdrop);
+        backdrop =
+            document.createElement(
+                'div'
+            );
 
-        backdrop.addEventListener('click', () => {
-            if (activeFlatpickrInstance) activeFlatpickrInstance.close();
-        });
+        backdrop.className =
+            'flatpickr-mobile-backdrop';
+
+        document.body.appendChild(
+            backdrop
+        );
+
+        backdrop.addEventListener(
+            'pointerdown',
+            event => {
+                if (
+                    backdrop.dataset.ready !==
+                    'true'
+                ) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                const instance =
+                    activeFlatpickrInstance;
+
+                if (!instance) {
+                    return;
+                }
+
+                activeFlatpickrInstance =
+                    null;
+
+                instance.close();
+            }
+        );
     }
 
     return backdrop;
 }
 
 function openFlatpickrSheet(instance) {
-    activeFlatpickrInstance = instance;
+    activeFlatpickrInstance =
+        instance;
 
-    if (!window.matchMedia('(max-width: 640px)').matches) return;
+    if (
+        !window.matchMedia(
+            '(max-width: 640px)'
+        ).matches
+    ) {
+        return;
+    }
 
-    const backdrop = ensureFlatpickrBackdrop();
+    const backdrop =
+        ensureFlatpickrBackdrop();
 
-    document.body.classList.add('flatpickr-sheet-open');
-    backdrop.classList.add('show');
+    backdrop.dataset.ready =
+        'false';
 
-    instance.calendarContainer.classList.add('flatpickr-mobile-sheet');
+    document.body.classList.add(
+        'flatpickr-sheet-open'
+    );
+
+    backdrop.classList.add(
+        'show'
+    );
+
+    instance.calendarContainer
+        .classList.add(
+            'flatpickr-mobile-sheet'
+        );
+
+    instance.calendarContainer.style.zIndex =
+        '999999';
 
     requestAnimationFrame(() => {
-        instance.calendarContainer.classList.add('sheet-show');
+        instance.calendarContainer
+            .classList.add(
+                'sheet-show'
+            );
+
+        window.setTimeout(() => {
+            backdrop.dataset.ready =
+                'true';
+        }, 180);
     });
 }
 
 function closeFlatpickrSheet(instance) {
-    if (!window.matchMedia('(max-width: 640px)').matches) return;
+    if (
+        !window.matchMedia(
+            '(max-width: 640px)'
+        ).matches
+    ) {
+        return;
+    }
 
-    document.body.classList.remove('flatpickr-sheet-open');
-    document.querySelector('.flatpickr-mobile-backdrop')?.classList.remove('show');
+    const backdrop =
+        document.querySelector(
+            '.flatpickr-mobile-backdrop'
+        );
 
-    instance.calendarContainer.classList.remove('sheet-show');
+    if (backdrop) {
+        backdrop.dataset.ready =
+            'false';
 
-    setTimeout(() => {
-        instance.calendarContainer.classList.remove('flatpickr-mobile-sheet', 'sheet-dragging');
-        instance.calendarContainer.style.transform = '';
+        backdrop.classList.remove(
+            'show'
+        );
+    }
+
+    document.body.classList.remove(
+        'flatpickr-sheet-open'
+    );
+
+    instance.calendarContainer
+        ?.classList.remove(
+            'sheet-show'
+        );
+
+    window.setTimeout(() => {
+
+        instance.calendarContainer
+            ?.classList.remove(
+                'flatpickr-mobile-sheet',
+                'sheet-dragging'
+            );
+
+        if (
+            instance.calendarContainer
+        ) {
+            instance.calendarContainer
+                .style.removeProperty(
+                    'transform'
+                );
+
+            instance.calendarContainer
+                .style.removeProperty(
+                    'z-index'
+                );
+        }
+
+        if (activeFlatpickrInstance === instance) {
+            activeFlatpickrInstance =
+                null;
+        }
+
     }, 220);
 }
 

@@ -13,8 +13,11 @@
 @section('hide-patient-modals')
 @endsection
 
+@section('hide-floating-actions')
+@endsection
+
 @section('styles')
-    @vite('resources/css/pages/patient/book-appointment.css')
+@vite('resources/css/pages/patient/book-appointment.css')
 @endsection
 
 @php
@@ -25,7 +28,7 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
 @endphp
 
 @section('content')
-<main id="mainContent" class="booking-page page-enter">
+<main id="mainContent" class="app-page-shell booking-page page-enter">
     <div class="booking-page-inner">
         <x-booking.workflow-header :back-url="route('homepage')" back-label="Back to Home"
             form-target="#appointmentForm" icon="fa-regular fa-calendar-check" title="Book an Appointment"
@@ -49,10 +52,9 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                         <input type="hidden" id="update_medical_history" name="update_medical_history" value="0">
 
                         @if ($isReservedBooking)
-                            <input type="hidden" name="reserved_booking_period_id"
-                                value="{{ $reservedBookingPeriod->id }}">
-                            <input type="hidden" id="reserved_booking_period_slot_id"
-                                name="reserved_booking_period_slot_id" value="">
+                        <input type="hidden" name="reserved_booking_period_id" value="{{ $reservedBookingPeriod->id }}">
+                        <input type="hidden" id="reserved_booking_period_slot_id" name="reserved_booking_period_slot_id"
+                            value="">
                         @endif
 
                         <input type="hidden" id="contact_email" name="contact_email"
@@ -81,87 +83,93 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                                         value="{{ $isReservedBooking && $reservedBookingPeriod->booking_mode === 'date_only' ? \Carbon\Carbon::parse($reservedBookingPeriod->start_time)->format('g:i A') : '' }}">
 
                                     @if ($isReservedBooking)
-                                        <div class="booking-section-card space-y-5">
-                                            <div class="flex flex-wrap items-start justify-between gap-4">
-                                                <div>
-                                                    <span class="cal-pill cal-pill-maroon inline-flex mb-3">
-                                                        <i class="fa-solid fa-calendar-check"></i>
-                                                        Reserved appointment
-                                                    </span>
-                                                    <h3 class="text-xl font-bold text-[#303846]">
-                                                        {{ $reservedBookingPeriod->title }}
-                                                    </h3>
-                                                    <p class="mt-1 text-sm text-[#697386]">
-                                                        This schedule is exclusively available to {{ $reservedBookingPeriod->target_label }}.
-                                                    </p>
-                                                </div>
+                                    <div class="booking-section-card space-y-5">
+                                        <div class="flex flex-wrap items-start justify-between gap-4">
+                                            <div>
+                                                <span class="cal-pill cal-pill-maroon inline-flex mb-3">
+                                                    <i class="fa-solid fa-calendar-check"></i>
+                                                    Reserved appointment
+                                                </span>
+                                                <h3 class="text-xl font-bold text-[#303846]">
+                                                    {{ $reservedBookingPeriod->title }}
+                                                </h3>
+                                                <p class="mt-1 text-sm text-[#697386]">
+                                                    This schedule is exclusively available to {{
+                                                    $reservedBookingPeriod->target_label }}.
+                                                </p>
+                                            </div>
 
-                                                <div class="text-sm text-[#4b5563] sm:text-right">
-                                                    <p class="font-bold">
-                                                        {{ $reservedBookingPeriod->reserved_date->format('F j, Y') }}
-                                                    </p>
-                                                    <p>
-                                                        {{ \Carbon\Carbon::parse($reservedBookingPeriod->start_time)->format('g:i A') }}
-                                                        &ndash;
-                                                        {{ \Carbon\Carbon::parse($reservedBookingPeriod->end_time)->format('g:i A') }}
-                                                    </p>
+                                            <div class="text-sm text-[#4b5563] sm:text-right">
+                                                <p class="font-bold">
+                                                    {{ $reservedBookingPeriod->reserved_date->format('F j, Y') }}
+                                                </p>
+                                                <p>
+                                                    {{
+                                                    \Carbon\Carbon::parse($reservedBookingPeriod->start_time)->format('g:i
+                                                    A') }}
+                                                    &ndash;
+                                                    {{
+                                                    \Carbon\Carbon::parse($reservedBookingPeriod->end_time)->format('g:i
+                                                    A') }}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        @if ($reservedBookingPeriod->booking_mode === 'timeslot')
+                                        <div class="time-panel appointment-time-panel" data-global-field>
+                                            <div class="appointment-time-heading">
+                                                <span class="appointment-time-heading-icon">
+                                                    <i class="fa-regular fa-clock"></i>
+                                                </span>
+                                                <div>
+                                                    <h4>Pick a Reserved Timeslot</h4>
+                                                    <p>Each timeslot can be selected by one patient only.</p>
                                                 </div>
                                             </div>
 
-                                            @if ($reservedBookingPeriod->booking_mode === 'timeslot')
-                                                <div class="time-panel appointment-time-panel" data-global-field>
-                                                    <div class="appointment-time-heading">
-                                                        <span class="appointment-time-heading-icon">
-                                                            <i class="fa-regular fa-clock"></i>
-                                                        </span>
-                                                        <div>
-                                                            <h4>Pick a Reserved Timeslot</h4>
-                                                            <p>Each timeslot can be selected by one patient only.</p>
-                                                        </div>
-                                                    </div>
+                                            <div id="slotGrid"
+                                                class="appointment-slot-grid slot-grid-ui reserved-slot-grid">
+                                                @foreach ($availableReservedSlots as $slot)
+                                                @php($slotLabel = \Carbon\Carbon::parse($slot->slot_time)->format('g:i
+                                                A'))
+                                                <button type="button"
+                                                    class="slot-chip flex items-center gap-2.5 px-4 py-2.5 rounded-xl border font-semibold text-sm cursor-pointer"
+                                                    data-reserved-slot-id="{{ $slot->id }}"
+                                                    data-reserved-slot-time="{{ $slotLabel }}" aria-pressed="false">
+                                                    <i class="text-xs opacity-70 fa-regular fa-clock"></i>
+                                                    <span>{{ $slotLabel }}</span>
+                                                </button>
+                                                @endforeach
+                                            </div>
 
-                                                    <div id="slotGrid" class="appointment-slot-grid slot-grid-ui reserved-slot-grid">
-                                                        @foreach ($availableReservedSlots as $slot)
-                                                            @php($slotLabel = \Carbon\Carbon::parse($slot->slot_time)->format('g:i A'))
-                                                            <button type="button"
-                                                                class="slot-chip flex items-center gap-2.5 px-4 py-2.5 rounded-xl border font-semibold text-sm cursor-pointer"
-                                                                data-reserved-slot-id="{{ $slot->id }}"
-                                                                data-reserved-slot-time="{{ $slotLabel }}"
-                                                                aria-pressed="false">
-                                                                <i class="text-xs opacity-70 fa-regular fa-clock"></i>
-                                                                <span>{{ $slotLabel }}</span>
-                                                            </button>
-                                                        @endforeach
-                                                    </div>
+                                            <button type="button" id="clearSlotSelectionBtn"
+                                                class="ui-btn ui-btn-secondary ui-btn-sm hidden mt-4 mb-2 w-full"
+                                                aria-hidden="true">
+                                                <i class="fa-solid fa-xmark"></i>
+                                                Clear selection
+                                            </button>
 
-                                                    <button type="button" id="clearSlotSelectionBtn"
-                                                        class="ui-btn ui-btn-secondary ui-btn-sm hidden mt-4 mb-2 w-full"
-                                                        aria-hidden="true">
-                                                        <i class="fa-solid fa-xmark"></i>
-                                                        Clear selection
-                                                    </button>
-
-                                                    <div id="selectedSlotDisplay" class="hidden appointment-selected-slot mt-4">
-                                                        <i class="fa-solid fa-circle-check"></i>
-                                                        Selected: <span id="selectedSlotText" class="font-bold"></span>
-                                                    </div>
-                                                </div>
-                                            @else
-                                                <div class="appointment-selected-slot">
-                                                    <i class="fa-solid fa-list-ol"></i>
-                                                    <span>
-                                                        No individual timeslot is required. You may be attended in queue order
-                                                        anytime within the reserved period.
-                                                    </span>
-                                                </div>
-                                            @endif
-
-                                            @if ($reservedBookingPeriod->notes)
-                                                <p class="text-sm text-[#697386]">
-                                                    <strong>Clinic note:</strong> {{ $reservedBookingPeriod->notes }}
-                                                </p>
-                                            @endif
+                                            <div id="selectedSlotDisplay" class="hidden appointment-selected-slot mt-4">
+                                                <i class="fa-solid fa-circle-check"></i>
+                                                Selected: <span id="selectedSlotText" class="font-bold"></span>
+                                            </div>
                                         </div>
+                                        @else
+                                        <div class="appointment-selected-slot">
+                                            <i class="fa-solid fa-list-ol"></i>
+                                            <span>
+                                                No individual timeslot is required. You may be attended in queue order
+                                                anytime within the reserved period.
+                                            </span>
+                                        </div>
+                                        @endif
+
+                                        @if ($reservedBookingPeriod->notes)
+                                        <p class="text-sm text-[#697386]">
+                                            <strong>Clinic note:</strong> {{ $reservedBookingPeriod->notes }}
+                                        </p>
+                                        @endif
+                                    </div>
                                     @else
                                     <div class="cal-time-layout grid gap-5 lg:gap-6 mx-auto w-full">
 
@@ -457,13 +465,14 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                 Back to Home
             </a>
 
-            <button type="button" id="introContinueDraftBtn" class="ui-btn ui-btn-secondary" style="display: none;">
+            <button type="button" id="introContinueDraftBtn" class="ui-btn ui-btn-secondary ui-btn-sm"
+                style="display: none;">
 
                 <i class="fa-solid fa-clock-rotate-left"></i>
                 Continue Draft
             </button>
 
-            <button type="button" id="introStartBtn" class="ui-btn ui-btn-primary">
+            <button type="button" id="introStartBtn" class="ui-btn ui-btn-primary ui-btn-sm">
 
                 <i class="fa-solid fa-play"></i>
                 Begin Booking
@@ -509,11 +518,11 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
     const diseaseLabelByCode = @json($diseases -> pluck('label', 'code'));
     const isFemalePatient = @json($isFemalePatient);
     const isReservedBooking = @json((bool) $isReservedBooking);
-    const reservedBookingPeriodId = @json($isReservedBooking ? $reservedBookingPeriod->id : null);
-    const reservedBookingDate = @json($isReservedBooking ? $reservedBookingPeriod->reserved_date->format('Y-m-d') : null);
+    const reservedBookingPeriodId = @json($isReservedBooking ? $reservedBookingPeriod -> id : null);
+    const reservedBookingDate = @json($isReservedBooking ? $reservedBookingPeriod -> reserved_date -> format('Y-m-d') : null);
     const reservedDateOnlyTime = @json(
-        $isReservedBooking && $reservedBookingPeriod->booking_mode === 'date_only'
-            ? \Carbon\Carbon::parse($reservedBookingPeriod->start_time)->format('g:i A')
+        $isReservedBooking && $reservedBookingPeriod -> booking_mode === 'date_only'
+            ?\Carbon\Carbon:: parse($reservedBookingPeriod -> start_time) -> format('g:i A')
             : null
     );
     const DRAFT_KEY = isReservedBooking

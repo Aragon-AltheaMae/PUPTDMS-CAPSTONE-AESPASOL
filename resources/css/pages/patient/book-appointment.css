@@ -128,25 +128,30 @@ textarea {
 
     #slotGrid.slot-grid-ui {
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        grid-template-rows: repeat(4, 56px);
-        grid-auto-rows: 56px;
+        grid-template-rows: repeat(4, 44px);
+        grid-auto-rows: 44px;
         grid-auto-flow: column;
-        gap: 0.75rem !important;
+        gap: .55rem !important;
     }
 
     #slotGrid .slot-chip,
     #slotGrid .slot-chip.disabled,
     #slotGrid .slot-chip:disabled {
-        height: 56px;
-        min-height: 56px;
-        font-size: 0.92rem !important;
-        border-radius: 14px !important;
-        padding: 0 0.85rem !important;
+        height: 44px;
+        min-height: 44px;
+        padding: 0 .65rem !important;
+        border-radius: 12px !important;
+        font-size: .76rem !important;
+    }
+
+    #slotGrid .slot-chip i {
+        font-size: .68rem !important;
     }
 
     #dateBanner {
-        font-size: 0.84rem !important;
-        padding: 0.8rem 0.9rem !important;
+        padding: .6rem .7rem !important;
+        border-radius: 12px !important;
+        font-size: .72rem !important;
     }
 }
 

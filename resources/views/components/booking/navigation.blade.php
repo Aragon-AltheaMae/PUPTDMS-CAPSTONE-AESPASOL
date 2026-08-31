@@ -6,18 +6,18 @@
 
 <div id="navBtns" class="booking-navigation">
 
-    <button type="button" id="prevBtn" class="ui-btn ui-btn-secondary">
+    <button type="button" id="prevBtn" class="ui-btn ui-btn-secondary ui-btn-sm">
         <i class="fa-solid fa-chevron-left"></i>
         Previous
     </button>
 
-    <button type="button" id="nextBtn" class="ui-btn ui-btn-primary">
+    <button type="button" id="nextBtn" class="ui-btn ui-btn-primary ui-btn-sm">
         Next
         <i class="fa-solid fa-chevron-right"></i>
     </button>
 
     @if ($showSubmit)
-        <button type="submit" id="submitBtn" class="ui-btn ui-btn-primary hidden">
+        <button type="submit" id="submitBtn" class="ui-btn ui-btn-primary ui-btn-sm hidden">
             {{ $submitLabel }}
             <i class="{{ $submitIcon }}"></i>
         </button>

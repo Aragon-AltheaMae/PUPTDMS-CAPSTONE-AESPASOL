@@ -14,6 +14,7 @@
     $hideSidebar = View::hasSection('hide-sidebar');
     $hideMobileNav = View::hasSection('hide-mobile-nav');
     $hidePatientModals = View::hasSection('hide-patient-modals');
+    $hideFloatingActions = View::hasSection('hide-floating-actions');
     $hideFooter = View::hasSection('hide-footer');
 
     $showMobileMenu = ($isAdmin || $isDentist) && !$hideSidebar;
@@ -133,6 +134,7 @@
         role-{{ $layoutRole }}
         {{ $hideSidebar ? 'layout-no-sidebar' : '' }}
         {{ $hideMobileNav ? 'layout-no-mobile-nav' : '' }}
+        {{ $hideFloatingActions ? 'layout-no-floating-actions' : '' }}
         @yield('body-class', 'bg-[#F4F4F4]')">
 
     @include('partials.header', [
@@ -284,7 +286,6 @@
             'useDynamicScheduleRules' => true,
             'renderStyle' => 'dentist',
         ])
-
     @endif
 
     @if ($isPatient && !$hideMobileNav && !$hidePatientModals)
@@ -308,10 +309,12 @@
     <div id="globalActionTooltip" class="global-action-tooltip" role="tooltip" aria-hidden="true">
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/sienna-accessibility@latest/dist/sienna-accessibility.umd.js"
-        data-position="bottom-right" data-offset="{{ $accessibilityOffset }}" defer></script>
+    @if (!$hideFloatingActions)
+        <script src="https://cdn.jsdelivr.net/npm/sienna-accessibility@latest/dist/sienna-accessibility.umd.js"
+            data-position="bottom-right" data-offset="{{ $accessibilityOffset }}" defer></script>
 
-    @include('partials.chatbot')
+        @include('partials.chatbot')
+    @endif
 
     @stack('scripts')
     @yield('scripts')

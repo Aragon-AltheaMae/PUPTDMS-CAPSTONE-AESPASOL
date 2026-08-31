@@ -1221,3 +1221,14 @@ body.appointment-confirmed-open .back-to-top {
     pointer-events: none !important;
     transform: translateY(20px) scale(.95) !important;
 }
+
+body.layout-no-floating-actions .assistive-fab-group,
+body.layout-no-floating-actions .back-to-top,
+body.layout-no-floating-actions .chatbot-fab,
+body.layout-no-floating-actions .chatbot-panel,
+body.layout-no-floating-actions .assistive-help-popover,
+body.layout-no-floating-actions .asw-container,
+body.layout-no-floating-actions .asw-widget,
+body.layout-no-floating-actions .asw-menu-btn {
+    display: none !important;
+}
