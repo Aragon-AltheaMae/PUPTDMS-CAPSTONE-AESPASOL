@@ -113,7 +113,17 @@ class ReservedBookingInvitationService
 
         $reservedDate = Carbon::parse($period->reserved_date)->startOfDay();
 
-        if (! $reservedDate->isAfter(now()->startOfDay())) {
+        // Temporarily disabled: same-day reserved invitations used to be unavailable.
+        // if (! $reservedDate->isAfter(now()->startOfDay())) {
+        //     return false;
+        // }
+
+        if ($reservedDate->isBefore(now()->startOfDay())) {
+            return false;
+        }
+
+        if ($reservedDate->isToday()
+            && Carbon::parse($period->reserved_date->format('Y-m-d').' '.$period->end_time)->isPast()) {
             return false;
         }
 

@@ -619,7 +619,7 @@ class ReservedBookingPeriodFeatureTest extends TestCase
         $this->assertStringNotContainsString('invited', data_get($notification->data, 'message'));
     }
 
-    public function test_patient_dashboard_keeps_reserved_reminder_until_booking_or_period_expiry(): void
+    public function test_patient_dashboard_keeps_reserved_reminder_until_booking_or_period_end(): void
     {
         $patientUser = $this->makePatientUser();
         $patient = $patientUser->patient;
@@ -680,6 +680,20 @@ class ReservedBookingPeriodFeatureTest extends TestCase
 
         $dashboard()
             ->assertOk()
+            ->assertSee('Book Reserved Appointment');
+
+        $this->actingAs($patientUser)
+            ->withSession([
+                'role' => 'patient',
+                'patient_id' => $patient->id,
+            ])
+            ->get(route('book.appointment.reserved', $period))
+            ->assertOk();
+
+        Carbon::setTestNow(self::RESERVED_DATE.' 13:00:01');
+
+        $dashboard()
+            ->assertOk()
             ->assertDontSee('Book Reserved Appointment');
 
         $this->actingAs($patientUser)
@@ -690,6 +704,28 @@ class ReservedBookingPeriodFeatureTest extends TestCase
             ->get(route('book.appointment.reserved', $period))
             ->assertRedirect(route('homepage'))
             ->assertSessionHas('error');
+    }
+
+    public function test_normal_booking_still_rejects_same_day_slot_requests(): void
+    {
+        $patientUser = $this->makePatientUser();
+        $patient = $patientUser->patient;
+
+        ClinicSchedule::query()->update([
+            'days_label' => 'Tue',
+            'days' => ['Tue'],
+        ]);
+
+        $this->actingAs($patientUser)
+            ->withSession([
+                'role' => 'patient',
+                'patient_id' => $patient->id,
+            ])
+            ->getJson(route('book.appointment.slots', [
+                'date' => Carbon::today()->toDateString(),
+            ]))
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('date');
     }
 
     public function test_student_emergency_contact_sync_does_not_skip_the_reserved_medical_form(): void

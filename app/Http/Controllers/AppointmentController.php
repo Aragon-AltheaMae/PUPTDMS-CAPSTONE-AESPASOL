@@ -261,6 +261,15 @@ class AppointmentController extends Controller
                 $availableReservedSlots = $reservedBookingPeriod->slots
                     ->filter(fn (ReservedBookingPeriodSlot $slot) => ! $slot->appointment
                         || $slot->appointment->status === 'cancelled')
+                    ->filter(function (ReservedBookingPeriodSlot $slot) use ($reservedBookingPeriod) {
+                        if (! $reservedBookingPeriod->reserved_date->isToday()) {
+                            return true;
+                        }
+
+                        return Carbon::parse(
+                            $reservedBookingPeriod->reserved_date->format('Y-m-d').' '.$slot->slot_time
+                        )->isFuture();
+                    })
                     ->values();
 
                 if ($availableReservedSlots->isEmpty()) {
@@ -503,9 +512,19 @@ class AppointmentController extends Controller
             return false;
         }
 
-        return Carbon::parse($period->reserved_date)
-            ->startOfDay()
-            ->isAfter(now()->startOfDay());
+        // Temporarily disabled: reserved periods previously had to be after today.
+        // return Carbon::parse($period->reserved_date)
+        //     ->startOfDay()
+        //     ->isAfter(now()->startOfDay());
+
+        $reservedDate = Carbon::parse($period->reserved_date)->startOfDay();
+
+        if ($reservedDate->isBefore(now()->startOfDay())) {
+            return false;
+        }
+
+        return ! $reservedDate->isToday()
+            || Carbon::parse($period->reserved_date->format('Y-m-d').' '.$period->end_time)->isFuture();
     }
 
     private function reservedPeriodRemainingCapacity(ReservedBookingPeriod $period): int
@@ -855,6 +874,17 @@ class AppointmentController extends Controller
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Same-day booking is not allowed. Please select a future date.');
+        }
+
+        $mustUseFutureTime = ! $reservedBookingPeriod
+            || $reservedBookingPeriod->booking_mode === 'timeslot';
+
+        if ($date->isToday()
+            && $mustUseFutureTime
+            && Carbon::parse($date->toDateString().' '.$mysqlTime)->lessThanOrEqualTo(now())) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'That appointment time has already passed. Please select a later time.');
         }
 
         if (BlockedDate::whereDate('date', $request->appointment_date)->exists()) {
@@ -1545,6 +1575,7 @@ class AppointmentController extends Controller
         }
 
         $slots = collect($schedule->availableSlots($iso, $bookedSlotCounts));
+
         $reservedPeriod = ReservedBookingPeriod::query()
             ->active()
             ->whereDate('reserved_date', $iso)
