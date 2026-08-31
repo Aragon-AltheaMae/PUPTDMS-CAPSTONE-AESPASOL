@@ -2310,11 +2310,11 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
             ).matches
         ) {
             setTimeout(
-                () => input?.focus(),
+                () => notes?.focus(),
                 80
             );
         }
-
+    }
         function openFilterModal() {
             window.syncFilterTagGroup('fSortGroup', filterSort);
             setDocTypeSelectValue(
