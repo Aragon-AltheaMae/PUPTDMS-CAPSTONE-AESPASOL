@@ -61,18 +61,6 @@ $pageEyebrow = $savedVisitEditMode ? 'Saved Dental Record Editor' : 'Dental Proc
 $pageTitle = $savedVisitEditMode ? 'Edit Saved Odontogram' : 'Patient Odontogram';
 $pageSubtitle = '2D / 3D Treatment &amp; Condition Mapping';
 
-$entryContextLabel = $existingAppointmentMode
-? 'Existing Appointment'
-: ($savedVisitEditMode ? 'Saved Visit Record' : ($isWalkInMode ? 'Walk-in Visit' : null));
-
-$entryContextMessage = $existingAppointmentMode
-? 'This odontogram is for an existing appointment. Saving it will store the visit as completed.'
- : ($savedVisitEditMode
-? 'You are editing a previously saved visit. Any changes here will update the saved 2D and 3D odontogram plus the clinical notes.'
-: ($isWalkInMode
-? 'This odontogram is being created for a walk-in visit.'
-: null));
-
 $existingProcedureDuration = $existingAppointmentMode
 ? data_get($existingAppointmentDraft ?? [], 'procedure_duration_hms', '00:00:00')
 : ($savedVisitEditMode
@@ -94,34 +82,6 @@ $existingProcedureDuration = $existingAppointmentMode
 
                 <div class="odontogram-hero">
                     <div class="odontogram-hero-main">
-
-                        @if ($entryContextLabel)
-                        <div class="card" style="position: relative; margin-bottom: 0.95rem; overflow: hidden; border: 1px solid rgba(120, 22, 22, 0.1); border-radius: 1.35rem; background: linear-gradient(135deg, rgba(255, 252, 251, 0.98), rgba(255, 255, 255, 1)); box-shadow: 0 12px 26px rgba(95, 25, 25, 0.08);">
-                            <span style="position: absolute; inset: 0 auto 0 0; width: 0.35rem; background: linear-gradient(180deg, #8b0000 0%, #b4232c 100%);"></span>
-
-                            <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem 1.35rem 1rem 1.5rem; font-family: inherit;">
-                                <span style="width: 5rem; height: 5rem; border-radius: 1.1rem; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; background: linear-gradient(145deg, rgba(139, 0, 0, 0.06), rgba(139, 0, 0, 0.025)); box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 8px 16px rgba(139, 0, 0, 0.04); color: #9e1c29;">
-                                    <i class="fa-solid fa-shield-halved" style="font-size: 2rem;"></i>
-                                </span>
-
-                                <div style="display: flex; flex-direction: column; justify-content: center; gap: 0.35rem; min-width: 0; flex: 1; font-family: inherit;">
-                                    <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
-                                        <h2 style="margin: 0; font: inherit; font-size: clamp(1.2rem, 1.8vw, 1.9rem); font-weight: 800; line-height: 1.08; letter-spacing: -0.03em; color: #1f2937;">
-                                            {{ $entryContextLabel }}
-                                        </h2>
-
-                                        <span style="display: inline-flex; align-items: center; justify-content: center; padding: 0.45rem 0.85rem; border-radius: 0.75rem; background: linear-gradient(135deg, rgba(139, 0, 0, 0.06), rgba(139, 0, 0, 0.1)); color: #a12633; font: inherit; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap;">
-                                            Saved Record
-                                        </span>
-                                    </div>
-
-                                    <p style="margin: 0; max-width: none; color: #5f636d; font: inherit; font-size: clamp(0.88rem, 0.92vw, 1rem); line-height: 1.4; font-weight: 400; white-space: nowrap;">
-                                        {{ $entryContextMessage }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        @endif
 
                         <div class="card hero-title-card">
 

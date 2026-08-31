@@ -167,6 +167,12 @@
 
 <body>
     @php
+        $riskLevel = data_get($aiReport, 'risk_level', 'Low');
+        $riskExplanation = data_get(
+            $aiReport,
+            'risk_explanation',
+            'Operational risk details are currently unavailable for this report.',
+        );
         $printFindings = $aiReport['key_findings'] ?? [];
         $printFindingsText = trim(implode(' ', array_filter($printFindings)));
         $printTreatmentText = trim(implode(' ', array_filter($aiReport['treatment_analysis'] ?? [])));
@@ -230,7 +236,7 @@
         </div>
         <div class="meta-card">
             <span>Operational Risk</span>
-            <strong>{{ $aiReport['risk_level'] }}</strong>
+            <strong>{{ $riskLevel }}</strong>
         </div>
     </div>
 
@@ -391,7 +397,7 @@
 
     <div class="section">
         <h2 class="section-title">Risk Interpretation and Recommendations</h2>
-        <p class="body-text"><strong>{{ $aiReport['risk_level'] }} risk:</strong> {{ $aiReport['risk_explanation'] }}</p>
+        <p class="body-text"><strong>{{ $riskLevel }} risk:</strong> {{ $riskExplanation }}</p>
 
         <ul>
             @foreach ($aiReport['recommendations'] ?? [] as $recommendation)

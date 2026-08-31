@@ -55,7 +55,6 @@ class PermissionSeeder extends Seeder
             ['name' => 'Create Follow-up Appointments', 'slug' => 'create_follow_up_appointments', 'module' => 'Appointments'],
             ['name' => 'Manage Walk-in Patients', 'slug' => 'manage_walk_in_patients', 'module' => 'Appointments'],
             ['name' => 'Add Existing Record', 'slug' => 'manage_existing_records', 'module' => 'Appointments'],
-            ['name' => 'Manage Clinic Schedule', 'slug' => 'manage_clinic_schedule', 'module' => 'Appointments'],
             ['name' => 'View Schedule and Dates', 'slug' => 'view_clinic_schedule', 'module' => 'Clinic Schedule'],
             ['name' => 'Update Clinic Hours', 'slug' => 'update_clinic_schedule', 'module' => 'Clinic Schedule'],
             ['name' => 'Create Clinic Hours', 'slug' => 'create_clinic_schedule', 'module' => 'Clinic Schedule'],

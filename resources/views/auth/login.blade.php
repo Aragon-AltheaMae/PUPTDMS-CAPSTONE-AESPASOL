@@ -114,12 +114,6 @@
             @endunless
           </div>
 
-          @unless ($idpAvailable ?? true)
-          <p class="backup-form-copy">
-            {{ $idpStatusMessage ?? 'Primary SSO is temporarily unavailable.' }} Admins may use local fallback login while the issue is ongoing.
-          </p>
-          @endunless
-
           <div class="auth-landing-trust-row">
             <div>
               <i class="fa-solid fa-shield-halved"></i>

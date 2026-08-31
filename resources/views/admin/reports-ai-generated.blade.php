@@ -5,11 +5,28 @@
 @section('title', 'AI Generated Report')
 
 @section('styles')
-    @php($routePrefix = request()->routeIs('dentist.*') ? 'dentist' : 'admin')
     @vite('resources/css/pages/admin/ai-generated-report.css')
 @endsection
 
 @section('content')
+    @php
+        $riskLevel = data_get($aiReport, 'risk_level', 'Low');
+        $riskExplanation = data_get(
+            $aiReport,
+            'risk_explanation',
+            'Operational risk details are currently unavailable for this report.',
+        );
+        $riskClass = match ($riskLevel) {
+            'High' => 'air-status-card--red',
+            'Moderate' => 'air-status-card--amber',
+            default => 'air-status-card--green',
+        };
+        $badgeClass = match ($riskLevel) {
+            'High' => 'air-badge--red',
+            'Moderate' => 'air-badge--amber',
+            default => 'air-badge--green',
+        };
+    @endphp
 
     <main id="mainContent" class="app-page-shell page-enter mode-list">
         <div class="w-full">
@@ -35,7 +52,7 @@
                         </div>
 
                         <div class="air-banner-actions">
-                            <a href="{{ route($routePrefix . '.reports') }}" class="ui-btn ui-btn-secondary">
+                            <a href="{{ route(request()->routeIs('dentist.*') ? 'dentist.reports' : 'admin.reports') }}" class="ui-btn ui-btn-secondary">
 
                                 <i class="fa-solid fa-arrow-left"></i>
                                 Back to reports
@@ -50,16 +67,6 @@
                     </div>
                 </div>
             </div>
-
-            @php
-                $screenTreatmentsRecorded =
-                    data_get($aiReport, 'print_metrics.treatments_recorded') ??
-                    data_get($aiReport, 'metrics.treatments_recorded') ??
-                    data_get($aiReport, 'treatments.total_treatments', '—');
-                $screenTreatmentBreakdown = collect(
-                    data_get($aiReport, 'print_metrics.treatment_breakdown', data_get($aiReport, 'treatments.breakdown', [])),
-                );
-            @endphp
 
             <section id="aiReportScreenArea" class="air-screen">
 
@@ -78,23 +85,11 @@
                             <i class="fa-solid fa-wand-magic-sparkles"></i> AI-generated insight
                         </span>
                     </div>
-                    @php
-                        $riskClass = match ($aiReport['risk_level']) {
-                            'High' => 'air-status-card--red',
-                            'Moderate' => 'air-status-card--amber',
-                            default => 'air-status-card--green',
-                        };
-                        $badgeClass = match ($aiReport['risk_level']) {
-                            'High' => 'air-badge--red',
-                            'Moderate' => 'air-badge--amber',
-                            default => 'air-badge--green',
-                        };
-                    @endphp
                     <div class="air-status-card {{ $riskClass }}">
                         <span class="air-status-label">Operational risk</span>
                         <span class="air-status-value air-status-value--inline">
-                            {{ $aiReport['risk_level'] }}
-                            <span class="air-badge {{ $badgeClass }}">{{ $aiReport['risk_level'] }}</span>
+                            {{ $riskLevel }}
+                            <span class="air-badge {{ $badgeClass }}">{{ $riskLevel }}</span>
                         </span>
                         <span class="air-status-sub">
                             <i class="fa-solid fa-shield-halved"></i> System assessment
@@ -145,6 +140,19 @@
 
                 <div class="air-two-col">
                     <div class="card">
+                        @php
+                            $screenTreatmentsRecorded =
+                                data_get($aiReport, 'print_metrics.treatments_recorded') ??
+                                data_get($aiReport, 'metrics.treatments_recorded') ??
+                                data_get($aiReport, 'treatments.total_treatments', '—');
+                            $screenTreatmentBreakdown = collect(
+                                data_get(
+                                    $aiReport,
+                                    'print_metrics.treatment_breakdown',
+                                    data_get($aiReport, 'treatments.breakdown', []),
+                                ),
+                            );
+                        @endphp
                         <div class="card-header">
                             <div class="card-header-left">
                                 <div class="card-header-icon">
@@ -266,8 +274,8 @@
                                 <i class="fa-solid fa-shield-halved"></i>
                             </div>
                             <div class="air-risk-text">
-                                <strong>{{ $aiReport['risk_level'] }} risk</strong>
-                                <p>{{ $aiReport['risk_explanation'] }}</p>
+                                <strong>{{ $riskLevel }} risk</strong>
+                                <p>{{ $riskExplanation }}</p>
                             </div>
                         </div>
                     </div>
@@ -475,7 +483,7 @@
                 </div>
                 <div class="air-print-meta-card">
                     <span>Operational risk level</span>
-                    <strong>{{ $aiReport['risk_level'] }}</strong>
+                    <strong>{{ $riskLevel }}</strong>
                 </div>
             </div>
 
@@ -663,8 +671,8 @@
                         <h2>Risk interpretation</h2>
                     </div>
                     <div class="air-print-risk-box">
-                        <strong>{{ $aiReport['risk_level'] }} risk</strong>
-                        <p>{{ $aiReport['risk_explanation'] }}</p>
+                        <strong>{{ $riskLevel }} risk</strong>
+                        <p>{{ $riskExplanation }}</p>
                     </div>
                 </section>
             @else
@@ -673,8 +681,8 @@
                         <h2>Risk interpretation</h2>
                     </div>
                     <div class="air-print-risk-box">
-                        <strong>{{ $aiReport['risk_level'] }} risk</strong>
-                        <p>{{ $aiReport['risk_explanation'] }}</p>
+                        <strong>{{ $riskLevel }} risk</strong>
+                        <p>{{ $riskExplanation }}</p>
                     </div>
                 </section>
 
@@ -803,7 +811,7 @@
                                     </div>
                                     <div class="air-modal-print-meta-card">
                                         <span>Operational risk level</span>
-                                        <strong>{{ $aiReport['risk_level'] }}</strong>
+                                        <strong>{{ $riskLevel }}</strong>
                                     </div>
                                 </div>
 
@@ -988,8 +996,8 @@
                                         </div>
 
                                         <div class="air-modal-print-risk-box">
-                                            <strong>{{ $aiReport['risk_level'] }} risk</strong>
-                                            <p>{{ $aiReport['risk_explanation'] }}</p>
+                                            <strong>{{ $riskLevel }} risk</strong>
+                                            <p>{{ $riskExplanation }}</p>
                                         </div>
                                     </section>
                                 @else
@@ -1000,8 +1008,8 @@
                                         </div>
 
                                         <div class="air-modal-print-risk-box">
-                                            <strong>{{ $aiReport['risk_level'] }} risk</strong>
-                                            <p>{{ $aiReport['risk_explanation'] }}</p>
+                                            <strong>{{ $riskLevel }} risk</strong>
+                                            <p>{{ $riskExplanation }}</p>
                                         </div>
                                     </section>
 

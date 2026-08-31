@@ -42,9 +42,14 @@ use Illuminate\Support\Facades\Log;
 
 use App\Mail\AppointmentConfirmationMail;
 use App\Mail\AppointmentRescheduleMail;
+use App\Services\StudentApiService;
 
 class AppointmentController extends Controller
 {
+    public function __construct(
+        private readonly StudentApiService $studentApiService
+    ) {
+    }
 
     public function index()
     {
@@ -55,6 +60,8 @@ class AppointmentController extends Controller
         }
 
         $patient = Patient::findOrFail($patientId);
+
+        $this->backfillStudentEmergencyContactIfNeeded($patient);
 
         $now = now();
         $today = $now->toDateString();
@@ -670,6 +677,12 @@ class AppointmentController extends Controller
     ======================= */
     public function store(Request $request, SignatureAiVerifier $signatureVerifier)
     {
+        $request->merge([
+            'emergency_number' => $this->normalizePhilippineMobile(
+                (string) $request->input('emergency_number', '')
+            ) ?? (string) $request->input('emergency_number', ''),
+        ]);
+
         $patientId = session('impersonated_patient_id') ?: session('patient_id');
 
         if (!$patientId) {
@@ -773,7 +786,7 @@ class AppointmentController extends Controller
                 'max:50',
                 'regex:/^[A-Za-zÑñ\s.\'-]+$/u',
             ],
-            'emergency_number'     => 'required|string|max:15',
+            'emergency_number'     => ['required', 'string', 'size:11', 'regex:/^09\d{9}$/'],
             'emergency_relation' => [
                 'required',
                 'string',
@@ -1774,6 +1787,181 @@ class AppointmentController extends Controller
         if (in_array($v, ['YES', 'Y', 'TRUE', '1', 'ON'], true)) return 'YES';
 
         return 'NO';
+    }
+
+    private function backfillStudentEmergencyContactIfNeeded(Patient $patient): void
+    {
+        $isStudent = ! empty($patient->student_no) || (! empty($patient->email) && ! empty($patient->course_code));
+
+        if (! $isStudent) {
+            return;
+        }
+
+        $medicalHistory = $patient->medicalHistory;
+        $needsBackfill = blank($medicalHistory?->emergency_person)
+            || blank($medicalHistory?->emergency_number)
+            || blank($medicalHistory?->emergency_relation);
+
+        if (! $needsBackfill) {
+            return;
+        }
+
+        try {
+            $studentProfile = [];
+
+            if (! empty($patient->email)) {
+                $studentProfileResponse = $this->studentApiService->getStudentByEmail($patient->email);
+                $studentProfile = is_array($studentProfileResponse['data'] ?? null)
+                    ? $studentProfileResponse['data']
+                    : [];
+            }
+
+            $studentNumber = $patient->student_no
+                ?: data_get($studentProfile, 'studentNumber')
+                ?: data_get($studentProfile, 'student_number');
+
+            if (empty($studentNumber)) {
+                return;
+            }
+
+            $personalInfoResponse = $this->studentApiService->getPersonalInfoByStudentNumber($studentNumber);
+            $personalInfo = is_array($personalInfoResponse['data'] ?? null)
+                ? $personalInfoResponse['data']
+                : [];
+
+            if ($personalInfo === []) {
+                return;
+            }
+
+            $this->syncStudentMedicalHistory($patient, $personalInfo);
+            $patient->unsetRelation('medicalHistory');
+            $patient->load('medicalHistory');
+        } catch (\Throwable $e) {
+            Log::warning('Appointment OGOS medical history backfill failed', [
+                'patient_id' => $patient->id,
+                'student_no' => $patient->student_no,
+                'email' => $patient->email,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function syncStudentMedicalHistory(Patient $patient, array $personalInfo): void
+    {
+        $emergencyPerson = $this->cleanStringValue(
+            $personalInfo['emergencyContactName']
+                ?? $personalInfo['emergency_contact_name']
+                ?? data_get($personalInfo, 'emergencyContact.name')
+                ?? data_get($personalInfo, 'emergency_contact.name')
+                ?? data_get($personalInfo, 'emergency_contact.contact_name')
+                ?? data_get($personalInfo, 'emergencyContact.contactName')
+                ?? null
+        );
+
+        $emergencyNumber = $this->normalizePhilippineMobile(
+            $this->cleanStringValue(
+                $personalInfo['emergencyContactNumber']
+                    ?? $personalInfo['emergency_contact_number']
+                    ?? data_get($personalInfo, 'emergencyContact.number')
+                    ?? data_get($personalInfo, 'emergencyContact.contactNumber')
+                    ?? data_get($personalInfo, 'emergency_contact.number')
+                    ?? data_get($personalInfo, 'emergency_contact.contact_number')
+                    ?? null
+            )
+        );
+
+        $emergencyRelation = $this->normalizeEmergencyRelation(
+            $this->cleanStringValue(
+                $personalInfo['emergencyContactRelationship']
+                    ?? $personalInfo['emergency_contact_relationship']
+                    ?? $personalInfo['emergencyContactRelation']
+                    ?? $personalInfo['emergency_contact_relation']
+                    ?? data_get($personalInfo, 'emergencyContact.relationship')
+                    ?? data_get($personalInfo, 'emergencyContact.relation')
+                    ?? data_get($personalInfo, 'emergency_contact.relationship')
+                    ?? data_get($personalInfo, 'emergency_contact.relation')
+                    ?? data_get($personalInfo, 'emergency_contact.relationship_name')
+                    ?? data_get($personalInfo, 'emergencyContact.relationshipName')
+                    ?? data_get($personalInfo, 'emergencyContactRelationship.name')
+                    ?? data_get($personalInfo, 'emergency_contact_relationship.name')
+                    ?? null
+            )
+        );
+
+        if (! $emergencyPerson && ! $emergencyNumber && ! $emergencyRelation) {
+            return;
+        }
+
+        $medicalHistory = MedicalHistory::firstOrNew(['patient_id' => $patient->id]);
+        $currentRelation = strtolower(trim((string) ($medicalHistory->emergency_relation ?? '')));
+        $hasPlaceholderRelation = in_array($currentRelation, ['', 'not specified', '(not specified)', 'n/a', 'na'], true);
+
+        if ($emergencyPerson && blank($medicalHistory->emergency_person)) {
+            $medicalHistory->emergency_person = $emergencyPerson;
+        }
+
+        if ($emergencyNumber && blank($medicalHistory->emergency_number)) {
+            $medicalHistory->emergency_number = $emergencyNumber;
+        }
+
+        if ($emergencyRelation && $hasPlaceholderRelation) {
+            $medicalHistory->emergency_relation = $emergencyRelation;
+        }
+
+        if (! $medicalHistory->exists && empty($medicalHistory->emergency_relation)) {
+            $medicalHistory->emergency_relation = 'Not specified';
+        }
+
+        if ($medicalHistory->isDirty()) {
+            $medicalHistory->save();
+        }
+    }
+
+    private function cleanStringValue(mixed $value): ?string
+    {
+        if (! is_scalar($value)) {
+            return null;
+        }
+
+        $cleaned = trim((string) $value);
+
+        return $cleaned !== '' ? $cleaned : null;
+    }
+
+    private function normalizePhilippineMobile(?string $value): ?string
+    {
+        $digits = preg_replace('/\D+/', '', (string) $value) ?? '';
+
+        if ($digits === '') {
+            return null;
+        }
+
+        if (str_starts_with($digits, '63') && strlen($digits) === 12) {
+            $digits = '0' . substr($digits, 2);
+        } elseif (str_starts_with($digits, '9') && strlen($digits) === 10) {
+            $digits = '0' . $digits;
+        }
+
+        return preg_match('/^09\d{9}$/', $digits) ? $digits : null;
+    }
+
+    private function normalizeEmergencyRelation(?string $value): ?string
+    {
+        $normalized = strtolower(trim((string) $value));
+
+        return match ($normalized) {
+            'mother', 'mom', 'mama', 'nanay' => 'Mother',
+            'father', 'dad', 'papa', 'tatay' => 'Father',
+            'sibling', 'brother', 'sister', 'kapatid' => 'Sibling',
+            'guardian' => 'Guardian',
+            'spouse', 'wife', 'husband', 'asawa' => 'Spouse',
+            'grandparent', 'grandmother', 'grandfather', 'lola', 'lolo' => 'Grandparent',
+            'aunt', 'tiya', 'tita' => 'Aunt',
+            'uncle', 'tiyo', 'tito' => 'Uncle',
+            'cousin', 'pinsan' => 'Cousin',
+            'child', 'son', 'daughter', 'anak' => 'Child',
+            default => null,
+        };
     }
 
     private function resolveAuthenticatedPatient(): ?Patient
