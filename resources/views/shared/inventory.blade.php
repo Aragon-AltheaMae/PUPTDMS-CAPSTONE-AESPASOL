@@ -174,7 +174,7 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                 <x-pagination-bar id="inventoryPaginationTopBar" info-id="inventoryPageInfoTop"
                     pagination-id="inventoryPaginationTop" position="top" :show-entries="true"
                     page-size-id="inventoryPerPageSelect" page-size-callback="handleInventoryPerPageChange"
-                    :page-size-value="10" page-size-label="per page" label="entries" />
+                    :page-size-value="10" page-size-label="per page" label="entries" hidden />
 
                 <div id="tableWrapper" class="table-scroll table-list-view">
 
@@ -205,7 +205,7 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                 <div id="emptyState" class="empty-state-host"></div>
 
                 <x-pagination-bar id="inventoryPaginationBottomBar" info-id="inventoryPageInfoBottom"
-                    pagination-id="inventoryPaginationBottom" position="bottom" label="entries" />
+                    pagination-id="inventoryPaginationBottom" position="bottom" label="entries" hidden />
             </div>
         </div>
     </div>
@@ -1934,30 +1934,6 @@ aria-label="Delete inventory item"
                         block: 'start',
                     });
             },
-        });
-
-        [
-            document.getElementById('inventoryPaginationTopBar'),
-            document.getElementById('inventoryPaginationBottomBar'),
-        ].forEach(function (bar) {
-            if (bar) {
-                bar.hidden = true;
-                bar.style.setProperty(
-                    'display',
-                    'none',
-                    'important'
-                );
-            }
-        });
-
-        [
-            document.getElementById('inventoryPaginationTopBar'),
-            document.getElementById('inventoryPaginationBottomBar'),
-        ].forEach(function (bar) {
-            if (bar) {
-                bar.hidden = false;
-                bar.style.removeProperty('display');
-            }
         });
 
         if (!data.length) {

@@ -84,7 +84,7 @@
 
       <x-pagination-bar id="dailyPagebarTop" info-id="dailyPageInfoTop" pagination-id="dailyPaginationTop"
         position="top" :show-entries="true" page-size-id="dtPerPageSelect" page-size-callback="selectDailyPerPage"
-        :page-size-value="10" label="entries" />
+        :page-size-value="10" label="entries" hidden />
 
       <div class="card-body dtr-card-body">
         <div id="dailyListView" class="table-responsive-fix service-table-wrap dtr-table-wrap">
@@ -113,7 +113,7 @@
       </div>
 
       <x-pagination-bar id="dailyPagebarBottom" info-id="dailyPageInfoBottom" pagination-id="dailyPaginationBottom"
-        position="bottom" label="entries" />
+        position="bottom" label="entries" hidden />
     </section>
   </div>
 </main>
