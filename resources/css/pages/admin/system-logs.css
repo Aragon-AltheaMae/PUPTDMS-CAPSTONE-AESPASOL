@@ -139,6 +139,16 @@
     gap: .5rem;
 }
 
+.system-logs-page #slTable .sl-user {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.system-logs-page #slTable .patient-avatar {
+    flex: 0 0 auto;
+}
+
 .system-logs-page #slTable td:nth-child(3),
 .system-logs-page #slTable th:nth-child(3) {
     text-align: center;
@@ -166,6 +176,12 @@
     color: #333333;
     font-size: .78rem;
     white-space: nowrap;
+}
+
+.system-logs-page #slTable .sl-username {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sl-action-alert {

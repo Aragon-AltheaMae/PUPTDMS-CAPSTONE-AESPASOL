@@ -16,83 +16,12 @@ use App\Helpers\PhilippineHolidays;
 use App\Notifications\AppointmentCancelledNotification;
 use App\Notifications\AppointmentRescheduledNotification;
 use App\Models\ServiceType;
-use App\Models\ReservedBookingPeriod;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Schema;
 
 
 class DentistAppointmentController extends Controller
 {
-    private function syncOverdueAppointmentsToCancelled(): void
-    {
-        $now = Carbon::now();
-
-        $gracePeriodMinutes = 60;
-
-        $cutoff = $now->copy()->subMinutes($gracePeriodMinutes);
-
-        $updatePayload = [
-            'status' => 'cancelled',
-            'updated_at' => $now,
-        ];
-
-        if (Schema::hasColumn('appointments', 'cancellation_reason')) {
-            $updatePayload['cancellation_reason'] = DB::raw(
-                "COALESCE(
-                NULLIF(cancellation_reason, ''),
-                'Appointment was not started within the 1-hour grace period.'
-            )"
-            );
-        }
-
-        Appointment::query()
-            ->whereIn('status', ['upcoming', 'rescheduled'])
-            ->whereNull('reserved_booking_period_id')
-            ->where(function ($query) use ($cutoff) {
-                $query
-                    ->whereDate(
-                        'appointment_date',
-                        '<',
-                        $cutoff->toDateString()
-                    )
-                    ->orWhere(function ($sameDay) use ($cutoff) {
-                        $sameDay
-                            ->whereDate(
-                                'appointment_date',
-                                $cutoff->toDateString()
-                            )
-                            ->whereTime(
-                                'appointment_time',
-                                '<',
-                                $cutoff->format('H:i:s')
-                            );
-                    });
-            })
-            ->update($updatePayload);
-
-        $expiredReservedPeriodIds = ReservedBookingPeriod::query()
-            ->where(function ($query) use ($cutoff) {
-                $query->whereDate('reserved_date', '<', $cutoff->toDateString())
-                    ->orWhere(function ($sameDay) use ($cutoff) {
-                        $sameDay->whereDate('reserved_date', $cutoff->toDateString())
-                            ->whereTime('end_time', '<', $cutoff->format('H:i:s'));
-                    });
-            })
-            ->pluck('id');
-
-        if ($expiredReservedPeriodIds->isNotEmpty()) {
-            Appointment::query()
-                ->whereIn('status', ['upcoming', 'rescheduled'])
-                ->whereIn('reserved_booking_period_id', $expiredReservedPeriodIds)
-                ->update([
-                    ...$updatePayload,
-                    'reserved_booking_period_slot_id' => null,
-                ]);
-        }
-    }
-
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -102,8 +31,6 @@ class DentistAppointmentController extends Controller
         if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return redirect('/login');
         }
-
-        $this->syncOverdueAppointmentsToCancelled();
 
         $today = Carbon::today()->toDateString();
 
@@ -240,8 +167,6 @@ class DentistAppointmentController extends Controller
             return redirect('/login');
         }
 
-        $this->syncOverdueAppointmentsToCancelled();
-
         $appointment->load('patient');
         $patient = $appointment->patient;
 
@@ -331,8 +256,6 @@ class DentistAppointmentController extends Controller
         if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
             return redirect('/login');
         }
-
-        $this->syncOverdueAppointmentsToCancelled();
 
         $appointment = Appointment::with(['patient', 'reservedBookingPeriod'])->findOrFail($id);
 
