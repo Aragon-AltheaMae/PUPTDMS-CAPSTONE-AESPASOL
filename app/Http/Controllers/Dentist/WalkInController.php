@@ -496,11 +496,17 @@ class WalkInController extends Controller
         $hasExistingMedicalHistory =
             $this->hasExistingMedicalHistoryRecord($patient);
 
-        $hasExistingAppointment =
+        $latestAppointment =
             Appointment::where(
                 'patient_id',
                 $patient->id
-            )->exists();
+            )
+            ->orderByDesc('appointment_date')
+            ->orderByDesc('appointment_time')
+            ->first();
+
+        $hasExistingAppointment =
+            $latestAppointment !== null;
 
         $hasExistingBookingInformation =
             $hasExistingDentalHistory &&
@@ -560,6 +566,9 @@ class WalkInController extends Controller
 
             'has_autofill_data' =>
             $hasAutofillData,
+
+            'last_service_type' =>
+            $latestAppointment?->service_type,
 
             'has_reusable_signature' =>
             $hasReusableSignature,
@@ -1186,16 +1195,18 @@ class WalkInController extends Controller
         $normalized = strtolower(trim((string) $value));
 
         return match ($normalized) {
-            'mother', 'mom', 'mama', 'nanay' => 'Mother',
             'father', 'dad', 'papa', 'tatay' => 'Father',
-            'sibling', 'brother', 'sister', 'kapatid' => 'Sibling',
-            'guardian' => 'Guardian',
-            'spouse', 'wife', 'husband', 'asawa' => 'Spouse',
-            'grandparent', 'grandmother', 'grandfather', 'lola', 'lolo' => 'Grandparent',
-            'aunt', 'tiya', 'tita' => 'Aunt',
+            'mother', 'mom', 'mama', 'nanay' => 'Mother',
             'uncle', 'tiyo', 'tito' => 'Uncle',
+            'aunt', 'auntie', 'tiya', 'tita' => 'Auntie',
+            'brother', 'kuya' => 'Brother',
+            'sister', 'ate' => 'Sister',
+            'grandmother', 'lola' => 'Grandmother',
+            'grandfather', 'lolo' => 'Grandfather',
             'cousin', 'pinsan' => 'Cousin',
-            'child', 'son', 'daughter', 'anak' => 'Child',
+            'guardian', 'legal guardian' => 'Legal Guardian',
+            'friend', 'kaibigan' => 'Friend',
+            'other relative', 'relative', 'kamag-anak', 'kamaganak' => 'Other Relative',
             default => null,
         };
     }

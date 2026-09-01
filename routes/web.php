@@ -1009,7 +1009,7 @@ Route::prefix('dentist')->middleware(['auth'])->group(function () {
         ->name('dentist.dentist.appointments');
 
     Route::get('/appointments/{appointment}/patient-profile', [DentistAppointmentController::class, 'patientProfile'])
-        ->middleware('permission:view_patient_profiles,view_dental_records')
+        ->middleware('permission:view_appointments,reschedule_appointments,cancel_appointments,create_follow_up_appointments,create_procedure_records')
         ->name('dentist.dentist.appointments.patientProfile');
 
     Route::put('/appointments/{id}/reschedule', [DentistAppointmentController::class, 'updateReschedule'])
@@ -1180,7 +1180,7 @@ Route::prefix('dentist')->middleware(['auth'])->group(function () {
         '/walk-in/patients/{patient}/booking-information',
         [WalkInController::class, 'patientBookingInformation']
     )
-        ->middleware('permission:view_dental_records')
+        ->middleware('permission:manage_walk_in_patients')
         ->name('dentist.walk-in.patient-booking-information');
 
     Route::post('/walk-in/guest', [WalkInController::class, 'storeGuest'])

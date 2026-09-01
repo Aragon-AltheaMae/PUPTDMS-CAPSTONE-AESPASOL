@@ -86,7 +86,7 @@ class AdminAppointmentController extends Controller
             'canStartProcedure' => false,
             'canRescheduleAppointment' => $user?->hasPermission('reschedule_appointments') ?? false,
             'canCancelAppointment' => $user?->hasPermission('cancel_appointments') ?? false,
-            'canViewTreatmentRecord' => $user?->hasPermission('view_dental_records') ?? false,
+            'canViewTreatmentRecord' => $user?->hasPermission('view_appointments') ?? false,
             'canScheduleFollowUp' => false,
 
             'patientProfileRouteName' => 'admin.admin.patient.profile',

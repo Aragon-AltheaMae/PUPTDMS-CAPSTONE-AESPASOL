@@ -424,7 +424,7 @@
                     Select relation
                 </option>
 
-                @foreach (['Mother', 'Father', 'Sibling', 'Guardian', 'Spouse', 'Grandparent', 'Aunt', 'Uncle', 'Cousin', 'Child'] as $relation)
+                @foreach (['Father', 'Mother', 'Uncle', 'Auntie', 'Brother', 'Sister', 'Grandmother', 'Grandfather', 'Cousin', 'Legal Guardian', 'Friend', 'Other Relative'] as $relation)
                     <option value="{{ $relation }}" @selected($selectedRelation === $relation)>
                         {{ $relation }}
                     </option>
