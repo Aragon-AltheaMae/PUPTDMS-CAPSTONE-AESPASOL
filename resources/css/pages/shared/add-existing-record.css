@@ -44,34 +44,9 @@
     line-height: 1.4;
 }
 
-.existing-record-role-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .4rem;
-}
-
-.existing-record-role-filter {
-    min-height: 2.25rem;
-    padding: .45rem .75rem;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    background: var(--surface);
-    color: var(--text-2);
-    font-size: .8rem;
-    font-weight: 600;
-    transition: background .15s ease, border-color .15s ease, color .15s ease;
-}
-
-.existing-record-role-filter:hover,
-.existing-record-role-filter.is-active {
-    border-color: var(--primary, #8b0000);
-    background: var(--primary, #8b0000);
-    color: #fff;
-}
-
 .existing-record-patient-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
     grid-auto-rows: 1fr;
     gap: 14px;
     width: 100%;
@@ -80,96 +55,17 @@
     align-items: stretch;
 }
 
-.existing-record-patient-grid>.patient-select-card {
+.existing-record-patient-grid>.global-record-card {
     width: 100%;
     min-width: 0;
     height: 100%;
 }
 
-.existing-record-patient-grid .patient-select-card-body {
+.existing-record-patient-grid .global-record-card-grid {
     height: 100%;
 }
 
-.patient-select-card {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    background: var(--surface);
-    box-shadow: 0 1px 2px rgb(15 23 42 / 6%);
-}
-
-.patient-select-card-body {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    gap: .9rem;
-    padding: 1rem;
-}
-
-.patient-select-profile {
-    display: flex;
-    align-items: flex-start;
-    gap: .7rem;
-    min-width: 0;
-}
-
-.patient-select-identity {
-    flex: 1;
-    min-width: 0;
-}
-
-.patient-select-name {
-    margin: 0;
-    overflow: hidden;
-    color: var(--text-1);
-    font-weight: 700;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.patient-select-meta {
-    margin: .2rem 0 0;
-    overflow: hidden;
-    color: var(--text-2);
-    font-size: .75rem;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.patient-select-details {
-    display: flex;
-    flex-wrap: wrap;
-    gap: .4rem;
-}
-
-.patient-select-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: .35rem;
-    max-width: 100%;
-    padding: .3rem .5rem;
-    border-radius: 999px;
-    background: var(--neutral-warm-50);
-    color: var(--text-2);
-    font-size: .72rem;
-    overflow-wrap: anywhere;
-}
-
-.patient-select-actions {
-    padding: 0 1rem 1rem;
-}
-
-@media (min-width: 1024px) and (max-width: 1279px) {
-    .existing-record-patient-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 12px;
-    }
-}
-
-@media (min-width: 640px) and (max-width: 1023px) {
+@media (min-width: 768px) and (max-width: 1180px) {
     .existing-record-patient-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px;
@@ -214,7 +110,7 @@
         line-height: 1.4;
     }
 
-    .existing-record-role-filters {
+    .existing-record-directory .tab-group {
         width: 100%;
 
         display: grid;
@@ -225,20 +121,11 @@
         gap: .35rem;
     }
 
-    .existing-record-role-filter {
+    .existing-record-directory .tab-btn {
         width: 100%;
         min-width: 0;
 
         justify-content: center;
-    }
-
-
-    .existing-record-patient-grid {
-        grid-template-columns: 1fr;
-
-        gap: 10px;
-
-        margin-block: .75rem;
     }
 }
 
@@ -258,7 +145,7 @@
         font-size: .65rem;
     }
 
-    .existing-record-role-filters {
+    .existing-record-directory .tab-group {
         gap: .3rem;
     }
 
