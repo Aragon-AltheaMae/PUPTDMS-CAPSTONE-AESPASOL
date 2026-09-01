@@ -5,59 +5,59 @@
 @section('title', 'Dental Records')
 
 @section('styles')
-    @vite('resources/css/pages/admin/dental-records.css')
+@vite('resources/css/pages/admin/dental-records.css')
 @endsection
 
 @section('content')
 
 @php use Carbon\Carbon;
 
-    $routePrefix = request()->routeIs('dentist.*') ? 'dentist' : 'admin';
-    $reportsRouteName = $routePrefix === 'dentist' ? 'dentist.dentist.report' : 'admin.report-files';
-    $appointmentsRouteName = $routePrefix === 'dentist' ? 'dentist.dentist.appointments' : 'admin.admin.appointments';
+$routePrefix = request()->routeIs('dentist.*') ? 'dentist' : 'admin';
+$reportsRouteName = $routePrefix === 'dentist' ? 'dentist.dentist.report' : 'admin.report-files';
+$appointmentsRouteName = $routePrefix === 'dentist' ? 'dentist.dentist.appointments' : 'admin.admin.appointments';
 
-    $recordsSource = $records ?? collect();
+$recordsSource = $records ?? collect();
 
-    $recordItems = $recordsSource instanceof \Illuminate\Pagination\AbstractPaginator
-        ? collect($recordsSource->items())
-        : collect($recordsSource);
+$recordItems = $recordsSource instanceof \Illuminate\Pagination\AbstractPaginator
+? collect($recordsSource->items())
+: collect($recordsSource);
 
-    $totalRecordsCount = $totalRecords
-        ?? (
-            $recordsSource instanceof \Illuminate\Pagination\AbstractPaginator
-                ? $recordsSource->total()
-                : $recordItems->count()
-        );
+$totalRecordsCount = $totalRecords
+?? (
+$recordsSource instanceof \Illuminate\Pagination\AbstractPaginator
+? $recordsSource->total()
+: $recordItems->count()
+);
 
-    $recordsTodayCount = $recordsToday ?? 0;
+$recordsTodayCount = $recordsToday ?? 0;
 
-    $pendingCount = $pending
-        ?? $recordItems
-            ->filter(
-                fn ($record) =>
-                    strtolower(
-                        trim(
-                            $record->status ?? 'pending'
-                        )
-                    ) === 'pending'
-                )
-            ->count();
+$pendingCount = $pending
+?? $recordItems
+->filter(
+fn ($record) =>
+strtolower(
+trim(
+$record->status ?? 'pending'
+)
+) === 'pending'
+)
+->count();
 
-    $recordPaginationMeta = $recordsSource instanceof \Illuminate\Pagination\AbstractPaginator
-        ? [
-            'current_page' => $recordsSource->currentPage(),
-            'last_page' => $recordsSource->lastPage(),
-            'total' => $recordsSource->total(),
-            'from' => $recordsSource->firstItem(),
-            'to' => $recordsSource->lastItem(),
-        ]
-        : null;
+$recordPaginationMeta = $recordsSource instanceof \Illuminate\Pagination\AbstractPaginator
+? [
+'current_page' => $recordsSource->currentPage(),
+'last_page' => $recordsSource->lastPage(),
+'total' => $recordsSource->total(),
+'from' => $recordsSource->firstItem(),
+'to' => $recordsSource->lastItem(),
+]
+: null;
 
-    $recordPerPage = $recordsSource instanceof \Illuminate\Pagination\AbstractPaginator
-        ? $recordsSource->perPage()
-        : 10;
+$recordPerPage = $recordsSource instanceof \Illuminate\Pagination\AbstractPaginator
+? $recordsSource->perPage()
+: 10;
 
-    $recordAppliedStatus = request('status', 'all');
+$recordAppliedStatus = request('status', 'all');
 @endphp
 
 <main id="mainContent" class="app-page-shell admin-dental-records-page page-enter mode-list">
@@ -136,19 +136,16 @@
                             </div>
 
                             <div class="record-filter-actions">
-                                <button id="dentalRecordFilterBtn" type="button"
-                                    class="global-filter-btn" aria-pressed="false"
-                                    onclick="openDentalRecordFilters()">
+                                <button id="dentalRecordFilterBtn" type="button" class="global-filter-btn"
+                                    aria-pressed="false" onclick="openDentalRecordFilters()">
                                     <i class="fa-solid fa-sliders"></i>
                                     <span>Filters</span>
                                     <span id="dentalRecordFilterBadge" class="filter-badge"></span>
                                 </button>
 
                                 <button id="dentalRecordFilterResetBtn" type="button"
-                                    class="global-filter-reset-btn hidden"
-                                    title="Reset filters"
-                                    aria-label="Reset dental record filters"
-                                    onclick="clearDentalRecordFilters()">
+                                    class="global-filter-reset-btn hidden" title="Reset filters"
+                                    aria-label="Reset dental record filters" onclick="clearDentalRecordFilters()">
                                     <i class="fa-solid fa-rotate-left"></i>
                                 </button>
                             </div>
@@ -165,17 +162,18 @@
                 <x-pagination-bar id="dentalRecordsPagebarTop" info-id="dentalRecordsPageInfoTop"
                     pagination-id="dentalRecordsPaginationTop" position="top" :show-entries="true"
                     page-size-id="dentalRecordsPageSize" page-size-callback="changeDentalRecordsPageSize"
-                    :page-size-value="$recordPerPage" label="records" />
+                    :page-size-value="$recordPerPage" label="records" :total="$recordsSource->total()"
+                    :from="$recordsSource->firstItem() ?? 0" :to="$recordsSource->lastItem() ?? 0" />
                 @endif
 
                 <div id="dentalRecordsResultsRegion">
                     @if ($recordItems->isEmpty())
-                        <div id="dentalRecordEmptyState" class="empty-state-host show"></div>
+                    <div id="dentalRecordEmptyState" class="empty-state-host show"></div>
                     @else
-                        <div id="dentalRecordListView" class="table-list-view table-scroll">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
+                    <div id="dentalRecordListView" class="table-list-view table-scroll">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
                                     <th>Patient</th>
                                     <th>Procedure</th>
                                     <th>Dentist</th>
@@ -190,16 +188,16 @@
                             <tbody id="dentalRecordsTableBody">
                                 @foreach ($recordsSource as $record)
                                 @php
-                                    $rawStatus = strtolower(trim($record->status ?? 'pending'));
-                                    $normalizedStatus = str_replace([' ', '_'], '-', $rawStatus);
-                                    $statusClass = match ($normalizedStatus) {
-                                        'completed' => 'status-completed',
-                                        'ongoing', 'in-progress' => 'status-ongoing',
-                                        'cancelled', 'canceled' => 'status-cancelled',
-                                        'not-started' => 'status-default',
-                                        default => 'status-pending',
-                                    };
-                                
+                                $rawStatus = strtolower(trim($record->status ?? 'pending'));
+                                $normalizedStatus = str_replace([' ', '_'], '-', $rawStatus);
+                                $statusClass = match ($normalizedStatus) {
+                                'completed' => 'status-completed',
+                                'ongoing', 'in-progress' => 'status-ongoing',
+                                'cancelled', 'canceled' => 'status-cancelled',
+                                'not-started' => 'status-default',
+                                default => 'status-pending',
+                                };
+
                                 $patientName = $record->patient_name ??
                                 (data_get($record, 'patient.name') ??
                                 (data_get($record, 'patient.full_name') ?? 'Unknown Patient'));
@@ -207,16 +205,16 @@
                                 $dentistName = $record->dentist_name ??
                                 (data_get($record, 'dentist.name') ??
                                 (data_get($record, 'dentist.full_name') ?? '—'));
-                                
+
                                 $procedure = $record->procedure ?? '—';
                                 $recordDate = null;
 
                                 if (!empty($record->date)) {
-                                    try {
-                                        $recordDate = Carbon::parse($record->date);
-                                    } catch (\Throwable $e) {
-                                        $recordDate = null;
-                                    }
+                                try {
+                                $recordDate = Carbon::parse($record->date);
+                                } catch (\Throwable $e) {
+                                $recordDate = null;
+                                }
                                 }
 
                                 $dateText = $recordDate ? $recordDate->format( 'M d, Y'): '—';
@@ -228,18 +226,14 @@
                                     data-patient="{{ strtolower($patientName) }}"
                                     data-procedure="{{ strtolower($procedure) }}"
                                     data-dentist="{{ strtolower($dentistName) }}" data-status="{{ $normalizedStatus }}"
-                                    data-date="{{ $dateIso }}" 
-                                    @if (!empty($record->id)) onclick="openRecordPanel({{
-                                        $record->id }})" 
+                                    data-date="{{ $dateIso }}" @if (!empty($record->id)) onclick="openRecordPanel({{
+                                    $record->id }})"
                                     @endif>
 
                                     <td class="table-cell-main">
                                         <div class="table-primary">
-                                            <span
-                                                class="patient-avatar patient-avatar-sm"
-                                                data-patient-avatar
-                                                data-patient-name="{{ $patientName }}"
-                                            ></span>
+                                            <span class="patient-avatar patient-avatar-sm" data-patient-avatar
+                                                data-patient-name="{{ $patientName }}"></span>
                                             <div class="dental-record-patient-copy">
                                                 <strong class="dental-record-patient-name" data-patient-name>
                                                     {{ $patientName }}
@@ -272,61 +266,61 @@
                                     <td class="table-action-cell">
                                         <div class="ui-action-group">
                                             @if (!empty($record->id))
-                                                <button type="button" class="ui-action-btn ui-action-view"
-                                                    onclick="event.stopPropagation(); openRecordPanel({{ $record->id }})"
-                                                    aria-label="View record" data-tooltip="View record">
-                                                    <i class="fa-solid fa-eye"></i>
-                                                </button>
+                                            <button type="button" class="ui-action-btn ui-action-view"
+                                                onclick="event.stopPropagation(); openRecordPanel({{ $record->id }})"
+                                                aria-label="View record" data-tooltip="View record">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </button>
                                             @endif
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
 
-                <div id="dentalRecordGridView" class="table-record-grid dental-record-grid-view" hidden>
+                    <div id="dentalRecordGridView" class="table-record-grid dental-record-grid-view" hidden>
                         @foreach ($recordsSource as $record)
                         @php
 
-                            $rawStatus = strtolower(trim($record->status ?? 'pending'));
+                        $rawStatus = strtolower(trim($record->status ?? 'pending'));
 
-                            $normalizedStatus = str_replace([' ', '_'],'-',$rawStatus);
+                        $normalizedStatus = str_replace([' ', '_'],'-',$rawStatus);
 
-                            $statusClass = match ($normalizedStatus) {
-                                'completed' => 'status-completed',
-                                'ongoing', 'in-progress' => 'status-ongoing',
-                                'cancelled','canceled' =>'status-cancelled',
-                                'not-started' => 'status-default',
-                                default =>'status-pending',
-                            };
+                        $statusClass = match ($normalizedStatus) {
+                        'completed' => 'status-completed',
+                        'ongoing', 'in-progress' => 'status-ongoing',
+                        'cancelled','canceled' =>'status-cancelled',
+                        'not-started' => 'status-default',
+                        default =>'status-pending',
+                        };
 
-                            $patientName = $record->patient_name
-                            ?? data_get($record,'patient.name')
-                            ?? data_get($record,'patient.full_name')
-                            ?? 'Unknown Patient';
+                        $patientName = $record->patient_name
+                        ?? data_get($record,'patient.name')
+                        ?? data_get($record,'patient.full_name')
+                        ?? 'Unknown Patient';
 
-                            $dentistName = $record->dentist_name
-                            ?? data_get($record,'dentist.name')
-                            ?? data_get($record,'dentist.full_name')
-                            ?? '—';
+                        $dentistName = $record->dentist_name
+                        ?? data_get($record,'dentist.name')
+                        ?? data_get($record,'dentist.full_name')
+                        ?? '—';
 
-                            $procedure = $record->procedure ?? '—';
-                            $recordDate = null;
+                        $procedure = $record->procedure ?? '—';
+                        $recordDate = null;
 
-                            if (!empty($record->date)) {
-                                try {
-                                    $recordDate = Carbon::parse($record->date);
-                                } catch (\Throwable $e) {
-                                    $recordDate = null;
-                                }
-                            }
+                        if (!empty($record->date)) {
+                        try {
+                        $recordDate = Carbon::parse($record->date);
+                        } catch (\Throwable $e) {
+                        $recordDate = null;
+                        }
+                        }
 
-                            $dateText = $recordDate? $recordDate->format('M d, Y'): '—';
-                            $dateIso = $recordDate? $recordDate->toDateString(): '';
+                        $dateText = $recordDate? $recordDate->format('M d, Y'): '—';
+                        $dateIso = $recordDate? $recordDate->toDateString(): '';
 
-                            $initial = strtoupper(substr($patientName, 0, 1));
+                        $initial = strtoupper(substr($patientName, 0, 1));
                         @endphp
 
                         <article class="table-record-card dental-record-grid-card dental-record-item"
@@ -340,11 +334,8 @@
                                 <div class="table-record-content">
                                     <div class="table-record-header">
                                         <div class="table-primary">
-                                            <span
-                                                class="patient-avatar patient-avatar-md"
-                                                data-patient-avatar
-                                                data-patient-name="{{ $patientName }}"
-                                            ></span>
+                                            <span class="patient-avatar patient-avatar-md" data-patient-avatar
+                                                data-patient-name="{{ $patientName }}"></span>
 
                                             <div class="dental-record-patient-copy">
                                                 <h3 class="table-record-title" data-patient-name>
@@ -405,10 +396,10 @@
                 </div>
 
                 @if ($recordsSource instanceof \Illuminate\Pagination\AbstractPaginator)
-                    <x-pagination-bar id="dentalRecordsPagebarBottom" info-id="dentalRecordsPageInfoBottom"
-                        pagination-id="dentalRecordsPaginationBottom" position="bottom" :show-entries="false"
-                        :page-size-value="$recordPerPage" label="records" 
-                    />
+                <x-pagination-bar id="dentalRecordsPagebarBottom" info-id="dentalRecordsPageInfoBottom"
+                    pagination-id="dentalRecordsPaginationBottom" position="bottom" :show-entries="false"
+                    :page-size-value="$recordPerPage" label="records" :total="$recordsSource->total()"
+                    :from="$recordsSource->firstItem() ?? 0" :to="$recordsSource->lastItem() ?? 0" />
                 @endif
             </section>
 
@@ -423,8 +414,7 @@
                             </div>
 
                             <div class="min-w-0">
-                                <h2 id="panelRecordTitle"
-                                    class="text-sm font-black text-gray-800 truncate">
+                                <h2 id="panelRecordTitle" class="text-sm font-black text-gray-800 truncate">
                                     Select a record
                                 </h2>
 
@@ -433,11 +423,11 @@
                                 </p>
                             </div>
                         </div>
-                    <div class="dental-record-panel-badges">
-                        <div id="panelRecordPwd"></div>
-                        <div id="panelRecordStatus"></div>
+                        <div class="dental-record-panel-badges">
+                            <div id="panelRecordPwd"></div>
+                            <div id="panelRecordStatus"></div>
+                        </div>
                     </div>
-                </div>
 
                     <div id="panelBody" class="p-5">
                         <div class="text-center py-8">
@@ -459,9 +449,9 @@
                                 border border-red-100 flex items-center justify-center flex-shrink-0">
                             <i class="fa-solid fa-chart-pie"></i>
                         </div>
-                    <div>
-                        
-                        <h2 class="text-sm font-black text-gray-800">Record Insights</h2>
+                        <div>
+
+                            <h2 class="text-sm font-black text-gray-800">Record Insights</h2>
                             <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
                                 Summary statistics
                             </p>
@@ -525,7 +515,8 @@
                     </div>
 
                     <div class="quick-actions-list">
-                        <a href="{{ route($routePrefix . '.reports.ai-generated') }}" class="quick-action quick-action-card">
+                        <a href="{{ route($routePrefix . '.reports.ai-generated') }}"
+                            class="quick-action quick-action-card">
                             <span class="quick-action-icon">
                                 <i class="fa-solid fa-chart-column"></i>
                             </span>
@@ -560,27 +551,17 @@
 </main>
 
 
-<x-filter-drawer id="filterModal"
-    title="Filter Records"
-    close-id="dentalRecordFilterCloseBtn"
-    close-callback="closeDentalRecordFilters()"
-    clear-id="dentalRecordFilterClearBtn"
-    clear-callback="clearDentalRecordFilterDraft()"
-    clear-label="Clear Filters"
-    cancel-id="dentalRecordFilterCancelBtn"
-    cancel-callback="closeDentalRecordFilters()"
-    cancel-label="Cancel"
-    apply-id="dentalRecordFilterApplyBtn"
-    apply-callback="applyDentalRecordFilters()"
-    apply-label="Show Results"
-    results-id="dentalRecordFilterResultsText">
+<x-filter-drawer id="filterModal" title="Filter Records" close-id="dentalRecordFilterCloseBtn"
+    close-callback="closeDentalRecordFilters()" clear-id="dentalRecordFilterClearBtn"
+    clear-callback="clearDentalRecordFilterDraft()" clear-label="Clear Filters" cancel-id="dentalRecordFilterCancelBtn"
+    cancel-callback="closeDentalRecordFilters()" cancel-label="Cancel" apply-id="dentalRecordFilterApplyBtn"
+    apply-callback="applyDentalRecordFilters()" apply-label="Show Results" results-id="dentalRecordFilterResultsText">
 
     <div id="dentalRecordActiveFiltersSection" class="filter-active-section hidden">
         <div class="filter-active-header">
             <span class="filter-active-title">Active Filters</span>
 
-            <button type="button"
-                class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm"
+            <button type="button" class="filter-clear-all ui-btn ui-btn-secondary ui-btn-sm"
                 onclick="clearDentalRecordFilterDraft()">
                 <i class="fa-solid fa-rotate-left"></i>
                 <span>Clear All</span>
@@ -593,15 +574,13 @@
     <x-filter-group title="Date Order">
         <div class="filter-chip-row">
             <label class="choice-chip">
-                <input type="radio" name="dental_record_sort" value="newest"
-                    class="filter-input radio-red chip-radio"
+                <input type="radio" name="dental_record_sort" value="newest" class="filter-input radio-red chip-radio"
                     data-record-filter="sort">
                 <span>Newest First</span>
             </label>
 
             <label class="choice-chip">
-                <input type="radio" name="dental_record_sort" value="oldest"
-                    class="filter-input radio-red chip-radio"
+                <input type="radio" name="dental_record_sort" value="oldest" class="filter-input radio-red chip-radio"
                     data-record-filter="sort">
                 <span>Oldest First</span>
             </label>
@@ -612,15 +591,13 @@
         <div class="filter-chip-row">
             <label class="choice-chip">
                 <input type="radio" name="dental_record_name_sort" value="name_asc"
-                    class="filter-input radio-red chip-radio"
-                    data-record-filter="name_sort">
+                    class="filter-input radio-red chip-radio" data-record-filter="name_sort">
                 <span>A to Z</span>
             </label>
 
             <label class="choice-chip">
                 <input type="radio" name="dental_record_name_sort" value="name_desc"
-                    class="filter-input radio-red chip-radio"
-                    data-record-filter="name_sort">
+                    class="filter-input radio-red chip-radio" data-record-filter="name_sort">
                 <span>Z to A</span>
             </label>
         </div>
@@ -629,18 +606,17 @@
     <x-filter-group title="Record Status">
         <div class="filter-chip-row">
             @foreach ([
-                'not-started' => 'Not Started',
-                'pending' => 'Pending',
-                'ongoing' => 'Ongoing',
-                'completed' => 'Completed',
-                'cancelled' => 'Cancelled',
+            'not-started' => 'Not Started',
+            'pending' => 'Pending',
+            'ongoing' => 'Ongoing',
+            'completed' => 'Completed',
+            'cancelled' => 'Cancelled',
             ] as $value => $label)
-                <label class="choice-chip">
-                    <input type="radio" name="dental_record_status" value="{{ $value }}"
-                        class="filter-input radio-red chip-radio"
-                        data-record-filter="status">
-                    <span>{{ $label }}</span>
-                </label>
+            <label class="choice-chip">
+                <input type="radio" name="dental_record_status" value="{{ $value }}"
+                    class="filter-input radio-red chip-radio" data-record-filter="status">
+                <span>{{ $label }}</span>
+            </label>
             @endforeach
         </div>
     </x-filter-group>
@@ -648,17 +624,16 @@
     <x-filter-group title="Patient Classification">
         <div class="filter-chip-row">
             @foreach ([
-                'student' => 'Student',
-                'faculty' => 'Faculty',
-                'administrative' => 'Administrative Personnel',
-                'dependent_alumni' => 'Dependent & Alumni',
+            'student' => 'Student',
+            'faculty' => 'Faculty',
+            'administrative' => 'Administrative Personnel',
+            'dependent_alumni' => 'Dependent & Alumni',
             ] as $value => $label)
-                <label class="choice-chip">
-                    <input type="radio" name="dental_record_classification" value="{{ $value }}"
-                        class="filter-input radio-red chip-radio"
-                        data-record-filter="classification">
-                    <span>{{ $label }}</span>
-                </label>
+            <label class="choice-chip">
+                <input type="radio" name="dental_record_classification" value="{{ $value }}"
+                    class="filter-input radio-red chip-radio" data-record-filter="classification">
+                <span>{{ $label }}</span>
+            </label>
             @endforeach
         </div>
     </x-filter-group>
@@ -666,19 +641,17 @@
     <x-filter-group title="Filter by Date Range">
         <div id="datePresetGroup" class="filter-chip-row">
             @foreach ([
-                'today' => 'Today',
-                '7' => 'Last 7 Days',
-                '30' => 'Last 30 Days',
-                '90' => 'Last 3 Months',
-                '180' => 'Last 6 Months',
-                '365' => 'Last 12 Months',
+            'today' => 'Today',
+            '7' => 'Last 7 Days',
+            '30' => 'Last 30 Days',
+            '90' => 'Last 3 Months',
+            '180' => 'Last 6 Months',
+            '365' => 'Last 12 Months',
             ] as $value => $label)
-                <button type="button"
-                    class="quick-date-chip"
-                    data-record-date="{{ $value }}"
-                    onclick="setDentalRecordDraftFilter('datePreset', '{{ $value }}')">
-                    {{ $label }}
-                </button>
+            <button type="button" class="quick-date-chip" data-record-date="{{ $value }}"
+                onclick="setDentalRecordDraftFilter('datePreset', '{{ $value }}')">
+                {{ $label }}
+            </button>
             @endforeach
         </div>
     </x-filter-group>
@@ -686,22 +659,14 @@
     <x-filter-group title="Custom Date Range" class="filter-group-last">
         <div class="filter-date-grid">
             <div class="filter-date-input-wrap">
-                <input id="dentalRecordDateFrom"
-                    type="text"
-                    class="js-flatpickr-date-range-from"
-                    placeholder="Start date"
-                    readonly
-                    autocomplete="off">
+                <input id="dentalRecordDateFrom" type="text" class="js-flatpickr-date-range-from"
+                    placeholder="Start date" readonly autocomplete="off">
                 <i class="fa-regular fa-calendar"></i>
             </div>
 
             <div class="filter-date-input-wrap">
-                <input id="dentalRecordDateTo"
-                    type="text"
-                    class="js-flatpickr-date-range-to"
-                    placeholder="End date"
-                    readonly
-                    autocomplete="off">
+                <input id="dentalRecordDateTo" type="text" class="js-flatpickr-date-range-to" placeholder="End date"
+                    readonly autocomplete="off">
                 <i class="fa-regular fa-calendar"></i>
             </div>
         </div>
@@ -839,15 +804,15 @@
         const value = item.value ?? '';
 
         let formattedValue = escapeHtml(value);
-            if (label.toLowerCase() === 'emergency contact') {
-                const parts = String(value)
-                    .split(/\s*•\s*/)
-                    .map(part => part.trim())
-                    .filter(Boolean);
+        if (label.toLowerCase() === 'emergency contact') {
+            const parts = String(value)
+                .split(/\s*•\s*/)
+                .map(part => part.trim())
+                .filter(Boolean);
 
-                const [name, phone, relationship] = parts;
+            const [name, phone, relationship] = parts;
 
-                formattedValue = `
+            formattedValue = `
                     <span class="block">
                         ${escapeHtml(name || 'N/A')}
                     </span>
@@ -857,35 +822,34 @@
                         ${relationship ? ` · ${escapeHtml(relationship)}` : ''}
                     </span>
                 `;
-            }
+        }
 
-            if (label.toLowerCase() === 'program / year') {
-                const parts = String(value)
-                    .split(/\s*•\s*/)
-                    .map(part => part.trim())
-                    .filter(Boolean);
+        if (label.toLowerCase() === 'program / year') {
+            const parts = String(value)
+                .split(/\s*•\s*/)
+                .map(part => part.trim())
+                .filter(Boolean);
 
-                const program = parts[0] || 'N/A';
-                const academicLevel = parts.slice(1).join(' · ');
+            const program = parts[0] || 'N/A';
+            const academicLevel = parts.slice(1).join(' · ');
 
-                formattedValue = `
+            formattedValue = `
                     <span class="block">
                         ${escapeHtml(program)}
                     </span>
 
-                    ${
-                        academicLevel
-                            ? `
+                    ${academicLevel
+                    ? `
                                 <span class="global-info-subvalue block">
                                     ${escapeHtml(academicLevel)}
                                 </span>
                             `
-                            : ''
-                        }
-                    `;
+                    : ''
                 }
+                    `;
+        }
 
-            return `
+        return `
                 <div class="global-info-item global-info-item-compact">
                     <span class="global-info-icon status-default">
                         <i class="${escapeHtml(icon)}"></i>
@@ -901,7 +865,7 @@
                         </strong>
                     </div>
                 </div>`;
-            }
+    }
 
     function reviewRow(label, value) {
         const hasValue =
@@ -983,18 +947,20 @@
             'fa-user',
             `
                 <div class="grid grid-cols-1 gap-y-1 sm:grid-cols-2 sm:gap-x-8">
-                    ${profileFields.filter(item => {const label = String(item.label || '').trim().toLowerCase();
-                    return !['emergency contact','pwd',].includes(label);})
-                    .map(item => reviewRow(
-                            item.label || 'Field',
-                            item.value || 'N/A'
-                        )
-                    )
-                    .join('')}
+                    ${profileFields.filter(item => {
+                const label = String(item.label || '').trim().toLowerCase();
+                return !['emergency contact', 'pwd',].includes(label);
+            })
+                .map(item => reviewRow(
+                    item.label || 'Field',
+                    item.value || 'N/A'
+                )
+                )
+                .join('')}
                                 </div>
                             `
-                        );
-                    }
+        );
+    }
 
     function renderRecordSection(section = {}) {
         if (Array.isArray(section.groups) && section.groups.length > 0) {
@@ -1013,8 +979,8 @@
                 `
                     <div class="grid grid-cols-1 gap-y-1">
                         ${section.rows
-                            .map(item => reviewRow(item.label, item.value))
-                            .join('')}
+                    .map(item => reviewRow(item.label, item.value))
+                    .join('')}
                     </div>
                 `
             );
@@ -1069,24 +1035,24 @@
                 ${renderPatientInformationCard(profileFields)}
 
                 ${recordSummaryCard(
-                    'Emergency Contact',
-                    'fa-phone',
-                    `
+            'Emergency Contact',
+            'fa-phone',
+            `
                         <div class="grid grid-cols-1 gap-y-1 sm:grid-cols-3 sm:gap-x-8">
                             ${reviewRow('Name', emergencyContact.name || 'N/A')}
                             ${reviewRow('Number', emergencyContact.number || 'N/A')}
                             ${reviewRow('Relation', emergencyContact.relation || 'N/A')}
                         </div>
                     `
-                )}
+        )}
 
                 ${sections
-                    .map(section => renderRecordSection(section))
-                    .filter(Boolean)
-                    .join('')
-                }
+                .map(section => renderRecordSection(section))
+                .filter(Boolean)
+                .join('')
+            }
             </div>`;
-        }
+    }
 
     function initDentalRecordDetailsModal() {
         const modal = document.getElementById('dentalRecordDetailsModal');
@@ -1147,7 +1113,7 @@
             title.textContent =
                 window.formatPatientName?.(patientName) ||
                 patientName;
-            
+
             if (panelAvatar) {
                 panelAvatar.innerHTML =
                     window.PatientUI?.buildAvatarHtml?.({
@@ -1170,7 +1136,7 @@
                     `
                     : '';
             }
-            
+
             if (panelStatus) {
                 panelStatus.innerHTML = `
                     <span class="status-pill ${statusPillClass(status)}">
@@ -1183,14 +1149,15 @@
             panelBody.innerHTML = `
                 <div class="dental-record-profile-shell">
                     <div class="global-info-grid dental-record-profile-grid">
-                        ${(data.profile_fields || []).filter(item => {const label = String(item.label || '').trim().toLowerCase();
-                            return ![
-                                'name',
-                                'pwd',
-                            ].includes(label);
-                        })
-                        .map(item => profileInfoRow(item))
-                        .join('')}
+                        ${(data.profile_fields || []).filter(item => {
+                const label = String(item.label || '').trim().toLowerCase();
+                return ![
+                    'name',
+                    'pwd',
+                ].includes(label);
+            })
+                    .map(item => profileInfoRow(item))
+                    .join('')}
                     </div>
                 </div>`;
 
@@ -1253,7 +1220,7 @@
             containers: paginationHosts,
             infoElements: infoElements,
             bars: pagebars,
-            itemLabel:'records',
+            itemLabel: 'records',
 
             onPageChange(page) {
                 loadDentalRecordsPage(
@@ -1330,7 +1297,7 @@
             });
 
         document.querySelectorAll('#filterModal [data-record-date]')
-                .forEach(button => {
+            .forEach(button => {
                 button.classList.toggle(
                     'active',
                     button.dataset.recordDate === dentalRecordFilterDraft.datePreset
@@ -1370,9 +1337,8 @@
 
         if (dentalRecordFilterDraft.sort !== 'newest') {
             chips.push([
-                `Sort: ${
-                    sortLabels[dentalRecordFilterDraft.sort]
-                    || 'Newest First'
+                `Sort: ${sortLabels[dentalRecordFilterDraft.sort]
+                || 'Newest First'
                 }`,
                 'sort'
             ]);
@@ -1396,10 +1362,9 @@
             };
 
             chips.push([
-                `Classification: ${
-                    classificationLabels[
-                        dentalRecordFilterDraft.classification
-                    ] || dentalRecordFilterDraft.classification
+                `Classification: ${classificationLabels[
+                dentalRecordFilterDraft.classification
+                ] || dentalRecordFilterDraft.classification
                 }`,
                 'classification'
             ]);
@@ -1427,7 +1392,7 @@
             } else {
                 dateLabel =
                     dateLabels[
-                        dentalRecordFilterDraft.datePreset
+                    dentalRecordFilterDraft.datePreset
                     ] || 'Custom Date';
             }
 
@@ -1466,7 +1431,7 @@
 
         updateDentalRecordFilterDraftUi();
 
-        if (typeof window.openFilterDrawer === 'function' ) {
+        if (typeof window.openFilterDrawer === 'function') {
             window.openFilterDrawer('filterModal');
             return;
         }
@@ -1482,7 +1447,7 @@
     }
 
     function closeDentalRecordFilters() {
-        if (typeof window.closeFilterDrawer ==='function') {
+        if (typeof window.closeFilterDrawer === 'function') {
             window.closeFilterDrawer(
                 'filterModal'
             );
@@ -1596,7 +1561,7 @@
     }
 
     function syncDentalRecordFilterParams(url, filters = dentalRecordFilters) {
-        
+
         if (filters.status && filters.status !== 'all') {
             url.searchParams.set('status', filters.status);
         } else {
@@ -1609,7 +1574,7 @@
             url.searchParams.delete('sort');
         }
 
-        if ( filters.classification && filters.classification !== 'all') {
+        if (filters.classification && filters.classification !== 'all') {
             url.searchParams.set('classification', filters.classification);
         } else {
             url.searchParams.delete('classification');
@@ -1690,7 +1655,7 @@
             }
             const total = Number(payload.pagination?.total) || 0;
 
-            resultsText.textContent = 
+            resultsText.textContent =
                 total === 1
                     ? 'Show 1 result'
                     : `Show ${total} results`;
@@ -1707,7 +1672,7 @@
             return;
         }
 
-        const hasRenderedResults = 
+        const hasRenderedResults =
             (document.querySelectorAll('#dentalRecordsTableBody tr').length > 0) ||
             (document.querySelectorAll('#dentalRecordGridView .dental-record-item').length > 0);
 
@@ -1742,33 +1707,33 @@
         if (dentalRecordFilterCount() > 0) {
             const states = {
                 today: {
-                    icon:'fa-clock',
-                    title:'No records added today',
-                    message:'Dental records created today will appear here.',
+                    icon: 'fa-clock',
+                    title: 'No records added today',
+                    message: 'Dental records created today will appear here.',
                 },
 
                 pending: {
-                    icon:'fa-user-clock',
-                    title:'No pending dental records',
-                    message:'Pending dental records will appear here once available.',
+                    icon: 'fa-user-clock',
+                    title: 'No pending dental records',
+                    message: 'Pending dental records will appear here once available.',
                 },
 
                 ongoing: {
-                    icon:'fa-spinner',
-                    title:'No ongoing dental records',
-                    message:'Ongoing dental procedures will appear here once started.',
+                    icon: 'fa-spinner',
+                    title: 'No ongoing dental records',
+                    message: 'Ongoing dental procedures will appear here once started.',
                 },
 
                 completed: {
-                    icon:'fa-check-double',
-                    title:'No completed dental records',
-                    message:'Completed dental records will appear here once finalized.',
+                    icon: 'fa-check-double',
+                    title: 'No completed dental records',
+                    message: 'Completed dental records will appear here once finalized.',
                 },
 
                 cancelled: {
-                    icon:'fa-calendar-xmark',
-                    title:'No cancelled dental records',
-                    message:'Cancelled dental records will appear here once available.',
+                    icon: 'fa-calendar-xmark',
+                    title: 'No cancelled dental records',
+                    message: 'Cancelled dental records will appear here once available.',
                 },
             };
 
@@ -1776,9 +1741,9 @@
                 states[
                 dentalRecordsStatus
                 ] || {
-                    icon:'fa-sliders',
-                    title:'No matching dental records',
-                    message:'Try changing the selected dental record filters.',
+                    icon: 'fa-sliders',
+                    title: 'No matching dental records',
+                    message: 'Try changing the selected dental record filters.',
                 };
 
             window.EmptyState?.render({
@@ -1805,9 +1770,9 @@
 
         window.EmptyState?.render({
             host,
-            icon:'fa-notes-medical',
-            title:'No dental records found',
-            message:'New records will appear here once they are added.',
+            icon: 'fa-notes-medical',
+            title: 'No dental records found',
+            message: 'New records will appear here once they are added.',
         });
     }
 
@@ -1942,7 +1907,7 @@
                     'dentalRecordsResultsRegion'
                 );
 
-            if (!nextRegion ||!currentRegion) {
+            if (!nextRegion || !currentRegion) {
                 throw new Error(
                     'Dental records results region was not found.'
                 );
@@ -2027,8 +1992,8 @@
                             },
                             300
                         );
-                    }
-                );
+                }
+            );
 
             window.initSearchClearButtons?.(document);
             window.initGlobalVoiceInputs?.(document);
@@ -2062,8 +2027,8 @@
             });
 
             document.querySelectorAll(
-                    '#filterModal [data-record-filter]'
-                )
+                '#filterModal [data-record-filter]'
+            )
                 .forEach(input => {
                     input.addEventListener(
                         'change',
@@ -2082,7 +2047,7 @@
                                 dentalRecordFilterDraft.status = input.value;
                             }
 
-                            if (key ==='classification') {
+                            if (key === 'classification') {
                                 dentalRecordFilterDraft.classification = input.value;
                             }
 

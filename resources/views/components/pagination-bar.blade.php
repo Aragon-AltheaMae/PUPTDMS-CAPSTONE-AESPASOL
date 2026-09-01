@@ -9,6 +9,10 @@
     'pageSizeValue' => 10,
     'pageSizeLabel' => 'entries',
     'label' => 'entries',
+
+    'total' => null,
+    'from' => null,
+    'to' => null,
 ])
 
 <div id="{{ $id }}"
@@ -20,7 +24,15 @@
     <div class="global-pagebar-left">
 
         <span id="{{ $infoId }}" class="global-pagebar-info">
-            Showing 0 {{ $label }}
+            @if ($total !== null && (int) $total > 0)
+                Showing
+                <strong>{{ $from ?? 1 }}</strong>–<strong>{{ $to ?? min((int) $pageSizeValue, (int) $total) }}</strong>
+                of
+                <strong>{{ (int) $total }}</strong>
+                {{ $label }}
+            @else
+                Showing <strong>0</strong> {{ $label }}
+            @endif
         </span>
 
         @if ($showEntries && $pageSizeId && $pageSizeCallback)
@@ -62,7 +74,7 @@
                         @endforeach
                     </div>
                 </div>
-                <span>entries</span>
+                <span>{{ $pageSizeLabel }}</span>
             </div>
         @endif
 
