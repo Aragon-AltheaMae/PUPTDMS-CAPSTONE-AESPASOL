@@ -54,11 +54,17 @@ class Patient extends Model
                     return $value;
                 }
 
-                return mb_convert_case(
+                $formattedName = mb_convert_case(
                     mb_strtolower(trim($value), 'UTF-8'),
                     MB_CASE_TITLE,
                     'UTF-8'
                 );
+
+                return preg_replace_callback(
+                    '/\b(ii|iii|iv|v|vi|vii|viii|ix|x)\.?$/i',
+                    fn ($matches) => strtoupper($matches[0]),
+                    $formattedName
+                ) ?? $formattedName;
             }
         );
     }
