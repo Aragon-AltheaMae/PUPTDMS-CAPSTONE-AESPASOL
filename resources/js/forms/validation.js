@@ -1412,6 +1412,22 @@ document.addEventListener(
     }
 );
 
+function shakeGlobalFieldErrors(form) {
+    if (!form) return;
+
+    form
+        .querySelectorAll(
+            '.global-field-error.show'
+        )
+        .forEach(error => {
+            error.style.animation = 'none';
+
+            void error.offsetWidth;
+
+            error.style.animation = '';
+        });
+}
+
 function validateGlobalForm(form, options = {}) {
     if (!form) {
         return {
@@ -1455,15 +1471,32 @@ function validateGlobalForm(form, options = {}) {
         focusGlobalInvalidField(firstInvalid);
     }
 
-    const customResult = runGlobalFormValidationRule(form);
+    const customResult =
+        runGlobalFormValidationRule(form);
 
-    if (!customResult.valid && !firstInvalid) {
-        firstInvalid = customResult.firstInvalid || null;
+    if (
+        !customResult.valid &&
+        !firstInvalid
+    ) {
+        firstInvalid =
+            customResult.firstInvalid ||
+            null;
+    }
+
+    const valid =
+        !firstInvalid &&
+        customResult.valid;
+
+    if (!valid) {
+        shakeGlobalFieldErrors(form);
     }
 
     return {
-        valid: !firstInvalid && customResult.valid,
-        firstInvalid: firstInvalid || customResult.firstInvalid || null
+        valid,
+        firstInvalid:
+            firstInvalid ||
+            customResult.firstInvalid ||
+            null
     };
 }
 
