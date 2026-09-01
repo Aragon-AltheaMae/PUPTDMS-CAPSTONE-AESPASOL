@@ -8,6 +8,9 @@ class ExistingRecordController extends Controller
 {
     public function index()
     {
-        return view('admin.add-existing-record');
+        return view('dentist.add-existing-record', [
+            'layoutRole' => 'admin',
+            'existingAppointmentRoute' => 'admin.odontogram.existing-appointment.create',
+        ]);
     }
 }

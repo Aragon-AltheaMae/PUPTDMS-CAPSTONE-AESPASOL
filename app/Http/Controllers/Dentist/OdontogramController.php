@@ -222,9 +222,28 @@ class OdontogramController extends Controller
             return 0;
         }
 
+        if (!preg_match('/^\d{2}:\d{2}:\d{2}$/', $normalized)) {
+            return 0;
+        }
+
         [$hours, $minutes, $seconds] = array_map('intval', explode(':', $normalized));
 
+        if ($minutes > 59 || $seconds > 59) {
+            return 0;
+        }
+
         return max(0, ($hours * 3600) + ($minutes * 60) + $seconds);
+    }
+
+    private function procedureDurationSeconds(array $validated): int
+    {
+        $durationHms = trim((string) ($validated['procedure_duration_hms'] ?? ''));
+
+        if ($durationHms !== '') {
+            return $this->parseDurationToSeconds($durationHms);
+        }
+
+        return max(0, (int) ($validated['procedure_duration_seconds'] ?? 0));
     }
 
     private function existingAppointmentDraftSessionKey(Patient $patient): string
@@ -302,7 +321,7 @@ class OdontogramController extends Controller
             'appointment_date' => 'required|date',
             'appointment_time' => 'required|date_format:H:i',
             'service_type' => 'required|string|max:255',
-            'procedure_duration_hms' => ['required', 'regex:/^\d{2}:\d{2}:\d{2}$/'],
+            'procedure_duration_hms' => ['required', 'regex:/^\d{2}:[0-5]\d:[0-5]\d$/'],
             'last_dental_visit' => 'nullable|date|before_or_equal:today',
             'previous_dentist' => 'nullable|string|max:50',
             'extraction_date' => 'nullable|date|before_or_equal:today',
@@ -568,13 +587,15 @@ class OdontogramController extends Controller
             ->values()
             ->all();
 
-        $isOralProphylaxis = strcasecmp(
-            trim((string) $appointment->service_type),
-            'Oral Prophylaxis'
-        ) === 0;
+        $allowsProcedureCompletionWithoutOdontogramChanges = $this->allowsProcedureCompletionWithoutOdontogramChanges(
+            $appointment->service_type
+        );
 
         $hasOdontogramChanges = count($cleanOdontogramData) > 0;
-        if (!$isOralProphylaxis && !$hasOdontogramChanges) {
+        if (
+            !$allowsProcedureCompletionWithoutOdontogramChanges &&
+            !$hasOdontogramChanges
+        ) {
             throw new HttpResponseException(
                 response()->json([
                     'message' =>
@@ -1516,15 +1537,18 @@ class OdontogramController extends Controller
             'prescriptions' => 'nullable|string',
             'completion_action' => 'nullable|in:finished,follow_up',
             'has_applied_treatment' => 'required|boolean',
+            'procedure_duration_hms' => ['required', 'regex:/^\d{2}:[0-5]\d:[0-5]\d$/'],
             'procedure_duration_seconds' => 'nullable|integer|min:0',
         ]);
 
-        $isOralProphylaxis = strcasecmp(
-            trim((string) $appointment->service_type),
-            'Oral Prophylaxis'
-        ) === 0;
+        $allowsProcedureCompletionWithoutOdontogramChanges = $this->allowsProcedureCompletionWithoutOdontogramChanges(
+            $appointment->service_type
+        );
 
-        if (!$isOralProphylaxis && !$request->boolean('has_applied_treatment')) {
+        if (
+            !$allowsProcedureCompletionWithoutOdontogramChanges &&
+            !$request->boolean('has_applied_treatment')
+        ) {
             return response()->json([
                 'message' =>
                 'Please apply at least one treatment to the tooth chart before finishing the procedure.',
@@ -1534,7 +1558,7 @@ class OdontogramController extends Controller
         $result = $this->persistProcedureSnapshot(
             $appointment,
             $validated,
-            max(0, (int) ($validated['procedure_duration_seconds'] ?? 0))
+            $this->procedureDurationSeconds($validated)
         );
         $appointment = $result['appointment'];
         $completionAction = $validated['completion_action'] ?? 'finished';
@@ -1582,12 +1606,6 @@ class OdontogramController extends Controller
             abort(404, 'Patient not found for this appointment.');
         }
 
-        if (!$procedure) {
-            return redirect()
-                ->to($this->savedVisitEditBackUrl($patient))
-                ->with('error', 'No saved odontogram was found for this visit.');
-        }
-
         return view('dentist.dentist-odontogram', array_merge(
             [
                 'patient' => $patient,
@@ -1595,7 +1613,8 @@ class OdontogramController extends Controller
                 'procedure' => $procedure,
                 'layoutRole' => 'dentist',
                 'cancelProcedureRedirectUrl' => $this->savedVisitEditBackUrl($patient),
-                'savedOdontogramData' => $procedure->odontogram_data ?? [],
+                // A completed visit may not have an odontogram record yet; start its editor blank.
+                'savedOdontogramData' => $procedure?->odontogram_data ?? [],
                 'existingAppointmentMode' => false,
                 'savedVisitEditMode' => true,
                 'saveProcedureUrl' => route('dentist.odontogram.saved.update', [
@@ -1649,21 +1668,24 @@ class OdontogramController extends Controller
             'prescriptions' => 'nullable|string',
             'completion_action' => 'nullable|in:finished',
             'has_applied_treatment' => 'required|boolean',
+            'procedure_duration_hms' => ['required', 'regex:/^\d{2}:\d{2}:\d{2}$/'],
             'procedure_duration_seconds' => 'nullable|integer|min:0',
         ]);
 
-        $isOralProphylaxis = strcasecmp(
-            trim((string) $appointment->service_type),
-            'Oral Prophylaxis'
-        ) === 0;
+        $allowsProcedureCompletionWithoutOdontogramChanges = $this->allowsProcedureCompletionWithoutOdontogramChanges(
+            $appointment->service_type
+        );
 
-        if (!$isOralProphylaxis && !$request->boolean('has_applied_treatment')) {
+        if (
+            !$allowsProcedureCompletionWithoutOdontogramChanges &&
+            !$request->boolean('has_applied_treatment')
+        ) {
             return response()->json([
                 'message' => 'Please apply at least one treatment to the tooth chart before saving the odontogram.',
             ], 422);
         }
 
-        $procedureDurationSeconds = (int) data_get($appointment, 'procedure.procedure_duration_seconds', 0);
+        $procedureDurationSeconds = $this->procedureDurationSeconds($validated);
 
         $result = $this->persistProcedureSnapshot(
             $appointment,
@@ -1719,13 +1741,12 @@ class OdontogramController extends Controller
             'has_applied_treatment' => 'required|boolean',
         ]);
 
-        $isOralProphylaxis = strcasecmp(
-            trim((string) ($draft['service_type'] ?? '')),
-            'Oral Prophylaxis'
-        ) === 0;
+        $allowsProcedureCompletionWithoutOdontogramChanges = $this->allowsProcedureCompletionWithoutOdontogramChanges(
+            $draft['service_type'] ?? ''
+        );
 
         if (
-            !$isOralProphylaxis && !$request->boolean(
+            !$allowsProcedureCompletionWithoutOdontogramChanges && !$request->boolean(
                 'has_applied_treatment'
             )
         ) {
@@ -1799,5 +1820,13 @@ class OdontogramController extends Controller
             'status' => 'completed',
             'redirect_url' => $this->existingAppointmentBackUrl($patient) . '?refresh=' . now()->timestamp,
         ]);
+    }
+
+    private function allowsProcedureCompletionWithoutOdontogramChanges(?string $serviceType): bool
+    {
+        $normalizedServiceType = trim((string) $serviceType);
+
+        return strcasecmp($normalizedServiceType, 'Oral Prophylaxis') === 0 ||
+            strcasecmp($normalizedServiceType, 'Oral Check-Up') === 0;
     }
 }

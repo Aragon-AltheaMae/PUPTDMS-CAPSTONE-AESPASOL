@@ -204,7 +204,13 @@ class DentistAppointmentController extends Controller
             'canStartProcedure' => $user?->hasPermission('create_procedure_records') ?? false,
             'canRescheduleAppointment' => $user?->hasPermission('reschedule_appointments') ?? false,
             'canCancelAppointment' => $user?->hasPermission('cancel_appointments') ?? false,
-            'canViewTreatmentRecord' => $user?->hasPermission('view_dental_records') ?? false,
+            'canViewTreatmentRecord' => $user?->hasAnyPermission([
+                'view_appointments',
+                'reschedule_appointments',
+                'cancel_appointments',
+                'create_follow_up_appointments',
+                'create_procedure_records',
+            ]) ?? false,
             'canScheduleFollowUp' => false,
 
             'patientProfileRouteName' => 'dentist.dentist.patient.profile',

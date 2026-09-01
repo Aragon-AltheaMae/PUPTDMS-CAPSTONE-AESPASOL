@@ -1213,6 +1213,13 @@
             return;
         }
 
+        if (data.last_service_type) {
+            setWalkInFormValue(
+                'service_type',
+                data.last_service_type
+            );
+        }
+
         Object.entries(
             data.dental || {}
         ).forEach(

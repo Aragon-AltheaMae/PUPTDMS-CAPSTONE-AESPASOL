@@ -1,6 +1,11 @@
 @extends('layouts.app')
 
-@section('layout-role', 'dentist')
+@php
+    $layoutRole ??= 'dentist';
+    $existingAppointmentRoute ??= 'dentist.odontogram.existing-appointment.create';
+@endphp
+
+@section('layout-role', $layoutRole)
 
 @section('title', 'Add Existing Record')
 
@@ -49,21 +54,20 @@
                 </div>
             </div>
 
-            <div class="tab-group" aria-label="Filter patients by role">
-
-                <button type="button" class="tab-btn active" data-patient-role-filter="">
+            <div class="existing-record-role-filters" aria-label="Filter patients by role">
+                <button type="button" class="existing-record-role-filter is-active" data-patient-role-filter="">
                     All
                 </button>
 
-                <button type="button" class="tab-btn" data-patient-role-filter="patient">
+                <button type="button" class="existing-record-role-filter" data-patient-role-filter="patient">
                     Patient
                 </button>
 
-                <button type="button" class="tab-btn" data-patient-role-filter="faculty">
+                <button type="button" class="existing-record-role-filter" data-patient-role-filter="faculty">
                     Faculty
                 </button>
 
-                <button type="button" class="tab-btn" data-patient-role-filter="admin">
+                <button type="button" class="existing-record-role-filter" data-patient-role-filter="admin">
                     Administrative
                 </button>
 
@@ -84,8 +88,7 @@
             page-size-id="existingRecordPerPage" page-size-callback="handleExistingRecordPerPageChange"
             label="patient records" />
 
-        <div id="patientGrid" class="table-record-grid existing-record-patient-grid" aria-live="polite">
-        </div>
+        <div id="patientGrid" class="existing-record-patient-grid" aria-live="polite"></div>
 
         <x-pagination-bar id="existingRecordPaginationBottomBar" info-id="existingRecordPageInfoBottom"
             pagination-id="existingRecordPaginationBottom" position="bottom" label="patient records" hidden />
@@ -99,7 +102,7 @@
         const input = document.getElementById('patientSearchInput');
         const patientGrid = document.getElementById('patientGrid');
         const searchEndpoint = @json(route('dentist.walk-in.search-patient'));
-        const recordUrlTemplate = @json(route('dentist.odontogram.existing-appointment.create', ['patient' => '__PATIENT__']));
+        const recordUrlTemplate = @json(route($existingAppointmentRoute, ['patient' => '__PATIENT__']));
 
     window.initGlobalSearchBars?.();
     window.initGlobalVoiceInputs?.();
@@ -261,7 +264,7 @@
                     roleFilterButtons
                         .forEach(item => {
                             item.classList.toggle(
-                                'active',
+                                'is-active',
                                 item === button
                             );
                         });
@@ -712,8 +715,8 @@
 
             if (patient.student_number) {
                 tags.push(`
-    <span class="global-info-pill">
-        <i class="fa-regular fa-id-card"></i>
+    <span class="patient-select-tag">
+        <i class="fa-solid fa-id-card"></i>
         ${escapeHtml(patient.student_number)}
     </span>
 `);
@@ -721,7 +724,7 @@
 
             if (patient.program) {
                 tags.push(`
-    <span class="global-info-pill">
+    <span class="patient-select-tag">
         <i class="fa-solid fa-graduation-cap"></i>
         ${escapeHtml(patient.program)}
     </span>
@@ -729,11 +732,9 @@
             }
 
             return `
-    <article class="global-record-card ${roleClass}">
-        <div class="global-record-card-grid">
-
-            <div class="global-record-profile">
-
+    <article class="patient-select-card ${roleClass}">
+        <div class="patient-select-card-body">
+            <div class="patient-select-profile">
                 <span class="patient-avatar patient-avatar-md">
                     ${avatarUrl
                     ? `
@@ -755,53 +756,33 @@
                 }
                 </span>
 
-                <div class="global-record-identity">
-
-                    <div class="global-record-name-row">
-                        <p
-                            class="global-record-name"
-                            data-patient-name>
-                            ${escapeHtml(patientName)}
+                <div class="patient-select-identity">
+                    <p class="patient-select-name" data-patient-name>
+                        ${escapeHtml(patientName)}
+                    </p>
+                    ${patientEmail ? `
+                        <p class="patient-select-meta">
+                            ${escapeHtml(patientEmail)}
                         </p>
-
-                        <span class="badge-role ${roleClass}">
-                            ${escapeHtml(patientType)}
-                        </span>
-                    </div>
-
-                    ${patientEmail
-                                    ? `
-                            <div class="global-record-subline">
-                                <span class="ui-muted-text">
-                                    <i class="fa-regular fa-envelope"></i>
-                                    ${escapeHtml(patientEmail)}
-                                </span>
-                            </div>
-                        `
-                                    : ''
-                                }
-
+                    ` : ''}
                 </div>
 
+                <span class="badge-role ${roleClass}">
+                    ${escapeHtml(patientType)}
+                </span>
             </div>
 
-            ${tags.length
-                    ? `
-                        <div class="global-record-subline">
-                            ${tags.join('')}
-                        </div>
-                    `
-                    : ''
-                }
+            <div class="patient-select-details">
+                ${tags.join('')}
+            </div>
+        </div>
 
-            <div class="global-record-footer">
+        <div class="patient-select-actions">
                 <a href="${escapeHtml(buildRecordUrl(patient))}"
-                    class="ui-btn ui-btn-primary ui-btn-sm">
+                    class="ui-btn ui-btn-primary w-full">
                     <i class="fa-solid fa-file-circle-plus"></i>
                     <span>Add Existing Appointment</span>
                 </a>
-            </div>
-
         </div>
     </article>
 `;
