@@ -400,7 +400,8 @@
             <input type="tel" id="emergency_number" name="emergency_number"
                 value="{{ old('emergency_number', $defaults['emergency_number'] ?? '') }}" inputmode="numeric"
                 autocomplete="tel" maxlength="13" pattern="09[0-9]{2}\s?[0-9]{3}\s?[0-9]{4}" class="form-input-custom"
-                placeholder="09XXXXXXXXX" data-validation-rule="philippineMobile"
+                placeholder="09xx xxx xxxx" data-validation-rule="philippineMobile"
+                data-emergency-contact-number="true"
                 data-required-message="Please enter an emergency contact number."
                 data-pattern-message="Contact number must start with 09 and contain exactly 11 digits." required>
         </div>
@@ -433,5 +434,55 @@
         </div>
 
     </div>
+
+    @once
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const formatEmergencyContactNumber = rawDigits => {
+                    const digits = String(rawDigits || '').slice(0, 11);
+                    let formatted = '';
+
+                    if (digits.length > 0) formatted += digits.slice(0, 4);
+                    if (digits.length > 4) formatted += ' ' + digits.slice(4, 7);
+                    if (digits.length > 7) formatted += ' ' + digits.slice(7, 11);
+
+                    return formatted;
+                };
+
+                document
+                    .querySelectorAll('input[data-emergency-contact-number="true"]')
+                    .forEach(field => {
+                        if (field.dataset.emergencyContactFormatterBound === 'true') {
+                            return;
+                        }
+
+                        const syncValue = () => {
+                            let digits = field.value.replace(/\D/g, '');
+
+                            if (digits.startsWith('9')) {
+                                digits = '0' + digits;
+                            }
+
+                            field.value = formatEmergencyContactNumber(digits);
+                        };
+
+                        field.addEventListener('input', () => {
+                            syncValue();
+                            window.validateFormInputField?.(field);
+                        });
+
+                        field.addEventListener('paste', () => {
+                            requestAnimationFrame(() => {
+                                syncValue();
+                                window.validateFormInputField?.(field);
+                            });
+                        });
+
+                        field.dataset.emergencyContactFormatterBound = 'true';
+                        syncValue();
+                    });
+            });
+        </script>
+    @endonce
 
 </div>

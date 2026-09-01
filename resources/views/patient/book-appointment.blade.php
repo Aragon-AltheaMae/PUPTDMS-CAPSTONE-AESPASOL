@@ -1866,7 +1866,7 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                     if (
                         !step5ConfirmationActive
                     ) {
-                        if (!validateContactInformation()) {
+                        if (!ensureGlobalContactInformation()) {
                             return false;
                         }
 
@@ -1972,88 +1972,6 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
 
     setupCharLimit("additional_concerns", "concernCount", 150);
 
-    function validateContactInformation() {
-        const email =
-            document.getElementById('contact_email')
-                ?.value.trim() || '';
-
-        const phone =
-            document.getElementById('contact_phone')
-                ?.value.replace(/\D/g, '') || '';
-
-        const address =
-            document.getElementById('contact_address')
-                ?.value.trim() || '';
-
-        if (!email) {
-            editContactInformationFromReview();
-
-            showMiniTab(
-                'Please complete your contact information.'
-            );
-
-            setTimeout(() => {
-                document
-                    .getElementById('contactEditEmail')
-                    ?.focus();
-            }, 100);
-
-            return false;
-        }
-
-        if (
-            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-        ) {
-            editContactInformationFromReview();
-
-            showMiniTab(
-                'Please enter a valid email address.'
-            );
-
-            setTimeout(() => {
-                document
-                    .getElementById('contactEditEmail')
-                    ?.focus();
-            }, 100);
-
-            return false;
-        }
-
-        if (!/^09\d{9}$/.test(phone)) {
-            editContactInformationFromReview();
-
-            showMiniTab(
-                'Please enter a valid 11-digit contact number.'
-            );
-
-            setTimeout(() => {
-                document
-                    .getElementById('contactEditPhone')
-                    ?.focus();
-            }, 100);
-
-            return false;
-        }
-
-        if (!address) {
-            editContactInformationFromReview();
-
-            showMiniTab(
-                'Please enter your address.'
-            );
-
-            setTimeout(() => {
-                document
-                    .getElementById('contactEditAddress')
-                    ?.focus();
-            }, 100);
-
-            return false;
-        }
-
-        return true;
-    }
-
     function editContactInformationFromReview() {
         const view =
             document.getElementById(
@@ -2132,7 +2050,7 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
         view?.classList.remove('hidden');
     }
 
-    function saveContactInformation() {
+    function validateGlobalContactFields() {
         const emailEditor =
             document.getElementById(
                 'contactEditEmail'
@@ -2148,6 +2066,76 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                 'contactEditAddress'
             );
 
+        const fields = [
+            emailEditor,
+            phoneEditor,
+            addressEditor,
+        ].filter(Boolean);
+
+        let firstInvalid = null;
+
+        fields.forEach(field => {
+            const valid =
+                window.validateFormInputField?.(field) ??
+                field.checkValidity();
+
+            if (!valid && !firstInvalid) {
+                firstInvalid = field;
+            }
+        });
+
+        return {
+            valid: !firstInvalid,
+            firstInvalid,
+        };
+    }
+
+    function ensureGlobalContactInformation() {
+        const validation =
+            validateGlobalContactFields();
+
+        if (validation.valid) {
+            return true;
+        }
+
+        editContactInformationFromReview();
+
+        window.setTimeout(() => {
+            window.focusGlobalInvalidField?.(
+                validation.firstInvalid
+            );
+        }, 100);
+
+        return false;
+    }
+
+    function saveGlobalContactInformation() {
+        const emailEditor =
+            document.getElementById(
+                'contactEditEmail'
+            );
+
+        const phoneEditor =
+            document.getElementById(
+                'contactEditPhone'
+            );
+
+        const addressEditor =
+            document.getElementById(
+                'contactEditAddress'
+            );
+
+        const validation =
+            validateGlobalContactFields();
+
+        if (!validation.valid) {
+            window.focusGlobalInvalidField?.(
+                validation.firstInvalid
+            );
+
+            return;
+        }
+
         const email =
             emailEditor?.value.trim() || '';
 
@@ -2158,52 +2146,6 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
 
         const address =
             addressEditor?.value.trim() || '';
-
-        if (!email) {
-            showMiniTab(
-                'Please enter your email address.'
-            );
-
-            emailEditor?.focus();
-
-            return;
-        }
-
-        if (
-            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-                email
-            )
-        ) {
-            showMiniTab(
-                'Please enter a valid email address.'
-            );
-
-            emailEditor?.focus();
-
-            return;
-        }
-
-        if (
-            !/^09\d{9}$/.test(phone)
-        ) {
-            showMiniTab(
-                'Phone number must start with 09 and contain 11 digits.'
-            );
-
-            phoneEditor?.focus();
-
-            return;
-        }
-
-        if (!address) {
-            showMiniTab(
-                'Please enter your address.'
-            );
-
-            addressEditor?.focus();
-
-            return;
-        }
 
         const emailInput =
             document.getElementById(
@@ -2235,10 +2177,6 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
         markFormDirty();
 
         buildSummary();
-
-        showMiniTab(
-            'Contact information updated.'
-        );
     }
 
     function editDentalHistoryFromReview() {
@@ -2691,34 +2629,44 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                                             id="contactSummaryEditor"
                                             class="hidden space-y-4"
                                         >
-                                            <div class="global-form-group">
+                                            <div class="global-form-group" data-global-field>
                                                 <label
                                                     for="contactEditEmail"
                                                     class="global-form-label"
                                                 >
                                                     Email
+                                                    <span class="required-mark">*</span>
                                                 </label>
 
                                                 <input
                                                     type="email"
                                                     id="contactEditEmail"
+                                                    name="contact_edit_email"
                                                     class="form-input-custom"
+                                                    required
+                                                    data-required-message="Please enter your email address."
                                                     value="${contactEmail === 'N/A' ? '' : contactEmail}"
                                                 >
                                             </div>
 
-                                            <div class="global-form-group">
+                                            <div class="global-form-group" data-global-field>
                                                 <label
                                                     for="contactEditPhone"
                                                     class="global-form-label"
                                                 >
                                                     Phone
+                                                    <span class="required-mark">*</span>
                                                 </label>
 
                                                 <input
                                                     type="tel"
                                                     id="contactEditPhone"
+                                                    name="contact_edit_phone"
                                                     class="form-input-custom"
+                                                    required
+                                                    data-validation-rule="philippineMobile"
+                                                    data-required-message="Please enter your contact number."
+                                                    data-pattern-message="Contact number must start with 09 and contain exactly 11 digits."
                                                     maxlength="11"
                                                     inputmode="numeric"
                                                     placeholder="09XXXXXXXXX"
@@ -2726,17 +2674,21 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                                                 >
                                             </div>
 
-                                            <div class="global-form-group">
+                                            <div class="global-form-group" data-global-field>
                                                 <label
                                                     for="contactEditAddress"
                                                     class="global-form-label"
                                                 >
                                                     Address
+                                                    <span class="required-mark">*</span>
                                                 </label>
 
                                                 <textarea
                                                     id="contactEditAddress"
+                                                    name="contact_edit_address"
                                                     class="form-input-custom global-form-textarea"
+                                                    required
+                                                    data-required-message="Please enter your address."
                                                     rows="3"
                                                 >${contactAddress === 'N/A' ? '' : contactAddress}</textarea>
                                             </div>
@@ -2745,7 +2697,7 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                                                 <button
                                                     type="button"
                                                     class="ui-btn ui-btn-primary ui-btn-sm"
-                                                    onclick="saveContactInformation()"
+                                                    onclick="saveGlobalContactInformation()"
                                                 >
                                                     <i class="fa-solid fa-check"></i>
                                                     Save Changes
@@ -2807,6 +2759,22 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
     </div>
 `;
 
+        [
+            'contactEditEmail',
+            'contactEditPhone',
+            'contactEditAddress',
+        ].forEach(id => {
+            const field = document.getElementById(id);
+
+            field?.addEventListener('input', () => {
+                window.validateFormInputField?.(field);
+            });
+
+            field?.addEventListener('change', () => {
+                window.validateFormInputField?.(field);
+            });
+        });
+
         document.querySelectorAll(".sm-grid-1col").forEach(el => {
             if (window.innerWidth < 640) el.style.gridTemplateColumns = "1fr";
         });
@@ -2854,9 +2822,7 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
             return false;
         }
 
-        if (
-            !validateContactInformation()
-        ) {
+        if (!ensureGlobalContactInformation()) {
             return false;
         }
 

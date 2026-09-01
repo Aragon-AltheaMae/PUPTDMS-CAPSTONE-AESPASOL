@@ -1807,6 +1807,12 @@ class WalkInController extends Controller
                 'max:100',
             ],
 
+            'guest_suffix' => [
+                'nullable',
+                'string',
+                'max:20',
+            ],
+
             'guest_email' => [
                 'required',
                 'email',
@@ -1895,11 +1901,16 @@ class WalkInController extends Controller
                         $guestPatientType
                     );
 
+                $guestSuffix = $this->normalizeNameSuffix(
+                    $validated['guest_suffix'] ?? null
+                );
+
                 $fullName = trim(
                     collect([
                         $validated['guest_first_name'],
                         $validated['guest_middle_name'] ?? null,
                         $validated['guest_last_name'],
+                        $guestSuffix,
                     ])
                         ->filter(fn($value) => filled($value))
                         ->implode(' ')
@@ -1915,6 +1926,9 @@ class WalkInController extends Controller
 
                     'last_name' =>
                     $validated['guest_last_name'],
+
+                    'suffix_name' =>
+                    $guestSuffix,
 
                     'email' =>
                     strtolower($email),
@@ -1992,6 +2006,11 @@ class WalkInController extends Controller
                     optional(
                         $patient->user
                     )->last_name,
+
+                    'suffix_name' =>
+                    optional(
+                        $patient->user
+                    )->suffix_name,
 
                     'gender' =>
                     $patient->gender,
@@ -2823,6 +2842,16 @@ class WalkInController extends Controller
                 : null;
         }
 
+        if (
+            Schema::hasColumn('users', 'suffix_name') &&
+            array_key_exists('suffix_name', $data)
+        ) {
+            $userData['suffix_name'] =
+                filled($data['suffix_name'])
+                ? trim((string) $data['suffix_name'])
+                : null;
+        }
+
         if (Schema::hasColumn('users', 'role_id')) {
             $patientRoleId = Role::query()
                 ->where('slug', 'patient')
@@ -3308,6 +3337,20 @@ class WalkInController extends Controller
             'administrative' => 'Administrative Personnel',
             default => 'Guest',
         };
+    }
+
+    private function normalizeNameSuffix(?string $suffix): ?string
+    {
+        $suffix = trim((string) $suffix);
+
+        if ($suffix === '') {
+            return null;
+        }
+
+        return preg_match(
+            '/^(ii|iii|iv|v|vi|vii|viii|ix|x)\.?$/i',
+            $suffix
+        ) ? strtoupper($suffix) : $suffix;
     }
 
     private function guestClassification(

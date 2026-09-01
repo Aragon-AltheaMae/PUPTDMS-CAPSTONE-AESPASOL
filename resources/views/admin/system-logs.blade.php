@@ -979,6 +979,10 @@
                                         <option value="logout">
                                             Logout
                                         </option>
+
+                                        <option value="error">
+                                            Error
+                                        </option>
                                     </select>
 
                                     <div class="global-field-error" data-error-for="slExportAction" aria-live="polite"

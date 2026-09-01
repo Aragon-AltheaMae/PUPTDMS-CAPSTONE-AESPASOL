@@ -315,6 +315,173 @@ class OdontogramController extends Controller
         ];
     }
 
+    private function backfillStudentEmergencyContactIfNeeded(Patient $patient): void
+    {
+        $isStudent = filled($patient->student_no)
+            || (filled($patient->email) && filled($patient->course_code))
+            || strtolower(trim((string) $patient->classification)) === 'student';
+
+        if (! $isStudent) {
+            return;
+        }
+
+        $medicalHistory = $patient->medicalHistory;
+
+        if (
+            filled($medicalHistory?->emergency_person)
+            && filled($medicalHistory?->emergency_number)
+            && filled($medicalHistory?->emergency_relation)
+        ) {
+            return;
+        }
+
+        try {
+            $studentService = app(\App\Services\StudentApiService::class);
+            $studentProfile = [];
+
+            if (filled($patient->email)) {
+                $studentProfile = data_get(
+                    $studentService->getStudentByEmail($patient->email),
+                    'data',
+                    []
+                );
+            }
+
+            $studentNumber = $patient->student_no
+                ?: data_get($studentProfile, 'studentNumber')
+                ?: data_get($studentProfile, 'student_number');
+
+            if (blank($studentNumber)) {
+                return;
+            }
+
+            $personalInfo = data_get(
+                $studentService->getPersonalInfoByStudentNumber($studentNumber),
+                'data',
+                []
+            );
+
+            if (! is_array($personalInfo) || $personalInfo === []) {
+                return;
+            }
+
+            $emergencyPerson = $this->cleanEmergencyContactValue(
+                $personalInfo['emergencyContactName']
+                    ?? $personalInfo['emergency_contact_name']
+                    ?? data_get($personalInfo, 'emergencyContact.name')
+                    ?? data_get($personalInfo, 'emergency_contact.name')
+                    ?? data_get($personalInfo, 'emergency_contact.contact_name')
+                    ?? data_get($personalInfo, 'emergencyContact.contactName')
+                    ?? null
+            );
+
+            $emergencyNumber = $this->normalizeEmergencyContactNumber(
+                $this->cleanEmergencyContactValue(
+                    $personalInfo['emergencyContactNumber']
+                        ?? $personalInfo['emergency_contact_number']
+                        ?? data_get($personalInfo, 'emergencyContact.number')
+                        ?? data_get($personalInfo, 'emergency_contact.number')
+                        ?? data_get($personalInfo, 'emergencyContact.contactNumber')
+                        ?? data_get($personalInfo, 'emergency_contact.contact_number')
+                        ?? null
+                )
+            );
+
+            $emergencyRelation = $this->normalizeEmergencyContactRelation(
+                $this->cleanEmergencyContactValue(
+                    $personalInfo['emergencyContactRelationship']
+                        ?? $personalInfo['emergency_contact_relationship']
+                        ?? $personalInfo['emergencyContactRelation']
+                        ?? $personalInfo['emergency_contact_relation']
+                        ?? data_get($personalInfo, 'emergencyContact.relationship')
+                        ?? data_get($personalInfo, 'emergency_contact.relationship')
+                        ?? data_get($personalInfo, 'emergencyContact.relation')
+                        ?? data_get($personalInfo, 'emergency_contact.relation')
+                        ?? data_get($personalInfo, 'emergency_contact.relationship_name')
+                        ?? data_get($personalInfo, 'emergencyContact.relationshipName')
+                        ?? data_get($personalInfo, 'emergencyContactRelationship.name')
+                        ?? data_get($personalInfo, 'emergency_contact_relationship.name')
+                        ?? null
+                )
+            );
+
+            if (! $emergencyPerson && ! $emergencyNumber && ! $emergencyRelation) {
+                return;
+            }
+
+            $medicalHistory = MedicalHistory::firstOrNew([
+                'patient_id' => $patient->id,
+            ]);
+
+            if ($emergencyPerson && blank($medicalHistory->emergency_person)) {
+                $medicalHistory->emergency_person = $emergencyPerson;
+            }
+
+            if ($emergencyNumber && blank($medicalHistory->emergency_number)) {
+                $medicalHistory->emergency_number = $emergencyNumber;
+            }
+
+            if ($emergencyRelation && blank($medicalHistory->emergency_relation)) {
+                $medicalHistory->emergency_relation = $emergencyRelation;
+            }
+
+            if ($medicalHistory->isDirty()) {
+                $medicalHistory->save();
+            }
+
+            $patient->unsetRelation('medicalHistory');
+            $patient->load('medicalHistory');
+        } catch (\Throwable $exception) {
+            logger()->warning('Existing appointment emergency contact backfill failed.', [
+                'patient_id' => $patient->id,
+                'message' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    private function cleanEmergencyContactValue(mixed $value): ?string
+    {
+        if (! is_scalar($value)) {
+            return null;
+        }
+
+        $value = trim((string) $value);
+
+        return $value !== '' ? $value : null;
+    }
+
+    private function normalizeEmergencyContactNumber(?string $value): ?string
+    {
+        $digits = preg_replace('/\D+/', '', (string) $value) ?? '';
+
+        if (str_starts_with($digits, '63') && strlen($digits) === 12) {
+            $digits = '0' . substr($digits, 2);
+        } elseif (str_starts_with($digits, '9') && strlen($digits) === 10) {
+            $digits = '0' . $digits;
+        }
+
+        return preg_match('/^09\d{9}$/', $digits) ? $digits : null;
+    }
+
+    private function normalizeEmergencyContactRelation(?string $value): ?string
+    {
+        return match (strtolower(trim((string) $value))) {
+            'father', 'dad', 'papa', 'tatay' => 'Father',
+            'mother', 'mom', 'mama', 'nanay' => 'Mother',
+            'uncle', 'tiyo', 'tito' => 'Uncle',
+            'aunt', 'auntie', 'tiya', 'tita' => 'Auntie',
+            'brother', 'kuya' => 'Brother',
+            'sister', 'ate' => 'Sister',
+            'grandmother', 'lola' => 'Grandmother',
+            'grandfather', 'lolo' => 'Grandfather',
+            'cousin', 'pinsan' => 'Cousin',
+            'guardian', 'legal guardian' => 'Legal Guardian',
+            'friend', 'kaibigan' => 'Friend',
+            'other relative', 'relative', 'kamag-anak', 'kamaganak' => 'Other Relative',
+            default => null,
+        };
+    }
+
     private function validateExistingAppointmentIntake(Request $request): array
     {
         return $request->validate([
@@ -884,6 +1051,8 @@ class OdontogramController extends Controller
         $patient->loadMissing(
             'medicalHistory'
         );
+
+        $this->backfillStudentEmergencyContactIfNeeded($patient);
 
         $hasReusableSignature =
             !empty($patient

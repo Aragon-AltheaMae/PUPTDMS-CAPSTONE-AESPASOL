@@ -781,6 +781,7 @@ class AppointmentController extends Controller
             'reserved_booking_period_id' => ['nullable', 'integer'],
             'reserved_booking_period_slot_id' => ['nullable', 'integer'],
             'service_type' => 'required|string|max:255',
+            'final_confirmation' => ['accepted'],
 
             'contact_email' => [
                 'required',

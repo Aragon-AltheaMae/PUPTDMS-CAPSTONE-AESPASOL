@@ -348,6 +348,11 @@ $pageHeading = $isDentistView
                                 $isFollowUpAppointment = (bool) ($appt->is_follow_up ?? false);
                                 $patientId = $patient?->id ?? $appt->patient_id;
                                 $patientName = $patient?->name ?? 'Unknown Patient';
+                                $patientName = preg_replace_callback(
+                                '/\b(ii|iii|iv|v|vi|vii|viii|ix|x)\.?$/i',
+                                fn ($matches) => strtoupper($matches[0]),
+                                $patientName
+                                ) ?? $patientName;
                                 $patientStudentNo = filled($patient?->student_no)
                                 ? $patient->student_no
                                 : (filled($patient?->faculty_code)

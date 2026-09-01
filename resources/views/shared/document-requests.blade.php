@@ -279,8 +279,8 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
 
             <x-pagination-bar id="documentRequestsPagebarBottom" info-id="documentRequestsPageInfoBottom"
                 pagination-id="documentRequestsPaginationBottom" position="bottom" :show-entries="false"
-                label="requests" :total="$documentRequests->total()" :from="$documentRequests->firstItem() ?? 0"
-                :to="$documentRequests->lastItem() ?? 0" />
+                label="requests" :total="$docRequestPagination['total']" :from="$docRequestPagination['from']"
+                :to="$docRequestPagination['to']" />
 
         </div>
     </div>
