@@ -189,23 +189,57 @@
 
                                             <div class="walkin-two-col">
 
-                                                <div class="global-form-group" data-global-field>
-                                                    <label class="global-form-label" for="guestPatientType">
-                                                        Patient Type
-                                                        <span class="required-mark">*</span>
-                                                    </label>
+                                                <div class="space-y-4">
 
-                                                    <select id="guestPatientType" name="guest_patient_type"
-                                                        class="form-select-custom" disabled required
-                                                        data-required-message="Please select the guest's patient type.">
-                                                        <option value="">Select patient type</option>
-                                                        <option value="student">Student</option>
-                                                        <option value="faculty">Faculty</option>
-                                                        <option value="alumni">Alumni</option>
-                                                        <option value="dependent">Dependent</option>
-                                                        <option value="administrative">Administrative Personnel
-                                                        </option>
-                                                    </select>
+                                                    <div class="global-form-group" data-global-field>
+                                                        <label class="global-form-label" for="guestPatientType">
+                                                            Patient Type
+                                                            <span class="required-mark">*</span>
+                                                        </label>
+
+                                                        <select id="guestPatientType" name="guest_patient_type"
+                                                            class="form-select-custom" disabled required
+                                                            data-required-message="Please select the guest's patient type.">
+                                                            <option value="">Select patient type</option>
+                                                            <option value="student">Student</option>
+                                                            <option value="faculty">Faculty</option>
+                                                            <option value="alumni">Alumni</option>
+                                                            <option value="dependent">Dependent</option>
+                                                            <option value="administrative">Administrative Personnel
+                                                            </option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="global-form-group" data-global-field
+                                                        data-guest-student-number-field hidden>
+                                                        <label class="global-form-label" for="guestStudentNumber">
+                                                            Student Number
+                                                            <span class="required-mark">*</span>
+                                                        </label>
+
+                                                        <input type="text" id="guestStudentNumber"
+                                                            name="guest_student_number" class="form-input-custom"
+                                                            placeholder="0000-00000-TG-0" inputmode="text"
+                                                            autocomplete="off" data-validation-rule="studentNumber"
+                                                            data-required-message="Please enter the guest's student number."
+                                                            maxlength="15" disabled>
+                                                    </div>
+
+                                                    <div class="global-form-group" data-global-field
+                                                        data-guest-faculty-code-field hidden>
+                                                        <label class="global-form-label" for="guestFacultyCode">
+                                                            Faculty Code
+                                                            <span class="required-mark">*</span>
+                                                        </label>
+
+                                                        <input type="text" id="guestFacultyCode"
+                                                            name="guest_faculty_code" class="form-input-custom"
+                                                            placeholder="FA0000TG0000" inputmode="text"
+                                                            autocomplete="off" data-validation-rule="facultyCode"
+                                                            data-required-message="Please enter the guest's faculty code."
+                                                            maxlength="12" disabled>
+                                                    </div>
+
                                                 </div>
 
                                                 <div class="global-form-group" data-global-field>
@@ -255,40 +289,7 @@
                                                 </div>
 
                                             </div>
-                                            <div class="walkin-two-col">
 
-                                                <div class="global-form-group" data-global-field
-                                                    data-guest-student-number-field hidden>
-                                                    <label class="global-form-label" for="guestStudentNumber">
-                                                        Student Number
-                                                        <span class="required-mark">*</span>
-                                                    </label>
-
-                                                    <input type="text" id="guestStudentNumber"
-                                                        name="guest_student_number" class="form-input-custom"
-                                                        placeholder="Enter student number"
-                                                        data-validation-rule="studentNumber"
-                                                        data-required-message="Please enter the guest's student number."
-                                                        data-pattern-message="Student number can only contain numbers and hyphens."
-                                                        maxlength="30" disabled>
-                                                </div>
-
-                                                <div class="global-form-group" data-global-field
-                                                    data-guest-faculty-code-field hidden>
-                                                    <label class="global-form-label" for="guestFacultyCode">
-                                                        Faculty Code
-                                                        <span class="required-mark">*</span>
-                                                    </label>
-
-                                                    <input type="text" id="guestFacultyCode" name="guest_faculty_code"
-                                                        class="form-input-custom" placeholder="Enter faculty code"
-                                                        data-validation-rule="facultyCode"
-                                                        data-required-message="Please enter the guest's faculty code."
-                                                        data-pattern-message="Faculty code can only contain letters, numbers, and hyphens."
-                                                        maxlength="30" disabled>
-                                                </div>
-
-                                            </div>
                                             <div class="walkin-two-col">
 
                                                 <div class="global-form-group" data-global-field>
@@ -654,26 +655,126 @@
     const guestFacultyCode =
         document.getElementById("guestFacultyCode");
 
-    const guestYearLevel =
-        document.getElementById("guestYearLevel");
+    function formatGuestStudentNumber(value = '') {
+        const raw =
+            String(value)
+                .toUpperCase()
+                .replace(/[^0-9A-Z]/g, '');
 
-    const guestSection =
-        document.getElementById("guestSection");
+        const digits =
+            raw
+                .replace(/TG/g, '')
+                .replace(/\D/g, '')
+                .slice(0, 10);
 
-    const guestStudentNumberField =
-        document.querySelector(
-            "[data-guest-student-number-field]"
-        );
+        let formatted =
+            digits.slice(0, 4);
 
-    const guestFacultyCodeField =
-        document.querySelector(
-            "[data-guest-faculty-code-field]"
-        );
+        if (digits.length > 4) {
+            formatted +=
+                '-' +
+                digits.slice(4, 9);
+        }
 
-    const guestPwdRadios =
-        document.querySelectorAll(
-            'input[name="guest_is_pwd"]'
-        );
+        if (digits.length > 9) {
+            formatted +=
+                '-TG-' +
+                digits.slice(9, 10);
+        } else if (
+            digits.length === 9
+        ) {
+            formatted +=
+                '-TG-';
+        }
+
+        return formatted;
+    }
+
+    function formatGuestFacultyCode(value = '') {
+        let raw =
+            String(value)
+                .toUpperCase()
+                .replace(
+                    /[^A-Z0-9]/g,
+                    ''
+                );
+
+        if (
+            !raw.startsWith('FA')
+        ) {
+            raw =
+                raw.replace(
+                    /^FA/,
+                    ''
+                );
+
+            raw =
+                'FA' +
+                raw.replace(
+                    /^[A-Z]+/,
+                    ''
+                );
+        }
+
+        const digits =
+            raw
+                .slice(2)
+                .replace(/TG/g, '')
+                .replace(/\D/g, '')
+                .slice(0, 8);
+
+        let formatted =
+            'FA' +
+            digits.slice(0, 4);
+
+        if (digits.length >= 4) {
+            formatted +=
+                'TG' +
+                digits.slice(4, 8);
+        }
+
+        return formatted;
+    }
+
+    guestFacultyCode?.addEventListener('input', () => {
+        const formatted =
+            formatGuestFacultyCode(
+                guestFacultyCode.value
+            );
+
+        if (
+            guestFacultyCode.value !==
+            formatted
+        ) {
+            guestFacultyCode.value =
+                formatted;
+        }
+    }
+    );
+
+    guestStudentNumber?.addEventListener('input', () => {
+        const formatted =
+            formatGuestStudentNumber(
+                guestStudentNumber.value
+            );
+
+        if (
+            guestStudentNumber.value !==
+            formatted
+        ) {
+            guestStudentNumber.value =
+                formatted;
+        }
+    }
+    );
+
+    const guestYearLevel = document.getElementById("guestYearLevel");
+    const guestSection = document.getElementById("guestSection");
+    const guestStudentNumberField = document.querySelector("[data-guest-student-number-field]");
+
+    const guestFacultyCodeField = document.querySelector("[data-guest-faculty-code-field]");
+    const guestPwdRadios = document.querySelectorAll('input[name="guest_is_pwd"]');
+
     const walkInPatientGroup = document.querySelector('[data-walkin-patient-group]');
     const emergencyPersonField = document.getElementById("emergency_person");
     const emergencyNumberField = document.getElementById("emergency_number");
