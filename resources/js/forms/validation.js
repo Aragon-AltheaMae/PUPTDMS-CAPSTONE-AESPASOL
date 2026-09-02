@@ -375,75 +375,71 @@ function registerGlobalValidationRule(name, validator) {
     globalValidationRules.set(name, validator);
 }
 
-registerGlobalValidationRule(
-    'bookingDuration',
-    function (field) {
-        const value =
-            String(
-                field.value || ''
-            ).trim();
+registerGlobalValidationRule('bookingDuration', function (field) {
+    const value =
+        String(
+            field.value || ''
+        ).trim();
 
-        if (!value) {
-            return '';
-        }
-
-        if (
-            !/^\d{2}:\d{2}:\d{2}$/.test(
-                value
-            )
-        ) {
-            return 'Use the HH:MM:SS format.';
-        }
-
-        const [
-            hours,
-            minutes,
-            seconds
-        ] =
-            value
-                .split(':')
-                .map(Number);
-
-        if (
-            minutes > 59 ||
-            seconds > 59
-        ) {
-            return 'Minutes and seconds must be between 00 and 59.';
-        }
-
-        if (
-            hours === 0 &&
-            minutes === 0 &&
-            seconds === 0
-        ) {
-            return 'Procedure duration must be greater than 00:00:00.';
-        }
-
+    if (!value) {
         return '';
     }
+
+    if (
+        !/^\d{2}:\d{2}:\d{2}$/.test(
+            value
+        )
+    ) {
+        return 'Use the HH:MM:SS format.';
+    }
+
+    const [
+        hours,
+        minutes,
+        seconds
+    ] =
+        value
+            .split(':')
+            .map(Number);
+
+    if (
+        minutes > 59 ||
+        seconds > 59
+    ) {
+        return 'Minutes and seconds must be between 00 and 59.';
+    }
+
+    if (
+        hours === 0 &&
+        minutes === 0 &&
+        seconds === 0
+    ) {
+        return 'Procedure duration must be greater than 00:00:00.';
+    }
+
+    return '';
+}
 );
 
-registerGlobalValidationRule(
-    'philippineMobile',
-    function (field) {
-        const digits =
-            String(field.value || '')
-                .replace(/\D/g, '');
+registerGlobalValidationRule('philippineMobile', function (field) {
+    const digits =
+        String(field.value || '')
+            .replace(/\D/g, '');
 
-        if (!digits) {
-            return '';
-        }
-
-        if (!digits.startsWith('09')) {
-            return 'Contact number must start with 09.';
-        }
-
-        if (digits.length !== 11) {
-            return 'Contact number must contain exactly 11 digits.';
-        }
-
+    if (!digits) {
         return '';
     }
+
+    if (!digits.startsWith('09')) {
+        return 'Contact number must start with 09.';
+    }
+
+    if (digits.length !== 11) {
+        return 'Contact number must contain exactly 11 digits.';
+    }
+
+    return '';
+}
 );
 
 function runGlobalValidationRule(field) {
@@ -458,202 +454,184 @@ function runGlobalValidationRule(field) {
     return validator(field) || '';
 }
 
-registerGlobalValidationRule(
-    'notFutureDate',
-    function (field) {
-        if (!field.value) return '';
+registerGlobalValidationRule('notFutureDate', function (field) {
+    if (!field.value) return '';
 
-        const picked = new Date(
-            `${field.value}T00:00:00`
+    const picked = new Date(
+        `${field.value}T00:00:00`
+    );
+
+    if (Number.isNaN(picked.getTime())) {
+        return 'Please enter a valid date.';
+    }
+
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+
+    return picked > today
+        ? 'Date cannot be in the future.'
+        : '';
+}
+);
+
+registerGlobalValidationRule('wholeNumber', function (field) {
+    if (!field.value) return '';
+
+    const value = Number(field.value);
+
+    if (
+        !Number.isInteger(value) ||
+        value < 0
+    ) {
+        return 'Please enter a whole number greater than or equal to 0.';
+    }
+
+    return '';
+}
+);
+
+registerGlobalValidationRule('inventoryConsumed', function (field) {
+    if (!field.value) return '';
+
+    const consumed = Number(field.value);
+
+    if (
+        !Number.isInteger(consumed) ||
+        consumed < 0
+    ) {
+        return 'Consumed must be a whole number greater than or equal to 0.';
+    }
+
+    const form = field.form;
+
+    const quantityField =
+        form?.querySelector(
+            '[name="qty"]'
         );
 
-        if (Number.isNaN(picked.getTime())) {
-            return 'Please enter a valid date.';
-        }
+    const quantity = Number(
+        quantityField?.value || 0
+    );
 
-        const today = new Date();
-        today.setHours(23, 59, 59, 999);
-
-        return picked > today
-            ? 'Date cannot be in the future.'
-            : '';
-    }
+    return consumed > quantity
+        ? 'Consumed cannot exceed quantity.'
+        : '';
+}
 );
 
-registerGlobalValidationRule(
-    'wholeNumber',
-    function (field) {
-        if (!field.value) return '';
+registerGlobalValidationRule('strongPassword', function (field) {
+    const value = String(field.value || '');
 
-        const value = Number(field.value);
-
-        if (
-            !Number.isInteger(value) ||
-            value < 0
-        ) {
-            return 'Please enter a whole number greater than or equal to 0.';
-        }
-
+    if (!value) {
         return '';
     }
-);
 
-registerGlobalValidationRule(
-    'inventoryConsumed',
-    function (field) {
-        if (!field.value) return '';
-
-        const consumed = Number(field.value);
-
-        if (
-            !Number.isInteger(consumed) ||
-            consumed < 0
-        ) {
-            return 'Consumed must be a whole number greater than or equal to 0.';
-        }
-
-        const form = field.form;
-
-        const quantityField =
-            form?.querySelector(
-                '[name="qty"]'
-            );
-
-        const quantity = Number(
-            quantityField?.value || 0
-        );
-
-        return consumed > quantity
-            ? 'Consumed cannot exceed quantity.'
-            : '';
+    if (value.length < 8) {
+        return 'Password must contain at least 8 characters.';
     }
+
+    if (!/[a-z]/.test(value)) {
+        return 'Password must contain at least one lowercase letter.';
+    }
+
+    if (!/[A-Z]/.test(value)) {
+        return 'Password must contain at least one uppercase letter.';
+    }
+
+    if (!/\d/.test(value)) {
+        return 'Password must contain at least one number.';
+    }
+
+    if (!/[^A-Za-z0-9]/.test(value)) {
+        return 'Password must contain at least one special character.';
+    }
+
+    return '';
+}
 );
 
-registerGlobalValidationRule(
-    'strongPassword',
-    function (field) {
-        const value = String(field.value || '');
+registerGlobalValidationRule('guestName', function (field) {
+    const value = String(field.value || '').trim();
 
-        if (!value) {
-            return '';
-        }
-
-        if (value.length < 8) {
-            return 'Password must contain at least 8 characters.';
-        }
-
-        if (!/[a-z]/.test(value)) {
-            return 'Password must contain at least one lowercase letter.';
-        }
-
-        if (!/[A-Z]/.test(value)) {
-            return 'Password must contain at least one uppercase letter.';
-        }
-
-        if (!/\d/.test(value)) {
-            return 'Password must contain at least one number.';
-        }
-
-        if (!/[^A-Za-z0-9]/.test(value)) {
-            return 'Password must contain at least one special character.';
-        }
-
+    if (!value) {
         return '';
     }
+
+    return /^[A-Za-zÑñ\s.'-]+$/.test(value)
+        ? ''
+        : 'Only letters, spaces, apostrophe, period, and hyphen are allowed.';
+}
 );
 
-registerGlobalValidationRule(
-    'guestName',
-    function (field) {
-        const value = String(field.value || '').trim();
+registerGlobalValidationRule('personName', function (field) {
+    const value =
+        String(
+            field.value || ''
+        ).trim();
 
-        if (!value) {
-            return '';
-        }
-
-        return /^[A-Za-zÑñ\s.'-]+$/.test(value)
-            ? ''
-            : 'Only letters, spaces, apostrophe, period, and hyphen are allowed.';
+    if (!value) {
+        return '';
     }
+
+    return /^[A-Za-zÑñ\s.'-]+$/
+        .test(value)
+        ? ''
+        : 'Only letters, spaces, apostrophe, period, and hyphen are allowed.';
+}
 );
 
-registerGlobalValidationRule(
-    'personName',
-    function (field) {
-        const value =
-            String(
-                field.value || ''
-            ).trim();
+registerGlobalValidationRule('studentNumber', function (field) {
+    const value = String(field.value || '').trim();
 
-        if (!value) {
-            return '';
-        }
-
-        return /^[A-Za-zÑñ\s.'-]+$/
-            .test(value)
-            ? ''
-            : 'Only letters, spaces, apostrophe, period, and hyphen are allowed.';
+    if (!value) {
+        return '';
     }
+
+    return /^\d{4}-\d{5}-TG-\d$/i
+        .test(value)
+        ? ''
+        : 'Student number must follow the format 0000-00000-TG-0.';
+}
 );
 
-registerGlobalValidationRule(
-    'studentNumber',
-    function (field) {
-        const value = String(field.value || '').trim();
+registerGlobalValidationRule('facultyCode', function (field) {
+    const value = String(field.value || '').trim();
 
-        if (!value) {
-            return '';
-        }
-
-        return /^[0-9-]+$/.test(value)
-            ? ''
-            : 'Student number can only contain numbers and hyphens.';
+    if (!value) {
+        return '';
     }
+
+    return /^FA\d{4}TG\d{4}$/i
+        .test(value)
+        ? ''
+        : 'Faculty code must follow the format FA0000TG0000.';
+}
 );
 
-registerGlobalValidationRule(
-    'facultyCode',
-    function (field) {
-        const value = String(field.value || '').trim();
+registerGlobalValidationRule('yearLevel', function (field) {
+    const value = String(field.value || '').trim();
 
-        if (!value) {
-            return '';
-        }
-
-        return /^[A-Za-z0-9-]+$/.test(value)
-            ? ''
-            : 'Faculty code can only contain letters, numbers, and hyphens.';
+    if (!value) {
+        return '';
     }
+
+    return /^[1-9][0-9]*$/.test(value)
+        ? ''
+        : 'Please enter a valid year level using whole numbers only.';
+}
 );
 
-registerGlobalValidationRule(
-    'yearLevel',
-    function (field) {
-        const value = String(field.value || '').trim();
+registerGlobalValidationRule('sectionCode', function (field) {
+    const value = String(field.value || '').trim();
 
-        if (!value) {
-            return '';
-        }
-
-        return /^[1-9][0-9]*$/.test(value)
-            ? ''
-            : 'Please enter a valid year level using whole numbers only.';
+    if (!value) {
+        return '';
     }
-);
 
-registerGlobalValidationRule(
-    'sectionCode',
-    function (field) {
-        const value = String(field.value || '').trim();
-
-        if (!value) {
-            return '';
-        }
-
-        return /^[A-Za-z0-9\s.-]+$/.test(value)
-            ? ''
-            : 'Section can only contain letters, numbers, spaces, periods, and hyphens.';
-    }
+    return /^[A-Za-z0-9\s.-]+$/.test(value)
+        ? ''
+        : 'Section can only contain letters, numbers, spaces, periods, and hyphens.';
+}
 );
 
 const globalFormValidationRules = new Map();

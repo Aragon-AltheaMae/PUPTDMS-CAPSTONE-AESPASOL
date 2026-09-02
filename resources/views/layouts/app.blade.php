@@ -92,7 +92,7 @@
     <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
 
     <style>
-        @keyframes page-enter-critical {
+        @keyframes page-enter {
             from {
                 opacity: .92;
                 transform: translateY(4px);
@@ -105,8 +105,21 @@
         }
 
         .page-enter {
-            animation: page-enter-critical 180ms ease-out both;
+            animation: page-enter 180ms ease-out both;
         }
+
+
+        @if ($isPatient)
+            @media (max-width: 640px) {
+                html body.role-patient .asw-menu-btn {
+                    opacity: 0 !important;
+                    visibility: hidden !important;
+                    pointer-events: none !important;
+                    transform: scale(0.01) !important;
+                    transition: none !important;
+                }
+            }
+        @endif
 
         @media (prefers-reduced-motion: reduce) {
             .page-enter {

@@ -526,6 +526,8 @@ body.filter-lock .asw-widget {
     width: var(--fab-final-size) !important;
     height: var(--fab-final-size) !important;
     z-index: 99995 !important;
+
+    pointer-events: none !important;
 }
 
 .asw-container .asw-menu-btn,
@@ -597,10 +599,11 @@ body.filter-lock .asw-widget {
 
     .asw-container,
     .asw-widget {
-        right: 18px !important;
+        right: 14px !important;
         bottom: var(--accessibility-bottom-final, 24px) !important;
-        width: 48px !important;
-        height: 48px !important;
+        width: 40px !important;
+        height: 40px !important;
+        pointer-events: none !important;
     }
 
     .asw-container .asw-menu-btn,
@@ -608,8 +611,8 @@ body.filter-lock .asw-widget {
     .asw-menu-btn {
         right: 0 !important;
         bottom: 0 !important;
-        width: 48px !important;
-        height: 48px !important;
+        width: 40px !important;
+        height: 40px !important;
     }
 
     body.role-patient .asw-menu {
@@ -636,7 +639,7 @@ body.filter-lock .asw-widget {
 .asw-menu-btn {
     opacity: 0 !important;
     pointer-events: none !important;
-    visibility: visible !important;
+    visibility: hidden !important;
     transform: scale(0.01) !important;
 }
 
