@@ -148,6 +148,11 @@
 
     if ($role === 'patient') {
         $displayName = ucwords(strtolower(optional($patient)->name ?? ($authUser->name ?? 'Patient User')));
+        $displayName = preg_replace_callback(
+            '/\b(ii|iii|iv|v|vi|vii|viii|ix|x)\.?$/i',
+            fn ($matches) => strtoupper($matches[0]),
+            $displayName
+        );
         $displayRole = 'Patient';
         $patientImage = optional($patient)->profile_image ?? null;
         $userImage = $authUser->profile_image ?? null;

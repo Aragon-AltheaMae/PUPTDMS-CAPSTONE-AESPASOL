@@ -31,7 +31,6 @@ export default defineConfig({
 
                 // Dentist
                 'resources/css/pages/dentist/add-existing-appointment.css',
-                'resources/css/pages/dentist/add-existing-record.css',
                 'resources/css/pages/dentist/daily-treatment.css',
                 'resources/css/pages/dentist/dental-services.css',
                 'resources/css/pages/dentist/dentist-dashboard.css',
@@ -50,6 +49,7 @@ export default defineConfig({
 
                 // Shared
                 'resources/css/pages/shared/active-sessions.css',
+                'resources/css/pages/shared/add-existing-record.css',
                 'resources/css/pages/shared/appointments.css',
                 'resources/css/pages/shared/clinic-schedule.css',
                 'resources/css/pages/shared/document-requests.css',

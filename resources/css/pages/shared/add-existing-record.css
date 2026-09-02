@@ -127,15 +127,6 @@
 
         justify-content: center;
     }
-
-
-    .existing-record-patient-grid {
-        grid-template-columns: 1fr;
-
-        gap: 10px;
-
-        margin-block: .75rem;
-    }
 }
 
 @media (max-width: 380px) {

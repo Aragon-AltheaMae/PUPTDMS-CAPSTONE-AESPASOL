@@ -149,10 +149,14 @@ class BrowserDetection
 
     public static function detectFromRequest(Request $request): string
     {
+        $browserNameHint = $request->hasSession()
+            ? $request->session()->get('browser_name_hint')
+            : null;
+
         $provided = self::normalizeBrowserName(
             $request->input('browser_name')
                 ?? $request->header('X-Browser-Name')
-                ?? $request->session()->get('browser_name_hint')
+                ?? $browserNameHint
         );
 
         if ($provided !== null) {

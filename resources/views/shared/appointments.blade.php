@@ -35,6 +35,13 @@ $canViewTreatmentRecord = $canViewTreatmentRecord ?? false;
 $canScheduleFollowUp = $canScheduleFollowUp ?? false;
 
 $resolveStartState = function ($appointment, bool $isToday): array {
+    $appointmentStatus = strtolower(trim((string) ($appointment->status ?? 'upcoming')));
+    $isActiveAppointment = in_array($appointmentStatus, ['pending', 'confirmed', 'upcoming', 'reschedule', 'rescheduled'], true);
+
+    if (!$isActiveAppointment) {
+        return [false, 'Only upcoming or rescheduled appointments can be started'];
+    }
+
     if (!$isToday) {
         return [false, 'Start procedure is available on the appointment date only'];
     }
@@ -1043,6 +1050,7 @@ return $aDateTime <=> $bDateTime;
                                                 data-tooltip-tone="{{ $canStartThisAppointment ? 'start' : 'locked' }}"
                                                 data-start-locked="{{ $canStartThisAppointment ? '0' : '1' }}"
                                                 aria-disabled="{{ $canStartThisAppointment ? 'false' : 'true' }}"
+                                                {{ $canStartThisAppointment ? '' : 'disabled' }}
                                                 onclick="openStartProcedureModal(this)" data-id="{{ $appt->id }}"
                                                 data-name="{{ $patientName }}" data-datetime="{{ $modalDatetime }}"
                                                 data-service="{{ $serviceLabel }}" data-start-url="{{ route(
@@ -1565,6 +1573,7 @@ return $aDateTime <=> $bDateTime;
                                         data-tooltip-tone="{{ $canStartThisAppointment ? 'start' : 'locked' }}"
                                         data-start-locked="{{ $canStartThisAppointment ? '0' : '1' }}"
                                         aria-disabled="{{ $canStartThisAppointment ? 'false' : 'true' }}"
+                                        {{ $canStartThisAppointment ? '' : 'disabled' }}
                                         onclick="openStartProcedureModal(this)" data-id="{{ $appt->id }}"
                                         data-name="{{ $patientName }}" data-datetime="{{ $modalDatetime }}"
                                         data-service="{{ $serviceLabel }}" data-start-url="{{ route(

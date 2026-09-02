@@ -307,8 +307,8 @@
 
                         <span id="statusModalBody">
                             Patients will not be able to book new appointments while the clinic is closed.
-                            All appointments scheduled for today will be marked as cancelled. You can reopen the clinic at
-                            any time.
+                            Existing appointments will remain active until they are completed or manually cancelled.
+                            You can reopen the clinic at any time.
                         </span>
                     </div>
                 </div>
@@ -2269,7 +2269,7 @@ Medicine inventory records will appear here once items are available.
                     'Mark clinic as OUT?';
 
                 body.textContent =
-                    'All appointments scheduled for today will be marked as cancelled. ';
+                    'Patients will not be able to book new appointments, but existing appointments will remain active. ';
 
                 confirmBtn.className =
                     'ui-btn ui-btn-danger';

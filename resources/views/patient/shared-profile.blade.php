@@ -530,7 +530,7 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                                     <x-appointment-record-card :appointment="$visit" variant="past" :show-details="true"
                                         :show-countdown="false" :show-time-range="false"
                                         :show-reserved="$isDentistProfile"
-                                        :record-edit-url="$isDentistProfile && !empty(data_get($visit, 'procedure.odontogram_data'))
+                                        :record-edit-url="$isDentistProfile && $visit->status === 'completed'
                                             ? route('dentist.odontogram.saved.edit', ['appointment' => $visit->id, 'from' => 'appointments'])
                                             : null"
                                         data-show-more-item />

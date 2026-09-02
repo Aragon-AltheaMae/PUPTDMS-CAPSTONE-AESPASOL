@@ -572,7 +572,8 @@ $createAcademicPeriodUnauthorizedMessage = 'You are not authorized to add academ
                             data-last-page="{{ $academicPeriods->lastPage() }}"
                             data-total="{{ $academicPeriods->total() }}"
                             data-from="{{ $academicPeriods->firstItem() ?? 0 }}"
-                            data-to="{{ $academicPeriods->lastItem() ?? 0 }}" />
+                            data-to="{{ $academicPeriods->lastItem() ?? 0 }}"
+                            />
                     </div>
 
                     <section class="table-card ap-calendar-card">

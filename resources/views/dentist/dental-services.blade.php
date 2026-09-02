@@ -152,7 +152,7 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
             <x-pagination-bar id="dentalServicesPagebarTop" info-id="dentalServicesPageInfoTop"
                 pagination-id="dentalServicesPaginationTop" position="top" :show-entries="true"
                 page-size-id="servicePerPageSelect" page-size-callback="selectDentalServicesPerPage"
-                :page-size-value="10" label="entries" />
+                :page-size-value="10" label="entries" hidden />
 
             <div id="dentalServicesListView" class="table-responsive-fix service-table-wrap">
                 <table class="data-table service-table service-dental-table">
@@ -186,7 +186,7 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
             <div id="dentalServicesEmptyState" class="empty-state-host"></div>
 
             <x-pagination-bar id="dentalServicesPagebarBottom" info-id="dentalServicesPageInfoBottom"
-                pagination-id="dentalServicesPaginationBottom" position="bottom" label="entries" />
+                pagination-id="dentalServicesPaginationBottom" position="bottom" label="entries" hidden/>
         </section>
     </div>
 </main>
@@ -1554,10 +1554,6 @@ $selectedMonth = $selectedMonth ?? now()->format('Y-m');
 
         tbody.innerHTML = '';
         if (grid) grid.innerHTML = '';
-
-        function updateDentalServiceStats() {
-            updateDentalServiceStats();
-        }
 
         const pagination = getDentalPagination(data);
         renderDentalPagebar(pagination);

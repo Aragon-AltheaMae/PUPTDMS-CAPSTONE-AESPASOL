@@ -97,7 +97,7 @@
 
                                         <div class="guest-fields-grid">
 
-                                            <div class="walkin-three-col">
+                                            <div class="walkin-two-col">
 
                                                 <div class="global-form-group" data-global-field>
                                                     <label class="global-form-label" for="guestFirstName">
@@ -107,7 +107,10 @@
 
                                                     <input type="text" id="guestFirstName" name="guest_first_name"
                                                         class="form-input-custom" placeholder="Enter first name"
-                                                        autocomplete="given-name" disabled>
+                                                        autocomplete="given-name" data-validation-rule="guestName"
+                                                        data-required-message="Please enter the guest's first name."
+                                                        data-pattern-message="Only letters, spaces, apostrophe, period, and hyphen are allowed."
+                                                        maxlength="50" disabled>
                                                 </div>
 
                                                 <div class="global-form-group" data-global-field>
@@ -118,7 +121,9 @@
 
                                                     <input type="text" id="guestMiddleName" name="guest_middle_name"
                                                         class="form-input-custom" placeholder="Enter middle name"
-                                                        autocomplete="additional-name" disabled>
+                                                        autocomplete="additional-name" data-validation-rule="guestName"
+                                                        data-pattern-message="Only letters, spaces, apostrophe, period, and hyphen are allowed."
+                                                        maxlength="50" disabled>
                                                 </div>
 
                                                 <div class="global-form-group" data-global-field>
@@ -129,7 +134,23 @@
 
                                                     <input type="text" id="guestLastName" name="guest_last_name"
                                                         class="form-input-custom" placeholder="Enter last name"
-                                                        autocomplete="family-name" disabled>
+                                                        autocomplete="family-name" data-validation-rule="guestName"
+                                                        data-required-message="Please enter the guest's last name."
+                                                        data-pattern-message="Only letters, spaces, apostrophe, period, and hyphen are allowed."
+                                                        maxlength="50" disabled>
+                                                </div>
+
+                                                <div class="global-form-group" data-global-field>
+                                                    <label class="global-form-label" for="guestSuffix">
+                                                        Suffix
+                                                        <span class="field-optional">(Optional)</span>
+                                                    </label>
+
+                                                    <input type="text" id="guestSuffix" name="guest_suffix"
+                                                        class="form-input-custom" placeholder="e.g. Jr., III"
+                                                        autocomplete="honorific-suffix" data-validation-rule="guestName"
+                                                        data-pattern-message="Only letters, spaces, apostrophe, period, and hyphen are allowed."
+                                                        maxlength="20" disabled>
                                                 </div>
 
                                             </div>
@@ -144,7 +165,9 @@
 
                                                     <input type="email" id="guestEmail" name="guest_email"
                                                         class="form-input-custom" placeholder="Enter email address"
-                                                        autocomplete="email" disabled>
+                                                        autocomplete="email"
+                                                        data-required-message="Please enter the guest's email address."
+                                                        disabled>
                                                 </div>
 
                                                 <div class="global-form-group" data-global-field>
@@ -156,7 +179,10 @@
                                                     <input type="text" id="guestPhone" name="guest_phone"
                                                         class="form-input-custom" placeholder="09xx xxx xxxx"
                                                         autocomplete="tel" inputmode="numeric"
-                                                        data-validation-rule="philippineMobile" maxlength="11" disabled>
+                                                        data-validation-rule="philippineMobile" maxlength="11"
+                                                        data-required-message="Please enter the guest's contact number."
+                                                        data-pattern-message="Contact number must start with 09 and contain exactly 11 digits."
+                                                        disabled>
                                                 </div>
 
                                             </div>
@@ -170,7 +196,8 @@
                                                     </label>
 
                                                     <select id="guestPatientType" name="guest_patient_type"
-                                                        class="form-select-custom" disabled required>
+                                                        class="form-select-custom" disabled required
+                                                        data-required-message="Please select the guest's patient type.">
                                                         <option value="">Select patient type</option>
                                                         <option value="student">Student</option>
                                                         <option value="faculty">Faculty</option>
@@ -188,7 +215,8 @@
                                                     </label>
 
                                                     <select id="guestGender" name="guest_gender"
-                                                        class="form-select-custom js-custom-select" disabled>
+                                                        class="form-select-custom js-custom-select" disabled
+                                                        data-required-message="Please select the guest's gender.">
                                                         <option value="">Select gender</option>
                                                         <option value="Male">Male</option>
                                                         <option value="Female">Female</option>
@@ -210,7 +238,9 @@
                                                         placeholder="Select birthday"
                                                         max="{{ now()->subDay()->format('Y-m-d') }}"
                                                         data-flatpickr-min-year="1900"
-                                                        data-validation-rule="notFutureDate" autocomplete="off"
+                                                        data-validation-rule="notFutureDate"
+                                                        data-required-message="Please select the guest's birthday."
+                                                        autocomplete="off"
                                                         disabled>
                                                 </div>
 
@@ -221,7 +251,8 @@
                                                     </label>
 
                                                     <input type="text" id="guestProgram" name="guest_program"
-                                                        class="form-input-custom" placeholder="Enter program" disabled>
+                                                        class="form-input-custom" placeholder="Enter program"
+                                                        maxlength="100" disabled>
                                                 </div>
 
                                             </div>
@@ -236,7 +267,11 @@
 
                                                     <input type="text" id="guestStudentNumber"
                                                         name="guest_student_number" class="form-input-custom"
-                                                        placeholder="Enter student number" disabled>
+                                                        placeholder="Enter student number"
+                                                        data-validation-rule="studentNumber"
+                                                        data-required-message="Please enter the guest's student number."
+                                                        data-pattern-message="Student number can only contain numbers and hyphens."
+                                                        maxlength="30" disabled>
                                                 </div>
 
                                                 <div class="global-form-group" data-global-field
@@ -248,6 +283,10 @@
 
                                                     <input type="text" id="guestFacultyCode" name="guest_faculty_code"
                                                         class="form-input-custom" placeholder="Enter faculty code"
+                                                        data-validation-rule="facultyCode"
+                                                        data-required-message="Please enter the guest's faculty code."
+                                                        data-pattern-message="Faculty code can only contain letters, numbers, and hyphens."
+                                                        maxlength="30"
                                                         disabled>
                                                 </div>
 
@@ -261,7 +300,10 @@
                                                     </label>
 
                                                     <input type="text" id="guestYearLevel" name="guest_year_level"
-                                                        class="form-input-custom" placeholder="e.g. 4" disabled>
+                                                        class="form-input-custom" placeholder="e.g. 4"
+                                                        data-validation-rule="yearLevel"
+                                                        data-pattern-message="Please enter a valid year level using whole numbers only."
+                                                        maxlength="2" disabled>
                                                 </div>
 
                                                 <div class="global-form-group" data-global-field>
@@ -271,7 +313,10 @@
                                                     </label>
 
                                                     <input type="text" id="guestSection" name="guest_section"
-                                                        class="form-input-custom" placeholder="e.g. BSIT 4-1" disabled>
+                                                        class="form-input-custom" placeholder="e.g. BSIT 4-1"
+                                                        data-validation-rule="sectionCode"
+                                                        data-pattern-message="Section can only contain letters, numbers, spaces, periods, and hyphens."
+                                                        maxlength="30" disabled>
                                                 </div>
 
                                             </div>
@@ -285,13 +330,17 @@
                                                 <div class="flex gap-4">
                                                     <label class="global-radio-option">
                                                         <input type="radio" name="guest_is_pwd" value="1"
-                                                            class="global-radio-input" disabled>
+                                                            class="global-radio-input"
+                                                            data-required-message="Please select whether the guest patient is a PWD."
+                                                            disabled>
                                                         <span>Yes</span>
                                                     </label>
 
                                                     <label class="global-radio-option">
                                                         <input type="radio" name="guest_is_pwd" value="0"
-                                                            class="global-radio-input" disabled>
+                                                            class="global-radio-input"
+                                                            data-required-message="Please select whether the guest patient is a PWD."
+                                                            disabled>
                                                         <span>No</span>
                                                     </label>
                                                 </div>
@@ -580,6 +629,9 @@
     const guestLastName =
         document.getElementById("guestLastName");
 
+    const guestSuffix =
+        document.getElementById("guestSuffix");
+
     const guestEmail =
         document.getElementById("guestEmail");
 
@@ -668,6 +720,7 @@
             guestFirstName,
             guestMiddleName,
             guestLastName,
+            guestSuffix,
             guestEmail,
             guestPhone,
             guestPatientType,
@@ -718,6 +771,10 @@
 
         if (guestLastName) {
             guestLastName.required = enabled;
+        }
+
+        if (guestSuffix) {
+            guestSuffix.required = false;
         }
 
         if (guestEmail) {
@@ -783,6 +840,7 @@
         guestFirstName,
         guestMiddleName,
         guestLastName,
+        guestSuffix,
         guestEmail,
         guestPhone,
         guestPatientType,
@@ -803,6 +861,8 @@
                 "input";
 
         input.addEventListener(eventName, () => {
+            window.validateFormInputField?.(input);
+
             if (
                 patientModeInput?.value === "guest" &&
                 selectedPatientId?.value
@@ -1115,6 +1175,7 @@
                 guestFirstName,
                 guestMiddleName,
                 guestLastName,
+                guestSuffix,
                 guestEmail,
                 guestPhone,
                 guestPatientType,
@@ -1211,6 +1272,13 @@
     function applyExistingPatientBookingInformation(data) {
         if (!data) {
             return;
+        }
+
+        if (data.last_service_type) {
+            setWalkInFormValue(
+                'service_type',
+                data.last_service_type
+            );
         }
 
         Object.entries(
@@ -1486,6 +1554,7 @@
             guestFirstName,
             guestMiddleName,
             guestLastName,
+            guestSuffix,
             guestEmail,
             guestPhone,
             guestGender,
@@ -1539,6 +1608,65 @@
 
     }
 
+    function validateGuestOnboardingFields() {
+        const guestValidationFields = [
+            guestFirstName,
+            guestMiddleName,
+            guestLastName,
+            guestEmail,
+            guestPhone,
+            guestPatientType,
+            guestGender,
+            guestBirthdate,
+            guestProgram,
+            guestYearLevel,
+            guestSection,
+        ].filter(Boolean);
+
+        if (guestPatientType?.value === "student" && guestStudentNumber) {
+            guestValidationFields.push(guestStudentNumber);
+        }
+
+        if (guestPatientType?.value === "faculty" && guestFacultyCode) {
+            guestValidationFields.push(guestFacultyCode);
+        }
+
+        let firstInvalid = null;
+
+        guestValidationFields.forEach(field => {
+            const isValid =
+                window.validateFormInputField?.(field) ?? true;
+
+            if (!isValid && !firstInvalid) {
+                firstInvalid = field;
+            }
+        });
+
+        const firstPwdRadio =
+            guestPwdRadios[0];
+
+        if (firstPwdRadio) {
+            const radioValid =
+                window.validateFormInputField?.(
+                    firstPwdRadio
+                ) ?? true;
+
+            if (!radioValid && !firstInvalid) {
+                firstInvalid = firstPwdRadio;
+            }
+        }
+
+        if (firstInvalid) {
+            window.focusGlobalInvalidField?.(
+                firstInvalid
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
     function selectGuestPatient(shouldProceed = true) {
         const firstName =
             guestFirstName?.value?.trim() || "";
@@ -1549,10 +1677,20 @@
         const lastName =
             guestLastName?.value?.trim() || "";
 
+        const suffix =
+            normalizeGuestSuffix(
+                guestSuffix?.value
+            );
+
+        if (guestSuffix) {
+            guestSuffix.value = suffix;
+        }
+
         const name = [
             firstName,
             middleName,
             lastName,
+            suffix,
         ]
             .filter(Boolean)
             .join(" ");
@@ -1589,174 +1727,9 @@
                 'input[name="guest_is_pwd"]:checked'
             )?.value;
 
-        if (!firstName) {
-            window.validateFormInputField?.(
-                guestFirstName
-            );
-
-            window.focusGlobalInvalidField?.(
-                guestFirstName
-            );
-
+        if (!validateGuestOnboardingFields()) {
             return false;
         }
-
-        if (!lastName) {
-            window.validateFormInputField?.(
-                guestLastName
-            );
-
-            window.focusGlobalInvalidField?.(
-                guestLastName
-            );
-
-            return false;
-        }
-
-        if (!email) {
-            window.validateFormInputField?.(
-                guestEmail
-            );
-
-            window.focusGlobalInvalidField?.(
-                guestEmail
-            );
-
-            return false;
-        }
-
-        if (!phone) {
-            window.validateFormInputField?.(
-                guestPhone
-            );
-
-            window.focusGlobalInvalidField?.(
-                guestPhone
-            );
-
-            return false;
-        }
-
-        if (!guestPatientType?.value) {
-            window.validateFormInputField?.(
-                guestPatientType
-            );
-
-            window.focusGlobalInvalidField?.(
-                guestPatientType
-            );
-
-            return false;
-        }
-
-        if (!gender) {
-            window.validateFormInputField?.(
-                guestGender
-            );
-
-            window.focusGlobalInvalidField?.(
-                guestGender
-            );
-
-            return false;
-        }
-
-        if (!birthdate) {
-            window.validateFormInputField?.(
-                guestBirthdate
-            );
-
-            window.focusGlobalInvalidField?.(
-                guestBirthdate
-            );
-
-            return false;
-        }
-
-        if (
-            guestPatientType?.value === "student" &&
-            !studentNumber
-        ) {
-            window.validateFormInputField?.(
-                guestStudentNumber
-            );
-
-            window.focusGlobalInvalidField?.(
-                guestStudentNumber
-            );
-
-            return false;
-        }
-
-        if (
-            guestPatientType?.value === "faculty" &&
-            !facultyCode
-        ) {
-            window.validateFormInputField?.(
-                guestFacultyCode
-            );
-
-            window.focusGlobalInvalidField?.(
-                guestFacultyCode
-            );
-
-            return false;
-        }
-
-        if (pwdValue === undefined) {
-            const firstPwdRadio =
-                guestPwdRadios[0];
-
-            if (firstPwdRadio) {
-                firstPwdRadio.required = true;
-
-                window.validateFormInputField?.(
-                    firstPwdRadio
-                );
-
-                window.focusGlobalInvalidField?.(
-                    firstPwdRadio
-                );
-            }
-
-            return false;
-        }
-
-        window.clearFormInputValidation?.(
-            guestFirstName
-        );
-
-        window.clearFormInputValidation?.(
-            guestLastName
-        );
-
-        window.clearFormInputValidation?.(
-            guestEmail
-        );
-
-        window.clearFormInputValidation?.(
-            guestPhone
-        );
-
-        window.clearFormInputValidation?.(
-            guestPatientType
-        );
-
-        window.clearFormInputValidation?.(
-            guestGender
-        );
-
-        window.clearFormInputValidation?.(
-            guestBirthdate
-        );
-
-        window.clearFormInputValidation?.(
-            guestStudentNumber
-        );
-
-        window.clearFormInputValidation?.(
-            guestFacultyCode
-        );
 
         const patientType =
             guestPatientType?.value || "";
@@ -1779,6 +1752,7 @@
             mode: "guest",
 
             name,
+            suffix_name: suffix,
             email,
             phone,
             gender,
@@ -1836,6 +1810,26 @@
         return true;
     }
 
+    function normalizeGuestSuffix(value) {
+        const suffix = String(value || "")
+            .trim();
+
+        return /^(ii|iii|iv|v|vi|vii|viii|ix|x)\.?$/i.test(
+            suffix
+        ) ?
+            suffix.toUpperCase() :
+            suffix;
+    }
+
+    function formatWalkInPatientName(value) {
+        return String(value || "")
+            .trim()
+            .replace(
+                /\b(ii|iii|iv|v|vi|vii|viii|ix|x)\.?$/i,
+                suffix => suffix.toUpperCase()
+            );
+    }
+
     async function createGuestPatientOnServer() {
         if (!selectGuestPatient(false)) {
             return false;
@@ -1849,6 +1843,7 @@
                 guestFirstName?.value?.trim(),
                 guestMiddleName?.value?.trim(),
                 guestLastName?.value?.trim(),
+                guestSuffix?.value?.trim(),
             ]
                 .filter(Boolean)
                 .join(" ")
@@ -1866,6 +1861,12 @@
         payload.append(
             "guest_last_name",
             guestLastName?.value?.trim() || ""
+        );
+        payload.append(
+            "guest_suffix",
+            normalizeGuestSuffix(
+                guestSuffix?.value
+            )
         );
         payload.append("guest_email", guestEmail?.value?.trim() || "");
         payload.append("guest_phone", guestPhone?.value?.trim() || "");
@@ -1939,6 +1940,9 @@
 
             selectedWalkInPatient = {
                 ...data.patient,
+                name: formatWalkInPatientName(
+                    data.patient.name
+                ),
                 mode: "guest",
                 type: data.patient.type || "Guest",
             };
@@ -1953,10 +1957,11 @@
 
             if (selectedPatientName) {
                 selectedPatientName.textContent =
-                    data.patient.name || [
+                    selectedWalkInPatient.name || [
                         guestFirstName?.value?.trim(),
                         guestMiddleName?.value?.trim(),
                         guestLastName?.value?.trim(),
+                        guestSuffix?.value?.trim(),
                     ]
                         .filter(Boolean)
                         .join(" ") ||
@@ -3698,11 +3703,13 @@
         `;
 
         const patientName =
-            selectedWalkInPatient?.name ||
-            document.getElementById(
-                "selectedPatientName"
-            )?.textContent ||
-            "N/A";
+            formatWalkInPatientName(
+                selectedWalkInPatient?.name ||
+                document.getElementById(
+                    "selectedPatientName"
+                )?.textContent ||
+                "N/A"
+            );
 
         const patientGender =
             selectedWalkInPatient?.gender ?
