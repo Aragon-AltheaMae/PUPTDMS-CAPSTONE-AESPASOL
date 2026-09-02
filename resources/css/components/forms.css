@@ -160,6 +160,12 @@
     animation: errorShake .35s ease;
 }
 
+.global-field-error.is-hiding {
+    display: flex;
+    pointer-events: none;
+    animation: globalFieldErrorExit .18s ease forwards;
+}
+
 .global-field-error i {
     flex-shrink: 0;
     margin-top: .12rem;
@@ -178,7 +184,7 @@
 .access-select.is-invalid {
     border-color: #dc2626 !important;
     background-color: #fff8f8 !important;
-    color: #991b1b !important;
+    color: var(--text-1, #111827) !important;
     box-shadow: 0 0 0 3px rgba(220, 38, 38, .08) !important;
 }
 
@@ -220,7 +226,7 @@
 .dark .access-select.is-invalid {
     border-color: rgba(252, 165, 165, .42) !important;
     background: rgba(220, 38, 38, .12) !important;
-    color: #fca5a5 !important;
+    color: var(--text-1) !important;
     box-shadow: 0 0 0 3px rgba(239, 68, 68, .10) !important;
 }
 

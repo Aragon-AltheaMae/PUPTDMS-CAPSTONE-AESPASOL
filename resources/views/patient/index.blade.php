@@ -869,7 +869,34 @@ $appointmentConfirmation = session('appointment_confirmation');
     @endif
 
     document.addEventListener('DOMContentLoaded', function () {
-        const quickAction = new URLSearchParams(window.location.search).get('quick_action');
+        const draftSavedToast =
+            sessionStorage.getItem(
+                'appointmentDraftSavedToast'
+            );
+
+        if (
+            draftSavedToast ===
+            '1'
+        ) {
+            sessionStorage.removeItem(
+                'appointmentDraftSavedToast'
+            );
+
+            window.showToast?.({
+                type: 'success',
+                title: 'Draft saved',
+                message:
+                    'Your appointment draft has been saved.',
+                duration: 3500,
+            });
+        }
+
+        const quickAction =
+            new URLSearchParams(
+                window.location.search
+            ).get(
+                'quick_action'
+            );
 
         const privateInformationModal =
             document.getElementById(

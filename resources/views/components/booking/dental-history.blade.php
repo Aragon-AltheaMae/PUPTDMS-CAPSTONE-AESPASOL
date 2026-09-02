@@ -54,6 +54,7 @@
                     <div class="global-form-group" data-global-field>
                         <label for="lastDentalVisit" class="global-form-label">
                             Last Dental Visit
+                            <span class="field-optional">(Optional)</span>
                         </label>
 
                         <div class="global-control-wrap">
@@ -69,6 +70,7 @@
                     <div class="global-form-group" data-global-field>
                         <label for="previous_dentist" class="global-form-label">
                             Previous Dentist
+                            <span class="field-optional">(Optional)</span>
                         </label>
 
                         <input type="text" id="previous_dentist" name="previous_dentist" maxlength="50"
@@ -198,6 +200,7 @@
                 <div class="global-form-group" data-global-field>
                     <label for="additional_concerns" class="global-form-label">
                         Additional Dental Concerns
+                        <span class="field-optional">(Optional)</span>
                     </label>
 
                     <div class="global-form-textarea-wrap">
