@@ -94,8 +94,8 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                                                     {{ $reservedBookingPeriod->title }}
                                                 </h3>
                                                 <p class="mt-1 text-sm text-[#697386]">
-                                                    This schedule is exclusively available to {{
-                                                    $reservedBookingPeriod->target_label }}.
+                                                    This schedule is exclusively available to
+                                                    {{ $reservedBookingPeriod->target_label }}.
                                                 </p>
                                             </div>
 
@@ -116,7 +116,9 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                                         </div>
 
                                         @if ($reservedBookingPeriod->booking_mode === 'timeslot')
-                                        <div class="time-panel appointment-time-panel" data-global-field>
+                                        <div class="time-panel appointment-time-panel" data-global-field
+                                            data-global-linked-input="#appointment_time"
+                                            data-global-error-key="appointment_time">
                                             <div class="appointment-time-heading">
                                                 <span class="appointment-time-heading-icon">
                                                     <i class="fa-regular fa-clock"></i>
@@ -130,8 +132,10 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                                             <div id="slotGrid"
                                                 class="appointment-slot-grid slot-grid-ui reserved-slot-grid">
                                                 @foreach ($availableReservedSlots as $slot)
-                                                @php($slotLabel = \Carbon\Carbon::parse($slot->slot_time)->format('g:i
-                                                A'))
+                                                @php(
+                                                $slotLabel = \Carbon\Carbon::parse($slot->slot_time)->format('g:i
+                                                A')
+                                                )
                                                 <button type="button"
                                                     class="slot-chip flex items-center gap-2.5 px-4 py-2.5 rounded-xl border font-semibold text-sm cursor-pointer"
                                                     data-reserved-slot-id="{{ $slot->id }}"
@@ -158,7 +162,8 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                                         <div class="appointment-selected-slot">
                                             <i class="fa-solid fa-list-ol"></i>
                                             <span>
-                                                No individual timeslot is required. You may be attended in queue order
+                                                No individual timeslot is required. You may be attended in queue
+                                                order
                                                 anytime within the reserved period.
                                             </span>
                                         </div>
@@ -173,11 +178,15 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                                     @else
                                     <div class="cal-time-layout grid gap-5 lg:gap-6 mx-auto w-full">
 
-                                        <div class="calendar-shell-no-card" data-global-field>
+                                        <div class="calendar-shell-no-card" data-global-field
+                                            data-global-linked-input="#appointment_date"
+                                            data-global-error-key="appointment_date">
                                             <div id="calendarSkeletonContainer"></div>
                                         </div>
 
-                                        <div class="time-panel appointment-time-panel is-empty" data-global-field>
+                                        <div class="time-panel appointment-time-panel is-empty" data-global-field
+                                            data-global-linked-input="#appointment_time"
+                                            data-global-error-key="appointment_time">
 
                                             <div class="appointment-time-heading">
 
@@ -481,12 +490,7 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
     </div>
 </div>
 
-<div id="miniTab" class="mini-tab">
-    <i class="fa-solid fa-circle-exclamation text-red-400"></i>
-    <span id="miniTabText">Please complete all required fields.</span>
-</div>
-
-@if (! $isReservedBooking)
+@if (!$isReservedBooking)
 @include('components.appointment-calendar-script', [
 'mode' => 'booking',
 'renderStyle' => 'patient',
@@ -523,11 +527,10 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
     const reservedDateOnlyTime = @json(
         $isReservedBooking && $reservedBookingPeriod -> booking_mode === 'date_only'
             ?\Carbon\Carbon:: parse($reservedBookingPeriod -> start_time) -> format('g:i A')
-            : null
-    );
-    const DRAFT_KEY = isReservedBooking
-        ? `appointmentDraft:reserved:${reservedBookingPeriodId}`
-        : "appointmentDraft:v1";
+                : null);
+    const DRAFT_KEY = isReservedBooking ?
+        `appointmentDraft:reserved:${reservedBookingPeriodId}` :
+        "appointmentDraft:v1";
 
     function enforceReservedSchedule() {
         if (!isReservedBooking) return;
@@ -566,7 +569,9 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                 if (slotIdInput) slotIdInput.value = chip.dataset.reservedSlotId || '';
                 if (timeInput) {
                     timeInput.value = chip.dataset.reservedSlotTime || '';
-                    timeInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    timeInput.dispatchEvent(new Event('change', {
+                        bubbles: true
+                    }));
                 }
                 if (selectedText) selectedText.textContent = chip.dataset.reservedSlotTime || '';
                 selectedDisplay?.classList.remove('hidden');
@@ -601,24 +606,6 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
             )?.content ||
             ''
         );
-    }
-
-    const miniTab = document.getElementById("miniTab");
-    const miniTabText = document.getElementById("miniTabText");
-
-    function showMiniTab(msg) {
-        if (!miniTab) return;
-        miniTabText.textContent = msg || "Please complete all required fields.";
-        miniTab.style.opacity = "1";
-        miniTab.style.pointerEvents = "auto";
-        miniTab.classList.add("show");
-
-        clearTimeout(window.__mtTimer);
-        window.__mtTimer = setTimeout(() => {
-            miniTab.style.opacity = "0";
-            miniTab.style.pointerEvents = "none";
-            miniTab.classList.remove("show");
-        }, 3200);
     }
 
     function hasMeaningfulDraftData(payload) {
@@ -1053,12 +1040,10 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
 
             formSubmitting = true;
 
-            window.showToast?.({
-                type: "success",
-                title: "Draft saved",
-                message: "Your appointment draft has been saved.",
-                duration: 3000,
-            });
+            sessionStorage.setItem(
+                'appointmentDraftSavedToast',
+                '1'
+            );
 
             return true;
         };
@@ -1234,17 +1219,16 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                             `[name="${CSS.escape(name)}"]`
                         )
                         .forEach(el => {
-                            const shouldPreserveEmergencyValue =
-                                [
-                                    "emergency_person",
-                                    "emergency_number",
-                                    "emergency_relation",
-                                ].includes(name) &&
+                            const shouldPreserveEmergencyValue = [
+                                "emergency_person",
+                                "emergency_number",
+                                "emergency_relation",
+                            ].includes(name) &&
                                 String(value ?? "").trim() === "" &&
                                 String(
-                                    el.type === "checkbox" || el.type === "radio"
-                                        ? (el.checked ? el.value : "")
-                                        : el.value ?? ""
+                                    el.type === "checkbox" || el.type === "radio" ?
+                                        (el.checked ? el.value : "") :
+                                        el.value ?? ""
                                 ).trim() !== "";
 
                             if (shouldPreserveEmergencyValue) {
@@ -1646,69 +1630,15 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
             );
         }
 
-        const fields =
-            Array.from(
-                stepEl.querySelectorAll(
-                    [
-                        'input:not([type="hidden"])',
-                        'textarea',
-                        'select',
-                    ].join(',')
-                )
-            ).filter(field => {
-                return (
-                    !field.disabled &&
-                    field.type !== 'button' &&
-                    field.type !== 'submit' &&
-                    field.type !== 'file'
-                );
-            });
+        const validation =
+            window.validateGlobalSection?.(
+                stepEl
+            );
 
-        const handledRadioGroups =
-            new Set();
-
-        let firstInvalid =
-            null;
-
-        for (const field of fields) {
-            if (
-                field.type === 'radio'
-            ) {
-                if (
-                    handledRadioGroups.has(
-                        field.name
-                    )
-                ) {
-                    continue;
-                }
-
-                handledRadioGroups.add(
-                    field.name
-                );
-            }
-
-            const valid =
-                window
-                    .validateFormInputField?.(
-                        field
-                    ) ??
-                field.checkValidity();
-
-            if (
-                !valid &&
-                !firstInvalid
-            ) {
-                firstInvalid =
-                    field;
-            }
-        }
-
-        if (firstInvalid) {
-            window
-                .focusGlobalInvalidField?.(
-                    firstInvalid
-                );
-
+        if (
+            validation &&
+            !validation.valid
+        ) {
             return false;
         }
 
@@ -1921,10 +1851,9 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
     ) {
         document.addEventListener(
             'DOMContentLoaded',
-            bootBookingWorkflow,
-            {
-                once: true
-            }
+            bootBookingWorkflow, {
+            once: true
+        }
         );
     } else {
         bootBookingWorkflow();
@@ -2399,15 +2328,15 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
     </div>
 
     ${editAction ? `
-                    <button
-                        type="button"
-                        class="ui-btn ui-btn-secondary ui-btn-sm ml-auto"
-                        onclick="${editAction}"
-                    >
-                        <i class="fa-solid fa-pen"></i>
-                        Edit
-                    </button>
-                ` : ''}
+                        <button
+                            type="button"
+                            class="ui-btn ui-btn-secondary ui-btn-sm ml-auto"
+                            onclick="${editAction}"
+                        >
+                            <i class="fa-solid fa-pen"></i>
+                            Edit
+                        </button>
+                    ` : ''}
 </div>
 
     <div class="booking-summary-card-body">
@@ -2484,10 +2413,10 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                 ${diseaseLabels
                     .map(
                         label => `
-                                                                                                                    <span class="booking-summary-tag">
-                                                                                                                        ${label}
-                                                                                                                    </span>
-                                                                                                                `
+                                                                                                                        <span class="booking-summary-tag">
+                                                                                                                            ${label}
+                                                                                                                        </span>
+                                                                                                                    `
                     )
                     .join('')}
             </div>
@@ -2510,83 +2439,83 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
             document.getElementById('contact_address')?.value || 'N/A';
         const dentalHistoryBody = `
     ${subSection("Basic Info", `
-                                                                                                        ${row("Last Dental Visit", get("last_dental_visit"))}
-                                                                                                        ${row("Previous Dentist", get("previous_dentist"))}
-                                                                                                    `)}
+                                                                                                            ${row("Last Dental Visit", get("last_dental_visit"))}
+                                                                                                            ${row("Previous Dentist", get("previous_dentist"))}
+                                                                                                        `)}
 
     ${subSection("Dental Symptoms", `
-                                                                                                        ${row("Bleeding Gums", get("bleeding_gums"))}
-                                                                                                        ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
-                                                                                                        ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
-                                                                                                        ${row("Tooth Pain", get("tooth_pain"))}
-                                                                                                        ${row("Sores/Lumps", get("sores"))}
-                                                                                                        ${row("Jaw Injuries", get("injuries"))}
-                                                                                                    `)}
+                                                                                                            ${row("Bleeding Gums", get("bleeding_gums"))}
+                                                                                                            ${row("Sensitive (Hot/Cold)", get("sensitive_temp"))}
+                                                                                                            ${row("Sensitive (Sweets/Sour)", get("sensitive_taste"))}
+                                                                                                            ${row("Tooth Pain", get("tooth_pain"))}
+                                                                                                            ${row("Sores/Lumps", get("sores"))}
+                                                                                                            ${row("Jaw Injuries", get("injuries"))}
+                                                                                                        `)}
 
     ${subSection("Jaw & Bite Symptoms", `
-                                                                                                        ${row("Clicking", get("clicking"))}
-                                                                                                        ${row("Joint Pain", get("joint_pain"))}
-                                                                                                        ${row("Difficulty Moving", get("difficulty_moving"))}
-                                                                                                        ${row("Difficulty Chewing", get("difficulty_chewing"))}
-                                                                                                        ${row("Frequent Headaches", get("jaw_headaches"))}
-                                                                                                        ${row("Grinding/Clenching", get("clench_grind"))}
-                                                                                                        ${row("Lips/Cheek Biting", get("biting"))}
-                                                                                                        ${row("Teeth Loosening", get("teeth_loosening"))}
-                                                                                                        ${row("Food Caught Between Teeth", get("food_teeth"))}
-                                                                                                        ${row("Medicine Reaction", get("med_reaction"))}
-                                                                                                    `)}
+                                                                                                            ${row("Clicking", get("clicking"))}
+                                                                                                            ${row("Joint Pain", get("joint_pain"))}
+                                                                                                            ${row("Difficulty Moving", get("difficulty_moving"))}
+                                                                                                            ${row("Difficulty Chewing", get("difficulty_chewing"))}
+                                                                                                            ${row("Frequent Headaches", get("jaw_headaches"))}
+                                                                                                            ${row("Grinding/Clenching", get("clench_grind"))}
+                                                                                                            ${row("Lips/Cheek Biting", get("biting"))}
+                                                                                                            ${row("Teeth Loosening", get("teeth_loosening"))}
+                                                                                                            ${row("Food Caught Between Teeth", get("food_teeth"))}
+                                                                                                            ${row("Medicine Reaction", get("med_reaction"))}
+                                                                                                        `)}
 
     ${subSection("Dental Procedures", `
-                                                                                                        ${row("Periodontal Treatment", get("periodontal"))}
-                                                                                                        ${row("Difficult Extraction", get("difficult_extraction"))}
-                                                                                                        ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
+                                                                                                            ${row("Periodontal Treatment", get("periodontal"))}
+                                                                                                            ${row("Difficult Extraction", get("difficult_extraction"))}
+                                                                                                            ${get("difficult_extraction") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
 
-                                                                                                        ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
-                                                                                                        ${row("Dentures", get("dentures"))}
-                                                                                                        ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
+                                                                                                            ${row("Prolonged Bleeding", get("prolonged_bleeding"))}
+                                                                                                            ${row("Dentures", get("dentures"))}
+                                                                                                            ${get("dentures") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
 
-                                                                                                        ${row("Orthodontic Treatment", get("ortho_treatment"))}
-                                                                                                        ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
-                                                                                                    `)}
+                                                                                                            ${row("Orthodontic Treatment", get("ortho_treatment"))}
+                                                                                                            ${get("ortho_treatment") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
+                                                                                                        `)}
 
     ${fullWidthSection("Additional Concerns", `
-                                                                                                        ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
+                                                                                                            ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
                 ? get("additional_concerns")
                 : '<span class="text-[#9e9690] italic">No additional concerns provided.</span>'}
-                                                                                                    `)}
+                                                                                                        `)}
     `;
 
         const medicalHistoryBody = `
     ${subSection("General Health", `
-                                                                                                        ${row("Good Health", get("good_health"))}
-                                                                                                        ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
+                                                                                                            ${row("Good Health", get("good_health"))}
+                                                                                                            ${get("good_health") === "NO" ? row("Health Details", get("good_health_details")) : ""}
 
-                                                                                                        ${row("Had Medical Exam", get("had_medical_exam"))}
-                                                                                                        ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
+                                                                                                            ${row("Had Medical Exam", get("had_medical_exam"))}
+                                                                                                            ${get("had_medical_exam") === "YES" ? row("Medical Exam Date", get("medical_exam_date")) : ""}
 
-                                                                                                        ${row("Under Treatment", get("under_treatment"))}
-                                                                                                        ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
+                                                                                                            ${row("Under Treatment", get("under_treatment"))}
+                                                                                                            ${get("under_treatment") === "YES" ? row("Treatment Details", get("treatment_details")) : ""}
 
-                                                                                                        ${row("Hospitalized", get("hospitalized"))}
-                                                                                                        ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
-                                                                                                    `)}
+                                                                                                            ${row("Hospitalized", get("hospitalized"))}
+                                                                                                            ${get("hospitalized") === "YES" ? row("Hospital Details", get("hospital_details")) : ""}
+                                                                                                        `)}
 
     ${subSection("Allergies", `
-                                                                                                        ${row("Allergy (Medicine)", get("allergy_medicine"))}
-                                                                                                        ${row("Allergy (Food)", get("allergy_food"))}
-                                                                                                        ${optionalRow("Allergy (Others)", get("allergy_others"))}
-                                                                                                    `)}
+                                                                                                            ${row("Allergy (Medicine)", get("allergy_medicine"))}
+                                                                                                            ${row("Allergy (Food)", get("allergy_food"))}
+                                                                                                            ${optionalRow("Allergy (Others)", get("allergy_others"))}
+                                                                                                        `)}
 
     ${subSection("Medications", `
-                                                                                                        ${row("Medication", get("medication"))}
-                                                                                                        ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
-                                                                                                    `)}
+                                                                                                            ${row("Medication", get("medication"))}
+                                                                                                            ${get("medication") === "YES" ? row("Medication Details", get("medication_details")) : ""}
+                                                                                                        `)}
 
     ${isFemalePatient ? subSection("For Women Only", `
-                                                                                                        ${row("Pregnant", get("pregnant"))}
-                                                                                                        ${row("Nursing", get("nursing"))}
-                                                                                                        ${row("Birth Control Pills", get("birth_control"))}
-                                                                                                    `) : ""}
+                                                                                                            ${row("Pregnant", get("pregnant"))}
+                                                                                                            ${row("Nursing", get("nursing"))}
+                                                                                                            ${row("Birth Control Pills", get("birth_control"))}
+                                                                                                        `) : ""}
 
    ${fullWidthSection(
             "Medical Conditions",
@@ -2594,141 +2523,142 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
         )}
 
     ${subSection("Tobacco Use", `
-                                                                                                        ${row("Tobacco Use", get("tobacco_use"))}
-                                                                                                        ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
-                                                                                                        ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
-                                                                                                    `)}
+                                                                                                            ${row("Tobacco Use", get("tobacco_use"))}
+                                                                                                            ${get("tobacco_use") === "YES" ? row("Amount Per Day", get("tobacco_per_day")) : ""}
+                                                                                                            ${get("tobacco_use") === "YES" ? row("Amount Per Week", get("tobacco_per_week")) : ""}
+                                                                                                        `)}
 
     ${subSection("Do You Suffer From", `
-                                                                                                        ${row("Headaches", get("headaches"))}
-                                                                                                        ${row("Earaches", get("earaches"))}
-                                                                                                        ${row("Neck Aches", get("neck_aches"))}
-                                                                                                    `)}
+                                                                                                            ${row("Headaches", get("headaches"))}
+                                                                                                            ${row("Earaches", get("earaches"))}
+                                                                                                            ${row("Neck Aches", get("neck_aches"))}
+                                                                                                        `)}
     `;
 
         document.getElementById("summaryBox").innerHTML = `
     ${summaryCard("Patient Information", "fa-user", `
-                                                                                                        <div class="grid grid-cols-1 gap-y-1">
-                                                                                                            ${row("Name", patientName)}
-                                                                                                            ${row("Gender", patientGender)}
-                                                                                                        </div>
-                                                                                                    `)}
+                                                                                                            <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                ${row("Name", patientName)}
+                                                                                                                ${row("Gender", patientGender)}
+                                                                                                            </div>
+                                                                                                        `)}
                                                                     ${summaryCard(
             "Contact Information",
             "fa-address-card",
             `
-                                        <div id="contactSummaryView">
-                                            <div class="grid grid-cols-1 gap-y-1">
-                                                ${row("Email", contactEmail)}
-                                                ${row("Phone", contactPhone)}
-                                                ${row("Address", contactAddress)}
-                                            </div>
-                                        </div>
-
-                                        <div
-                                            id="contactSummaryEditor"
-                                            class="hidden space-y-4"
-                                        >
-                                            <div class="global-form-group" data-global-field>
-                                                <label
-                                                    for="contactEditEmail"
-                                                    class="global-form-label"
-                                                >
-                                                    Email
-                                                    <span class="required-mark">*</span>
-                                                </label>
-
-                                                <input
-                                                    type="email"
-                                                    id="contactEditEmail"
-                                                    name="contact_edit_email"
-                                                    class="form-input-custom"
-                                                    required
-                                                    data-required-message="Please enter your email address."
-                                                    value="${contactEmail === 'N/A' ? '' : contactEmail}"
-                                                >
+                                            <div id="contactSummaryView">
+                                                <div class="grid grid-cols-1 gap-y-1">
+                                                    ${row("Email", contactEmail)}
+                                                    ${row("Phone", contactPhone)}
+                                                    ${row("Address", contactAddress)}
+                                                </div>
                                             </div>
 
-                                            <div class="global-form-group" data-global-field>
-                                                <label
-                                                    for="contactEditPhone"
-                                                    class="global-form-label"
-                                                >
-                                                    Phone
-                                                    <span class="required-mark">*</span>
-                                                </label>
+                                            <div
+                                                id="contactSummaryEditor"
+                                                class="hidden space-y-4"
+                                            >
+                                                <div class="global-form-group" data-global-field>
+                                                    <label
+                                                        for="contactEditEmail"
+                                                        class="global-form-label"
+                                                    >
+                                                        Email
+                                                        <span class="required-mark">*</span>
+                                                    </label>
 
-                                                <input
-                                                    type="tel"
-                                                    id="contactEditPhone"
-                                                    name="contact_edit_phone"
-                                                    class="form-input-custom"
-                                                    required
-                                                    data-validation-rule="philippineMobile"
-                                                    data-required-message="Please enter your contact number."
-                                                    data-pattern-message="Contact number must start with 09 and contain exactly 11 digits."
-                                                    maxlength="11"
-                                                    inputmode="numeric"
-                                                    placeholder="09XXXXXXXXX"
-                                                    value="${contactPhone === 'N/A' ? '' : contactPhone}"
-                                                >
+                                                    <input
+                                                        type="email"
+                                                        id="contactEditEmail"
+                                                        name="contact_edit_email"
+                                                        class="form-input-custom"
+                                                        required
+                                                        data-required-message="Please enter your email address."
+                                                        value="${contactEmail === 'N/A' ? '' : contactEmail}"
+                                                    >
+                                                </div>
+
+                                                <div class="global-form-group" data-global-field>
+                                                    <label
+                                                        for="contactEditPhone"
+                                                        class="global-form-label"
+                                                    >
+                                                        Phone
+                                                        <span class="required-mark">*</span>
+                                                    </label>
+
+                                                    <input
+                                                        type="tel"
+                                                        id="contactEditPhone"
+                                                        name="contact_edit_phone"
+                                                        class="form-input-custom"
+                                                        required
+                                                        data-validation-rule="philippineMobile"
+                                                        data-required-message="Please enter your contact number."
+                                                        data-pattern-message="Contact number must start with 09 and contain exactly 11 digits."
+                                                        maxlength="13"
+                                                        inputmode="numeric"
+                                                        autocomplete="tel"
+                                                        placeholder="0000 000 0000"
+                                                        value="${contactPhone === 'N/A' ? '' : contactPhone}"
+                                                    >
+                                                </div>
+
+                                                <div class="global-form-group" data-global-field>
+                                                    <label
+                                                        for="contactEditAddress"
+                                                        class="global-form-label"
+                                                    >
+                                                        Address
+                                                        <span class="required-mark">*</span>
+                                                    </label>
+
+                                                    <textarea
+                                                        id="contactEditAddress"
+                                                        name="contact_edit_address"
+                                                        class="form-input-custom global-form-textarea"
+                                                        required
+                                                        data-required-message="Please enter your address."
+                                                        rows="3"
+                                                    >${contactAddress === 'N/A' ? '' : contactAddress}</textarea>
+                                                </div>
+
+                                                <div class="flex flex-wrap gap-2">
+                                                    <button
+                                                        type="button"
+                                                        class="ui-btn ui-btn-primary ui-btn-sm"
+                                                        onclick="saveGlobalContactInformation()"
+                                                    >
+                                                        <i class="fa-solid fa-check"></i>
+                                                        Save Changes
+                                                    </button>
+
+                                                    <button
+                                                        type="button"
+                                                        class="ui-btn ui-btn-secondary ui-btn-sm"
+                                                        onclick="cancelContactInformationEdit()"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </div>
                                             </div>
-
-                                            <div class="global-form-group" data-global-field>
-                                                <label
-                                                    for="contactEditAddress"
-                                                    class="global-form-label"
-                                                >
-                                                    Address
-                                                    <span class="required-mark">*</span>
-                                                </label>
-
-                                                <textarea
-                                                    id="contactEditAddress"
-                                                    name="contact_edit_address"
-                                                    class="form-input-custom global-form-textarea"
-                                                    required
-                                                    data-required-message="Please enter your address."
-                                                    rows="3"
-                                                >${contactAddress === 'N/A' ? '' : contactAddress}</textarea>
-                                            </div>
-
-                                            <div class="flex flex-wrap gap-2">
-                                                <button
-                                                    type="button"
-                                                    class="ui-btn ui-btn-primary ui-btn-sm"
-                                                    onclick="saveGlobalContactInformation()"
-                                                >
-                                                    <i class="fa-solid fa-check"></i>
-                                                    Save Changes
-                                                </button>
-
-                                                <button
-                                                    type="button"
-                                                    class="ui-btn ui-btn-secondary ui-btn-sm"
-                                                    onclick="cancelContactInformationEdit()"
-                                                >
-                                                    Cancel
-                                                </button>
-                                            </div>
-                                        </div>
-                                    `,
+                                        `,
             "editContactInformationFromReview()"
         )}
 
     <div class="grid grid-cols-2 gap-4 sm-grid-1col">
         ${summaryCard("Appointment Details", "fa-calendar-check", `
-                                                                                                        <div class="grid grid-cols-1 gap-y-1">
-                                                                                                            ${row("Date", get("appointment_date"))}
-                                                                                                            ${row("Time", get("appointment_time"))}
-                                                                                                        </div>
-                                                                                                    `)}
-
-        ${summaryCard("Service", "fa-tooth", `
                                                                                                             <div class="grid grid-cols-1 gap-y-1">
-                                                                                                                ${row("Type", get("service_type"))}
+                                                                                                                ${row("Date", get("appointment_date"))}
+                                                                                                                ${row("Time", get("appointment_time"))}
                                                                                                             </div>
                                                                                                         `)}
+
+        ${summaryCard("Service", "fa-tooth", `
+                                                                                                                <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                    ${row("Type", get("service_type"))}
+                                                                                                                </div>
+                                                                                                            `)}
     </div>
 
         ${summaryCard("Dental History", "fa-teeth",
@@ -2743,12 +2673,12 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
 
     <div class="grid grid-cols-2 gap-4 sm-grid-1col">
         ${summaryCard("Emergency Contact", "fa-phone", `
-                                                                                                            <div class="grid grid-cols-1 gap-y-1">
-                                                                                                                ${row("Name", get("emergency_person"))}
-                                                                                                                ${row("Number", get("emergency_number"))}
-                                                                                                                ${row("Relation", emergencyRelation)}
-                                                                                                            </div>
-                                                                                                        `)}
+                                                                                                                <div class="grid grid-cols-1 gap-y-1">
+                                                                                                                    ${row("Name", get("emergency_person"))}
+                                                                                                                    ${row("Number", get("emergency_number"))}
+                                                                                                                    ${row("Relation", emergencyRelation)}
+                                                                                                                </div>
+                                                                                                            `)}
 
         ${summaryCard(
             "Signature",
@@ -2759,21 +2689,12 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
     </div>
 `;
 
-        [
-            'contactEditEmail',
-            'contactEditPhone',
-            'contactEditAddress',
-        ].forEach(id => {
-            const field = document.getElementById(id);
-
-            field?.addEventListener('input', () => {
-                window.validateFormInputField?.(field);
-            });
-
-            field?.addEventListener('change', () => {
-                window.validateFormInputField?.(field);
-            });
-        });
+        window
+            .normalizeGlobalPhilippineMobile?.(
+                document.getElementById(
+                    'contactEditPhone'
+                )
+            );
 
         document.querySelectorAll(".sm-grid-1col").forEach(el => {
             if (window.innerWidth < 640) el.style.gridTemplateColumns = "1fr";
@@ -2813,11 +2734,15 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
             !finalConfirm ||
             !finalConfirm.checked
         ) {
-            showMiniTab(
-                'Please confirm before submitting.'
-            );
+            window
+                .validateFormInputField?.(
+                    finalConfirm
+                );
 
-            finalConfirm?.focus();
+            window
+                .focusGlobalInvalidField?.(
+                    finalConfirm
+                );
 
             return false;
         }
@@ -2910,116 +2835,36 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
         else document.getElementById("tobacco_details")?.classList.add("hidden");
     }));
 
-    const emergencyNumber = document.getElementById("emergency_number");
-    const emergencyNumberFeedback = document.getElementById("emergency_number_feedback");
-    const emergencyPerson = document.getElementById("emergency_person");
-    const emergencyPersonFeedback = document.getElementById("emergency_person_feedback");
+    const appointmentForm = document.getElementById("appointmentForm");
 
-    function setEmergencyPersonFeedback(message, type = "") {
-        if (!emergencyPersonFeedback) return;
+    appointmentForm?.addEventListener("input", event => {
+        if (
+            !event.target.matches(
+                "input, textarea, select"
+            )
+        ) {
+            return;
+        }
 
-        emergencyPersonFeedback.textContent = message;
-        emergencyPersonFeedback.classList.remove("error", "success", "text-[#9e9690]");
+        formIsDirty = true;
 
-        if (type === "error") emergencyPersonFeedback.classList.add("error");
-        else if (type === "success") emergencyPersonFeedback.classList.add("success");
-        else emergencyPersonFeedback.classList.add("text-[#9e9690]");
+        scheduleDraftAutosave();
     }
-
-    function validateEmergencyPerson(showNeutral = false) {
-        if (!emergencyPerson) return false;
-
-        const value = emergencyPerson.value.trim();
-        const validNamePattern = /^[A-Za-zÑñ\s.'-]+$/;
-
-        emergencyPerson.classList.remove("input-invalid", "input-valid");
-
-        if (!value.length) {
-            if (showNeutral) {
-                setEmergencyPersonFeedback("Only letters, spaces, apostrophe, period, and hyphen are allowed.");
-            } else {
-                setEmergencyPersonFeedback("");
-            }
-            return false;
-        }
-
-        if (!validNamePattern.test(value)) {
-            emergencyPerson.classList.add("input-invalid");
-            setEmergencyPersonFeedback("This name is invalid. Please use letters only.", "error");
-            return false;
-        }
-
-        emergencyPerson.classList.add("input-valid");
-        setEmergencyPersonFeedback("Valid emergency contact name.", "success");
-        return true;
-    }
-
-    emergencyPerson?.addEventListener("input", (e) => {
-        const sanitizedValue = e.target.value.replace(/[^A-Za-zÑñ\s.'-]/g, "");
-        const hadInvalidChars = sanitizedValue !== e.target.value;
-
-        if (hadInvalidChars) {
-            e.target.value = sanitizedValue;
-            showMiniTab("Emergency contact name must contain letters only.");
-        }
-
-        validateEmergencyPerson(true);
-        markFormDirty();
-    });
-
-    emergencyPerson?.addEventListener("blur", () => {
-        validateEmergencyPerson(true);
-    });
-    let emergencyNumberFeedbackTimer = null;
-
-    function formatPhoneDisplay(rawDigits) {
-        const digits = rawDigits.slice(0, 11);
-        let out = "";
-
-        if (digits.length > 0) out += digits.slice(0, 4);
-        if (digits.length > 4) out += " " + digits.slice(4, 7);
-        if (digits.length > 7) out += " " + digits.slice(7, 11);
-
-        return out;
-    }
-
-    const appointmentForm =
-        document.getElementById(
-            "appointmentForm"
-        );
-
-    appointmentForm?.addEventListener(
-        "input",
-        event => {
-            if (
-                !event.target.matches(
-                    "input, textarea, select"
-                )
-            ) {
-                return;
-            }
-
-            formIsDirty = true;
-
-            scheduleDraftAutosave();
-        }
     );
 
-    appointmentForm?.addEventListener(
-        "change",
-        event => {
-            if (
-                !event.target.matches(
-                    "input, textarea, select"
-                )
-            ) {
-                return;
-            }
-
-            formIsDirty = true;
-
-            scheduleDraftAutosave();
+    appointmentForm?.addEventListener("change", event => {
+        if (
+            !event.target.matches(
+                "input, textarea, select"
+            )
+        ) {
+            return;
         }
+
+        formIsDirty = true;
+
+        scheduleDraftAutosave();
+    }
     );
 
     document.addEventListener(

@@ -1880,8 +1880,31 @@
         const dateInput = document.getElementById(calendarConfig.dateInputId);
         const timeInput = document.getElementById(calendarConfig.timeInputId);
 
-        if (dateInput) dateInput.value = iso;
-        if (timeInput) timeInput.value = "";
+        if (dateInput) {
+            dateInput.value =
+                iso;
+
+            dateInput.dispatchEvent(
+                new Event(
+                    'change', {
+                        bubbles: true
+                    }
+                )
+            );
+        }
+
+        if (timeInput) {
+            timeInput.value =
+                '';
+
+            timeInput.dispatchEvent(
+                new Event(
+                    'change', {
+                        bubbles: true
+                    }
+                )
+            );
+        }
         if (typeof markFormDirty === "function") markFormDirty();
 
         renderCalendar();

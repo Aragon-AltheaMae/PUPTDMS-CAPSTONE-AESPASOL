@@ -402,6 +402,18 @@
     }
 }
 
+@keyframes globalFieldErrorExit {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+}
+
 @keyframes toastIn {
     from {
         opacity: 0;
