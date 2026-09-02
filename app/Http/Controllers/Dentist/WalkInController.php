@@ -1225,12 +1225,14 @@ class WalkInController extends Controller
                 ->map(function (array $student) {
                     $user = $this->syncWalkInUser($student);
                     $patient = $this->syncWalkInPatient($user, $student, 'Student');
+                    $displayName = $patient->name ?: $student['name'];
+
                     return [
                         'id' =>
                         $patient->id,
 
                         'name' =>
-                        $student['name'],
+                        $displayName,
 
                         'gender' =>
                         $student['gender']
@@ -1282,7 +1284,7 @@ class WalkInController extends Controller
                         'avatar_url' =>
                         $this->getPatientAvatarUrl(
                             $patient,
-                            $student['name']
+                            $displayName
                         ),
                     ];
                 })
@@ -1453,12 +1455,15 @@ class WalkInController extends Controller
             ->get()
             ->map(function (Patient $patient) {
                 $user = $patient->user;
+                $suffixName = $this->normalizeNameSuffix(
+                    $user?->suffix_name
+                );
 
                 $patientName = trim(collect([
                     $user?->first_name,
                     $user?->middle_name,
                     $user?->last_name,
-                    $user?->suffix_name,
+                    $suffixName,
                 ])->filter(fn($value) => filled($value))->implode(' '));
 
                 if ($patientName === '') {

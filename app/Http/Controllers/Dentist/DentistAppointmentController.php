@@ -249,7 +249,7 @@ class DentistAppointmentController extends Controller
         ]);
     }
 
-    public function start($id)
+    public function start(Request $request, $id)
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
@@ -295,7 +295,11 @@ class DentistAppointmentController extends Controller
             'Dentist started an appointment procedure'
         );
 
-        return redirect()->route('dentist.odontogram', $appointment->id);
+        return redirect()->route('dentist.odontogram', [
+            'appointment' => $appointment->id,
+            'from' => $request->query('from', 'appointments'),
+            'start_procedure' => $request->query('start_procedure'),
+        ]);
     }
 
     public function cancel(Request $request, $id)

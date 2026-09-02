@@ -17,18 +17,6 @@ class EnsureSessionActivity
             return $next($request);
         }
 
-        $timeoutSeconds = max(
-            0,
-            (int) config(
-                'session.idle_timeout_seconds',
-                600
-            )
-        );
-
-        if ($timeoutSeconds <= 0) {
-            return $next($request);
-        }
-
         if (!Auth::check()) {
             $request->session()->forget([
                 'last_activity_at',
@@ -38,7 +26,9 @@ class EnsureSessionActivity
             return $next($request);
         }
 
-        if ($this->isExemptFromIdleTimeout($request)) {
+        $timeoutSeconds = $this->idleTimeoutSeconds($request);
+
+        if ($timeoutSeconds <= 0) {
             $request->session()->forget([
                 'last_activity_at',
                 'session_idle_locked',
@@ -139,19 +129,18 @@ class EnsureSessionActivity
         return $next($request);
     }
 
-    private function isExemptFromIdleTimeout(Request $request): bool
+    private function idleTimeoutSeconds(Request $request): int
     {
-        $activeRole = strtolower(trim((string) (
+        $user = $request->user();
+
+        if (!$user) {
+            return 0;
+        }
+
+        return $user->idleTimeoutSeconds((string) (
             $request->session()->get('impersonated_role')
                 ?: $request->session()->get('role')
-                ?: optional($request->user()?->role)->slug
-        )));
-
-        $exemptRoles = array_map(
-            static fn (mixed $role): string => strtolower(trim((string) $role)),
-            (array) config('session.idle_timeout_exempt_roles', [])
-        );
-
-        return in_array($activeRole, $exemptRoles, true);
+                ?: optional($user->role)->slug
+        ));
     }
 }

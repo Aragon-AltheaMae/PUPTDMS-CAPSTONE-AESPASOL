@@ -99,6 +99,22 @@ floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60)
 (int) data_get($procedure, 'procedure_duration_seconds', 0) % 60
 )
 : '00:00:00');
+
+$discardProcedureTitle = $existingAppointmentMode
+? 'Discard appointment entry?'
+: ($savedVisitEditMode ? 'Discard saved visit changes?' : 'Discard procedure?');
+
+$discardProcedureSubtitle = $existingAppointmentMode
+? 'The current existing appointment entry has not been saved.'
+: ($savedVisitEditMode
+? 'The current saved visit changes have not been saved.'
+: 'The current procedure has not been completed.');
+
+$discardProcedureMessage = $existingAppointmentMode
+? 'Going back will discard this existing appointment entry and return you to the Add Existing Appointment form.'
+: ($savedVisitEditMode
+? 'Going back will discard the current saved visit changes and return you to the patient profile.'
+: 'Going back will discard the current procedure progress and return you to the previous page.');
 @endphp
 
 <main id="mainContent" class="odontogram-page">
@@ -166,12 +182,10 @@ floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60)
                             <button type="button" id="cancelProcedureBtn"
                                 class="ui-btn {{ $savedVisitEditMode ? 'ui-btn-primary' : 'ui-btn-danger' }}">
 
-                                <i class="fa-solid fa-xmark"></i>
+                                <i class="fa-solid fa-arrow-left"></i>
 
                                 <span>
-                                    {{ $existingAppointmentMode
-                                    ? 'Cancel Entry'
-                                    : ($savedVisitEditMode ? 'Cancel Edit' : 'Cancel Procedure') }}
+                                    Cancel Odontogram
                                 </span>
                             </button>
 
@@ -257,6 +271,17 @@ floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60)
                             </div>
                         </div>
                     </div>
+
+                    <form id="procedureDiscardForm" class="hidden" data-discard-form
+                        data-discard-handler="discardProcedureBeforeLeave"
+                        data-discard-title="{{ $discardProcedureTitle }}"
+                        data-discard-subtitle="{{ $discardProcedureSubtitle }}"
+                        data-discard-message="{{ $discardProcedureMessage }}">
+                        <input type="hidden" name="context" value="{{ $discardProcedureContext ?? 'appointments' }}">
+                        <input type="hidden" name="appointment_id" value="{{ $appointment->id ?? '' }}">
+                        <input type="hidden" name="patient_id" value="{{ $patient->id ?? '' }}">
+                        <input type="hidden" id="procedureDiscardDirtyFlag" name="dirty_flag" value="0">
+                    </form>
 
                     <div class="card odontogram-toolbar" id="odontogramToolbar">
                         <div class="toolbar-group toolbar-group-tools">
@@ -867,7 +892,12 @@ floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60)
         const savedVisitEditMode = @json($savedVisitEditMode);
         const existingProcedureDuration = @json($existingProcedureDuration);
         const allowsProcedureCompletionWithoutOdontogramChanges = @json($allowsProcedureCompletionWithoutOdontogramChanges);
+        const procedureDiscardForm = document.getElementById('procedureDiscardForm');
+        const procedureDiscardDirtyFlag = document.getElementById('procedureDiscardDirtyFlag');
+        const discardProcedureUrl = @json($discardProcedureUrl ?? null);
+        const discardProcedureReturnUrl = @json($discardProcedureReturnUrl ?? ($cancelProcedureRedirectUrl ?? route('dentist.dentist.patient.profile', $patient -> id ?? 1)));
         const cancelProcedureRedirectUrl = @json($cancelProcedureRedirectUrl ?? route('dentist.dentist.patient.profile', $patient -> id ?? 1));
+        let procedureDiscardPending = false;
         let finishProcedureModalRedirectUrl = null;
 
         const legendResultCount = document.getElementById('legendResultCount');
@@ -1462,8 +1492,99 @@ floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60)
             }, 170);
         }
 
+        function markProcedureDiscardDirty() {
+            if (procedureDiscardDirtyFlag) {
+                procedureDiscardDirtyFlag.value = '1';
+            }
+        }
+
+        async function discardProcedureBeforeLeave(form) {
+            if (procedureDiscardPending) {
+                return false;
+            }
+
+            if (!discardProcedureUrl) {
+                window.DiscardChanges?.closeDiscardModal?.();
+                window.location.href = discardProcedureReturnUrl || cancelProcedureRedirectUrl;
+                return false;
+            }
+
+            procedureDiscardPending = true;
+
+            const discardModal = document.getElementById('globalDiscardModal');
+            const confirmButton = discardModal?.querySelector('[data-discard-confirm]');
+            const keepButtons = discardModal?.querySelectorAll('[data-discard-keep]') ?? [];
+            const originalConfirmHtml = confirmButton?.innerHTML;
+
+            if (confirmButton) {
+                confirmButton.disabled = true;
+                confirmButton.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Discarding...';
+            }
+
+            keepButtons.forEach(button => {
+                button.disabled = true;
+            });
+
+            try {
+                const payload = {
+                    context: form?.querySelector('[name="context"]')?.value || 'appointments',
+                    appointment_id: form?.querySelector('[name="appointment_id"]')?.value || null,
+                    patient_id: form?.querySelector('[name="patient_id"]')?.value || null,
+                };
+
+                const response = await fetch(discardProcedureUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': @json(csrf_token()),
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                const result = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    showProcedureToast(
+                        result.message || 'Unable to discard the current procedure.',
+                        'error'
+                    );
+                    return false;
+                }
+
+                window.DiscardChanges?.closeDiscardModal?.();
+                window.location.href = result.redirect_url || discardProcedureReturnUrl || cancelProcedureRedirectUrl;
+                return false;
+            } catch (error) {
+                console.error(error);
+                showProcedureToast('Something went wrong while discarding the current procedure.', 'error');
+                return false;
+            } finally {
+                procedureDiscardPending = false;
+
+                if (confirmButton) {
+                    confirmButton.disabled = false;
+                    confirmButton.innerHTML = originalConfirmHtml;
+                }
+
+                keepButtons.forEach(button => {
+                    button.disabled = false;
+                });
+            }
+        }
+
+        window.discardProcedureBeforeLeave = discardProcedureBeforeLeave;
+
         function openCancelProcedureModal() {
-            openUiModal(cancelProcedureModal);
+            markProcedureDiscardDirty();
+
+            if (window.DiscardChanges?.confirmClose && procedureDiscardForm) {
+                window.DiscardChanges.confirmClose(procedureDiscardForm, () => {});
+                return;
+            }
+
+            void discardProcedureBeforeLeave(procedureDiscardForm);
         }
 
         function closeCancelProcedureModal() {
@@ -3277,22 +3398,9 @@ floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60)
             cancelProcedureBtn.addEventListener('click', openCancelProcedureModal);
         }
 
-        if (dismissCancelProcedureBtn) {
-            dismissCancelProcedureBtn.addEventListener('click', closeCancelProcedureModal);
-        }
-
-        if (confirmCancelProcedureBtn) {
-            confirmCancelProcedureBtn.addEventListener('click', function () {
-                window.location.href = cancelProcedureRedirectUrl;
-            });
-        }
-
-        if (cancelProcedureModal) {
-            cancelProcedureModal.addEventListener('click', function (event) {
-                if (event.target === cancelProcedureModal) {
-                    closeCancelProcedureModal();
-                }
-            });
+        if (procedureDiscardForm) {
+            window.DiscardChanges?.captureForm?.(procedureDiscardForm);
+            markProcedureDiscardDirty();
         }
 
         function initLegendPanelResize() {

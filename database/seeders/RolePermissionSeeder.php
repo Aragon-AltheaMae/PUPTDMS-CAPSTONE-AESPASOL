@@ -87,7 +87,6 @@ class RolePermissionSeeder extends Seeder
         $dentistPermissions = [
             'access_dentist_dashboard',
             'view_patient_profiles',
-            'view_dental_records',
             'view_appointments',
             'reschedule_appointments',
             'cancel_appointments',
@@ -111,6 +110,10 @@ class RolePermissionSeeder extends Seeder
             'add_inventory',
             'update_inventory',
             'delete_inventory',
+            'view_service_type',
+            'create_service_type',
+            'delete_service_type',
+            'update_default_service_type',
             'view_reports',
             'create_report_files',
         ];

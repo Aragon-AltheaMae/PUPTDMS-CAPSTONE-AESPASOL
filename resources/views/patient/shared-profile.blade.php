@@ -1000,7 +1000,7 @@ $procedureAppointment->service_type
 <x-start-procedure-modal id="startModal" subtitle="Open the odontogram to begin this appointment."
     :patient="$patientName" :schedule="$startProcedureSchedule" :service="$startProcedureService" :start-url="route(
         'dentist.dentist.appointments.start',
-        ['id' => $procedureAppointment->id]
+        ['id' => $procedureAppointment->id, 'from' => 'patient-profile', 'start_procedure' => 1]
     )" />
 @endif
 @endsection

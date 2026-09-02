@@ -1254,6 +1254,10 @@ Route::prefix('dentist')->middleware(['auth'])->group(function () {
         ->middleware('permission:create_procedure_records')
         ->name('dentist.odontogram.save');
 
+    Route::post('/odontogram/discard', [OdontogramController::class, 'discard'])
+        ->middleware('permission:create_procedure_records')
+        ->name('dentist.odontogram.discard');
+
     Route::post('/odontogram/{appointment}/saved/update', [OdontogramController::class, 'updateSavedVisit'])
         ->middleware('permission:create_procedure_records')
         ->name('dentist.odontogram.saved.update');

@@ -91,6 +91,17 @@
                     (data_get($payload, 'subject') ?? class_basename($notification->type));
                 $message =
                     data_get($payload, 'message') ?? (data_get($payload, 'body') ?? data_get($payload, 'description'));
+                $event = (string) data_get($payload, 'event');
+                $expirationDate = data_get($payload, 'expiration_date');
+
+                if (str_starts_with($event, 'inventory.expiration.') && $expirationDate) {
+                    $date = \Illuminate\Support\Carbon::parse($expirationDate);
+                    $message = str_replace(
+                        $date->format('M d, Y'),
+                        $date->format('F d, Y'),
+                        (string) $message
+                    );
+                }
                 $actionUrl = $resolveNotificationUrl($payload, $role);
 
                 return [
@@ -106,7 +117,9 @@
                         ? route('notifications.mark-read', ['notificationId' => $notification->id])
                         : null,
                 ];
-            });
+            })
+            ->reject(fn ($notification) => data_get($notification, 'event') === 'inventory.low_stock')
+            ->values();
     }
 
     if ($databaseNotifications->isNotEmpty()) {

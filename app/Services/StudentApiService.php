@@ -443,12 +443,32 @@ class StudentApiService
             ?? data_get($student, 'full_name')
             ?? data_get($student, 'fullName');
 
-        if (! $name) {
-            $first = data_get($student, 'first_name') ?? data_get($student, 'firstName');
-            $middle = data_get($student, 'middle_name') ?? data_get($student, 'middleName');
-            $last = data_get($student, 'last_name') ?? data_get($student, 'lastName');
+        $first = data_get($student, 'first_name') ?? data_get($student, 'firstName');
+        $middle = data_get($student, 'middle_name') ?? data_get($student, 'middleName');
+        $last = data_get($student, 'last_name') ?? data_get($student, 'lastName');
+        $suffix = data_get($student, 'suffix_name')
+            ?? data_get($student, 'suffixName')
+            ?? data_get($student, 'name_suffix')
+            ?? data_get($student, 'nameSuffix')
+            ?? data_get($student, 'suffix')
+            ?? data_get($student, 'profile.suffix_name')
+            ?? data_get($student, 'profile.suffixName')
+            ?? data_get($student, 'profile.name_suffix')
+            ?? data_get($student, 'profile.nameSuffix');
 
-            $name = trim(collect([$first, $middle, $last])->filter()->implode(' '));
+        $suffix = trim((string) $suffix);
+
+        if (preg_match('/^(ii|iii|iv|v|vi|vii|viii|ix|x)\\.?$/i', $suffix)) {
+            $suffix = strtoupper($suffix);
+        }
+
+        if (! $name) {
+            $name = trim(collect([$first, $middle, $last, $suffix])->filter()->implode(' '));
+        } elseif ($suffix !== '' && !preg_match(
+            '/(?:^|\\s)' . preg_quote($suffix, '/') . '\\.?$/iu',
+            $name
+        )) {
+            $name = trim($name . ' ' . $suffix);
         }
 
         $email = data_get($student, 'email')
@@ -552,6 +572,14 @@ class StudentApiService
             'student_number' => $studentNumber,
 
             'name' => $name,
+
+            'first_name' => $first,
+
+            'middle_name' => $middle,
+
+            'last_name' => $last,
+
+            'suffix_name' => $suffix !== '' ? $suffix : null,
 
             'email' =>
             strtolower($email),

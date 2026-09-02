@@ -56,7 +56,9 @@
                                     </span>
                                 </span>
                                 <span class="greeting-line greeting-name-line">
-                                    <span class="greeting-name-prefix">Dr.</span>
+                                    @if (auth()->user()?->hasRole('dentist'))
+                                        <span class="greeting-name-prefix">Dr.</span>
+                                    @endif
                                     <span id="dentistName">
                                         {{ auth()->user()->name ?? 'Doctor' }}
                                     </span>
