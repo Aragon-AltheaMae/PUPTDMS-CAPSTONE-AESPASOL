@@ -81,8 +81,29 @@
     gap: .5rem;
 }
 
+.odontogram-target-scope {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: .5rem;
+    margin-top: .75rem;
+}
+
+.odontogram-target-scope .ui-btn {
+    min-height: 38px;
+    padding: .45rem .55rem;
+    border-radius: 9px;
+    font-size: .6rem;
+}
+
+.odontogram-target-scope .ui-btn.active {
+    color: #fff;
+    background: #8B0000;
+    border-color: #8B0000;
+    box-shadow: 0 4px 10px rgba(139, 0, 0, .18);
+}
+
 .odontogram-treatment-row {
-    margin-top: .5rem;
+    margin-top: .75rem;
 
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
@@ -382,6 +403,11 @@
     min-width: 1.25rem;
 }
 
+.odontogram-surface-orientation-row .odontogram-arch-spacer {
+    width: 1.65rem;
+    min-width: 1.65rem;
+}
+
 @media (max-width: 767px) {
     .odontogram-arch-spacer {
         width: .75rem;
@@ -606,6 +632,7 @@
 }
 
 .tooth-unit {
+    position: relative;
     width: 40px;
     min-width: 40px;
     display: flex;
@@ -613,6 +640,33 @@
     align-items: center;
     gap: 5px;
     flex-shrink: 0;
+}
+
+.tooth-endpoint-surface-label {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    pointer-events: none;
+    user-select: none;
+    color: #475569;
+    font-size: 5.5px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: .02em;
+    opacity: .58;
+    text-transform: uppercase;
+    white-space: nowrap;
+    writing-mode: vertical-rl;
+}
+
+.tooth-endpoint-surface-label-left {
+    left: -8px;
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.tooth-endpoint-surface-label-right {
+    right: -8px;
+    transform: translateY(-50%);
 }
 
 .status-box {
@@ -671,6 +725,13 @@
     flex-shrink: 0;
 }
 
+.tooth-2d-frame {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+}
+
 .tooth-svg {
     width: 100%;
     height: 100%;
@@ -699,6 +760,35 @@
     stroke-width: 2.5px;
 }
 
+.surface-orientation-side {
+    align-self: flex-end;
+    display: flex;
+    height: 38px;
+    padding: 2px 0;
+    flex-direction: column;
+    justify-content: space-between;
+    color: #64748b;
+    font-size: 3.5px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+}
+
+.status-label-left.surface-orientation-side {
+    align-items: flex-end;
+    padding-right: 16px;
+}
+
+.status-label-right.surface-orientation-side {
+    align-items: flex-start;
+    padding-left: 16px;
+}
+
+.odontogram-surface-orientation-row-bottom .surface-orientation-side {
+    align-self: flex-start;
+}
+
 .status-label-left {
     width: 52px;
     min-width: 52px;
@@ -716,11 +806,35 @@
     min-width: 52px;
     text-align: left;
     font-weight: 800;
-    font-size: 11px;
+    font-size: 10px;
     line-height: 1.2;
     color: #8B0000;
     padding-left: 12px;
     text-transform: uppercase;
+}
+
+.status-label-left.surface-orientation-side,
+.status-label-right.surface-orientation-side {
+    font-family: inherit;
+    font-size: 8px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.surface-orientation-side .surface-side-label {
+    display: block;
+    font: inherit;
+    letter-spacing: inherit;
+    opacity: .75;
+}
+
+.surface-side-label-buccal {
+    color: #991b1b;
+}
+
+.surface-side-label-palatal,
+.surface-side-label-lingual {
+    color: #1e40af;
 }
 
 @media (max-width: 1280px) {
@@ -2039,7 +2153,8 @@ body.layout-no-sidebar #mainContent.odontogram-page {
 .odontogram-selected-display {
     width: 100%;
 
-    padding: .4rem .5rem;
+    margin-top: .65rem;
+    padding: .5rem .6rem;
 
     border: 1px solid var(--crimson-mid);
     border-radius: 9px;
@@ -2675,11 +2790,12 @@ body.odontogram-resizing * {
 
 .odontogram-legend-target {
     margin-top: .5rem;
-    padding: .5rem;
+    padding: .75rem;
 }
 
 .odontogram-selected-name {
-    margin-top: .3rem;
+    margin-top: .45rem;
+    margin-bottom: .15rem;
 
     color: var(--text-1);
 
@@ -2698,8 +2814,8 @@ body.odontogram-resizing * {
 }
 
 .odontogram-legend-status-note {
-    margin-top: .35rem;
-    padding: .38rem .48rem;
+    margin-top: .55rem;
+    padding: .48rem .58rem;
 
     border-radius: 8px;
 
@@ -2712,13 +2828,13 @@ body.odontogram-resizing * {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
 
-    gap: .35rem;
-    margin-top: .4rem;
+    gap: .5rem;
+    margin-top: .55rem;
 }
 
 .odontogram-target-actions .ui-btn {
-    min-height: 32px;
-    height: 32px;
+    min-height: 36px;
+    height: 36px;
 
     padding: .3rem .4rem;
 

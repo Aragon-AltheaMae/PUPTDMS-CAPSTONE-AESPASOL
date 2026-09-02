@@ -567,7 +567,7 @@ $discardProcedureMessage = $existingAppointmentMode
                     <div>
                         <h3 class="legend-drawer-title">Treatment Legend</h3>
                         <p class="legend-drawer-subtitle">
-                            Select a treatment for the chosen surface.
+                            Choose a whole tooth or a specific surface, then select a treatment.
                         </p>
                     </div>
                 </div>
@@ -581,6 +581,19 @@ $discardProcedureMessage = $existingAppointmentMode
                         <span id="selectedViewBadge" class="badge-pill status-all">
                             2D
                         </span>
+                    </div>
+
+                    <div class="odontogram-target-scope" role="group" aria-label="Treatment target scope">
+                        <button type="button" id="wholeToothScopeBtn" class="ui-btn ui-btn-secondary"
+                            aria-pressed="false">
+                            <i class="fa-solid fa-tooth"></i>
+                            Whole Tooth
+                        </button>
+                        <button type="button" id="toothSurfaceScopeBtn" class="ui-btn ui-btn-secondary active"
+                            aria-pressed="true">
+                            <i class="fa-solid fa-border-all"></i>
+                            Tooth Surface
+                        </button>
                     </div>
 
                     <div id="selectedToothDisplay" class="odontogram-selected-display">
@@ -929,6 +942,8 @@ $discardProcedureMessage = $existingAppointmentMode
         const selectedToothLegendList = document.getElementById('selectedToothLegendList');
         const legendStatusNote = document.getElementById('legendStatusNote');
         const applyTreatmentBtn = document.getElementById('applyTreatmentBtn');
+        const wholeToothScopeBtn = document.getElementById('wholeToothScopeBtn');
+        const toothSurfaceScopeBtn = document.getElementById('toothSurfaceScopeBtn');
         const clearCurrentToothBtn = document.getElementById('clearCurrentToothBtn');
 
         const clearSelectionBtn = document.getElementById('clearSelectionBtn');
@@ -955,6 +970,7 @@ $discardProcedureMessage = $existingAppointmentMode
         let selectedTargetType = null;
         let selectedSurfaceKey = null;
         let selectedMesh = null;
+        let selectedScope = 'surface';
         let pendingResetPayload = null;
         let hasAppliedTreatmentThisSession = false;
 
@@ -1216,9 +1232,13 @@ $discardProcedureMessage = $existingAppointmentMode
                             selectedMesh =
                                 mesh;
 
-                            restoreSavedSurfaceSelectionForTooth(
-                                toothNumber
-                            );
+                            if (selectedScope === 'whole') {
+                                selectedTargetType = 'whole';
+                                selectedSurfaceKey = null;
+                                selectedLegend = ensureToothState(toothNumber).status?.code || null;
+                            } else {
+                                restoreSavedSurfaceSelectionForTooth(toothNumber);
+                            }
 
                             window
                                 .Odontogram3D
@@ -1690,13 +1710,42 @@ $discardProcedureMessage = $existingAppointmentMode
             }, 180);
         }
 
-        function getSurfaceLabel(surface) {
+        function getSurfaceLabel(surface, toothNumber = selectedTooth) {
+            const numericTooth = Number(toothNumber);
+            const quadrant = Math.floor(numericTooth / 10);
+            const toothPosition = numericTooth % 10;
+            const isUpperTooth = [1, 2, 5, 6].includes(quadrant);
+            const isLowerTooth = [3, 4, 7, 8].includes(quadrant);
+            const centerSurfaceLabel = toothPosition >= 1 && toothPosition <= 3
+                ? 'Incisal Surface'
+                : (toothPosition >= 4 && toothPosition <= 8
+                    ? 'Occlusal Surface'
+                    : 'Center Surface');
+            const isPatientRightSide =
+                (numericTooth >= 11 && numericTooth <= 18) ||
+                (numericTooth >= 41 && numericTooth <= 48) ||
+                (numericTooth >= 51 && numericTooth <= 55) ||
+                (numericTooth >= 81 && numericTooth <= 85);
+            const isPatientLeftSide =
+                (numericTooth >= 21 && numericTooth <= 28) ||
+                (numericTooth >= 31 && numericTooth <= 38) ||
+                (numericTooth >= 61 && numericTooth <= 65) ||
+                (numericTooth >= 71 && numericTooth <= 75);
+
             const map = {
-                top: 'Top Surface',
-                bottom: 'Bottom Surface',
-                left: 'Left Surface',
-                right: 'Right Surface',
-                center: 'Center Surface',
+                top: isUpperTooth
+                    ? 'Buccal Surface'
+                    : (isLowerTooth ? 'Lingual Surface' : 'Top Surface'),
+                bottom: isUpperTooth
+                    ? 'Palatal Surface'
+                    : (isLowerTooth ? 'Buccal Surface' : 'Bottom Surface'),
+                left: isPatientRightSide
+                    ? 'Distal Surface'
+                    : (isPatientLeftSide ? 'Mesial Surface' : 'Left Surface'),
+                right: isPatientRightSide
+                    ? 'Mesial Surface'
+                    : (isPatientLeftSide ? 'Distal Surface' : 'Right Surface'),
+                center: centerSurfaceLabel,
                 status: 'Status Box',
                 whole: 'Whole Tooth'
             };
@@ -1706,7 +1755,7 @@ $discardProcedureMessage = $existingAppointmentMode
         function update3DSurfacePicker() {
             if (!surfacePicker3D) return;
 
-            const showPicker = currentView === '3d' && !!selectedTooth;
+            const showPicker = currentView === '3d' && !!selectedTooth && selectedScope === 'surface';
             surfacePicker3D.classList.toggle('hidden', !showPicker);
 
             if (!showPicker) {
@@ -1716,7 +1765,7 @@ $discardProcedureMessage = $existingAppointmentMode
             if (selectedTooth) {
                 surfacePickerToothLabel.textContent = `Tooth #${selectedTooth} - ${getToothName(selectedTooth)}`;
                 surfacePickerHelperText.textContent = selectedTargetType === 'surface'
-                    ? `${getSurfaceLabel(selectedSurfaceKey)} selected.`
+                    ? `${getSurfaceLabel(selectedSurfaceKey, selectedTooth)} selected.`
                     : 'Camera focused on the selected tooth. Now choose one large surface button below.';
             } else {
                 surfacePickerToothLabel.textContent = 'No tooth selected';
@@ -1732,6 +1781,8 @@ $discardProcedureMessage = $existingAppointmentMode
                     selectedSurfaceKey === surfaceKey;
 
                 btn.disabled = disabled;
+                btn.textContent = getSurfaceLabel(surfaceKey, selectedTooth).replace(' Surface', '');
+                btn.setAttribute('aria-label', getSurfaceLabel(surfaceKey, selectedTooth));
                 btn.classList.toggle('active', isActive);
             });
         }
@@ -1813,6 +1864,7 @@ $discardProcedureMessage = $existingAppointmentMode
             const state = ensureToothState(selectedTooth);
 
             if (selectedTargetType === 'status') return state.status;
+            if (selectedTargetType === 'whole') return state.status;
             if (selectedTargetType === 'surface' && selectedSurfaceKey) return state.surfaces[
                 selectedSurfaceKey];
             if (selectedTargetType === '3d') return state.threeD;
@@ -1864,7 +1916,7 @@ $discardProcedureMessage = $existingAppointmentMode
 
                 selectedToothDisplay.textContent =
                     currentView === '2d'
-                        ? 'Select a tooth surface.'
+                        ? (selectedScope === 'whole' ? 'Select a tooth.' : 'Select a tooth surface.')
                         : 'Select a tooth.';
 
                 selectedToothName.textContent = '';
@@ -1898,7 +1950,7 @@ $discardProcedureMessage = $existingAppointmentMode
             }
 
             const surfaceText = selectedTargetType === 'surface' ?
-                getSurfaceLabel(selectedSurfaceKey) :
+                getSurfaceLabel(selectedSurfaceKey, selectedTooth) :
                 selectedTargetType === 'status' ?
                     getSurfaceLabel('status') :
                     getSurfaceLabel('whole');
@@ -2057,7 +2109,8 @@ $discardProcedureMessage = $existingAppointmentMode
         }
 
         function getFirstTreatedSurfaceKey(state) {
-            if (!state || !state.surfaces) return null;
+            if (!state) return null;
+            if (!state.surfaces) return null;
 
             const surfacePriority = ['top', 'left', 'center', 'right', 'bottom'];
 
@@ -2087,7 +2140,11 @@ $discardProcedureMessage = $existingAppointmentMode
         }
 
         function getStatusBoxDisplayRecord(state) {
-            if (!state || !state.surfaces) return null;
+            if (!state) return null;
+
+            if (state.status?.code) return state.status;
+
+            if (!state.surfaces) return null;
 
             const preferredSurfaceKey = getPreferredSurfaceKey(state);
 
@@ -2177,16 +2234,16 @@ $discardProcedureMessage = $existingAppointmentMode
                 return;
             }
 
-            state.threeD = getPreferredToothVisual(state);
+            state.threeD = state.status || null;
         }
 
         function fillAll2DSurfacesFromLegend(state, payload) {
             state.status = payload;
-            state.surfaces.top = payload;
-            state.surfaces.left = payload;
-            state.surfaces.center = payload;
-            state.surfaces.right = payload;
-            state.surfaces.bottom = payload;
+            state.surfaces.top = null;
+            state.surfaces.left = null;
+            state.surfaces.center = null;
+            state.surfaces.right = null;
+            state.surfaces.bottom = null;
         }
 
         function clearAll2DSurfaces(state) {
@@ -2282,15 +2339,6 @@ $discardProcedureMessage = $existingAppointmentMode
         function applyLegendToSelectedTarget(code) {
             if (!selectedTooth || !selectedTargetType) return;
 
-            if (selectedTargetType === 'status') {
-                showProcedureToast(
-                    'Apply treatments to an actual tooth surface instead of the divided status indicator.',
-                    'warning',
-                    'Select a Tooth Surface'
-                );
-                return;
-            }
-
             pushHistory();
 
             const state = ensureToothState(selectedTooth);
@@ -2301,19 +2349,29 @@ $discardProcedureMessage = $existingAppointmentMode
                 selectedTargetType === 'surface' &&
                 selectedSurfaceKey
             ) {
+                const replacedWholeTooth = !!state.status;
+                state.status = null;
+                state.threeD = null;
                 state.surfaces[selectedSurfaceKey] =
                     payload;
 
                 sync3DFrom2D(selectedTooth);
+                if (replacedWholeTooth) {
+                    showProcedureToast('The whole tooth treatment was replaced by this surface treatment.', 'info', 'Target Updated');
+                }
             } else if (
-                selectedTargetType === '3d'
+                ['whole', '3d', 'status'].includes(selectedTargetType)
             ) {
+                const replacedSurfaces = Object.values(state.surfaces || {}).some(Boolean);
                 state.threeD = payload;
 
                 fillAll2DSurfacesFromLegend(
                     state,
                     payload
                 );
+                if (replacedSurfaces) {
+                    showProcedureToast('Existing surface treatments were replaced by the whole tooth treatment.', 'info', 'Target Updated');
+                }
             }
 
             updateHiddenInput();
@@ -2347,15 +2405,11 @@ $discardProcedureMessage = $existingAppointmentMode
             } = pendingResetPayload;
             const state = ensureToothState(tooth);
 
-            if (targetType === 'status') {
-                pendingResetPayload = null;
-                closeResetModal();
-                return;
-            } else if (targetType === 'surface' && surfaceKey) {
+            if (targetType === 'surface' && surfaceKey) {
                 state.surfaces[surfaceKey] = null;
                 state.lastSelectedSurface = getFirstTreatedSurfaceKey(state);
                 sync3DFrom2D(tooth);
-            } else if (targetType === '3d') {
+            } else if (['whole', '3d', 'status'].includes(targetType)) {
                 state.threeD = null;
                 state.lastSelectedSurface = null;
                 clearAll2DSurfaces(state);
@@ -2390,7 +2444,7 @@ $discardProcedureMessage = $existingAppointmentMode
             };
 
             const partText = selectedTargetType === 'surface' ?
-                getSurfaceLabel(selectedSurfaceKey) :
+                getSurfaceLabel(selectedSurfaceKey, selectedTooth) :
                 selectedTargetType === 'status' ?
                     'Status Box' :
                     'Whole Tooth';
@@ -2408,6 +2462,16 @@ $discardProcedureMessage = $existingAppointmentMode
 
         function createToothUnit(toothNumber, statusPlacement = 'top') {
             const state = ensureToothState(toothNumber);
+            const endpointSurfaceIndicators = {
+                18: { side: 'left', label: 'Distal' },
+                11: { side: 'right', label: 'Mesial' },
+                21: { side: 'left', label: 'Mesial' },
+                28: { side: 'right', label: 'Distal' },
+                48: { side: 'left', label: 'Distal' },
+                41: { side: 'right', label: 'Mesial' },
+                31: { side: 'left', label: 'Mesial' },
+                38: { side: 'right', label: 'Distal' }
+            };
 
             const wrap = document.createElement('div');
             wrap.className = 'tooth-unit';
@@ -2415,13 +2479,28 @@ $discardProcedureMessage = $existingAppointmentMode
             const statusBox = document.createElement('div');
             statusBox.className = 'status-box';
             statusBox.dataset.tooth = toothNumber;
-            statusBox.setAttribute('aria-label', `Surface legend indicator for tooth #${toothNumber}`);
-            statusBox.title = 'Display only: this box updates after applying a legend to a tooth surface.';
-            statusBox.style.cursor = 'default';
+            statusBox.setAttribute('aria-label', `Select whole tooth #${toothNumber}`);
+            statusBox.title = 'Select this whole tooth.';
+            statusBox.style.cursor = 'pointer';
 
             const statusDisplayRecord = getStatusBoxDisplayRecord(state);
 
             applyDividedStatusBoxVisual(statusBox, statusDisplayRecord);
+
+            if (selectedTooth === toothNumber && selectedTargetType === 'whole') {
+                statusBox.classList.add('selected-target');
+            }
+
+            statusBox.addEventListener('click', function () {
+                selectedScope = 'whole';
+                selectedTooth = toothNumber;
+                selectedTargetType = 'whole';
+                selectedSurfaceKey = null;
+                selectedLegend = state.status?.code || null;
+                updateScopeButtons();
+                updateSelectedToothUI();
+                render2DOdontogram();
+            });
 
             const toothNumberEl = document.createElement('div');
             toothNumberEl.className = 'tooth-number';
@@ -2429,6 +2508,10 @@ $discardProcedureMessage = $existingAppointmentMode
 
             const toothFace = document.createElement('div');
             toothFace.className = 'tooth-2d-wrapper';
+
+            const toothFaceFrame = document.createElement('div');
+            toothFaceFrame.className = 'tooth-2d-frame';
+            toothFaceFrame.appendChild(toothFace);
 
             toothFace.innerHTML = `
                     <svg viewBox="0 0 100 100" class="tooth-svg" preserveAspectRatio="xMidYMid meet">
@@ -2443,7 +2526,7 @@ $discardProcedureMessage = $existingAppointmentMode
             const surfaces = toothFace.querySelectorAll('.surface-part');
             surfaces.forEach(part => {
                 const surface = part.dataset.surface;
-                const surfaceRecord = state.surfaces[surface];
+                const surfaceRecord = state.surfaces[surface] || state.status;
 
                 if (surfaceRecord) {
                     part.style.fill = surfaceRecord.colorHex;
@@ -2456,9 +2539,12 @@ $discardProcedureMessage = $existingAppointmentMode
 
                 part.addEventListener('click', function () {
                     currentView = '2d';
+                    selectedScope = 'surface';
                     selectedTooth = toothNumber;
                     selectedTargetType = 'surface';
                     selectedSurfaceKey = surface;
+                    selectedLegend = state.surfaces[surface]?.code || null;
+                    updateScopeButtons();
                     updateSelectedToothUI();
                     render2DOdontogram();
                 });
@@ -2473,12 +2559,25 @@ $discardProcedureMessage = $existingAppointmentMode
                 });
             });
 
+            const endpointIndicator = endpointSurfaceIndicators[toothNumber];
+            if (endpointIndicator) {
+                const indicator = document.createElement('span');
+                indicator.className = [
+                    'tooth-endpoint-surface-label',
+                    `tooth-endpoint-surface-label-${endpointIndicator.side}`,
+                    `tooth-endpoint-surface-label-${statusPlacement}`
+                ].join(' ');
+                indicator.textContent = endpointIndicator.label;
+                indicator.setAttribute('aria-hidden', 'true');
+                toothFaceFrame.appendChild(indicator);
+            }
+
             if (statusPlacement === 'top') {
                 wrap.appendChild(statusBox);
                 wrap.appendChild(toothNumberEl);
-                wrap.appendChild(toothFace);
+                wrap.appendChild(toothFaceFrame);
             } else {
-                wrap.appendChild(toothFace);
+                wrap.appendChild(toothFaceFrame);
                 wrap.appendChild(toothNumberEl);
                 wrap.appendChild(statusBox);
             }
@@ -2486,15 +2585,29 @@ $discardProcedureMessage = $existingAppointmentMode
             return wrap;
         }
 
-        function createRow(leftTeeth, rightTeeth, statusPlacement = 'top', leftLabel = '', rightLabel = '') {
+        function createRow(leftTeeth, rightTeeth, statusPlacement = 'top', leftLabel = '', rightLabel = '', surfaceOrientation = null) {
             const row = document.createElement('div');
             row.className = 'odontogram-row';
 
+            if (surfaceOrientation) {
+                row.classList.add('odontogram-surface-orientation-row');
+                row.classList.add(`odontogram-surface-orientation-row-${statusPlacement}`);
+            }
+
+            const orientationLabels = surfaceOrientation
+                ? `<span class="surface-side-label surface-side-label-${surfaceOrientation.top.toLowerCase()}">${surfaceOrientation.top}</span>` +
+                    `<span class="surface-side-label surface-side-label-${surfaceOrientation.bottom.toLowerCase()}">${surfaceOrientation.bottom}</span>`
+                : '';
+
             const left = document.createElement('div');
             left.className = 'status-label-left';
-            left.innerHTML = leftLabel ? leftLabel : '&nbsp;';
+            left.innerHTML = surfaceOrientation
+                ? orientationLabels
+                : (leftLabel ? leftLabel : '&nbsp;');
 
-            if (statusPlacement === 'top') {
+            if (surfaceOrientation) {
+                left.classList.add('surface-orientation-side');
+            } else if (statusPlacement === 'top') {
                 left.style.paddingTop = '10px';
             } else {
                 left.style.alignSelf = 'flex-end';
@@ -2512,9 +2625,13 @@ $discardProcedureMessage = $existingAppointmentMode
 
             const right = document.createElement('div');
             right.className = 'status-label-right';
-            right.innerHTML = rightLabel ? rightLabel : '&nbsp;';
+            right.innerHTML = surfaceOrientation
+                ? orientationLabels
+                : (rightLabel ? rightLabel : '&nbsp;');
 
-            if (statusPlacement === 'top') {
+            if (surfaceOrientation) {
+                right.classList.add('surface-orientation-side');
+            } else if (statusPlacement === 'top') {
                 right.style.paddingTop = '10px';
             } else {
                 right.style.alignSelf = 'flex-end';
@@ -2532,11 +2649,17 @@ $discardProcedureMessage = $existingAppointmentMode
             row1.classList.add('arch-divider');
             board2d.appendChild(row1);
 
-            const row2 = createRow(adultUpperRight, adultUpperLeft, 'top', '', '');
+            const row2 = createRow(adultUpperRight, adultUpperLeft, 'top', '', '', {
+                top: 'Buccal',
+                bottom: 'Palatal'
+            });
             row2.style.marginBottom = '24px';
             board2d.appendChild(row2);
 
-            const row3 = createRow(adultLowerRight, adultLowerLeft, 'bottom', '', '');
+            const row3 = createRow(adultLowerRight, adultLowerLeft, 'bottom', '', '', {
+                top: 'Lingual',
+                bottom: 'Buccal'
+            });
             row3.classList.add('arch-divider');
             board2d.appendChild(row3);
 
@@ -2601,6 +2724,33 @@ $discardProcedureMessage = $existingAppointmentMode
 
         view2dBtn.addEventListener('click', () => switchView('2d'));
         view3dBtn.addEventListener('click', () => switchView('3d'));
+
+        function updateScopeButtons() {
+            const isWhole = selectedScope === 'whole';
+            wholeToothScopeBtn?.classList.toggle('active', isWhole);
+            toothSurfaceScopeBtn?.classList.toggle('active', !isWhole);
+            wholeToothScopeBtn?.setAttribute('aria-pressed', String(isWhole));
+            toothSurfaceScopeBtn?.setAttribute('aria-pressed', String(!isWhole));
+            update3DSurfacePicker();
+        }
+
+        function selectTargetScope(scope) {
+            selectedScope = scope;
+            selectedSurfaceKey = null;
+
+            if (selectedTooth) {
+                const state = ensureToothState(selectedTooth);
+                selectedTargetType = scope === 'whole' ? 'whole' : null;
+                selectedLegend = scope === 'whole' ? state.status?.code || null : null;
+            }
+
+            updateScopeButtons();
+            updateSelectedToothUI();
+            render2DOdontogram();
+        }
+
+        wholeToothScopeBtn?.addEventListener('click', () => selectTargetScope('whole'));
+        toothSurfaceScopeBtn?.addEventListener('click', () => selectTargetScope('surface'));
 
         function showTooltip(event, mesh) {
             const toothNumber = mesh.userData.tooth;

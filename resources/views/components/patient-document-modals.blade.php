@@ -157,20 +157,6 @@
                                     <small>Includes available dental history, diagnosis, and treatment details.</small>
                                 </span>
                             </button>
-                            <button type="button" class="doc-dd-option" data-value="Medical Records">
-                                <span class="doc-dd-option-icon"><i class="fa-solid fa-notes-medical"></i></span>
-                                <span>
-                                    <strong>Medical Records</strong>
-                                    <small>Includes related health information recorded by the clinic.</small>
-                                </span>
-                            </button>
-                            <button type="button" class="doc-dd-option" data-value="Diagnosis and Treatment">
-                                <span class="doc-dd-option-icon"><i class="fa-solid fa-stethoscope"></i></span>
-                                <span>
-                                    <strong>Diagnosis and Treatment</strong>
-                                    <small>Focused copy of diagnosis notes and treatment information.</small>
-                                </span>
-                            </button>
                         </div>
                     </div>
                 </div>
