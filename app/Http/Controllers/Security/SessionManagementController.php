@@ -163,18 +163,17 @@ class SessionManagementController extends Controller
 
     private function isExemptFromIdleTimeout(Request $request): bool
     {
-        $activeRole = strtolower(trim((string) (
+        $user = $request->user();
+
+        if (!$user) {
+            return false;
+        }
+
+        return $user->isExemptFromIdleTimeout((string) (
             $request->session()->get('impersonated_role')
                 ?: $request->session()->get('role')
-                ?: optional($request->user()?->role)->slug
-        )));
-
-        $exemptRoles = array_map(
-            static fn (mixed $role): string => strtolower(trim((string) $role)),
-            (array) config('session.idle_timeout_exempt_roles', [])
-        );
-
-        return in_array($activeRole, $exemptRoles, true);
+                ?: optional($user->role)->slug
+        ));
     }
 
     private function logoutCurrentSession(

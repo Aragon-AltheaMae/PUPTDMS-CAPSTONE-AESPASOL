@@ -2,21 +2,14 @@
 
 @php
     $flashToasts = [];
-    $idleTimeoutSeconds = max(60, (int) config('session.idle_timeout_seconds', 600));
-
-    $idleTimeoutMinutes = max(1, (int) ceil($idleTimeoutSeconds / 60));
-
-    $activeSessionRole = strtolower(trim((string) (
+    $activeSessionRole = (string) (
         session('impersonated_role')
             ?: ($layoutRole ?? session('role') ?? optional(auth()->user()?->role)->slug)
-    )));
-
-    $idleTimeoutExemptRoles = array_map(
-        static fn ($role) => strtolower(trim((string) $role)),
-        (array) config('session.idle_timeout_exempt_roles', [])
     );
-
-    $showSessionTimeout = !in_array($activeSessionRole, $idleTimeoutExemptRoles, true);
+    $idleTimeoutSeconds = auth()->user()?->idleTimeoutSeconds($activeSessionRole)
+        ?? max(0, (int) config('session.idle_timeout_seconds', 600));
+    $idleTimeoutMinutes = max(1, (int) ceil($idleTimeoutSeconds / 60));
+    $showSessionTimeout = $idleTimeoutSeconds > 0;
 
     if (session('success')) {
         $flashToasts[] = [

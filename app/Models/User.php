@@ -339,6 +339,47 @@ class User extends Authenticatable implements JWTSubject
         return false;
     }
 
+    public function isExemptFromIdleTimeout(?string $activeRoleSlug = null): bool
+    {
+        $normalizedRole = $this->activeRoleSlug($activeRoleSlug);
+
+        $exemptRoles = array_map(
+            static fn (mixed $role): string => strtolower(trim((string) $role)),
+            (array) config('session.idle_timeout_exempt_roles', [])
+        );
+
+        return in_array($normalizedRole, $exemptRoles, true);
+    }
+
+    public function idleTimeoutSeconds(?string $activeRoleSlug = null): int
+    {
+        if ($this->isExemptFromIdleTimeout($activeRoleSlug)) {
+            return 0;
+        }
+
+        $roleSlug = $this->activeRoleSlug($activeRoleSlug);
+        $coreRoles = array_map(
+            static fn (mixed $role): string => strtolower(trim((string) $role)),
+            (array) config('session.core_role_slugs', [])
+        );
+
+        if (!in_array($roleSlug, $coreRoles, true)) {
+            return max(0, (int) config('session.custom_role_idle_timeout_seconds', 3600));
+        }
+
+        return max(0, (int) config('session.idle_timeout_seconds', 600));
+    }
+
+    private function activeRoleSlug(?string $activeRoleSlug = null): string
+    {
+        return strtolower(trim((string) (
+            $activeRoleSlug
+            ?: session('impersonated_role')
+            ?: session('role')
+            ?: optional($this->role)->slug
+        )));
+    }
+
     public function canAccessAdminArea(?string $activeRoleSlug = null): bool
     {
         $normalizedRole = strtolower(trim((string) $activeRoleSlug));

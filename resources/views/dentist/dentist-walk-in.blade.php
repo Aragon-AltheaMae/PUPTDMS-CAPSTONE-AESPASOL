@@ -2361,9 +2361,15 @@
         card.dataset.patientId =
             patient.id;
 
-        const patientName =
+        const rawPatientName =
             patient.name ||
             'Unnamed Patient';
+
+        const patientName =
+            window.formatPatientName?.(
+                rawPatientName
+            ) ||
+            rawPatientName;
 
         const patientType =
             patient.type ||

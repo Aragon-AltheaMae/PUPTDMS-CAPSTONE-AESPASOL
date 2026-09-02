@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('layout-role', 'admin')
+@section('layout-role', request()->routeIs('dentist.*') ? 'dentist' : 'admin')
 
 @section('title', 'Service Types')
 

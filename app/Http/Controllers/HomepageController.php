@@ -119,16 +119,16 @@ class HomepageController extends Controller
         }
 
         try {
+            $studentNumber = $patient->student_no;
             $studentProfile = [];
-
-            if (! empty($patient->email)) {
+            if (empty($studentNumber) && ! empty($patient->email)) {
                 $studentProfileResponse = $this->studentApiService->getStudentByEmail($patient->email);
                 $studentProfile = is_array($studentProfileResponse['data'] ?? null)
                     ? $studentProfileResponse['data']
                     : [];
             }
 
-            $studentNumber = $patient->student_no
+            $studentNumber = $studentNumber
                 ?: data_get($studentProfile, 'studentNumber')
                 ?: data_get($studentProfile, 'student_number');
 

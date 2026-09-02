@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Inventory;
+use App\Services\InventoryExpirationNotifier;
 use Illuminate\Http\Request;
 use App\Helpers\AuditLogger;
 
@@ -45,6 +46,7 @@ class AdminInventoryController extends Controller
         $data = $request->validate([
             'category' => 'required|in:Medicine,Supplies',
             'date_received' => 'required|date',
+            'expiration_date' => 'nullable|date',
             'stock_no' => 'required|unique:inventory_items,stock_no',
             'name' => 'required|string|max:255',
             'unit' => 'required|string|max:50',
@@ -54,7 +56,8 @@ class AdminInventoryController extends Controller
 
         $data['unit'] = ucwords(strtolower(trim($data['unit'])));
 
-        Inventory::create($data);
+        $inventory = Inventory::create($data);
+        app(InventoryExpirationNotifier::class)->notify($inventory);
 
         AuditLogger::log(
             'create_inventory',
@@ -70,6 +73,7 @@ class AdminInventoryController extends Controller
         $data = $request->validate([
             'category' => 'required|in:Medicine,Supplies',
             'date_received' => 'required|date',
+            'expiration_date' => 'nullable|date',
             'stock_no' => 'required|unique:inventory_items,stock_no,' . $inventory->id,
             'name' => 'required|string|max:255',
             'unit' => 'required|string|max:50',
@@ -80,6 +84,7 @@ class AdminInventoryController extends Controller
         $data['unit'] = ucwords(strtolower(trim($data['unit'])));
 
         $inventory->update($data);
+        app(InventoryExpirationNotifier::class)->notify($inventory->fresh());
 
         AuditLogger::log(
             'update_inventory',
