@@ -504,10 +504,18 @@ $patientProfileBackUrl = $isAdminView
                         return;
                     }
 
-                    data.append(
-                        field.name,
-                        field.value
-                    );
+                    const submissionValue =
+                        field.name ===
+                            'emergency_number'
+                            ? String(
+                                field.value || ''
+                            ).replace(
+                                /\D/g,
+                                ''
+                            )
+                            : field.value;
+
+                    data.append(field.name, submissionValue);
                 }
             );
 
@@ -1952,27 +1960,6 @@ ${summaryCard(
                     return true;
                 },
             });
-
-        document.getElementById('calendarSkeletonContainer')?.addEventListener('click', function (event) {
-            const dateButton = event.target.closest('[data-date]');
-            if (!dateButton) return;
-
-            const iso = dateButton.dataset.date;
-            if (!iso) return;
-
-            setTimeout(() => {
-                const dateInput = document.getElementById('appointment_date');
-                const slotContainer = document.getElementById('slotContainer');
-
-                if (dateInput && dateInput.value !== iso) {
-                    dateInput.value = iso;
-                }
-
-                if (!hasVisibleSlots && typeof window.selectDate === 'function') {
-                    window.selectDate(iso);
-                }
-            }, 60);
-        });
 
         syncTimeFieldFromState();
         showExistingPatientInformationToast();

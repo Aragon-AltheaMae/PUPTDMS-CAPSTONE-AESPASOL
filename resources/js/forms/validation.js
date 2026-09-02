@@ -1149,16 +1149,19 @@ function focusGlobalInvalidField(
     );
 }
 
-window.focusGlobalInvalidField =
-    focusGlobalInvalidField;
+window.focusGlobalInvalidField = focusGlobalInvalidField;
 
-function formatGlobalPhilippineMobile(
-    value = ''
-) {
+function getGlobalPhilippineMobileDigits(value = '') {
+    return String(value || '')
+        .replace(/\D/g, '')
+        .slice(0, 11);
+}
+
+function formatGlobalPhilippineMobile(value = '') {
     const digits =
-        String(value)
-            .replace(/\D/g, '')
-            .slice(0, 11);
+        getGlobalPhilippineMobileDigits(
+            value
+        );
 
     const parts = [];
 
@@ -1265,6 +1268,30 @@ function bindFormInputValidation(root = document) {
             form.dataset.formInputValidationInitialized = 'true';
 
             form.setAttribute('novalidate', '');
+
+            form.addEventListener('formdata', event => {
+                form
+                    .querySelectorAll(
+                        'input[name]'
+                    )
+                    .forEach(field => {
+                        if (
+                            !isGlobalPhoneField(
+                                field
+                            )
+                        ) {
+                            return;
+                        }
+
+                        event.formData.set(
+                            field.name,
+                            getGlobalPhilippineMobileDigits(
+                                field.value
+                            )
+                        );
+                    });
+            }
+            );
 
             form.querySelectorAll('input').forEach(field => {
                 normalizeGlobalPhilippineMobile(
@@ -2048,6 +2075,7 @@ window.showGlobalGroupError = showGlobalGroupError;
 window.clearGlobalGroupError = clearGlobalGroupError;
 window.focusGlobalInvalidField = focusGlobalInvalidField;
 window.normalizeGlobalPhilippineMobile = normalizeGlobalPhilippineMobile;
+window.getGlobalPhilippineMobileDigits = getGlobalPhilippineMobileDigits;
 window.bindGlobalLinkedGroupErrors = bindGlobalLinkedGroupErrors;
 window.initGlobalNumberSteppers = initGlobalNumberSteppers;
 window.validateGlobalSection = validateGlobalSection;

@@ -390,10 +390,9 @@
             </label>
 
             <input type="text" id="emergency_person" name="emergency_person" maxlength="50"
-                pattern="[A-Za-zÑñ\s.'-]+" value="{{ old('emergency_person', $defaults['emergency_person'] ?? '') }}"
-                class="form-input-custom" placeholder="Full name" data-validation-rule="personName"
-                data-required-message="Please enter the emergency contact person's name."
-                data-pattern-message="Only letters, spaces, apostrophe, period, and hyphen are allowed." required>
+                value="{{ old('emergency_person', $defaults['emergency_person'] ?? '') }}" class="form-input-custom"
+                placeholder="Full name" data-validation-rule="personName"
+                data-required-message="Please enter the emergency contact person's name." required>
         </div>
 
 
@@ -425,8 +424,8 @@
             @endphp
 
             <select id="emergency_relation" name="emergency_relation" class="js-custom-select"
-                data-placeholder="Select relation" data-required-message="Please select the emergency contact's relationship to the patient."
-                required>
+                data-placeholder="Select relation"
+                data-required-message="Please select the emergency contact's relationship to the patient." required>
                 <option value="" disabled @selected($selectedRelation === '')>
                     Select relation
                 </option>
