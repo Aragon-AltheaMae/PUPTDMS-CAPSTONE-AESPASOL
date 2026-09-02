@@ -254,7 +254,7 @@
                 <x-pagination-bar id="systemLogsPaginationTopBar" info-id="systemLogsPageInfoTop"
                     pagination-id="systemLogsPaginationTop" position="top" :show-entries="true" page-size-id="perPageSelect"
                     page-size-callback="handleSystemLogsPerPageChange" :page-size-value="$perPage" page-size-label="per page"
-                    label="entries" />
+                    label="entries" :total="$logs->total()" :from="$logs->firstItem() ?? 0" :to="$logs->lastItem() ?? 0" />
 
                 <div class="sl-view" id="slListView">
                     <div class="sl-table-wrap">
@@ -545,7 +545,8 @@
                 <div id="emptyState" class="empty-state-host"></div>
 
                 <x-pagination-bar id="systemLogsPaginationBottomBar" info-id="systemLogsPageInfoBottom"
-                    pagination-id="systemLogsPaginationBottom" position="bottom" :page-size-value="$perPage" label="entries" />
+                    pagination-id="systemLogsPaginationBottom" position="bottom" :page-size-value="$perPage" label="entries"
+                    :total="$logs->total()" :from="$logs->firstItem() ?? 0" :to="$logs->lastItem() ?? 0" />
 
             </div>
         </div>
@@ -978,6 +979,10 @@
                                         <option value="logout">
                                             Logout
                                         </option>
+
+                                        <option value="error">
+                                            Error
+                                        </option>
                                     </select>
 
                                     <div class="global-field-error" data-error-for="slExportAction" aria-live="polite"
@@ -1098,6 +1103,9 @@
         const CAN_VIEW_SYSTEM_LOGS = @json($canViewSystemLogs);
         const CAN_EXPORT_SYSTEM_LOGS = @json($canExportSystemLogs);
         const CAN_ARCHIVE_SYSTEM_LOGS = @json($canArchiveSystemLogs);
+
+        const SYSTEM_LOGS_CHECK_URL =
+            @json(route($routeNames['check'] ?? 'admin.system_logs.check')) + '?status=active';
 
         function showSystemLogsUnauthorized(actionLabel) {
             window.showToast?.({
@@ -1423,7 +1431,7 @@
                     ._flatpickr
                     ?.clear();
             }
-            
+
             exportForm
                 ?.querySelectorAll(
                     'input, select, textarea'
@@ -1641,24 +1649,7 @@
             });
         }
 
-        window.submitSlExportModal =
-            submitSlExportModal;
-
-        function handleSystemLogsPerPageChange(value) {
-            const nextPerPage = Number(value) || 10;
-
-            if (slState.perPage === nextPerPage) {
-                return;
-            }
-
-            slState.perPage = nextPerPage;
-            slState.page = 1;
-
-            slFetch();
-        }
-
-        window.handleSystemLogsPerPageChange =
-            handleSystemLogsPerPageChange;
+        window.submitSlExportModal = submitSlExportModal;
 
         var slState = {
             role: @json($role ?? 'all'),
@@ -1893,8 +1884,7 @@
                 window.initGlobalRefreshWatcher?.({
                     key: 'system-logs',
 
-                    url: @json(route($routeNames['check'] ?? 'admin.system_logs.check')) +
-                        '?status=active',
+                    url: SYSTEM_LOGS_CHECK_URL,
 
                     interval: 5000,
 
@@ -1925,20 +1915,56 @@
                         return item?.id;
                     },
 
-                    title: function(count) {
-                        return count === 1 ?
-                            'New log entry detected' :
-                            `${count} new log entries detected`;
+                    title: function() {
+                        return 'New system activity detected';
                     },
 
                     subtitle: function() {
-                        return 'Refresh to see the latest system activity.';
+                        return 'Refresh to see the latest system logs.';
                     },
 
-                    onRefresh: function() {
+                    onRefresh: async function(payload) {
                         slState.page = 1;
 
-                        return slFetch();
+                        await slFetch();
+
+                        try {
+                            const response =
+                                await fetch(
+                                    SYSTEM_LOGS_CHECK_URL, {
+                                        cache: 'no-store',
+
+                                        credentials: 'same-origin',
+
+                                        headers: {
+                                            'Accept': 'application/json',
+
+                                            'X-Requested-With': 'XMLHttpRequest'
+                                        }
+                                    }
+                                );
+
+                            if (!response.ok) {
+                                return;
+                            }
+
+                            const latest =
+                                await response.json();
+
+                            if (
+                                payload &&
+                                latest?.latest_id
+                            ) {
+                                payload.latest_id =
+                                    latest.latest_id;
+                            }
+
+                        } catch (error) {
+                            console.warn(
+                                'Unable to refresh system logs baseline:',
+                                error
+                            );
+                        }
                     },
 
                     toast: {
@@ -1960,8 +1986,7 @@
                 try {
                     const response =
                         await fetch(
-                            @json(route($routeNames['check'] ?? 'admin.system_logs.check')) +
-                            '?status=active', {
+                            SYSTEM_LOGS_CHECK_URL, {
                                 cache: 'no-store',
 
                                 credentials: 'same-origin',
@@ -2826,67 +2851,6 @@
                 clearOnlySlFilters();
             }
 
-            let slRefreshBaselineController =
-                null;
-
-            async function syncSystemLogsRefreshBaseline() {
-                if (
-                    !systemLogsRefreshWatcher ||
-                    slState.status === 'archived'
-                ) {
-                    return;
-                }
-
-                slRefreshBaselineController
-                    ?.abort();
-
-                slRefreshBaselineController =
-                    new AbortController();
-
-                try {
-                    const response =
-                        await fetch(
-                            @json(route($routeNames['check'] ?? 'admin.system_logs.check')) +
-                            '?status=active', {
-                                cache: 'no-store',
-
-                                credentials: 'same-origin',
-
-                                headers: {
-                                    'Accept': 'application/json',
-
-                                    'X-Requested-With': 'XMLHttpRequest'
-                                },
-
-                                signal: slRefreshBaselineController
-                                    .signal
-                            }
-                        );
-
-                    if (!response.ok) {
-                        return;
-                    }
-
-                    const payload =
-                        await response.json();
-
-                    systemLogsRefreshWatcher.sync(
-                        payload
-                    );
-
-                } catch (error) {
-                    if (
-                        error.name !==
-                        'AbortError'
-                    ) {
-                        console.warn(
-                            'System logs refresh baseline sync failed:',
-                            error
-                        );
-                    }
-                }
-            }
-
             function slFetch(silent) {
                 if (slController) slController.abort();
 
@@ -2968,12 +2932,6 @@
                                 data.pagination?.total ?? 0
                             )
                         );
-
-                        if (
-                            slState.status !== 'archived'
-                        ) {
-                            syncSystemLogsRefreshBaseline();
-                        }
                     })
                     .catch(function(error) {
                         if (
@@ -2991,6 +2949,22 @@
                         throw error;
                     });
             }
+
+            function handleSystemLogsPerPageChange(value) {
+                const nextPerPage = Number(value) || 10;
+
+                if (slState.perPage === nextPerPage) {
+                    return;
+                }
+
+                slState.perPage = nextPerPage;
+                slState.page = 1;
+
+                slFetch();
+            }
+
+            window.handleSystemLogsPerPageChange =
+                handleSystemLogsPerPageChange;
 
             function slSkeletonRows(count) {
                 var row = '<tr>' +

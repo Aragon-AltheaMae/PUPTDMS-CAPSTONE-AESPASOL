@@ -146,11 +146,9 @@
     display: none;
     align-items: flex-start;
     gap: .38rem;
-
     width: 100%;
     margin-top: .42rem;
-
-    color: #b91c1c;
+    color: var(--crimson-1);
     font-family: inherit;
     font-size: .72rem;
     font-weight: 700;
@@ -159,7 +157,7 @@
 
 .global-field-error.show {
     display: flex;
-    animation: globalFieldErrorIn .18s ease-out;
+    animation: errorShake .35s ease;
 }
 
 .global-field-error i {

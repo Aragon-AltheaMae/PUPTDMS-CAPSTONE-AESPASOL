@@ -8,7 +8,7 @@
 @section('title', 'Add Existing Appointment')
 
 @section('styles')
-    @vite('resources/css/pages/dentist/add-existing-appointment.css')
+@vite('resources/css/pages/dentist/add-existing-appointment.css')
 @endsection
 
 @php
@@ -17,14 +17,25 @@ $dentalAnswers = $defaults['dental_answers'] ?? [];
 $medicalAnswers = $defaults['medical_answers'] ?? [];
 $selectedDiseases = collect($defaults['diseases'] ?? []);
 $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
+
+$isAdminView = ($layoutRole ?? 'dentist') === 'admin';
+
+$patientProfileBackUrl = $isAdminView
+? route(
+'admin.admin.patient.profile',
+['patient' => $patient->id]
+)
+: route(
+'dentist.dentist.patient.profile',
+['patient' => $patient->id]
+);
 @endphp
 
 @section('content')
 <main id="mainContent" class="booking-page page-enter">
     <div class="booking-page-inner">
-        <x-booking.workflow-header :back-url="$backUrl ?? route('dentist.dentist.patient.profile', ['patient' => $patient->id])"
-            back-label="Back to Patient Profile" form-target="#existingAppointmentForm"
-            icon="fa-solid fa-file-circle-plus" title="Add Existing Appointment"
+        <x-booking.workflow-header :back-url="$patientProfileBackUrl" back-label="Back to Patient Profile"
+            form-target="#existingAppointmentForm" icon="fa-solid fa-file-circle-plus" title="Add Existing Appointment"
             subtitle="Encode the completed appointment details before continuing to the odontogram."
             :steps="['Date & Time', 'Service', 'Dental History', 'Medical History', 'Review']" />
 

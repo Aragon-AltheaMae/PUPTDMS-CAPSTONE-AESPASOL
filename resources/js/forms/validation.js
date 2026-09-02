@@ -540,6 +540,81 @@ registerGlobalValidationRule(
     }
 );
 
+registerGlobalValidationRule(
+    'guestName',
+    function (field) {
+        const value = String(field.value || '').trim();
+
+        if (!value) {
+            return '';
+        }
+
+        return /^[A-Za-zÑñ\s.'-]+$/.test(value)
+            ? ''
+            : 'Only letters, spaces, apostrophe, period, and hyphen are allowed.';
+    }
+);
+
+registerGlobalValidationRule(
+    'studentNumber',
+    function (field) {
+        const value = String(field.value || '').trim();
+
+        if (!value) {
+            return '';
+        }
+
+        return /^[0-9-]+$/.test(value)
+            ? ''
+            : 'Student number can only contain numbers and hyphens.';
+    }
+);
+
+registerGlobalValidationRule(
+    'facultyCode',
+    function (field) {
+        const value = String(field.value || '').trim();
+
+        if (!value) {
+            return '';
+        }
+
+        return /^[A-Za-z0-9-]+$/.test(value)
+            ? ''
+            : 'Faculty code can only contain letters, numbers, and hyphens.';
+    }
+);
+
+registerGlobalValidationRule(
+    'yearLevel',
+    function (field) {
+        const value = String(field.value || '').trim();
+
+        if (!value) {
+            return '';
+        }
+
+        return /^[1-9][0-9]*$/.test(value)
+            ? ''
+            : 'Please enter a valid year level using whole numbers only.';
+    }
+);
+
+registerGlobalValidationRule(
+    'sectionCode',
+    function (field) {
+        const value = String(field.value || '').trim();
+
+        if (!value) {
+            return '';
+        }
+
+        return /^[A-Za-z0-9\s.-]+$/.test(value)
+            ? ''
+            : 'Section can only contain letters, numbers, spaces, periods, and hyphens.';
+    }
+);
+
 const globalFormValidationRules = new Map();
 
 function registerGlobalFormValidationRule(name, validator) {
@@ -815,6 +890,12 @@ function showFormInputValidationMessage(
     }
 }
 
+function clearFormInputValidation(field) {
+    if (!field) return;
+
+    showFormInputValidationMessage(field, '', '');
+}
+
 function validateFormInputField(field) {
     if (!field) return true;
 
@@ -969,9 +1050,8 @@ function bindFormInputValidation(root = document) {
                     field
                 );
             };
-
-            form.addEventListener('input', validateEventField);
-            form.addEventListener('change', validateEventField);
+            form.addEventListener('input', validateEventField, true);
+            form.addEventListener('change', validateEventField, true);
             form.addEventListener('blur', validateEventField, true);
 
             form.addEventListener('submit', event => {
@@ -1332,6 +1412,22 @@ document.addEventListener(
     }
 );
 
+function shakeGlobalFieldErrors(form) {
+    if (!form) return;
+
+    form
+        .querySelectorAll(
+            '.global-field-error.show'
+        )
+        .forEach(error => {
+            error.style.animation = 'none';
+
+            void error.offsetWidth;
+
+            error.style.animation = '';
+        });
+}
+
 function validateGlobalForm(form, options = {}) {
     if (!form) {
         return {
@@ -1375,15 +1471,32 @@ function validateGlobalForm(form, options = {}) {
         focusGlobalInvalidField(firstInvalid);
     }
 
-    const customResult = runGlobalFormValidationRule(form);
+    const customResult =
+        runGlobalFormValidationRule(form);
 
-    if (!customResult.valid && !firstInvalid) {
-        firstInvalid = customResult.firstInvalid || null;
+    if (
+        !customResult.valid &&
+        !firstInvalid
+    ) {
+        firstInvalid =
+            customResult.firstInvalid ||
+            null;
+    }
+
+    const valid =
+        !firstInvalid &&
+        customResult.valid;
+
+    if (!valid) {
+        shakeGlobalFieldErrors(form);
     }
 
     return {
-        valid: !firstInvalid && customResult.valid,
-        firstInvalid: firstInvalid || customResult.firstInvalid || null
+        valid,
+        firstInvalid:
+            firstInvalid ||
+            customResult.firstInvalid ||
+            null
     };
 }
 
@@ -1409,6 +1522,7 @@ window.initCharLimitFields = initCharLimitFields;
 window.bindFormInputValidation = bindFormInputValidation;
 window.validateFormInputField = validateFormInputField;
 window.showFormInputValidationMessage = showFormInputValidationMessage;
+window.clearFormInputValidation = clearFormInputValidation;
 
 window.setFieldState = setFieldState;
 window.updateCharCounter = updateCharCounter;

@@ -256,6 +256,16 @@ Route::middleware('auth')->prefix('security')->name('security.')->group(function
         ->name('sessions.destroy-others');
 });
 
+Route::get(
+    '/clinical/patients/search',
+    [WalkInController::class, 'searchPatient']
+)
+    ->middleware([
+        'auth',
+        'permission:view_patient_profiles,manage_existing_records,manage_walk_in_patients',
+    ])
+    ->name('shared.existing-record.search-patient');
+
 /*
 |--------------------------------------------------------------------------
 | ADMIN / SUPER ADMIN ROUTES
@@ -422,7 +432,7 @@ Route::prefix('admin')
             ->middleware('permission:view_appointments')
             ->name('admin.admin.appointments');
 
-        Route::get('/add-existing-record', [\App\Http\Controllers\Admin\ExistingRecordController::class, 'index'])
+        Route::get('/add-existing-record', [\App\Http\Controllers\Shared\ExistingRecordController::class, 'index'])
             ->middleware('permission:manage_existing_records')
             ->name('admin.existing-record.index');
 
@@ -1009,7 +1019,7 @@ Route::prefix('dentist')->middleware(['auth'])->group(function () {
         ->name('dentist.dentist.appointments');
 
     Route::get('/appointments/{appointment}/patient-profile', [DentistAppointmentController::class, 'patientProfile'])
-        ->middleware('permission:view_patient_profiles,view_dental_records')
+        ->middleware('permission:view_appointments,reschedule_appointments,cancel_appointments,create_follow_up_appointments,create_procedure_records')
         ->name('dentist.dentist.appointments.patientProfile');
 
     Route::put('/appointments/{id}/reschedule', [DentistAppointmentController::class, 'updateReschedule'])
@@ -1180,7 +1190,7 @@ Route::prefix('dentist')->middleware(['auth'])->group(function () {
         '/walk-in/patients/{patient}/booking-information',
         [WalkInController::class, 'patientBookingInformation']
     )
-        ->middleware('permission:view_dental_records')
+        ->middleware('permission:manage_walk_in_patients')
         ->name('dentist.walk-in.patient-booking-information');
 
     Route::post('/walk-in/guest', [WalkInController::class, 'storeGuest'])
@@ -1190,7 +1200,7 @@ Route::prefix('dentist')->middleware(['auth'])->group(function () {
         ->middleware('permission:manage_walk_in_patients')
         ->name('dentist.walk-in.start');
 
-    Route::get('/add-existing-record', [\App\Http\Controllers\Dentist\ExistingRecordController::class, 'index'])
+    Route::get('/add-existing-record', [\App\Http\Controllers\Shared\ExistingRecordController::class, 'index'])
         ->middleware('permission:manage_existing_records')
         ->name('dentist.existing-record.index');
 

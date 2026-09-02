@@ -1,5 +1,5 @@
 function formatPatientName(value = '') {
-    return String(value || '')
+    const formattedName = String(value || '')
         .trim()
         .replace(/\s+/g, ' ')
         .toLocaleLowerCase('en-PH')
@@ -8,6 +8,11 @@ function formatPatientName(value = '') {
             character =>
                 character.toLocaleUpperCase('en-PH')
         );
+        
+    return formattedName.replace(
+        /\b(ii|iii|iv|v|vi|vii|viii|ix|x)\.?$/iu,
+        suffix => suffix.toLocaleUpperCase('en-PH')
+    );
 }
 
 function formatPatientNameElement(element) {

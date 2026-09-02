@@ -131,6 +131,11 @@ class EnsureSessionActivity
             ], 401);
         }
 
+        $request->session()->put(
+            'last_activity_at',
+            $now
+        );
+
         return $next($request);
     }
 

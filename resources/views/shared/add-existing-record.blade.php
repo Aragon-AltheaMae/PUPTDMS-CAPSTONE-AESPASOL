@@ -1,16 +1,39 @@
 @extends('layouts.app')
 
-@section('layout-role', 'admin')
+@php
+$layoutRole ??= 'dentist';
+
+$isAdminView = $layoutRole === 'admin';
+
+$patientSearchRoute ??=
+'dentist.walk-in.search-patient';
+
+$existingAppointmentRoute ??=
+'dentist.odontogram.existing-appointment.create';
+@endphp
+
+@section('layout-role', $layoutRole)
 
 @section('title', 'Add Existing Record')
 
 @section('styles')
-    @vite('resources/css/pages/dentist/add-existing-record.css')
+@vite('resources/css/pages/shared/add-existing-record.css')
 @endsection
 
 @section('content')
-<main id="mainContent" class="dentist-page-shell existing-record-page page-enter">
+<main id="mainContent" class="app-page-shell existing-record-page page-enter">
     <div class="w-full">
+        @if ($isAdminView)
+        <div class="page-banner mb-6">
+            <div class="page-banner-inner">
+                <div class="min-w-0">
+                    <h1 class="page-title">
+                        Add Existing Record
+                    </h1>
+                </div>
+            </div>
+        </div>
+        @else
         <div class="dentist-hero page-title-row mb-6">
             <div class="dentist-hero-content">
 
@@ -33,6 +56,7 @@
 
             </div>
         </div>
+        @endif
 
         <div class="existing-record-directory mb-5">
             <div class="existing-record-directory-copy">
@@ -49,35 +73,43 @@
                 </div>
             </div>
 
-            <div class="existing-record-role-filters" aria-label="Filter patients by role">
-                <button type="button" class="existing-record-role-filter is-active" data-patient-role-filter="">
+            <div class="tab-group" aria-label="Filter patients by role">
+
+                <button type="button" class="tab-btn active" data-patient-role-filter="">
                     All
                 </button>
 
-                <button type="button" class="existing-record-role-filter" data-patient-role-filter="patient">
+                <button type="button" class="tab-btn" data-patient-role-filter="patient">
                     Patient
                 </button>
 
-                <button type="button" class="existing-record-role-filter" data-patient-role-filter="faculty">
+                <button type="button" class="tab-btn" data-patient-role-filter="faculty">
                     Faculty
                 </button>
 
-                <button type="button" class="existing-record-role-filter" data-patient-role-filter="admin">
+                <button type="button" class="tab-btn" data-patient-role-filter="admin">
                     Administrative
                 </button>
+
             </div>
         </div>
 
-        <x-search-bar id="patientSearchInput" placeholder="Search by name, ID, email, or program..."
-            callback="handleExistingRecordSearch" :debounce="250" clear-label="Clear patient search" class="mb-6" />
+        <div class="voice-search-row">
+            <x-search-bar id="patientSearchInput" placeholder="Search by name, ID, email, or program..."
+                callback="handleExistingRecordSearch" :debounce="300" clear-label="Clear patient search"
+                class="flex-1" />
+
+            <x-voice-input target="#patientSearchInput" status-id="existingRecordVoiceStatus" label="Use voice search"
+                title="Voice search" />
+        </div>
 
         <x-pagination-bar id="existingRecordPaginationTopBar" info-id="existingRecordPageInfoTop"
             pagination-id="existingRecordPaginationTop" position="top" :show-entries="true"
             page-size-id="existingRecordPerPage" page-size-callback="handleExistingRecordPerPageChange"
             label="patient records" />
 
-        <div id="patientGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-5 mb-5"
-            aria-live="polite"></div>
+        <div id="patientGrid" class="table-record-grid existing-record-patient-grid" aria-live="polite">
+        </div>
 
         <x-pagination-bar id="existingRecordPaginationBottomBar" info-id="existingRecordPageInfoBottom"
             pagination-id="existingRecordPaginationBottom" position="bottom" label="patient records" hidden />
@@ -90,10 +122,21 @@
     document.addEventListener('DOMContentLoaded', function () {
         const input = document.getElementById('patientSearchInput');
         const patientGrid = document.getElementById('patientGrid');
-        const searchEndpoint = @json(route('dentist.walk-in.search-patient'));
-        const recordUrlTemplate = @json(route('admin.odontogram.existing-appointment.create', ['patient' => '__PATIENT__']));
+        const searchEndpoint =
+            @json(route($patientSearchRoute));
+
+        const recordUrlTemplate =
+            @json(route(
+                $existingAppointmentRoute,
+                ['patient' => '__PATIENT__']));
+
+    window.initGlobalSearchBars?.();
+    window.initGlobalVoiceInputs?.();
 
     let activeRequestId = 0;
+    let patientFetchController = null;
+
+    const patientResponseCache = new Map();
     let patientCurrentPage = 1;
     let patientPageSize = 10;
     let patientPaginationMeta = {
@@ -247,7 +290,7 @@
                     roleFilterButtons
                         .forEach(item => {
                             item.classList.toggle(
-                                'is-active',
+                                'active',
                                 item === button
                             );
                         });
@@ -266,19 +309,130 @@
         }
     );
 
-    async function loadPatients(query = '', showAll = false, options = {}) {
-        if (!patientGrid) return;
+    function getPatientRequestCacheKey(query = '') {
+        return [
+            String(query || '').trim().toLowerCase(),
+            activeRoleFilter || 'all',
+            patientCurrentPage,
+            patientPageSize,
+        ].join('|');
+    }
 
-        const showLoading = options.showLoading !== false;
-        const requestId = ++activeRequestId;
-        const params = new URLSearchParams();
+    function applyPatientResponse(result) {
+        const normalizedPatients =
+            Array.isArray(result)
+                ? result
+                : Array.isArray(result?.data)
+                    ? result.data
+                    : [];
+
+        patientPaginationMeta = {
+            currentPage:
+                Number(result?.current_page) || 1,
+
+            lastPage:
+                Number(result?.last_page) || 1,
+
+            total:
+                Number(result?.total) ||
+                normalizedPatients.length,
+
+            from:
+                result?.from ??
+                (
+                    normalizedPatients.length
+                        ? (
+                            (
+                                Number(
+                                    result?.current_page ||
+                                    patientCurrentPage
+                                ) - 1
+                            ) * patientPageSize
+                        ) + 1
+                        : null
+                ),
+
+            to:
+                result?.to ??
+                (
+                    normalizedPatients.length
+                        ? (
+                            (
+                                Number(
+                                    result?.current_page ||
+                                    patientCurrentPage
+                                ) - 1
+                            ) * patientPageSize
+                        ) +
+                        normalizedPatients.length
+                        : null
+                ),
+        };
+
+        patientCurrentPage =
+            patientPaginationMeta.currentPage;
+
+        renderPatients(
+            normalizedPatients
+        );
+
+        renderPatientPagination();
+    }
+
+    async function loadPatients(
+        query = '',
+        showAll = false,
+        options = {}
+    ) {
+        if (!patientGrid) {
+            return;
+        }
+
+        const showLoading =
+            options.showLoading !== false;
+
+        const requestId =
+            ++activeRequestId;
+
+        const cacheKey =
+            getPatientRequestCacheKey(
+                query
+            );
+
+        if (
+            patientResponseCache.has(
+                cacheKey
+            )
+        ) {
+            applyPatientResponse(
+                patientResponseCache.get(
+                    cacheKey
+                )
+            );
+
+            return;
+        }
+
+        patientFetchController?.abort();
+
+        patientFetchController =
+            new AbortController();
+
+        const params =
+            new URLSearchParams();
 
         if (query) {
-            params.set('q', query);
+            params.set(
+                'q',
+                query
+            );
         }
 
         if (showAll) {
-            params.set('show_all', '1');
+            params.set(
+                'show_all',
+                '1'
+            );
         }
 
         if (activeRoleFilter) {
@@ -290,12 +444,16 @@
 
         params.set(
             'page',
-            String(patientCurrentPage)
+            String(
+                patientCurrentPage
+            )
         );
 
         params.set(
             'per_page',
-            String(patientPageSize)
+            String(
+                patientPageSize
+            )
         );
 
         if (showLoading) {
@@ -303,84 +461,33 @@
         }
 
         try {
-            const response = await fetch(`${searchEndpoint}?${params.toString()}`, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json',
-                },
-            });
+            const response =
+                await fetch(
+                    `${searchEndpoint}?${params.toString()}`,
+                    {
+                        headers: {
+                            'X-Requested-With':
+                                'XMLHttpRequest',
+
+                            Accept:
+                                'application/json',
+                        },
+
+                        signal:
+                            patientFetchController
+                                .signal,
+                    }
+                );
 
             if (!response.ok) {
-                throw new Error(`Search failed with status ${response.status}`);
+                throw new Error(
+                    `Search failed with status ${response.status}`
+                );
             }
 
-            const result = await response.json();
+            const result =
+                await response.json();
 
-            if (requestId !== activeRequestId) {
-                return;
-            }
-
-            const normalizedPatients = Array.isArray(result)
-                ? result
-                : Array.isArray(result.data)
-                    ? result.data
-                    : [];
-
-            patientPaginationMeta = {
-                currentPage:
-                    Number(
-                        result.current_page
-                    ) || 1,
-
-                lastPage:
-                    Number(
-                        result.last_page
-                    ) || 1,
-
-                total:
-                    Number(
-                        result.total
-                    ) || normalizedPatients.length,
-
-                from:
-                    result.from ?? (
-                        normalizedPatients.length
-                            ? (
-                                (
-                                    Number(
-                                        result.current_page ||
-                                        patientCurrentPage
-                                    ) - 1
-                                ) *
-                                patientPageSize
-                            ) + 1
-                            : null
-                    ),
-
-                to:
-                    result.to ?? (
-                        normalizedPatients.length
-                            ? (
-                                (
-                                    Number(
-                                        result.current_page ||
-                                        patientCurrentPage
-                                    ) - 1
-                                ) *
-                                patientPageSize
-                            ) +
-                            normalizedPatients.length
-                            : null
-                    ),
-            };
-
-            patientCurrentPage =
-                patientPaginationMeta.currentPage;
-
-            renderPatients(normalizedPatients);
-            renderPatientPagination();
-
-        } catch (error) {
             if (
                 requestId !==
                 activeRequestId
@@ -388,9 +495,38 @@
                 return;
             }
 
-            console.error(error);
+            patientResponseCache.set(
+                cacheKey,
+                result
+            );
 
-            patientGrid.innerHTML = '';
+            applyPatientResponse(
+                result
+            );
+
+        } catch (error) {
+
+            if (
+                error.name ===
+                'AbortError'
+            ) {
+                return;
+            }
+
+            if (
+                requestId !==
+                activeRequestId
+            ) {
+                return;
+            }
+
+            console.error(
+                'Existing-record patient loading error:',
+                error
+            );
+
+            patientGrid.innerHTML =
+                '';
 
             window.EmptyState?.render({
                 host:
@@ -525,11 +661,12 @@
     }
 
     function buildRecordUrl(patient) {
-        if (patient.record_url) {
-            return patient.record_url;
-        }
-
-        return recordUrlTemplate.replace('__PATIENT__', encodeURIComponent(String(patient.id || '')));
+        return recordUrlTemplate.replace(
+            '__PATIENT__',
+            encodeURIComponent(
+                String(patient.id || '')
+            )
+        );
     }
 
     function renderPatients(patients) {
@@ -605,116 +742,98 @@
 
             if (patient.student_number) {
                 tags.push(`
-        <span class="patient-select-tag">
-            <i class="fa-solid fa-id-card"></i>
-            ${escapeHtml(
-                    patient.student_number
-                )}
-        </span>
-    `);
+    <span class="global-info-pill">
+        <i class="fa-regular fa-id-card"></i>
+        ${escapeHtml(patient.student_number)}
+    </span>
+`);
             }
 
             if (patient.program) {
                 tags.push(`
-        <span class="patient-select-tag">
-            <i class="fa-solid fa-graduation-cap"></i>
-            ${escapeHtml(
-                    patient.program
-                )}
-        </span>
-    `);
+    <span class="global-info-pill">
+        <i class="fa-solid fa-graduation-cap"></i>
+        ${escapeHtml(patient.program)}
+    </span>
+`);
             }
 
             return `
-    <div
-        class="
-            patient-select-card
-            ${roleClass}
-        "
-    >
-        <div class="patient-select-card-body">
+    <article class="global-record-card ${roleClass}">
+        <div class="global-record-card-grid">
 
-            <div class="patient-select-profile">
+            <div class="global-record-profile">
 
-                <span
-                    class="
-                        patient-avatar
-                        patient-avatar-md
-                    "
-                >
+                <span class="patient-avatar patient-avatar-md">
                     ${avatarUrl
                     ? `
                                 <img
-                                    src="${escapeHtml(
-                        avatarUrl
-                    )}"
-                                    alt="${escapeHtml(
-                        patientName
-                    )}"
+                                    src="${escapeHtml(avatarUrl)}"
+                                    alt="${escapeHtml(patientName)}"
                                     loading="lazy"
                                     onerror="
                                         this.parentElement.innerHTML =
-                                        '<span>${escapeHtml(
-                        patientInitials
-                    )}</span>';
+                                        '<span>${escapeHtml(patientInitials)}</span>';
                                     "
                                 >
                             `
                     : `
                                 <span>
-                                    ${escapeHtml(
-                        patientInitials
-                    )}
+                                    ${escapeHtml(patientInitials)}
                                 </span>
                             `
                 }
                 </span>
 
-                <div class="patient-select-identity">
-                    <p class="patient-select-name" data-patient-name>
-                        ${escapeHtml(patientName)}
-                    </p>
+                <div class="global-record-identity">
 
-                    <p class="patient-select-meta">
-                        ${escapeHtml(patientEmail)}
-                    </p>
+                    <div class="global-record-name-row">
+                        <p
+                            class="global-record-name"
+                            data-patient-name>
+                            ${escapeHtml(patientName)}
+                        </p>
+
+                        <span class="badge-role ${roleClass}">
+                            ${escapeHtml(patientType)}
+                        </span>
+                    </div>
+
+                    ${patientEmail
+                    ? `
+                            <div class="global-record-subline">
+                                <span class="ui-muted-text">
+                                    <i class="fa-regular fa-envelope"></i>
+                                    ${escapeHtml(patientEmail)}
+                                </span>
+                            </div>
+                        `
+                    : ''
+                }
+
                 </div>
 
-                <span
-                    class="badge-role ${roleClass}">
-                    ${escapeHtml(patientType)}
-                </span>
             </div>
 
-            <div class="patient-select-details">
-                ${tags.join('')}
+            ${tags.length
+                    ? `
+                        <div class="global-record-subline">
+                            ${tags.join('')}
+                        </div>
+                    `
+                    : ''
+                }
+
+            <div class="global-record-footer">
+                <a href="${escapeHtml(buildRecordUrl(patient))}"
+                    class="ui-btn ui-btn-primary ui-btn-sm">
+                    <i class="fa-solid fa-file-circle-plus"></i>
+                    <span>Add Existing Appointment</span>
+                </a>
             </div>
-        </div>
 
-        <div class="patient-select-actions">
-            <a
-                href="${escapeHtml(
-                    buildRecordUrl(
-                        patient
-                    )
-                )}"
-                class="
-                    ui-btn
-                    ui-btn-primary
-                    w-full
-                "
-            >
-                <i
-                    class="
-                        fa-solid
-                        fa-file-circle-plus
-                    "
-                ></i>
-
-                Add Existing Appointment
-            </a>
         </div>
-    </div>
+    </article>
 `;
         }).join('');
 

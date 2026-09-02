@@ -1669,6 +1669,10 @@ class DentistReportController extends Controller
                 $procedureDiagnosisByAppointment
             );
 
+            if ($diagnosis === null) {
+                continue;
+            }
+
             if (! isset($groups[$groupKey][$diagnosis])) {
                 $groups[$groupKey][$diagnosis] = 0;
             }
@@ -1916,7 +1920,7 @@ class DentistReportController extends Controller
         return $pages;
     }
 
-    private function getDentalCaseDiagnosisLabel(Appointment $appointment, $procedureDiagnosisByAppointment): string
+    private function getDentalCaseDiagnosisLabel(Appointment $appointment, $procedureDiagnosisByAppointment): ?string
     {
         $diagnosis = '';
 
@@ -1931,10 +1935,43 @@ class DentistReportController extends Controller
         }
 
         if ($diagnosis === '') {
-            $diagnosis = $this->getMonthlyReportServiceLabel($appointment);
+            return null;
         }
 
-        return $this->normalizeReportServiceLabel($diagnosis, 'Dental Service');
+        $diagnosis = $this->normalizeReportServiceLabel($diagnosis, '');
+        if ($this->isDentalCaseProcedureLabel($diagnosis)) {
+            return null;
+        }
+
+        return $diagnosis;
+    }
+
+    private function isDentalCaseProcedureLabel(string $diagnosis): bool
+    {
+        static $procedureLabels = null;
+
+        if ($procedureLabels === null) {
+            $procedureLabels = ServiceType::query()
+                ->pluck('name')
+                ->map(fn($name) => $this->normalizeDentalCaseLabel($name))
+                ->filter()
+                ->all();
+        }
+
+        return in_array(
+            $this->normalizeDentalCaseLabel($diagnosis),
+            $procedureLabels,
+            true
+        );
+    }
+
+    private function normalizeDentalCaseLabel(?string $value): string
+    {
+        return preg_replace(
+            '/[^a-z0-9]+/',
+            '',
+            strtolower(trim((string) $value))
+        ) ?? '';
     }
 
     private function getMonthlyReportServiceLabel(Appointment $appointment): string

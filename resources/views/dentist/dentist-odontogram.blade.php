@@ -48,10 +48,14 @@ $currentServiceType = $existingAppointmentMode
 ? data_get($existingAppointmentDraft ?? [], 'service_type', '')
 : ($appointment?->service_type ?? '');
 
-$isOralProphylaxis =
+$allowsProcedureCompletionWithoutOdontogramChanges =
 strcasecmp(
 trim((string) $currentServiceType),
 'Oral Prophylaxis'
+) === 0 ||
+strcasecmp(
+trim((string) $currentServiceType),
+'Oral Check-Up'
 ) === 0;
 
 $entrySource = request()->query('from');
@@ -229,19 +233,25 @@ floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60)
                                     </div>
                                 </div>
 
-                                <div class="odontogram-appointment-meta-item">
+                                <div class="odontogram-appointment-meta-item odontogram-procedure-duration-item">
                                     <span class="odontogram-appointment-meta-icon">
                                         <i class="fa-solid fa-stopwatch"></i>
                                     </span>
 
-                                    <div>
-                                        <span class="odontogram-appointment-meta-label">
-                                            {{ $existingAppointmentMode ? 'Procedure Duration' : 'Session Timer' }}
-                                        </span>
+                                    <div class="odontogram-procedure-duration-copy">
+                                        <label for="procedureDurationInput" class="odontogram-appointment-meta-label">
+                                            Procedure Duration
+                                        </label>
 
-                                        <strong id="procedureTimer" class="odontogram-appointment-meta-value">
-                                            {{ $existingAppointmentMode ? $existingProcedureDuration : '00:00:00' }}
-                                        </strong>
+                                        <input
+                                            type="text"
+                                            id="procedureDurationInput"
+                                            class="form-input-custom"
+                                            value="{{ $existingProcedureDuration !== '00:00:00' ? $existingProcedureDuration : '' }}"
+                                            inputmode="numeric"
+                                            placeholder="HH:MM:SS"
+                                            maxlength="8"
+                                            aria-label="Procedure duration in HH:MM:SS format">
                                     </div>
                                 </div>
                             </div>
@@ -445,14 +455,41 @@ floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60)
                                         placeholder="Record oral examination findings...">{{ old('oral_examination', $procedure?->oral_examination) }}</textarea>
                                 </div>
 
+                                @php
+                                    $savedDiagnosis = trim((string) old('diagnosis', $procedure?->diagnosis));
+                                    $diagnosisOptions = [
+                                        'Dental Caries',
+                                        'Gingivitis',
+                                        'Periapical Abscess',
+                                        'Ulceration',
+                                    ];
+                                    $selectedDiagnosis = in_array($savedDiagnosis, $diagnosisOptions, true)
+                                        ? $savedDiagnosis
+                                        : ($savedDiagnosis !== '' ? 'Others' : '');
+                                    $customDiagnosis = $selectedDiagnosis === 'Others' ? $savedDiagnosis : '';
+                                @endphp
                                 <div class="global-form-group">
                                     <label for="diagnosisNotes" class="global-form-label">
                                         Diagnosis
                                     </label>
 
-                                    <textarea id="diagnosisNotes" rows="4"
-                                        class="form-input-custom global-form-textarea"
-                                        placeholder="Record the clinical diagnosis...">{{ old('diagnosis', $procedure?->diagnosis) }}</textarea>
+                                    <select id="diagnosisNotes" class="form-select-custom js-custom-select"
+                                        data-placeholder="Select diagnosis">
+                                        <option value="" {{ $selectedDiagnosis === '' ? 'selected' : '' }}>Select diagnosis</option>
+                                        @foreach ($diagnosisOptions as $diagnosisOption)
+                                            <option value="{{ $diagnosisOption }}"
+                                                {{ $selectedDiagnosis === $diagnosisOption ? 'selected' : '' }}>
+                                                {{ $diagnosisOption }}
+                                            </option>
+                                        @endforeach
+                                        <option value="Others" {{ $selectedDiagnosis === 'Others' ? 'selected' : '' }}>
+                                            Others
+                                        </option>
+                                    </select>
+
+                                    <input type="text" id="diagnosisCustomNotes" class="form-input-custom mt-3"
+                                        placeholder="Enter custom diagnosis..." value="{{ $customDiagnosis }}"
+                                        @if ($selectedDiagnosis !== 'Others') hidden @endif>
                                 </div>
 
                                 <div class="global-form-group odontogram-prescription-field">
@@ -807,6 +844,8 @@ floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60)
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const cancelProcedureBtn = document.getElementById('cancelProcedureBtn');
+        const diagnosisSelect = document.getElementById('diagnosisNotes');
+        const diagnosisCustomInput = document.getElementById('diagnosisCustomNotes');
         const cancelProcedureModal = document.getElementById('cancelProcedureModal');
         const confirmCancelProcedureBtn = document.getElementById('confirmCancelProcedureBtn');
         const dismissCancelProcedureBtn = document.getElementById('dismissCancelProcedureBtn');
@@ -827,7 +866,7 @@ floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60)
         const existingAppointmentMode = @json($existingAppointmentMode);
         const savedVisitEditMode = @json($savedVisitEditMode);
         const existingProcedureDuration = @json($existingProcedureDuration);
-        const isOralProphylaxis = @json($isOralProphylaxis);
+        const allowsProcedureCompletionWithoutOdontogramChanges = @json($allowsProcedureCompletionWithoutOdontogramChanges);
         const cancelProcedureRedirectUrl = @json($cancelProcedureRedirectUrl ?? route('dentist.dentist.patient.profile', $patient -> id ?? 1));
         let finishProcedureModalRedirectUrl = null;
 
@@ -835,7 +874,7 @@ floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60)
         const legendEmptyState = document.getElementById('legendEmptyState');
         const drawerSelectedLegendPreview = document.getElementById('drawerSelectedLegendPreview');
 
-        const procedureTimer = document.getElementById('procedureTimer');
+        const procedureDurationInput = document.getElementById('procedureDurationInput');
         const container = document.getElementById('canvas-container');
         const loadingOverlay = document.getElementById('loadingOverlay');
         const legendDrawer = document.getElementById('legendDrawer');
@@ -2482,19 +2521,57 @@ floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60)
             toothTooltip.classList.remove('show');
         }
 
-        const procedureStartTimestamp = Date.now();
+        let procedureDurationDigits = procedureDurationInput?.value.replace(/\D/g, '') || '';
 
-        function formatElapsedTime(totalSeconds) {
-            const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
-            const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
-            const seconds = String(totalSeconds % 60).padStart(2, '0');
-            return `${hours}:${minutes}:${seconds}`;
+        function formatProcedureDurationInput(digits) {
+            const normalizedDigits = String(digits || '').replace(/\D/g, '').slice(-6);
+
+            if (!normalizedDigits) {
+                return '';
+            }
+
+            const paddedDigits = normalizedDigits.padStart(6, '0');
+
+            return `${paddedDigits.slice(0, 2)}:${paddedDigits.slice(2, 4)}:${paddedDigits.slice(4, 6)}`;
         }
 
-        function updateProcedureTimer() {
-            const elapsedSeconds = Math.floor((Date.now() - procedureStartTimestamp) / 1000);
-            procedureTimer.textContent = formatElapsedTime(elapsedSeconds);
+        function parseProcedureDurationSeconds() {
+            const rawValue = procedureDurationInput?.value.trim() || '';
+
+            if (!/^\d{2}:\d{2}:\d{2}$/.test(rawValue)) {
+                return null;
+            }
+
+            const [hours, minutes, seconds] = rawValue.split(':').map(Number);
+
+            if (minutes > 59 || seconds > 59) {
+                return null;
+            }
+
+            return (hours * 3600) + (minutes * 60) + seconds;
         }
+
+        procedureDurationInput?.addEventListener('keydown', function (event) {
+            if (/^\d$/.test(event.key)) {
+                event.preventDefault();
+                procedureDurationDigits = `${procedureDurationDigits}${event.key}`.slice(-6);
+                procedureDurationInput.value = formatProcedureDurationInput(procedureDurationDigits);
+                return;
+            }
+
+            if (event.key === 'Backspace') {
+                event.preventDefault();
+                procedureDurationDigits = procedureDurationDigits.slice(0, -1);
+                procedureDurationInput.value = formatProcedureDurationInput(procedureDurationDigits);
+            }
+        });
+
+        procedureDurationInput?.addEventListener('paste', function (event) {
+            event.preventDefault();
+            const pastedDigits = event.clipboardData?.getData('text').replace(/\D/g, '').slice(-6) || '';
+            procedureDurationDigits = pastedDigits;
+            procedureDurationInput.value = formatProcedureDurationInput(procedureDurationDigits);
+        });
 
         applyTreatmentBtn.addEventListener('click', function () {
             if (!selectedTooth || !selectedTargetType) {
@@ -2851,14 +2928,54 @@ floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60)
                 .filter(Boolean);
         }
 
+        function syncDiagnosisField() {
+            if (!diagnosisSelect || !diagnosisCustomInput) {
+                return '';
+            }
+
+            const selectedValue = diagnosisSelect.value.trim();
+            const useCustomDiagnosis = selectedValue === 'Others';
+
+            diagnosisCustomInput.hidden = !useCustomDiagnosis;
+            diagnosisCustomInput.required = useCustomDiagnosis;
+
+            if (!useCustomDiagnosis) {
+                return selectedValue;
+            }
+
+            return diagnosisCustomInput.value.trim();
+        }
+
+        diagnosisSelect?.addEventListener('change', syncDiagnosisField);
+        syncDiagnosisField();
+
         async function saveProcedure(completionAction, clickedButton, loadingText) {
             const originalButtonHtml = clickedButton.innerHTML;
 
             updateHiddenInput();
             const cleanOdontogramData = getCleanOdontogramDataForSave();
             const hasAnySavedTreatment = cleanOdontogramData.length > 0;
+            const diagnosisValue = syncDiagnosisField();
 
-            if (!isOralProphylaxis && !hasAppliedTreatmentThisSession && !(savedVisitEditMode && hasAnySavedTreatment)) {
+            if (diagnosisSelect?.value === 'Others' && !diagnosisValue) {
+                diagnosisCustomInput?.focus();
+                showProcedureToast('Please enter a custom diagnosis for Others.', 'warning', 'Diagnosis Required');
+                return;
+            }
+
+            const procedureDurationSeconds = parseProcedureDurationSeconds();
+
+            if (procedureDurationSeconds === null) {
+                procedureDurationInput?.focus();
+                showProcedureToast(
+                    'Enter a valid procedure duration using HH:MM:SS format.',
+                    'warning',
+                    'Duration Required'
+                );
+                return;
+            }
+
+            if (!allowsProcedureCompletionWithoutOdontogramChanges && !hasAppliedTreatmentThisSession && !(savedVisitEditMode && hasAnySavedTreatment)) {
                 showProcedureToast(
                     'Apply at least one treatment to the tooth chart before finishing the procedure.',
                     'warning',
@@ -2868,7 +2985,7 @@ floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60)
                 return;
             }
 
-            if (!isOralProphylaxis && cleanOdontogramData.length === 0) {
+            if (!allowsProcedureCompletionWithoutOdontogramChanges && cleanOdontogramData.length === 0) {
                 showProcedureToast(
                     'Apply at least one treatment to the tooth chart before finishing the procedure.',
                     'warning',
@@ -2881,13 +2998,12 @@ floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60)
             const payload = {
                 odontogram_data: cleanOdontogramData,
                 oral_examination: document.getElementById('oralExaminationNotes').value,
-                diagnosis: document.getElementById('diagnosisNotes').value,
+                diagnosis: diagnosisValue,
                 prescriptions: document.getElementById('prescriptionsNotes').value,
                 completion_action: completionAction,
-                has_applied_treatment: isOralProphylaxis || hasAppliedTreatmentThisSession,
-                procedure_duration_seconds: (existingAppointmentMode || savedVisitEditMode)
-                    ? 0
-                    : Math.max(0, Math.floor((Date.now() - procedureStartTimestamp) / 1000)),
+                has_applied_treatment: allowsProcedureCompletionWithoutOdontogramChanges || hasAppliedTreatmentThisSession,
+                procedure_duration_hms: procedureDurationInput?.value.trim() || '00:00:00',
+                procedure_duration_seconds: procedureDurationSeconds,
             };
 
             finishProcedureBtn.disabled = true;
@@ -2961,7 +3077,7 @@ floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60)
             const cleanOdontogramData = getCleanOdontogramDataForSave();
             const hasAnySavedTreatment = cleanOdontogramData.length > 0;
 
-            if (!isOralProphylaxis &&
+            if (!allowsProcedureCompletionWithoutOdontogramChanges &&
                 (
                     (!hasAppliedTreatmentThisSession && !(savedVisitEditMode && hasAnySavedTreatment)) ||
                     cleanOdontogramData.length === 0
@@ -3310,11 +3426,8 @@ floor(((int) data_get($procedure, 'procedure_duration_seconds', 0) % 3600) / 60)
 
         initLegendPanelResize();
 
-        if (existingAppointmentMode || savedVisitEditMode) {
-            procedureTimer.textContent = existingProcedureDuration || '00:00:00';
-        } else {
-            updateProcedureTimer();
-            setInterval(updateProcedureTimer, 1000);
+        if (procedureDurationInput && existingProcedureDuration && existingProcedureDuration !== '00:00:00') {
+            procedureDurationInput.value = existingProcedureDuration;
         }
 
         renderLegendButtons('');

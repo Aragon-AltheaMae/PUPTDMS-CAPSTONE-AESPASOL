@@ -15,8 +15,8 @@ $notifications = collect($notifications ?? []);
 $notifCount = $notifications->count();
 $isBookingMode = $bookingMode ?? request()->routeIs('admin.book_appointments.*');
 $pageHeading = $isDentistView
-    ? 'Patient Directory'
-    : ($pageTitle ?? ($isBookingMode ? 'Select Patient for Booking' : 'Patient List'));
+? 'Patient Directory'
+: ($pageTitle ?? ($isBookingMode ? 'Select Patient for Booking' : 'Patient List'));
 @endphp
 
 <main id="mainContent" class="{{ $pageShellClass }}
@@ -109,48 +109,48 @@ $pageHeading = $isDentistView
 
                     @php
                     $patientStatusOptions = [
-                        [
-                            'value' => 'all',
-                            'label' => 'All Patients',
-                            'icon' => 'fa-users',
-                            'tone' => 'status-all',
-                            'count' => $allCount ?? 0,
-                        ],
-                        [
-                            'value' => 'today',
-                            'label' => 'Today',
-                            'icon' => 'fa-clock',
-                            'tone' => 'status-today',
-                            'count' => $todayCount ?? 0,
-                        ],
-                        [
-                            'value' => 'upcoming',
-                            'label' => 'Upcoming',
-                            'icon' => 'fa-calendar-check',
-                            'tone' => 'status-upcoming',
-                            'count' => $upcomingCount ?? 0,
-                        ],
-                        [
-                            'value' => 'rescheduled',
-                            'label' => 'Rescheduled',
-                            'icon' => 'fa-calendar-plus',
-                            'tone' => 'status-rescheduled',
-                            'count' => $rescheduledCount ?? 0,
-                        ],
-                        [
-                            'value' => 'completed',
-                            'label' => 'Completed',
-                            'icon' => 'fa-check-double',
-                            'tone' => 'status-completed',
-                            'count' => $completedCount ?? 0,
-                        ],
-                        [
-                            'value' => 'cancelled',
-                            'label' => 'Cancelled',
-                            'icon' => 'fa-calendar-xmark',
-                            'tone' => 'status-cancelled',
-                            'count' => $cancelledCount ?? 0,
-                        ],
+                    [
+                    'value' => 'all',
+                    'label' => 'All Patients',
+                    'icon' => 'fa-users',
+                    'tone' => 'status-all',
+                    'count' => $allCount ?? 0,
+                    ],
+                    [
+                    'value' => 'today',
+                    'label' => 'Today',
+                    'icon' => 'fa-clock',
+                    'tone' => 'status-today',
+                    'count' => $todayCount ?? 0,
+                    ],
+                    [
+                    'value' => 'upcoming',
+                    'label' => 'Upcoming',
+                    'icon' => 'fa-calendar-check',
+                    'tone' => 'status-upcoming',
+                    'count' => $upcomingCount ?? 0,
+                    ],
+                    [
+                    'value' => 'rescheduled',
+                    'label' => 'Rescheduled',
+                    'icon' => 'fa-calendar-plus',
+                    'tone' => 'status-rescheduled',
+                    'count' => $rescheduledCount ?? 0,
+                    ],
+                    [
+                    'value' => 'completed',
+                    'label' => 'Completed',
+                    'icon' => 'fa-check-double',
+                    'tone' => 'status-completed',
+                    'count' => $completedCount ?? 0,
+                    ],
+                    [
+                    'value' => 'cancelled',
+                    'label' => 'Cancelled',
+                    'icon' => 'fa-calendar-xmark',
+                    'tone' => 'status-cancelled',
+                    'count' => $cancelledCount ?? 0,
+                    ],
                     ];
                     @endphp
 
@@ -197,7 +197,8 @@ $pageHeading = $isDentistView
                     <x-pagination-bar id="patientPaginationTopBar" info-id="patientPageInfoTop"
                         pagination-id="patientPaginationTop" position="top" :show-entries="true"
                         page-size-id="patientPerPage" page-size-callback="changePatientPageSize" :page-size-value="10"
-                        page-size-label="per page" label="patients" class="patient-pagebar" />
+                        page-size-label="per page" label="patients" :total="$allCount" :from="$allCount > 0 ? 1 : 0"
+                        :to="min(10, $allCount)" class="patient-pagebar" />
 
                     <div class="table-scroll-wrapper">
                         <div class="table-scroll-inner">
@@ -347,6 +348,11 @@ $pageHeading = $isDentistView
                                 $isFollowUpAppointment = (bool) ($appt->is_follow_up ?? false);
                                 $patientId = $patient?->id ?? $appt->patient_id;
                                 $patientName = $patient?->name ?? 'Unknown Patient';
+                                $patientName = preg_replace_callback(
+                                '/\b(ii|iii|iv|v|vi|vii|viii|ix|x)\.?$/i',
+                                fn ($matches) => strtoupper($matches[0]),
+                                $patientName
+                                ) ?? $patientName;
                                 $patientStudentNo = filled($patient?->student_no)
                                 ? $patient->student_no
                                 : (filled($patient?->faculty_code)
@@ -701,7 +707,8 @@ $pageHeading = $isDentistView
             </div>
 
             <x-pagination-bar id="patientPaginationBottomBar" info-id="patientPageInfoBottom"
-                pagination-id="patientPaginationBottom" position="bottom" label="patients" class="patient-pagebar" />
+                pagination-id="patientPaginationBottom" position="bottom" label="patients" :total="$allCount"
+                :from="$allCount > 0 ? 1 : 0" :to="min(10, $allCount)" class="patient-pagebar" />
 
         </div>
     </div>
@@ -1804,7 +1811,7 @@ $pageHeading = $isDentistView
 
             var currentPage = 1;
 
-            var currentItems = [];
+            var currentItems = allPatients.slice();
 
             function renderPatientPagebars() {
                 const totalItems =

@@ -1948,6 +1948,15 @@ body.layout-no-sidebar #mainContent.odontogram-page {
     min-width: 0;
 }
 
+.odontogram-procedure-duration-copy {
+    margin-top: .6rem;
+}
+
+#procedureDurationInput {
+    height: 34px;
+    margin-top: .25rem;
+}
+
 .odontogram-patient-name {
     margin-top: .2rem;
     color: var(--text-1);
