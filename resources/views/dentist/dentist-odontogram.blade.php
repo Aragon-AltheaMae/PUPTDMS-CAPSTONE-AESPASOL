@@ -355,6 +355,7 @@ $discardProcedureMessage = $existingAppointmentMode
                             </div>
 
                             <div id="odontogram2DPanel" class="mode-panel active">
+
                                 <div class="odontogram2d-shell custom-scrollbar">
                                     <div id="odontogram2DBoard" class="odontogram-board"></div>
                                 </div>
@@ -966,6 +967,8 @@ $discardProcedureMessage = $existingAppointmentMode
         let selectedSurfaceKey = null;
         let selectedMesh = null;
         let selectedScope = 'surface';
+        const selectedTargets = new Map();
+        let multiSelectTipToast = null;
         let pendingResetPayload = null;
         let hasAppliedTreatmentThisSession = false;
 
@@ -1805,6 +1808,7 @@ $discardProcedureMessage = $existingAppointmentMode
         }
 
         function clear3DSurfacePickerSelection(shouldResetCamera = false) {
+            selectedTargets.clear();
             selectedTooth = null;
             selectedTargetType = null;
             selectedSurfaceKey = null;
@@ -1853,6 +1857,101 @@ $discardProcedureMessage = $existingAppointmentMode
             });
         }
 
+        function getTargetSelectionKey(tooth, targetType, surfaceKey = null) {
+            return `${Number(tooth)}:${targetType}:${surfaceKey || ''}`;
+        }
+
+        function isTargetSelected(tooth, targetType, surfaceKey = null) {
+            return selectedTargets.has(
+                getTargetSelectionKey(tooth, targetType, surfaceKey)
+            );
+        }
+
+        function getLastSelectedTarget() {
+            const targets = Array.from(selectedTargets.values());
+            return targets.length ? targets[targets.length - 1] : null;
+        }
+
+        function setPrimaryTarget(target, preserveLegend = false) {
+            if (!target) {
+                selectedTooth = null;
+                selectedTargetType = null;
+                selectedSurfaceKey = null;
+                selectedLegend = null;
+                return;
+            }
+
+            const previousLegend = selectedLegend;
+
+            selectedTooth = Number(target.tooth);
+            selectedTargetType = target.targetType;
+            selectedSurfaceKey = target.surfaceKey || null;
+            selectedScope = target.targetType === 'whole' ? 'whole' : 'surface';
+
+            const state = ensureToothState(selectedTooth);
+            const record = target.targetType === 'whole'
+                ? state.status
+                : state.surfaces[selectedSurfaceKey];
+
+            selectedLegend = preserveLegend
+                ? previousLegend
+                : (record?.code || null);
+        }
+
+        function removeConflictingTargetsForTooth(tooth, targetType) {
+            const numericTooth = Number(tooth);
+
+            selectedTargets.forEach((target, key) => {
+                if (Number(target.tooth) !== numericTooth) return;
+
+                const conflicts =
+                    targetType === 'whole' ||
+                    target.targetType === 'whole';
+
+                if (conflicts) {
+                    selectedTargets.delete(key);
+                }
+            });
+        }
+
+        function select2DTarget(target, useMultiSelect = false) {
+            const normalizedTarget = {
+                tooth: Number(target.tooth),
+                targetType: target.targetType,
+                surfaceKey: target.surfaceKey || null
+            };
+            const key = getTargetSelectionKey(
+                normalizedTarget.tooth,
+                normalizedTarget.targetType,
+                normalizedTarget.surfaceKey
+            );
+
+            if (!useMultiSelect) {
+                selectedTargets.clear();
+                selectedTargets.set(key, normalizedTarget);
+                setPrimaryTarget(normalizedTarget, false);
+                return;
+            }
+
+            window.dismissToast?.(multiSelectTipToast);
+            multiSelectTipToast = null;
+
+            const preserveLegend = selectedTargets.size > 0 && !!selectedLegend;
+
+            if (selectedTargets.has(key)) {
+                selectedTargets.delete(key);
+                setPrimaryTarget(getLastSelectedTarget(), preserveLegend);
+                return;
+            }
+
+            removeConflictingTargetsForTooth(
+                normalizedTarget.tooth,
+                normalizedTarget.targetType
+            );
+            selectedTargets.set(key, normalizedTarget);
+            setPrimaryTarget(normalizedTarget, preserveLegend);
+        }
+
         function getSelectedRecord() {
             if (!selectedTooth || !selectedTargetType) return null;
 
@@ -1868,6 +1967,29 @@ $discardProcedureMessage = $existingAppointmentMode
         }
 
         function renderSelectedToothLegendList() {
+            if (currentView === '2d' && selectedTargets.size > 1) {
+                const legend = selectedLegend ? getLegendByCode(selectedLegend) : null;
+
+                if (!legend) {
+                    selectedToothLegendList.innerHTML =
+                        `<span class="ui-muted-text">${selectedTargets.size} targets selected</span>`;
+                    return;
+                }
+
+                selectedToothLegendList.innerHTML = `
+                    <span class="odontogram-preview-marking">
+                        <span
+                            class="odontogram-preview-marking-swatch"
+                            style="background:${legendColors[legend.code]};"
+                        ></span>
+                        <span>
+                            ${getLegendDisplayCode(legend.code)} - ${legend.label}
+                        </span>
+                    </span>
+                `;
+                return;
+            }
+
             const selectedRecord = getSelectedRecord();
 
             if (!selectedRecord) {
@@ -1892,12 +2014,59 @@ $discardProcedureMessage = $existingAppointmentMode
         }
 
         function updateActionButtons() {
-            const hasSelectedTarget = !!selectedTooth && !!selectedTargetType;
-            const hasSelectedLegend = !!selectedLegend;
-            const hasAssignedTreatment = !!getSelectedRecord();
+            const hasSelectedTarget =
+                selectedTargets.size > 0 ||
+                (!!selectedTooth && !!selectedTargetType);
 
-            applyTreatmentBtn.disabled = !(hasSelectedTarget && hasSelectedLegend);
-            clearCurrentToothBtn.disabled = !hasAssignedTreatment;
+            const hasSelectedLegend =
+                !!selectedLegend;
+
+            const hasAssignedTreatment =
+                currentView === '2d' &&
+                selectedTargets.size > 0
+                    ? Array.from(
+                        selectedTargets.values()
+                    ).some(target => {
+                        const state =
+                            ensureToothState(
+                                target.tooth
+                            );
+
+                        if (
+                            target.targetType === 'surface' &&
+                            target.surfaceKey
+                        ) {
+                            return !!state
+                                .surfaces[
+                                    target.surfaceKey
+                                ];
+                        }
+
+                        if (
+                            [
+                                'whole',
+                                'status',
+                                '3d'
+                            ].includes(
+                                target.targetType
+                            )
+                        ) {
+                            return !!state.status;
+                        }
+
+                        return false;
+                    })
+                    : !!getSelectedRecord();
+
+            applyTreatmentBtn.disabled =
+                !(
+                    hasSelectedTarget &&
+                    hasSelectedLegend
+                );
+
+            clearCurrentToothBtn.disabled =
+                !hasAssignedTreatment;
+
             updateHistoryButtons();
         }
 
@@ -1919,6 +2088,24 @@ $discardProcedureMessage = $existingAppointmentMode
                 legendStatusNote.classList.add('hidden');
                 selectedLegend = null;
                 selectedViewBadge.textContent = currentView === '2d' ? '2D View' : '3D View';
+
+                updateLegendActiveState();
+                renderSelectedToothLegendList();
+                updateActionButtons();
+                update3DSurfacePicker();
+                return;
+            }
+
+            if (currentView === '2d' && selectedTargets.size > 1) {
+                const targetCount = selectedTargets.size;
+
+                selectedToothDisplay.textContent = `${targetCount} targets selected`;
+                selectedToothName.textContent = 'Shift + Click to add or remove teeth and surfaces';
+                toothHoverLabel.innerText = `${targetCount} targets selected`;
+                selectedViewBadge.textContent = '2D View';
+                legendStatusNote.classList.remove('hidden');
+                legendStatusNote.textContent =
+                    `Select a treatment, then apply it to all ${targetCount} selected targets.`;
 
                 updateLegendActiveState();
                 renderSelectedToothLegendList();
@@ -2288,7 +2475,12 @@ $discardProcedureMessage = $existingAppointmentMode
         function updateHistoryButtons() {
             if (undoBtn) undoBtn.disabled = historyStack.length === 0;
             if (redoBtn) redoBtn.disabled = redoStack.length === 0;
-            if (clearSelectionBtn) clearSelectionBtn.disabled = !(selectedTooth && selectedTargetType);
+            if (clearSelectionBtn) {
+                clearSelectionBtn.disabled = !(
+                    selectedTargets.size > 0 ||
+                    (selectedTooth && selectedTargetType)
+                );
+            }
         }
 
         function clearCurrentSelection() {
@@ -2297,6 +2489,7 @@ $discardProcedureMessage = $existingAppointmentMode
                 return;
             }
 
+            selectedTargets.clear();
             selectedTooth = null;
             selectedTargetType = null;
             selectedSurfaceKey = null;
@@ -2334,42 +2527,88 @@ $discardProcedureMessage = $existingAppointmentMode
         function applyLegendToSelectedTarget(code) {
             if (!selectedTooth || !selectedTargetType) return;
 
+            const targets =
+                currentView === '2d' && selectedTargets.size > 0
+                    ? Array.from(selectedTargets.values())
+                    : [{
+                        tooth: selectedTooth,
+                        targetType: selectedTargetType,
+                        surfaceKey: selectedSurfaceKey
+                    }];
+
             pushHistory();
 
-            const state = ensureToothState(selectedTooth);
             const payload = createLegendPayload(code);
+            let replacedWholeTooth = false;
+            let replacedSurfaces = false;
+
+            targets.forEach(target => {
+                const state = ensureToothState(target.tooth);
+
+                if (
+                    target.targetType === 'surface' &&
+                    target.surfaceKey
+                ) {
+                    replacedWholeTooth = replacedWholeTooth || !!state.status;
+                    state.status = null;
+                    state.threeD = null;
+                    state.surfaces[target.surfaceKey] = { ...payload };
+                    state.lastSelectedSurface = target.surfaceKey;
+
+                    sync3DFrom2D(target.tooth);
+                    return;
+                }
+
+                if (['whole', '3d', 'status'].includes(target.targetType)) {
+                    replacedSurfaces = replacedSurfaces ||
+                        Object.values(state.surfaces || {}).some(Boolean);
+                    state.threeD = { ...payload };
+
+                    fillAll2DSurfacesFromLegend(
+                        state,
+                        { ...payload }
+                    );
+                }
+            });
+
             hasAppliedTreatmentThisSession = true;
 
-            if (
-                selectedTargetType === 'surface' &&
-                selectedSurfaceKey
-            ) {
-                const replacedWholeTooth = !!state.status;
-                state.status = null;
-                state.threeD = null;
-                state.surfaces[selectedSurfaceKey] =
-                    payload;
-
-                sync3DFrom2D(selectedTooth);
+            if (targets.length === 1) {
                 if (replacedWholeTooth) {
-                    showProcedureToast('The whole tooth treatment was replaced by this surface treatment.', 'info', 'Target Updated');
+                    showProcedureToast(
+                        'The whole tooth treatment was replaced by this surface treatment.',
+                        'info',
+                        'Target Updated'
+                    );
+                } else if (replacedSurfaces) {
+                    showProcedureToast(
+                        'Existing surface treatments were replaced by the whole tooth treatment.',
+                        'info',
+                        'Target Updated'
+                    );
                 }
-            } else if (
-                ['whole', '3d', 'status'].includes(selectedTargetType)
-            ) {
-                const replacedSurfaces = Object.values(state.surfaces || {}).some(Boolean);
-                state.threeD = payload;
-
-                fillAll2DSurfacesFromLegend(
-                    state,
-                    payload
+            } else {
+                showProcedureToast(
+                    `${getLegendDisplayCode(payload.code)} - ${payload.label} was applied to ${targets.length} selected targets.`,
+                    'success',
+                    'Multiple Targets Updated'
                 );
-                if (replacedSurfaces) {
-                    showProcedureToast('Existing surface treatments were replaced by the whole tooth treatment.', 'info', 'Target Updated');
-                }
             }
 
             updateHiddenInput();
+
+            if (currentView === '2d') {
+                clearCurrentSelection();
+
+                selectedLegendPreview.textContent =
+                    'None selected';
+
+                drawerSelectedLegendPreview.textContent =
+                    'None selected';
+
+                return;
+            }
+
             render2DOdontogram();
 
             if (odontogramThreeState) {
@@ -2379,8 +2618,12 @@ $discardProcedureMessage = $existingAppointmentMode
             renderSelectedToothLegendList();
             updateLegendActiveState();
             updateActionButtons();
-            selectedLegendPreview.textContent = `${getLegendDisplayCode(payload.code)} - ${payload.label}`;
-            drawerSelectedLegendPreview.textContent = `${getLegendDisplayCode(payload.code)} - ${payload.label}`;
+
+            selectedLegendPreview.textContent =
+                `${getLegendDisplayCode(payload.code)} - ${payload.label}`;
+
+            drawerSelectedLegendPreview.textContent =
+                `${getLegendDisplayCode(payload.code)} - ${payload.label}`;
 
             if (currentView === '3d') {
                 setTimeout(function () {
@@ -2390,64 +2633,199 @@ $discardProcedureMessage = $existingAppointmentMode
         }
 
         function clearSelectedTargetTreatment() {
-            if (!pendingResetPayload) return;
+            if (
+                !Array.isArray(
+                    pendingResetPayload
+                ) ||
+                !pendingResetPayload.length
+            ) {
+                return;
+            }
+
+            const targetsToClear =
+                [...pendingResetPayload];
+
             pushHistory();
 
-            const {
-                tooth,
-                targetType,
-                surfaceKey
-            } = pendingResetPayload;
-            const state = ensureToothState(tooth);
+            targetsToClear.forEach(
+                target => {
+                    const {
+                        tooth,
+                        targetType,
+                        surfaceKey
+                    } = target;
 
-            if (targetType === 'surface' && surfaceKey) {
-                state.surfaces[surfaceKey] = null;
-                state.lastSelectedSurface = getFirstTreatedSurfaceKey(state);
-                sync3DFrom2D(tooth);
-            } else if (['whole', '3d', 'status'].includes(targetType)) {
-                state.threeD = null;
-                state.lastSelectedSurface = null;
-                clearAll2DSurfaces(state);
-            }
+                    const state =
+                        ensureToothState(
+                            tooth
+                        );
+
+                    if (
+                        targetType === 'surface' &&
+                        surfaceKey
+                    ) {
+                        state.surfaces[
+                            surfaceKey
+                        ] = null;
+
+                        state.lastSelectedSurface =
+                            getFirstTreatedSurfaceKey(
+                                state
+                            );
+
+                        sync3DFrom2D(
+                            tooth
+                        );
+
+                        return;
+                    }
+
+                    if (
+                        [
+                            'whole',
+                            '3d',
+                            'status'
+                        ].includes(
+                            targetType
+                        )
+                    ) {
+                        state.threeD = null;
+                        state.lastSelectedSurface = null;
+
+                        clearAll2DSurfaces(
+                            state
+                        );
+                    }
+                }
+            );
+
+            const clearedCount =
+                targetsToClear.length;
 
             selectedLegend = null;
             pendingResetPayload = null;
 
-            selectedLegendPreview.textContent = 'None selected';
-            drawerSelectedLegendPreview.textContent = 'None selected';
+            selectedLegendPreview.textContent =
+                'None selected';
+
+            drawerSelectedLegendPreview.textContent =
+                'None selected';
 
             updateHiddenInput();
-            render2DOdontogram();
 
-            if (odontogramThreeState) {
-                renderThreeVisuals();
+            closeResetModal();
+
+            if (
+                clearedCount > 1
+            ) {
+                showProcedureToast(
+                    `Treatments were cleared from ${clearedCount} selected targets.`,
+                    'success',
+                    'Multiple Treatments Cleared'
+                );
             }
 
-            renderSelectedToothLegendList();
-            updateLegendActiveState();
-            updateActionButtons();
-            closeResetModal();
+            clearCurrentSelection();
         }
 
         function openResetModal() {
-            if (!selectedTooth || !selectedTargetType || !getSelectedRecord()) return;
+            if (
+                !selectedTooth ||
+                !selectedTargetType
+            ) {
+                return;
+            }
 
-            pendingResetPayload = {
-                tooth: selectedTooth,
-                targetType: selectedTargetType,
-                surfaceKey: selectedSurfaceKey
-            };
+            const targets =
+                currentView === '2d' &&
+                selectedTargets.size > 0
+                    ? Array.from(
+                        selectedTargets.values()
+                    )
+                    : [{
+                        tooth:
+                            selectedTooth,
 
-            const partText = selectedTargetType === 'surface' ?
-                getSurfaceLabel(selectedSurfaceKey, selectedTooth) :
-                selectedTargetType === 'status' ?
-                    'Status Box' :
-                    'Whole Tooth';
+                        targetType:
+                            selectedTargetType,
+
+                        surfaceKey:
+                            selectedSurfaceKey
+                    }];
+
+            const treatedTargets =
+                targets.filter(
+                    target => {
+                        const state =
+                            ensureToothState(
+                                target.tooth
+                            );
+
+                        if (
+                            target.targetType === 'surface' &&
+                            target.surfaceKey
+                        ) {
+                            return !!state
+                                .surfaces[
+                                    target.surfaceKey
+                                ];
+                        }
+
+                        if (
+                            [
+                                'whole',
+                                'status',
+                                '3d'
+                            ].includes(
+                                target.targetType
+                            )
+                        ) {
+                            return !!state.status;
+                        }
+
+                        return false;
+                    }
+                );
+
+            if (!treatedTargets.length) {
+                return;
+            }
+
+            pendingResetPayload =
+                treatedTargets;
+
+            if (
+                treatedTargets.length > 1
+            ) {
+                resetTreatmentMessage.textContent =
+                    `Are you sure you want to clear the treatments from ${treatedTargets.length} selected targets?`;
+
+                openUiModal(
+                    resetTreatmentModal
+                );
+
+                return;
+            }
+
+            const target =
+                treatedTargets[0];
+
+            const partText =
+                target.targetType === 'surface'
+                    ? getSurfaceLabel(
+                        target.surfaceKey,
+                        target.tooth
+                    )
+                    : target.targetType === 'status'
+                        ? 'Status Box'
+                        : 'Whole Tooth';
 
             resetTreatmentMessage.textContent =
-                `Are you sure you want to reset the treatment for tooth #${selectedTooth} (${getToothName(selectedTooth)}) - ${partText}?`;
+                `Are you sure you want to reset the treatment for tooth #${target.tooth} (${getToothName(target.tooth)}) - ${partText}?`;
 
-            openUiModal(resetTreatmentModal);
+            openUiModal(
+                resetTreatmentModal
+            );
         }
 
         function closeResetModal() {
@@ -2480,18 +2858,32 @@ $discardProcedureMessage = $existingAppointmentMode
 
             const statusDisplayRecord = getStatusBoxDisplayRecord(state);
 
-            applyDividedStatusBoxVisual(statusBox, statusDisplayRecord);
+            applyDividedStatusBoxVisual(
+                statusBox,
+                statusDisplayRecord
+            );
 
-            if (selectedTooth === toothNumber && selectedTargetType === 'whole') {
-                statusBox.classList.add('selected-target');
+            if (statusDisplayRecord) {
+                statusBox.classList.add(
+                    'has-treatment'
+                );
             }
 
-            statusBox.addEventListener('click', function () {
-                selectedScope = 'whole';
-                selectedTooth = toothNumber;
-                selectedTargetType = 'whole';
-                selectedSurfaceKey = null;
-                selectedLegend = state.status?.code || null;
+            if (isTargetSelected(toothNumber, 'whole')) {
+                statusBox.classList.add('selected-target');
+
+                if (selectedTargets.size > 1) {
+                    statusBox.classList.add('multi-selected-target');
+                }
+            }
+
+            statusBox.addEventListener('click', function (event) {
+                currentView = '2d';
+                select2DTarget({
+                    tooth: toothNumber,
+                    targetType: 'whole',
+                    surfaceKey: null
+                }, event.shiftKey);
                 updateScopeButtons();
                 updateSelectedToothUI();
                 render2DOdontogram();
@@ -2524,21 +2916,29 @@ $discardProcedureMessage = $existingAppointmentMode
                 const surfaceRecord = state.surfaces[surface] || state.status;
 
                 if (surfaceRecord) {
-                    part.style.fill = surfaceRecord.colorHex;
+                    part.style.fill =
+                        surfaceRecord.colorHex;
+
+                    part.classList.add(
+                        'has-treatment'
+                    );
                 }
 
-                if (selectedTooth === toothNumber && selectedTargetType === 'surface' &&
-                    selectedSurfaceKey === surface) {
+                if (isTargetSelected(toothNumber, 'surface', surface)) {
                     part.classList.add('selected-target');
+
+                    if (selectedTargets.size > 1) {
+                        part.classList.add('multi-selected-target');
+                    }
                 }
 
-                part.addEventListener('click', function () {
+                part.addEventListener('click', function (event) {
                     currentView = '2d';
-                    selectedScope = 'surface';
-                    selectedTooth = toothNumber;
-                    selectedTargetType = 'surface';
-                    selectedSurfaceKey = surface;
-                    selectedLegend = state.surfaces[surface]?.code || null;
+                    select2DTarget({
+                        tooth: toothNumber,
+                        targetType: 'surface',
+                        surfaceKey: surface
+                    }, event.shiftKey);
                     updateScopeButtons();
                     updateSelectedToothUI();
                     render2DOdontogram();
@@ -2683,6 +3083,7 @@ $discardProcedureMessage = $existingAppointmentMode
                     'Select a tooth, then choose a surface';
 
                 if (previousView !== '3d') {
+                    selectedTargets.clear();
                     selectedTooth = null;
                     selectedTargetType = null;
                     selectedSurfaceKey = null;
@@ -2732,11 +3133,24 @@ $discardProcedureMessage = $existingAppointmentMode
         function selectTargetScope(scope) {
             selectedScope = scope;
             selectedSurfaceKey = null;
+            selectedTargets.clear();
 
             if (selectedTooth) {
                 const state = ensureToothState(selectedTooth);
                 selectedTargetType = scope === 'whole' ? 'whole' : null;
                 selectedLegend = scope === 'whole' ? state.status?.code || null : null;
+
+                if (scope === 'whole') {
+                    const target = {
+                        tooth: Number(selectedTooth),
+                        targetType: 'whole',
+                        surfaceKey: null
+                    };
+                    selectedTargets.set(
+                        getTargetSelectionKey(target.tooth, target.targetType),
+                        target
+                    );
+                }
             }
 
             updateScopeButtons();
@@ -2864,10 +3278,16 @@ $discardProcedureMessage = $existingAppointmentMode
             applyLegendToSelectedTarget(selectedLegend);
         });
 
-        clearCurrentToothBtn.addEventListener('click', function () {
-            if (!selectedTooth || !selectedTargetType || !getSelectedRecord()) return;
-            openResetModal();
-        });
+        clearCurrentToothBtn.addEventListener('click',function () {
+            if (
+                !selectedTooth ||
+                !selectedTargetType
+            ) {
+                return;
+            }
+                openResetModal();
+            }
+        );
 
         confirmResetTreatmentBtn.addEventListener('click', clearSelectedTargetTreatment);
         cancelResetTreatmentBtn.addEventListener('click', closeResetModal);
@@ -3662,6 +4082,36 @@ $discardProcedureMessage = $existingAppointmentMode
             close3DSurfacePickerBtn.addEventListener('click', function () {
                 clear3DSurfacePickerSelection(false);
             });
+        }
+
+        const coarsePointer =
+            window.matchMedia?.(
+                '(hover: none), (pointer: coarse)'
+            )?.matches;
+
+        if (!coarsePointer) {
+            multiSelectTipToast =
+            window.showToast?.({
+                type: 'info',
+                title: 'Tip',
+                message: 'Hold Shift + Click to select multiple teeth and surfaces.',
+                duration: 9000,
+            });
+
+            multiSelectTipToast
+                ?.classList
+                .add(
+                    'odontogram-tip-toast'
+                );
+
+            multiSelectTipToast
+                ?.querySelector(
+                    '.toast-icon-wrap i'
+                )
+                ?.setAttribute(
+                    'class',
+                    'fa-solid fa-lightbulb'
+                );
         }
 
         initLegendPanelResize();

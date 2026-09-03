@@ -596,6 +596,86 @@
     font-weight: 900;
 }
 
+#odontogram2DPanel {
+    position: relative;
+}
+
+.odontogram-multi-select-hint {
+    position: absolute;
+    top: .75rem;
+    left: .75rem;
+    z-index: 12;
+
+    max-width: min(430px, calc(100% - 1.5rem));
+    min-height: 36px;
+    padding: .5rem .55rem .5rem .65rem;
+
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+
+    border: 1px solid var(--blue-200);
+    border-radius: 11px;
+    background: color-mix(in srgb, var(--blue-50) 94%, transparent);
+    color: var(--blue-700);
+    box-shadow: 0 8px 20px var(--alpha-blue-600-14);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    font-size: .68rem;
+    font-weight: 750;
+    line-height: 1.35;
+
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition:
+        opacity .2s ease,
+        visibility .2s ease,
+        transform .2s ease;
+}
+
+.odontogram-multi-select-hint.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    pointer-events: none;
+}
+
+.odontogram-multi-select-hint-icon {
+    flex: 0 0 auto;
+    font-size: .82rem;
+}
+
+.odontogram-multi-select-hint-close {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    margin-left: .15rem;
+    padding: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: currentColor;
+    cursor: pointer;
+    opacity: .72;
+}
+
+.odontogram-multi-select-hint-close:hover,
+.odontogram-multi-select-hint-close:focus-visible {
+    background: var(--blue-100);
+    opacity: 1;
+}
+
+.odontogram-multi-select-hint-close i {
+    font-size: .62rem;
+}
+
 .odontogram2d-shell {
     width: 100%;
     overflow-x: auto;
@@ -616,6 +696,12 @@
     gap: 14px;
     margin: 0 auto;
     padding: .35rem 0;
+}
+
+.odontogram-board,
+.odontogram-board * {
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .odontogram-row {
@@ -699,8 +785,24 @@
 }
 
 .status-box.selected-target {
-    outline: 2.5px solid rgba(139, 0, 0, 0.2);
-    background: #FEE2E2;
+    outline: 2.5px solid var(--alpha-blue-600-22);
+    border-color: var(--blue-600);
+}
+
+.status-box.selected-target:not(.has-treatment) {
+    background: var(--blue-50);
+}
+
+.status-box.multi-selected-target {
+    border-color: var(--blue-600);
+    box-shadow:
+        0 0 0 3px var(--alpha-blue-600-14);
+    animation:
+        odontogramMultiSelectPop .22s ease-out;
+}
+
+.status-box.multi-selected-target:not(.has-treatment) {
+    background: var(--blue-100);
 }
 
 .tooth-number {
@@ -750,10 +852,41 @@
     fill: #E5E7EB;
 }
 
-.surface-part.selected-target {
-    fill: #FEE2E2;
-    stroke: #8B0000;
+.surface-part.selected-target:not(.has-treatment) {
+    fill: var(--blue-50) !important;
+    stroke: var(--blue-600) !important;
     stroke-width: 4px;
+}
+
+.surface-part.multi-selected-target:not(.has-treatment) {
+    fill: var(--blue-100) !important;
+    stroke: var(--blue-600) !important;
+    stroke-width: 4px;
+}
+
+.surface-part.has-treatment.selected-target,
+.surface-part.has-treatment.multi-selected-target {
+    stroke: var(--blue-600) !important;
+    stroke-width: 5px;
+}
+
+.surface-part.multi-selected-target {
+    filter: drop-shadow(0 0 3px var(--alpha-blue-600-22));
+    animation: odontogramMultiSelectPop .22s ease-out;
+}
+
+@keyframes odontogramMultiSelectPop {
+    0% {
+        opacity: .62;
+        transform: scale(.92);
+        transform-origin: center;
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+        transform-origin: center;
+    }
 }
 
 .surface-center {
@@ -1663,8 +1796,16 @@ body.layout-no-sidebar #mainContent.odontogram-page {
 
 [data-theme="dark"] #mainContent.odontogram-page .status-box.selected-target,
 .dark #mainContent.odontogram-page .status-box.selected-target {
-    background: rgba(139, 0, 0, 0.30);
-    outline-color: rgba(252, 165, 165, 0.35);
+    background: var(--alpha-blue-600-22);
+    border-color: var(--blue-400);
+    outline-color: var(--alpha-blue-300-36);
+}
+
+[data-theme="dark"] #mainContent.odontogram-page .status-box.multi-selected-target,
+.dark #mainContent.odontogram-page .status-box.multi-selected-target {
+    background: var(--alpha-blue-600-34);
+    border-color: var(--blue-300);
+    box-shadow: 0 0 0 3px var(--alpha-blue-300-28);
 }
 
 [data-theme="dark"] #mainContent.odontogram-page .tooth-2d-wrapper,
@@ -1686,8 +1827,30 @@ body.layout-no-sidebar #mainContent.odontogram-page {
 
 [data-theme="dark"] #mainContent.odontogram-page .surface-part.selected-target,
 .dark #mainContent.odontogram-page .surface-part.selected-target {
-    fill: rgba(139, 0, 0, 0.34);
-    stroke: #FCA5A5;
+    fill: var(--alpha-blue-600-22) !important;
+    stroke: var(--blue-400) !important;
+}
+
+[data-theme="dark"] #mainContent.odontogram-page .surface-part.multi-selected-target,
+.dark #mainContent.odontogram-page .surface-part.multi-selected-target {
+    fill: var(--alpha-blue-600-34) !important;
+    stroke: var(--blue-300) !important;
+    filter: drop-shadow(0 0 4px var(--alpha-blue-300-36));
+}
+
+[data-theme="dark"] #mainContent.odontogram-page .odontogram-multi-select-hint,
+.dark #mainContent.odontogram-page .odontogram-multi-select-hint {
+    background: color-mix(in srgb, var(--surface) 88%, var(--blue-600) 12%);
+    border-color: var(--alpha-blue-300-36);
+    color: var(--blue-300);
+    box-shadow: 0 10px 24px var(--alpha-black-30);
+}
+
+[data-theme="dark"] #mainContent.odontogram-page .odontogram-multi-select-hint-close:hover,
+[data-theme="dark"] #mainContent.odontogram-page .odontogram-multi-select-hint-close:focus-visible,
+.dark #mainContent.odontogram-page .odontogram-multi-select-hint-close:hover,
+.dark #mainContent.odontogram-page .odontogram-multi-select-hint-close:focus-visible {
+    background: var(--alpha-blue-600-22);
 }
 
 [data-theme="dark"] #mainContent.odontogram-page .three-mouse-guide-item,
@@ -2720,6 +2883,46 @@ body.odontogram-resizing * {
     user-select: none !important;
 }
 
+body:has(#mainContent.odontogram-page) #toastContainer .toast-item.odontogram-tip-toast {
+    position: fixed !important;
+
+    top: calc(var(--header-h, 72px) + 1rem) !important;
+    left: 1.5rem !important;
+    right: auto !important;
+
+    width: min(420px, calc(100vw - 3rem)) !important;
+    margin: 0 !important;
+
+    z-index: 1000000 !important;
+
+    animation:
+        odontogramTipToastIn .38s cubic-bezier(.22, 1, .36, 1) both !important;
+}
+
+body:has(#mainContent.odontogram-page) #toastContainer .toast-item.odontogram-tip-toast.toast-exit {
+    animation: odontogramTipToastOut .32s cubic-bezier(.4, 0, 1, 1) both !important;
+}
+
+@keyframes odontogramTipToastIn {
+    from {
+        transform: translateX(-120px);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes odontogramTipToastOut {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-120px);
+    }
+}
+
 .odontogram-legend-panel .legend-drawer-body {
     flex: 1 1 auto;
     min-height: 0;
@@ -2970,4 +3173,20 @@ body.odontogram-resizing * {
     align-items: center;
 
     gap: .4rem;
+}
+
+
+@media (hover: none),
+(pointer: coarse) {
+    .odontogram-multi-select-hint {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .status-box.multi-selected-target,
+    .surface-part.multi-selected-target {
+        animation: none;
+    }
 }
