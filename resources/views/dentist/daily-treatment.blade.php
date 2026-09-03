@@ -324,6 +324,7 @@
                     <option value="">Select office</option>
                     <option value="Administrative">Administrative</option>
                     <option value="Faculty">Faculty</option>
+                    <option value="Alumni">Alumni</option>
                     <option value="Dependent">Dependent</option>
                   </select>
                 </div>

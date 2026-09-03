@@ -43,6 +43,11 @@ function normalizeRecordData(source) {
                 source.dataset.treatment ||
                 '',
 
+            treatmentItems: parseRecordDatasetJson(
+                source.dataset.treatmentItems,
+                []
+            ),
+
             oral: source.dataset.oral ||
                 source.dataset.oralExamination ||
                 '',
@@ -97,6 +102,9 @@ function normalizeRecordData(source) {
             source?.treatment_notes ||
             source?.treatment ||
             '',
+
+        treatmentItems: source?.treatment_items ||
+            source?.treatmentItems || [],
 
         oral: source?.oral ||
             source?.oral_examination ||
@@ -355,22 +363,12 @@ function formatRecordTreatments(
     };
 
     entries.forEach(entry => {
+        const surfaceTreatments = [];
 
         if (entry?.status) {
             addTreatment(
                 'Status',
                 entry.status
-            );
-        }
-
-        if (
-            entry?.threeD ||
-            entry?.three_d
-        ) {
-            addTreatment(
-                '3D',
-                entry.threeD ||
-                entry.three_d
             );
         }
 
@@ -394,15 +392,66 @@ function formatRecordTreatments(
                 return;
             }
 
-            addTreatment(
+            const surfaceLabel =
                 surface
                     .charAt(0)
                     .toUpperCase() +
-                surface.slice(1),
+                surface.slice(1);
 
+            addTreatment(
+                surfaceLabel,
                 record
             );
+
+            surfaceTreatments.push({
+                code: String(
+                    record.code || ''
+                )
+                    .trim()
+                    .toUpperCase(),
+                label: String(
+                    record.label ||
+                    record.code ||
+                    ''
+                )
+                    .trim()
+                    .toLowerCase(),
+            });
         });
+
+        const threeDRecord =
+            entry?.threeD ||
+            entry?.three_d;
+
+        const hasMatchingSurfaceTreatment =
+            !!threeDRecord &&
+            surfaceTreatments.some(
+                treatment =>
+                    treatment.code ===
+                    String(
+                        threeDRecord.code || ''
+                    )
+                        .trim()
+                        .toUpperCase() &&
+                    treatment.label ===
+                    String(
+                        threeDRecord.label ||
+                        threeDRecord.code ||
+                        ''
+                    )
+                        .trim()
+                        .toLowerCase()
+            );
+
+        if (
+            threeDRecord &&
+            !hasMatchingSurfaceTreatment
+        ) {
+            addTreatment(
+                '3D',
+                threeDRecord
+            );
+        }
     });
 
     return treatments;
@@ -561,9 +610,14 @@ function setRecordModalData(
     }
 
     const treatments =
-        formatRecordTreatments(
-            data.odontogramData
-        );
+        Array.isArray(
+            data.treatmentItems
+        ) &&
+            data.treatmentItems.length
+            ? data.treatmentItems
+            : formatRecordTreatments(
+                data.odontogramData
+            );
 
     renderRecordTreatments(
         'm_remarks',

@@ -192,6 +192,8 @@ class WalkInController extends Controller
                 match ($role) {
                     'patient' => [
                         'student',
+                        'alumni',
+                        'dependent',
                         'dependent_alumni',
                     ],
 
@@ -1478,6 +1480,8 @@ class WalkInController extends Controller
                     'student' => 'Student',
                     'faculty' => 'Faculty',
                     'administrative' => 'Administrative Personnel',
+                    'alumni' => 'Alumni',
+                    'dependent' => 'Dependent',
                     'dependent_alumni' => 'Dependent & Alumni',
                     default => 'Dependent & Alumni',
                 };
@@ -2052,6 +2056,8 @@ class WalkInController extends Controller
                         'student' => 'Student',
                         'faculty' => 'Faculty',
                         'administrative' => 'Administrative Personnel',
+                        'alumni' => 'Alumni',
+                        'dependent' => 'Dependent',
                         'dependent_alumni' => 'Dependent & Alumni',
                         default => $selectedPatientType,
                     },
@@ -2060,6 +2066,8 @@ class WalkInController extends Controller
                         'student' => 'Student',
                         'faculty' => 'Faculty',
                         'administrative' => 'Administrative Personnel',
+                        'alumni' => 'Alumni',
+                        'dependent' => 'Dependent',
                         'dependent_alumni' => 'Dependent & Alumni',
                         default => $selectedPatientType,
                     },
@@ -3130,6 +3138,8 @@ class WalkInController extends Controller
                         'student',
                         'faculty',
                         'administrative',
+                        'alumni',
+                        'dependent',
                         'dependent_alumni',
                     ],
                     true
@@ -3371,12 +3381,14 @@ class WalkInController extends Controller
             'administrative' =>
             'administrative',
 
+            'dependent' =>
             'dependent',
+
             'alumni' =>
-            'dependent_alumni',
+            'alumni',
 
             default =>
-            'dependent_alumni',
+            'dependent',
         };
     }
 
@@ -3396,13 +3408,17 @@ class WalkInController extends Controller
             str_contains($type, 'personnel') =>
             'administrative',
 
-            str_contains($type, 'dependent'),
-            str_contains($type, 'alumni'),
+            str_contains($type, 'dependent') =>
+            'dependent',
+
+            str_contains($type, 'alumni') =>
+            'alumni',
+
             str_contains($type, 'guest') =>
-            'dependent_alumni',
+            'dependent',
 
             default =>
-            'dependent_alumni',
+            'dependent',
         };
     }
 }

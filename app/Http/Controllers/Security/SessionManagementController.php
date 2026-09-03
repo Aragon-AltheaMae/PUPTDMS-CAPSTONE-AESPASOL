@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Security;
 
-use App\Helpers\AuditLogger;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\ConcurrentSessionService;
@@ -192,13 +191,7 @@ class SessionManagementController extends Controller
         }
 
         if ($user) {
-            AuditLogger::log(
-                'logout',
-                'authentication',
-                $reason === 'idle'
-                    ? 'User was signed out due to inactivity.'
-                    : 'User signed out from session management.'
-            );
+            $this->concurrentSessionService->recordLogoutActivity($user, $reason);
         }
 
         Cookie::queue(Cookie::forget('jwt_token', '/'));

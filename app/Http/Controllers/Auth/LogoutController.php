@@ -5,12 +5,17 @@ namespace App\Http\Controllers\Auth;
 use App\Helpers\AuditLogger;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\ConcurrentSessionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
 
 class LogoutController extends Controller
 {
+    public function __construct(
+        private readonly ConcurrentSessionService $concurrentSessionService
+    ) {}
+
     public function logout(Request $request)
     {
         $user = Auth::user();
@@ -41,13 +46,17 @@ class LogoutController extends Controller
 
         Cookie::queue(Cookie::forget('jwt_token', '/'));
 
-        AuditLogger::log(
-            'logout',
-            'authentication',
-            $reason === 'idle'
-                ? 'User was logged out due to inactivity'
-                : 'User logged out of the system (global logout)'
-        );
+        if ($user) {
+            $this->concurrentSessionService->recordLogoutActivity($user, $reason);
+        } else {
+            AuditLogger::log(
+                'logout',
+                'authentication',
+                $reason === 'idle'
+                    ? 'User was signed out due to inactivity.'
+                    : 'User logged out of the system (global logout)'
+            );
+        }
 
         Auth::guard('patient')->logout();
         Auth::logout();
