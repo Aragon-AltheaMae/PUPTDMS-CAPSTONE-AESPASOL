@@ -146,11 +146,17 @@
                                                         <span class="field-optional">(Optional)</span>
                                                     </label>
 
-                                                    <input type="text" id="guestSuffix" name="guest_suffix"
-                                                        class="form-input-custom" placeholder="e.g. Jr., III"
-                                                        autocomplete="honorific-suffix" data-validation-rule="guestName"
-                                                        data-pattern-message="Only letters, spaces, apostrophe, period, and hyphen are allowed."
-                                                        maxlength="20" disabled>
+                                                    <select id="guestSuffix" name="guest_suffix"
+                                                        class="form-select-custom js-custom-select"
+                                                        data-placeholder="Select suffix" disabled>
+                                                        <option value="">Select suffix</option>
+                                                        <option value="Jr.">Jr.</option>
+                                                        <option value="Sr.">Sr.</option>
+                                                        <option value="II">II</option>
+                                                        <option value="III">III</option>
+                                                        <option value="IV">IV</option>
+                                                        <option value="V">V</option>
+                                                    </select>
                                                 </div>
 
                                             </div>
@@ -198,7 +204,7 @@
                                                         </label>
 
                                                         <select id="guestPatientType" name="guest_patient_type"
-                                                            class="form-select-custom" disabled required
+                                                            class="form-select-custom js-custom-select" disabled required
                                                             data-required-message="Please select the guest's patient type.">
                                                             <option value="">Select patient type</option>
                                                             <option value="student">Student</option>
@@ -905,6 +911,7 @@
         });
 
         [
+            guestSuffix,
             guestPatientType,
             guestGender,
         ].forEach(selectField => {
@@ -1295,18 +1302,22 @@
                 radio.checked = false;
             });
 
-            if (guestPatientType) {
-                const guestPatientTypeWrapper =
-                    guestPatientType.closest(
+            [
+                guestSuffix,
+                guestPatientType,
+                guestGender,
+            ].forEach(selectField => {
+                const selectWrapper =
+                    selectField?.closest(
                         ".custom-select"
                     );
 
-                if (guestPatientTypeWrapper) {
+                if (selectWrapper) {
                     window.syncCustomSelect?.(
-                        guestPatientTypeWrapper
+                        selectWrapper
                     );
                 }
-            }
+            });
 
             updateGuestIdentityFields();
         }

@@ -105,14 +105,7 @@ $appt->duration
 ),
 
 'remarks' =>
-$appt->procedure?->completion_action
-? \Illuminate\Support\Str::of(
-$appt->procedure->completion_action
-)
-->replace('_', ' ')
-->title()
-->toString()
-: ($appt->remarks ?? null),
+($appt->remarks ?? null),
 
 'oral' =>
 $appt->procedure?->oral_examination
@@ -128,6 +121,11 @@ $appt->procedure?->diagnosis
 $appt->procedure?->prescriptions
 ?? $appt->prescription
 ?? null,
+
+'treatment_items' =>
+\App\Support\OdontogramTreatmentDisplay::items(
+    $appt->procedure?->odontogram_data ?? []
+),
 ];
 }
 @endphp

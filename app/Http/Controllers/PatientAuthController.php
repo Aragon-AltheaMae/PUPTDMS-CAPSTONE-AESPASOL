@@ -156,11 +156,7 @@ class PatientAuthController extends Controller
         $patient = Auth::user()?->patient;
 
         if ($patient) {
-            AuditLogger::log(
-                'logout',
-                'patient_auth',
-                "Patient logged out"
-            );
+            $this->concurrentSessionService->recordLogoutActivity($patient->user, 'manual', 'patient_auth');
         }
 
         Auth::guard('patient')->logout();
