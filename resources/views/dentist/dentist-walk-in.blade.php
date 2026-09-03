@@ -376,7 +376,6 @@
                                     <button type="button" id="clearSelectedPatientBtn"
                                         class="ui-btn ui-btn-secondary ui-btn-sm">
 
-                                        <i class="fa-solid fa-xmark"></i>
                                         <span>Clear Selection</span>
 
                                     </button>
@@ -1481,19 +1480,7 @@
             );
         });
 
-        const tobacco =
-            document.querySelector(
-                'input[name="tobacco_use"]:checked'
-            );
-
-        document
-            .getElementById(
-                "tobacco_details"
-            )
-            ?.classList.toggle(
-                "hidden",
-                tobacco?.value !== "YES"
-            );
+        syncTobaccoDetails();
 
         updateWomenSection(
             selectedWalkInPatient?.gender
@@ -4618,12 +4605,62 @@ ${summaryCard(
             }
         }));
     });
-    [...document.getElementsByName("tobacco_use")].forEach(r => r.addEventListener("change", () => {
-        if (r.checked && r.value === "YES") document.getElementById("tobacco_details")?.classList
-            .remove(
-                "hidden");
-        else document.getElementById("tobacco_details")?.classList.add("hidden");
-    }));
+   
+    function syncTobaccoDetails() {
+        const selected =
+            document.querySelector(
+                'input[name="tobacco_use"]:checked'
+            );
+
+        const box =
+            document.getElementById(
+                'tobacco_details'
+            );
+
+        if (!box) {
+            return;
+        }
+
+        const shouldShow =
+            selected?.value === 'YES';
+
+        box.classList.toggle(
+            'hidden',
+            !shouldShow
+        );
+
+        box.querySelectorAll(
+            '[data-number-stepper-input]'
+        ).forEach(input => {
+            if (shouldShow) {
+                if (!input.value) {
+                    input.value = '1';
+                }
+
+                return;
+            }
+
+            input.value = '';
+
+            window
+                .clearFormInputValidation?.(
+                    input
+                );
+        });
+    }
+
+    document
+        .querySelectorAll(
+            'input[name="tobacco_use"]'
+        )
+        .forEach(radio => {
+            radio.addEventListener(
+                'change',
+                syncTobaccoDetails
+            );
+        });
+
+    syncTobaccoDetails();
 
     document.querySelectorAll('input, textarea, select').forEach(input => {
         input.addEventListener('input', () => {

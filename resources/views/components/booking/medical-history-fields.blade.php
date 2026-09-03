@@ -312,9 +312,9 @@
 
 
                     <input type="number" name="{{ $fieldName('tobacco_per_day') }}"
-                        value="{{ $fieldValue('tobacco_per_day', '1') }}" min="1" max="100"
-                        step="1" class="global-number-stepper-input" data-number-stepper-input
-                        data-required-when-visible="true"
+                        value="{{ $fieldValue('tobacco_use') === 'YES' ? $fieldValue('tobacco_per_day', '1') : '' }}"
+                        min="1" max="100" step="1" class="global-number-stepper-input"
+                        data-number-stepper-input data-required-when-visible="true"
                         data-required-message="Please enter the tobacco amount per day.">
 
                     <button type="button" class="global-number-stepper-btn" data-number-step="1"
@@ -339,9 +339,9 @@
                     </button>
 
                     <input type="number" name="{{ $fieldName('tobacco_per_week') }}"
-                        value="{{ $fieldValue('tobacco_per_week', '1') }}" min="1" max="7"
-                        step="1" class="global-number-stepper-input" data-number-stepper-input
-                        data-required-when-visible="true"
+                        value="{{ $fieldValue('tobacco_use') === 'YES' ? $fieldValue('tobacco_per_week', '1') : '' }}"
+                        min="1" max="7" step="1" class="global-number-stepper-input"
+                        data-number-stepper-input data-required-when-visible="true"
                         data-required-message="Please enter the tobacco amount per week.">
 
                     <button type="button" class="global-number-stepper-btn" data-number-step="1"

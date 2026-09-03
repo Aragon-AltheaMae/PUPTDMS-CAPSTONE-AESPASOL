@@ -106,18 +106,25 @@
 
                 <div class="modal-form-grid-2 mb-2 sm:mb-3">
 
-                    <div class="cal-wrap modal-calendar-panel calendar-shell-no-card" data-global-field>
+                    <div class="cal-wrap modal-calendar-panel calendar-shell-no-card" data-global-field
+                        data-global-linked-input="#new_appointment_date" data-global-error-key="reschedule-date">
                         <div id="calGridWrapReschedule"></div>
                     </div>
 
-                    <div class="slots-wrap modal-option-panel appointment-time-panel" data-global-field>
-                        <div class="modal-section-heading">
-                            <span class="modal-section-icon">
+                    <div class="slots-wrap time-panel appointment-time-panel" data-global-field
+                        data-global-linked-input="#new_appointment_time" data-global-error-key="reschedule-time">
+
+                        <div class="appointment-time-heading">
+                            <span class="appointment-time-heading-icon">
                                 <i class="fa-regular fa-clock"></i>
                             </span>
 
                             <div>
-                                <h4>Time Slot</h4>
+                                <h4>Pick a Time Slot</h4>
+
+                                <p>
+                                    Choose a new appointment time for the selected date.
+                                </p>
                             </div>
                         </div>
 
@@ -156,7 +163,6 @@
             w-full
         "
                                 onclick="clearRescheduleSlotSelection()">
-                                <i class="fa-solid fa-xmark"></i>
                                 Clear selection
                             </button>
 

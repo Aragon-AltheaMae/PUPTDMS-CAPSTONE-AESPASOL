@@ -48,8 +48,7 @@ class AppointmentController extends Controller
 {
     public function __construct(
         private readonly StudentApiService $studentApiService
-    ) {
-    }
+    ) {}
 
     public function index()
     {
@@ -222,8 +221,7 @@ class AppointmentController extends Controller
     public function create(
         Request $request,
         ?ReservedBookingPeriod $reservedBookingPeriod = null
-    )
-    {
+    ) {
         $patientId = session('impersonated_patient_id') ?: session('patient_id');
 
         if (!$patientId) {
@@ -259,7 +257,7 @@ class AppointmentController extends Controller
 
             if ($reservedBookingPeriod->booking_mode === 'timeslot') {
                 $availableReservedSlots = $reservedBookingPeriod->slots
-                    ->filter(fn (ReservedBookingPeriodSlot $slot) => ! $slot->appointment
+                    ->filter(fn(ReservedBookingPeriodSlot $slot) => ! $slot->appointment
                         || $slot->appointment->status === 'cancelled')
                     ->filter(function (ReservedBookingPeriodSlot $slot) use ($reservedBookingPeriod) {
                         if (! $reservedBookingPeriod->reserved_date->isToday()) {
@@ -267,7 +265,7 @@ class AppointmentController extends Controller
                         }
 
                         return Carbon::parse(
-                            $reservedBookingPeriod->reserved_date->format('Y-m-d').' '.$slot->slot_time
+                            $reservedBookingPeriod->reserved_date->format('Y-m-d') . ' ' . $slot->slot_time
                         )->isFuture();
                     })
                     ->values();
@@ -524,7 +522,7 @@ class AppointmentController extends Controller
         }
 
         return ! $reservedDate->isToday()
-            || Carbon::parse($period->reserved_date->format('Y-m-d').' '.$period->end_time)->isFuture();
+            || Carbon::parse($period->reserved_date->format('Y-m-d') . ' ' . $period->end_time)->isFuture();
     }
 
     private function reservedPeriodRemainingCapacity(ReservedBookingPeriod $period): int
@@ -882,9 +880,11 @@ class AppointmentController extends Controller
         $mustUseFutureTime = ! $reservedBookingPeriod
             || $reservedBookingPeriod->booking_mode === 'timeslot';
 
-        if ($date->isToday()
+        if (
+            $date->isToday()
             && $mustUseFutureTime
-            && Carbon::parse($date->toDateString().' '.$mysqlTime)->lessThanOrEqualTo(now())) {
+            && Carbon::parse($date->toDateString() . ' ' . $mysqlTime)->lessThanOrEqualTo(now())
+        ) {
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'That appointment time has already passed. Please select a later time.');
@@ -1143,7 +1143,8 @@ class AppointmentController extends Controller
                 if (Appointment::query()
                     ->where('patient_id', $patientId)
                     ->where('reserved_booking_period_id', $lockedReservedPeriod->id)
-                    ->exists()) {
+                    ->exists()
+                ) {
                     throw \Illuminate\Validation\ValidationException::withMessages([
                         'reserved_booking_period_id' => 'You already booked this reserved period.',
                     ]);
@@ -1187,236 +1188,243 @@ class AppointmentController extends Controller
 
             // 2) DENTAL HISTORY (patient-based)
             if (! $preserveExistingDentalHistory) {
-            DentalHistory::updateOrCreate(
-                ['patient_id' => $patientId],
-                [
-                    'last_dental_visit' => $request->last_dental_visit,
-                    'previous_dentist'  => $request->previous_dentist,
-                ]
-            );
-
-            DentalHistoryConditionDate::updateOrCreate(
-                ['patient_id' => $patientId],
-                [
-                    'extraction_date' => $request->extraction_date,
-                    'dentures_date'   => $request->dentures_date,
-                    'ortho_date'      => $request->ortho_date,
-                ]
-            );
-
-            DentalHistoryConcern::updateOrCreate(
-                ['patient_id' => $patientId],
-                [
-                    'additional_concerns' => $request->additional_concerns,
-                ]
-            );
-
-            // YES/NO answers (dental_history_answers)
-            $dentalAnswerMap = [
-                'bleeding_gums'      => $request->bleeding_gums,
-                'sensitive_temp'     => $request->sensitive_temp,
-                'sensitive_taste'    => $request->sensitive_taste,
-                'tooth_pain'         => $request->tooth_pain,
-                'sores'              => $request->sores,
-                'injuries'           => $request->injuries,
-
-                'clicking'           => $request->clicking,
-                'joint_pain'         => $request->joint_pain,
-                'difficulty_moving'  => $request->difficulty_moving,
-                'difficulty_chewing' => $request->difficulty_chewing,
-                'jaw_headaches'      => $request->jaw_headaches,
-                'clench_grind'       => $request->clench_grind,
-                'biting'             => $request->biting,
-                'teeth_loosening'    => $request->teeth_loosening,
-                'food_teeth'         => $request->food_teeth,
-                'med_reaction'       => $request->med_reaction,
-
-                'periodontal'          => $request->periodontal,
-                'difficult_extraction' => $request->difficult_extraction,
-                'prolonged_bleeding'   => $request->prolonged_bleeding,
-                'dentures'             => $request->dentures,
-                'ortho_treatment'      => $request->ortho_treatment,
-            ];
-
-            $conditionIdsByCode = DentalHistoryCondition::whereIn('code', array_keys($dentalAnswerMap))
-                ->pluck('id', 'code');
-
-            foreach ($dentalAnswerMap as $code => $rawValue) {
-                $conditionId = $conditionIdsByCode[$code] ?? null;
-                if (!$conditionId) continue;
-
-                DentalHistoryAnswer::updateOrCreate(
+                DentalHistory::updateOrCreate(
+                    ['patient_id' => $patientId],
                     [
-                        'patient_id'   => $patientId,
-                        'condition_id' => $conditionId,
-                    ],
-                    [
-                        'answer' => ($this->yesNoValue($rawValue) === 'YES'),
+                        'last_dental_visit' => $request->last_dental_visit,
+                        'previous_dentist'  => $request->previous_dentist,
                     ]
                 );
-            }
+
+                DentalHistoryConditionDate::updateOrCreate(
+                    ['patient_id' => $patientId],
+                    [
+                        'extraction_date' => $request->extraction_date,
+                        'dentures_date'   => $request->dentures_date,
+                        'ortho_date'      => $request->ortho_date,
+                    ]
+                );
+
+                DentalHistoryConcern::updateOrCreate(
+                    ['patient_id' => $patientId],
+                    [
+                        'additional_concerns' => $request->additional_concerns,
+                    ]
+                );
+
+                // YES/NO answers (dental_history_answers)
+                $dentalAnswerMap = [
+                    'bleeding_gums'      => $request->bleeding_gums,
+                    'sensitive_temp'     => $request->sensitive_temp,
+                    'sensitive_taste'    => $request->sensitive_taste,
+                    'tooth_pain'         => $request->tooth_pain,
+                    'sores'              => $request->sores,
+                    'injuries'           => $request->injuries,
+
+                    'clicking'           => $request->clicking,
+                    'joint_pain'         => $request->joint_pain,
+                    'difficulty_moving'  => $request->difficulty_moving,
+                    'difficulty_chewing' => $request->difficulty_chewing,
+                    'jaw_headaches'      => $request->jaw_headaches,
+                    'clench_grind'       => $request->clench_grind,
+                    'biting'             => $request->biting,
+                    'teeth_loosening'    => $request->teeth_loosening,
+                    'food_teeth'         => $request->food_teeth,
+                    'med_reaction'       => $request->med_reaction,
+
+                    'periodontal'          => $request->periodontal,
+                    'difficult_extraction' => $request->difficult_extraction,
+                    'prolonged_bleeding'   => $request->prolonged_bleeding,
+                    'dentures'             => $request->dentures,
+                    'ortho_treatment'      => $request->ortho_treatment,
+                ];
+
+                $conditionIdsByCode = DentalHistoryCondition::whereIn('code', array_keys($dentalAnswerMap))
+                    ->pluck('id', 'code');
+
+                foreach ($dentalAnswerMap as $code => $rawValue) {
+                    $conditionId = $conditionIdsByCode[$code] ?? null;
+                    if (!$conditionId) continue;
+
+                    DentalHistoryAnswer::updateOrCreate(
+                        [
+                            'patient_id'   => $patientId,
+                            'condition_id' => $conditionId,
+                        ],
+                        [
+                            'answer' => ($this->yesNoValue($rawValue) === 'YES'),
+                        ]
+                    );
+                }
             }
 
             // 3) MEDICAL HISTORY (patient-based)
             if (! $preserveExistingMedicalHistory) {
-            $medicalHistory = MedicalHistory::updateOrCreate(
-                ['patient_id' => $patientId],
-                [
-                    'emergency_person'   => $request->emergency_person,
-                    'emergency_number'   => $request->emergency_number,
-                    'emergency_relation' => $request->emergency_relation,
-                    'patient_signature'  => $signaturePath,
-                    'signature_review_status' => $signatureReviewStatus,
-                    'signature_review_notes' => $signatureReviewNotes,
-                    'signature_ai_provider' => 'openai',
-                    'signature_ai_confidence' => $aiResult['confidence'] ?? null,
-                ]
-            );
+                $medicalHistory = MedicalHistory::updateOrCreate(
+                    ['patient_id' => $patientId],
+                    [
+                        'emergency_person'   => $request->emergency_person,
+                        'emergency_number'   => $request->emergency_number,
+                        'emergency_relation' => $request->emergency_relation,
+                        'patient_signature'  => $signaturePath,
+                        'signature_review_status' => $signatureReviewStatus,
+                        'signature_review_notes' => $signatureReviewNotes,
+                        'signature_ai_provider' => 'openai',
+                        'signature_ai_confidence' => $aiResult['confidence'] ?? null,
+                    ]
+                );
 
-            // Medical answers map
-            $medicalAnswerMap = [
-                // bool
-                'good_health'       => $request->good_health,
-                'had_medical_exam'  => $request->had_medical_exam,
-                'under_treatment'   => $request->under_treatment,
-                'hospitalized'      => $request->hospitalized,
-                'allergy_medicine'  => $request->allergy_medicine,
-                'allergy_food'      => $request->allergy_food,
-                'medication'        => $request->medication,
-                'pregnant'          => $request->pregnant,
-                'nursing'           => $request->nursing,
-                'birth_control'     => $request->birth_control,
-                'tobacco_use'       => $request->tobacco_use,
-                'headaches'         => $request->headaches,
-                'earaches'          => $request->earaches,
-                'neck_aches'        => $request->neck_aches,
+                $tobaccoUse = $this->yesNoValue($request->input('tobacco_use'));
 
-                // text
-                'good_health_details' => $request->good_health_details,
-                'treatment_details'   => $request->treatment_details,
-                'hospital_details'    => $request->hospital_details,
-                'allergy_others'      => $request->allergy_others,
-                'medication_details'  => $request->medication_details,
-                'tobacco_per_day'     => $request->tobacco_per_day,
-                'tobacco_per_week'    => $request->tobacco_per_week,
+                // Medical answers map
+                $medicalAnswerMap = [
+                    // bool
+                    'good_health'       => $request->good_health,
+                    'had_medical_exam'  => $request->had_medical_exam,
+                    'under_treatment'   => $request->under_treatment,
+                    'hospitalized'      => $request->hospitalized,
+                    'allergy_medicine'  => $request->allergy_medicine,
+                    'allergy_food'      => $request->allergy_food,
+                    'medication'        => $request->medication,
+                    'pregnant'          => $request->pregnant,
+                    'nursing'           => $request->nursing,
+                    'birth_control'     => $request->birth_control,
+                    'tobacco_use'       => $tobaccoUse,
+                    'headaches'         => $request->headaches,
+                    'earaches'          => $request->earaches,
+                    'neck_aches'        => $request->neck_aches,
 
-                // date
-                'medical_exam_date'   => $request->medical_exam_date,
-            ];
+                    // text
+                    'good_health_details' => $request->good_health_details,
+                    'treatment_details'   => $request->treatment_details,
+                    'hospital_details'    => $request->hospital_details,
+                    'allergy_others'      => $request->allergy_others,
+                    'medication_details'  => $request->medication_details,
+                    'tobacco_per_day' => $tobaccoUse === 'YES'
+                        ? $request->input('tobacco_per_day')
+                        : null,
 
-            $questions = MedicalHistoryQuestion::whereIn('code', array_keys($medicalAnswerMap))
-                ->get()
-                ->keyBy('code');
+                    'tobacco_per_week' => $tobaccoUse === 'YES'
+                        ? $request->input('tobacco_per_week')
+                        : null,
 
-            foreach ($medicalAnswerMap as $code => $rawValue) {
-                $q = $questions->get($code);
-                if (!$q) continue;
+                    // date
+                    'medical_exam_date'   => $request->medical_exam_date,
+                ];
 
-                // Normalize by type
-                if ($q->type === 'bool') {
-                    $bool = ($this->yesNoValue($rawValue) === 'YES');
+                $questions = MedicalHistoryQuestion::whereIn('code', array_keys($medicalAnswerMap))
+                    ->get()
+                    ->keyBy('code');
 
-                    MedicalHistoryAnswer::updateOrCreate(
-                        [
-                            'patient_id'         => $patientId,
-                            'medical_history_id' => $medicalHistory->id,
-                            'question_id'        => $q->id,
-                        ],
-                        [
-                            'answer_bool' => $bool,
-                            'answer_text' => null,
-                            'answer_date' => null,
-                        ]
-                    );
+                foreach ($medicalAnswerMap as $code => $rawValue) {
+                    $q = $questions->get($code);
+                    if (!$q) continue;
 
-                    continue;
-                }
+                    // Normalize by type
+                    if ($q->type === 'bool') {
+                        $bool = ($this->yesNoValue($rawValue) === 'YES');
 
-                if ($q->type === 'text') {
-                    $text = ($rawValue === null) ? '' : trim((string) $rawValue);
+                        MedicalHistoryAnswer::updateOrCreate(
+                            [
+                                'patient_id'         => $patientId,
+                                'medical_history_id' => $medicalHistory->id,
+                                'question_id'        => $q->id,
+                            ],
+                            [
+                                'answer_bool' => $bool,
+                                'answer_text' => null,
+                                'answer_date' => null,
+                            ]
+                        );
 
-                    // remove row if empty text 
-                    if ($text === '') {
-                        MedicalHistoryAnswer::where([
-                            'patient_id'         => $patientId,
-                            'medical_history_id' => $medicalHistory->id,
-                            'question_id'        => $q->id,
-                        ])->delete();
                         continue;
                     }
 
-                    MedicalHistoryAnswer::updateOrCreate(
-                        [
-                            'patient_id'         => $patientId,
-                            'medical_history_id' => $medicalHistory->id,
-                            'question_id'        => $q->id,
-                        ],
-                        [
-                            'answer_bool' => null,
-                            'answer_text' => $text,
-                            'answer_date' => null,
-                        ]
-                    );
+                    if ($q->type === 'text') {
+                        $text = ($rawValue === null) ? '' : trim((string) $rawValue);
 
-                    continue;
-                }
+                        // remove row if empty text 
+                        if ($text === '') {
+                            MedicalHistoryAnswer::where([
+                                'patient_id'         => $patientId,
+                                'medical_history_id' => $medicalHistory->id,
+                                'question_id'        => $q->id,
+                            ])->delete();
+                            continue;
+                        }
 
-                if ($q->type === 'date') {
-                    $date = $rawValue ? trim((string) $rawValue) : '';
+                        MedicalHistoryAnswer::updateOrCreate(
+                            [
+                                'patient_id'         => $patientId,
+                                'medical_history_id' => $medicalHistory->id,
+                                'question_id'        => $q->id,
+                            ],
+                            [
+                                'answer_bool' => null,
+                                'answer_text' => $text,
+                                'answer_date' => null,
+                            ]
+                        );
 
-                    // remove row if empty date
-                    if ($date === '') {
-                        MedicalHistoryAnswer::where([
-                            'patient_id'         => $patientId,
-                            'medical_history_id' => $medicalHistory->id,
-                            'question_id'        => $q->id,
-                        ])->delete();
                         continue;
                     }
 
-                    MedicalHistoryAnswer::updateOrCreate(
-                        [
-                            'patient_id'         => $patientId,
-                            'medical_history_id' => $medicalHistory->id,
-                            'question_id'        => $q->id,
-                        ],
-                        [
-                            'answer_bool' => null,
-                            'answer_text' => null,
-                            'answer_date' => $date,
-                        ]
-                    );
+                    if ($q->type === 'date') {
+                        $date = $rawValue ? trim((string) $rawValue) : '';
 
-                    continue;
+                        // remove row if empty date
+                        if ($date === '') {
+                            MedicalHistoryAnswer::where([
+                                'patient_id'         => $patientId,
+                                'medical_history_id' => $medicalHistory->id,
+                                'question_id'        => $q->id,
+                            ])->delete();
+                            continue;
+                        }
+
+                        MedicalHistoryAnswer::updateOrCreate(
+                            [
+                                'patient_id'         => $patientId,
+                                'medical_history_id' => $medicalHistory->id,
+                                'question_id'        => $q->id,
+                            ],
+                            [
+                                'answer_bool' => null,
+                                'answer_text' => null,
+                                'answer_date' => $date,
+                            ]
+                        );
+
+                        continue;
+                    }
                 }
-            }
 
-            MedicalHistoryAnswer::where('patient_id', $patientId)
-                ->where('medical_history_id', $medicalHistory->id)
-                ->whereNull('answer_bool')
-                ->whereNull('answer_date')
-                ->where(function ($q) {
-                    $q->whereNull('answer_text')
-                        ->orWhereRaw("TRIM(answer_text) = ''");
-                })
-                ->delete();
+                MedicalHistoryAnswer::where('patient_id', $patientId)
+                    ->where('medical_history_id', $medicalHistory->id)
+                    ->whereNull('answer_bool')
+                    ->whereNull('answer_date')
+                    ->where(function ($q) {
+                        $q->whereNull('answer_text')
+                            ->orWhereRaw("TRIM(answer_text) = ''");
+                    })
+                    ->delete();
 
-            // 4) DISEASES (selected codes from form)
-            $selectedDiseaseCodes = $request->input('diseases', []);
-            $selectedDiseaseIds = Disease::whereIn('code', $selectedDiseaseCodes)
-                ->pluck('id')
-                ->all();
+                // 4) DISEASES (selected codes from form)
+                $selectedDiseaseCodes = $request->input('diseases', []);
+                $selectedDiseaseIds = Disease::whereIn('code', $selectedDiseaseCodes)
+                    ->pluck('id')
+                    ->all();
 
-            MedicalHistoryDiseaseAnswer::where('medical_history_id', $medicalHistory->id)->delete();
+                MedicalHistoryDiseaseAnswer::where('medical_history_id', $medicalHistory->id)->delete();
 
-            foreach ($selectedDiseaseIds as $diseaseId) {
-                MedicalHistoryDiseaseAnswer::create([
-                    'patient_id'         => $patientId,
-                    'medical_history_id' => $medicalHistory->id,
-                    'disease_id'         => $diseaseId,
-                    'has_disease'        => true,
-                ]);
-            }
+                foreach ($selectedDiseaseIds as $diseaseId) {
+                    MedicalHistoryDiseaseAnswer::create([
+                        'patient_id'         => $patientId,
+                        'medical_history_id' => $medicalHistory->id,
+                        'disease_id'         => $diseaseId,
+                        'has_disease'        => true,
+                    ]);
+                }
             }
         });
 

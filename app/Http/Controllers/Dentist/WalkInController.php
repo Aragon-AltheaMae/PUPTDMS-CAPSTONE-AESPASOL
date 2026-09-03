@@ -345,8 +345,7 @@ class WalkInController extends Controller
     public function patientBookingInformation(
         Patient $patient,
         StudentApiService $studentApiService
-    )
-    {
+    ) {
         $patient = $this->resolveWalkInSourcePatient($patient);
 
         $this->backfillConnectedPatientMedicalHistory(
@@ -727,7 +726,7 @@ class WalkInController extends Controller
                             ?? null
                     )
                 ),
-            ], fn ($value) => filled($value));
+            ], fn($value) => filled($value));
         } catch (\Throwable $e) {
             Log::warning('Walk-in OGOS emergency defaults fetch failed', [
                 'patient_id' => $patient->id,
@@ -2442,6 +2441,8 @@ class WalkInController extends Controller
                             ]
                         );
 
+                    $tobaccoUse = $this->yesNoValue($request->input('tobacco_use'));
+
                     $medicalAnswerMap = [
                         'good_health' =>
                         $request->input(
@@ -2494,9 +2495,7 @@ class WalkInController extends Controller
                         ),
 
                         'tobacco_use' =>
-                        $request->input(
-                            'tobacco_use'
-                        ),
+                        $tobaccoUse,
 
                         'headaches' =>
                         $request->input(
@@ -2539,14 +2538,18 @@ class WalkInController extends Controller
                         ),
 
                         'tobacco_per_day' =>
-                        $request->input(
-                            'tobacco_per_day'
-                        ),
+                        $tobaccoUse === 'YES'
+                            ? $request->input(
+                                'tobacco_per_day'
+                            )
+                            : null,
 
                         'tobacco_per_week' =>
-                        $request->input(
-                            'tobacco_per_week'
-                        ),
+                        $tobaccoUse === 'YES'
+                            ? $request->input(
+                                'tobacco_per_week'
+                            )
+                            : null,
 
                         'medical_exam_date' =>
                         $request->input(
