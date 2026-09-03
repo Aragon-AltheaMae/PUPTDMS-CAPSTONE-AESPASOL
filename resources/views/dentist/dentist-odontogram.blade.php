@@ -533,14 +533,11 @@ $discardProcedureMessage = $existingAppointmentMode
                                 <div class="odontogram-procedure-actions">
                                     @unless ($existingAppointmentMode || $savedVisitEditMode)
                                     <button type="button" id="followUpBtn" class="ui-btn ui-btn-warning">
-                                        <i class="fa-solid fa-calendar-plus"></i>
                                         <span>Set Follow-Up Appointment</span>
                                     </button>
                                     @endunless
 
                                     <button type="button" id="finishProcedureBtn" class="ui-btn ui-btn-primary">
-                                        <i class="fa-solid fa-check"></i>
-
                                         <span>
                                             {{ $existingAppointmentMode
                                             ? 'Save Existing Appointment'
@@ -620,12 +617,10 @@ $discardProcedureMessage = $existingAppointmentMode
 
                     <div class="odontogram-target-actions">
                         <button type="button" id="applyTreatmentBtn" class="ui-btn ui-btn-primary w-full" disabled>
-                            <i class="fa-solid fa-stethoscope"></i>
                             Apply
                         </button>
 
                         <button type="button" id="clearCurrentToothBtn" class="ui-btn ui-btn-secondary w-full" disabled>
-                            <i class="fa-solid fa-eraser"></i>
                             Clear
                         </button>
                     </div>
@@ -705,12 +700,10 @@ $discardProcedureMessage = $existingAppointmentMode
 
         <div class="modal-ft">
             <button type="button" id="cancelResetTreatmentBtn" class="ui-btn ui-btn-secondary">
-                <i class="fa-solid fa-arrow-left"></i>
                 <span>Keep Treatment</span>
             </button>
 
             <button type="button" id="confirmResetTreatmentBtn" class="ui-btn ui-btn-danger">
-                <i class="fa-solid fa-eraser"></i>
                 <span>Reset Treatment</span>
             </button>
         </div>
@@ -840,7 +833,7 @@ $discardProcedureMessage = $existingAppointmentMode
 @include('components.appointment-calendar-script', [
 'mode' => 'booking',
 
-'calendarContainerId' => 'followUpCalendarWrap',
+'calendarContainerId' => 'followUpCalendarGrid',
 'calGridId' => 'followUpCalGrid',
 'calMonthLabelId' => 'followUpCalMonthLabel',
 'calYearLabelId' => 'followUpCalYearLabel',
@@ -856,6 +849,8 @@ $discardProcedureMessage = $existingAppointmentMode
 
 'selectedSlotDisplayId' => 'followUpSelectedSlotDisplay',
 'selectedSlotTextId' => 'followUpSelectedSlotText',
+
+'clearSlotButtonId' => 'followUpClearTimeBtn',
 
 'datePillId' => null,
 
@@ -876,7 +871,7 @@ $discardProcedureMessage = $existingAppointmentMode
 'disallowToday' => true,
 'allowToggleOffDate' => true,
 'useDynamicScheduleRules' => true,
-'renderStyle' => 'patient',
+'renderStyle' => 'dentist',
 ])
 @endunless
 <script>
@@ -2963,9 +2958,20 @@ $discardProcedureMessage = $existingAppointmentMode
                 );
 
             form?.reset();
-            if (dateInput) dateInput.value = '';
-            if (timeInput) timeInput.value = '';
-            if (reasonInput) reasonInput.value = '';
+
+            window.DiscardChanges?.markNotSubmitting(form);
+
+            if (dateInput) {
+                dateInput.value = '';
+            }
+
+            if (timeInput) {
+                timeInput.value = '';
+            }
+
+            if (reasonInput) {
+                reasonInput.value = '';
+            }
 
             if (typeof selectedDate !== 'undefined') selectedDate = null;
             if (typeof selectedTime !== 'undefined') selectedTime = null;
@@ -2979,9 +2985,6 @@ $discardProcedureMessage = $existingAppointmentMode
                 timeGroup,
                 'followup_appointment_time'
             );
-
-            document.getElementById('followUpDateError')?.classList.remove('show');
-            document.getElementById('followUpTimeError')?.classList.remove('show');
 
             if (dateBanner) {
                 dateBanner.replaceChildren();
@@ -3092,13 +3095,6 @@ $discardProcedureMessage = $existingAppointmentMode
 
                 followUpClearTimeBtn.classList.add(
                     'hidden'
-                );
-
-                window.clearGlobalGroupError?.(
-                    document.getElementById(
-                        'followUpTimeWrap'
-                    ),
-                    'followup_appointment_time'
                 );
             }
         );
@@ -3417,55 +3413,31 @@ $discardProcedureMessage = $existingAppointmentMode
         document.getElementById('followUpForm')?.addEventListener('submit', async function (event) {
             event.preventDefault();
 
-            const form = event.currentTarget;
-            const dateInput = document.getElementById('followup_appointment_date');
-            const timeInput = document.getElementById('followup_appointment_time');
-            const reasonInput = document.getElementById('followup_reason');
-            const confirmBtn = document.getElementById('confirmFollowUpBtn');
+            const form =
+                event.currentTarget;
 
-            let valid = true;
-
-            const dateGroup =
+            const confirmBtn =
                 document.getElementById(
-                    'followUpCalendarWrap'
+                    'confirmFollowUpBtn'
                 );
 
-            const timeGroup =
-                document.getElementById(
-                    'followUpTimeWrap'
+            const validation =
+                window.validateGlobalForm?.(
+                    form,
+                    {
+                        focus: false
+                    }
                 );
 
-            if (!dateInput?.value) {
-                window.showGlobalGroupError?.(
-                    dateGroup,
-                    'followup_appointment_date',
-                    'Select a follow-up date.'
-                );
+            if (
+                validation &&
+                !validation.valid
+            ) {
+                window.DiscardChanges
+                    ?.markNotSubmitting(
+                        form
+                    );
 
-                valid = false;
-            } else {
-                window.clearGlobalGroupError?.(
-                    dateGroup,
-                    'followup_appointment_date'
-                );
-            }
-
-            if (!timeInput?.value) {
-                window.showGlobalGroupError?.(
-                    timeGroup,
-                    'followup_appointment_time',
-                    'Select a follow-up time.'
-                );
-
-                valid = false;
-            } else {
-                window.clearGlobalGroupError?.(
-                    timeGroup,
-                    'followup_appointment_time'
-                );
-            }
-
-            if (!valid) {
                 return;
             }
 
@@ -3488,15 +3460,25 @@ $discardProcedureMessage = $existingAppointmentMode
                 const followUpResult = await followUpResponse.json().catch(() => null);
 
                 if (!followUpResponse.ok) {
-                    showProcedureToast(followUpResult?.message || 'Failed to schedule follow-up appointment.', 'error');
+                    window.DiscardChanges?.markNotSubmitting(form);
+
+                    showProcedureToast(
+                        followUpResult?.message ||
+                        'Failed to schedule follow-up appointment.',
+                        'error'
+                    );
+
                     confirmBtn.disabled = false;
-                    confirmBtn.innerHTML = originalBtnHtml;
+                    confirmBtn.innerHTML =
+                        originalBtnHtml;
+
                     return;
                 }
 
                 await saveProcedure('follow_up', confirmBtn, 'Saving Procedure...');
 
             } catch (error) {
+                window.DiscardChanges?.markNotSubmitting(form);
                 console.error(error);
                 showProcedureToast('Something went wrong while scheduling the follow-up appointment.', 'error');
                 confirmBtn.disabled = false;

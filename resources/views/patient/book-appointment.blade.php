@@ -149,7 +149,6 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                                             <button type="button" id="clearSlotSelectionBtn"
                                                 class="ui-btn ui-btn-secondary ui-btn-sm hidden mt-4 mb-2 w-full"
                                                 aria-hidden="true">
-                                                <i class="fa-solid fa-xmark"></i>
                                                 Clear selection
                                             </button>
 
@@ -230,7 +229,6 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
 
                                                 <button type="button" id="clearSlotSelectionBtn"
                                                     class="ui-btn ui-btn-secondary ui-btn-sm hidden mt-4 mb-2 w-full">
-                                                    <i class="fa-solid fa-xmark"></i>
                                                     Clear selection
                                                 </button>
 
@@ -2828,12 +2826,62 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
             }
         }));
     });
-    [...document.getElementsByName("tobacco_use")].forEach(r => r.addEventListener("change", () => {
-        if (r.checked && r.value === "YES") document.getElementById("tobacco_details")?.classList
-            .remove(
-                "hidden");
-        else document.getElementById("tobacco_details")?.classList.add("hidden");
-    }));
+    
+    function syncTobaccoDetails() {
+        const selected =
+            document.querySelector(
+                'input[name="tobacco_use"]:checked'
+            );
+
+        const box =
+            document.getElementById(
+                'tobacco_details'
+            );
+
+        if (!box) {
+            return;
+        }
+
+        const shouldShow =
+            selected?.value === 'YES';
+
+        box.classList.toggle(
+            'hidden',
+            !shouldShow
+        );
+
+        box.querySelectorAll(
+            '[data-number-stepper-input]'
+        ).forEach(input => {
+            if (shouldShow) {
+                if (!input.value) {
+                    input.value = '1';
+                }
+
+                return;
+            }
+
+            input.value = '';
+
+            window
+                .clearFormInputValidation?.(
+                    input
+                );
+        });
+    }
+
+    document
+        .querySelectorAll(
+            'input[name="tobacco_use"]'
+        )
+        .forEach(radio => {
+            radio.addEventListener(
+                'change',
+                syncTobaccoDetails
+            );
+        });
+
+    syncTobaccoDetails();
 
     const appointmentForm = document.getElementById("appointmentForm");
 
@@ -2894,6 +2942,13 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
     const clearSlotSelectionBtn = document.getElementById("clearSlotSelectionBtn");
 
     function clearTimeSelectionOnly() {
+        if (
+            typeof selectedTime !==
+            "undefined"
+        ) {
+            selectedTime = null;
+        }
+
         const timeInput =
             document.getElementById("appointment_time");
 
@@ -2925,12 +2980,10 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
         }
 
         selectedSlotDisplay?.classList.add("hidden");
-
+        selectedSlotDisplay?.style.removeProperty("display");
         clearSlotSelectionBtn?.classList.add("hidden");
-        clearSlotSelectionBtn?.setAttribute(
-            "aria-hidden",
-            "true"
-        );
+        clearSlotSelectionBtn?.setAttribute("aria-hidden", "true");
+        clearSlotSelectionBtn?.style.removeProperty("display");
 
         document
             .querySelectorAll(

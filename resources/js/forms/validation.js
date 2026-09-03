@@ -740,6 +740,14 @@ function showGlobalFieldErrorElement(error) {
         error
     );
 
+    error.style.removeProperty(
+        'display'
+    );
+
+    error.classList.remove(
+        'hidden'
+    );
+
     error.classList.add(
         'show'
     );
@@ -757,6 +765,10 @@ function hideGlobalFieldErrorElement(error) {
 
     cancelGlobalFieldErrorHide(
         error
+    );
+
+    error.style.removeProperty(
+        'display'
     );
 
     if (
@@ -1522,6 +1534,115 @@ function bindGlobalLinkedGroupErrors(root = document) {
     });
 }
 
+function validateGlobalLinkedGroups(
+    root = document
+) {
+    const scope =
+        root &&
+            typeof root.querySelectorAll ===
+            'function'
+            ? root
+            : document;
+
+    const groups = [];
+
+    if (
+        scope.matches?.(
+            '[data-global-linked-input]' +
+            '[data-global-required="true"]'
+        )
+    ) {
+        groups.push(
+            scope
+        );
+    }
+
+    scope
+        .querySelectorAll?.(
+            '[data-global-linked-input]' +
+            '[data-global-required="true"]'
+        )
+        .forEach(group => {
+            groups.push(
+                group
+            );
+        });
+
+    let firstInvalid = null;
+
+    groups.forEach(group => {
+        const selector =
+            group.dataset
+                .globalLinkedInput;
+
+        if (!selector) {
+            return;
+        }
+
+        let linkedField = null;
+
+        try {
+            linkedField =
+                scope.querySelector?.(
+                    selector
+                ) ||
+                group.ownerDocument
+                    ?.querySelector(
+                        selector
+                    );
+        } catch (error) {
+            return;
+        }
+
+        if (!linkedField) {
+            return;
+        }
+
+        const errorKey =
+            group.dataset
+                .globalErrorKey ||
+            linkedField.id ||
+            linkedField.name;
+
+        const message =
+            group.dataset
+                .globalRequiredMessage ||
+            'Please make a selection.';
+
+        const hasValue =
+            String(
+                linkedField.value || ''
+            ).trim() !== '';
+
+        if (hasValue) {
+            clearGlobalGroupError(
+                group,
+                errorKey
+            );
+
+            return;
+        }
+
+        showGlobalGroupError(
+            group,
+            errorKey,
+            message
+        );
+
+        if (!firstInvalid) {
+            firstInvalid =
+                group;
+        }
+    });
+
+    return {
+        valid:
+            !firstInvalid,
+
+        firstInvalid
+    };
+}
+
 function bindCharLimitField(field) {
     if (!field || field.dataset.charLimitInitialized === 'true') return;
 
@@ -1945,6 +2066,20 @@ function validateGlobalSection(
         }
     });
 
+    const linkedResult =
+        validateGlobalLinkedGroups(
+            section
+        );
+
+    if (
+        !linkedResult.valid &&
+        !firstInvalid
+    ) {
+        firstInvalid =
+            linkedResult
+                .firstInvalid;
+    }
+
     if (
         firstInvalid &&
         options.focus !== false
@@ -2002,6 +2137,20 @@ function validateGlobalForm(form, options = {}) {
         }
     });
 
+    const linkedResult =
+        validateGlobalLinkedGroups(
+            form
+        );
+
+    if (
+        !linkedResult.valid &&
+        !firstInvalid
+    ) {
+        firstInvalid =
+            linkedResult
+                .firstInvalid;
+    }
+
     if (
         firstInvalid &&
         options.focus !== false
@@ -2055,6 +2204,7 @@ window.focusGlobalInvalidField = focusGlobalInvalidField;
 window.normalizeGlobalPhilippineMobile = normalizeGlobalPhilippineMobile;
 window.getGlobalPhilippineMobileDigits = getGlobalPhilippineMobileDigits;
 window.bindGlobalLinkedGroupErrors = bindGlobalLinkedGroupErrors;
+window.validateGlobalLinkedGroups = validateGlobalLinkedGroups;
 window.initGlobalNumberSteppers = initGlobalNumberSteppers;
 window.validateGlobalSection = validateGlobalSection;
 window.validateGlobalForm = validateGlobalForm;

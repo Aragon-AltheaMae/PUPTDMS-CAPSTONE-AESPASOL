@@ -238,20 +238,52 @@
         return getSelectedDateValue() !== '';
     }
 
-    function getLegendItemsForMode(mode) {
+    function getAppointmentSlotPeriod(timeValue = '') {
+        const value =
+            String(timeValue)
+                .trim()
+                .toUpperCase();
+
         if (
-            calendarConfig
-            .allowAllDatesExceptHolidays
+            /\bAM\b/.test(value)
         ) {
+            return 'am';
+        }
+
+        if (
+            /\bPM\b/.test(value)
+        ) {
+            return 'pm';
+        }
+
+        const hour =
+            Number.parseInt(
+                value.split(':')[0],
+                10
+            );
+
+        if (
+            Number.isFinite(hour)
+        ) {
+            return hour < 12 ?
+                'am' :
+                'pm';
+        }
+
+        return 'am';
+    }
+
+    function getLegendItemsForMode(mode) {
+        if (calendarConfig.allowAllDatesExceptHolidays) {
             return calendarConfig
                 .disableWeekends ? [
-                    'today',
-                    'holiday',
-                    'clinicClosed'
-                ] : [
-                    'today',
-                    'holiday'
-                ];
+                'today',
+                'holiday',
+                'clinicClosed'
+            ] : [
+                'today',
+                'holiday'
+            ];
         }
         if (mode === 'dentist') {
             return ['today', 'hasPatients', 'fullyBooked', 'holiday', 'clinicClosed'];
@@ -449,16 +481,16 @@
 
         if (
             calendarConfig
-            .allowAllDatesExceptHolidays
+                .allowAllDatesExceptHolidays
         ) {
             const holidayBlocked =
                 isHoliday &&
                 !calendarConfig
-                .allowHolidaySelection;
+                    .allowHolidaySelection;
 
             const weekendBlocked =
                 calendarConfig
-                .disableWeekends ===
+                    .disableWeekends ===
                 true &&
                 isWeekend;
 
@@ -534,11 +566,11 @@
 
         const allowAllDatesExceptHolidays =
             calendarConfig
-            .allowAllDatesExceptHolidays === true;
+                .allowAllDatesExceptHolidays === true;
 
         const disableWeekends =
             calendarConfig
-            .disableWeekends ===
+                .disableWeekends ===
             true;
 
         const ignoreAvailabilityRestrictions =
@@ -576,7 +608,7 @@
 
                 if (
                     !calendarConfig
-                    .allowHolidaySelection
+                        .allowHolidaySelection
                 ) {
                     cellClass +=
                         " disabled";
@@ -650,14 +682,14 @@
         if (state.myAppointment && !state.isBookingMode) {
             badgeHtml += CALENDAR_THEME.statuses.myAppointment.badge(
                 String(state.myAppointment)
-                .toLowerCase()
-                .includes('follow-up')
+                    .toLowerCase()
+                    .includes('follow-up')
             );
 
             const isFollowUp =
                 String(state.myAppointment)
-                .toLowerCase()
-                .includes('follow-up');
+                    .toLowerCase()
+                    .includes('follow-up');
 
             const appointmentIcon = isFollowUp ?
                 'fa-solid fa-calendar-plus' :
@@ -746,7 +778,7 @@
         } else if (variant === 'dentist' && state.hasPatients && !state.isPast && !state.isHoliday) {
             badgeHtml += makeCalendarDot(
                 state.isFull ? CALENDAR_THEME.statuses.fullyBooked.dotClass : CALENDAR_THEME.statuses.hasPatients
-                .dotClass,
+                    .dotClass,
                 state.count > 0 ? String(state.count) : ''
             );
             cellClass += " has-patients font-bold";
@@ -775,7 +807,7 @@
         } else if (
             state.isHoliday &&
             !allowAllDates
-        ) {} else if (
+        ) { } else if (
             !state.myAppointment &&
             !ignoreAvailabilityRestrictions &&
             state.isToday &&
@@ -828,9 +860,9 @@
 
             tooltipClass =
                 CALENDAR_THEME
-                .statuses
-                .today
-                .tooltipClass;
+                    .statuses
+                    .today
+                    .tooltipClass;
         }
 
         if (tooltip) {
@@ -929,21 +961,45 @@
         }
 
         if (slotGrid) {
-            slotGrid.style.display = "grid";
+            slotGrid.style.display =
+                'grid';
 
-            if (calendarConfig.renderStyle === 'dentist') {
-                slotGrid.className = "slot-grid-ui";
-            } else {
-                slotGrid.className = "slot-grid-ui";
-            }
+            slotGrid.className =
+                'appointment-slot-grid slot-grid-ui';
 
-            slotGrid.innerHTML = Array.from({
-                length: 8
+            slotGrid.innerHTML = `
+                <div class="appointment-slot-period">
+                    <div class="appointment-slot-period-heading">
+                        AM
+                    </div>
+
+                    <div class="appointment-slot-period-grid">
+                        ${Array.from({
+                length: 4
             }).map(() => `
-            <div class="px-4 py-3 rounded-xl border border-gray-100 bg-gray-50">
-                <div class="h-4 w-24 skeleton-block rounded"></div>
-            </div>
-        `).join("");
+                            <div class="px-4 py-3 rounded-xl border border-gray-100 bg-gray-50">
+                                <div class="h-4 w-20 skeleton-block rounded"></div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="appointment-slot-period">
+                    <div class="appointment-slot-period-heading">
+                        PM
+                    </div>
+
+                    <div class="appointment-slot-period-grid">
+                        ${Array.from({
+                length: 4
+            }).map(() => `
+                            <div class="px-4 py-3 rounded-xl border border-gray-100 bg-gray-50">
+                                <div class="h-4 w-20 skeleton-block rounded"></div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
         }
     }
 
@@ -973,14 +1029,14 @@
             Number.isFinite(
                 Number(
                     calendarConfig
-                    .maxFutureMonths
+                        .maxFutureMonths
                 )
             ) ?
-            Number(
-                calendarConfig
-                .maxFutureMonths
-            ) :
-            6;
+                Number(
+                    calendarConfig
+                        .maxFutureMonths
+                ) :
+                6;
 
         const maximum =
             new Date(
@@ -1011,9 +1067,9 @@
                 month: cursor.getMonth(),
                 label: cursor.toLocaleDateString(
                     'en-US', {
-                        month: 'long',
-                        year: 'numeric'
-                    }
+                    month: 'long',
+                    year: 'numeric'
+                }
                 )
             });
 
@@ -1461,17 +1517,17 @@
 
             <select
                 ${isDashboard
-                    ? 'data-calendar-month-picker'
-                    : 'data-calendar-month-select'
-                }
+                ? 'data-calendar-month-picker'
+                : 'data-calendar-month-select'
+            }
                 class="js-custom-select calendar-month-picker"
                 data-placeholder="Choose month"
                 aria-label="Choose month"
             >
                 ${isDashboard
-                    ? monthOptions
-                    : splitMonthOptions
-                }
+                ? monthOptions
+                : splitMonthOptions
+            }
             </select>
         </div>
 
@@ -1517,7 +1573,7 @@
             <div class="calendar-main-header">
                 <button
                     type="button"
-                    class="cal-nav-btn w-8 h-8 rounded-full border flex items-center justify-center text-xs ${prevDisabled ? 'opacity-40 cursor-not-allowed' : ''}"
+                    class="cal-nav-btn w-8 h-8 rounded-full border flex items-center justify-center  ${prevDisabled ? 'opacity-40 cursor-not-allowed' : ''}"
                     ${prevDisabled ? 'disabled' : 'onclick="changeMonth(-1)"'}
                     aria-label="Previous month"
                 >
@@ -1528,7 +1584,7 @@
 
                 <button
                     type="button"
-                    class="cal-nav-btn w-8 h-8 rounded-full border flex items-center justify-center text-xs ${nextDisabled ? 'opacity-40 cursor-not-allowed' : ''}"
+                    class="cal-nav-btn w-8 h-8 rounded-full border flex items-center justify-center  ${nextDisabled ? 'opacity-40 cursor-not-allowed' : ''}"
                     ${nextDisabled ? 'disabled' : 'onclick="changeMonth(1)"'}
                     aria-label="Next month"
                 >
@@ -1747,9 +1803,20 @@
         const slotPlaceholder = document.getElementById(calendarConfig.slotPlaceholderId);
         const slotContainer = document.getElementById(calendarConfig.slotContainerId);
         const slotGrid = document.getElementById(calendarConfig.slotGridId);
-        const timePill = document.getElementById(calendarConfig.selectedTimePillId);
-        const timeText = document.getElementById(calendarConfig.selectedTimeTextId);
-        const clearSlotBtn = document.getElementById(calendarConfig.clearSlotButtonId);
+        const timePill =
+            document.getElementById(
+                calendarConfig.selectedTimePillId
+            );
+
+        const timeText =
+            document.getElementById(
+                calendarConfig.selectedTimeTextId
+            );
+
+        const clearSlotBtn =
+            document.getElementById(
+                calendarConfig.clearSlotButtonId
+            );
 
         selectedDate = null;
         selectedTime = null;
@@ -1863,12 +1930,6 @@
             return;
         }
 
-        const dateError = document.getElementById(calendarConfig.dateErrorId);
-        const calendarWrap = document.querySelector(calendarConfig.calendarWrapSelector);
-
-        if (dateError) dateError.style.display = "none";
-        if (calendarWrap) calendarWrap.classList.remove("error");
-
         if (calendarConfig.allowToggleOffDate && selectedDate === iso) {
             clearSlotSelectionUI();
             return;
@@ -1887,8 +1948,8 @@
             dateInput.dispatchEvent(
                 new Event(
                     'change', {
-                        bubbles: true
-                    }
+                    bubbles: true
+                }
                 )
             );
         }
@@ -1900,8 +1961,8 @@
             timeInput.dispatchEvent(
                 new Event(
                     'change', {
-                        bubbles: true
-                    }
+                    bubbles: true
+                }
                 )
             );
         }
@@ -1991,12 +2052,12 @@
 
             const headerHeight =
                 header?.getBoundingClientRect()
-                .height || 0;
+                    .height || 0;
 
             const extraOffset =
                 window.innerWidth <= 640 ?
-                10 :
-                18;
+                    10 :
+                    18;
 
             const targetTop =
                 target.getBoundingClientRect().top +
@@ -2018,7 +2079,7 @@
 
         const appointments =
             Array.isArray(state.completedAppointments) ?
-            state.completedAppointments : [];
+                state.completedAppointments : [];
 
         if (!appointments.length) {
             resetDashboardAvailabilityPanel();
@@ -2058,17 +2119,17 @@
                             <div>
                                 <strong>
                                     ${escapeCalendarText(
-                                        appointment.service ||
-                                        'Dental Appointment'
-                                    )}
+            appointment.service ||
+            'Dental Appointment'
+        )}
                                 </strong>
 
                                 <span>
                                     <i class="fa-regular fa-clock"></i>
                                     ${escapeCalendarText(
-                                        appointment.time ||
-                                        'Time not recorded'
-                                    )}
+            appointment.time ||
+            'Time not recorded'
+        )}
                                 </span>
                             </div>
                         </div>
@@ -2078,9 +2139,9 @@
                                 <span>Dentist</span>
                                 <strong>
                                     ${escapeCalendarText(
-                                        appointment.dentist ||
-                                        'Assigned Dentist'
-                                    )}
+            appointment.dentist ||
+            'Assigned Dentist'
+        )}
                                 </strong>
                             </div>
 
@@ -2089,8 +2150,8 @@
                                     <span>Duration</span>
                                     <strong>
                                         ${escapeCalendarText(
-                                            appointment.duration
-                                        )}
+            appointment.duration
+        )}
                                     </strong>
                                 </div>
                             ` : ''}
@@ -2101,8 +2162,8 @@
                                 <span>Remarks</span>
                                 <p>
                                     ${escapeCalendarText(
-                                        appointment.remarks
-                                    )}
+            appointment.remarks
+        )}
                                 </p>
                             </div>
                         ` : ''}
@@ -2259,25 +2320,25 @@
 
                     <div class="dashboard-calendar-preview-slots">
                         ${previewSlots.map(slot => {
-                            const time = typeof slot === 'string'
-                                ? slot
-                                : slot.time;
+            const time = typeof slot === 'string'
+                ? slot
+                : slot.time;
 
-                            return `
+            return `
                                 <span class="dashboard-calendar-preview-slot">
                                     <i class="fa-regular fa-clock"></i>
                                     ${time}
                                 </span>
                             `;
-                        }).join('')}
+        }).join('')}
                     </div>
                 </div>
 
                 <div class="dashboard-calendar-side-footer">
                     <span>
                         ${earliestSlot
-                            ? `Earliest available: ${earliestSlot}`
-                            : 'Slots are subject to confirmation'}
+                ? `Earliest available: ${earliestSlot}`
+                : 'Slots are subject to confirmation'}
                     </span>
 
                     <a
@@ -2301,18 +2362,38 @@
         const banner = document.getElementById(calendarConfig.dateBannerId);
         const pill = document.getElementById(calendarConfig.datePillId);
         const timePill = document.getElementById(calendarConfig.selectedTimePillId);
-        const timeText = document.getElementById(calendarConfig.selectedTimeTextId);
-        const clearSlotBtn = document.getElementById('clearSlotSelectionBtn');
+        const timeText =
+            document.getElementById(
+                calendarConfig.selectedTimeTextId
+            );
+
+        const selectedDisplay =
+            document.getElementById(
+                calendarConfig.selectedSlotDisplayId
+            );
+
+        const selectedDisplayText =
+            document.getElementById(
+                calendarConfig.selectedSlotTextId
+            );
+
+        const clearSlotBtn =
+            document.getElementById(
+                calendarConfig.clearSlotButtonId
+            );
 
         const slots = payload?.slots || [];
         const remaining = payload?.remaining ?? 0;
         const maxSlots = payload?.max_slots ?? 0;
 
         if (slotGrid) {
-            slotGrid.innerHTML = "";
-            slotGrid.style.display = "grid";
+            slotGrid.innerHTML = '';
 
-            slotGrid.className = "slot-grid-ui";
+            slotGrid.style.display =
+                'grid';
+
+            slotGrid.className =
+                'appointment-slot-grid slot-grid-ui';
         }
 
         if (timePill) {
@@ -2322,9 +2403,38 @@
         }
         if (timeText) timeText.textContent = "";
 
+        selectedTime = null;
+
+        if (selectedDisplayText) {
+            selectedDisplayText.textContent =
+                '';
+        }
+
+        if (selectedDisplay) {
+            selectedDisplay.classList.add(
+                'hidden'
+            );
+
+            selectedDisplay.style
+                .removeProperty(
+                    'display'
+                );
+        }
+
         if (clearSlotBtn) {
-            clearSlotBtn.classList.add('hidden');
-            clearSlotBtn.setAttribute('aria-hidden', 'true');
+            clearSlotBtn.classList.add(
+                'hidden'
+            );
+
+            clearSlotBtn.setAttribute(
+                'aria-hidden',
+                'true'
+            );
+
+            clearSlotBtn.style
+                .removeProperty(
+                    'display'
+                );
         }
 
         const [y, m, d] = iso.split("-");
@@ -2338,8 +2448,8 @@
             } else {
                 const slotAvailabilityClass =
                     remaining <= 2 ?
-                    "slot-availability-low" :
-                    "slot-availability-good";
+                        "slot-availability-low" :
+                        "slot-availability-good";
                 banner.innerHTML = `
                     <i class="fa-regular fa-calendar mr-2"></i>
                     ${MONTHS[parseInt(m) - 1]} ${parseInt(d)}, ${y}
@@ -2394,6 +2504,81 @@
             return;
         }
 
+        const slotPeriodLists = {};
+
+        [{
+            key: 'am',
+            label: 'AM'
+        },
+        {
+            key: 'pm',
+            label: 'PM'
+        }
+        ].forEach(period => {
+
+            const hasSlots =
+                slots.some(slot => {
+                    const timeValue =
+                        typeof slot ===
+                            'string' ?
+                            slot :
+                            slot.time;
+
+                    return (
+                        getAppointmentSlotPeriod(
+                            timeValue
+                        ) === period.key
+                    );
+                });
+
+            if (
+                !hasSlots ||
+                !slotGrid
+            ) {
+                return;
+            }
+
+            const group = document.createElement('section');
+
+            group.className =
+                'appointment-slot-period';
+
+            group.dataset.slotPeriod =
+                period.key;
+
+            const heading =
+                document.createElement(
+                    'div'
+                );
+
+            heading.className =
+                'appointment-slot-period-heading';
+
+            heading.textContent =
+                period.label;
+
+            const list =
+                document.createElement(
+                    'div'
+                );
+
+            list.className =
+                'appointment-slot-period-grid';
+
+            group.append(
+                heading,
+                list
+            );
+
+            slotGrid.appendChild(
+                group
+            );
+
+            slotPeriodLists[
+                period.key
+            ] = list;
+        });
+
         slots.forEach(slot => {
             const timeValue = typeof slot === 'string' ? slot : slot.time;
             const disabled = typeof slot === 'object' ?
@@ -2406,41 +2591,65 @@
                 calendarConfig.renderStyle ===
                 'dentist'
             ) {
-                chip.className =
-                    "slot-chip flex items-center justify-center gap-2 rounded-2xl border font-bold text-[0.98rem] " +
+                chip.className = "slot-chip border " +
                     (
                         disabled ?
-                        "disabled line-through opacity-60 cursor-not-allowed pointer-events-none" :
-                        "cursor-pointer"
+                            "disabled line-through opacity-60 cursor-not-allowed pointer-events-none" :
+                            "cursor-pointer"
                     );
 
                 chip.innerHTML =
                     disabled ?
-                    `<i class="fa-solid fa-ban text-[0.9rem]"></i><span>${timeValue}</span>` :
-                    `<i class="fa-regular fa-clock text-[0.9rem]"></i><span>${timeValue}</span>`;
+                        `<i class="fa-solid fa-ban "></i><span>${timeValue}</span>` :
+                        `<i class="fa-regular fa-clock "></i><span>${timeValue}</span>`;
             } else {
-                chip.className =
-                    "slot-chip flex items-center gap-2.5 px-4 py-2.5 rounded-xl border font-semibold text-sm " +
+                chip.className = "slot-chip border " +
                     (
                         disabled ?
-                        "disabled line-through opacity-60 cursor-not-allowed" :
-                        "cursor-pointer"
+                            "disabled line-through opacity-60 cursor-not-allowed" :
+                            "cursor-pointer"
                     );
 
                 chip.innerHTML =
                     disabled ?
-                    `<i class="text-xs opacity-70 fa-solid fa-ban"></i><span>${timeValue}</span>` :
-                    `<i class="text-xs opacity-70 fa-regular fa-clock"></i><span>${timeValue}</span>`;
+                        `<i class=" opacity-70 fa-solid fa-ban"></i><span>${timeValue}</span>` :
+                        `<i class=" opacity-70 fa-regular fa-clock"></i><span>${timeValue}</span>`;
             }
 
             chip.dataset.time = timeValue;
 
             if (!disabled) {
                 chip.addEventListener("click", () => {
-                    const timeError = document.getElementById(calendarConfig.timeErrorId);
-                    const dateError = document.getElementById(calendarConfig.dateErrorId);
-                    const slotsWrap = document.querySelector(calendarConfig.slotsWrapSelector);
-                    const timeInput = document.getElementById(calendarConfig.timeInputId);
+                    const calendarWrap =
+                    document.querySelector(
+                        calendarConfig
+                            .calendarWrapSelector
+                    );
+
+                const slotsWrap =
+                    document.querySelector(
+                        calendarConfig
+                            .slotsWrapSelector
+                    );
+
+                const dateErrorKey =
+                    calendarWrap
+                        ?.dataset
+                        .globalErrorKey ||
+                    calendarConfig
+                        .dateInputId;
+
+                const timeErrorKey =
+                    slotsWrap
+                        ?.dataset
+                        .globalErrorKey ||
+                    calendarConfig
+                        .timeInputId;
+
+                const timeInput =
+                    document.getElementById(
+                        calendarConfig.timeInputId
+                    );
 
                     const currentDisplay = document.getElementById(calendarConfig
                         .selectedSlotDisplayId || "selectedSlotDisplay");
@@ -2452,26 +2661,20 @@
                         "selectedTimeText");
 
                     if (!hasSelectedDateValue()) {
-                        if (dateError) {
-                            dateError.textContent = "Please select a date first.";
-                            dateError.style.display = "block";
-                        }
+                        window.showGlobalGroupError?.(
+                            calendarWrap,
+                            dateErrorKey,
+                            'Please select a date first.'
+                        );
 
-                        if (timeError) {
-                            timeError.textContent = "Please select a date first.";
-                            timeError.style.display = "block";
-                        }
-
-                        if (slotsWrap) {
-                            slotsWrap.classList.add("error");
-                        }
+                        window.showGlobalGroupError?.(
+                            slotsWrap,
+                            timeErrorKey,
+                            'Please select a date first.'
+                        );
 
                         return;
                     }
-
-                    if (timeError) timeError.style.display = "none";
-                    if (dateError) dateError.style.display = "none";
-                    if (slotsWrap) slotsWrap.classList.remove("error");
 
                     if (selectedTime === timeValue) {
                         chip.classList.remove(
@@ -2553,7 +2756,13 @@
                 });
             }
 
-            slotGrid.appendChild(chip);
+            const period = getAppointmentSlotPeriod(timeValue);
+
+            slotPeriodLists[
+                period
+            ]?.appendChild(
+                chip
+            );
         });
     }
 
@@ -2562,7 +2771,7 @@
 
     let calendarMonthAnimating = false;
 
-    window.changeMonth = async function(dir) {
+    window.changeMonth = async function (dir) {
         if (calendarMonthAnimating) {
             return;
         }
@@ -2608,8 +2817,8 @@
         if (currentPanel) {
             const outgoingClass =
                 direction > 0 ?
-                'global-carousel-out-left' :
-                'global-carousel-out-right';
+                    'global-carousel-out-left' :
+                    'global-carousel-out-right';
 
             currentPanel.classList.add(
                 outgoingClass
@@ -2655,8 +2864,8 @@
 
             const incomingClass =
                 direction > 0 ?
-                'global-carousel-in-right' :
-                'global-carousel-in-left';
+                    'global-carousel-in-right' :
+                    'global-carousel-in-left';
 
             nextPanel.classList.add(
                 incomingClass
@@ -2696,8 +2905,8 @@
                 todayDate.getDate() +
                 (
                     calendarConfig.disallowToday ?
-                    1 :
-                    0
+                        1 :
+                        0
                 );
         }
 
@@ -2775,7 +2984,7 @@
 
     document.addEventListener(
         "DOMContentLoaded",
-        function() {
+        function () {
 
             const queryDate =
                 new URLSearchParams(
@@ -2784,10 +2993,10 @@
 
             const queryDateState =
                 queryDate ?
-                getCalendarDateStateFromIso(
-                    queryDate
-                ) :
-                null;
+                    getCalendarDateStateFromIso(
+                        queryDate
+                    ) :
+                    null;
 
             if (
                 calendarConfig.mode ===
@@ -2811,13 +3020,13 @@
                 ) {
                     currentYear =
                         queryDateState
-                        .cellDate
-                        .getFullYear();
+                            .cellDate
+                            .getFullYear();
 
                     currentMonth =
                         queryDateState
-                        .cellDate
-                        .getMonth();
+                            .cellDate
+                            .getMonth();
 
                     selectedDate =
                         queryDateState.iso;
@@ -2850,21 +3059,21 @@
             setTimeout(
                 async () => {
 
-                        renderCalendar();
+                    renderCalendar();
 
-                        if (
-                            calendarConfig.mode ===
-                            'booking' &&
-                            queryDateState &&
-                            !queryDateState.isDisabled
-                        ) {
-                            await selectDate(
-                                queryDateState.iso
-                            );
-                        }
+                    if (
+                        calendarConfig.mode ===
+                        'booking' &&
+                        queryDateState &&
+                        !queryDateState.isDisabled
+                    ) {
+                        await selectDate(
+                            queryDateState.iso
+                        );
+                    }
 
-                    },
-                    calendarConfig.mode ===
+                },
+                calendarConfig.mode ===
                     'booking' ?
                     0 :
                     650
