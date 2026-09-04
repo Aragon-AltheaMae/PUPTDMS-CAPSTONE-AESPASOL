@@ -260,9 +260,18 @@
 }
 
 .document-request-item .global-record-card-grid {
-    gap: .28rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, .75fr);
+    grid-template-areas:
+        "topline topline"
+        "main purpose"
+        "main status";
+    column-gap: 1.5rem;
+    row-gap: .18rem;
+    align-items: center;
+
     min-height: 0;
-    padding: .55rem .8rem .55rem .95rem;
+    padding: .42rem .8rem .42rem .95rem;
 }
 
 .document-request-item::before {
@@ -271,11 +280,18 @@
 }
 
 .document-request-topline {
+    grid-area: topline;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: .65rem;
     margin: 0;
+}
+
+.document-request-item .global-record-card-grid > div:nth-child(2) {
+    grid-area: main;
+    min-width: 0;
 }
 
 .document-history-reference {
@@ -307,11 +323,11 @@
 }
 
 .document-request-purpose {
+    grid-area: purpose;
     display: flex;
     align-items: flex-start;
     gap: .35rem;
     margin: 0;
-    margin-top: .08rem;
     min-width: 0;
     color: var(--text-2);
     font-size: .68rem;
@@ -320,15 +336,12 @@
 
 .document-request-purpose>i {
     flex-shrink: 0;
-
     margin-top: .12rem;
-
     color: var(--crimson);
 }
 
 .document-request-purpose-label {
     flex-shrink: 0;
-
     color: var(--text-3);
     font-weight: 700;
 }
@@ -344,11 +357,11 @@
 }
 
 .document-request-status-note {
+    grid-area: status;
     display: inline-flex;
     align-items: flex-start;
     gap: .35rem;
     margin: 0;
-    margin-top: .08rem;
     width: fit-content;
     max-width: 100%;
     color: var(--text-3);
@@ -359,7 +372,6 @@
 
 .document-request-status-note>i {
     flex-shrink: 0;
-
     margin-top: .12rem;
 }
 
@@ -376,6 +388,18 @@
 }
 
 @media (max-width: 768px) {
+
+    .document-request-item .global-record-card-grid {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            "topline"
+            "main"
+            "purpose"
+            "status";
+        column-gap: 0;
+        row-gap: .35rem;
+        padding: .55rem .7rem .55rem .85rem;
+    }
     .document-request-summary-grid {
         grid-template-columns: 1fr;
     }
@@ -396,12 +420,17 @@
     }
 
     .document-request-purpose {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+        align-items: flex-start;
     }
 
     .document-request-purpose strong {
-        width: 100%;
-        flex-basis: 100%;
+        flex: 1 1 auto;
+        width: auto;
+        min-width: 0;
+        flex-basis: auto;
+        overflow-wrap: anywhere;
+        word-break: break-word;
     }
 
     .document-request-status-note {
