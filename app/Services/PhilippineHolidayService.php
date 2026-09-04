@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Helpers\PhilippineHolidays;
+use App\Models\PhilippineHolidaySnapshot;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -105,6 +106,17 @@ class PhilippineHolidayService
                 $remoteHolidays
             );
 
+            /*
+            * Persist the most recent successful MCP dataset
+            * outside Laravel's cache.
+            *
+            * This survives optimize:clear / cache:clear.
+            */
+            $this->storeDatabaseSnapshot(
+                $year,
+                $remoteHolidays
+            );
+
             return $remoteHolidays;
         }
 
@@ -138,6 +150,50 @@ class PhilippineHolidayService
             );
 
             return $lastGood;
+        }
+
+        /*
+ * Laravel's cache may have been cleared during deployment.
+ *
+ * Recover the most recent successfully retrieved MCP dataset
+ * from the persistent database snapshot before falling back
+ * to locally generated/provisional holidays.
+ */
+        $databaseSnapshot =
+            $this->loadDatabaseSnapshot(
+                $year
+            );
+
+        if (
+            is_array($databaseSnapshot) &&
+            $databaseSnapshot !== []
+        ) {
+            $databaseSnapshot =
+                $this->applyStatutoryHolidayOverlay(
+                    $databaseSnapshot,
+                    $year
+                );
+
+            /*
+     * Rehydrate both cache layers so subsequent requests
+     * return to the fast cache path.
+     */
+            Cache::put(
+                $freshCacheKey,
+                $databaseSnapshot,
+                now()->addHours(
+                    $this->fallbackCacheHours()
+                )
+            );
+
+            Cache::forever(
+                $this->lastGoodCacheKey(
+                    $year
+                ),
+                $databaseSnapshot
+            );
+
+            return $databaseSnapshot;
         }
 
         /*
@@ -1615,6 +1671,95 @@ class PhilippineHolidayService
 
         return $date
             ->toDateString();
+    }
+
+    private function storeDatabaseSnapshot(
+        int $year,
+        array $holidays
+    ): void {
+        if ($holidays === []) {
+            return;
+        }
+
+        try {
+            PhilippineHolidaySnapshot::updateOrCreate(
+                [
+                    'year' =>
+                    $year,
+                ],
+                [
+                    'holidays' =>
+                    $holidays,
+
+                    'source' =>
+                    'ph_holidays_mcp',
+
+                    'fetched_at' =>
+                    now(),
+                ]
+            );
+        } catch (\Throwable $exception) {
+            /*
+         * Database snapshot persistence must never break
+         * appointment/calendar functionality.
+         */
+            Log::warning(
+                'Unable to persist PH holiday database snapshot.',
+                [
+                    'year' =>
+                    $year,
+
+                    'message' =>
+                    $exception->getMessage(),
+                ]
+            );
+        }
+    }
+
+    private function loadDatabaseSnapshot(
+        int $year
+    ): ?array {
+        try {
+            $snapshot =
+                PhilippineHolidaySnapshot::query()
+                ->where(
+                    'year',
+                    $year
+                )
+                ->first();
+
+            if (! $snapshot) {
+                return null;
+            }
+
+            $holidays =
+                $snapshot->holidays;
+
+            return (
+                is_array($holidays) &&
+                $holidays !== []
+            )
+                ? $holidays
+                : null;
+        } catch (\Throwable $exception) {
+            /*
+         * If the database itself is unavailable, continue
+         * to the existing local fallback instead of failing
+         * appointment booking.
+         */
+            Log::warning(
+                'Unable to read PH holiday database snapshot.',
+                [
+                    'year' =>
+                    $year,
+
+                    'message' =>
+                    $exception->getMessage(),
+                ]
+            );
+
+            return null;
+        }
     }
 
     private function freshCacheKey(

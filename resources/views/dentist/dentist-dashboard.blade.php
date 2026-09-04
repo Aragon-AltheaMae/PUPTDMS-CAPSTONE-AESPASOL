@@ -290,11 +290,6 @@
 
                 </div>
 
-                <button type="button" class="modal-x" onclick="closeStatusModal()"
-                    aria-label="Close clinic status dialog" data-tooltip="Close" data-tooltip-tone="neutral">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-
             </div>
 
             <div class="modal-bd">

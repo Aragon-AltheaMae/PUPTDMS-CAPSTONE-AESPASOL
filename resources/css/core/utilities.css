@@ -337,8 +337,8 @@
     gap: 8px;
     min-height: 40px;
     padding: 0 16px;
-    border-radius: 8px;
-    font-size: 13px;
+    border-radius: 16px;
+    font-size: 0.76rem;
     font-weight: 800;
     line-height: 1;
     cursor: pointer;
@@ -729,10 +729,26 @@
     pointer-events: none;
 
     transform: translateY(4px);
+
     transition:
         opacity .15s ease,
-        visibility .15s ease,
         transform .15s ease;
+}
+
+.global-action-tooltip.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.global-action-tooltip:not(.show) {
+    padding: 0;
+    width: 0;
+    height: 0;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    box-shadow: none;
 }
 
 .global-action-tooltip strong {
@@ -755,12 +771,6 @@
 
 .global-action-tooltip span+span {
     margin-top: 2px;
-}
-
-.global-action-tooltip.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
 }
 
 .global-action-tooltip.tooltip-view {
@@ -796,18 +806,6 @@
 [data-theme="dark"] .global-action-tooltip,
 .dark .global-action-tooltip {
     box-shadow: 0 14px 30px var(--alpha-black-42);
-}
-
-.ui-action-btn:hover::after,
-.ui-action-btn:focus-visible::after {
-    transform:
-        translateX(-50%) translateY(0);
-}
-
-.ui-action-btn:hover::before,
-.ui-action-btn:focus-visible::before {
-    transform:
-        translateX(-50%) translateY(0) rotate(45deg);
 }
 
 .appt-type-icon {

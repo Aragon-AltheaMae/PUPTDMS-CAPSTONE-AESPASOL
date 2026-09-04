@@ -2226,12 +2226,21 @@ body.layout-no-sidebar #mainContent.odontogram-page {
 }
 
 .odontogram-procedure-duration-copy {
+    width: 100%;
+    min-width: 0;
     margin-top: .6rem;
 }
 
 #procedureDurationInput {
     height: 34px;
     margin-top: .25rem;
+}
+
+#procedureDurationField .global-field-error {
+    width: max-content;
+    max-width: none;
+    white-space: nowrap;
+    font-size: .66rem;
 }
 
 .odontogram-patient-name {
@@ -2243,23 +2252,18 @@ body.layout-no-sidebar #mainContent.odontogram-page {
     overflow-wrap: anywhere;
 }
 
-.odontogram-patient-service {
-    display: inline-flex;
-    align-items: center;
-    gap: .4rem;
+.odontogram-service-badge {
     margin-top: .4rem;
-    color: var(--crimson);
-    font-size: .74rem;
-    font-weight: 800;
 }
 
-.odontogram-patient-service i {
+.odontogram-service-badge i {
     color: currentColor;
 }
 
 .odontogram-appointment-meta {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns:
+        minmax(0, .85fr) minmax(0, .85fr) minmax(250px, 1.3fr);
     gap: .65rem;
 }
 
@@ -2843,6 +2847,7 @@ body.layout-no-sidebar #mainContent.odontogram-page {
 .odontogram-left-panel {
     width: 100%;
     min-width: 0;
+    scroll-margin-top: calc(var(--header-h, 72px) + 1rem);
 }
 
 .odontogram-legend-panel {

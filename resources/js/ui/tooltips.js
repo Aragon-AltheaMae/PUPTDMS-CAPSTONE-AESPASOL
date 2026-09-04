@@ -25,6 +25,10 @@ function initGlobalActionTooltips() {
         tooltip.classList.remove('show', ...toneClasses);
         tooltip.setAttribute('aria-hidden', 'true');
         tooltip.textContent = '';
+
+        tooltip.style.left = '';
+        tooltip.style.top = '';
+
         activeTarget = null;
     }
 
@@ -196,6 +200,10 @@ function renderGlobalChartTooltip(context) {
         );
 
         element.replaceChildren();
+
+        element.style.left = '';
+        element.style.top = '';
+
         return;
     }
 

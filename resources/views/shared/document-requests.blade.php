@@ -411,10 +411,6 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
                     </p>
                 </div>
             </div>
-
-            <button type="button" class="modal-x" id="approveCancelBtn" aria-label="Close approve modal">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
         </div>
 
         <div class="modal-bd">
@@ -2635,8 +2631,9 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
             updateShowResultsButton();
         });
 
-        ['approveCancelBtn', 'approveCancelBtn2'].forEach(id =>
-            document.getElementById(id)?.addEventListener('click', () => window.closeModal('approveModal'))
+        document.getElementById('approveCancelBtn2')?.addEventListener(
+            'click',
+            () => window.closeModal('approveModal')
         );
 
         document.getElementById('approveConfirmBtn')?.addEventListener('click', async () => {
@@ -2727,117 +2724,109 @@ is_object($requests ?? null) && method_exists($requests, 'lastPage') ? $requests
             }
         });
 
-        ['rejectCancelBtn', 'rejectCancelBtn2'].forEach(id =>
-            document.getElementById(id)?.addEventListener('click', () => window.closeModal('rejectModal'))
-        );
+        document.getElementById('rejectRequestForm')?.addEventListener('submit', async event => {
+            event.preventDefault();
 
-        document.getElementById(
-            'rejectRequestForm'
-        )?.addEventListener(
-            'submit',
-            async event => {
-                event.preventDefault();
+            const form = event.currentTarget;
 
-                const form = event.currentTarget;
-
-                const validation =
-                    window.validateGlobalForm?.(
-                        form
-                    );
-
-                if (
-                    validation &&
-                    !validation.valid
-                ) {
-                    return;
-                }
-
-                const id =
-                    document.getElementById(
-                        'rejectRequestId'
-                    ).value;
-
-                const button =
-                    document.getElementById(
-                        'rejectConfirmBtn'
-                    );
-
-                const notes =
-                    document.getElementById(
-                        'rejectNotes'
-                    )?.value.trim() || '';
-
-                if (!id || !button) return;
-
-                button.disabled = true;
-
-                window.DiscardChanges?.markSubmitting(
+            const validation =
+                window.validateGlobalForm?.(
                     form
                 );
 
-                try {
-                    const rejectUrl = String(
-                        DOCREQ_ROUTES.reject || ''
-                    ).replace('__ID__', id);
-
-                    const response = await fetch(
-                        rejectUrl,
-                        {
-                            method: DOCREQ_METHODS.reject || 'POST',
-                            headers: {
-                                Accept: 'application/json',
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': CSRF,
-                                'X-Requested-With': 'XMLHttpRequest'
-                            },
-                            body: JSON.stringify({
-                                reason: notes
-                            })
-                        }
-                    );
-
-                    const data =
-                        await response.json()
-                            .catch(() => ({}));
-
-                    if (!response.ok) {
-                        throw new Error(
-                            data.message ||
-                            `Rejection failed. Status: ${response.status}`
-                        );
-                    }
-
-                    window.closeModal(
-                        'rejectModal'
-                    );
-
-                    syncLocalDocRequestStatus(
-                        id,
-                        'rejected', {
-                        rejection_reason: notes
-                    }
-                    );
-
-                    docreqToast(
-                        'success',
-                        'Request rejected',
-                        data.message ||
-                        'The document request has been rejected.'
-                    );
-                } catch (error) {
-                    window.DiscardChanges
-                        ?.markNotSubmitting(form);
-
-                    docreqToast(
-                        'error',
-                        'Rejection failed',
-                        error.message ||
-                        'The request could not be rejected.'
-                    );
-                } finally {
-                    button.disabled = false;
-                }
+            if (
+                validation &&
+                !validation.valid
+            ) {
+                return;
             }
+
+            const id =
+                document.getElementById(
+                    'rejectRequestId'
+                ).value;
+
+            const button =
+                document.getElementById(
+                    'rejectConfirmBtn'
+                );
+
+            const notes =
+                document.getElementById(
+                    'rejectNotes'
+                )?.value.trim() || '';
+
+            if (!id || !button) return;
+
+            button.disabled = true;
+
+            window.DiscardChanges?.markSubmitting(
+                form
+            );
+
+            try {
+                const rejectUrl = String(
+                    DOCREQ_ROUTES.reject || ''
+                ).replace('__ID__', id);
+
+                const response = await fetch(
+                    rejectUrl,
+                    {
+                        method: DOCREQ_METHODS.reject || 'POST',
+                        headers: {
+                            Accept: 'application/json',
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': CSRF,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            reason: notes
+                        })
+                    }
+                );
+
+                const data =
+                    await response.json()
+                        .catch(() => ({}));
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.message ||
+                        `Rejection failed. Status: ${response.status}`
+                    );
+                }
+
+                window.closeModal(
+                    'rejectModal'
+                );
+
+                syncLocalDocRequestStatus(
+                    id,
+                    'rejected', {
+                    rejection_reason: notes
+                }
+                );
+
+                docreqToast(
+                    'success',
+                    'Request rejected',
+                    data.message ||
+                    'The document request has been rejected.'
+                );
+            } catch (error) {
+                window.DiscardChanges
+                    ?.markNotSubmitting(form);
+
+                docreqToast(
+                    'error',
+                    'Rejection failed',
+                    error.message ||
+                    'The request could not be rejected.'
+                );
+            } finally {
+                button.disabled = false;
+            }
+        }
         );
 
         showSkeleton();
