@@ -206,6 +206,16 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                                             <div id="dateBanner" class="hidden appointment-slot-date-banner">
                                             </div>
 
+                                            <div id="workingHolidayNotice"
+                                                class="hidden cal-pill cal-pill-working-holiday mb-3"
+                                                aria-hidden="true">
+                                                <i class="fa-solid fa-briefcase"></i>
+
+                                                <span>
+                                                    Working Holiday · Regular schedule applies
+                                                </span>
+                                            </div>
+
                                             <div id="slotPlaceholder" class="appointment-slot-placeholder">
 
                                                 <div class="empty-icon">
@@ -489,6 +499,115 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
 </div>
 
 @if (!$isReservedBooking)
+<div id="holidaySchedulingNoticeModal" class="ui-modal modal-theme-primary" aria-hidden="true">
+    <div class="ui-modal-card modal-md">
+
+        <div class="modal-hd">
+            <div class="modal-heading w-full">
+
+                <div class="modal-icon">
+                    <i class="fa-solid fa-calendar-days"></i>
+                </div>
+
+                <div class="modal-copy flex-1 min-w-0">
+
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h2 class="modal-title">
+                            Holiday Scheduling Notice
+                        </h2>
+
+                        <span class="cal-pill cal-pill-maroon flex-shrink-0">
+                            <i class="fa-solid fa-bullhorn"></i>
+                            Announcement
+                        </span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-bd">
+
+            <div class="global-confirm-alert mb-5">
+                <i class="fa-solid fa-circle-info"></i>
+
+                <p>
+                    <strong>
+                        Know how holidays affect appointment booking.
+                    </strong>
+
+                    <span>
+                        A holiday does not always mean the clinic is closed.
+                        Working holidays follow the regular clinic schedule,
+                        while non-working holidays are unavailable for booking.
+                    </span>
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
+                    <span class="cal-pill cal-pill-working-holiday">
+                        <i class="fa-solid fa-briefcase"></i>
+                        Working Holiday
+                    </span>
+
+                    <p class="mt-3 text-sm font-bold text-[var(--text-1)]">
+                        Regular schedule applies.
+                    </p>
+
+                    <p class="mt-1 text-xs leading-relaxed text-[var(--text-2)]">
+                        You may book if appointment slots
+                        are available.
+                    </p>
+                </div>
+
+                <div class="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
+                    <span class="cal-pill cal-pill-yellow">
+                        <i class="fa-solid fa-star"></i>
+                        Non-Working Holiday
+                    </span>
+
+                    <p class="mt-3 text-sm font-bold text-[var(--text-1)]">
+                        Clinic is closed.
+                    </p>
+
+                    <p class="mt-1 text-xs leading-relaxed text-[var(--text-2)]">
+                        Appointment booking is unavailable
+                        on this date.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="mt-5 pt-4 border-t border-[var(--border)]">
+                <label class="global-checkbox-row" for="hideHolidayNoticeForSevenDays">
+                    <input type="checkbox" id="hideHolidayNoticeForSevenDays" class="global-checkbox-input">
+
+                    <span class="global-checkbox-label">
+                        <span class="ui-muted-text">
+                            Don't show this notice again for 7 days.
+                        </span>
+                    </span>
+                </label>
+            </div>
+
+        </div>
+
+        <div class="modal-ft modal-ft--centered">
+
+            <button type="button" id="holidaySchedulingNoticeDoneBtn" class="ui-btn ui-btn-primary ui-btn-sm">
+                <i class="fa-solid fa-check"></i>
+                Got it
+            </button>
+
+        </div>
+
+    </div>
+</div>
+@endif
+
+@if (!$isReservedBooking)
 @include('components.appointment-calendar-script', [
 'mode' => 'booking',
 'renderStyle' => 'patient',
@@ -496,6 +615,7 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
 'dateInputId' => 'appointment_date',
 'timeInputId' => 'appointment_time',
 'dateBannerId' => 'dateBanner',
+'workingHolidayNoticeId' => 'workingHolidayNotice',
 'slotPlaceholderId' => 'slotPlaceholder',
 'slotContainerId' => 'slotContainer',
 'slotGridId' => 'slotGrid',
@@ -529,6 +649,9 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
     const DRAFT_KEY = isReservedBooking ?
         `appointmentDraft:reserved:${reservedBookingPeriodId}` :
         "appointmentDraft:v1";
+
+    const HOLIDAY_NOTICE_STORAGE_KEY = 'holidaySchedulingNoticeHiddenUntil:v1';
+    const HOLIDAY_NOTICE_HIDE_DURATION = 7 * 24 * 60 * 60 * 1000;
 
     function enforceReservedSchedule() {
         if (!isReservedBooking) return;
@@ -2826,7 +2949,7 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
             }
         }));
     });
-    
+
     function syncTobaccoDetails() {
         const selected =
             document.querySelector(
@@ -3075,6 +3198,90 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
         }, 320);
     }
 
+    function isHolidaySchedulingNoticeHidden() {
+        try {
+            const storedValue =
+                Number(
+                    localStorage.getItem(
+                        HOLIDAY_NOTICE_STORAGE_KEY
+                    )
+                );
+
+            if (
+                !Number.isFinite(storedValue) ||
+                storedValue <= Date.now()
+            ) {
+                localStorage.removeItem(
+                    HOLIDAY_NOTICE_STORAGE_KEY
+                );
+
+                return false;
+            }
+
+            return true;
+
+        } catch {
+            return false;
+        }
+    }
+
+    function openHolidaySchedulingNotice() {
+        if (
+            isReservedBooking ||
+            window.__SESSION_EXPIRED__ ||
+            isHolidaySchedulingNoticeHidden()
+        ) {
+            return;
+        }
+
+        const modal =
+            document.getElementById(
+                'holidaySchedulingNoticeModal'
+            );
+
+        if (
+            !modal ||
+            modal.classList.contains('open')
+        ) {
+            return;
+        }
+
+        window.openModal?.(
+            'holidaySchedulingNoticeModal'
+        );
+    }
+
+    function closeHolidaySchedulingNotice() {
+        const checkbox =
+            document.getElementById(
+                'hideHolidayNoticeForSevenDays'
+            );
+
+        if (checkbox?.checked) {
+            try {
+                localStorage.setItem(
+                    HOLIDAY_NOTICE_STORAGE_KEY,
+                    String(
+                        Date.now() +
+                        HOLIDAY_NOTICE_HIDE_DURATION
+                    )
+                );
+            } catch {
+                /*
+                 * Storage failure should never prevent
+                 * the modal from closing.
+                 */
+            }
+        }
+
+        window.closeModal?.(
+            'holidaySchedulingNoticeModal'
+        );
+    }
+
+    document.getElementById('holidaySchedulingNoticeDoneBtn')
+        ?.addEventListener('click', closeHolidaySchedulingNotice);
+
     async function initIntroBookingModal() {
         const modal =
             document.getElementById(
@@ -3127,13 +3334,16 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
             }
         }
 
-        startBtn?.addEventListener(
-            "click",
-            () => {
-                window.closeModal?.(
-                    "introBookingModal"
-                );
-            }
+        startBtn?.addEventListener("click", () => {
+            window.closeModal?.(
+                "introBookingModal"
+            );
+
+            window.setTimeout(
+                openHolidaySchedulingNotice,
+                220
+            );
+        }
         );
 
         continueDraftBtn
@@ -3165,8 +3375,7 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                         "introBookingModal"
                     );
 
-                    const restored =
-                        await restoreDraft();
+                    const restored = await restoreDraft();
 
                     if (restored) {
                         window.showToast?.({
@@ -3176,6 +3385,8 @@ $isReservedBooking = isset($reservedBookingPeriod) && $reservedBookingPeriod;
                             duration: 4000,
                         });
                     }
+
+                    window.setTimeout(openHolidaySchedulingNotice, 220);
                 }
             );
 

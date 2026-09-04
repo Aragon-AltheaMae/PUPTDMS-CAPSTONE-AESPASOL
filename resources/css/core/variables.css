@@ -456,10 +456,10 @@
     --red-600: #DC2626;
     --red-700: #B91C1C;
     --rose-white: #fff5f5;
-    --slate-300: #CBD5E1;
+    --slate-300: #e2e2e2;
     --slate-50: #F8FAFC;
-    --slate-500: #64748B;
-    --slate-600: #475569;
+    --slate-500: #acb1b9;
+    --slate-600: #707379;
     --utility-color-01: #E2E8F0;
     --validation-red: #C0392B;
     --violet-100: #EDE9FE;
@@ -502,6 +502,15 @@
 
     --calendar-tooltip-text: var(--text-on-brand);
     --calendar-badge-border: var(--color-white);
+
+    --calendar-working-badge-bg: var(--calendar-completed-bg);
+    --calendar-working-badge-text: var(--text-on-brand);
+    --calendar-working-badge-border: var(--calendar-badge-border);
+
+    --calendar-closed-badge-bg: var(--calendar-closed-bg);
+    --calendar-closed-badge-text: var(--text-on-brand);
+    --calendar-closed-badge-border: var(--calendar-badge-border);
+
     --calendar-tooltip-neutral: var(--gray-800);
 
     --calendar-shell-bg: var(--card);
@@ -892,40 +901,29 @@
     --calendar-closed-text: var(--text-3);
     --calendar-closed-border: var(--border);
 
-    --calendar-panel-bg:
-        linear-gradient(145deg,
+    --calendar-working-badge-bg: var(--emerald-800);
+    --calendar-working-badge-text: var(--green-100);
+    --calendar-working-badge-border: var(--alpha-emerald-300-48);
+    --calendar-closed-badge-bg: var(--gray-700);
+    --calendar-closed-badge-text: var(--slate-300);
+    --calendar-closed-badge-border: var(--alpha-white-18);
+
+    --calendar-panel-bg: linear-gradient(145deg,
             var(--calendar-panel-bg-start),
             var(--calendar-panel-bg-end));
 
-    --calendar-panel-text:
-        var(--calendar-heading-text);
+    --calendar-panel-text: var(--calendar-heading-text);
+    --calendar-panel-muted: var(--calendar-muted-text);
 
-    --calendar-panel-muted:
-        var(--calendar-muted-text);
+    --calendar-slot-hover-bg: var(--alpha-crimson-16);
+    --calendar-slot-hover-border: var(--alpha-red-300-28);
+    --calendar-slot-hover-text: var(--red-200);
 
-    --calendar-slot-hover-bg:
-        var(--alpha-crimson-16);
-
-    --calendar-slot-hover-border:
-        var(--alpha-red-300-28);
-
-    --calendar-slot-hover-text:
-        var(--red-200);
-
-    --calendar-slot-selected-bg:
-        var(--crimson);
-
-    --calendar-slot-selected-border:
-        var(--red-300);
-
-    --calendar-slot-selected-text:
-        var(--color-white);
-
-    --calendar-slot-disabled-bg:
-        var(--surface);
-
-    --calendar-slot-disabled-border:
-        var(--border);
+    --calendar-slot-selected-bg: var(--crimson);
+    --calendar-slot-selected-border: var(--red-300);
+    --calendar-slot-selected-text: var(--color-white);
+    --calendar-slot-disabled-bg: var(--surface);
+    --calendar-slot-disabled-border: var(--border);
 }
 
 @media (max-width: 1199px) {

@@ -123,6 +123,78 @@ function createCalendarSource(config = {}) {
             return this.holidaysMap?.[iso] || null;
         },
 
+        getHolidayName(iso) {
+            const holiday =
+                this.getHoliday(iso);
+
+            if (!holiday) {
+                return null;
+            }
+
+            /*
+             * Backward compatibility for old:
+             * date => "Holiday Name"
+             */
+            if (typeof holiday === 'string') {
+                return holiday;
+            }
+
+            return String(
+                holiday.name ||
+                'Philippine Holiday'
+            );
+        },
+
+        isHolidayBlocked(iso) {
+            const holiday =
+                this.getHoliday(iso);
+
+            if (!holiday) {
+                return false;
+            }
+
+            /*
+             * Legacy holiday maps were always treated as blocking.
+             */
+            if (typeof holiday === 'string') {
+                return true;
+            }
+
+            /*
+             * Prefer the booking decision normalized by Laravel.
+             */
+            if (
+                typeof holiday
+                    .is_blocked_for_booking ===
+                'boolean'
+            ) {
+                return holiday
+                    .is_blocked_for_booking;
+            }
+
+            /*
+             * Defensive compatibility if an older normalized payload
+             * does not yet contain is_blocked_for_booking.
+             */
+            if (
+                holiday.type ===
+                'special_working' ||
+                holiday.is_working_day ===
+                true
+            ) {
+                return false;
+            }
+
+            if (
+                holiday.type === 'islamic' &&
+                holiday.eid_confirmed === false
+            ) {
+                return false;
+            }
+
+            return true;
+        },
+
         isDateSchedulable(dateObj, iso = this.toIsoDate(dateObj)) {
             if (!iso) return false;
 
@@ -130,7 +202,7 @@ function createCalendarSource(config = {}) {
                 return false;
             }
 
-            if (this.getHoliday(iso)) {
+            if (this.isHolidayBlocked(iso)) {
                 return false;
             }
 

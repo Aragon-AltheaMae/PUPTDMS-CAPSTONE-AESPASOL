@@ -75,7 +75,7 @@ class WalkInController extends Controller
             ->groupBy('appointment_date')
             ->pluck('total', 'appointment_date');
 
-        $philippineHolidays = PhilippineHolidays::range(yearsBefore: 1, yearsAfter: 5);
+        $philippineHolidays = PhilippineHolidays::recordsRange(yearsBefore: 1, yearsAfter: 5);
 
         $dentalQuestions = BookingQuestions::dental();
         $medicalQuestions = BookingQuestions::medical();

@@ -94,7 +94,7 @@ class DentistAppointmentController extends Controller
             ->map(fn($d) => Carbon::parse($d)->toDateString())
             ->toArray();
 
-        $philippineHolidays = PhilippineHolidays::range(0, 1);
+        $philippineHolidays = PhilippineHolidays::recordsRange(0, 1);
 
         $defaultServiceTypes = ServiceType::where('is_default', true)
             ->where('is_active_for_booking', true)
@@ -377,6 +377,14 @@ class DentistAppointmentController extends Controller
             ], 422);
         }
 
+        if (PhilippineHolidays::isBlockedForBooking($request->new_appointment_date)) {
+            return response()->json([
+                'success' => false,
+                'message' =>
+                'The clinic is closed on this Philippine holiday. Please choose another date.',
+            ], 422);
+        }
+
         $appointment = Appointment::with('patient.user')->findOrFail($id);
 
         if ($appointment->reserved_booking_period_id) {
@@ -478,6 +486,14 @@ class DentistAppointmentController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Same-day follow-up scheduling is not allowed. Please choose a future date.',
+            ], 422);
+        }
+
+        if (PhilippineHolidays::isBlockedForBooking($request->followup_appointment_date)) {
+            return response()->json([
+                'success' => false,
+                'message' =>
+                'The clinic is closed on this Philippine holiday. Please choose another date.',
             ], 422);
         }
 

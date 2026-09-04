@@ -1,54 +1,57 @@
 .cal-pill {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: .42rem !important;
-    padding: .36rem .75rem !important;
-    border-radius: 999px !important;
-    font-size: .72rem !important;
-    font-weight: 750 !important;
-    line-height: 1 !important;
-    border: 1px solid transparent !important;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45);
+    display: inline-flex;
+    align-items: center;
+    gap: .42rem;
+    padding: .36rem .75rem;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 750;
+    line-height: 1;
+    border: 1px solid var(--border);
+}
+
+.cal-pill.hidden {
+    display: none !important;
 }
 
 .cal-pill i {
-    font-size: .7rem !important;
+    font-size: .7rem;
 }
 
 .cal-pill-green {
-    background: var(--status-completed-bg) !important;
-    color: var(--status-completed-text) !important;
-    border-color: var(--status-completed-border) !important;
+    background: var(--status-completed-bg);
+    color: var(--status-completed-text);
+    border-color: var(--status-completed-border);
 }
 
 .cal-pill-blue {
-    background: #e8edff !important;
-    color: #4338ca !important;
-    border-color: #cdd5ff !important;
+    background: var(--calendar-appointment-soft);
+    color: var(--calendar-appointment-text);
+    border-color: var(--calendar-appointment-border);
 }
 
 .cal-pill-red {
-    background: var(--status-cancelled-bg) !important;
-    color: var(--status-cancelled-text) !important;
-    border-color: var(--status-cancelled-border) !important;
+    background: var(--status-cancelled-bg);
+    color: var(--status-cancelled-text);
+    border-color: var(--status-cancelled-border);
 }
 
 .cal-pill-maroon {
-    background: var(--crimson-light) !important;
-    color: var(--crimson) !important;
-    border-color: var(--crimson-mid) !important;
+    background: var(--crimson-light);
+    color: var(--crimson);
+    border-color: var(--crimson-mid);
 }
 
 .cal-pill-yellow {
-    background: var(--calendar-holiday-soft) !important;
-    color: var(--calendar-holiday-text) !important;
-    border-color: var(--calendar-holiday-border) !important;
+    background: var(--calendar-holiday-soft);
+    color: var(--calendar-holiday-text);
+    border-color: var(--calendar-holiday-border);
 }
 
 .cal-pill-gray {
-    background: var(--calendar-closed-soft) !important;
-    color: var(--calendar-closed-text) !important;
-    border-color: var(--calendar-closed-border) !important;
+    background: var(--calendar-closed-soft);
+    color: var(--calendar-closed-text);
+    border-color: var(--calendar-closed-border);
 }
 
 .cal-shell {
@@ -100,8 +103,8 @@
 
 .cal-day.today:hover,
 .cal-cell.today:hover {
-    background: var(--calendar-today-bg) !important;
-    color: var(--calendar-today-text) !important;
+    background: var(--calendar-today-bg);
+    color: var(--calendar-today-text);
     transform: none;
 }
 
@@ -112,17 +115,12 @@
 }
 
 .cal-shell .cal-cell.selected {
-    background:
-        linear-gradient(135deg,
-            var(--crimson),
-            var(--crimson-dark)) !important;
-    color: var(--calendar-selected-text) !important;
-    border: 1px solid var(--crimson) !important;
-    font-weight: 850 !important;
-    opacity: 1 !important;
-    box-shadow:
-        0 8px 18px var(--calendar-selected-shadow) !important;
-    transform: none !important;
+    background: var(--calendar-cell-bg);
+    color: var(--crimson);
+    border: 2px solid var(--crimson);
+    font-weight: 850;
+    opacity: 1;
+    transform: none;
 }
 
 .cal-cell {
@@ -148,7 +146,7 @@
     transition: all 0.18s ease;
 }
 
-.cal-cell:hover:not(.disabled):not(.today):not(.selected):not(.holiday):not(.full) {
+.cal-cell:hover:not(.disabled):not(.today):not(.selected):not(.holiday):not(.full):not(.has-patients):not(.my-appointment):not(.completed-appointment) {
     background: var(--calendar-cell-hover-bg);
     border-color: var(--calendar-cell-hover-border);
     color: var(--calendar-cell-hover-text);
@@ -156,31 +154,86 @@
 }
 
 .cal-cell.holiday {
-    background: var(--calendar-holiday-soft) !important;
-    border-color: var(--calendar-holiday-border) !important;
-    color: var(--calendar-holiday-text) !important;
-    font-weight: 800;
-}
-
-.cal-cell.holiday,
-.cal-cell.holiday.disabled {
     background:
-        var(--calendar-holiday-soft) !important;
+        var(--calendar-holiday-soft);
 
     border-color:
-        var(--calendar-holiday-border) !important;
+        var(--calendar-holiday-border);
 
     color:
-        var(--calendar-holiday-text) !important;
+        var(--calendar-holiday-text);
 
     font-weight: 800;
-    opacity: 1 !important;
-    cursor: not-allowed !important;
+    opacity: 1;
+    cursor: pointer;
 
     box-shadow:
         0 2px 10px color-mix(in srgb,
             var(--calendar-holiday-text) 10%,
             transparent);
+}
+
+.calendar-badge.calendar-badge-working-holiday {
+    background: var(--calendar-working-badge-bg);
+    color: var(--calendar-working-badge-text);
+    border-color: var(--calendar-working-badge-border);
+}
+
+.cal-pill-working-holiday {
+    background:
+        var(--status-completed-bg);
+
+    color:
+        var(--status-completed-text);
+
+    border-color:
+        var(--status-completed-border);
+}
+
+.cal-pill-working-holiday i {
+    color:
+        currentColor;
+}
+
+.cal-cell.holiday-working {
+    background:
+        var(--status-completed-bg);
+
+    color:
+        var(--status-completed-text);
+
+    border-color:
+        var(--status-completed-border);
+
+    cursor:
+        pointer;
+
+    box-shadow:
+        0 2px 10px color-mix(in srgb,
+            var(--status-completed-solid) 12%,
+            transparent);
+}
+
+.cal-cell.holiday-working:hover {
+    background:
+        var(--status-completed-soft);
+
+    border-color:
+        var(--status-completed-solid);
+
+    color:
+        var(--status-completed-text);
+
+    transform:
+        translateY(-1px);
+}
+
+.cal-cell.holiday-closed {
+    cursor: not-allowed;
+}
+
+.cal-cell.holiday-closed.disabled {
+    cursor: not-allowed;
 }
 
 .cal-cell.full {
@@ -231,7 +284,7 @@
 }
 
 .cal-shell hr {
-    border-color: var(--calendar-divider) !important;
+    border-color: var(--calendar-divider);
 }
 
 .day-smart-tooltip {
@@ -243,7 +296,7 @@
 
 [data-theme="dark"] #mainContent section .fa-calendar-xmark,
 .dark #mainContent section .fa-calendar-xmark {
-    color: rgba(252, 165, 165, 0.58) !important;
+    color: rgba(252, 165, 165, 0.58);
 }
 
 .group:hover .day-smart-tooltip {
@@ -338,16 +391,56 @@
     background: var(--calendar-full-bg);
 }
 
+.calendar-badge-today {
+    background: var(--calendar-today-bg);
+}
+
 .calendar-badge-holiday {
     background: var(--calendar-holiday-bg);
 }
 
-.calendar-badge-closed {
-    background: var(--calendar-closed-bg);
+.calendar-badge.calendar-badge-closed {
+    background: var(--calendar-closed-badge-bg);
+    color: var(--calendar-closed-badge-text);
+    border-color: var(--calendar-closed-badge-border);
 }
 
 .calendar-tooltip {
+    width: max-content;
+    max-width: min(300px, calc(100vw - 32px));
     color: var(--calendar-tooltip-text);
+    white-space: normal;
+    text-align: left;
+    line-height: 1.4;
+    word-break: normal;
+    overflow-wrap: normal;
+}
+
+.calendar-tooltip>strong {
+    display: flex;
+    align-items: flex-start;
+    gap: .4rem;
+
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.calendar-tooltip>strong i {
+    flex: 0 0 auto;
+    margin-top: .12rem;
+}
+
+.calendar-tooltip>span {
+    display: block;
+
+    margin-top: .3rem;
+    padding-left: 1.05rem;
+
+    font-size: .6rem;
+    font-weight: 600;
+    line-height: 1.35;
+
+    opacity: .9;
 }
 
 .calendar-tooltip-appointment {
@@ -364,6 +457,11 @@
 
 .calendar-tooltip-holiday {
     background: var(--calendar-holiday-bg);
+}
+
+.calendar-tooltip-working-holiday {
+    background:
+        var(--calendar-completed-bg);
 }
 
 .calendar-tooltip-closed {
@@ -388,6 +486,11 @@
 
 .calendar-tooltip-holiday::after {
     border-top-color: var(--calendar-holiday-bg);
+}
+
+.calendar-tooltip-working-holiday::after {
+    border-top-color:
+        var(--calendar-completed-bg);
 }
 
 .calendar-tooltip-closed::after {
@@ -422,120 +525,278 @@
         color-mix(in srgb,
             var(--calendar-completed-bg) 16%,
             var(--card));
+
+    border-color:
+        var(--calendar-completed-bg);
+
+    color:
+        var(--calendar-completed-text);
+
+    transform:
+        translateY(-1px);
+}
+
+.cal-cell.my-appointment {
+    background:
+        var(--calendar-appointment-soft);
+
+    color:
+        var(--calendar-appointment-text);
+
+    border-color:
+        var(--calendar-appointment-border);
+
+    opacity:
+        1;
+}
+
+.cal-cell.my-appointment:hover {
+    background:
+        color-mix(in srgb,
+            var(--calendar-appointment-bg) 16%,
+            var(--card));
+
+    border-color:
+        var(--calendar-appointment-bg);
+
+    color:
+        var(--calendar-appointment-text);
+
+    transform:
+        translateY(-1px);
+}
+
+[data-theme="dark"] .cal-cell.has-patients,
+.dark .cal-cell.has-patients {
+    background: rgba(6, 95, 70, 0.24);
+    border-color: rgba(52, 211, 153, 0.38);
+    color: #86efac;
+}
+
+[data-theme="dark"] .cal-cell.has-patients:hover,
+.dark .cal-cell.has-patients:hover {
+    background: rgba(6, 95, 70, 0.34);
+    border-color: rgba(110, 231, 183, 0.62);
+    color: #bbf7d0;
+    transform: translateY(-1px);
+}
+
+[data-theme="dark"] .cal-cell.my-appointment,
+.dark .cal-cell.my-appointment {
+    background:
+        color-mix(in srgb,
+            var(--calendar-appointment-bg) 13%,
+            var(--card));
+    border-color: var(--calendar-appointment-border);
+    color: var(--calendar-appointment-text);
+}
+
+[data-theme="dark"] .cal-cell.my-appointment:hover,
+.dark .cal-cell.my-appointment:hover {
+    background:
+        color-mix(in srgb,
+            var(--calendar-appointment-bg) 22%,
+            var(--card));
+
+    border-color: var(--calendar-appointment-bg);
+    color: var(--calendar-appointment-text);
+}
+
+[data-theme="dark"] .calendar-tooltip,
+.dark .calendar-tooltip {
+    color:
+        var(--text-1);
+}
+
+[data-theme="dark"] .calendar-tooltip-appointment,
+.dark .calendar-tooltip-appointment {
+    --calendar-dark-tooltip-bg:
+        color-mix(in srgb,
+            var(--calendar-appointment-bg) 34%,
+            var(--card));
+
+    background:
+        var(--calendar-dark-tooltip-bg);
+}
+
+[data-theme="dark"] .calendar-tooltip-completed,
+.dark .calendar-tooltip-completed {
+    --calendar-dark-tooltip-bg:
+        color-mix(in srgb,
+            #065f46 72%,
+            var(--card));
+    background: var(--calendar-dark-tooltip-bg);
+    color: #d1fae5;
+    border: 1px solid rgba(110, 231, 183, 0.18);
+}
+
+[data-theme="dark"] .calendar-tooltip-working-holiday,
+.dark .calendar-tooltip-working-holiday {
+    --calendar-dark-tooltip-bg:
+        color-mix(in srgb,
+            #065f46 66%,
+            var(--card));
+    background: var(--calendar-dark-tooltip-bg);
+    color: #d1fae5;
+    border: 1px solid rgba(110, 231, 183, 0.16);
+}
+
+[data-theme="dark"] .calendar-tooltip-full,
+.dark .calendar-tooltip-full {
+    --calendar-dark-tooltip-bg:
+        color-mix(in srgb,
+            var(--calendar-full-bg) 34%,
+            var(--card));
+
+    background:
+        var(--calendar-dark-tooltip-bg);
+}
+
+[data-theme="dark"] .calendar-tooltip-holiday,
+.dark .calendar-tooltip-holiday {
+    --calendar-dark-tooltip-bg:
+        color-mix(in srgb,
+            var(--calendar-holiday-bg) 34%,
+            var(--card));
+
+    background:
+        var(--calendar-dark-tooltip-bg);
+}
+
+[data-theme="dark"] .calendar-tooltip-closed,
+.dark .calendar-tooltip-closed {
+    --calendar-dark-tooltip-bg:
+        color-mix(in srgb,
+            var(--calendar-closed-bg) 34%,
+            var(--card));
+
+    background:
+        var(--calendar-dark-tooltip-bg);
+}
+
+[data-theme="dark"] .calendar-tooltip-neutral,
+.dark .calendar-tooltip-neutral {
+    --calendar-dark-tooltip-bg:
+        color-mix(in srgb,
+            var(--calendar-closed-bg) 24%,
+            var(--card));
+
+    background:
+        var(--calendar-dark-tooltip-bg);
+}
+
+[data-theme="dark"] .calendar-tooltip::after,
+.dark .calendar-tooltip::after {
+    border-top-color:
+        var(--calendar-dark-tooltip-bg,
+            var(--calendar-tooltip-neutral));
 }
 
 [data-theme="dark"] .cal-shell hr,
 [data-theme="dark"] .cal-legend {
-    border-color: rgba(203, 213, 225, 0.18) !important;
+    border-color: rgba(203, 213, 225, 0.18);
 }
 
 [data-theme="dark"] .cal-shell,
 .dark .cal-shell {
-    background: var(--card) !important;
-    border-color: var(--border) !important;
+    background: var(--card);
+    border-color: var(--border);
 
     box-shadow:
         0 18px 38px rgba(0, 0, 0, 0.32),
-        inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
+        inset 0 1px 0 rgba(255, 255, 255, 0.035);
 }
 
 [data-theme="dark"] .cal-shell hr,
 [data-theme="dark"] .cal-legend,
 .dark .cal-shell hr,
 .dark .cal-legend {
-    border-color: rgba(255, 255, 255, 0.09) !important;
+    border-color: rgba(255, 255, 255, 0.09);
 }
 
 [data-theme="dark"] .cal-pill-green,
 .dark .cal-pill-green {
-    background: rgba(16, 185, 129, 0.13) !important;
-    color: #86efac !important;
-    border-color: rgba(74, 222, 128, 0.20) !important;
+    background: rgba(16, 185, 129, 0.13);
+    color: #86efac;
+    border-color: rgba(74, 222, 128, 0.20);
 }
 
 [data-theme="dark"] .cal-pill-red,
 .dark .cal-pill-red {
-    background: rgba(239, 68, 68, 0.12) !important;
-    color: #fca5a5 !important;
-    border-color: rgba(248, 113, 113, 0.20) !important;
+    background: rgba(239, 68, 68, 0.12);
+    color: #fca5a5;
+    border-color: rgba(248, 113, 113, 0.20);
 }
 
 [data-theme="dark"] .cal-pill-maroon,
 .dark .cal-pill-maroon {
-    background: rgba(139, 0, 0, 0.28) !important;
-    color: #fecaca !important;
-    border-color: rgba(252, 165, 165, 0.20) !important;
+    background: rgba(139, 0, 0, 0.28);
+    color: #fecaca;
+    border-color: rgba(252, 165, 165, 0.20);
 }
 
 [data-theme="dark"] .cal-pill-yellow,
 .dark .cal-pill-yellow {
-    background: rgba(245, 158, 11, 0.12) !important;
-    color: #fde68a !important;
-    border-color: rgba(251, 191, 36, 0.20) !important;
+    background: rgba(245, 158, 11, 0.12);
+    color: #fde68a;
+    border-color: rgba(251, 191, 36, 0.20);
 }
 
 [data-theme="dark"] .cal-pill-gray,
 .dark .cal-pill-gray {
-    background: rgba(148, 163, 184, 0.10) !important;
-    color: #b6bec9 !important;
-    border-color: rgba(203, 213, 225, 0.14) !important;
+    background: rgba(148, 163, 184, 0.10);
+    color: #b6bec9;
+    border-color: rgba(203, 213, 225, 0.14);
 }
 
 [data-theme="dark"] .cal-nav-btn:hover:not(:disabled),
 .dark .cal-nav-btn:hover:not(:disabled) {
-    background: rgba(139, 0, 0, 0.18) !important;
-    border-color: rgba(252, 165, 165, 0.26) !important;
-    color: #fecaca !important;
+    background: rgba(139, 0, 0, 0.18);
+    border-color: rgba(252, 165, 165, 0.26);
+    color: #fecaca;
 }
 
 [data-theme="dark"] .cal-cell,
 .dark .cal-cell {
-    background: rgba(255, 255, 255, 0.035) !important;
-    border-color: rgba(255, 255, 255, 0.09) !important;
-    color: #d1d5db !important;
+    background: rgba(255, 255, 255, 0.035);
+    border-color: rgba(255, 255, 255, 0.09);
+    color: #d1d5db;
 
     box-shadow:
         0 2px 10px rgba(0, 0, 0, 0.18),
-        inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
+        inset 0 1px 0 rgba(255, 255, 255, 0.035);
 
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
 
-[data-theme="dark"] .cal-cell:hover:not(.disabled):not(.today):not(.selected):not(.holiday):not(.full),
-.dark .cal-cell:hover:not(.disabled):not(.today):not(.selected):not(.holiday):not(.full) {
-    background: rgba(139, 0, 0, 0.16) !important;
-    border-color: rgba(252, 165, 165, 0.28) !important;
-    color: #fecaca !important;
+[data-theme="dark"] .cal-cell:hover:not(.disabled):not(.today):not(.selected):not(.holiday):not(.full):not(.has-patients):not(.my-appointment):not(.completed-appointment),
+.dark .cal-cell:hover:not(.disabled):not(.today):not(.selected):not(.holiday):not(.full):not(.has-patients):not(.my-appointment):not(.completed-appointment) {
+    background: rgba(139, 0, 0, 0.16);
+    border-color: rgba(252, 165, 165, 0.28);
+    color: var(--calendar-cell-hover-text);
 }
 
 [data-theme="dark"] .cal-cell.today,
 .dark .cal-cell.today {
     background: linear-gradient(135deg,
             #8b0000,
-            #b31212) !important;
+            #b31212);
 
-    color: #ffffff !important;
+    color: #ffffff;
 
     border-color:
-        rgba(252, 165, 165, 0.34) !important;
+        rgba(252, 165, 165, 0.34);
 
     box-shadow:
-        0 8px 20px rgba(139, 0, 0, 0.30) !important;
+        0 8px 20px rgba(139, 0, 0, 0.30);
 }
 
 [data-theme="dark"] .cal-cell.selected,
 .dark .cal-cell.selected {
-    background:
-        rgba(139, 0, 0, 0.22) !important;
-
-    color: #fecaca !important;
-
-    border: 2px solid rgba(252, 165, 165, 0.72) !important;
-
-    box-shadow:
-        0 0 0 3px rgba(139, 0, 0, 0.16),
-        0 8px 20px rgba(0, 0, 0, 0.26) !important;
+    background: rgba(139, 0, 0, 0.22);
+    color: #fecaca;
+    border: 2px solid rgba(252, 165, 165, 0.72);
 }
 
 [data-theme="dark"] .cal-cell.holiday,
@@ -543,29 +804,70 @@
 .dark .cal-cell.holiday,
 .dark .cal-cell.holiday.disabled {
     background:
-        rgba(245, 158, 11, 0.13) !important;
+        rgba(245, 158, 11, 0.13);
 
     border-color:
-        rgba(251, 191, 36, 0.24) !important;
+        rgba(251, 191, 36, 0.24);
 
-    color: #fcd34d !important;
+    color: #fcd34d;
 
-    opacity: 0.86 !important;
+    opacity: 0.86;
 
-    box-shadow: none !important;
+    box-shadow: none;
+}
+
+[data-theme="dark"] .cal-cell.holiday-working,
+.dark .cal-cell.holiday-working {
+    background:
+        rgba(16, 185, 129, 0.13);
+
+    border-color:
+        rgba(74, 222, 128, 0.22);
+
+    color:
+        #86efac;
+
+    opacity:
+        1;
+
+    cursor:
+        pointer;
+
+    box-shadow:
+        none;
+}
+
+[data-theme="dark"] .cal-pill-working-holiday,
+.dark .cal-pill-working-holiday {
+    background:
+        rgba(16, 185, 129, 0.13);
+
+    color:
+        #86efac;
+
+    border-color:
+        rgba(74, 222, 128, 0.20);
 }
 
 [data-theme="dark"] .cal-cell.full,
 .dark .cal-cell.full {
     background:
-        rgba(239, 68, 68, 0.13) !important;
+        rgba(239, 68, 68, 0.13);
 
     border-color:
-        rgba(248, 113, 113, 0.25) !important;
+        rgba(248, 113, 113, 0.25);
 
-    color: #fca5a5 !important;
+    color: #fca5a5;
 
-    box-shadow: none !important;
+    box-shadow: none;
+}
+
+[data-theme="dark"] .calendar-badge-completed,
+.dark .calendar-badge-completed {
+    background: rgba(5, 95, 68, 0.92);
+    color: #d1fae5;
+    border-color: rgba(110, 231, 183, 0.55);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.32);
 }
 
 [data-theme="dark"] .cal-cell.disabled,
@@ -577,30 +879,30 @@
 .dark .cal-cell.past-date,
 .dark .cal-cell.same-day-unavailable {
     background:
-        rgba(255, 255, 255, 0.018) !important;
+        rgba(255, 255, 255, 0.018);
 
     border-color:
-        rgba(255, 255, 255, 0.055) !important;
+        rgba(255, 255, 255, 0.055);
 
-    color: #626974 !important;
+    color: #626974;
 
-    opacity: 0.72 !important;
+    opacity: 0.72;
 
-    box-shadow: none !important;
+    box-shadow: none;
 }
 
 [data-theme="dark"] #mainContent .glass-icon-red,
 [data-theme="dark"] #mainContent .upcoming-tooth-glass,
 [data-theme="dark"] #mainContent .book-appointment-btn {
-    background: linear-gradient(135deg, #5A0000 0%, #8B0000 58%, #A31212 100%) !important;
-    border-color: rgba(255, 255, 255, 0.14) !important;
-    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.35) !important;
+    background: linear-gradient(135deg, #5A0000 0%, #8B0000 58%, #A31212 100%);
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.35);
 }
 
 .cal-grid {
-    display: grid !important;
-    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
-    gap: 2px !important;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 2px;
 }
 
 .dashboard-calendar-availability-header {
@@ -1292,11 +1594,11 @@
 }
 
 .cal-cell.completed-appointment {
-    opacity: 1 !important;
-    cursor: pointer !important;
-    background: var(--status-completed-bg) !important;
-    color: var(--status-completed-text) !important;
-    border: 2px solid var(--status-completed-border) !important;
+    opacity: 1;
+    cursor: pointer;
+    background: var(--status-completed-bg);
+    color: var(--status-completed-text);
+    border: 2px solid var(--status-completed-border);
     font-weight: 850;
     box-shadow:
         0 4px 12px color-mix(in srgb,
@@ -1306,23 +1608,23 @@
 }
 
 .cal-cell.completed-appointment:hover {
-    background: var(--status-completed-soft) !important;
-    border-color: var(--status-completed-solid) !important;
-    color: var(--status-completed-text) !important;
+    background: var(--status-completed-soft);
+    border-color: var(--status-completed-solid);
+    color: var(--status-completed-text);
     transform: translateY(-1px);
 }
 
 .cal-cell.completed-appointment.selected-history {
-    background: var(--card) !important;
-    color: var(--status-completed-text) !important;
-    border: 3px solid var(--status-completed-solid) !important;
+    background: var(--card);
+    color: var(--status-completed-text);
+    border: 3px solid var(--status-completed-solid);
     box-shadow:
         0 0 0 3px color-mix(in srgb,
             var(--status-completed-solid) 12%,
             transparent),
         0 8px 18px color-mix(in srgb,
             var(--status-completed-solid) 16%,
-            transparent) !important;
+            transparent);
 }
 
 .dashboard-calendar-status.completed {
@@ -1470,29 +1772,29 @@
 }
 
 .cal-cell.past-date {
-    background: #f5f3f2 !important;
-    color: #b2aaa5 !important;
-    border-color: #ebe6e3 !important;
-    box-shadow: none !important;
-    opacity: .72 !important;
-    cursor: not-allowed !important;
+    background: #f5f3f2;
+    color: #b2aaa5;
+    border-color: #ebe6e3;
+    box-shadow: none;
+    opacity: .72;
+    cursor: not-allowed;
 }
 
 [data-theme="dark"] .cal-cell.past-date,
 .dark .cal-cell.past-date {
     background: color-mix(in srgb,
             var(--surface) 72%,
-            var(--page-bg)) !important;
+            var(--page-bg));
 
-    color: var(--text-3) !important;
+    color: var(--text-3);
 
     border-color:
         color-mix(in srgb,
             var(--border) 65%,
-            transparent) !important;
+            transparent);
 
-    box-shadow: none !important;
-    opacity: .52 !important;
+    box-shadow: none;
+    opacity: .52;
 }
 
 .cal-cell.clinic-closed {
@@ -1501,14 +1803,14 @@
             #f4f1ef,
             #f4f1ef 4px,
             #ebe6e3 4px,
-            #ebe6e3 8px) !important;
+            #ebe6e3 8px);
 
-    color: #8f8580 !important;
-    border-color: #ddd6d1 !important;
+    color: #8f8580;
+    border-color: #ddd6d1;
 
-    box-shadow: none !important;
-    opacity: 1 !important;
-    cursor: not-allowed !important;
+    box-shadow: none;
+    opacity: 1;
+    cursor: not-allowed;
 }
 
 [data-theme="dark"] .cal-cell.clinic-closed,
@@ -1518,24 +1820,24 @@
             var(--surface),
             var(--surface) 4px,
             var(--card) 4px,
-            var(--card) 8px) !important;
+            var(--card) 8px);
 
-    color: var(--text-3) !important;
-    border-color: var(--border) !important;
+    color: var(--text-3);
+    border-color: var(--border);
 
-    box-shadow: none !important;
-    opacity: .82 !important;
+    box-shadow: none;
+    opacity: .82;
 }
 
 .cal-cell.same-day-unavailable {
-    background: #f5f3f2 !important;
-    color: #9e9690 !important;
-    border-color: #e5ded9 !important;
+    background: #f5f3f2;
+    color: #9e9690;
+    border-color: #e5ded9;
 
-    box-shadow: none !important;
+    box-shadow: none;
 
-    opacity: .72 !important;
-    cursor: not-allowed !important;
+    opacity: .72;
+    cursor: not-allowed;
 }
 
 [data-theme="dark"] .cal-cell.same-day-unavailable,
@@ -1543,16 +1845,16 @@
     background:
         color-mix(in srgb,
             var(--surface) 82%,
-            var(--crimson) 18%) !important;
+            var(--crimson) 18%);
 
-    color: var(--text-3) !important;
+    color: var(--text-3);
     border-color:
         color-mix(in srgb,
             var(--border) 72%,
-            var(--crimson) 28%) !important;
+            var(--crimson) 28%);
 
-    box-shadow: none !important;
-    opacity: .72 !important;
+    box-shadow: none;
+    opacity: .72;
 }
 
 .slot-chip {
@@ -1579,24 +1881,24 @@
 
 .slot-chip.selected {
     border-color:
-        var(--calendar-slot-selected-border) !important;
+        var(--calendar-slot-selected-border);
 
     background:
-        var(--calendar-slot-selected-bg) !important;
+        var(--calendar-slot-selected-bg);
 
     color:
-        var(--calendar-slot-selected-text) !important;
+        var(--calendar-slot-selected-text);
 }
 
 .slot-chip.disabled {
     border-color:
-        var(--calendar-slot-disabled-border) !important;
+        var(--calendar-slot-disabled-border);
 
     background:
-        var(--calendar-slot-disabled-bg) !important;
+        var(--calendar-slot-disabled-bg);
 
     color:
-        var(--calendar-slot-disabled-text) !important;
+        var(--calendar-slot-disabled-text);
 }
 
 .appointment-time-panel {
@@ -1610,10 +1912,10 @@
 .appointment-slot-grid,
 .appointment-slot-grid.slot-grid-ui {
     width: 100%;
-    display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    column-gap: .85rem !important;
-    row-gap: .85rem !important;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: .85rem;
+    row-gap: .85rem;
     margin-top: .8rem;
 }
 
@@ -1778,7 +2080,7 @@
 .appointment-slot-placeholder.hidden,
 .appointment-selected-slot.hidden,
 .appointment-slot-date-banner.hidden {
-    display: none !important;
+    display: none;
 }
 
 [data-theme="dark"] .appointment-time-panel,
@@ -1945,8 +2247,8 @@
 
     .appointment-slot-grid,
     .appointment-slot-grid.slot-grid-ui {
-        column-gap: .55rem !important;
-        row-gap: .55rem !important;
+        column-gap: .55rem;
+        row-gap: .55rem;
         margin-top: .65rem;
     }
 
@@ -2100,11 +2402,14 @@
 }
 
 @media (max-width: 767px) {
+    .calendar-tooltip {
+        max-width: min(210px, calc(100vw - 20px));
+    }
 
     .cal-shell {
-        min-height: 0 !important;
+        min-height: 0;
 
-        padding: clamp(.75rem, 3vw, 1rem) !important;
+        padding: clamp(.75rem, 3vw, 1rem);
 
         border-radius: 16px;
 
@@ -2131,33 +2436,33 @@
     }
 
     .cal-month-label {
-        font-size: .92rem !important;
-        line-height: 1.05 !important;
+        font-size: .92rem;
+        line-height: 1.05;
     }
 
     .calendar-year-label {
-        margin-top: .12rem !important;
+        margin-top: .12rem;
 
-        font-size: .58rem !important;
-        line-height: 1 !important;
+        font-size: .58rem;
+        line-height: 1;
     }
 
     .cal-shell hr {
-        margin-top: .55rem !important;
-        margin-bottom: .55rem !important;
+        margin-top: .55rem;
+        margin-bottom: .55rem;
     }
 
     .cal-grid {
-        gap: 1px !important;
+        gap: 1px;
     }
 
     .cal-grid>.cal-day-label,
     .cal-grid>.cal-day-weekend {
-        padding-top: .2rem !important;
-        padding-bottom: .35rem !important;
+        padding-top: .2rem;
+        padding-bottom: .35rem;
 
-        font-size: .52rem !important;
-        letter-spacing: .08em !important;
+        font-size: .52rem;
+        letter-spacing: .08em;
     }
 
     .cal-cell-wrap {
@@ -2189,23 +2494,23 @@
     }
 
     .cal-pill {
-        gap: .3rem !important;
+        gap: .3rem;
 
         padding:
-            .28rem .52rem !important;
+            .28rem .52rem;
 
-        font-size: .6rem !important;
+        font-size: .6rem;
     }
 
     .cal-pill i {
-        font-size: .58rem !important;
+        font-size: .58rem;
     }
 }
 
 @media (max-width: 390px) {
 
     .cal-shell {
-        padding: .7rem !important;
+        padding: .7rem;
     }
 
     .calendar-main-header {
@@ -2221,11 +2526,11 @@
     }
 
     .cal-month-label {
-        font-size: .86rem !important;
+        font-size: .86rem;
     }
 
     .calendar-year-label {
-        font-size: .54rem !important;
+        font-size: .54rem;
     }
 
     .cal-cell-wrap {
@@ -2244,7 +2549,7 @@
 
     .cal-grid>.cal-day-label,
     .cal-grid>.cal-day-weekend {
-        font-size: .48rem !important;
+        font-size: .48rem;
     }
 
     .cal-legend {
@@ -2253,13 +2558,13 @@
 
     .cal-pill {
         padding:
-            .25rem .45rem !important;
+            .25rem .45rem;
 
-        font-size: .55rem !important;
+        font-size: .55rem;
     }
 
     .cal-pill i {
-        font-size: .52rem !important;
+        font-size: .52rem;
     }
 }
 

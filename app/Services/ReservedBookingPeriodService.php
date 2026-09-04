@@ -115,7 +115,7 @@ class ReservedBookingPeriodService
             );
         }
 
-        if (array_key_exists($dateString, PhilippineHolidays::range(0, 2))) {
+        if (array_key_exists($dateString, PhilippineHolidays::recordsRange(0, 2))) {
             $this->fail(
                 'reserved_date',
                 'Reserved booking periods cannot be scheduled on a holiday.'

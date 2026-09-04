@@ -243,7 +243,7 @@ class DentistPatientController extends Controller
 
         $nextAppointment = $futureVisits->first();
 
-        $philippineHolidays = PhilippineHolidays::range(1, 1);
+        $philippineHolidays = PhilippineHolidays::recordsRange(1, 1);
 
         $appointmentCountsPerDay = Appointment::where('patient_id', $patient->id)
             ->whereIn('status', ['upcoming', 'rescheduled'])
