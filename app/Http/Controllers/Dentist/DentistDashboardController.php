@@ -307,7 +307,7 @@ class DentistDashboardController extends Controller
             )
             ->toArray();
 
-        $philippineHolidays = PhilippineHolidays::range(
+        $philippineHolidays = PhilippineHolidays::recordsRange(
             yearsBefore: 1,
             yearsAfter: 5
         );

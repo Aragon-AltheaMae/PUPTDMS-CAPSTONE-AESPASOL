@@ -17,7 +17,7 @@ class AcademicPeriodController extends Controller
         $today = Carbon::today();
 
         // Fetch PH holidays (previous year, current year, next year)
-        $holidays = PhilippineHolidays::range(1, 1);
+        $holidays = PhilippineHolidays::recordsRange(1, 1);
 
         $query = AcademicPeriod::query();
 

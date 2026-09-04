@@ -180,7 +180,7 @@ class OdontogramController extends Controller
             ->map(fn($d) => Carbon::parse($d)->toDateString())
             ->toArray();
 
-        $philippineHolidays = PhilippineHolidays::range(
+        $philippineHolidays = PhilippineHolidays::recordsRange(
             yearsBefore: 15,
             yearsAfter: 15
         );
@@ -224,7 +224,7 @@ class OdontogramController extends Controller
             ->toArray();
 
         $philippineHolidays =
-            PhilippineHolidays::range(
+            PhilippineHolidays::recordsRange(
                 yearsBefore: 15,
                 yearsAfter: 15
             );
@@ -1312,29 +1312,23 @@ class OdontogramController extends Controller
                 ]);
         }
 
-        $holidayDates =
-            PhilippineHolidays::range(
-                yearsBefore: 15,
-                yearsAfter: 15
-            );
-
         $appointmentDateIso =
             $appointmentDate
             ->toDateString();
 
         if (
-            isset(
-                $holidayDates[$appointmentDateIso]
+            PhilippineHolidays::isBlockedForBooking(
+                $appointmentDateIso
             )
         ) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'message' =>
-                    'The clinic is closed on Philippine holidays.',
+                    'The clinic is closed on this Philippine holiday.',
 
                     'errors' => [
                         'appointment_date' => [
-                            'The clinic is closed on Philippine holidays.',
+                            'The clinic is closed on this Philippine holiday.',
                         ],
                     ],
                 ], 422);
@@ -1345,7 +1339,7 @@ class OdontogramController extends Controller
                 ->withInput()
                 ->withErrors([
                     'appointment_date' =>
-                    'The clinic is closed on Philippine holidays.',
+                    'The clinic is closed on this Philippine holiday.',
                 ]);
         }
 
@@ -1676,6 +1670,14 @@ class OdontogramController extends Controller
         $iso = $request->date;
         $date = Carbon::parse($iso);
         $dayAbbr = $date->format('D');
+
+        if (PhilippineHolidays::isBlockedForBooking($iso)) {
+            return response()->json([
+                'slots' => [],
+                'message' =>
+                'The clinic is closed on this Philippine holiday.',
+            ]);
+        }
 
         $schedule = ClinicSchedule::active()
             ->get()

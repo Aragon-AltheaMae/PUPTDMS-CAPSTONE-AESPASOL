@@ -63,7 +63,7 @@ class DentistClinicScheduleController extends Controller
             })
             ->values();
 
-        $philippineHolidays = PhilippineHolidays::range(0, 1);
+        $philippineHolidays = PhilippineHolidays::recordsRange(0, 1);
         $notifications = [];
 
         return view('shared.clinic-schedule', [
@@ -174,11 +174,16 @@ class DentistClinicScheduleController extends Controller
             }
         }
 
-        $philippineHolidays = PhilippineHolidays::range(0, 1);
+        $philippineHolidays = PhilippineHolidays::recordsRange(0, 1);
 
-        foreach ($philippineHolidays as $date => $name) {
-            if ($date >= $start->toDateString() && $date <= $end->toDateString()) {
-                $unavailable[] = $date;
+        foreach ($philippineHolidays as $date => $holiday) {
+            if (
+                $date >= $start->toDateString() &&
+                $date <= $end->toDateString() &&
+                ($holiday['is_blocked_for_booking'] ?? false)
+            ) {
+                $unavailable[] =
+                    $date;
             }
         }
 
@@ -202,12 +207,11 @@ class DentistClinicScheduleController extends Controller
             ]);
         }
 
-        $philippineHolidays = PhilippineHolidays::range(0, 1);
-
-        if (isset($philippineHolidays[$iso])) {
+        if (PhilippineHolidays::isBlockedForBooking($iso)) {
             return response()->json([
                 'slots' => [],
-                'message' => 'The clinic is closed on holidays.',
+                'message' =>
+                'The clinic is closed on this Philippine holiday.',
             ]);
         }
 

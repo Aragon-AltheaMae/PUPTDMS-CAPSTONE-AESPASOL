@@ -151,7 +151,7 @@ class AppointmentController extends Controller
 
         $unavailableDates = [];
 
-        $philippineHolidays = PhilippineHolidays::range(1, 3);
+        $philippineHolidays = PhilippineHolidays::recordsRange(1, 3);
 
         $odontogramTeeth =
             PatientOdontogram::where(
@@ -426,7 +426,7 @@ class AppointmentController extends Controller
             ->map(fn($d) => Carbon::parse($d)->toDateString())
             ->toArray();
 
-        $philippineHolidays = PhilippineHolidays::range(0, 1);
+        $philippineHolidays = PhilippineHolidays::recordsRange(0, 1);
 
         $diseases = Disease::orderBy('sort_order')->get();
 
@@ -896,11 +896,13 @@ class AppointmentController extends Controller
                 ->with('error', 'This date is blocked and unavailable for booking.');
         }
 
-        $philippineHolidays = PhilippineHolidays::range(0, 1);
-        if (isset($philippineHolidays[$request->appointment_date])) {
+        if (PhilippineHolidays::isBlockedForBooking($request->appointment_date)) {
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'The clinic is closed on holidays. Please choose another date.');
+                ->with(
+                    'error',
+                    'The clinic is closed on this Philippine holiday. Please choose another date.'
+                );
         }
 
         $schedule = ClinicSchedule::active()
@@ -1546,11 +1548,11 @@ class AppointmentController extends Controller
             ]);
         }
 
-        $philippineHolidays = PhilippineHolidays::range(0, 1);
-        if (isset($philippineHolidays[$iso])) {
+        if (PhilippineHolidays::isBlockedForBooking($iso)) {
             return response()->json([
                 'slots' => [],
-                'message' => 'The clinic is closed on holidays.',
+                'message' =>
+                'The clinic is closed on this Philippine holiday.',
             ]);
         }
 
@@ -2043,7 +2045,7 @@ class AppointmentController extends Controller
 
         $unavailableDates = [];
 
-        $philippineHolidays = PhilippineHolidays::current();
+        $philippineHolidays = PhilippineHolidays::recordsCurrent();
 
         return view('dentist.dentist-reschedule', compact(
             'appointment',

@@ -75,7 +75,7 @@ class HomepageController extends Controller
 
         $unavailableDates = [];
 
-        $philippineHolidays = PhilippineHolidays::range(0, 4);
+        $philippineHolidays = PhilippineHolidays::recordsRange(0, 4);
 
         $records = Appointment::with(['procedure', 'dentist'])
             ->where('patient_id', $patient->id)

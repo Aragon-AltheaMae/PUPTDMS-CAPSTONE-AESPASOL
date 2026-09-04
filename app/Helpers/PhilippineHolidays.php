@@ -57,7 +57,6 @@ class PhilippineHolidays
         $special = [
             '02-25' => 'EDSA People Power Revolution Anniversary',
             '08-21' => 'Ninoy Aquino Day',
-            '09-08' => 'Feast of the Nativity of the Virgin Mary',
             '11-01' => "All Saints' Day",
             '11-02' => "All Souls' Day",
             '12-08' => 'Feast of the Immaculate Conception of Mary',
@@ -103,8 +102,56 @@ class PhilippineHolidays
         return $merged;
     }
 
-    // Private Helpers
+    /**
+     * Return normalized holiday records from the maintained
+     * Philippine holiday service.
+     */
+    public static function recordsForYear(
+        int $year
+    ): array {
+        return app(
+            \App\Services\PhilippineHolidayService::class
+        )->forYear(
+            $year
+        );
+    }
 
+    /**
+     * Return normalized holiday records for the current year.
+     */
+    public static function recordsCurrent(): array
+    {
+        return self::recordsForYear(
+            (int) date('Y')
+        );
+    }
+
+    /**
+     * Return normalized holiday records across adjacent years.
+     */
+    public static function recordsRange(
+        int $yearsBefore = 1,
+        int $yearsAfter = 1
+    ): array {
+        return app(
+            \App\Services\PhilippineHolidayService::class
+        )->range(
+            $yearsBefore,
+            $yearsAfter
+        );
+    }
+
+    public static function isBlockedForBooking(
+        string $date
+    ): bool {
+        return app(
+            \App\Services\PhilippineHolidayService::class
+        )->isBlockedForBooking(
+            $date
+        );
+    }
+    
+    // Private Helpers
     private static function easterDate(int $year): \DateTime
     {
         $a = $year % 19;

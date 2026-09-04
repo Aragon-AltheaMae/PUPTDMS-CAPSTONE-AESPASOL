@@ -157,14 +157,12 @@
             <div class="modal-ft">
 
                 <button type="button" onclick="closeCancelAppointmentModal()" class="ui-btn ui-btn-secondary">
-                    <i class="fa-solid fa-arrow-left"></i>
                     <span>Keep Appointment</span>
                 </button>
 
                 <button type="button" id="confirmCancelBtn" onclick="confirmCancelAppointment()"
                     class="ui-btn ui-btn-danger">
-                    <i class="fa-solid fa-ban"></i>
-                    <span>Yes, Cancel</span>
+                    <span>Cancel Appointment</span>
                 </button>
 
             </div>
@@ -192,7 +190,7 @@
         document.querySelectorAll('input[name="cancelReason"]').forEach(r => r.checked = false);
         const confirmBtn = document.getElementById('confirmCancelBtn');
         confirmBtn.disabled = false;
-        confirmBtn.innerHTML = `<i class="fa-solid fa-ban"></i><span>Yes, Cancel</span>`;
+        confirmBtn.innerHTML = `<span>Cancel Appointment</span>`;
         const modal = document.getElementById('cancelAppointmentModal');
 
         if (!modal) return;
@@ -331,8 +329,7 @@
             } else {
                 btn.disabled = false;
                 btn.innerHTML = `
-        <i class="fa-solid fa-ban"></i>
-        <span>Yes, Cancel</span>
+        <span>Cancel Appointment</span>
     `;
             }
         } catch (error) {
@@ -341,8 +338,7 @@
             btn.disabled = false;
 
             btn.innerHTML = `
-        <i class="fa-solid fa-ban"></i>
-        <span>Yes, Cancel</span>
+        <span>Cancel Appointment</span>
     `;
         }
     }

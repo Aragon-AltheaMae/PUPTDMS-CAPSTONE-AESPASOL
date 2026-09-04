@@ -77,7 +77,7 @@ class AdminDashboardController extends Controller
             ->orderByDesc('start_date')
             ->first();
 
-        $holidays = PhilippineHolidays::range(1, 1);
+        $holidays = PhilippineHolidays::recordsRange(1, 1);
 
         return view('admin.admin-dashboard', compact(
             'totalPatients',

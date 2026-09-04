@@ -215,13 +215,10 @@
             <div class="modal-ft modal-sticky-footer">
 
                 <button type="button" class="ui-btn ui-btn-secondary" data-discard-close="rescheduleModal">
-                    <i class="fa-solid fa-xmark"></i>
                     <span>Cancel</span>
                 </button>
 
                 <button type="submit" id="confirmRescheduleBtn" class="ui-btn ui-btn-warning">
-
-                    <i class="fa-solid fa-check"></i>
                     <span>Confirm Reschedule</span>
                 </button>
             </div>
@@ -484,7 +481,7 @@
         const submitBtn = document.getElementById('confirmRescheduleBtn');
         if (submitBtn) {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Confirm Reschedule';
+            submitBtn.innerHTML = 'Confirm Reschedule';
         }
 
         window.openModal?.(
@@ -666,7 +663,7 @@
 
                 if (submitBtn) {
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Confirm Reschedule';
+                    submitBtn.innerHTML = 'Confirm Reschedule';
                 }
                 alert(data?.message ?? "Something went wrong. Please try again.");
             }
@@ -675,7 +672,7 @@
 
             if (submitBtn) {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Confirm Reschedule';
+                submitBtn.innerHTML = 'Confirm Reschedule';
             }
             alert("Network error. Please try again.");
         }

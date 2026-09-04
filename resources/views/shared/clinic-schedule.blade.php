@@ -38,8 +38,12 @@
         $maxSlots = $openRules->max('max_slots') ?? 0;
         $blockedThisMonth = $blockedDates->filter(fn($b) => \Carbon\Carbon::parse($b->date)->isCurrentMonth())->count();
         $holidaysThisMonth = collect($philippineHolidays)
-            ->filter(fn($name, $date) => \Carbon\Carbon::parse($date)->isCurrentMonth())
-            ->count();
+        ->filter(
+            fn($holiday, $date) =>
+                \Carbon\Carbon::parse($date)
+                    ->isCurrentMonth()
+        )
+        ->count();
 
         $scheduleByDay = [];
         foreach ($schedules as $s) {
@@ -627,30 +631,60 @@
                                         'Dec',
                                     ];
                                     $upcoming = collect($philippineHolidays)
-                                        ->filter(fn($n, $d) => \Carbon\Carbon::parse($d)->gte($today))
-                                        ->take(5);
+                                    ->filter(
+                                        fn($holiday, $date) =>
+                                            \Carbon\Carbon::parse($date)
+                                                ->startOfDay()
+                                                ->gte($today)
+                                    )
+                                    ->sortKeys()
+                                    ->take(5);
                                 @endphp
-                                @forelse($upcoming as $hDate => $hName)
+                                @forelse($upcoming as $hDate => $holiday)
                                     @php
                                         $hC = \Carbon\Carbon::parse($hDate);
-                                        $diff = (int) $today->diffInDays($hC, false);
+
+                                        $diff = (int) $today->diffInDays(
+                                            $hC,
+                                            false
+                                        );
+
+                                        $holidayName = is_array($holiday)
+                                            ? ($holiday['name'] ?? 'Philippine Holiday')
+                                            : (string) $holiday;
+
+                                        $isBlockedHoliday = is_array($holiday)
+                                            ? ($holiday['is_blocked_for_booking'] ?? true)
+                                            : true;
                                     @endphp
+
                                     <div
                                         class="holiday-item flex items-center gap-3 py-2 border-b border-gray-50 last:border-b-0">
+
                                         <div class="w-10 text-center flex-shrink-0">
                                             <div class="month text-[10px] font-bold uppercase text-[#8B0000]">
-                                                {{ $MONTHS_SHORT[$hC->month - 1] }}</div>
+                                                {{ $MONTHS_SHORT[$hC->month - 1] }}
+                                            </div>
+
                                             <div class="day text-xl font-extrabold text-gray-800 leading-tight">
-                                                {{ $hC->day }}</div>
+                                                {{ $hC->day }}
+                                            </div>
                                         </div>
+
                                         <div class="flex-1 min-w-0">
                                             <p class="holiday-title text-xs font-semibold text-gray-800 truncate">
-                                                {{ $hName }}</p>
+                                                {{ $holidayName }}
+                                            </p>
+
                                             <p class="holiday-meta text-[10px] text-gray-400">
                                                 {{ $diff === 0 ? 'Today' : ($diff === 1 ? 'Tomorrow' : "In $diff days") }}
                                             </p>
                                         </div>
-                                        <span class="holiday-badge badge-holiday flex-shrink-0">Holiday</span>
+
+                                        <span
+                                            class="{{ $isBlockedHoliday ? 'holiday-badge badge-holiday' : 'badge-open' }} flex-shrink-0">
+                                            {{ $isBlockedHoliday ? 'Non-Working' : 'Working Holiday' }}
+                                        </span>
                                     </div>
                                 @empty
                                     <p class="text-xs text-gray-400 text-center py-4">No upcoming holidays.</p>
