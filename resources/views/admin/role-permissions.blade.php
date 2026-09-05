@@ -602,10 +602,6 @@ $canDeleteCustomRoles = $authUser?->hasPermission('delete_custom_roles') ?? fals
 
             </div>
 
-            <button type="button" class="modal-x" onclick="closeResetConfirm()" aria-label="Close reset defaults modal">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
         </div>
 
         <div class="modal-bd">

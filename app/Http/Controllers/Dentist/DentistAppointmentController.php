@@ -536,7 +536,37 @@ class DentistAppointmentController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Follow-up appointment scheduled successfully.',
+
+            'message' =>
+            'Follow-up appointment scheduled successfully.',
+
+            'appointment' => [
+                'id' => $followUpAppointment->id,
+
+                'patient_name' =>
+                $originalAppointment->patient?->name
+                    ?? 'Unknown Patient',
+
+                'service_type' => $followUpAppointment->service_type,
+
+                'appointment_date' =>
+                Carbon::parse(
+                    $request->followup_appointment_date
+                )->format('F j, Y'),
+
+                'appointment_time' =>
+                Carbon::createFromFormat(
+                    'H:i:s',
+                    $mysqlTime
+                )->format('g:i A'),
+
+                'status' =>
+                ucfirst(
+                    $followUpAppointment->status
+                ),
+
+                'follow_up_reason' => $followUpAppointment->follow_up_reason,
+            ],
         ]);
     }
 }

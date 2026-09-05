@@ -14,9 +14,11 @@
     'messageTitle' => 'Confirmation details',
     'messageId' => 'confirmMessage',
     'size' => 'modal-lg',
+    'isStatic' => false,
 ])
 
-<div id="{{ $id }}" class="ui-modal" aria-hidden="true">
+<div id="{{ $id }}" class="ui-modal" aria-hidden="true"
+    @if ($isStatic) data-modal-static @endif>
     <div class="ui-modal-card {{ $size }}">
         <div class="modal-hd appointment-modal-header">
             <div class="modal-heading">

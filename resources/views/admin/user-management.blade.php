@@ -1393,12 +1393,6 @@ $canUpdateUserPassword = $authUser?->hasPermission('update_user_password') ?? fa
                     </p>
                 </div>
             </div>
-
-            <button type="button" onclick="closeModal('toggleConfirmModal')" class="modal-x"
-                aria-label="Close confirm action modal">
-
-                <i class="fa-solid fa-xmark"></i>
-            </button>
         </div>
 
         <div class="modal-bd">
@@ -1414,7 +1408,6 @@ $canUpdateUserPassword = $authUser?->hasPermission('update_user_password') ?? fa
 
         <div class="modal-ft">
             <button type="button" onclick="closeModal('toggleConfirmModal')" class="ui-btn ui-btn-secondary">
-
                 Cancel
             </button>
 

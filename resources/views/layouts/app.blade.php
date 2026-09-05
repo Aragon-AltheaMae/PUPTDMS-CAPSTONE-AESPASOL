@@ -220,10 +220,6 @@
                         </p>
                     </div>
                 </div>
-
-                <button type="button" class="modal-x" data-logout-modal-close aria-label="Close logout confirmation">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
             </div>
 
             <div class="modal-bd">

@@ -561,14 +561,12 @@
         </div>
 
         <div class="modal-ft">
-            <a href="{{ route('dentist.dentist.appointments') }}" class="ui-btn ui-btn-primary ui-btn-sm"
+            <a href="{{ route('dentist.dentist.appointments') }}" class="ui-btn ui-btn-secondary ui-btn-sm"
                 data-discard-navigation data-discard-form-target="#appointmentForm">
-                <i class="fa-solid fa-arrow-left"></i>
                 Back to Appointments
             </a>
 
-            <button type="button" id="introStartBtn" class="ui-btn ui-btn-primary">
-                <i class="fa-solid fa-play"></i>
+            <button type="button" id="introStartBtn" class="ui-btn ui-btn-primary ui-btn-sm">
                 Begin Walk-in Intake
             </button>
         </div>

@@ -1310,11 +1310,6 @@ $createAcademicPeriodUnauthorizedMessage = 'You are not authorized to add academ
                     </p>
                 </div>
             </div>
-
-            <button type="button" class="modal-x" data-modal-close="setActiveModal"
-                aria-label="Close confirmation modal">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
         </div>
 
         <div class="modal-bd">
@@ -1375,10 +1370,6 @@ $createAcademicPeriodUnauthorizedMessage = 'You are not authorized to add academ
                     </p>
                 </div>
             </div>
-
-            <button type="button" class="modal-x" data-modal-close="syncFlssModal" aria-label="Close sync modal">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
         </div>
 
         <div class="modal-bd">
