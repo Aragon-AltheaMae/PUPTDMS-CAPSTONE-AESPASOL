@@ -28,7 +28,7 @@ class AdminDashboardController extends Controller
             'admin_dashboard',
             'Admin viewed the dashboard'
         );
-        
+
         $now = Carbon::now();
 
         $totalPatients = Patient::count();
@@ -44,19 +44,19 @@ class AdminDashboardController extends Controller
 
         $inventoryItems = Inventory::get();
 
-            $inventoryTotal = $inventoryItems->count();
-            $inventoryMedicine = $inventoryItems->where('category', 'Medicine')->count();
-            $inventorySupplies = $inventoryItems->where('category', 'Supplies')->count();
-            $inventoryLowStock = $inventoryItems->filter(fn($item) => $item->balance > 0 && $item->balance <= 5)->count();
-            $inventoryOutOfStock = $inventoryItems->filter(fn($item) => $item->balance <= 0)->count();
-            $inventoryInStock = $inventoryItems->filter(fn($item) => $item->balance > 5)->count();
+        $inventoryTotal = $inventoryItems->count();
+        $inventoryMedicine = $inventoryItems->where('category', 'Medicine')->count();
+        $inventorySupplies = $inventoryItems->where('category', 'Supplies')->count();
+        $inventoryLowStock = $inventoryItems->filter(fn($item) => $item->balance > 0 && $item->balance <= 5)->count();
+        $inventoryOutOfStock = $inventoryItems->filter(fn($item) => $item->balance <= 0)->count();
+        $inventoryInStock = $inventoryItems->filter(fn($item) => $item->balance > 5)->count();
 
-            $inventoryCriticalItems = $inventoryItems
-                ->filter(fn($item) => $item->balance <= 5)
-                ->sortBy('balance')
-                ->take(5)
-                ->values();
-        
+        $inventoryCriticalItems = $inventoryItems
+            ->filter(fn($item) => $item->balance <= 5)
+            ->sortBy('balance')
+            ->take(5)
+            ->values();
+
         $notifications = [];
 
         $recentLogs = AuditLog::latest()->take(5)->get()->map(function ($log) {
@@ -73,7 +73,11 @@ class AdminDashboardController extends Controller
 
         $logErrors = AuditLog::where('action', 'error')->count();
 
-        $activePeriod = AcademicPeriod::where('is_active', true)
+        $activePeriod = AcademicPeriod::with([
+            'academicYear',
+            'academicTerm',
+        ])
+            ->where('is_active', true)
             ->orderByDesc('start_date')
             ->first();
 

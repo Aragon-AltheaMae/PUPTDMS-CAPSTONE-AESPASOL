@@ -125,19 +125,23 @@ class DentistReportController extends Controller
         $returningPatients = $patientVisitCounts->where('total_visits', '>', 1)->count();
         $newPatients = $patientVisitCounts->where('total_visits', 1)->count();
 
-        $validServiceTypes = ServiceType::query()
-            ->pluck('name');
-
         $topServices = Appointment::query()
-            ->whereYear('appointment_date', $thisYear)
-            ->whereMonth('appointment_date', $thisMonth)
-            ->whereNotNull('service_type')
-            ->whereIn('service_type', $validServiceTypes)
+            ->join(
+                'service_types',
+                'appointments.service_type_id',
+                '=',
+                'service_types.id'
+            )
+            ->whereYear('appointments.appointment_date', $thisYear)
+            ->whereMonth('appointments.appointment_date', $thisMonth)
             ->select(
-                'service_type as name',
+                'service_types.name as name',
                 DB::raw('COUNT(*) as total')
             )
-            ->groupBy('service_type')
+            ->groupBy(
+                'service_types.id',
+                'service_types.name'
+            )
             ->orderByDesc('total')
             ->limit(5)
             ->get();
@@ -1992,8 +1996,7 @@ class DentistReportController extends Controller
 
     private function getMonthlyReportServiceLabel(Appointment $appointment): string
     {
-        $service = trim((string) ($appointment->service_type ?? ''));
-
+        $service = trim((string) ($appointment->service_type_name ?? ''));
         if ($service === '' && filled($appointment->procedure?->diagnosis)) {
             $service = trim((string) $appointment->procedure->diagnosis);
         }
@@ -2469,11 +2472,10 @@ class DentistReportController extends Controller
             }
 
             if ($diagnosis === '') {
-                $diagnosis = trim((string) ($appointment->service_type ?? ''));
+                $diagnosis = trim((string) ($appointment->service_type_name ?? ''));
             }
 
-            $treatment = trim((string) ($appointment->service_type ?? ''));
-
+            $treatment = trim((string) ($appointment->service_type_name ?? ''));
             if ($treatment === '') {
                 $treatment = 'Dental Service';
             }
@@ -3143,6 +3145,7 @@ class DentistReportController extends Controller
         $query = Appointment::query()
             ->with([
                 'patient.medicalHistory',
+                'patient.information',
                 'procedure',
             ])
             ->where('status', 'completed')
@@ -3159,15 +3162,53 @@ class DentistReportController extends Controller
             $search = trim((string) $request->input('search'));
 
             $query->where(function ($q) use ($search) {
-                $q->where('service_type', 'like', "%{$search}%")
-                    ->orWhereHas('patient', function ($patientQuery) use ($search) {
-                        $patientQuery->where('name', 'like', "%{$search}%")
-                            ->orWhere('email', 'like', "%{$search}%")
-                            ->orWhere('phone', 'like', "%{$search}%")
-                            ->orWhere('course_code', 'like', "%{$search}%")
-                            ->orWhere('course_name', 'like', "%{$search}%")
-                            ->orWhere('faculty_code', 'like', "%{$search}%");
-                    });
+                $q->where(
+                    'service_type',
+                    'like',
+                    "%{$search}%"
+                )
+                    ->orWhereHas(
+                        'patient',
+                        function ($patientQuery) use ($search) {
+                            $patientQuery
+                                ->where(
+                                    'name',
+                                    'like',
+                                    "%{$search}%"
+                                )
+                                ->orWhere(
+                                    'email',
+                                    'like',
+                                    "%{$search}%"
+                                )
+                                ->orWhereHas(
+                                    'information',
+                                    function ($informationQuery) use ($search) {
+                                        $informationQuery
+                                            ->where(
+                                                'phone',
+                                                'like',
+                                                "%{$search}%"
+                                            )
+                                            ->orWhere(
+                                                'course_code',
+                                                'like',
+                                                "%{$search}%"
+                                            )
+                                            ->orWhere(
+                                                'course_name',
+                                                'like',
+                                                "%{$search}%"
+                                            )
+                                            ->orWhere(
+                                                'faculty_code',
+                                                'like',
+                                                "%{$search}%"
+                                            );
+                                    }
+                                );
+                        }
+                    );
             });
         }
 
@@ -3237,11 +3278,19 @@ class DentistReportController extends Controller
         }
 
         if ($request->filled('program_code')) {
-            $programCode = trim((string) $request->input('program_code'));
+            $programCode = trim(
+                (string) $request->input('program_code')
+            );
 
-            $query->whereHas('patient', function ($patientQuery) use ($programCode) {
-                $patientQuery->where('course_code', $programCode);
-            });
+            $query->whereHas(
+                'patient.information',
+                function ($informationQuery) use ($programCode) {
+                    $informationQuery->where(
+                        'course_code',
+                        $programCode
+                    );
+                }
+            );
         }
 
         if ($request->input('sort_name') === 'az') {
@@ -3462,16 +3511,29 @@ class DentistReportController extends Controller
 
     private function buildWeeklyData(int $year, int $month): array
     {
-        $topServices = Appointment::whereYear('appointment_date', $year)
-            ->whereMonth('appointment_date', $month)
-            ->select('service_type', DB::raw('COUNT(*) as total'))
-            ->groupBy('service_type')
+        $topServices = Appointment::query()
+            ->join(
+                'service_types',
+                'appointments.service_type_id',
+                '=',
+                'service_types.id'
+            )
+            ->whereYear('appointments.appointment_date', $year)
+            ->whereMonth('appointments.appointment_date', $month)
+            ->select(
+                'service_types.id',
+                'service_types.name',
+                DB::raw('COUNT(*) as total')
+            )
+            ->groupBy(
+                'service_types.id',
+                'service_types.name'
+            )
             ->orderByDesc('total')
             ->limit(3)
-            ->pluck('service_type')
-            ->toArray();
+            ->get();
 
-        if (empty($topServices)) {
+        if ($topServices->isEmpty()) {
             return [[], []];
         }
 
@@ -3479,15 +3541,29 @@ class DentistReportController extends Controller
         $weeksInMonth = (int) ceil($daysInMonth / 7);
         $weekLabels = array_map(fn($i) => "Week $i", range(1, $weeksInMonth));
 
-        $weeklyRaw = Appointment::whereYear('appointment_date', $year)
-            ->whereMonth('appointment_date', $month)
-            ->whereIn('service_type', $topServices)
+        $topServiceIds = $topServices->pluck('id')->all();
+
+        $weeklyRaw = Appointment::query()
+            ->join(
+                'service_types',
+                'appointments.service_type_id',
+                '=',
+                'service_types.id'
+            )
+            ->whereYear('appointments.appointment_date', $year)
+            ->whereMonth('appointments.appointment_date', $month)
+            ->whereIn('appointments.service_type_id', $topServiceIds)
             ->select(
-                'service_type',
-                DB::raw('CEIL(DAY(appointment_date) / 7) as week_num'),
+                'appointments.service_type_id',
+                'service_types.name as service_type',
+                DB::raw('CEIL(DAY(appointments.appointment_date) / 7) as week_num'),
                 DB::raw('COUNT(*) as total')
             )
-            ->groupBy('service_type', 'week_num')
+            ->groupBy(
+                'appointments.service_type_id',
+                'service_types.name',
+                'week_num'
+            )
             ->get();
 
         $chartColors = [
@@ -3500,11 +3576,14 @@ class DentistReportController extends Controller
         foreach ($topServices as $i => $service) {
             $data = [];
             for ($w = 1; $w <= $weeksInMonth; $w++) {
-                $data[] = (int) $weeklyRaw->where('service_type', $service)->where('week_num', $w)->sum('total');
+                $data[] = (int) $weeklyRaw
+                    ->where('service_type_id', $service->id)
+                    ->where('week_num', $w)
+                    ->sum('total');
             }
             $color = $chartColors[$i] ?? ['border' => '#6B7280', 'bg' => 'rgba(107,114,128,0.08)'];
             $datasets[] = [
-                'label' => $service,
+                'label' => $service->name,
                 'data' => $data,
                 'borderColor' => $color['border'],
                 'backgroundColor' => $color['bg'],
@@ -4495,8 +4574,7 @@ class DentistReportController extends Controller
 
             $demographics = $this->getPatientDemographics($patient);
             $gender = trim((string) ($demographics['gender'] ?? ''));
-            $treatmentDone = trim((string) ($appointment->service_type ?? ''));
-
+            $treatmentDone = trim((string) ($appointment->service_type_name ?? ''));
             if ($treatmentDone === '') {
                 $treatmentDone = 'Dental Service';
             }

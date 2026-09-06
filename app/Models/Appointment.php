@@ -5,13 +5,31 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use App\Models\ServiceType;
 
 class Appointment extends Model
 {
     use HasFactory;
 
+    public const ACTIVE_DUTY_END_STATUSES = [
+        'pending',
+        'confirmed',
+        'upcoming',
+        'rescheduled',
+    ];
+
+    public const FINALIZED_STATUSES = [
+        'completed',
+        'cancelled',
+        'rejected',
+        'no_show',
+        'no-show',
+    ];
+
     protected $fillable = [
         'patient_id',
+        'service_type_id',
         'reserved_booking_period_id',
         'reserved_booking_period_slot_id',
         'dentist_id',
@@ -42,9 +60,29 @@ class Appointment extends Model
         'transferred_at' => 'datetime',
     ];
 
+    public function serviceType()
+    {
+        return $this->belongsTo(ServiceType::class);
+    }
+
     public function dentalHistory()
     {
         return $this->hasOne(DentalHistory::class);
+    }
+
+    public function scopeForDentist(Builder $query, int $dentistId): Builder
+    {
+        return $query->where('dentist_id', $dentistId);
+    }
+
+    public function scopeScheduledOnDate(Builder $query, string $date): Builder
+    {
+        return $query->whereDate('appointment_date', $date);
+    }
+
+    public function scopeActiveForDutyEnd(Builder $query): Builder
+    {
+        return $query->whereIn('status', self::ACTIVE_DUTY_END_STATUSES);
     }
 
     public function medicalHistory()
@@ -74,8 +112,8 @@ class Appointment extends Model
 
         $now ??= now();
         $date = Carbon::parse($this->reservedBookingPeriod->reserved_date)->toDateString();
-        $start = Carbon::parse($date.' '.$this->reservedBookingPeriod->start_time);
-        $end = Carbon::parse($date.' '.$this->reservedBookingPeriod->end_time);
+        $start = Carbon::parse($date . ' ' . $this->reservedBookingPeriod->start_time);
+        $end = Carbon::parse($date . ' ' . $this->reservedBookingPeriod->end_time);
 
         return $now->betweenIncluded($start, $end);
     }
@@ -108,5 +146,10 @@ class Appointment extends Model
     public function procedure()
     {
         return $this->hasOne(AppointmentProcedure::class);
+    }
+
+    public function getServiceTypeNameAttribute(): ?string
+    {
+        return $this->serviceType?->name ?? $this->service_type;
     }
 }

@@ -471,9 +471,32 @@ Route::prefix('admin')
             if (! $user || ! $user->hasPermission('view_patient_profiles')) {
                 return response()->json(['message' => 'Unauthorized'], 403);
             }
-            $patients = Patient::select('id', 'name', 'email', 'phone')
+            $patients = Patient::query()
+                ->with([
+                    'information' => function ($query) {
+                        $query->select([
+                            'id',
+                            'patient_id',
+                            'phone',
+                        ]);
+                    },
+                ])
+                ->select([
+                    'id',
+                    'name',
+                    'email',
+                ])
                 ->orderBy('name')
-                ->get();
+                ->get()
+                ->map(function (Patient $patient) {
+                    return [
+                        'id' => $patient->id,
+                        'name' => $patient->name,
+                        'email' => $patient->email,
+                        'phone' => $patient->information?->phone,
+                    ];
+                })
+                ->values();
 
             return response()->json($patients);
         })->name('admin.patients.list');
@@ -1199,6 +1222,13 @@ Route::prefix('dentist')->middleware(['auth'])->group(function () {
     Route::post('/walk-in/start', [WalkInController::class, 'startWalkIn'])
         ->middleware('permission:manage_walk_in_patients')
         ->name('dentist.walk-in.start');
+
+    Route::post(
+        '/walk-in/resolve-external-patient',
+        [WalkInController::class, 'resolveExternalPatient']
+    )
+        ->middleware('permission:manage_walk_in_patients')
+        ->name('dentist.walk-in.external.resolve');
 
     Route::get('/add-existing-record', [\App\Http\Controllers\Shared\ExistingRecordController::class, 'index'])
         ->middleware('permission:manage_existing_records')

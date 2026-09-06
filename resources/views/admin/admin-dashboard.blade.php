@@ -32,7 +32,7 @@
                         <span class="period-label"><i class="fa-solid fa-calendar"></i>
                             Semester</span>
                         <span class="period-value">
-                            {{ $activePeriod?->semester ?? 'No Active Period' }}
+                            {{ $activePeriod?->academicTerm?->name ?? 'No Active Period' }}
                         </span>
                     </div>
                     <div class="period-divider"></div>
@@ -41,8 +41,8 @@
                             Academic
                             Year</span>
                         <span class="period-value">
-                            {{ $activePeriod?->academic_year ?? 'Not Set' }}
-                        </span>
+                            {{ $activePeriod?->academicYear?->name ?? 'Not Set' }}
+                         </span>
                     </div>
                     <div class="period-divider"></div>
                     <div class="period-item">
