@@ -10,7 +10,6 @@
         $event = data_get($payload, 'event') ?? data_get($payload, 'type');
 
         return match ($event) {
-
             'appointment.booked', 'appointment.rescheduled' => match ($activeRole) {
                 'admin', 'super_admin' => Route::has('admin.admin.appointments')
                     ? route('admin.admin.appointments')
@@ -96,11 +95,7 @@
 
                 if (str_starts_with($event, 'inventory.expiration.') && $expirationDate) {
                     $date = \Illuminate\Support\Carbon::parse($expirationDate);
-                    $message = str_replace(
-                        $date->format('M d, Y'),
-                        $date->format('F d, Y'),
-                        (string) $message
-                    );
+                    $message = str_replace($date->format('M d, Y'), $date->format('F d, Y'), (string) $message);
                 }
                 $actionUrl = $resolveNotificationUrl($payload, $role);
 
@@ -118,7 +113,7 @@
                         : null,
                 ];
             })
-            ->reject(fn ($notification) => data_get($notification, 'event') === 'inventory.low_stock')
+            ->reject(fn($notification) => data_get($notification, 'event') === 'inventory.low_stock')
             ->values();
     }
 
@@ -163,8 +158,8 @@
         $displayName = ucwords(strtolower(optional($patient)->name ?? ($authUser->name ?? 'Patient User')));
         $displayName = preg_replace_callback(
             '/\b(ii|iii|iv|v|vi|vii|viii|ix|x)\.?$/i',
-            fn ($matches) => strtoupper($matches[0]),
-            $displayName
+            fn($matches) => strtoupper($matches[0]),
+            $displayName,
         );
         $displayRole = 'Patient';
         $patientImage = optional($patient)->profile_image ?? null;
@@ -184,7 +179,7 @@
         $displayName = $authUser->name ?? 'User';
         $displayRole = session()->has('impersonated_role')
             ? Role::displayNameFor(session('impersonated_role'))
-            : ($authUser?->display_role_name ?? Role::displayNameFor($role));
+            : $authUser?->display_role_name ?? Role::displayNameFor($role);
 
         if (!empty($authUser->profile_image)) {
             $avatarUrl = asset('storage/' . $authUser->profile_image);
@@ -195,9 +190,6 @@
                 '&background=8B0000&color=ffffff&bold=true';
         }
     }
-
-    $logoutRoute = route('logout');
-    $settingsRoute = $settingsRoute ?? (Route::has('admin.system_settings') ? route('admin.system_settings') : '#');
 @endphp
 
 <header class="header">
@@ -332,14 +324,9 @@
             </div>
         </div>
 
-        @if ($showSettings)
-            <a href="{{ $settingsRoute }}" class="hdr-icon-btn" aria-label="System Settings">
-                <i class="fa-solid fa-gear"></i>
-            </a>
-        @endif
-
         <div id="userDropdown">
-            <button class="header-user-btn" id="userBtn" type="button">
+            <button class="header-user-btn" id="userBtn" type="button" aria-haspopup="menu" aria-controls="userMenu"
+                aria-expanded="false">
                 <div class="avatar-wrapper">
                     <img src="{{ $avatarUrl }}" class="header-avatar" alt="Profile avatar">
                     <div class="mobile-chevron-badge">
@@ -356,51 +343,45 @@
                     style="font-size:.65rem; opacity:.75; margin-left:4px;"></i>
             </button>
 
-            <div id="userMenu" class="header-dropdown-menu header-user-menu">
-
-                <div class="dropdown-profile-card">
-                    <img src="{{ $avatarUrl }}" class="dropdown-avatar" alt="Profile large avatar">
-                    <div class="dropdown-user-details">
-                        <div class="dropdown-name">{{ $displayName }}</div>
-                        <div class="dropdown-role">{{ $displayRole }}</div>
-                    </div>
-                </div>
-
-                <div class="dropdown-divider"></div>
-
+            <div id="userMenu" class="header-dropdown-menu header-user-menu" role="menu">
                 <div class="dropdown-menu-list">
-                    <label class="dropdown-menu-item" id="darkModeToggleItem">
-                        <div class="dropdown-item-content">
-                            <i class="fa-regular fa-sun text-gray-400 text-base" id="themeIcon"></i>
-                            <span class="dropdown-item-text">Dark Mode</span>
-                        </div>
-                        <div class="modern-switch">
-                            <input type="checkbox" id="themeSwitchCheckbox" class="theme-switch-input"
-                                aria-label="Toggle Dark Mode">
-                            <span class="switch-slider"></span>
-                        </div>
-                    </label>
 
-                    @if (Route::has('security.sessions.index'))
-                        <a href="{{ route('security.sessions.index') }}" class="dropdown-menu-item">
+                    @if ($showSettings && Route::has('admin.system_settings'))
+                        <a href="{{ route('admin.system_settings') }}" class="dropdown-menu-item" role="menuitem">
                             <div class="dropdown-item-content">
-                                <i class="fa-solid fa-shield-halved text-gray-400 text-base"></i>
-                                <span class="dropdown-item-text">Active Sessions</span>
+                                <span class="dropdown-item-icon">
+                                    <i class="fa-solid fa-gear"></i>
+                                </span>
+
+                                <span class="dropdown-item-text">
+                                    System Settings
+                                </span>
                             </div>
-                            <i class="fa-solid fa-chevron-right text-gray-300 text-xs"></i>
+
+                            <i class="fa-solid fa-chevron-right dropdown-item-chevron" aria-hidden="true"></i>
                         </a>
                     @endif
 
-                    <form method="POST" action="{{ $logoutRoute }}" class="js-logout-form" style="margin: 0;">
-                        @csrf
-                        <button type="submit" class="dropdown-menu-item dropdown-logout-item">
+                    @if ($showSettings && Route::has('admin.system_settings') && Route::has('security.sessions.index'))
+                        <div class="dropdown-menu-divider" role="separator"></div>
+                    @endif
+
+                    @if (Route::has('security.sessions.index'))
+                        <a href="{{ route('security.sessions.index') }}" class="dropdown-menu-item" role="menuitem">
                             <div class="dropdown-item-content">
-                                <i class="fa-solid fa-right-from-bracket text-red-500 text-base"></i>
-                                <span class="dropdown-item-text text-red-600">Log out</span>
+                                <span class="dropdown-item-icon">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                </span>
+
+                                <span class="dropdown-item-text">
+                                    Active Sessions
+                                </span>
                             </div>
-                            <i class="fa-solid fa-chevron-right text-gray-300 text-xs"></i>
-                        </button>
-                    </form>
+
+                            <i class="fa-solid fa-chevron-right dropdown-item-chevron" aria-hidden="true"></i>
+                        </a>
+                    @endif
+
                 </div>
             </div>
         </div>

@@ -77,7 +77,35 @@
                 patient: 'patientSidebarCollapsed'
             };
 
-            document.documentElement.classList.add('sidebar-preload');
+            const sidebarStorageKey =
+                sidebarKeys[role] ??
+                'sidebarCollapsed';
+
+            const savedSidebarCollapsed =
+                localStorage.getItem(
+                    sidebarStorageKey
+                ) === '1';
+
+            const sidebarCanRender =
+                role === 'patient' ?
+                window.matchMedia(
+                    '(min-width: 1200px)'
+                ).matches :
+                window.matchMedia(
+                    '(min-width: 768px)'
+                ).matches;
+
+            document.documentElement
+                .classList
+                .add('sidebar-preload');
+
+            document.documentElement
+                .classList
+                .toggle(
+                    'sidebar-collapsed-init',
+                    savedSidebarCollapsed &&
+                    sidebarCanRender
+                );
         })();
     </script>
 

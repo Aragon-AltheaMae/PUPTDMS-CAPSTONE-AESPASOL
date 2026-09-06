@@ -86,10 +86,14 @@ function initSidebarScrollMemory() {
     requestAnimationFrame(() => {
         restoreSidebarScroll();
 
-        requestAnimationFrame(() => {
-            restoreSidebarScroll();
-            isRestoring = false;
-        });
+        isRestoring = false;
+
+        document.documentElement
+            .classList
+            .remove(
+                'sidebar-preload',
+                'sidebar-collapsed-init'
+            );
     });
 
     sidebarInner.addEventListener('scroll', saveSidebarScroll, { passive: true });
@@ -151,6 +155,17 @@ function applySidebarState(isCollapsed) {
             collapsed ? 'Expand sidebar' : 'Collapse sidebar'
         );
     });
+
+    window.dispatchEvent(
+        new CustomEvent(
+            'sidebar:statechange',
+            {
+                detail: {
+                    collapsed
+                }
+            }
+        )
+    );
 }
 
 function toggleSidebar() {
@@ -210,17 +225,6 @@ function initGlobalSidebar() {
             );
         }
     });
-
-    requestAnimationFrame(
-        () => {
-            document.documentElement
-                .classList
-                .remove(
-                    'sidebar-preload',
-                    'sidebar-collapsed-init'
-                );
-        }
-    );
 }
 
 window.addEventListener(
@@ -247,83 +251,308 @@ window.addEventListener(
         );
     });
 
-function initAdminSidebarGroupClick() {
-    const sidebar = document.querySelector('#sidebar.sidebar-admin');
+function initSidebarGroupNavigation() {
+    const sidebar =
+        document.querySelector(
+            '#sidebar.sidebar-grouped'
+        );
+
     if (!sidebar) return;
 
-    const groups = Array.from(sidebar.querySelectorAll('.nav-group'));
+    const groups =
+        Array.from(
+            sidebar.querySelectorAll(
+                '.nav-group'
+            )
+        );
 
     const isCollapsed = () =>
-        sidebar.classList.contains('collapsed') ||
-        document.body.classList.contains('sidebar-collapsed');
+        sidebar.classList.contains(
+            'collapsed'
+        ) ||
+        document.body.classList.contains(
+            'sidebar-collapsed'
+        );
 
-    const closeGroups = () => {
-        sidebar.classList.remove('has-flyout-open');
+    const getTrigger = group =>
+        group.querySelector(
+            '[data-sidebar-group-toggle]'
+        );
 
+    const syncAria = () => {
         groups.forEach(group => {
-            group.classList.remove('is-flyout-open');
-            group.querySelector('[data-admin-group-toggle]')?.setAttribute('aria-expanded', 'false');
+            const visible =
+                isCollapsed()
+                    ? group.classList.contains(
+                        'is-flyout-open'
+                    )
+                    : group.classList.contains(
+                        'is-expanded'
+                    );
+
+            getTrigger(group)
+                ?.setAttribute(
+                    'aria-expanded',
+                    visible
+                        ? 'true'
+                        : 'false'
+                );
         });
     };
 
-    const openGroup = (targetGroup) => {
-        sidebar.classList.add('has-flyout-open');
+    const closeFlyouts = () => {
+        sidebar.classList.remove(
+            'has-flyout-open'
+        );
 
         groups.forEach(group => {
-            const isOpen = group === targetGroup;
-
-            group.classList.toggle('is-flyout-open', isOpen);
-            group.querySelector('[data-admin-group-toggle]')?.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            group.classList.remove(
+                'is-flyout-open'
+            );
         });
+
+        syncAria();
+    };
+
+    const openFlyout = targetGroup => {
+        sidebar.classList.add(
+            'has-flyout-open'
+        );
+
+        groups.forEach(group => {
+            group.classList.toggle(
+                'is-flyout-open',
+                group === targetGroup
+            );
+        });
+
+        syncAria();
+    };
+
+    const setExpandedGroup =
+        targetGroup => {
+
+            groups.forEach(group => {
+                group.classList.toggle(
+                    'is-expanded',
+                    group === targetGroup
+                );
+            });
+
+            syncAria();
+        };
+
+    const ensureActiveGroupOpen = () => {
+        if (isCollapsed()) {
+            return;
+        }
+
+        const hasExpanded =
+            groups.some(group =>
+                group.classList.contains(
+                    'is-expanded'
+                )
+            );
+
+        if (!hasExpanded) {
+            const activeGroup =
+                groups.find(group =>
+                    getTrigger(group)
+                        ?.classList
+                        .contains(
+                            'active-group'
+                        )
+                );
+
+            if (activeGroup) {
+                activeGroup.classList.add(
+                    'is-expanded'
+                );
+            }
+        }
+
+        syncAria();
     };
 
     groups.forEach(group => {
-        const trigger = group.querySelector('[data-admin-group-toggle]');
-        const panel = group.querySelector('.group-body');
+        const trigger =
+            getTrigger(group);
 
-        if (!trigger || trigger.dataset.groupClickInitialized === 'true') return;
+        const panel =
+            group.querySelector(
+                '.group-body'
+            );
 
-        trigger.dataset.groupClickInitialized = 'true';
+        if (
+            !trigger ||
+            trigger.dataset
+                .groupClickInitialized ===
+            'true'
+        ) {
+            return;
+        }
 
-        trigger.addEventListener('click', event => {
-            if (!isCollapsed()) return;
+        trigger.dataset
+            .groupClickInitialized =
+            'true';
 
-            event.preventDefault();
-            event.stopPropagation();
+        trigger.addEventListener(
+            'click',
+            event => {
+                event.preventDefault();
+                event.stopPropagation();
 
-            const alreadyOpen = group.classList.contains('is-flyout-open');
+                if (isCollapsed()) {
+                    const alreadyOpen =
+                        group.classList
+                            .contains(
+                                'is-flyout-open'
+                            );
 
-            closeGroups();
+                    closeFlyouts();
 
-            if (!alreadyOpen) {
-                openGroup(group);
+                    if (!alreadyOpen) {
+                        openFlyout(
+                            group
+                        );
+                    }
+
+                    return;
+                }
+
+                const alreadyExpanded =
+                    group.classList
+                        .contains(
+                            'is-expanded'
+                        );
+
+                setExpandedGroup(
+                    alreadyExpanded
+                        ? null
+                        : group
+                );
             }
-        });
+        );
 
-        panel?.addEventListener('click', event => {
-            event.stopPropagation();
-        });
+        panel?.addEventListener(
+            'click',
+            event => {
+                event.stopPropagation();
+            }
+        );
     });
 
-    document.addEventListener('click', event => {
-        if (!sidebar.contains(event.target)) {
-            closeGroups();
+    document.addEventListener(
+        'click',
+        event => {
+            if (
+                !sidebar.contains(
+                    event.target
+                )
+            ) {
+                closeFlyouts();
+            }
         }
-    });
+    );
 
-    document.addEventListener('keydown', event => {
-        if (event.key === 'Escape') {
-            closeGroups();
+    document.addEventListener(
+        'keydown',
+        event => {
+            if (
+                event.key === 'Escape'
+            ) {
+                closeFlyouts();
+            }
         }
-    });
+    );
 
-    window.addEventListener('resize', () => {
-        if (!isCollapsed()) {
-            closeGroups();
+    window.addEventListener(
+        'sidebar:statechange',
+        () => {
+            closeFlyouts();
+            ensureActiveGroupOpen();
         }
-    });
+    );
 
-    window.closeAdminSidebarGroups = closeGroups;
+    window.addEventListener(
+        'resize',
+        () => {
+            if (!isCollapsed()) {
+                closeFlyouts();
+                ensureActiveGroupOpen();
+            }
+        }
+    );
+
+    ensureActiveGroupOpen();
+
+    window.closeSidebarGroups = closeFlyouts;
+}
+
+function initMobileDrawerGroups() {
+    const drawer =
+        document.getElementById(
+            'mobileDrawer'
+        );
+
+    if (!drawer) return;
+
+    const groups =
+        Array.from(
+            drawer.querySelectorAll(
+                '.drawer-group'
+            )
+        );
+
+    const setExpandedGroup =
+        targetGroup => {
+
+            groups.forEach(group => {
+                const expanded =
+                    group ===
+                    targetGroup;
+
+                group.classList.toggle(
+                    'is-expanded',
+                    expanded
+                );
+
+                group.querySelector(
+                    '[data-drawer-group-toggle]'
+                )?.setAttribute(
+                    'aria-expanded',
+                    expanded
+                        ? 'true'
+                        : 'false'
+                );
+            });
+        };
+
+    groups.forEach(group => {
+        const trigger =
+            group.querySelector(
+                '[data-drawer-group-toggle]'
+            );
+
+        if (!trigger) return;
+
+        trigger.addEventListener(
+            'click',
+            () => {
+                const alreadyExpanded =
+                    group.classList
+                        .contains(
+                            'is-expanded'
+                        );
+
+                setExpandedGroup(
+                    alreadyExpanded
+                        ? null
+                        : group
+                );
+            }
+        );
+    });
 }
 
 function openDrawer() {
@@ -389,10 +618,11 @@ function initMobileDrawerControls() {
 document.addEventListener(
     'DOMContentLoaded',
     () => {
-        initMobileDrawerControls();
         initGlobalSidebar();
+        initSidebarGroupNavigation();
         initSidebarScrollMemory();
-        initAdminSidebarGroupClick();
+        initMobileDrawerControls();
+        initMobileDrawerGroups();
     }
 );
 
