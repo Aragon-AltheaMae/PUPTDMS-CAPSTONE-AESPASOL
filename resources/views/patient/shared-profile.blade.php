@@ -17,7 +17,7 @@ $bookingMode = $bookingMode ?? false;
 @section('usesPatientProfile', true)
 
 @section('styles')
-    @vite('resources/css/pages/patient/patient-profile.css')
+@vite('resources/css/pages/patient/patient-profile.css')
 @endsection
 
 @section('content')
@@ -25,6 +25,7 @@ $bookingMode = $bookingMode ?? false;
 @php
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use App\Services\AppointmentOdontogramSnapshotService;
 $isDentistProfile = $profileMode === 'dentist';
 
 $patientName = $patient->name ?? 'Unknown Patient';
@@ -34,6 +35,15 @@ $birthdateFormatted = $patient->birthdate ? Carbon::parse($patient->birthdate)->
 
 $futureCount = isset($futureVisits) ? $futureVisits->count() : 0;
 $pastCount = isset($pastVisits) ? $pastVisits->count() : 0;
+
+$odontogramSnapshotService =
+    app(AppointmentOdontogramSnapshotService::class);
+
+$previousOdontogramByVisitId =
+    $odontogramSnapshotService
+        ->previousSnapshotsByAppointment(
+            collect($pastVisits ?? [])
+        );
 
 $medicalAnswers = optional($patient->medicalHistory)->answers ?? collect();
 $dentalDates = optional($patient->dentalHistoryDates);
@@ -494,8 +504,7 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
 
                                     <x-appointment-record-card :appointment="$visit" variant="upcoming"
                                         :show-details="false" :show-countdown="true" :show-time-range="false"
-                                        :show-reserved="$isDentistProfile"
-                                        data-show-more-item />
+                                        :show-reserved="$isDentistProfile" data-show-more-item />
 
                                     @empty
 
@@ -530,10 +539,10 @@ $odontogramMetaService = $odontogramMetaVisit?->service_type ?: 'Dental Treatmen
                                     <x-appointment-record-card :appointment="$visit" variant="past" :show-details="true"
                                         :show-countdown="false" :show-time-range="false"
                                         :show-reserved="$isDentistProfile"
+                                        :previous-odontogram="$previousOdontogramByVisitId[$visit->id] ?? []"
                                         :record-edit-url="$isDentistProfile && $visit->status === 'completed'
-                                            ? route('dentist.odontogram.saved.edit', ['appointment' => $visit->id, 'from' => 'appointments'])
-                                            : null"
-                                        data-show-more-item />
+                                        ? route('dentist.odontogram.saved.edit', ['appointment' => $visit->id, 'from' => 'appointments'])
+                                        : null" data-show-more-item />
 
                                     @empty
 

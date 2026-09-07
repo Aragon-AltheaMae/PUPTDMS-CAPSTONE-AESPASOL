@@ -51,6 +51,55 @@ class RecordController extends Controller
             ->paginate($perPage, ['*'], 'records_page')
             ->withQueryString();
 
+        $completedOdontogramVisits = Appointment::query()
+            ->with([
+                'procedure:id,appointment_id,odontogram_data',
+            ])
+            ->where('patient_id', $patient->id)
+            ->where('status', 'completed')
+            ->orderBy('appointment_date', 'asc')
+            ->orderBy('appointment_time', 'asc')
+            ->orderBy('id', 'asc')
+            ->get([
+                'id',
+                'appointment_date',
+                'appointment_time',
+            ]);
+
+        $previousOdontogramByVisitId = [];
+        $previousCompletedSnapshot = [];
+
+        foreach ($completedOdontogramVisits as $completedVisit) {
+            $previousOdontogramByVisitId[$completedVisit->id] =
+                $previousCompletedSnapshot;
+
+            $currentSnapshot = data_get(
+                $completedVisit,
+                'procedure.odontogram_data',
+                []
+            );
+
+            if (is_string($currentSnapshot)) {
+                $decodedSnapshot = json_decode(
+                    $currentSnapshot,
+                    true
+                );
+
+                $currentSnapshot =
+                    is_array($decodedSnapshot)
+                    ? $decodedSnapshot
+                    : [];
+            }
+
+            if (
+                is_array($currentSnapshot) &&
+                !empty($currentSnapshot)
+            ) {
+                $previousCompletedSnapshot =
+                    array_values($currentSnapshot);
+            }
+        }
+
         $documentRequestsPerPage = (int) request(
             'document_requests_per_page',
             10
@@ -122,7 +171,8 @@ class RecordController extends Controller
             'records',
             'latestDate',
             'documentRequests',
-            'documentRequestStats'
+            'documentRequestStats',
+            'previousOdontogramByVisitId'
         ));
     }
 }
