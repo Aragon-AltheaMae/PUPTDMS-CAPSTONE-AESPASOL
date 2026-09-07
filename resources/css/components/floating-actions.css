@@ -1093,10 +1093,6 @@ body.role-dentist .assistive-fab-group {
     bottom: calc(24px + env(safe-area-inset-bottom)) !important;
 }
 
-body.role-patient .assistive-fab-group {
-    bottom: var(--accessibility-bottom-final, 24px) !important;
-}
-
 .assistive-main-fab,
 .assistive-mini-fab {
     width: var(--fab-final-size, 52px) !important;
@@ -1177,17 +1173,26 @@ body.filter-lock .back-to-top {
 
 @media (max-width: 640px) {
     .assistive-fab-group {
-        right: 18px !important;
+        right: 14px !important;
+        gap: 10px !important;
+    }
+
+    body.role-patient .assistive-fab-group {
         bottom: var(--assistive-mobile-bottom) !important;
     }
 
     .assistive-main-fab,
     .assistive-mini-fab,
     .back-to-top {
-        width: 48px !important;
-        height: 48px !important;
-        min-width: 48px !important;
-        min-height: 48px !important;
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+    }
+
+    .assistive-main-fab i,
+    .assistive-mini-fab i {
+        font-size: 15px !important;
     }
 
     .back-to-top {
@@ -1197,10 +1202,10 @@ body.filter-lock .back-to-top {
 
     .assistive-mini-menu .chatbot-fab,
     .assistive-mini-menu .accessibility-fab {
-        width: 48px !important;
-        height: 48px !important;
-        min-width: 48px !important;
-        min-height: 48px !important;
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
         right: auto !important;
         bottom: auto !important;
     }

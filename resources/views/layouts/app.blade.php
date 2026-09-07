@@ -77,7 +77,35 @@
                 patient: 'patientSidebarCollapsed'
             };
 
-            document.documentElement.classList.add('sidebar-preload');
+            const sidebarStorageKey =
+                sidebarKeys[role] ??
+                'sidebarCollapsed';
+
+            const savedSidebarCollapsed =
+                localStorage.getItem(
+                    sidebarStorageKey
+                ) === '1';
+
+            const sidebarCanRender =
+                role === 'patient' ?
+                window.matchMedia(
+                    '(min-width: 1200px)'
+                ).matches :
+                window.matchMedia(
+                    '(min-width: 768px)'
+                ).matches;
+
+            document.documentElement
+                .classList
+                .add('sidebar-preload');
+
+            document.documentElement
+                .classList
+                .toggle(
+                    'sidebar-collapsed-init',
+                    savedSidebarCollapsed &&
+                    sidebarCanRender
+                );
         })();
     </script>
 
@@ -92,7 +120,7 @@
     <link rel="icon" type="image/png" href="{{ asset('images/PUPT-DMS-Logo.png') }}">
 
     <style>
-        @keyframes page-enter-critical {
+        @keyframes page-enter {
             from {
                 opacity: .92;
                 transform: translateY(4px);
@@ -105,8 +133,21 @@
         }
 
         .page-enter {
-            animation: page-enter-critical 180ms ease-out both;
+            animation: page-enter 180ms ease-out both;
         }
+
+
+        @if ($isPatient)
+            @media (max-width: 640px) {
+                html body.role-patient .asw-menu-btn {
+                    opacity: 0 !important;
+                    visibility: hidden !important;
+                    pointer-events: none !important;
+                    transform: scale(0.01) !important;
+                    transition: none !important;
+                }
+            }
+        @endif
 
         @media (prefers-reduced-motion: reduce) {
             .page-enter {
@@ -207,10 +248,6 @@
                         </p>
                     </div>
                 </div>
-
-                <button type="button" class="modal-x" data-logout-modal-close aria-label="Close logout confirmation">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
             </div>
 
             <div class="modal-bd">

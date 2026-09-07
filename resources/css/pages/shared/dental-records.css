@@ -1,0 +1,293 @@
+.shared-dental-records-page {
+    overflow-x: hidden;
+}
+
+.shared-dental-records-page #statCards.dental-records-stat-grid {
+    margin-bottom: 1.25rem;
+}
+
+.shared-dental-records-page .patient-table-toolbar,
+.shared-dental-records-page .record-toolbar-layout,
+.shared-dental-records-page .record-toolbar-actions,
+.shared-dental-records-page .record-search-row,
+.shared-dental-records-page .voice-input-toggle {
+    overflow: visible;
+}
+
+.shared-dental-records-page .record-toolbar-layout {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+}
+
+.shared-dental-records-page .record-toolbar-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    min-width: 0;
+    margin-left: auto;
+}
+
+.shared-dental-records-page .record-view-toggle.view-toggle-container {
+    flex: 0 0 auto;
+}
+
+.shared-dental-records-page .dental-record-row {
+    cursor: pointer;
+}
+
+.shared-dental-records-page .data-table th:nth-child(n + 2),
+.shared-dental-records-page .data-table td:nth-child(n + 2) {
+    text-align: center;
+}
+
+.shared-dental-records-page .data-table td:nth-child(4) .table-primary,
+.shared-dental-records-page .data-table td:nth-child(6) .ui-action-group {
+    justify-content: center;
+}
+
+.shared-dental-records-page .dental-record-grid-view {
+    padding: 20px 24px 24px;
+    gap: 18px;
+}
+
+.shared-dental-records-page .dental-record-grid-card {
+    min-width: 0;
+}
+
+.shared-dental-records-page .dental-record-grid-card .table-record-value i {
+    margin-right: 6px;
+}
+
+.shared-dental-records-page #panelFoot .ui-btn {
+    justify-content: center;
+}
+
+[data-theme="dark"] #mainContent.shared-dental-records-page .record-insight-row,
+.dark #mainContent.shared-dental-records-page .record-insight-row {
+    background: transparent !important;
+}
+
+.dental-record-patient-copy {
+    min-width: 0;
+    display: grid;
+    gap: .18rem;
+}
+
+.dental-record-patient-name {
+    min-width: 0;
+    color: var(--table-text);
+    font-size: .78rem;
+    font-weight: 850;
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dental-record-patient-sub {
+    color: var(--table-text-muted);
+    font-size: .66rem;
+    font-weight: 700;
+}
+
+.dental-records-main-card {
+    min-width: 0;
+    overflow: visible;
+}
+
+.dental-records-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 1.25rem;
+}
+
+.dental-records-side-column {
+    min-width: 0;
+}
+
+@media (min-width: 1280px) {
+    .dental-records-layout {
+        grid-template-columns: minmax(0, 1fr) clamp(300px, 24vw, 420px);
+    }
+
+    .dental-records-side-column {
+        position: sticky;
+        top: 1.25rem;
+    }
+}
+
+.dental-record-panel {
+    position: sticky;
+    top: 1.5rem;
+}
+
+.shared-dental-records-page .dental-record-profile-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.shared-dental-records-page .dental-record-profile-shell {
+    padding: 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border-light);
+    border-radius: 1rem;
+}
+
+.shared-dental-records-page .dental-record-panel-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+}
+
+.shared-dental-records-page .dental-record-panel-badges {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+.shared-dental-records-page .dental-record-pwd-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 30px;
+    padding: 6px 10px;
+    border: 1px solid #bfdbfe;
+    border-radius: 999px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: .72rem;
+    font-weight: 850;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+@media (max-width: 1024px) {
+    .dental-record-panel {
+        position: static;
+    }
+
+    .shared-dental-records-page .dental-record-grid-view {
+        padding: 16px;
+        gap: 14px;
+    }
+}
+
+@media (max-width: 767px) {
+    .shared-dental-records-page .record-toolbar-layout {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .shared-dental-records-page .record-toolbar-actions,
+    .shared-dental-records-page .record-search-row {
+        width: 100%;
+        max-width: none;
+        min-width: 0;
+    }
+
+    .shared-dental-records-page .record-toolbar-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .shared-dental-records-page .record-view-toggle.view-toggle-container {
+        width: 100%;
+    }
+
+    .shared-dental-records-page .dental-record-grid-view {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .shared-dental-records-page .dental-record-profile-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .shared-dental-records-page .dental-record-profile-grid
+    .global-info-item {
+        grid-column: auto;
+    }
+}
+
+
+.shared-dental-records-page .record-filter-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+.shared-dental-records-page .voice-search-row,
+.shared-dental-records-page .voice-input-toggle {
+    position: relative;
+    overflow: visible;
+}
+
+.shared-dental-records-page .voice-input-toggle {
+    z-index: 20;
+    pointer-events: auto;
+}
+
+.shared-dental-records-page .voice-search-mic.external {
+    position: relative;
+    z-index: 21;
+    pointer-events: auto;
+}
+
+.shared-dental-records-page .voice-status,
+.shared-dental-records-page .global-voice-waveform {
+    z-index: 9999;
+}
+
+@media (max-width: 767px) {
+    .shared-dental-records-page .record-filter-actions {
+        width: 100%;
+    }
+
+    .shared-dental-records-page .record-filter-actions .global-filter-btn {
+        flex: 1 1 auto;
+    }
+}
+
+
+.shared-dental-records-page .record-toolbar-actions {
+    width: 100%;
+}
+
+.shared-dental-records-page .record-search-row {
+    isolation: isolate;
+}
+
+.shared-dental-records-page .record-search-row .search-wrap.global-search {
+    position: relative;
+    z-index: 1;
+}
+
+.shared-dental-records-page .record-search-row .voice-input-toggle {
+    position: relative;
+    z-index: 50;
+    pointer-events: auto;
+}
+
+.shared-dental-records-page .record-search-row .voice-search-mic.external,
+.shared-dental-records-page .record-search-row [data-global-voice-trigger],
+.shared-dental-records-page .record-search-row [data-voice-trigger] {
+    position: relative;
+    z-index: 51;
+    pointer-events: auto !important;
+}
+
+.shared-dental-records-page .record-filter-actions,
+.shared-dental-records-page .record-view-toggle.view-toggle-container {
+    position: relative;
+    z-index: 2;
+}

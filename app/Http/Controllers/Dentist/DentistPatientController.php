@@ -13,6 +13,7 @@ use App\Helpers\AuditLogger;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use App\Models\SystemSetting;
 
 class DentistPatientController extends Controller
 {
@@ -20,10 +21,16 @@ class DentistPatientController extends Controller
     private function syncOverdueAppointmentsToCancelled(): void
     {
         $now = Carbon::now();
+        $clinicStatus = strtolower((string) SystemSetting::getSetting('clinic_status', 'in'));
 
-        $gracePeriodMinutes = 60;
+        if ($clinicStatus !== 'out') {
+            return;
+        }
 
-        $cutoff = $now->copy()->subMinutes($gracePeriodMinutes);
+        $outAtValue = SystemSetting::getSetting('clinic_status_out_at');
+        $cutoff = filled($outAtValue)
+            ? Carbon::parse($outAtValue)
+            : $now->copy();
 
         $updatePayload = [
             'status' => 'cancelled',
@@ -34,7 +41,7 @@ class DentistPatientController extends Controller
             $updatePayload['cancellation_reason'] = DB::raw(
                 "COALESCE(
                 NULLIF(cancellation_reason, ''),
-                'Appointment was not started within the 1-hour grace period.'
+                'Appointment was not started before the dentist checked out.'
             )"
             );
         }
@@ -236,7 +243,7 @@ class DentistPatientController extends Controller
 
         $nextAppointment = $futureVisits->first();
 
-        $philippineHolidays = PhilippineHolidays::range(1, 1);
+        $philippineHolidays = PhilippineHolidays::recordsRange(1, 1);
 
         $appointmentCountsPerDay = Appointment::where('patient_id', $patient->id)
             ->whereIn('status', ['upcoming', 'rescheduled'])

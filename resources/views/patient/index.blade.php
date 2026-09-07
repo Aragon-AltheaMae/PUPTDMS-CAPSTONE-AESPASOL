@@ -71,13 +71,12 @@ $followUp->follow_up_reason
 ->cascade()
 ->forHumans(['short' => true, 'minimumUnit' => 'second'])
 : $r->duration ?? ($r->procedure_duration ?? ($r->treatment_duration ?? '60 mins')),
-'remarks' => $r->procedure?->completion_action
-? \Illuminate\Support\Str::of($r->procedure->completion_action)->replace('_', ' ')->title()
-: $r->remarks ?? '',
+'remarks' => $r->remarks ?? '',
 'oral' => $r->procedure?->oral_examination ?? '',
 'diagnosis' => $r->procedure?->diagnosis ?? '',
 'prescription' => $r->procedure?->prescriptions ?? '',
 'odontogram' => $r->procedure?->odontogram_data ?? [],
+'treatment_items' => \App\Support\OdontogramTreatmentDisplay::items($r->procedure?->odontogram_data ?? []),
 ];
 })
 ->values();
@@ -129,12 +128,11 @@ $completedCalendarAppointments[$dateKey][] = [
 ->cascade()
 ->forHumans(['short' => true, 'minimumUnit' => 'second'])
 : $record->duration ?? ($record->procedure_duration ?? ($record->treatment_duration ?? '60 mins')),
-'remarks' => $record->procedure?->completion_action
-? \Illuminate\Support\Str::of($record->procedure->completion_action)->replace('_', ' ')->title()
-: $record->remarks ?? null,
+'remarks' => $record->remarks ?? null,
 'oral' => $record->procedure?->oral_examination ?? null,
 'diagnosis' => $record->procedure?->diagnosis ?? null,
 'prescription' => $record->procedure?->prescriptions ?? null,
+'treatment_items' => \App\Support\OdontogramTreatmentDisplay::items($record->procedure?->odontogram_data ?? []),
 ];
 }
 
@@ -869,7 +867,34 @@ $appointmentConfirmation = session('appointment_confirmation');
     @endif
 
     document.addEventListener('DOMContentLoaded', function () {
-        const quickAction = new URLSearchParams(window.location.search).get('quick_action');
+        const draftSavedToast =
+            sessionStorage.getItem(
+                'appointmentDraftSavedToast'
+            );
+
+        if (
+            draftSavedToast ===
+            '1'
+        ) {
+            sessionStorage.removeItem(
+                'appointmentDraftSavedToast'
+            );
+
+            window.showToast?.({
+                type: 'success',
+                title: 'Draft saved',
+                message:
+                    'Your appointment draft has been saved.',
+                duration: 3500,
+            });
+        }
+
+        const quickAction =
+            new URLSearchParams(
+                window.location.search
+            ).get(
+                'quick_action'
+            );
 
         const privateInformationModal =
             document.getElementById(

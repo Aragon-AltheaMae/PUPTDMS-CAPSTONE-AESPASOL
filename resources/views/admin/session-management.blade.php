@@ -446,9 +446,6 @@
                         <p class="modal-subtitle">Security verification confirmation</p>
                     </div>
                 </div>
-                <button type="button" class="modal-x close-session-modal" aria-label="Close modal">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
             </div>
 
             <div class="modal-bd">

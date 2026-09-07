@@ -316,6 +316,7 @@ class DentistReportController extends Controller
         $pathsByCode = [
             'DTR-DEFAULT' => 'daily-treatment-record-template.pdf',
             'DTR-FACULTY' => 'dental-treatment-record-faculty.pdf',
+            'DTR-ALUMNI' => 'daily-treatment-record-alumni-dependent.pdf',
             'DSRV-DEFAULT' => 'dental-services-template.pdf',
             'DHREC-DEFAULT' => 'dental-health-record-template.pdf',
             'ADCL-DEFAULT' => 'annual-dental-clearance-template.pdf',
@@ -1156,6 +1157,10 @@ class DentistReportController extends Controller
             return in_array($patientAudience, ['faculty', 'administrative'], true);
         }
 
+        if ($audience === 'alumni_dependent') {
+            return $patientAudience === 'alumni_dependent';
+        }
+
         if ($audience === 'student') {
             return $patientAudience === 'student';
         }
@@ -1172,6 +1177,10 @@ class DentistReportController extends Controller
             return 'faculty_admin';
         }
 
+        if ($code === 'DTR-ALUMNI') {
+            return 'alumni_dependent';
+        }
+
         if ($code === 'DTR-DEFAULT') {
             return 'student';
         }
@@ -1180,6 +1189,13 @@ class DentistReportController extends Controller
             $template->name,
             $template->notes,
         ]))));
+
+        if (
+            str_contains($haystack, 'alumni') ||
+            str_contains($haystack, 'dependent')
+        ) {
+            return 'alumni_dependent';
+        }
 
         if (
             str_contains($haystack, 'faculty') ||
@@ -1204,10 +1220,10 @@ class DentistReportController extends Controller
             return 'unknown';
         }
 
-        return match ($this->categorizePatientForReports($patient)) {
+        return match ($this->resolveDailyTreatmentPatientClassification($patient)) {
             'administrative' => 'administrative',
             'faculty' => 'faculty',
-            'dependent' => 'dependent',
+            'alumni', 'dependent', 'dependent_alumni' => 'alumni_dependent',
             default => 'student',
         };
     }
@@ -3024,7 +3040,8 @@ class DentistReportController extends Controller
                 CASE
                     WHEN code = 'DTR-DEFAULT' THEN 0
                     WHEN code = 'DTR-FACULTY' THEN 1
-                    ELSE 2
+                    WHEN code = 'DTR-ALUMNI' THEN 2
+                    ELSE 3
                 END
             ")
             ->orderBy('name')
@@ -3048,7 +3065,7 @@ class DentistReportController extends Controller
             'patient_name' => ['required', 'string', 'max:150'],
             'patient_email' => ['nullable', 'email', 'max:190'],
             'patient_phone' => ['nullable', 'string', 'max:30'],
-            'office_type' => ['nullable', Rule::in(['Administrative', 'Faculty', 'Dependent'])],
+            'office_type' => ['nullable', Rule::in(['Administrative', 'Faculty', 'Dependent', 'Alumni'])],
             'program_code' => ['nullable', 'string', 'max:50'],
             'gender' => ['nullable', Rule::in(['Male', 'Female', 'Other'])],
             'treatment_done' => ['required', 'string', 'max:150'],
@@ -3210,9 +3227,9 @@ class DentistReportController extends Controller
                             true
                         )
                     ) {
-                        $patientQuery->where(
+                        $patientQuery->whereIn(
                             'classification',
-                            'dependent_alumni'
+                            ['alumni', 'dependent', 'dependent_alumni']
                         );
                     }
                 }
@@ -3327,16 +3344,41 @@ class DentistReportController extends Controller
         ]);
     }
 
+    private function dentalServicesCourseYearSectionDisplay($patient): string
+    {
+        if (! $patient) {
+            return '';
+        }
+
+        if ($this->categorizePatientForReports($patient) === 'faculty') {
+            return 'Faculty';
+        }
+
+        $programOrDept = trim((string) ($patient->course_code ?? ''));
+
+        if ($programOrDept === '') {
+            $programOrDept = trim((string) ($patient->course_name ?? ''));
+        }
+
+        if ($programOrDept !== '' && ! empty($patient->year_level)) {
+            $programOrDept .= ' - Y' . $patient->year_level;
+        }
+
+        if ($programOrDept !== '' && ! empty($patient->section)) {
+            $programOrDept .= ' / ' . $patient->section;
+        }
+
+        return $programOrDept;
+    }
+
     private function dailyTreatmentOfficeDisplay($patient): string
     {
         if (! $patient) {
             return '—';
         }
 
-        $category =
-            $this->categorizePatientForReports(
-                $patient
-            );
+        $category = $this->categorizePatientForReports($patient);
+        $classification = $this->resolveDailyTreatmentPatientClassification($patient);
 
         if ($category === 'administrative') {
             return trim((string) (
@@ -3355,7 +3397,7 @@ class DentistReportController extends Controller
         }
 
         if ($category === 'dependent') {
-            return 'Dependent & Alumni';
+            return $classification === 'alumni' ? 'Alumni' : 'Dependent';
         }
 
         if ($category === 'student') {
@@ -3386,10 +3428,10 @@ class DentistReportController extends Controller
             'Administrative Personnel',
 
             'dependent' =>
-            'Dependent & Alumni',
+            'Alumni / Dependent',
 
             default =>
-            'Dependent & Alumni',
+            'Alumni / Dependent',
         };
     }
 
@@ -3531,6 +3573,8 @@ class DentistReportController extends Controller
         float $width = 36,
         float $height = 10
     ): void {
+        $text = $this->preparePdfText($text);
+
         $pdf->SetXY($centerX - ($width / 2), $centerY - ($height / 2));
         $pdf->Cell($width, $height, $text, 0, 0, 'C');
     }
@@ -3645,22 +3689,47 @@ class DentistReportController extends Controller
             return 'dependent';
         }
 
-        $classification = strtolower(
-            trim((string) ($patient->classification ?? ''))
-        );
+        $classification = $this->resolveDailyTreatmentPatientClassification($patient);
 
         if ($classification !== '') {
             return match ($classification) {
                 'student' => 'student',
-
                 'faculty' => 'faculty',
-
                 'administrative' => 'administrative',
+                default => 'dependent',
+            };
+        }
 
-                'dependent_alumni',
+        if (
+            filled($patient->student_no) ||
+            filled($patient->student_number)
+        ) {
+            return 'student';
+        }
+
+        if (filled($patient->faculty_code)) {
+            return 'faculty';
+        }
+
+        return 'dependent';
+    }
+
+    private function resolveDailyTreatmentPatientClassification($patient): string
+    {
+        if (! $patient) {
+            return 'dependent';
+        }
+
+        $classification = strtolower(trim((string) ($patient->classification ?? '')));
+
+        if ($classification !== '') {
+            return match ($classification) {
+                'student',
+                'faculty',
+                'administrative',
+                'alumni',
                 'dependent',
-                'alumni' => 'dependent',
-
+                'dependent_alumni' => $classification,
                 default => 'dependent',
             };
         }
@@ -4015,27 +4084,7 @@ class DentistReportController extends Controller
             $patientName = $this->formatPdfPatientNameSurnameFirst($patient?->name);
             $patientName = $patientName !== '' ? $patientName : 'Unknown Patient';
 
-            $programOrDept = trim((string) ($patient->course_code ?? ''));
-
-            if ($programOrDept === '') {
-                $programOrDept = trim((string) ($patient->course_name ?? ''));
-            }
-
-            if ($programOrDept !== '' && ! empty($patient->year_level)) {
-                $programOrDept .= ' - Y' . $patient->year_level;
-            }
-
-            if ($programOrDept !== '' && ! empty($patient->section)) {
-                $programOrDept .= ' / ' . $patient->section;
-            }
-
-            if ($programOrDept === '') {
-                $programOrDept = trim((string) ($patient->faculty_code ?? ''));
-            }
-
-            if ($programOrDept === '') {
-                $programOrDept = '';
-            }
+            $programOrDept = $this->dentalServicesCourseYearSectionDisplay($patient);
 
             $demographics = $this->getPatientDemographics($patient);
             $age = $demographics['age'];
@@ -4606,7 +4655,7 @@ class DentistReportController extends Controller
         float $height,
         string $align = 'C'
     ): void {
-        $text = $this->fitPdfText($pdf, $text, $width);
+        $text = $this->fitPdfText($pdf, $this->preparePdfText($text), $width);
 
         $pdf->SetXY($centerX - ($width / 2), $centerY - ($height / 2));
         $pdf->Cell($width, $height, $text, 0, 0, $align);
@@ -4625,7 +4674,7 @@ class DentistReportController extends Controller
         float $startFontSize = 4.0,
         float $minFontSize = 2.7
     ): void {
-        $text = trim($text);
+        $text = trim($this->preparePdfText($text));
 
         if ($text === '') {
             return;
@@ -4661,7 +4710,7 @@ class DentistReportController extends Controller
         float $height,
         string $align = 'C'
     ): void {
-        $lines = preg_split('/\r\n|\r|\n/', trim($text));
+        $lines = preg_split('/\r\n|\r|\n/', trim($this->preparePdfText($text)));
 
         if (! $lines || count($lines) === 0) {
             return;
@@ -4707,7 +4756,7 @@ class DentistReportController extends Controller
 
     private function wrapPdfText(Fpdi $pdf, string $text, float $maxWidth, int $maxLines = 2): array
     {
-        $text = trim((string) $text);
+        $text = trim($this->preparePdfText((string) $text));
 
         if ($text === '') {
             return [];
@@ -4859,10 +4908,21 @@ class DentistReportController extends Controller
         }
 
         while ($text !== '' && $pdf->GetStringWidth($text . '...') > $maxWidth) {
-            $text = mb_substr($text, 0, -1);
+            $text = substr($text, 0, -1);
         }
 
         return trim($text) . '...';
+    }
+
+    private function preparePdfText(string $text): string
+    {
+        $text = trim($text);
+
+        if ($text === '' || ! mb_check_encoding($text, 'UTF-8')) {
+            return $text;
+        }
+
+        return mb_convert_encoding($text, 'Windows-1252', 'UTF-8');
     }
 
     private function formatPdfTime($value): string

@@ -102,6 +102,8 @@ class SystemSetting extends Model
             'notif_follow_up_scheduled' => ['database', 'broadcast'],
             'notif_follow_up_reminder' => ['database', 'broadcast'],
             'notif_follow_up_today_reminder' => ['database', 'broadcast'],
+
+            'notif_inventory_expiration' => ['database', 'broadcast'],
         ];
 
         if (! static::isEnabled($key, true)) {

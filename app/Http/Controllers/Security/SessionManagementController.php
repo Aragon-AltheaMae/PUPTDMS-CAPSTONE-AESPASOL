@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Security;
 
-use App\Helpers\AuditLogger;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Services\ConcurrentSessionService;
@@ -163,18 +162,17 @@ class SessionManagementController extends Controller
 
     private function isExemptFromIdleTimeout(Request $request): bool
     {
-        $activeRole = strtolower(trim((string) (
+        $user = $request->user();
+
+        if (!$user) {
+            return false;
+        }
+
+        return $user->isExemptFromIdleTimeout((string) (
             $request->session()->get('impersonated_role')
                 ?: $request->session()->get('role')
-                ?: optional($request->user()?->role)->slug
-        )));
-
-        $exemptRoles = array_map(
-            static fn (mixed $role): string => strtolower(trim((string) $role)),
-            (array) config('session.idle_timeout_exempt_roles', [])
-        );
-
-        return in_array($activeRole, $exemptRoles, true);
+                ?: optional($user->role)->slug
+        ));
     }
 
     private function logoutCurrentSession(
@@ -193,13 +191,7 @@ class SessionManagementController extends Controller
         }
 
         if ($user) {
-            AuditLogger::log(
-                'logout',
-                'authentication',
-                $reason === 'idle'
-                    ? 'User was signed out due to inactivity.'
-                    : 'User signed out from session management.'
-            );
+            $this->concurrentSessionService->recordLogoutActivity($user, $reason);
         }
 
         Cookie::queue(Cookie::forget('jwt_token', '/'));

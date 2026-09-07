@@ -13,10 +13,6 @@
                     </p>
                 </div>
             </div>
-
-            <button type="button" class="discard-modal-x" data-discard-keep aria-label="Keep editing">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
         </div>
 
         <div class="discard-modal-body">

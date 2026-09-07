@@ -21,14 +21,8 @@ $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
 $isAdminView = ($layoutRole ?? 'dentist') === 'admin';
 
 $patientProfileBackUrl = $isAdminView
-? route(
-'admin.admin.patient.profile',
-['patient' => $patient->id]
-)
-: route(
-'dentist.dentist.patient.profile',
-['patient' => $patient->id]
-);
+? route('admin.admin.patient.profile', ['patient' => $patient->id])
+: route('dentist.dentist.patient.profile', ['patient' => $patient->id]);
 @endphp
 
 @section('content')
@@ -83,7 +77,9 @@ $patientProfileBackUrl = $isAdminView
 
                                         <div
                                             class="cal-time-layout grid gap-5 lg:gap-6 mx-auto w-full add-existing-cal-time-layout">
-                                            <div class="calendar-shell-no-card" data-global-field>
+                                            <div class="calendar-shell-no-card" data-global-field
+                                                data-global-linked-input="#appointment_date"
+                                                data-global-error-key="appointment_date">
                                                 <div id="calendarSkeletonContainer"></div>
                                             </div>
 
@@ -103,7 +99,8 @@ $patientProfileBackUrl = $isAdminView
                                                 </div>
 
                                                 <div id="appointmentTimeField" class="global-form-group"
-                                                    data-global-field>
+                                                    data-global-field data-global-linked-input="#appointment_time"
+                                                    data-global-error-key="appointment_time">
                                                     <label for="existing_time_input" class="global-form-label">
                                                         Appointment Time
                                                     </label>
@@ -366,8 +363,7 @@ $patientProfileBackUrl = $isAdminView
             window.showToast?.({
                 type: 'success',
                 title: 'Patient Information Loaded',
-                message:
-                    'The saved dental and medical history will be reused.',
+                message: 'The saved dental and medical history will be reused.',
             });
         }
 
@@ -508,10 +504,18 @@ $patientProfileBackUrl = $isAdminView
                         return;
                     }
 
-                    data.append(
-                        field.name,
-                        field.value
-                    );
+                    const submissionValue =
+                        field.name ===
+                            'emergency_number'
+                            ? String(
+                                field.value || ''
+                            ).replace(
+                                /\D/g,
+                                ''
+                            )
+                            : field.value;
+
+                    data.append(field.name, submissionValue);
                 }
             );
 
@@ -841,7 +845,7 @@ $patientProfileBackUrl = $isAdminView
                     shouldShow &&
                     radioName === 'medical_answers[tobacco_use]'
                 ) {
-                    box.querySelectorAll('[data-number-stepper]')
+                    box.querySelectorAll('[data-number-stepper-input]')
                         .forEach(input => {
 
                             if (!input.value) {
@@ -876,24 +880,10 @@ $patientProfileBackUrl = $isAdminView
                             field.value = '';
                         }
 
-                        field.classList.remove(
-                            'is-invalid',
-                            'is-valid'
-                        );
-
-                        const fieldError =
-                            field
-                                .closest(
-                                    '[data-global-field], .global-form-group'
-                                )
-                                ?.querySelector(
-                                    '.global-field-error'
-                                );
-
-                        fieldError?.classList.remove(
-                            'show',
-                            'is-success'
-                        );
+                        window
+                            .clearFormInputValidation?.(
+                                field
+                            );
                     });
             };
 
@@ -936,10 +926,10 @@ $patientProfileBackUrl = $isAdminView
                 ${diseaseLabels
                         .map(
                             label => `
-                                                                        <span class="booking-summary-tag">
-                                                                            ${label}
-                                                                        </span>
-                                                                    `
+                                                                            <span class="booking-summary-tag">
+                                                                                ${label}
+                                                                            </span>
+                                                                        `
                         )
                         .join('')}
 
@@ -1019,11 +1009,11 @@ $patientProfileBackUrl = $isAdminView
 
             ${viewOnly
                     ? `
-            <span class="booking-summary-view-only ml-auto">
-                <i class="fa-regular fa-eye"></i>
-                <span>View Only</span>
-            </span>
-        `
+                <span class="booking-summary-view-only ml-auto">
+                    <i class="fa-regular fa-eye"></i>
+                    <span>View Only</span>
+                </span>
+            `
                     : ''
                 }
 
@@ -1084,78 +1074,78 @@ $patientProfileBackUrl = $isAdminView
 
             const dentalHistoryBody = `
             ${subSection("Basic Info", `
-                                                                    ${row("Last Dental Visit", get("last_dental_visit"))}
-                                                                    ${row("Previous Dentist", get("previous_dentist"))}
-                                                                `)}
+                                                                        ${row("Last Dental Visit", get("last_dental_visit"))}
+                                                                        ${row("Previous Dentist", get("previous_dentist"))}
+                                                                    `)}
 
             ${subSection("Dental Symptoms", `
-                                                                    ${row("Bleeding Gums", get("dental_answers[bleeding_gums]"))}
-                                                                    ${row("Sensitive (Hot/Cold)", get("dental_answers[sensitive_temp]"))}
-                                                                    ${row("Sensitive (Sweets/Sour)", get("dental_answers[sensitive_taste]"))}
-                                                                    ${row("Tooth Pain", get("dental_answers[tooth_pain]"))}
-                                                                    ${row("Sores/Lumps", get("dental_answers[sores]"))}
-                                                                    ${row("Jaw Injuries", get("dental_answers[injuries]"))}
-                                                                `)}
+                                                                        ${row("Bleeding Gums", get("dental_answers[bleeding_gums]"))}
+                                                                        ${row("Sensitive (Hot/Cold)", get("dental_answers[sensitive_temp]"))}
+                                                                        ${row("Sensitive (Sweets/Sour)", get("dental_answers[sensitive_taste]"))}
+                                                                        ${row("Tooth Pain", get("dental_answers[tooth_pain]"))}
+                                                                        ${row("Sores/Lumps", get("dental_answers[sores]"))}
+                                                                        ${row("Jaw Injuries", get("dental_answers[injuries]"))}
+                                                                    `)}
 
             ${subSection("Jaw & Bite Symptoms", `
-                                                                    ${row("Clicking", get("dental_answers[clicking]"))}
-                                                                    ${row("Joint Pain", get("dental_answers[joint_pain]"))}
-                                                                    ${row("Difficulty Moving", get("dental_answers[difficulty_moving]"))}
-                                                                    ${row("Difficulty Chewing", get("dental_answers[difficulty_chewing]"))}
-                                                                    ${row("Frequent Headaches", get("dental_answers[jaw_headaches]"))}
-                                                                    ${row("Grinding/Clenching", get("dental_answers[clench_grind]"))}
-                                                                    ${row("Lips/Cheek Biting", get("dental_answers[biting]"))}
-                                                                    ${row("Teeth Loosening", get("dental_answers[teeth_loosening]"))}
-                                                                    ${row("Food Caught Between Teeth", get("dental_answers[food_teeth]"))}
-                                                                    ${row("Medicine Reaction", get("dental_answers[med_reaction]"))}
-                                                                `)}
+                                                                        ${row("Clicking", get("dental_answers[clicking]"))}
+                                                                        ${row("Joint Pain", get("dental_answers[joint_pain]"))}
+                                                                        ${row("Difficulty Moving", get("dental_answers[difficulty_moving]"))}
+                                                                        ${row("Difficulty Chewing", get("dental_answers[difficulty_chewing]"))}
+                                                                        ${row("Frequent Headaches", get("dental_answers[jaw_headaches]"))}
+                                                                        ${row("Grinding/Clenching", get("dental_answers[clench_grind]"))}
+                                                                        ${row("Lips/Cheek Biting", get("dental_answers[biting]"))}
+                                                                        ${row("Teeth Loosening", get("dental_answers[teeth_loosening]"))}
+                                                                        ${row("Food Caught Between Teeth", get("dental_answers[food_teeth]"))}
+                                                                        ${row("Medicine Reaction", get("dental_answers[med_reaction]"))}
+                                                                    `)}
 
             ${subSection("Dental Procedures", `
-                                                                    ${row("Periodontal Treatment", get("dental_answers[periodontal]"))}
-                                                                    ${row("Difficult Extraction", get("dental_answers[difficult_extraction]"))}
-                                                                    ${get("dental_answers[difficult_extraction]") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
-                                                                    ${row("Prolonged Bleeding", get("dental_answers[prolonged_bleeding]"))}
-                                                                    ${row("Dentures", get("dental_answers[dentures]"))}
-                                                                    ${get("dental_answers[dentures]") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
-                                                                    ${row("Orthodontic Treatment", get("dental_answers[ortho_treatment]"))}
-                                                                    ${get("dental_answers[ortho_treatment]") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
-                                                                `)}
+                                                                        ${row("Periodontal Treatment", get("dental_answers[periodontal]"))}
+                                                                        ${row("Difficult Extraction", get("dental_answers[difficult_extraction]"))}
+                                                                        ${get("dental_answers[difficult_extraction]") === "YES" ? row("Extraction Date", get("extraction_date")) : ""}
+                                                                        ${row("Prolonged Bleeding", get("dental_answers[prolonged_bleeding]"))}
+                                                                        ${row("Dentures", get("dental_answers[dentures]"))}
+                                                                        ${get("dental_answers[dentures]") === "YES" ? row("Dentures Placement Date", get("dentures_date")) : ""}
+                                                                        ${row("Orthodontic Treatment", get("dental_answers[ortho_treatment]"))}
+                                                                        ${get("dental_answers[ortho_treatment]") === "YES" ? row("Orthodontic Completion Date", get("ortho_date")) : ""}
+                                                                    `)}
 
             ${fullWidthSection("Additional Concerns", `
-                                                                    ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
+                                                                        ${get("additional_concerns") !== "N/A" && String(get("additional_concerns")).trim() !== ""
                     ? get("additional_concerns")
                     : '<span class="text-[#9e9690] italic">No additional concerns provided.</span>'}
-                                                                `)}
+                                                                    `)}
         `;
 
             const medicalHistoryBody = `
             ${subSection("General Health", `
-                                                                    ${row("Good Health", get("medical_answers[good_health]"))}
-                                                                    ${get("medical_answers[good_health]") === "NO" ? row("Health Details", get("medical_answers[good_health_details]")) : ""}
-                                                                    ${row("Had Medical Exam", get("medical_answers[had_medical_exam]"))}
-                                                                    ${get("medical_answers[had_medical_exam]") === "YES" ? row("Medical Exam Date", get("medical_answers[medical_exam_date]")) : ""}
-                                                                    ${row("Under Treatment", get("medical_answers[under_treatment]"))}
-                                                                    ${get("medical_answers[under_treatment]") === "YES" ? row("Treatment Details", get("medical_answers[treatment_details]")) : ""}
-                                                                    ${row("Hospitalized", get("medical_answers[hospitalized]"))}
-                                                                    ${get("medical_answers[hospitalized]") === "YES" ? row("Hospital Details", get("medical_answers[hospital_details]")) : ""}
-                                                                `)}
+                                                                        ${row("Good Health", get("medical_answers[good_health]"))}
+                                                                        ${get("medical_answers[good_health]") === "NO" ? row("Health Details", get("medical_answers[good_health_details]")) : ""}
+                                                                        ${row("Had Medical Exam", get("medical_answers[had_medical_exam]"))}
+                                                                        ${get("medical_answers[had_medical_exam]") === "YES" ? row("Medical Exam Date", get("medical_answers[medical_exam_date]")) : ""}
+                                                                        ${row("Under Treatment", get("medical_answers[under_treatment]"))}
+                                                                        ${get("medical_answers[under_treatment]") === "YES" ? row("Treatment Details", get("medical_answers[treatment_details]")) : ""}
+                                                                        ${row("Hospitalized", get("medical_answers[hospitalized]"))}
+                                                                        ${get("medical_answers[hospitalized]") === "YES" ? row("Hospital Details", get("medical_answers[hospital_details]")) : ""}
+                                                                    `)}
 
             ${subSection("Allergies", `
-                                                                    ${row("Allergy (Medicine)", get("medical_answers[allergy_medicine]"))}
-                                                                    ${row("Allergy (Food)", get("medical_answers[allergy_food]"))}
-                                                                    ${optionalRow("Allergy (Others)", get("medical_answers[allergy_others]"))}
-                                                                `)}
+                                                                        ${row("Allergy (Medicine)", get("medical_answers[allergy_medicine]"))}
+                                                                        ${row("Allergy (Food)", get("medical_answers[allergy_food]"))}
+                                                                        ${optionalRow("Allergy (Others)", get("medical_answers[allergy_others]"))}
+                                                                    `)}
 
             ${subSection("Medications", `
-                                                                    ${row("Medication", get("medical_answers[medication]"))}
-                                                                    ${get("medical_answers[medication]") === "YES" ? row("Medication Details", get("medical_answers[medication_details]")) : ""}
-                                                                `)}
+                                                                        ${row("Medication", get("medical_answers[medication]"))}
+                                                                        ${get("medical_answers[medication]") === "YES" ? row("Medication Details", get("medical_answers[medication_details]")) : ""}
+                                                                    `)}
 
             ${isFemalePatient ? subSection("For Women Only", `
-                                                                    ${row("Pregnant", get("medical_answers[pregnant]"))}
-                                                                    ${row("Nursing", get("medical_answers[nursing]"))}
-                                                                    ${row("Birth Control Pills", get("medical_answers[birth_control]"))}
-                                                                `) : ""}
+                                                                        ${row("Pregnant", get("medical_answers[pregnant]"))}
+                                                                        ${row("Nursing", get("medical_answers[nursing]"))}
+                                                                        ${row("Birth Control Pills", get("medical_answers[birth_control]"))}
+                                                                    `) : ""}
 
             ${fullWidthSection(
                 "Medical Conditions",
@@ -1163,16 +1153,16 @@ $patientProfileBackUrl = $isAdminView
             )}
 
             ${subSection("Tobacco Use", `
-                                                                    ${row("Tobacco Use", get("medical_answers[tobacco_use]"))}
-                                                                    ${get("medical_answers[tobacco_use]") === "YES" ? row("Amount Per Day", get("medical_answers[tobacco_per_day]")) : ""}
-                                                                    ${get("medical_answers[tobacco_use]") === "YES" ? row("Amount Per Week", get("medical_answers[tobacco_per_week]")) : ""}
-                                                                `)}
+                                                                        ${row("Tobacco Use", get("medical_answers[tobacco_use]"))}
+                                                                        ${get("medical_answers[tobacco_use]") === "YES" ? row("Amount Per Day", get("medical_answers[tobacco_per_day]")) : ""}
+                                                                        ${get("medical_answers[tobacco_use]") === "YES" ? row("Amount Per Week", get("medical_answers[tobacco_per_week]")) : ""}
+                                                                    `)}
 
             ${subSection("Do You Suffer From", `
-                                                                    ${row("Headaches", get("medical_answers[headaches]"))}
-                                                                    ${row("Earaches", get("medical_answers[earaches]"))}
-                                                                    ${row("Neck Aches", get("medical_answers[neck_aches]"))}
-                                                                `)}
+                                                                        ${row("Headaches", get("medical_answers[headaches]"))}
+                                                                        ${row("Earaches", get("medical_answers[earaches]"))}
+                                                                        ${row("Neck Aches", get("medical_answers[neck_aches]"))}
+                                                                    `)}
         `;
 
             const hasExistingSignature =
@@ -1183,8 +1173,8 @@ $patientProfileBackUrl = $isAdminView
 
             const signatureBody =
                 hasExistingSignature &&
-                    existingSignatureUrl
-                    ? `
+                    existingSignatureUrl ?
+                    `
             <div class="signature-existing-card">
 
                 <div class="signature-existing-header">
@@ -1209,8 +1199,8 @@ $patientProfileBackUrl = $isAdminView
                 </p>
 
             </div>
-        `
-                    : `
+        ` :
+                    `
             <span class="booking-summary-muted">
                 No existing signature on file.
             </span>
@@ -1218,13 +1208,13 @@ $patientProfileBackUrl = $isAdminView
 
             reviewGrid.innerHTML = `
             ${summaryCard("Appointment Details", "fa-calendar-check", `
-                                                                    <div class="grid grid-cols-1 gap-y-1">
-                                                                        ${row("Service", get("service_type"))}
-                                                                        ${row("Date", get("appointment_date"))}
-                                                                        ${row("Time", toDisplayTime(get("appointment_time")) || 'N/A')}
-                                                                        ${row("Duration", get("procedure_duration_hms"))}
-                                                                    </div>
-                                                                `)}
+                                                                        <div class="grid grid-cols-1 gap-y-1">
+                                                                            ${row("Service", get("service_type"))}
+                                                                            ${row("Date", get("appointment_date"))}
+                                                                            ${row("Time", toDisplayTime(get("appointment_time")) || 'N/A')}
+                                                                            ${row("Duration", get("procedure_duration_hms"))}
+                                                                        </div>
+                                                                    `)}
           ${summaryCard(
                 "Dental History",
                 "fa-tooth",
@@ -1245,23 +1235,23 @@ ${summaryCard(
                 "Emergency Contact",
                 "fa-phone",
                 `
-            <div class="grid grid-cols-1 gap-y-1">
-                ${row(
+                <div class="grid grid-cols-1 gap-y-1">
+                    ${row(
                     "Name",
                     get("emergency_person")
                 )}
 
-                ${row(
+                    ${row(
                     "Number",
                     get("emergency_number")
                 )}
 
-                ${row(
+                    ${row(
                     "Relation",
                     get("emergency_relation")
                 )}
-            </div>
-        `
+                </div>
+            `
             )}
 
     ${summaryCard(
@@ -1328,6 +1318,14 @@ ${summaryCard(
 
                 timeInput.value =
                     selected;
+
+                timeInput.dispatchEvent(
+                    new Event(
+                        'change', {
+                        bubbles: true
+                    }
+                    )
+                );
 
                 const matchingChip =
                     Array.from(
@@ -1544,57 +1542,16 @@ ${summaryCard(
                     'service_type'
                 );
             }
-            const fields =
-                Array.from(
-                    currentPanel.querySelectorAll(
-                        'input:not([type="hidden"]):not([type="button"]):not([type="submit"]), textarea, select'
-                    )
+
+            const validation =
+                window.validateGlobalSection?.(
+                    currentPanel
                 );
 
-            const processedRadioGroups =
-                new Set();
-
-            let firstInvalid = null;
-
-            fields.forEach(field => {
-                if (
-                    field.type === 'radio' &&
-                    processedRadioGroups.has(
-                        field.name
-                    )
-                ) {
-                    return;
-                }
-
-                if (
-                    field.type === 'radio'
-                ) {
-                    processedRadioGroups.add(
-                        field.name
-                    );
-                }
-
-                const valid =
-                    window
-                        .validateFormInputField?.(
-                            field
-                        ) ?? true;
-
-                if (
-                    !valid &&
-                    !firstInvalid
-                ) {
-                    firstInvalid =
-                        field;
-                }
-            });
-
-            if (firstInvalid) {
-                window
-                    .focusGlobalInvalidField?.(
-                        firstInvalid
-                    );
-
+            if (
+                validation &&
+                !validation.valid
+            ) {
                 return false;
             }
 
@@ -1622,11 +1579,9 @@ ${summaryCard(
 
             bookingWorkflow
                 ?.setNextButton({
-                    label:
-                        'Continue to Odontogram',
+                    label: 'Continue to Odontogram',
 
-                    icon:
-                        'fa-arrow-right',
+                    icon: 'fa-arrow-right',
                 });
         }
 
@@ -1648,23 +1603,19 @@ ${summaryCard(
             try {
                 const response =
                     await fetch(
-                        existingAppointmentForm.action,
-                        {
-                            method: 'POST',
+                        existingAppointmentForm.action, {
+                        method: 'POST',
 
-                            headers: {
-                                Accept:
-                                    'application/json',
+                        headers: {
+                            Accept: 'application/json',
 
-                                'X-Requested-With':
-                                    'XMLHttpRequest',
-                            },
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
 
-                            body:
-                                new FormData(
-                                    existingAppointmentForm
-                                ),
-                        }
+                        body: new FormData(
+                            existingAppointmentForm
+                        ),
+                    }
                     );
 
                 const data =
@@ -1809,11 +1760,9 @@ ${summaryCard(
                 window.showToast?.({
                     type: 'error',
 
-                    title:
-                        'Unable to save appointment',
+                    title: 'Unable to save appointment',
 
-                    message:
-                        error.message ||
+                    message: error.message ||
                         'Please try again.',
                 });
 
@@ -2011,27 +1960,6 @@ ${summaryCard(
                     return true;
                 },
             });
-
-        document.getElementById('calendarSkeletonContainer')?.addEventListener('click', function (event) {
-            const dateButton = event.target.closest('[data-date]');
-            if (!dateButton) return;
-
-            const iso = dateButton.dataset.date;
-            if (!iso) return;
-
-            setTimeout(() => {
-                const dateInput = document.getElementById('appointment_date');
-                const slotContainer = document.getElementById('slotContainer');
-
-                if (dateInput && dateInput.value !== iso) {
-                    dateInput.value = iso;
-                }
-
-                if (!hasVisibleSlots && typeof window.selectDate === 'function') {
-                    window.selectDate(iso);
-                }
-            }, 60);
-        });
 
         syncTimeFieldFromState();
         showExistingPatientInformationToast();

@@ -334,6 +334,8 @@ class DocumentRequestController extends Controller
         $callback = function () use ($requests) {
             $file = fopen('php://output', 'w');
 
+            fwrite($file, "\xEF\xBB\xBF");
+
             fputcsv($file, [
                 'Reference Number',
                 'Patient Name',

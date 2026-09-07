@@ -685,6 +685,8 @@ function loadDatePickerModule() {
     );
 }
 
+window.loadDatePickerModule = loadDatePickerModule;
+
 async function ensureDatePickerReady(
     input
 ) {
