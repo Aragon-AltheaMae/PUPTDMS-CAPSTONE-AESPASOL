@@ -10,6 +10,7 @@
         }
 
         body {
+            font-family: DejaVu Sans, sans-serif;
             color: #2f2f2f;
             font-size: 12px;
             line-height: 1.45;

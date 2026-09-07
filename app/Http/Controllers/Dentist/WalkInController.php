@@ -75,7 +75,7 @@ class WalkInController extends Controller
             ->groupBy('appointment_date')
             ->pluck('total', 'appointment_date');
 
-        $philippineHolidays = PhilippineHolidays::range(yearsBefore: 1, yearsAfter: 5);
+        $philippineHolidays = PhilippineHolidays::recordsRange(yearsBefore: 1, yearsAfter: 5);
 
         $dentalQuestions = BookingQuestions::dental();
         $medicalQuestions = BookingQuestions::medical();
@@ -192,6 +192,8 @@ class WalkInController extends Controller
                 match ($role) {
                     'patient' => [
                         'student',
+                        'alumni',
+                        'dependent',
                         'dependent_alumni',
                     ],
 
@@ -343,8 +345,7 @@ class WalkInController extends Controller
     public function patientBookingInformation(
         Patient $patient,
         StudentApiService $studentApiService
-    )
-    {
+    ) {
         $patient = $this->resolveWalkInSourcePatient($patient);
 
         $this->backfillConnectedPatientMedicalHistory(
@@ -725,7 +726,7 @@ class WalkInController extends Controller
                             ?? null
                     )
                 ),
-            ], fn ($value) => filled($value));
+            ], fn($value) => filled($value));
         } catch (\Throwable $e) {
             Log::warning('Walk-in OGOS emergency defaults fetch failed', [
                 'patient_id' => $patient->id,
@@ -1225,12 +1226,14 @@ class WalkInController extends Controller
                 ->map(function (array $student) {
                     $user = $this->syncWalkInUser($student);
                     $patient = $this->syncWalkInPatient($user, $student, 'Student');
+                    $displayName = $patient->name ?: $student['name'];
+
                     return [
                         'id' =>
                         $patient->id,
 
                         'name' =>
-                        $student['name'],
+                        $displayName,
 
                         'gender' =>
                         $student['gender']
@@ -1282,7 +1285,7 @@ class WalkInController extends Controller
                         'avatar_url' =>
                         $this->getPatientAvatarUrl(
                             $patient,
-                            $student['name']
+                            $displayName
                         ),
                     ];
                 })
@@ -1453,12 +1456,15 @@ class WalkInController extends Controller
             ->get()
             ->map(function (Patient $patient) {
                 $user = $patient->user;
+                $suffixName = $this->normalizeNameSuffix(
+                    $user?->suffix_name
+                );
 
                 $patientName = trim(collect([
                     $user?->first_name,
                     $user?->middle_name,
                     $user?->last_name,
-                    $user?->suffix_name,
+                    $suffixName,
                 ])->filter(fn($value) => filled($value))->implode(' '));
 
                 if ($patientName === '') {
@@ -1473,6 +1479,8 @@ class WalkInController extends Controller
                     'student' => 'Student',
                     'faculty' => 'Faculty',
                     'administrative' => 'Administrative Personnel',
+                    'alumni' => 'Alumni',
+                    'dependent' => 'Dependent',
                     'dependent_alumni' => 'Dependent & Alumni',
                     default => 'Dependent & Alumni',
                 };
@@ -2047,6 +2055,8 @@ class WalkInController extends Controller
                         'student' => 'Student',
                         'faculty' => 'Faculty',
                         'administrative' => 'Administrative Personnel',
+                        'alumni' => 'Alumni',
+                        'dependent' => 'Dependent',
                         'dependent_alumni' => 'Dependent & Alumni',
                         default => $selectedPatientType,
                     },
@@ -2055,6 +2065,8 @@ class WalkInController extends Controller
                         'student' => 'Student',
                         'faculty' => 'Faculty',
                         'administrative' => 'Administrative Personnel',
+                        'alumni' => 'Alumni',
+                        'dependent' => 'Dependent',
                         'dependent_alumni' => 'Dependent & Alumni',
                         default => $selectedPatientType,
                     },
@@ -2429,6 +2441,8 @@ class WalkInController extends Controller
                             ]
                         );
 
+                    $tobaccoUse = $this->yesNoValue($request->input('tobacco_use'));
+
                     $medicalAnswerMap = [
                         'good_health' =>
                         $request->input(
@@ -2481,9 +2495,7 @@ class WalkInController extends Controller
                         ),
 
                         'tobacco_use' =>
-                        $request->input(
-                            'tobacco_use'
-                        ),
+                        $tobaccoUse,
 
                         'headaches' =>
                         $request->input(
@@ -2526,14 +2538,18 @@ class WalkInController extends Controller
                         ),
 
                         'tobacco_per_day' =>
-                        $request->input(
-                            'tobacco_per_day'
-                        ),
+                        $tobaccoUse === 'YES'
+                            ? $request->input(
+                                'tobacco_per_day'
+                            )
+                            : null,
 
                         'tobacco_per_week' =>
-                        $request->input(
-                            'tobacco_per_week'
-                        ),
+                        $tobaccoUse === 'YES'
+                            ? $request->input(
+                                'tobacco_per_week'
+                            )
+                            : null,
 
                         'medical_exam_date' =>
                         $request->input(
@@ -3125,6 +3141,8 @@ class WalkInController extends Controller
                         'student',
                         'faculty',
                         'administrative',
+                        'alumni',
+                        'dependent',
                         'dependent_alumni',
                     ],
                     true
@@ -3366,12 +3384,14 @@ class WalkInController extends Controller
             'administrative' =>
             'administrative',
 
+            'dependent' =>
             'dependent',
+
             'alumni' =>
-            'dependent_alumni',
+            'alumni',
 
             default =>
-            'dependent_alumni',
+            'dependent',
         };
     }
 
@@ -3391,13 +3411,17 @@ class WalkInController extends Controller
             str_contains($type, 'personnel') =>
             'administrative',
 
-            str_contains($type, 'dependent'),
-            str_contains($type, 'alumni'),
+            str_contains($type, 'dependent') =>
+            'dependent',
+
+            str_contains($type, 'alumni') =>
+            'alumni',
+
             str_contains($type, 'guest') =>
-            'dependent_alumni',
+            'dependent',
 
             default =>
-            'dependent_alumni',
+            'dependent',
         };
     }
 }

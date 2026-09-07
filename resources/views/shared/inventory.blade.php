@@ -189,6 +189,7 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                                 <th>Qty</th>
                                 <th>Used</th>
                                 <th>Balance</th>
+                                <th>Expiration</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -407,7 +408,23 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                         <input id="addDate" name="date_received" type="text"
                             class="field-input form-input-custom js-flatpickr-date-max-today"
                             data-field-label="Date Received" data-required-message="Please select a date."
-                            data-validation-rule="notFutureDate" placeholder="Select date" required readonly>
+                            data-validation-rule="notFutureDate" data-flatpickr-append-to-body
+                            placeholder="Select date" required readonly>
+
+                        <i class="fa-regular fa-calendar inventory-date-icon"></i>
+                    </div>
+                </div>
+
+                <div class="inventory-field" data-global-field>
+                    <label for="addExpirationDate" class="inventory-field-label">
+                        Expiration Date
+                    </label>
+
+                    <div class="inventory-date-control">
+                        <input id="addExpirationDate" name="expiration_date" type="text"
+                            class="field-input form-input-custom js-flatpickr-date"
+                            data-field-label="Expiration Date" data-flatpickr-append-to-body
+                            placeholder="Optional" readonly>
 
                         <i class="fa-regular fa-calendar inventory-date-icon"></i>
                     </div>
@@ -444,7 +461,7 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                         data-required-message="Please enter a unit." required>
                 </div>
 
-                <div class="inventory-field inventory-field-full" data-global-field>
+                <div class="inventory-field" data-global-field>
 
                     <div class="global-label-row">
                         <label for="addName" class="inventory-field-label">
@@ -623,7 +640,22 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                         <input id="editDate" name="date_received" type="text"
                             class="field-input form-input-custom js-flatpickr-date" data-field-label="Date Received"
                             data-required-message="Please select a date." data-validation-rule="notFutureDate" required
-                            readonly>
+                            data-flatpickr-append-to-body readonly>
+
+                        <i class="fa-regular fa-calendar inventory-date-icon"></i>
+                    </div>
+                </div>
+
+                <div class="inventory-field" data-global-field>
+                    <label for="editExpirationDate" class="inventory-field-label">
+                        Expiration Date
+                    </label>
+
+                    <div class="inventory-date-control">
+                        <input id="editExpirationDate" name="expiration_date" type="text"
+                            class="field-input form-input-custom js-flatpickr-date"
+                            data-field-label="Expiration Date" data-flatpickr-append-to-body
+                            placeholder="Optional" readonly>
 
                         <i class="fa-regular fa-calendar inventory-date-icon"></i>
                     </div>
@@ -662,7 +694,7 @@ $inventoryRouteNames = $inventoryRouteNames ?? [
                         data-required-message="Please enter a unit." required>
                 </div>
 
-                <div class="inventory-field inventory-field-full" data-global-field>
+                <div class="inventory-field" data-global-field>
 
                     <div class="global-label-row">
                         <label for="editName" class="inventory-field-label">
@@ -2109,6 +2141,27 @@ aria-label="Delete inventory item"
                         'low-stock' :
                         '';
 
+            var expirationStatus =
+                item.expiration_status ||
+                'none';
+
+            var expirationDate = item.formatted_expiration_date || '—';
+            var expirationDays = item.expiration_days_remaining;
+            var hasExpirationDate = expirationStatus !== 'none' && expirationDays !== null;
+            var expirationDaysLabel = expirationDays === 1 ?
+                '1 day remaining' :
+                `${expirationDays} days remaining`;
+
+            var expirationMarkup = hasExpirationDate ?
+                `<div class="inventory-expiration-cell">
+                    <span class="table-date inventory-expiration-date">
+                        <i class="fa-solid fa-calendar"></i>
+                        ${expirationDate}
+                    </span>
+                    <span class="inventory-expiration-pill">${expirationDaysLabel}</span>
+                </div>` :
+                `<span class="table-cell">${expirationDate}</span>`;
+
             if (currentViewMode === 'grid') {
                 grid.innerHTML += `
     <article class="table-record-card">
@@ -2162,6 +2215,16 @@ aria-label="Delete inventory item"
 
                         <span class="table-record-value">
                             ${item.formatted_date || '—'}
+                        </span>
+                    </div>
+
+                    <div class="table-record-row">
+                        <span class="table-record-label">
+                            Expiration
+                        </span>
+
+                        <span class="table-record-value">
+                            ${expirationMarkup}
                         </span>
                     </div>
 
@@ -2260,6 +2323,10 @@ aria-label="Delete inventory item"
         </td>
 
         <td>
+            ${expirationMarkup}
+        </td>
+
+        <td>
             <div class="ui-action-group inventory-row-actions">
                 ${inventoryActionButtons(item.id)}
             </div>
@@ -2311,6 +2378,7 @@ aria-label="Delete inventory item"
 
         [
             'addDate',
+            'addExpirationDate',
             'addStock',
             'addName',
             'addUnit'
@@ -2322,7 +2390,11 @@ aria-label="Delete inventory item"
                 return;
             }
 
-            field.value = '';
+            if (id === 'addExpirationDate') {
+                clearInventoryDate(id);
+            } else {
+                field.value = '';
+            }
 
             field.classList.remove(
                 'is-invalid',
@@ -2447,6 +2519,7 @@ aria-label="Delete inventory item"
             body: JSON.stringify({
                 category: document.getElementById('addCategory').value,
                 date_received: document.getElementById('addDate').value,
+                expiration_date: document.getElementById('addExpirationDate').value || null,
                 stock_no: document.getElementById('addStock').value.trim(),
                 name: document.getElementById('addName').value.trim(),
                 unit: document.getElementById('addUnit').value.trim(),
@@ -2465,6 +2538,7 @@ aria-label="Delete inventory item"
                 const fieldMap = {
                     category: 'addCategory',
                     date_received: 'addDate',
+                    expiration_date: 'addExpirationDate',
                     stock_no: 'addStock',
                     name: 'addName',
                     unit: 'addUnit',
@@ -2559,6 +2633,19 @@ aria-label="Delete inventory item"
 
     var editId = null;
 
+    function clearInventoryDate(id) {
+        const input = document.getElementById(id);
+
+        if (!input) return;
+
+        if (input._flatpickr) {
+            input._flatpickr.clear();
+        } else {
+            input.value = '';
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    }
+
     function openEdit(id) {
         editId = id;
 
@@ -2641,6 +2728,17 @@ aria-label="Delete inventory item"
                 String(item.date_received).slice(0, 10) :
                 '';
 
+        const editExpirationDate = document.getElementById('editExpirationDate');
+        const expirationDateValue = item.expiration_date ?
+            String(item.expiration_date).slice(0, 10) :
+            '';
+
+        if (editExpirationDate?._flatpickr) {
+            editExpirationDate._flatpickr.setDate(expirationDateValue, false);
+        } else if (editExpirationDate) {
+            editExpirationDate.value = expirationDateValue;
+        }
+
         document.querySelectorAll(
             '#editModal .custom-select'
         ).forEach(function (wrapper) {
@@ -2683,6 +2781,7 @@ aria-label="Delete inventory item"
             body: JSON.stringify({
                 category: document.getElementById('editCategory').value,
                 date_received: document.getElementById('editDate').value,
+                expiration_date: document.getElementById('editExpirationDate').value || null,
                 stock_no: document.getElementById('editStock').value.trim(),
                 name: document.getElementById('editName').value.trim(),
                 unit: document.getElementById('editUnit').value.trim(),

@@ -190,10 +190,23 @@ function getGlobalFieldLabel(field) {
 function getFormInputValidationMessage(field) {
     if (!field || field.disabled) return '';
 
+    const requiredWhenVisible =
+        field.dataset.requiredWhenVisible ===
+        'true' &&
+        !field.closest(
+            '.hidden, [hidden]'
+        );
+
+    const isRequired =
+        field.required ||
+        requiredWhenVisible;
+
     if (
         field.readOnly &&
-        !field.required &&
-        !field.hasAttribute('data-validation-rule')
+        !isRequired &&
+        !field.hasAttribute(
+            'data-validation-rule'
+        )
     ) {
         return '';
     }
@@ -203,7 +216,7 @@ function getFormInputValidationMessage(field) {
     const label = getGlobalFieldLabel(field);
 
     if (type === 'radio') {
-        if (!field.required) {
+        if (!isRequired) {
             return '';
         }
 
@@ -248,7 +261,7 @@ function getFormInputValidationMessage(field) {
 
     if (type === 'checkbox') {
         if (
-            field.required &&
+            isRequired &&
             !field.checked
         ) {
             return (
@@ -260,9 +273,18 @@ function getFormInputValidationMessage(field) {
         return '';
     }
 
-    if (field.required && !value) {
+    if (isRequired && !value) {
         if (field.dataset.requiredMessage) {
             return field.dataset.requiredMessage;
+        }
+
+        const isConditionalInstruction =
+            /^if\s+(yes|no)\b/i.test(
+                label
+            );
+
+        if (isConditionalInstruction) {
+            return 'Please provide the required details.';
         }
 
         if (field instanceof HTMLSelectElement) {
@@ -353,75 +375,71 @@ function registerGlobalValidationRule(name, validator) {
     globalValidationRules.set(name, validator);
 }
 
-registerGlobalValidationRule(
-    'bookingDuration',
-    function (field) {
-        const value =
-            String(
-                field.value || ''
-            ).trim();
+registerGlobalValidationRule('bookingDuration', function (field) {
+    const value =
+        String(
+            field.value || ''
+        ).trim();
 
-        if (!value) {
-            return '';
-        }
-
-        if (
-            !/^\d{2}:\d{2}:\d{2}$/.test(
-                value
-            )
-        ) {
-            return 'Use the HH:MM:SS format.';
-        }
-
-        const [
-            hours,
-            minutes,
-            seconds
-        ] =
-            value
-                .split(':')
-                .map(Number);
-
-        if (
-            minutes > 59 ||
-            seconds > 59
-        ) {
-            return 'Minutes and seconds must be between 00 and 59.';
-        }
-
-        if (
-            hours === 0 &&
-            minutes === 0 &&
-            seconds === 0
-        ) {
-            return 'Procedure duration must be greater than 00:00:00.';
-        }
-
+    if (!value) {
         return '';
     }
+
+    if (
+        !/^\d{2}:\d{2}:\d{2}$/.test(
+            value
+        )
+    ) {
+        return 'Use the HH:MM:SS format.';
+    }
+
+    const [
+        hours,
+        minutes,
+        seconds
+    ] =
+        value
+            .split(':')
+            .map(Number);
+
+    if (
+        minutes > 59 ||
+        seconds > 59
+    ) {
+        return 'Minutes and seconds must be between 00 and 59.';
+    }
+
+    if (
+        hours === 0 &&
+        minutes === 0 &&
+        seconds === 0
+    ) {
+        return 'Procedure duration must be greater than 00:00:00.';
+    }
+
+    return '';
+}
 );
 
-registerGlobalValidationRule(
-    'philippineMobile',
-    function (field) {
-        const digits =
-            String(field.value || '')
-                .replace(/\D/g, '');
+registerGlobalValidationRule('philippineMobile', function (field) {
+    const digits =
+        String(field.value || '')
+            .replace(/\D/g, '');
 
-        if (!digits) {
-            return '';
-        }
-
-        if (!digits.startsWith('09')) {
-            return 'Contact number must start with 09.';
-        }
-
-        if (digits.length !== 11) {
-            return 'Contact number must contain exactly 11 digits.';
-        }
-
+    if (!digits) {
         return '';
     }
+
+    if (!digits.startsWith('09')) {
+        return 'Contact number must start with 09.';
+    }
+
+    if (digits.length !== 11) {
+        return 'Contact number must contain exactly 11 digits.';
+    }
+
+    return '';
+}
 );
 
 function runGlobalValidationRule(field) {
@@ -436,183 +454,184 @@ function runGlobalValidationRule(field) {
     return validator(field) || '';
 }
 
-registerGlobalValidationRule(
-    'notFutureDate',
-    function (field) {
-        if (!field.value) return '';
+registerGlobalValidationRule('notFutureDate', function (field) {
+    if (!field.value) return '';
 
-        const picked = new Date(
-            `${field.value}T00:00:00`
+    const picked = new Date(
+        `${field.value}T00:00:00`
+    );
+
+    if (Number.isNaN(picked.getTime())) {
+        return 'Please enter a valid date.';
+    }
+
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+
+    return picked > today
+        ? 'Date cannot be in the future.'
+        : '';
+}
+);
+
+registerGlobalValidationRule('wholeNumber', function (field) {
+    if (!field.value) return '';
+
+    const value = Number(field.value);
+
+    if (
+        !Number.isInteger(value) ||
+        value < 0
+    ) {
+        return 'Please enter a whole number greater than or equal to 0.';
+    }
+
+    return '';
+}
+);
+
+registerGlobalValidationRule('inventoryConsumed', function (field) {
+    if (!field.value) return '';
+
+    const consumed = Number(field.value);
+
+    if (
+        !Number.isInteger(consumed) ||
+        consumed < 0
+    ) {
+        return 'Consumed must be a whole number greater than or equal to 0.';
+    }
+
+    const form = field.form;
+
+    const quantityField =
+        form?.querySelector(
+            '[name="qty"]'
         );
 
-        if (Number.isNaN(picked.getTime())) {
-            return 'Please enter a valid date.';
-        }
+    const quantity = Number(
+        quantityField?.value || 0
+    );
 
-        const today = new Date();
-        today.setHours(23, 59, 59, 999);
-
-        return picked > today
-            ? 'Date cannot be in the future.'
-            : '';
-    }
+    return consumed > quantity
+        ? 'Consumed cannot exceed quantity.'
+        : '';
+}
 );
 
-registerGlobalValidationRule(
-    'wholeNumber',
-    function (field) {
-        if (!field.value) return '';
+registerGlobalValidationRule('strongPassword', function (field) {
+    const value = String(field.value || '');
 
-        const value = Number(field.value);
-
-        if (
-            !Number.isInteger(value) ||
-            value < 0
-        ) {
-            return 'Please enter a whole number greater than or equal to 0.';
-        }
-
+    if (!value) {
         return '';
     }
-);
 
-registerGlobalValidationRule(
-    'inventoryConsumed',
-    function (field) {
-        if (!field.value) return '';
-
-        const consumed = Number(field.value);
-
-        if (
-            !Number.isInteger(consumed) ||
-            consumed < 0
-        ) {
-            return 'Consumed must be a whole number greater than or equal to 0.';
-        }
-
-        const form = field.form;
-
-        const quantityField =
-            form?.querySelector(
-                '[name="qty"]'
-            );
-
-        const quantity = Number(
-            quantityField?.value || 0
-        );
-
-        return consumed > quantity
-            ? 'Consumed cannot exceed quantity.'
-            : '';
+    if (value.length < 8) {
+        return 'Password must contain at least 8 characters.';
     }
+
+    if (!/[a-z]/.test(value)) {
+        return 'Password must contain at least one lowercase letter.';
+    }
+
+    if (!/[A-Z]/.test(value)) {
+        return 'Password must contain at least one uppercase letter.';
+    }
+
+    if (!/\d/.test(value)) {
+        return 'Password must contain at least one number.';
+    }
+
+    if (!/[^A-Za-z0-9]/.test(value)) {
+        return 'Password must contain at least one special character.';
+    }
+
+    return '';
+}
 );
 
-registerGlobalValidationRule(
-    'strongPassword',
-    function (field) {
-        const value = String(field.value || '');
+registerGlobalValidationRule('guestName', function (field) {
+    const value = String(field.value || '').trim();
 
-        if (!value) {
-            return '';
-        }
-
-        if (value.length < 8) {
-            return 'Password must contain at least 8 characters.';
-        }
-
-        if (!/[a-z]/.test(value)) {
-            return 'Password must contain at least one lowercase letter.';
-        }
-
-        if (!/[A-Z]/.test(value)) {
-            return 'Password must contain at least one uppercase letter.';
-        }
-
-        if (!/\d/.test(value)) {
-            return 'Password must contain at least one number.';
-        }
-
-        if (!/[^A-Za-z0-9]/.test(value)) {
-            return 'Password must contain at least one special character.';
-        }
-
+    if (!value) {
         return '';
     }
+
+    return /^[A-Za-zÑñ\s.'-]+$/.test(value)
+        ? ''
+        : 'Only letters, spaces, apostrophe, period, and hyphen are allowed.';
+}
 );
 
-registerGlobalValidationRule(
-    'guestName',
-    function (field) {
-        const value = String(field.value || '').trim();
+registerGlobalValidationRule('personName', function (field) {
+    const value =
+        String(
+            field.value || ''
+        ).trim();
 
-        if (!value) {
-            return '';
-        }
-
-        return /^[A-Za-zÑñ\s.'-]+$/.test(value)
-            ? ''
-            : 'Only letters, spaces, apostrophe, period, and hyphen are allowed.';
+    if (!value) {
+        return '';
     }
+
+    return /^[A-Za-zÑñ\s.'-]+$/
+        .test(value)
+        ? ''
+        : 'Only letters, spaces, apostrophe, period, and hyphen are allowed.';
+}
 );
 
-registerGlobalValidationRule(
-    'studentNumber',
-    function (field) {
-        const value = String(field.value || '').trim();
+registerGlobalValidationRule('studentNumber', function (field) {
+    const value = String(field.value || '').trim();
 
-        if (!value) {
-            return '';
-        }
-
-        return /^[0-9-]+$/.test(value)
-            ? ''
-            : 'Student number can only contain numbers and hyphens.';
+    if (!value) {
+        return '';
     }
+
+    return /^\d{4}-\d{5}-TG-\d$/i
+        .test(value)
+        ? ''
+        : 'Student number must follow the format 0000-00000-TG-0.';
+}
 );
 
-registerGlobalValidationRule(
-    'facultyCode',
-    function (field) {
-        const value = String(field.value || '').trim();
+registerGlobalValidationRule('facultyCode', function (field) {
+    const value = String(field.value || '').trim();
 
-        if (!value) {
-            return '';
-        }
-
-        return /^[A-Za-z0-9-]+$/.test(value)
-            ? ''
-            : 'Faculty code can only contain letters, numbers, and hyphens.';
+    if (!value) {
+        return '';
     }
+
+    return /^FA\d{4}TG\d{4}$/i
+        .test(value)
+        ? ''
+        : 'Faculty code must follow the format FA0000TG0000.';
+}
 );
 
-registerGlobalValidationRule(
-    'yearLevel',
-    function (field) {
-        const value = String(field.value || '').trim();
+registerGlobalValidationRule('yearLevel', function (field) {
+    const value = String(field.value || '').trim();
 
-        if (!value) {
-            return '';
-        }
-
-        return /^[1-9][0-9]*$/.test(value)
-            ? ''
-            : 'Please enter a valid year level using whole numbers only.';
+    if (!value) {
+        return '';
     }
+
+    return /^[1-9][0-9]*$/.test(value)
+        ? ''
+        : 'Please enter a valid year level using whole numbers only.';
+}
 );
 
-registerGlobalValidationRule(
-    'sectionCode',
-    function (field) {
-        const value = String(field.value || '').trim();
+registerGlobalValidationRule('sectionCode', function (field) {
+    const value = String(field.value || '').trim();
 
-        if (!value) {
-            return '';
-        }
-
-        return /^[A-Za-z0-9\s.-]+$/.test(value)
-            ? ''
-            : 'Section can only contain letters, numbers, spaces, periods, and hyphens.';
+    if (!value) {
+        return '';
     }
+
+    return /^[A-Za-z0-9\s.-]+$/.test(value)
+        ? ''
+        : 'Section can only contain letters, numbers, spaces, periods, and hyphens.';
+}
 );
 
 const globalFormValidationRules = new Map();
@@ -671,23 +690,164 @@ function ensureGlobalGroupError(group, key) {
     return error;
 }
 
+function restartGlobalFieldErrorAnimation(error) {
+    if (
+        !error ||
+        !error.classList.contains(
+            'show'
+        )
+    ) {
+        return;
+    }
+
+    error.style.animation =
+        'none';
+
+    void error.offsetWidth;
+
+    error.style.removeProperty(
+        'animation'
+    );
+}
+
+function cancelGlobalFieldErrorHide(error) {
+    if (!error) {
+        return;
+    }
+
+    if (
+        error.__globalFieldErrorHideTimer
+    ) {
+        window.clearTimeout(
+            error.__globalFieldErrorHideTimer
+        );
+
+        error.__globalFieldErrorHideTimer =
+            null;
+    }
+
+    error.classList.remove(
+        'is-hiding'
+    );
+}
+
+function showGlobalFieldErrorElement(error) {
+    if (!error) {
+        return;
+    }
+
+    cancelGlobalFieldErrorHide(
+        error
+    );
+
+    error.style.removeProperty(
+        'display'
+    );
+
+    error.classList.remove(
+        'hidden'
+    );
+
+    error.classList.add(
+        'show'
+    );
+
+    error.setAttribute(
+        'aria-hidden',
+        'false'
+    );
+}
+
+function hideGlobalFieldErrorElement(error) {
+    if (!error) {
+        return;
+    }
+
+    cancelGlobalFieldErrorHide(
+        error
+    );
+
+    error.style.removeProperty(
+        'display'
+    );
+
+    if (
+        !error.classList.contains(
+            'show'
+        )
+    ) {
+        error.innerHTML = '';
+
+        error.classList.remove(
+            'is-success'
+        );
+
+        error.setAttribute(
+            'aria-hidden',
+            'true'
+        );
+
+        return;
+    }
+
+    error.classList.add(
+        'is-hiding'
+    );
+
+    error.__globalFieldErrorHideTimer =
+        window.setTimeout(
+            () => {
+                error.classList.remove(
+                    'show',
+                    'is-hiding',
+                    'is-success'
+                );
+
+                error.innerHTML = '';
+
+                error.setAttribute(
+                    'aria-hidden',
+                    'true'
+                );
+
+                error
+                    .__globalFieldErrorHideTimer =
+                    null;
+            },
+            180
+        );
+}
+
 function showGlobalGroupError(group, key, message) {
     if (!group) return;
 
-    const error = ensureGlobalGroupError(group, key);
+    const error =
+        ensureGlobalGroupError(
+            group,
+            key
+        );
 
-    group.classList.toggle('is-invalid', Boolean(message));
+    group.classList.toggle(
+        'is-invalid',
+        Boolean(message)
+    );
 
     if (!error) return;
 
-    error.innerHTML = message
-        ? `
-            <i class="fa-solid fa-circle-exclamation"></i>
-            <span>${escapeValidationHtml(message)}</span>
-          `
-        : '';
+    if (message) {
+        error.innerHTML = `
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span>${escapeValidationHtml(message)}</span>
+    `;
 
-    error.classList.toggle('show', Boolean(message));
+        error.classList.remove('is-success');
+        showGlobalFieldErrorElement(error);
+        restartGlobalFieldErrorAnimation(error);
+
+        return;
+    }
+
+    hideGlobalFieldErrorElement(error);
 }
 
 function clearGlobalGroupError(group, key) {
@@ -828,34 +988,41 @@ function showFormInputValidationMessage(
     if (indicator) {
         if (hasError) {
             indicator.innerHTML = `
-                <i class="fa-solid fa-circle-exclamation"></i>
-                <span>${escapeValidationHtml(message)}</span>
-            `;
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>${escapeValidationHtml(message)}</span>
+        `;
+
+            indicator.classList.remove(
+                'is-success'
+            );
+
+            showGlobalFieldErrorElement(
+                indicator
+            );
+
+            restartGlobalFieldErrorAnimation(
+                indicator
+            );
+
         } else if (hasSuccess) {
             indicator.innerHTML = `
-                <i class="fa-solid fa-circle-check"></i>
-                <span>${escapeValidationHtml(successMessage)}</span>
-            `;
+            <i class="fa-solid fa-circle-check"></i>
+            <span>${escapeValidationHtml(successMessage)}</span>
+        `;
+
+            indicator.classList.add(
+                'is-success'
+            );
+
+            showGlobalFieldErrorElement(
+                indicator
+            );
+
         } else {
-            indicator.innerHTML = '';
+            hideGlobalFieldErrorElement(
+                indicator
+            );
         }
-
-        indicator.classList.toggle(
-            'show',
-            hasError || hasSuccess
-        );
-
-        indicator.classList.toggle(
-            'is-success',
-            hasSuccess
-        );
-
-        indicator.setAttribute(
-            'aria-hidden',
-            hasError || hasSuccess
-                ? 'false'
-                : 'true'
-        );
     }
 
     if (field.id && indicator) {
@@ -972,16 +1139,86 @@ function focusGlobalInvalidField(
     );
 }
 
-window.focusGlobalInvalidField =
-    focusGlobalInvalidField;
+window.focusGlobalInvalidField = focusGlobalInvalidField;
 
-function normalizeGlobalPhilippineMobile(
-    field
-) {
+function getGlobalPhilippineMobileDigits(value = '') {
+    return String(value || '')
+        .replace(/\D/g, '')
+        .slice(0, 11);
+}
+
+function formatGlobalPhilippineMobile(value = '') {
+    const digits =
+        getGlobalPhilippineMobileDigits(
+            value
+        );
+
+    const parts = [];
+
+    if (digits.length > 0) {
+        parts.push(
+            digits.slice(0, 4)
+        );
+    }
+
+    if (digits.length > 4) {
+        parts.push(
+            digits.slice(4, 7)
+        );
+    }
+
+    if (digits.length > 7) {
+        parts.push(
+            digits.slice(7, 11)
+        );
+    }
+
+    return parts.join(' ');
+}
+
+function normalizeGlobalPhilippineMobile(field) {
+    if (
+        !field ||
+        (
+            field.dataset.validationRule !==
+            'philippineMobile' &&
+            !isContactInput(field)
+        )
+    ) {
+        return;
+    }
+
+    const formatted =
+        formatGlobalPhilippineMobile(
+            field.value
+        );
+
+    if (
+        field.value !==
+        formatted
+    ) {
+        field.value =
+            formatted;
+    }
+}
+
+function isGlobalPhoneField(field) {
+    return (
+        field instanceof
+        HTMLInputElement &&
+        (
+            field.dataset.validationRule ===
+            'philippineMobile' ||
+            isContactInput(field)
+        )
+    );
+}
+
+function normalizeGlobalPersonName(field) {
     if (
         !field ||
         field.dataset.validationRule !==
-        'philippineMobile'
+        'personName'
     ) {
         return;
     }
@@ -989,9 +1226,10 @@ function normalizeGlobalPhilippineMobile(
     const normalized =
         String(
             field.value || ''
-        )
-            .replace(/\D/g, '')
-            .slice(0, 11);
+        ).replace(
+            /[^A-Za-zÑñ\s.'-]/g,
+            ''
+        );
 
     if (
         field.value !==
@@ -1021,6 +1259,88 @@ function bindFormInputValidation(root = document) {
 
             form.setAttribute('novalidate', '');
 
+            form.addEventListener('formdata', event => {
+                form
+                    .querySelectorAll(
+                        'input[name]'
+                    )
+                    .forEach(field => {
+                        if (
+                            !isGlobalPhoneField(
+                                field
+                            )
+                        ) {
+                            return;
+                        }
+
+                        event.formData.set(
+                            field.name,
+                            getGlobalPhilippineMobileDigits(
+                                field.value
+                            )
+                        );
+                    });
+            }
+            );
+
+            form.querySelectorAll('input').forEach(field => {
+                normalizeGlobalPhilippineMobile(
+                    field
+                );
+
+                normalizeGlobalPersonName(
+                    field
+                );
+            });
+
+            form.addEventListener(
+                'beforeinput',
+                event => {
+                    const field =
+                        event.target;
+
+                    if (
+                        !(
+                            field instanceof
+                            HTMLInputElement
+                        )
+                    ) {
+                        return;
+                    }
+
+                    const insertedText =
+                        event.data;
+
+                    if (!insertedText) {
+                        return;
+                    }
+
+                    if (
+                        isGlobalPhoneField(
+                            field
+                        ) &&
+                        /\D/.test(
+                            insertedText
+                        )
+                    ) {
+                        event.preventDefault();
+
+                        return;
+                    }
+
+                    if (
+                        field.dataset.validationRule ===
+                        'personName' &&
+                        /[^A-Za-zÑñ\s.'-]/.test(
+                            insertedText
+                        )
+                    ) {
+                        event.preventDefault();
+                    }
+                },
+                true
+            );
+
             const validateEventField = event => {
                 const field =
                     event.target;
@@ -1042,7 +1362,26 @@ function bindFormInputValidation(root = document) {
                     return;
                 }
 
+                if (
+                    field instanceof
+                    HTMLInputElement &&
+                    [
+                        'hidden',
+                        'submit',
+                        'button',
+                        'file'
+                    ].includes(
+                        field.type
+                    )
+                ) {
+                    return;
+                }
+
                 normalizeGlobalPhilippineMobile(
+                    field
+                );
+
+                normalizeGlobalPersonName(
                     field
                 );
 
@@ -1075,6 +1414,233 @@ function bindFormInputValidation(root = document) {
                 }
             });
         });
+}
+
+function bindGlobalLinkedGroupErrors(root = document) {
+    const scope =
+        root &&
+            typeof root.querySelectorAll ===
+            'function'
+            ? root
+            : document;
+
+    const groups = [];
+
+    if (
+        scope.matches?.(
+            '[data-global-linked-input]'
+        )
+    ) {
+        groups.push(scope);
+    }
+
+    scope
+        .querySelectorAll?.(
+            '[data-global-linked-input]'
+        )
+        .forEach(group => {
+            groups.push(group);
+        });
+
+    groups.forEach(group => {
+        if (
+            group.dataset
+                .globalLinkedErrorInitialized ===
+            'true'
+        ) {
+            return;
+        }
+
+        const selector =
+            group.dataset
+                .globalLinkedInput;
+
+        if (!selector) {
+            return;
+        }
+
+        const linkedField =
+            group.ownerDocument
+                ?.querySelector(
+                    selector
+                );
+
+        if (!linkedField) {
+            return;
+        }
+
+        const errorKey =
+            group.dataset
+                .globalErrorKey ||
+            linkedField.id ||
+            linkedField.name;
+
+        const sync = () => {
+            const hasValue =
+                String(
+                    linkedField.value ||
+                    ''
+                ).trim() !== '';
+
+            if (!hasValue) {
+                return;
+            }
+
+            clearGlobalGroupError(
+                group,
+                errorKey
+            );
+        };
+
+        const queueSync = () => {
+            window.setTimeout(
+                sync,
+                0
+            );
+
+            window.setTimeout(
+                sync,
+                120
+            );
+        };
+
+        linkedField.addEventListener(
+            'input',
+            sync
+        );
+
+        linkedField.addEventListener(
+            'change',
+            sync
+        );
+
+        group.addEventListener(
+            'click',
+            queueSync,
+            true
+        );
+
+        group.addEventListener(
+            'change',
+            queueSync,
+            true
+        );
+
+        group.dataset
+            .globalLinkedErrorInitialized =
+            'true';
+
+        sync();
+    });
+}
+
+function validateGlobalLinkedGroups(
+    root = document
+) {
+    const scope =
+        root &&
+            typeof root.querySelectorAll ===
+            'function'
+            ? root
+            : document;
+
+    const groups = [];
+
+    if (
+        scope.matches?.(
+            '[data-global-linked-input]' +
+            '[data-global-required="true"]'
+        )
+    ) {
+        groups.push(
+            scope
+        );
+    }
+
+    scope
+        .querySelectorAll?.(
+            '[data-global-linked-input]' +
+            '[data-global-required="true"]'
+        )
+        .forEach(group => {
+            groups.push(
+                group
+            );
+        });
+
+    let firstInvalid = null;
+
+    groups.forEach(group => {
+        const selector =
+            group.dataset
+                .globalLinkedInput;
+
+        if (!selector) {
+            return;
+        }
+
+        let linkedField = null;
+
+        try {
+            linkedField =
+                scope.querySelector?.(
+                    selector
+                ) ||
+                group.ownerDocument
+                    ?.querySelector(
+                        selector
+                    );
+        } catch (error) {
+            return;
+        }
+
+        if (!linkedField) {
+            return;
+        }
+
+        const errorKey =
+            group.dataset
+                .globalErrorKey ||
+            linkedField.id ||
+            linkedField.name;
+
+        const message =
+            group.dataset
+                .globalRequiredMessage ||
+            'Please make a selection.';
+
+        const hasValue =
+            String(
+                linkedField.value || ''
+            ).trim() !== '';
+
+        if (hasValue) {
+            clearGlobalGroupError(
+                group,
+                errorKey
+            );
+
+            return;
+        }
+
+        showGlobalGroupError(
+            group,
+            errorKey,
+            message
+        );
+
+        if (!firstInvalid) {
+            firstInvalid =
+                group;
+        }
+    });
+
+    return {
+        valid:
+            !firstInvalid,
+
+        firstInvalid
+    };
 }
 
 function bindCharLimitField(field) {
@@ -1112,10 +1678,24 @@ function initCharLimitFields(root = document) {
     root.querySelectorAll('[data-char-limit]').forEach(bindCharLimitField);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function bootGlobalValidation() {
     initCharLimitFields();
     bindFormInputValidation();
-});
+    bindGlobalLinkedGroupErrors();
+    initGlobalNumberSteppers();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener(
+        'DOMContentLoaded',
+        bootGlobalValidation,
+        {
+            once: true
+        }
+    );
+} else {
+    bootGlobalValidation();
+}
 
 function getGlobalNumberStepperConfig(
     stepper,
@@ -1396,13 +1976,6 @@ function initGlobalNumberSteppers(
 }
 
 document.addEventListener(
-    'DOMContentLoaded',
-    () => {
-        initGlobalNumberSteppers();
-    }
-);
-
-document.addEventListener(
     'ui-modal:opened',
     event => {
         initGlobalNumberSteppers(
@@ -1426,6 +1999,106 @@ function shakeGlobalFieldErrors(form) {
 
             error.style.animation = '';
         });
+}
+
+function validateGlobalSection(
+    section,
+    options = {}
+) {
+    if (!section) {
+        return {
+            valid: true,
+            firstInvalid: null
+        };
+    }
+
+    const fields = Array.from(
+        section.querySelectorAll(
+            [
+                'input:not([type="hidden"])',
+                'textarea',
+                'select'
+            ].join(',')
+        )
+    ).filter(field => {
+        return (
+            !field.disabled &&
+            field.type !== 'button' &&
+            field.type !== 'submit' &&
+            field.type !== 'file'
+        );
+    });
+
+    const processedRadioGroups =
+        new Set();
+
+    let firstInvalid = null;
+
+    fields.forEach(field => {
+        if (
+            field.type === 'radio' &&
+            processedRadioGroups.has(
+                field.name
+            )
+        ) {
+            return;
+        }
+
+        if (
+            field.type === 'radio'
+        ) {
+            processedRadioGroups.add(
+                field.name
+            );
+        }
+
+        const valid =
+            validateFormInputField(
+                field
+            );
+
+        if (
+            !valid &&
+            !firstInvalid
+        ) {
+            firstInvalid =
+                field;
+        }
+    });
+
+    const linkedResult =
+        validateGlobalLinkedGroups(
+            section
+        );
+
+    if (
+        !linkedResult.valid &&
+        !firstInvalid
+    ) {
+        firstInvalid =
+            linkedResult
+                .firstInvalid;
+    }
+
+    if (
+        firstInvalid &&
+        options.focus !== false
+    ) {
+        focusGlobalInvalidField(
+            firstInvalid
+        );
+    }
+
+    if (firstInvalid) {
+        shakeGlobalFieldErrors(
+            section
+        );
+    }
+
+    return {
+        valid: !firstInvalid,
+        firstInvalid
+    };
 }
 
 function validateGlobalForm(form, options = {}) {
@@ -1463,6 +2136,20 @@ function validateGlobalForm(form, options = {}) {
             firstInvalid = field;
         }
     });
+
+    const linkedResult =
+        validateGlobalLinkedGroups(
+            form
+        );
+
+    if (
+        !linkedResult.valid &&
+        !firstInvalid
+    ) {
+        firstInvalid =
+            linkedResult
+                .firstInvalid;
+    }
 
     if (
         firstInvalid &&
@@ -1515,7 +2202,11 @@ window.showGlobalGroupError = showGlobalGroupError;
 window.clearGlobalGroupError = clearGlobalGroupError;
 window.focusGlobalInvalidField = focusGlobalInvalidField;
 window.normalizeGlobalPhilippineMobile = normalizeGlobalPhilippineMobile;
+window.getGlobalPhilippineMobileDigits = getGlobalPhilippineMobileDigits;
+window.bindGlobalLinkedGroupErrors = bindGlobalLinkedGroupErrors;
+window.validateGlobalLinkedGroups = validateGlobalLinkedGroups;
 window.initGlobalNumberSteppers = initGlobalNumberSteppers;
+window.validateGlobalSection = validateGlobalSection;
 window.validateGlobalForm = validateGlobalForm;
 window.validateCharLimit = validateCharLimit;
 window.initCharLimitFields = initCharLimitFields;

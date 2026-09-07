@@ -62,6 +62,7 @@ class PatientOdontogramPersistenceTest extends TestCase
                 ],
                 'oral_examination' => 'Initial examination',
                 'diagnosis' => 'Initial diagnosis',
+                'procedure_duration_hms' => '00:30:00',
                 'completion_action' => 'finished',
                 'has_applied_treatment' => true,
             ])
@@ -78,6 +79,7 @@ class PatientOdontogramPersistenceTest extends TestCase
                 ],
                 'oral_examination' => 'Follow-up examination',
                 'diagnosis' => 'Updated diagnosis',
+                'procedure_duration_hms' => '00:30:00',
                 'completion_action' => 'finished',
                 'has_applied_treatment' => true,
             ])

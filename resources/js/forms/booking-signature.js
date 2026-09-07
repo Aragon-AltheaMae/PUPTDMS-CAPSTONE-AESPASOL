@@ -10,7 +10,6 @@ function escapeSignatureHtml(value = '') {
 function createBookingSignature(root) {
     let editingExistingSignature = false;
 
-
     if (
         !root ||
         root.dataset.bookingSignatureInitialized ===
@@ -1077,6 +1076,8 @@ function createBookingSignature(root) {
 
         event.preventDefault();
 
+        clearSignatureDisplay();
+
         drawnSignatureIsDrawing =
             true;
 
@@ -1418,16 +1419,10 @@ function createBookingSignature(root) {
         }
 
         if (isBlank()) {
-            showSignatureError(
-                '',
-                {
-                    reason:
-                        'Please draw your signature first.',
-                    detected_type:
-                        'blank_signature',
-                    confidence:
-                        0,
-                }
+            window.showGlobalGroupError?.(
+                root,
+                'patient_signature',
+                'Please draw your signature first.'
             );
 
             return;
@@ -1438,14 +1433,10 @@ function createBookingSignature(root) {
         const croppedCanvas = cropCanvasToSignature();
 
         if (!croppedCanvas) {
-            showSignatureError(
-                '',
-                {
-                    reason:
-                        'Please draw your signature first.',
-                    detected_type:
-                        'blank_signature'
-                }
+            window.showGlobalGroupError?.(
+                root,
+                'patient_signature',
+                'Please draw your signature first.'
             );
 
             return;

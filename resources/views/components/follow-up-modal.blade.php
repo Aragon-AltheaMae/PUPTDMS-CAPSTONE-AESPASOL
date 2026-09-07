@@ -125,62 +125,85 @@
 
                 </div>
 
-                <div class="modal-section-heading">
-
-                    <span class="modal-section-icon">
-                        <i class="fa-regular fa-calendar"></i>
-                    </span>
-
-                    <div>
-                        <h4>New Date &amp; Time</h4>
-                    </div>
-
-                </div>
-
                 <div class="modal-form-grid-2 mb-2 sm:mb-3">
 
-                    <div class="global-form-group" data-global-field>
-                        <div class="global-label-row">
-                            <label for="followUpDatePicker" class="global-form-label">
-                                Follow-Up Date
-                            </label>
-                        </div>
+                    <div id="followUpCalendarWrap" class="cal-wrap modal-calendar-panel calendar-shell-no-card"
+                        data-global-field data-global-linked-input="#followup_appointment_date"
+                        data-global-error-key="followup_appointment_date" data-global-required="true"
+                        data-global-required-message="Please select a follow-up date.">
 
-                        <input id="followUpDatePicker" type="date" class="form-input-custom"
-                            min="{{ now()->addDay()->toDateString() }}">
+                        <div id="followUpCalendarGrid"></div>
 
                         <div id="followUpDateError" class="global-field-error"
                             data-error-for="followup_appointment_date" aria-hidden="true">
                         </div>
+
                     </div>
 
-                    <div class="global-form-group" data-global-field>
-                        <div class="global-label-row">
-                            <label for="followUpTimePicker" class="global-form-label">
-                                Time Slot
-                            </label>
+                    <div id="followUpTimeWrap" class="slots-wrap time-panel appointment-time-panel" data-global-field
+                        data-global-linked-input="#followup_appointment_time"
+                        data-global-error-key="followup_appointment_time" data-global-required="true"
+                        data-global-required-message="Please select a follow-up time slot.">
+
+                        <div class="appointment-time-heading">
+
+                            <span class="appointment-time-heading-icon">
+                                <i class="fa-regular fa-clock"></i>
+                            </span>
+
+                            <div>
+                                <h4>Pick a Time Slot</h4>
+
+                                <p>
+                                    Choose a follow-up appointment time for the selected date.
+                                </p>
+                            </div>
+
                         </div>
 
-                        <select id="followUpTimePicker" class="form-input-custom" disabled>
-                            <option value="">Select a date first</option>
-                        </select>
+                        <div id="followUpDateBanner" class="hidden appointment-slot-date-banner">
+                        </div>
 
-                        <button type="button" id="followUpClearTimeBtn"
-                            class="ui-btn ui-btn-secondary ui-btn-sm hidden mt-4 mb-2 w-full">
-                            <i class="fa-solid fa-xmark"></i>
-                            Clear selection
-                        </button>
+                        <div id="followUpSlotPlaceholder" class="appointment-slot-placeholder">
 
-                        <div id="followUpSelectedSlotDisplay" class="hidden appointment-selected-slot">
-                            <i class="fa-solid fa-circle-check"></i>
-                            Selected:
-                            <span id="followUpSelectedSlotText" class="font-bold">
-                            </span>
+                            <div class="empty-icon">
+                                <i class="fa-regular fa-calendar"></i>
+                            </div>
+
+                            <p class="empty-title">
+                                Choose a date
+                            </p>
+
+                            <p class="empty-subtitle">
+                                Select an available day to see time slots.
+                            </p>
+
+                        </div>
+
+                        <div id="followUpSlotContainer" class="hidden appointment-slot-container">
+
+                            <div id="followUpSlotGrid" class="appointment-slot-grid">
+                            </div>
+
+                            <button type="button" id="followUpClearTimeBtn"
+                                class="appointment-slot-clear ui-btn ui-btn-secondary ui-btn-sm hidden mt-4 mb-2 w-full"
+                                aria-hidden="true">
+                                Clear selection
+                            </button>
+
+                            <div id="followUpSelectedSlotDisplay" class="hidden appointment-selected-slot">
+                                <i class="fa-solid fa-circle-check"></i>
+                                Selected:
+                                <span id="followUpSelectedSlotText" class="font-bold">
+                                </span>
+                            </div>
+
                         </div>
 
                         <div id="followUpTimeError" class="global-field-error"
                             data-error-for="followup_appointment_time" aria-hidden="true">
                         </div>
+
                     </div>
 
                 </div>
@@ -192,15 +215,12 @@
                     </span>
 
                     <div>
-
                         <h4>
                             Reason for Follow-Up
                         </h4>
-
                         <p>
                             Optional — add a short explanation for this follow-up appointment.
                         </p>
-
                     </div>
 
                 </div>
@@ -222,14 +242,12 @@
             <div class="modal-ft modal-sticky-footer">
 
                 <button type="button" class="ui-btn ui-btn-secondary" data-discard-close="{{ $id }}">
-                    <i class="fa-solid fa-xmark"></i>
                     <span>
                         Cancel
                     </span>
                 </button>
 
                 <button type="submit" id="confirmFollowUpBtn" class="ui-btn ui-btn-warning">
-                    <i class="fa-solid fa-check"></i>
                     <span>
                         Schedule Follow-Up
                     </span>

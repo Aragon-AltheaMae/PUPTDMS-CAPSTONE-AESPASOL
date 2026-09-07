@@ -102,6 +102,16 @@ class DefaultDocumentTemplateSeeder extends Seeder
                 'notes' => 'Faculty / Administrative Personnel PDF variant for the daily treatment record.',
             ],
             [
+                'name' => 'Daily Treatment Record - Alumni / Dependent',
+                'code' => 'DTR-ALUMNI',
+                'document_type' => 'daily_treatment_record',
+                'category' => 'Record',
+                'file_path' => resource_path('views/admin/document-templates-defaults/daily-treatment.blade.php'),
+                'paper_size' => 'Legal',
+                'orientation' => 'landscape',
+                'notes' => 'Alumni / Dependent PDF variant for the daily treatment record.',
+            ],
+            [
                 'name' => 'Dental Services Record',
                 'code' => 'DSRV-DEFAULT',
                 'document_type' => 'dental_services',

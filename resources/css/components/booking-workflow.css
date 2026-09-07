@@ -438,13 +438,159 @@
 .time-panel {
     min-width: 0;
     padding: 1rem;
+    display: flex;
+    flex-direction: column;
     border: 1px solid var(--border);
     border-radius: 20px;
     background: var(--surface);
+    container-type: inline-size;
 }
 
-.date-banner-gradient {
-    background: linear-gradient(135deg, #8B0000, #660000);
+.appointment-time-panel #slotContainer:not(.hidden),
+.appointment-time-panel .appointment-slot-container:not(.hidden) {
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    flex: 1;
+    display: flex !important;
+    flex-direction: column;
+}
+
+.appointment-time-panel #slotGrid,
+.appointment-time-panel .appointment-slot-grid {
+    flex: 0 0 auto;
+    order: 1;
+}
+
+.appointment-time-panel #selectedSlotDisplay,
+.appointment-time-panel .appointment-selected-slot {
+    order: 2;
+    width: 100%;
+    margin-bottom: 0 !important;
+}
+
+.appointment-time-panel #clearSlotSelectionBtn,
+.appointment-time-panel .appointment-slot-clear {
+    order: 3;
+    width: 100%;
+    margin-bottom: 0 !important;
+}
+
+.appointment-time-panel #clearSlotSelectionBtn.hidden,
+.appointment-time-panel .appointment-slot-clear.hidden {
+    display: none !important;
+}
+
+.appointment-time-panel #selectedSlotDisplay.hidden,
+.appointment-time-panel .appointment-selected-slot.hidden {
+    display: none !important;
+}
+
+.appointment-time-panel #slotContainer:has(#selectedSlotDisplay:not(.hidden)) #selectedSlotDisplay,
+.appointment-time-panel .appointment-slot-container:has(.appointment-selected-slot:not(.hidden)) .appointment-selected-slot {
+    margin-top: auto !important;
+}
+
+.appointment-time-panel #slotContainer:has(#selectedSlotDisplay:not(.hidden)) #clearSlotSelectionBtn:not(.hidden),
+.appointment-time-panel .appointment-slot-container:has(.appointment-selected-slot:not(.hidden)) .appointment-slot-clear:not(.hidden) {
+    margin-top: .75rem !important;
+}
+
+.appointment-slot-grid,
+.slot-grid-ui {
+    width: 100%;
+    min-width: 0;
+
+    display: grid;
+    grid-template-columns: 1fr;
+
+    gap: .9rem;
+}
+
+.appointment-slot-period {
+    width: 100%;
+    min-width: 0;
+
+    display: grid;
+    align-content: start;
+
+    gap: .55rem;
+}
+
+.appointment-slot-period-heading {
+    width: 100%;
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+
+    gap: .45rem;
+
+    color: var(--text-2);
+
+    font-size: .68rem;
+    font-weight: 850;
+    line-height: 1;
+
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.appointment-slot-period-heading::after {
+    content: "";
+
+    min-width: 0;
+    flex: 1;
+
+    height: 1px;
+
+    background: var(--border);
+}
+
+.appointment-slot-period-grid {
+    width: 100%;
+    min-width: 0;
+
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: .55rem;
+}
+
+.appointment-slot-grid .slot-chip,
+.slot-grid-ui .slot-chip {
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+    padding: .5rem .5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: .32rem;
+    border-radius: 12px;
+    font-size: clamp(.72rem, 2.2cqi, .8rem);
+    font-weight: 750;
+    line-height: 1;
+    white-space: nowrap;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.appointment-slot-grid .slot-chip i,
+.slot-grid-ui .slot-chip i {
+    flex: 0 0 auto;
+    font-size: .68rem;
+}
+
+.appointment-slot-grid .slot-chip span,
+.slot-grid-ui .slot-chip span {
+    flex: 0 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    word-break: keep-all;
+    overflow-wrap: normal;
+    font-variant-numeric: tabular-nums;
 }
 
 [data-theme="dark"] .booking-step-title {
@@ -474,6 +620,15 @@
 }
 
 @media (max-width: 767px) {
+
+    .appointment-slot-period-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: .55rem;
+    }
+
+    .date-banner-gradient {
+        background: linear-gradient(135deg, #8B0000, #660000);
+    }
 
     .step-circle {
         width: 27px !important;
@@ -1421,6 +1576,23 @@
     .booking-confirmation-note-text,
     .booking-confirmation-check-text {
         font-size: .75rem;
+    }
+}
+
+@container (max-width: 320px) {
+
+    .appointment-slot-period-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .appointment-slot-grid .slot-chip,
+    .slot-grid-ui .slot-chip {
+        min-height: 44px;
+
+        padding:
+            .5rem .55rem;
+
+        font-size: .76rem;
     }
 }
 

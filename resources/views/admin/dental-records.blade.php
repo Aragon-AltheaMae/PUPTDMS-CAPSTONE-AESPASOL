@@ -5,14 +5,20 @@
 @section('title', 'Dental Records')
 
 @section('styles')
-@vite('resources/css/pages/admin/dental-records.css')
+@vite('resources/css/pages/shared/dental-records.css')
 @endsection
 
 @section('content')
 
 @php use Carbon\Carbon;
 
-$routePrefix = request()->routeIs('dentist.*') ? 'dentist' : 'admin';
+$layoutRole = $layoutRole ?? 'admin';
+
+$isDentistView = $layoutRole === 'dentist';
+$isAdminView = !$isDentistView;
+
+$routePrefix = $isDentistView ? 'dentist' : 'admin';
+
 $reportsRouteName = $routePrefix === 'dentist' ? 'dentist.dentist.report' : 'admin.report-files';
 $appointmentsRouteName = $routePrefix === 'dentist' ? 'dentist.dentist.appointments' : 'admin.admin.appointments';
 
@@ -31,15 +37,15 @@ $recordsSource instanceof \Illuminate\Pagination\AbstractPaginator
 
 $recordsTodayCount = $recordsToday ?? 0;
 
-$pendingCount = $pending
+$scheduledRecordsCount = $scheduledCount
 ?? $recordItems
 ->filter(
 fn ($record) =>
 strtolower(
 trim(
-$record->status ?? 'pending'
+$record->status ?? 'scheduled'
 )
-) === 'pending'
+) === 'scheduled'
 )
 ->count();
 
@@ -60,13 +66,46 @@ $recordPerPage = $recordsSource instanceof \Illuminate\Pagination\AbstractPagina
 $recordAppliedStatus = request('status', 'all');
 @endphp
 
-<main id="mainContent" class="app-page-shell admin-dental-records-page page-enter mode-list">
+<main id="mainContent" class="app-page-shell
+           shared-dental-records-page
+           {{ $isDentistView ? 'dentist-dental-records-view' : 'admin-dental-records-view' }}
+           page-enter
+           mode-list">
     <div class="w-full">
 
+        @if ($isDentistView)
+        <div class="dentist-hero mb-6">
+            <div class="dentist-hero-content">
+                <div class="dentist-hero-icon">
+                    <i class="fa-solid fa-notes-medical"></i>
+                </div>
+
+                <div class="min-w-0">
+                    <div class="dentist-hero-eyebrow">
+                        <i class="fa-solid fa-tooth"></i>
+                        Clinical Operations
+                    </div>
+
+                    <h2 class="dentist-hero-title">
+                        Dental Records
+                    </h2>
+                </div>
+            </div>
+
+            <div class="dentist-hero-actions">
+                <a href="{{ route($routePrefix . '.reports.ai-generated') }}" class="ui-btn ui-btn-primary">
+                    <i class="fa-solid fa-chart-column"></i>
+                    <span>View AI Reports</span>
+                </a>
+            </div>
+        </div>
+        @else
         <div class="page-banner mt-2 mb-6">
             <div class="page-banner-inner">
                 <div>
-                    <h1 class="page-title">Dental Records</h1>
+                    <h1 class="page-title">
+                        Dental Records
+                    </h1>
                 </div>
 
                 <div class="flex items-center gap-3 flex-shrink-0">
@@ -77,6 +116,7 @@ $recordAppliedStatus = request('status', 'all');
                 </div>
             </div>
         </div>
+        @endif
 
         <div id="statCards" class="stat-grid dental-records-stat-grid">
             <div class="stat-card s-all" data-filter="all">
@@ -97,17 +137,20 @@ $recordAppliedStatus = request('status', 'all');
                 <div class="stat-icon"><i class="fa-solid fa-calendar-day"></i></div>
             </div>
 
-            <div class="stat-card s-pending" data-filter="pending">
+            <div class="stat-card s-pending" data-filter="scheduled">
                 <div class="stat-card-info">
-                    <div class="stat-label">Pending Records</div>
-                    <div class="stat-num">{{ number_format($pendingCount) }}</div>
-                    <div class="stat-footer">needs action</div>
+                    <div class="stat-label">Scheduled Records</div>
+                    <div class="stat-num">{{ number_format($scheduledRecordsCount) }}</div>
+                    <div class="stat-footer">upcoming visits</div>
                 </div>
-                <div class="stat-icon"><i class="fa-solid fa-user-clock"></i></div>
+
+                <div class="stat-icon">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 2xl:grid-cols-[minmax(0,1fr)_440px] gap-5 items-start">
+        <div class="dental-records-layout">
             <section class="table-card dental-records-main-card">
 
                 <div class="patient-table-toolbar record-toolbar px-4 md:px-6 py-4 border-b border-gray-100">
@@ -116,12 +159,15 @@ $recordAppliedStatus = request('status', 'all');
                         @php
                         $recordAllCount = $totalRecordsCount;
                         $recordTodayCount = $recordsTodayCount ?? 0;
-                        $recordPendingCount = $pendingCount ?? 0;
-                        $recordOngoingCount = $ongoingCount ?? $recordItems->where('status', 'ongoing')->count();
-                        $recordCompletedCount = $completedCount ?? $recordItems->where('status',
-                        'completed')->count();
-                        $recordCancelledCount = $cancelledCount ?? $recordItems->where('status',
-                        'cancelled')->count();
+
+                        $recordScheduledCount =
+                        $scheduledRecordsCount ?? 0;
+
+                        $recordCompletedCount =
+                        $completedCount
+                        ?? $recordItems
+                        ->where('status', 'completed')
+                        ->count();
                         @endphp
 
                         <div class="record-toolbar-actions">
@@ -188,15 +234,21 @@ $recordAppliedStatus = request('status', 'all');
                             <tbody id="dentalRecordsTableBody">
                                 @foreach ($recordsSource as $record)
                                 @php
-                                $rawStatus = strtolower(trim($record->status ?? 'pending'));
-                                $normalizedStatus = str_replace([' ', '_'], '-', $rawStatus);
-                                $statusClass = match ($normalizedStatus) {
-                                'completed' => 'status-completed',
-                                'ongoing', 'in-progress' => 'status-ongoing',
-                                'cancelled', 'canceled' => 'status-cancelled',
-                                'not-started' => 'status-default',
-                                default => 'status-pending',
-                                };
+                                $rawStatus = strtolower(
+                                trim(
+                                $record->status ?? 'scheduled'
+                                )
+                                );
+
+                                $normalizedStatus =
+                                $rawStatus === 'completed'
+                                ? 'completed'
+                                : 'scheduled';
+
+                                $statusClass =
+                                $normalizedStatus === 'completed'
+                                ? 'status-completed'
+                                : 'status-upcoming';
 
                                 $patientName = $record->patient_name ??
                                 (data_get($record, 'patient.name') ??
@@ -226,8 +278,8 @@ $recordAppliedStatus = request('status', 'all');
                                     data-patient="{{ strtolower($patientName) }}"
                                     data-procedure="{{ strtolower($procedure) }}"
                                     data-dentist="{{ strtolower($dentistName) }}" data-status="{{ $normalizedStatus }}"
-                                    data-date="{{ $dateIso }}" @if (!empty($record->id)) onclick="openRecordPanel({{
-                                    $record->id }})"
+                                    data-date="{{ $dateIso }}" @if (!empty($record->appointment_id))
+                                    onclick="openRecordPanel({{ $record->appointment_id }})"
                                     @endif>
 
                                     <td class="table-cell-main">
@@ -265,7 +317,7 @@ $recordAppliedStatus = request('status', 'all');
                                     </td>
                                     <td class="table-action-cell">
                                         <div class="ui-action-group">
-                                            @if (!empty($record->id))
+                                            @if (!empty($record->appointment_id))
                                             <button type="button" class="ui-action-btn ui-action-view"
                                                 onclick="event.stopPropagation(); openRecordPanel({{ $record->id }})"
                                                 aria-label="View record" data-tooltip="View record">
@@ -284,17 +336,21 @@ $recordAppliedStatus = request('status', 'all');
                         @foreach ($recordsSource as $record)
                         @php
 
-                        $rawStatus = strtolower(trim($record->status ?? 'pending'));
+                        $rawStatus = strtolower(
+                        trim(
+                        $record->status ?? 'scheduled'
+                        )
+                        );
 
-                        $normalizedStatus = str_replace([' ', '_'],'-',$rawStatus);
+                        $normalizedStatus =
+                        $rawStatus === 'completed'
+                        ? 'completed'
+                        : 'scheduled';
 
-                        $statusClass = match ($normalizedStatus) {
-                        'completed' => 'status-completed',
-                        'ongoing', 'in-progress' => 'status-ongoing',
-                        'cancelled','canceled' =>'status-cancelled',
-                        'not-started' => 'status-default',
-                        default =>'status-pending',
-                        };
+                        $statusClass =
+                        $normalizedStatus === 'completed'
+                        ? 'status-completed'
+                        : 'status-upcoming';
 
                         $patientName = $record->patient_name
                         ?? data_get($record,'patient.name')
@@ -326,10 +382,9 @@ $recordAppliedStatus = request('status', 'all');
                         <article class="table-record-card dental-record-grid-card dental-record-item"
                             data-patient="{{ strtolower($patientName) }}" data-procedure="{{ strtolower($procedure) }}"
                             data-dentist="{{ strtolower($dentistName) }}" data-status="{{ $normalizedStatus }}"
-                            data-date="{{ $dateIso }}" @if (!empty($record->id))
-                            onclick="openRecordPanel({{ $record->id }})"
-                            @endif
-                            >
+                            data-date="{{ $dateIso }}" @if (!empty($record->appointment_id))
+                            onclick="openRecordPanel({{ $record->appointment_id }})"
+                            @endif>
                             <div class="table-record-card-layout">
                                 <div class="table-record-content">
                                     <div class="table-record-header">
@@ -403,46 +458,7 @@ $recordAppliedStatus = request('status', 'all');
                 @endif
             </section>
 
-            <aside class="space-y-5">
-                <section class="table-card dental-record-panel">
-                    <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between gap-3">
-                        <div class="flex items-center gap-3 min-w-0">
-                            <div id="panelRecordAvatar" class="dental-record-panel-avatar">
-                                <span class="patient-avatar patient-avatar-md">
-                                    <span>?</span>
-                                </span>
-                            </div>
-
-                            <div class="min-w-0">
-                                <h2 id="panelRecordTitle" class="text-sm font-black text-gray-800 truncate">
-                                    Select a record
-                                </h2>
-
-                                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">
-                                    Dental Record
-                                </p>
-                            </div>
-                        </div>
-                        <div class="dental-record-panel-badges">
-                            <div id="panelRecordPwd"></div>
-                            <div id="panelRecordStatus"></div>
-                        </div>
-                    </div>
-
-                    <div id="panelBody" class="p-5">
-                        <div class="text-center py-8">
-                            <div class="empty-state-icon !w-[64px] !h-[64px] !rounded-2xl !mb-4">
-                                <i class="fa-solid fa-notes-medical !text-[26px]"></i>
-                            </div>
-                            <h3 class="empty-state-title !text-[15px]">No record selected</h3>
-                            <p class="empty-state-sub !text-[13px] !mt-2">Click a row to view the record details.</p>
-                        </div>
-                    </div>
-
-                    <div id="panelFoot" class="hidden px-5 py-4 border-t border-gray-100 bg-gray-50 flex-wrap gap-2">
-                    </div>
-                </section>
-
+            <aside class="dental-records-side-column space-y-5">
                 <section class="table-card rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                     <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
                         <div class="dental-req-quick-actions-icon w-10 h-10 rounded-2xl bg-red-50 text-[#8B0000] 
@@ -606,11 +622,8 @@ $recordAppliedStatus = request('status', 'all');
     <x-filter-group title="Record Status">
         <div class="filter-chip-row">
             @foreach ([
-            'not-started' => 'Not Started',
-            'pending' => 'Pending',
-            'ongoing' => 'Ongoing',
+            'scheduled' => 'Scheduled',
             'completed' => 'Completed',
-            'cancelled' => 'Cancelled',
             ] as $value => $label)
             <label class="choice-chip">
                 <input type="radio" name="dental_record_status" value="{{ $value }}"
@@ -714,6 +727,23 @@ $recordAppliedStatus = request('status', 'all');
         </div>
     </div>
 </div>
+
+<template id="dentalRecordOdontogramTemplate">
+    <section class="booking-summary-card">
+        <div class="booking-summary-card-header flex items-center justify-between gap-4 w-full">
+            <div class="flex items-center gap-2 min-w-0">
+                <i class="fa-solid fa-tooth"></i>
+                <span>Odontogram</span>
+            </div>
+        </div>
+        <div class="booking-summary-card-body">
+            @include('components.odontogram-preview', [
+            'odontogramData' => [],
+            'showEditButton' => false,
+            ])
+        </div>
+    </section>
+</template>
 @endsection
 
 @section('scripts')
@@ -721,6 +751,7 @@ $recordAppliedStatus = request('status', 'all');
     const csrfMeta = document.querySelector('meta[name="csrf-token"]');
     const csrfToken = csrfMeta ? csrfMeta.content : '';
 
+    const dentalRecordShowBaseUrl = @json(url($routePrefix. '/dental-records'));
     let dentalRecordsLoading = false;
     let dentalRecordsSearchTimer = null;
     let dentalRecordFilterPreviewRequest = 0;
@@ -753,29 +784,20 @@ $recordAppliedStatus = request('status', 'all');
     }
 
     function normalizeStatus(value) {
-        return String(value || 'pending').trim().toLowerCase().replace(/[\s_]+/g, '-');
+        const normalized = String(value || 'scheduled')
+            .trim()
+            .toLowerCase()
+            .replace(/[\s_]+/g, '-');
+
+        return normalized === 'completed'
+            ? 'completed'
+            : 'scheduled';
     }
 
     function statusPillClass(status) {
-        const normalized = normalizeStatus(status);
-
-        if (normalized === 'completed') {
-            return 'status-completed';
-        }
-
-        if (normalized === 'ongoing' || normalized === 'in-progress') {
-            return 'status-ongoing';
-        }
-
-        if (normalized === 'cancelled' || normalized === 'canceled') {
-            return 'status-cancelled';
-        }
-
-        if (normalized === 'not-started') {
-            return 'status-default';
-        }
-
-        return 'status-pending';
+        return normalizeStatus(status) === 'completed'
+            ? 'status-completed'
+            : 'status-upcoming';
     }
 
     function statusLabel(status) {
@@ -1016,6 +1038,60 @@ $recordAppliedStatus = request('status', 'all');
         }, 160);
     }
 
+    function hasOdontogramSnapshot(data) {
+        if (Array.isArray(data)) {
+            return data.length > 0;
+        }
+
+        return data && typeof data === 'object' && Object.keys(data).length > 0;
+    }
+
+    async function appendDentalRecordOdontogram(container, odontogramData) {
+        if (!container) {
+            return;
+        }
+
+        if (!hasOdontogramSnapshot(odontogramData)) {
+            container.insertAdjacentHTML('beforeend', recordSummaryCard(
+                'Odontogram',
+                'fa-tooth',
+                `
+                    <div class="empty-state empty-state-compact">
+                        <div class="empty-state-icon">
+                            <i class="fa-solid fa-tooth"></i>
+                        </div>
+                        <h3 class="empty-state-title">No odontogram recorded</h3>
+                        <p class="empty-state-sub">No odontogram was recorded for this appointment.</p>
+                    </div>
+                `
+            ));
+            return;
+        }
+
+        const template = document.getElementById('dentalRecordOdontogramTemplate');
+
+        if (!template) {
+            return;
+        }
+
+        const fragment = template.content.cloneNode(true);
+        const preview = fragment.querySelector('[data-odontogram-preview]');
+
+        if (!preview) {
+            return;
+        }
+
+        preview.dataset.odontogram = JSON.stringify(odontogramData);
+        container.appendChild(fragment);
+
+        try {
+            const module = await window.loadOdontogramPreviewModule?.();
+            module?.initOdontogramPreviews?.(preview);
+        } catch (error) {
+            console.error('Unable to load appointment odontogram snapshot.', error);
+        }
+    }
+
     function setDentalRecordDetailsModalData(data) {
         const title = document.getElementById('dentalRecordDetailsModalTitle');
         const body = document.getElementById('dentalRecordDetailsModalBody');
@@ -1031,7 +1107,7 @@ $recordAppliedStatus = request('status', 'all');
         const emergencyContact = data.emergency_contact || {};
 
         body.innerHTML = `
-            <div class="space-y-4">
+            <div class="space-y-4" data-dental-record-sections>
                 ${renderPatientInformationCard(profileFields)}
 
                 ${recordSummaryCard(
@@ -1052,6 +1128,11 @@ $recordAppliedStatus = request('status', 'all');
                 .join('')
             }
             </div>`;
+
+        appendDentalRecordOdontogram(
+            body.querySelector('[data-dental-record-sections]'),
+            data.odontogram_data
+        );
     }
 
     function initDentalRecordDetailsModal() {
@@ -1078,101 +1159,38 @@ $recordAppliedStatus = request('status', 'all');
     }
 
     async function openRecordPanel(id) {
-        const title = document.getElementById('panelRecordTitle');
-        const panelBody = document.getElementById('panelBody');
-        const panelFoot = document.getElementById('panelFoot');
-        const panelStatus = document.getElementById('panelRecordStatus');
-        const panelAvatar = document.getElementById('panelRecordAvatar');
-        const panelPwd = document.getElementById('panelRecordPwd');
+        const modalTitle = document.getElementById('dentalRecordDetailsModalTitle');
+        const modalBody = document.getElementById('dentalRecordDetailsModalBody');
 
-        if (!title || !panelBody || !panelFoot) return;
+        if (!modalTitle || !modalBody) return;
 
-        title.textContent = 'Loading...';
-        panelBody.innerHTML = `
+        modalTitle.textContent = 'Loading record...';
+        modalBody.innerHTML = `
             <div class="text-center py-10 text-gray-300">
                 <i class="fa-solid fa-spinner fa-spin text-2xl"></i>
             </div>`;
-        panelFoot.classList.add('hidden');
-        panelFoot.classList.remove('flex');
-        panelFoot.innerHTML = '';
+        openDentalRecordDetailsModal();
 
         try {
-            const res = await fetch(`/admin/dental-records/${id}`, {
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
+            const res = await fetch(
+                `${dentalRecordShowBaseUrl}/${encodeURIComponent(id)}`,
+                {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    }
                 }
-            });
+            );
 
             if (!res.ok) throw new Error('Failed to fetch record.');
 
             const data = await res.json();
-            const status = normalizeStatus(data.status);
-            const patientName = data.patient_name || 'Record Details';
-
-            title.textContent =
-                window.formatPatientName?.(patientName) ||
-                patientName;
-
-            if (panelAvatar) {
-                panelAvatar.innerHTML =
-                    window.PatientUI?.buildAvatarHtml?.({
-                        name: patientName,
-                        size: 'md',
-                        escapeHtml,
-                    }) || '';
-            }
-
-            const isPwd = (data.profile_fields || []).some(
-                item => String(item.label || '').trim().toLowerCase() === 'pwd');
-
-            if (panelPwd) {
-                panelPwd.innerHTML = isPwd
-                    ? `
-                        <span class="dental-record-pwd-badge">
-                            <i class="fa-solid fa-wheelchair"></i>
-                            <span>PWD</span>
-                        </span>
-                    `
-                    : '';
-            }
-
-            if (panelStatus) {
-                panelStatus.innerHTML = `
-                    <span class="status-pill ${statusPillClass(status)}">
-                        <span class="status-dot"></span>
-                        ${escapeHtml(statusLabel(status))}
-                    </span>
-                `;
-            }
-
-            panelBody.innerHTML = `
-                <div class="dental-record-profile-shell">
-                    <div class="global-info-grid dental-record-profile-grid">
-                        ${(data.profile_fields || []).filter(item => {
-                const label = String(item.label || '').trim().toLowerCase();
-                return ![
-                    'name',
-                    'pwd',
-                ].includes(label);
-            })
-                    .map(item => profileInfoRow(item))
-                    .join('')}
-                    </div>
-                </div>`;
 
             window.currentDentalRecordData = data;
             setDentalRecordDetailsModalData(data);
-
-            panelFoot.classList.remove('hidden');
-            panelFoot.classList.add('flex');
-            panelFoot.innerHTML = `
-                <button type="button" class="ui-btn ui-btn-primary " onclick="openDentalRecordDetailsModal()">
-                    <i class="fa-solid fa-eye"></i>
-                    <span>View Record Details</span>
-                </button>`;
         } catch (error) {
-            panelBody.innerHTML = `
+            modalTitle.textContent = 'Unable to load record';
+            modalBody.innerHTML = `
                 <div class="text-center py-8">
                     <div class="empty-state-icon !w-[64px] !h-[64px] !rounded-2xl !mb-4">
                         <i class="fa-solid fa-triangle-exclamation !text-[26px]"></i>
@@ -1706,34 +1724,16 @@ $recordAppliedStatus = request('status', 'all');
 
         if (dentalRecordFilterCount() > 0) {
             const states = {
-                today: {
-                    icon: 'fa-clock',
-                    title: 'No records added today',
-                    message: 'Dental records created today will appear here.',
-                },
-
-                pending: {
-                    icon: 'fa-user-clock',
-                    title: 'No pending dental records',
-                    message: 'Pending dental records will appear here once available.',
-                },
-
-                ongoing: {
-                    icon: 'fa-spinner',
-                    title: 'No ongoing dental records',
-                    message: 'Ongoing dental procedures will appear here once started.',
+                scheduled: {
+                    icon: 'fa-calendar-check',
+                    title: 'No scheduled dental records',
+                    message: 'Upcoming and rescheduled appointments will appear here.',
                 },
 
                 completed: {
                     icon: 'fa-check-double',
                     title: 'No completed dental records',
-                    message: 'Completed dental records will appear here once finalized.',
-                },
-
-                cancelled: {
-                    icon: 'fa-calendar-xmark',
-                    title: 'No cancelled dental records',
-                    message: 'Cancelled dental records will appear here once available.',
+                    message: 'Completed appointments will appear here once their procedures are finished.',
                 },
             };
 

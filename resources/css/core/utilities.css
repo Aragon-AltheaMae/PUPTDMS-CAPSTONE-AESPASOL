@@ -42,7 +42,7 @@
     border: none;
     background: none;
     cursor: pointer;
-    font-size: 10px !important;
+    font-size: 10px;
     font-weight: 600;
     color: var(--neutral-warm-500);
     transition: all .2s;
@@ -337,8 +337,8 @@
     gap: 8px;
     min-height: 40px;
     padding: 0 16px;
-    border-radius: 999px;
-    font-size: 13px;
+    border-radius: 16px;
+    font-size: 0.76rem;
     font-weight: 800;
     line-height: 1;
     cursor: pointer;
@@ -669,7 +669,7 @@
 .dark .ui-action-btn:hover,
 [data-theme="dark"] .ui-action-btn:focus-visible,
 .dark .ui-action-btn:focus-visible {
-    box-shadow: none !important;
+    box-shadow: none;
 }
 
 .ui-action-btn:active {
@@ -693,7 +693,7 @@
 
 .ui-muted-text {
     color: var(--text-3);
-    font-size: .72rem;
+    font-size: .82rem;
     font-weight: 600;
     line-height: 1.3;
 }
@@ -729,10 +729,26 @@
     pointer-events: none;
 
     transform: translateY(4px);
+
     transition:
         opacity .15s ease,
-        visibility .15s ease,
         transform .15s ease;
+}
+
+.global-action-tooltip.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.global-action-tooltip:not(.show) {
+    padding: 0;
+    width: 0;
+    height: 0;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    box-shadow: none;
 }
 
 .global-action-tooltip strong {
@@ -755,12 +771,6 @@
 
 .global-action-tooltip span+span {
     margin-top: 2px;
-}
-
-.global-action-tooltip.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
 }
 
 .global-action-tooltip.tooltip-view {
@@ -798,52 +808,40 @@
     box-shadow: 0 14px 30px var(--alpha-black-42);
 }
 
-.ui-action-btn:hover::after,
-.ui-action-btn:focus-visible::after {
-    transform:
-        translateX(-50%) translateY(0);
-}
-
-.ui-action-btn:hover::before,
-.ui-action-btn:focus-visible::before {
-    transform:
-        translateX(-50%) translateY(0) rotate(45deg);
-}
-
 .appt-type-icon {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex: 0 0 auto !important;
-    width: auto !important;
-    height: auto !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    color: var(--text-3) !important;
-    font-size: 10px !important;
-    line-height: 1 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: auto;
+    height: auto;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: var(--text-3);
+    font-size: 10px;
+    line-height: 1;
     cursor: default;
-    transform: none !important;
+    transform: none;
 }
 
 .appt-type-icon:hover,
 .appt-type-icon:focus,
 .appt-type-icon:focus-visible {
-    width: auto !important;
-    height: auto !important;
-    padding: 0 !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    transform: none !important;
-    outline: none !important;
+    width: auto;
+    height: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    transform: none;
+    outline: none;
 }
 
 .appt-type-icon i {
@@ -904,23 +902,23 @@
 }
 
 .ui-action-view {
-    --action-bg: var(--color-white);
+    --action-bg: var(--crimson-light);
     --action-color: var(--crimson);
-    --action-border: var(--alpha-crimson-24);
+    --action-border: var(--crimson-mid);
     --action-hover-bg: var(--crimson);
-    --action-hover-color: var(--color-white);
+    --action-hover-color: var(--text-on-brand);
     --action-hover-border: var(--crimson);
     --action-tooltip-bg: var(--crimson);
 }
 
 .ui-action-neutral {
-    --action-bg: var(--slate-50);
-    --action-color: var(--slate-500);
-    --action-border: var(--utility-color-01);
-    --action-hover-bg: var(--slate-500);
-    --action-hover-color: var(--color-white);
-    --action-hover-border: var(--slate-500);
-    --action-tooltip-bg: var(--slate-600);
+    --action-bg: var(--status-default-bg);
+    --action-color: var(--status-default-text);
+    --action-border: var(--status-default-border);
+    --action-hover-bg: var(--status-default-solid);
+    --action-hover-color: var(--text-on-brand);
+    --action-hover-border: var(--status-default-solid);
+    --action-tooltip-bg: var(--status-default-solid);
 }
 
 .chip-val {
@@ -936,10 +934,10 @@
 }
 
 .char-counter {
-    flex-shrink: 0 !important;
+    flex-shrink: 0;
     color: var(--gray-400);
-    font-weight: 900 !important;
-    line-height: 1 !important;
+    font-weight: 900;
+    line-height: 1;
     font-size: 10px;
     text-align: right;
     margin-top: 3px;
@@ -947,12 +945,12 @@
 }
 
 .char-counter.warn {
-    color: var(--orange-700) !important;
+    color: var(--orange-700);
 }
 
 .char-counter.over {
-    color: var(--validation-red) !important;
-    font-weight: 700 !important;
+    color: var(--validation-red);
+    font-weight: 700;
 }
 
 .field-error {
@@ -972,12 +970,12 @@
 }
 
 .field-invalid {
-    border-color: var(--red-600) !important;
-    box-shadow: 0 0 0 3px var(--alpha-red-600-10) !important;
+    border-color: var(--red-600);
+    box-shadow: 0 0 0 3px var(--alpha-red-600-10);
 }
 
 .field-valid {
-    border-color: var(--green-600) !important;
+    border-color: var(--green-600);
 }
 
 .service-badge {
@@ -1018,28 +1016,28 @@
 
 [data-theme="dark"] .service-badge-default,
 .dark .service-badge-default {
-    background: rgba(139, 0, 0, 0.18) !important;
-    color: #FCA5A5 !important;
+    background: rgba(139, 0, 0, 0.18);
+    color: #FCA5A5;
 }
 
 [data-theme="dark"] .service-badge-checkup,
 .dark .service-badge-checkup {
-    background: rgba(22, 163, 74, 0.16) !important;
-    color: #86EFAC !important;
+    background: rgba(22, 163, 74, 0.16);
+    color: #86EFAC;
 }
 
 [data-theme="dark"] .service-badge-surgery,
 [data-theme="dark"] .service-badge-extraction,
 .dark .service-badge-surgery,
 .dark .service-badge-extraction {
-    background: rgba(220, 38, 38, 0.16) !important;
-    color: #FCA5A5 !important;
+    background: rgba(220, 38, 38, 0.16);
+    color: #FCA5A5;
 }
 
 [data-theme="dark"] .service-badge-whitening,
 .dark .service-badge-whitening {
-    background: rgba(250, 204, 21, 0.16) !important;
-    color: #FDE047 !important;
+    background: rgba(250, 204, 21, 0.16);
+    color: #FDE047;
 }
 
 :is(.status-pill,
@@ -1096,64 +1094,64 @@
 .past-status-pill,
 .patient-status-pill,
 .entry-badge {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-    gap: var(--status-pill-gap) !important;
+    gap: var(--status-pill-gap);
 
-    min-height: var(--status-pill-height) !important;
+    min-height: var(--status-pill-height);
 
-    width: fit-content !important;
-    max-width: 100% !important;
+    width: fit-content;
+    max-width: 100%;
 
     padding:
-        0 var(--status-pill-padding-x) !important;
+        0 var(--status-pill-padding-x);
 
-    border-radius: 999px !important;
+    border-radius: 999px;
 
     font-size:
-        var(--status-pill-font-size) !important;
+        var(--status-pill-font-size);
 
-    font-weight: 900 !important;
-    line-height: 1 !important;
+    font-weight: 900;
+    line-height: 1;
 
-    white-space: nowrap !important;
+    white-space: nowrap;
 
-    letter-spacing: -0.01em !important;
+    letter-spacing: -0.01em;
 
     background:
-        var(--status-bg, var(--status-default-bg)) !important;
+        var(--status-bg, var(--status-default-bg));
 
     color:
-        var(--status-text, var(--status-default-text)) !important;
+        var(--status-text, var(--status-default-text));
 
     border:
-        1px solid var(--status-border, var(--status-default-border)) !important;
+        1px solid var(--status-border, var(--status-default-border));
 
-    flex: 0 1 auto !important;
+    flex: 0 1 auto;
 }
 
 .status-badge::before {
-    content: "" !important;
+    content: "";
 }
 
 .status-dot,
 .pill-dot,
 .status-badge::before,
 .entry-badge::before {
-    width: var(--status-pill-dot-size) !important;
-    height: var(--status-pill-dot-size) !important;
+    width: var(--status-pill-dot-size);
+    height: var(--status-pill-dot-size);
 
-    min-width: var(--status-pill-dot-size) !important;
-    min-height: var(--status-pill-dot-size) !important;
+    min-width: var(--status-pill-dot-size);
+    min-height: var(--status-pill-dot-size);
 
-    border-radius: 999px !important;
+    border-radius: 999px;
 
     background:
-        var(--status-solid, currentColor) !important;
+        var(--status-solid, currentColor);
 
-    flex-shrink: 0 !important;
+    flex-shrink: 0;
 }
 
 .status-all,
@@ -1482,7 +1480,7 @@
 
 .status-accent,
 .accent-bar {
-    background: var(--status-solid, var(--status-default-solid)) !important;
+    background: var(--status-solid, var(--status-default-solid));
 }
 
 .urgency-chip {
@@ -1742,7 +1740,7 @@
         radial-gradient(circle at bottom right,
             var(--alpha-white-5),
             transparent 42%),
-        var(--surface) !important;
+        var(--surface);
 
     border: 1px solid var(--border);
 
@@ -1785,27 +1783,27 @@
 }
 
 [data-theme="dark"] .sem-pill {
-    background: var(--alpha-white-6) !important;
-    border: 1px solid var(--alpha-white-12) !important;
-    color: var(--gray-300) !important;
-    backdrop-filter: blur(12px) saturate(150%) !important;
-    -webkit-backdrop-filter: blur(12px) saturate(150%) !important;
+    background: var(--alpha-white-6);
+    border: 1px solid var(--alpha-white-12);
+    color: var(--gray-300);
+    backdrop-filter: blur(12px) saturate(150%);
+    -webkit-backdrop-filter: blur(12px) saturate(150%);
     box-shadow:
         inset 0 1px 0 var(--alpha-white-10),
-        0 4px 12px var(--alpha-black-22) !important;
-    text-shadow: none !important;
+        0 4px 12px var(--alpha-black-22);
+    text-shadow: none;
 }
 
 [data-theme="dark"] .sem-pill::before {
-    display: none !important;
+    display: none;
 }
 
 [data-theme="dark"] .academic-item .sem-pill i {
-    color: currentColor !important;
+    color: currentColor;
 }
 
 [data-theme="dark"] .sem-pill i {
-    color: currentColor !important;
+    color: currentColor;
     opacity: .8;
 }
 
@@ -1815,9 +1813,9 @@
 }
 
 [data-theme="dark"] .entry-badge {
-    background: var(--alpha-white-6) !important;
-    border-color: var(--alpha-white-10) !important;
-    color: var(--red-300) !important;
+    background: var(--alpha-white-6);
+    border-color: var(--alpha-white-10);
+    color: var(--red-300);
 }
 
 [data-theme="dark"] .act {
@@ -1860,42 +1858,42 @@
 
 [data-theme="dark"] .char-counter.warn,
 .dark .char-counter.warn {
-    color: var(--amber-300) !important;
+    color: var(--amber-300);
 }
 
 [data-theme="dark"] .char-counter.over,
 .dark .char-counter.over {
-    color: var(--red-300) !important;
+    color: var(--red-300);
 }
 
 [data-theme="dark"] .chip-val,
 .dark .chip-val {
-    background: var(--surface) !important;
-    color: var(--text-1) !important;
+    background: var(--surface);
+    color: var(--text-1);
     border: 1px solid var(--border);
 }
 
 [data-theme="dark"] .ui-btn-secondary,
 .dark .ui-btn-secondary {
-    background: var(--alpha-white-8) !important;
-    border-color: var(--alpha-white-14) !important;
-    color: var(--rose-white) !important;
+    background: var(--alpha-white-8);
+    border-color: var(--alpha-white-14);
+    color: var(--rose-white);
     box-shadow:
         inset 0 1px 0 var(--alpha-white-8),
-        0 10px 22px var(--alpha-black-22) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
+        0 10px 22px var(--alpha-black-22);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 [data-theme="dark"] .ui-btn-secondary:hover,
 .dark .ui-btn-secondary:hover {
-    background: var(--alpha-white-12) !important;
-    border-color: var(--alpha-red-300-26) !important;
-    color: var(--color-white) !important;
-    transform: translateY(-1px) !important;
+    background: var(--alpha-white-12);
+    border-color: var(--alpha-red-300-26);
+    color: var(--color-white);
+    transform: translateY(-1px);
     box-shadow:
         inset 0 1px 0 var(--alpha-white-10),
-        0 14px 28px var(--alpha-black-30) !important;
+        0 14px 28px var(--alpha-black-30);
 }
 
 
@@ -2300,9 +2298,9 @@
 .global-info-icon.status-pending,
 .global-info-icon.status-approved,
 .global-info-icon.status-rejected {
-    background: var(--status-bg) !important;
-    border-color: var(--status-border) !important;
-    color: var(--status-text) !important;
+    background: var(--status-bg);
+    border-color: var(--status-border);
+    color: var(--status-text);
 }
 
 .global-record-card {
@@ -2693,43 +2691,44 @@
     font-size: 12px;
     font-weight: 500;
     color: var(--text-2);
+    white-space: nowrap;
 }
 
 [data-theme="dark"] #mainContent .time-chip,
 .dark #mainContent .time-chip {
-    background: rgba(13, 17, 23, 0.58) !important;
-    border-color: rgba(255, 255, 255, 0.12) !important;
-    color: #CBD5E1 !important;
+    background: rgba(13, 17, 23, 0.58);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #CBD5E1;
 }
 
 [data-theme="dark"] .mobile-appt-card,
 .dark .mobile-appt-card {
-    background: var(--card) !important;
-    border-color: var(--border) !important;
+    background: var(--card);
+    border-color: var(--border);
     box-shadow:
         inset 0 1px 0 color-mix(in srgb, var(--text-1) 5%, transparent),
-        0 14px 30px color-mix(in srgb, var(--bg-main) 45%, transparent) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+        0 14px 30px color-mix(in srgb, var(--bg-main) 45%, transparent);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
 
 [data-theme="dark"] .mobile-appt-card:hover,
 .dark .mobile-appt-card:hover {
-    border-color: rgba(252, 165, 165, 0.24) !important;
+    border-color: rgba(252, 165, 165, 0.24);
     box-shadow:
         0 18px 38px rgba(0, 0, 0, 0.36),
-        0 0 18px rgba(139, 0, 0, 0.14) !important;
+        0 0 18px rgba(139, 0, 0, 0.14);
 }
 
 [data-theme="dark"] .appointment-grid-details,
 .dark .appointment-grid-details {
-    background: rgba(13, 17, 23, 0.58) !important;
-    border-color: rgba(255, 255, 255, 0.10) !important;
+    background: rgba(13, 17, 23, 0.58);
+    border-color: rgba(255, 255, 255, 0.10);
 }
 
 [data-theme="dark"] .mobile-patient-name,
 .dark .mobile-patient-name {
-    color: #F8FAFC !important;
+    color: #F8FAFC;
 }
 
 [data-theme="dark"] .badge-role.role-patient,
@@ -2803,8 +2802,8 @@
 
 [data-theme="dark"] .tab-btn.active,
 .dark .tab-btn.active {
-    background: var(--crimson) !important;
-    color: var(--color-white) !important;
+    background: var(--crimson);
+    color: var(--color-white);
 }
 
 [data-theme="dark"] .tab-group,
@@ -2836,12 +2835,12 @@
                 var(--modal-accent) 20%,
                 transparent),
             transparent 42%),
-        var(--surface) !important;
+        var(--surface);
 
     border-bottom-color:
         color-mix(in srgb,
             var(--modal-accent) 32%,
-            var(--border)) !important;
+            var(--border));
 }
 
 [data-theme="dark"] .modal-themed-icon,
@@ -2849,7 +2848,7 @@
     box-shadow:
         0 12px 28px color-mix(in srgb,
             var(--modal-accent) 28%,
-            transparent) !important;
+            transparent);
 }
 
 [data-theme="dark"] .global-info-item,
@@ -2899,7 +2898,7 @@
 
 @media (max-width: 640px) {
     .tab-bar {
-        width: 100% !important;
+        width: 100%;
         display: flex;
         gap: .25rem;
         padding: .3rem;
@@ -2992,7 +2991,6 @@
         min-height: 20px;
         padding: 3px 6px;
         gap: 4px;
-
         font-size: 8px;
         font-weight: 800;
         line-height: 1;
@@ -3002,30 +3000,20 @@
         font-size: 8px;
     }
 
-    .global-record-card {
-        border-radius: 13px;
-    }
-
     .global-record-card::before {
         top: 7px;
         bottom: 7px;
-
         width: 3px;
     }
 
     .global-record-card-body {
         display: grid;
-
         grid-template-columns:
             minmax(0, 1fr) auto;
 
         align-items: start;
-
-        gap:
-            .6rem .5rem;
-
-        padding:
-            .7rem .7rem .7rem .9rem;
+        gap: .6rem .5rem;
+        padding: .7rem .7rem .7rem .9rem;
     }
 
     .global-record-profile {
@@ -3100,10 +3088,7 @@
         width: 30px;
         height: 30px;
         min-width: 30px;
-
         flex: 0 0 30px;
-
-        border-radius: 9px;
     }
 
     .global-record-information .global-info-icon i {
@@ -3156,10 +3141,8 @@
         width: 32px;
         height: 32px;
         min-width: 32px;
-
         padding: 0;
 
-        border-radius: 10px;
     }
 
     .ui-action-group {
@@ -3169,10 +3152,7 @@
 
     .ui-action-btn {
         --ui-action-size: clamp(30px, 8.5vw, 32px);
-
         padding: 0;
-
-        border-radius: clamp(9px, 2.6vw, 10px);
     }
 
     .ui-action-btn i {
@@ -3232,7 +3212,6 @@
 
     .mobile-appt-card-head {
         gap: .45rem;
-
         margin-bottom: .5rem;
     }
 
@@ -3242,7 +3221,6 @@
 
     .appointment-grid-details {
         padding: .52rem;
-
         gap: .4rem .5rem;
     }
 
@@ -3323,7 +3301,6 @@
         height: 28px;
         min-width: 28px;
         flex-basis: 28px;
-        border-radius: 8px;
     }
 
     .global-record-information .global-info-icon i {
@@ -3348,7 +3325,6 @@
 
     .ui-action-btn {
         --ui-action-size: 30px;
-        border-radius: 9px;
     }
 
     .ui-action-btn i {
@@ -3401,8 +3377,6 @@
 
     .ui-action-btn {
         --ui-action-size: clamp(34px, 4vw, 36px);
-
-        border-radius: 11px;
     }
 
     .ui-action-btn i {
@@ -3419,7 +3393,6 @@
 
     .appointment-grid-details {
         padding: .7rem;
-
         gap: .55rem .65rem;
     }
 
@@ -3461,7 +3434,6 @@
         height: 32px;
         min-width: 32px;
         flex: 0 0 32px;
-        border-radius: 10px;
     }
 
     .global-record-information .global-info-icon i {

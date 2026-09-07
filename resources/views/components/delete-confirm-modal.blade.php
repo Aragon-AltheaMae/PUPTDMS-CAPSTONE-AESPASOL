@@ -31,11 +31,6 @@
                     </p>
                 </div>
             </div>
-
-            <button type="button" class="modal-x" onclick="{{ $closeCallback ?: "closeModal('$id')" }}"
-                aria-label="Close delete modal">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
         </div>
 
         <div class="modal-bd">

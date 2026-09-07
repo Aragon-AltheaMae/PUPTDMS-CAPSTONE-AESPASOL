@@ -15,14 +15,54 @@ class AdminAppointmentController extends Controller
         $user = Auth::user();
         $today = Carbon::today()->toDateString();
 
-        $appointments = Appointment::with([
+        $upcomingAppointments = Appointment::with([
             'patient',
             'procedure',
             'followUpAppointments',
+            'reservedBookingPeriod',
         ])
-            ->orderBy('appointment_date', 'asc')
-            ->orderBy('appointment_time', 'asc')
+            ->whereIn('status', [
+                'upcoming',
+                'rescheduled',
+            ])
+            ->whereDate(
+                'appointment_date',
+                '>=',
+                $today
+            )
+            ->orderBy(
+                'appointment_date',
+                'asc'
+            )
+            ->orderBy(
+                'appointment_time',
+                'asc'
+            )
             ->get();
+
+        $pastAppointments = Appointment::with([
+            'patient',
+            'procedure',
+            'followUpAppointments',
+            'reservedBookingPeriod',
+        ])
+            ->whereIn('status', [
+                'completed',
+                'cancelled',
+            ])
+            ->orderBy(
+                'appointment_date',
+                'desc'
+            )
+            ->orderBy(
+                'appointment_time',
+                'desc'
+            )
+            ->get();
+
+        $appointments = $upcomingAppointments
+            ->merge($pastAppointments)
+            ->values();
 
         $todayCount = $appointments->filter(function ($appt) use ($today) {
             $status = strtolower($appt->status ?? '');
@@ -49,18 +89,6 @@ class AdminAppointmentController extends Controller
         })->count();
 
         $allCount = $appointments->count();
-
-        $upcomingAppointments = $appointments->filter(function ($appt) use ($today) {
-            $status = strtolower($appt->status ?? '');
-            return $appt->appointment_date >= $today
-                && !in_array($status, ['cancelled', 'completed'], true);
-        });
-
-        $pastAppointments = $appointments->filter(function ($appt) use ($today) {
-            $status = strtolower($appt->status ?? '');
-            return $appt->appointment_date < $today
-                || in_array($status, ['completed', 'cancelled'], true);
-        });
 
         if ($request->expectsJson()) {
             $appointments = $upcomingAppointments

@@ -59,6 +59,33 @@ return [
         'threshold' => env('SIGNATURE_AI_THRESHOLD', 0.80),
     ],
 
+    'ph_holidays' => [
+        'mcp_url' => env(
+            'PH_HOLIDAYS_MCP_URL',
+            'https://ph-holidays.godmode.ph/mcp'
+        ),
+
+        'connect_timeout' => (int) env(
+            'PH_HOLIDAYS_CONNECT_TIMEOUT',
+            5
+        ),
+
+        'timeout' => (int) env(
+            'PH_HOLIDAYS_TIMEOUT',
+            15
+        ),
+
+        'cache_hours' => (int) env(
+            'PH_HOLIDAYS_CACHE_HOURS',
+            24
+        ),
+
+        'fallback_cache_hours' => (int) env(
+            'PH_HOLIDAYS_FALLBACK_CACHE_HOURS',
+            6
+        ),
+    ],
+
     'flss' => [
         'base_url' => env('FLSS_BASE_URL', 'https://test-flss.alquatrilixbsit2027.com'),
         'api_url' => env('FLSS_API_URL', 'https://test-flss.alquatrilixbsit2027.com/api/v1'),

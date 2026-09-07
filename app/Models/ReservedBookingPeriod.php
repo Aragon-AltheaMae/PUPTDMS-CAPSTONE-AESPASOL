@@ -33,6 +33,7 @@ class ReservedBookingPeriod extends Model
         'booking_mode',
         'timeslot_duration_minutes',
         'target_patient_type',
+        'allowed_services',
         'program_code',
         'year_level',
         'section',
@@ -49,6 +50,7 @@ class ReservedBookingPeriod extends Model
         'year_level' => 'integer',
         'max_capacity' => 'integer',
         'timeslot_duration_minutes' => 'integer',
+        'allowed_services' => 'array',
         'is_active' => 'boolean',
     ];
 
@@ -131,6 +133,17 @@ class ReservedBookingPeriod extends Model
         return strtoupper(trim((string) $patient->course_code)) === strtoupper(trim((string) $this->program_code))
             && (int) $patient->year_level === (int) $this->year_level
             && strtoupper(trim((string) $patient->section)) === strtoupper(trim((string) $this->section));
+    }
+
+    public function allowsService(?string $service): bool
+    {
+        if ($this->allowed_services === null) {
+            return true;
+        }
+
+        return collect($this->allowed_services)->contains(
+            fn ($allowedService) => strcasecmp(trim((string) $allowedService), trim((string) $service)) === 0
+        );
     }
 
     public function getTargetLabelAttribute(): string

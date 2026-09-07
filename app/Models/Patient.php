@@ -60,6 +60,15 @@ class Patient extends Model
                     'UTF-8'
                 );
 
+                $suffix = trim((string) ($this->user?->suffix_name ?? ''));
+
+                if ($suffix !== '' && !preg_match(
+                    '/(?:^|\\s)' . preg_quote($suffix, '/') . '\\.?$/iu',
+                    $formattedName
+                )) {
+                    $formattedName .= ' ' . $suffix;
+                }
+
                 return preg_replace_callback(
                     '/\b(ii|iii|iv|v|vi|vii|viii|ix|x)\.?$/i',
                     fn ($matches) => strtoupper($matches[0]),

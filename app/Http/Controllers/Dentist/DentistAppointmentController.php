@@ -94,7 +94,7 @@ class DentistAppointmentController extends Controller
             ->map(fn($d) => Carbon::parse($d)->toDateString())
             ->toArray();
 
-        $philippineHolidays = PhilippineHolidays::range(0, 1);
+        $philippineHolidays = PhilippineHolidays::recordsRange(0, 1);
 
         $defaultServiceTypes = ServiceType::where('is_default', true)
             ->where('is_active_for_booking', true)
@@ -249,7 +249,7 @@ class DentistAppointmentController extends Controller
         ]);
     }
 
-    public function start($id)
+    public function start(Request $request, $id)
     {
         $activeRole = session('impersonated_role') ?: session('role');
 
@@ -295,7 +295,11 @@ class DentistAppointmentController extends Controller
             'Dentist started an appointment procedure'
         );
 
-        return redirect()->route('dentist.odontogram', $appointment->id);
+        return redirect()->route('dentist.odontogram', [
+            'appointment' => $appointment->id,
+            'from' => $request->query('from', 'appointments'),
+            'start_procedure' => $request->query('start_procedure'),
+        ]);
     }
 
     public function cancel(Request $request, $id)
@@ -370,6 +374,14 @@ class DentistAppointmentController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Same-day rescheduling is not allowed. Please choose a future date.',
+            ], 422);
+        }
+
+        if (PhilippineHolidays::isBlockedForBooking($request->new_appointment_date)) {
+            return response()->json([
+                'success' => false,
+                'message' =>
+                'The clinic is closed on this Philippine holiday. Please choose another date.',
             ], 422);
         }
 
@@ -477,6 +489,14 @@ class DentistAppointmentController extends Controller
             ], 422);
         }
 
+        if (PhilippineHolidays::isBlockedForBooking($request->followup_appointment_date)) {
+            return response()->json([
+                'success' => false,
+                'message' =>
+                'The clinic is closed on this Philippine holiday. Please choose another date.',
+            ], 422);
+        }
+
         $originalAppointment = Appointment::with('patient')->findOrFail($id);
 
         $mysqlTime = Carbon::createFromFormat('g:i A', trim($request->followup_appointment_time))->format('H:i:s');
@@ -516,7 +536,37 @@ class DentistAppointmentController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Follow-up appointment scheduled successfully.',
+
+            'message' =>
+            'Follow-up appointment scheduled successfully.',
+
+            'appointment' => [
+                'id' => $followUpAppointment->id,
+
+                'patient_name' =>
+                $originalAppointment->patient?->name
+                    ?? 'Unknown Patient',
+
+                'service_type' => $followUpAppointment->service_type,
+
+                'appointment_date' =>
+                Carbon::parse(
+                    $request->followup_appointment_date
+                )->format('F j, Y'),
+
+                'appointment_time' =>
+                Carbon::createFromFormat(
+                    'H:i:s',
+                    $mysqlTime
+                )->format('g:i A'),
+
+                'status' =>
+                ucfirst(
+                    $followUpAppointment->status
+                ),
+
+                'follow_up_reason' => $followUpAppointment->follow_up_reason,
+            ],
         ]);
     }
 }

@@ -309,6 +309,15 @@ class ConcurrentSessionService
             });
     }
 
+    public function recordLogoutActivity(User $user, string $reason = 'manual', string $module = 'authentication'): void
+    {
+        AuditLogger::log(
+            'logout',
+            $module,
+            $this->logoutDescription($user, $reason)
+        );
+    }
+
     public function revokeSessionByReference(User $user, string $reference, ?string $currentSessionId = null): bool
     {
         if (!$this->isEnabled()) {
@@ -732,6 +741,24 @@ class ConcurrentSessionService
             'logout' => 'neutral',
             'session_limit_enforced', 'sessions_revoked', 'session_revoked' => 'warning',
             default => 'neutral',
+        };
+    }
+
+    protected function logoutDescription(User $user, string $reason): string
+    {
+        if ($reason === 'idle') {
+            return 'User was signed out due to inactivity.';
+        }
+
+        $roleSlug = (string) optional($user->role)->slug;
+
+        return match ($roleSlug) {
+            'patient' => 'Patient logged out',
+            'admin', 'super_admin' => 'Admin logged out',
+            default => sprintf(
+                'Clinical user (%s) logged out',
+                $roleSlug !== '' ? $roleSlug : 'unknown'
+            ),
         };
     }
 

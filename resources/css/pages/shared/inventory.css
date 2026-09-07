@@ -50,6 +50,28 @@
     margin-top: 8px;
 }
 
+.inventory-expiration-cell {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+.inventory-expiration-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: calc(var(--status-pill-height) - 6px);
+    padding: 0 calc(var(--status-pill-padding-x) - 3px);
+    border: 1px solid var(--amber-200);
+    border-radius: 999px;
+    background: var(--amber-100);
+    color: var(--amber-700);
+    font-size: calc(var(--status-pill-font-size) - 1px);
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
+}
+
 .inventory-error-icon {
     font-size: 9px;
 }
@@ -292,6 +314,17 @@
     #mainContent.inventory-page #inventoryGrid .status-pill {
         flex: 0 0 auto;
         max-width: 100%;
+    }
+
+    #mainContent.inventory-page #inventoryGrid .inventory-expiration-cell {
+        align-items: flex-end;
+        gap: 3px;
+    }
+
+    #mainContent.inventory-page #inventoryGrid .inventory-expiration-pill {
+        min-height: 18px;
+        padding: 0 5px;
+        font-size: 7px;
     }
 
     #mainContent.inventory-page #inventoryGrid .table-record-meta {

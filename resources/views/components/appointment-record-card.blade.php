@@ -8,10 +8,13 @@
 'compact' => false,
 'recordEditUrl' => null,
 'showReserved' => false,
+'previousOdontogram' => [],
 ])
 
 @php
 use Carbon\Carbon;
+use App\Support\OdontogramTreatmentDisplay;
+use App\Services\AppointmentOdontogramSnapshotService;
 use Illuminate\Support\Str;
 
 $get = function ($key, $fallback = null) use ($appointment) {
@@ -106,8 +109,7 @@ data_get($procedure, 'procedure_duration_seconds') ??
 $duration = $get('duration');
 
 $remarks =
-data_get($procedure, 'completion_action') ??
-($get('remarks') ?? ($get('treatment') ?? $get('treatment_notes')));
+    $get('remarks') ?? ($get('treatment') ?? $get('treatment_notes'));
 
 $oral = data_get($procedure, 'oral_examination') ?? ($get('oral') ?? $get('oral_examination'));
 
@@ -115,7 +117,35 @@ $diagnosis = data_get($procedure, 'diagnosis') ?? $get('diagnosis');
 
 $prescription = data_get($procedure, 'prescriptions') ?? ($get('prescription') ?? $get('prescriptions'));
 
-$odontogram = data_get($procedure, 'odontogram_data') ?? ($get('odontogram') ?? ($get('odontogram_data') ?? []));
+$currentOdontogram =
+    data_get(
+        $procedure,
+        'odontogram_data'
+    )
+    ?? (
+        $get('odontogram')
+        ?? (
+            $get('odontogram_data')
+            ?? []
+        )
+    );
+
+$odontogramSnapshotService =
+    app(
+        AppointmentOdontogramSnapshotService::class
+    );
+
+$odontogram =
+    $odontogramSnapshotService
+        ->appointmentSnapshot(
+            $currentOdontogram,
+            $previousOdontogram
+        );
+
+$treatmentItems =
+    OdontogramTreatmentDisplay::items(
+        $odontogram
+    );
 
 $followUp = $get('follow_up') ?? $get('followUp');
 
@@ -169,6 +199,8 @@ $recordPayload = [
 'prescription' => $prescription,
 
 'odontogram_data' => $odontogram,
+
+'treatment_items' => $treatmentItems,
 
 'follow_up' => $followUp,
 

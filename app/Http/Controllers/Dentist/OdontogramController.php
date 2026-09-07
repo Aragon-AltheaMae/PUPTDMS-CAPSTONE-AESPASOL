@@ -73,6 +73,49 @@ class OdontogramController extends Controller
         ]);
     }
 
+    private function procedureEntrySource(?string $source, bool $existingAppointmentMode = false, bool $savedVisitEditMode = false): string
+    {
+        if ($existingAppointmentMode) {
+            return 'existing-appointment';
+        }
+
+        if ($savedVisitEditMode) {
+            return 'saved-visit';
+        }
+
+        $normalized = strtolower(trim((string) $source));
+
+        return match ($normalized) {
+            'walk-in', 'appointments', 'patient-profile' => $normalized,
+            default => 'appointments',
+        };
+    }
+
+    private function procedureDiscardReturnUrl(
+        string $source,
+        ?Appointment $appointment = null,
+        ?Patient $patient = null,
+        bool $existingAppointmentMode = false,
+        bool $savedVisitEditMode = false
+    ): string {
+        if ($existingAppointmentMode) {
+            return route($this->existingAppointmentRouteName('create'), ['patient' => $patient?->id]);
+        }
+
+        if ($savedVisitEditMode) {
+            return $this->savedVisitEditBackUrl($patient ?? $appointment->patient);
+        }
+
+        return match ($source) {
+            'walk-in' => route('dentist.walk-in.index'),
+            'patient-profile' => route('dentist.dentist.patient.profile', [
+                'patient' => $patient?->id ?? $appointment?->patient_id,
+                'from' => 'patient-profile',
+            ]),
+            default => route('dentist.dentist.appointments'),
+        };
+    }
+
     private function getSavedOdontogramDataForPatient(Patient $patient): array
     {
         $patientOdontogram = PatientOdontogram::where('patient_id', $patient->id)->first();
@@ -137,7 +180,7 @@ class OdontogramController extends Controller
             ->map(fn($d) => Carbon::parse($d)->toDateString())
             ->toArray();
 
-        $philippineHolidays = PhilippineHolidays::range(
+        $philippineHolidays = PhilippineHolidays::recordsRange(
             yearsBefore: 15,
             yearsAfter: 15
         );
@@ -181,7 +224,7 @@ class OdontogramController extends Controller
             ->toArray();
 
         $philippineHolidays =
-            PhilippineHolidays::range(
+            PhilippineHolidays::recordsRange(
                 yearsBefore: 15,
                 yearsAfter: 15
             );
@@ -1022,6 +1065,7 @@ class OdontogramController extends Controller
         }
 
         $patient = $appointment->patient;
+        $entrySource = $this->procedureEntrySource($request->query('from'));
 
         $procedure = AppointmentProcedure::where('appointment_id', $appointment->id)->first();
         $savedOdontogramData = $this->getSavedOdontogramDataForPatient($patient);
@@ -1033,6 +1077,9 @@ class OdontogramController extends Controller
             'savedOdontogramData',
         ), $this->getProcedureWorkspaceContext(), [
             'existingAppointmentMode' => false,
+            'discardProcedureContext' => $entrySource,
+            'discardProcedureReturnUrl' => $this->procedureDiscardReturnUrl($entrySource, $appointment, $patient),
+            'discardProcedureUrl' => route('dentist.odontogram.discard'),
             'serviceTypes' => ServiceType::activeForBooking()->orderBy('name')->get(['name']),
             'saveProcedureUrl' => route('dentist.odontogram.save', $appointment->id),
         ]));
@@ -1265,29 +1312,23 @@ class OdontogramController extends Controller
                 ]);
         }
 
-        $holidayDates =
-            PhilippineHolidays::range(
-                yearsBefore: 15,
-                yearsAfter: 15
-            );
-
         $appointmentDateIso =
             $appointmentDate
             ->toDateString();
 
         if (
-            isset(
-                $holidayDates[$appointmentDateIso]
+            PhilippineHolidays::isBlockedForBooking(
+                $appointmentDateIso
             )
         ) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'message' =>
-                    'The clinic is closed on Philippine holidays.',
+                    'The clinic is closed on this Philippine holiday.',
 
                     'errors' => [
                         'appointment_date' => [
-                            'The clinic is closed on Philippine holidays.',
+                            'The clinic is closed on this Philippine holiday.',
                         ],
                     ],
                 ], 422);
@@ -1298,7 +1339,7 @@ class OdontogramController extends Controller
                 ->withInput()
                 ->withErrors([
                     'appointment_date' =>
-                    'The clinic is closed on Philippine holidays.',
+                    'The clinic is closed on this Philippine holiday.',
                 ]);
         }
 
@@ -1589,6 +1630,14 @@ class OdontogramController extends Controller
             'procedure' => null,
             'layoutRole' => $this->existingAppointmentLayoutRole(),
             'cancelProcedureRedirectUrl' => $this->existingAppointmentBackUrl($patient),
+            'discardProcedureContext' => $this->procedureEntrySource(null, true),
+            'discardProcedureReturnUrl' => $this->procedureDiscardReturnUrl(
+                $this->procedureEntrySource(null, true),
+                null,
+                $patient,
+                true
+            ),
+            'discardProcedureUrl' => route('dentist.odontogram.discard'),
             'savedOdontogramData' => $this->getSavedOdontogramDataForPatient($patient),
             'existingAppointmentMode' => true,
             'existingAppointmentDraft' => $draft,
@@ -1621,6 +1670,14 @@ class OdontogramController extends Controller
         $iso = $request->date;
         $date = Carbon::parse($iso);
         $dayAbbr = $date->format('D');
+
+        if (PhilippineHolidays::isBlockedForBooking($iso)) {
+            return response()->json([
+                'slots' => [],
+                'message' =>
+                'The clinic is closed on this Philippine holiday.',
+            ]);
+        }
 
         $schedule = ClinicSchedule::active()
             ->get()
@@ -1782,6 +1839,15 @@ class OdontogramController extends Controller
                 'procedure' => $procedure,
                 'layoutRole' => 'dentist',
                 'cancelProcedureRedirectUrl' => $this->savedVisitEditBackUrl($patient),
+                'discardProcedureContext' => $this->procedureEntrySource($request->query('from'), false, true),
+                'discardProcedureReturnUrl' => $this->procedureDiscardReturnUrl(
+                    $this->procedureEntrySource($request->query('from'), false, true),
+                    $appointment,
+                    $patient,
+                    false,
+                    true
+                ),
+                'discardProcedureUrl' => route('dentist.odontogram.discard'),
                 // A completed visit may not have an odontogram record yet; start its editor blank.
                 'savedOdontogramData' => $procedure?->odontogram_data ?? [],
                 'existingAppointmentMode' => false,
@@ -1869,6 +1935,72 @@ class OdontogramController extends Controller
             'saved_teeth' => $result['saved_teeth'],
             'status' => 'completed',
             'redirect_url' => $this->savedVisitEditBackUrl($patient) . '&refresh=' . now()->timestamp,
+        ]);
+    }
+
+    public function discard(Request $request)
+    {
+        $activeRole = session('impersonated_role') ?: session('role');
+
+        if (!optional(Auth::user())->canAccessClinicalArea($activeRole)) {
+            return response()->json([
+                'message' => 'Unauthorized.',
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'context' => 'required|string|in:walk-in,appointments,patient-profile,existing-appointment,saved-visit',
+            'appointment_id' => 'nullable|integer|exists:appointments,id',
+            'patient_id' => 'nullable|integer|exists:patients,id',
+        ]);
+
+        $context = $validated['context'];
+        $appointment = null;
+        $patient = null;
+
+        if (!empty($validated['appointment_id'])) {
+            $appointment = Appointment::with(['patient', 'procedure'])->findOrFail($validated['appointment_id']);
+            $patient = $appointment->patient;
+        }
+
+        if (!empty($validated['patient_id'])) {
+            $patient = $patient ?: Patient::findOrFail($validated['patient_id']);
+        }
+
+        if ($context === 'existing-appointment') {
+            abort_unless($patient, 404, 'Patient not found.');
+
+            session()->forget($this->existingAppointmentDraftSessionKey($patient));
+
+            return response()->json([
+                'redirect_url' => $this->procedureDiscardReturnUrl($context, null, $patient, true),
+            ]);
+        }
+
+        abort_unless($appointment && $patient, 404, 'Appointment not found.');
+
+        if ($context === 'walk-in') {
+            abort_if(!($appointment->is_walk_in ?? false), 422, 'Only temporary walk-in procedures can be discarded from this flow.');
+
+            if ($appointment->procedure()->exists() || $appointment->status === 'completed') {
+                return response()->json([
+                    'redirect_url' => $this->procedureDiscardReturnUrl($context, $appointment, $patient),
+                ]);
+            }
+
+            DB::transaction(function () use ($appointment) {
+                $appointment->delete();
+            });
+        }
+
+        return response()->json([
+            'redirect_url' => $this->procedureDiscardReturnUrl(
+                $context,
+                $appointment,
+                $patient,
+                false,
+                $context === 'saved-visit'
+            ),
         ]);
     }
 

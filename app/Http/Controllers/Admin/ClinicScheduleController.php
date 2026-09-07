@@ -7,6 +7,7 @@ use App\Models\BlockedDate;
 use App\Models\ClinicSchedule;
 use App\Models\Appointment;
 use App\Models\ReservedBookingPeriod;
+use App\Models\ServiceType;
 use App\Services\StudentTargetOptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -17,7 +18,7 @@ class ClinicScheduleController extends Controller
     private const ALL_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     public function index(StudentTargetOptionService $studentTargetOptionService)
     {
-        $schedules    = ClinicSchedule::active()->orderBy('id')->get();
+        $schedules    = ClinicSchedule::query()->orderByDesc('is_active')->orderBy('id')->get();
         $blockedDates = BlockedDate::orderBy('date')->get();
         $reservedBookingPeriods = ReservedBookingPeriod::query()
             ->with(['creator:id,name', 'slots'])
@@ -25,6 +26,7 @@ class ClinicScheduleController extends Controller
             ->orderBy('start_time')
             ->get();
         $studentTargetOptions = $studentTargetOptionService->get();
+        $serviceTypes = ServiceType::activeForBooking()->orderBy('name')->get(['name', 'description']);
 
         $startDate = Carbon::now()->startOfMonth()->subMonth();
         $endDate   = Carbon::now()->endOfMonth()->addMonths(3);
@@ -62,7 +64,7 @@ class ClinicScheduleController extends Controller
             })
             ->values();
 
-        $philippineHolidays = PhilippineHolidays::range(0, 1);
+        $philippineHolidays = PhilippineHolidays::recordsRange(0, 1);
         $notifications      = [];
 
         return view('shared.clinic-schedule', [
@@ -75,6 +77,7 @@ class ClinicScheduleController extends Controller
             'blockedDates' => $blockedDates,
             'reservedBookingPeriods' => $reservedBookingPeriods,
             'studentTargetOptions' => $studentTargetOptions,
+            'serviceTypes' => $serviceTypes,
             'appointmentCountsPerDay' => $appointmentCountsPerDay,
             'weeklyAppointments' => $weeklyAppointments,
             'philippineHolidays' => $philippineHolidays,
@@ -96,7 +99,10 @@ class ClinicScheduleController extends Controller
     public function store(Request $request)
     {
         $validated = $this->validateRule($request);
-        $this->ensureDaysAreAvailable($request, $validated['days']);
+
+        if ((bool) $validated['is_active']) {
+            $this->ensureDaysAreAvailable($request, $validated['days']);
+        }
 
         ClinicSchedule::create($this->prepareRule($validated));
         return back()->with('success', 'Schedule rule added successfully.');
@@ -105,7 +111,10 @@ class ClinicScheduleController extends Controller
     public function update(Request $request, ClinicSchedule $clinicSchedule)
     {
         $validated = $this->validateRule($request);
-        $this->ensureDaysAreAvailable($request, $validated['days'], $clinicSchedule->id);
+
+        if ((bool) $validated['is_active']) {
+            $this->ensureDaysAreAvailable($request, $validated['days'], $clinicSchedule->id);
+        }
 
         $clinicSchedule->update($this->prepareRule($validated));
         return back()->with('success', 'Schedule rule updated.');
@@ -168,10 +177,14 @@ class ClinicScheduleController extends Controller
             }
         }
 
-        // Philippine holidays
-        $philippineHolidays = PhilippineHolidays::range(0, 1);
-        foreach ($philippineHolidays as $date => $name) {
-            if ($date >= $start->toDateString() && $date <= $end->toDateString()) {
+        $philippineHolidays = PhilippineHolidays::recordsRange(0, 1);
+
+        foreach ($philippineHolidays as $date => $holiday) {
+            if (
+                $date >= $start->toDateString() &&
+                $date <= $end->toDateString() &&
+                ($holiday['is_blocked_for_booking'] ?? false)
+            ) {
                 $unavailable[] = $date;
             }
         }
@@ -194,11 +207,11 @@ class ClinicScheduleController extends Controller
             ]);
         }
 
-        $philippineHolidays = PhilippineHolidays::range(0, 1);
-        if (isset($philippineHolidays[$iso])) {
+        if (PhilippineHolidays::isBlockedForBooking($iso)) {
             return response()->json([
-                'slots'   => [],
-                'message' => 'The clinic is closed on holidays.',
+                'slots' => [],
+                'message' =>
+                'The clinic is closed on this Philippine holiday.',
             ]);
         }
 
@@ -265,11 +278,12 @@ class ClinicScheduleController extends Controller
         return $request->validate([
             'days'       => 'required|array|min:1',
             'days.*'     => 'in:Mon,Tue,Wed,Thu,Fri,Sat,Sun',
+            'is_active'  => 'required|boolean',
             'status'     => 'required|in:open,closed,limited',
             'open_time'  => 'required_unless:status,closed|nullable|date_format:H:i',
             'close_time' => 'required_unless:status,closed|nullable|date_format:H:i|after:open_time',
             'break_time' => 'nullable|string',
-            'max_slots'  => 'required_unless:status,closed|nullable|integer|min:1|max:50',
+            'max_slots'  => 'required_unless:status,closed|nullable|integer|min:1|max:30',
             'notes'      => 'nullable|string|max:500',
         ]);
     }
@@ -285,7 +299,7 @@ class ClinicScheduleController extends Controller
         $request->validate([
             'days' => [
                 function ($attribute, $value, $fail) use ($conflictingDays) {
-                    $fail('A schedule already exists for ' . $this->formatDays($conflictingDays) . '. Edit the existing schedule instead of adding another rule for the same day.');
+                    $fail('An active schedule already exists for ' . $this->formatDays($conflictingDays) . '. Set the current active schedule to Inactive before activating this rule.');
                 },
             ],
         ]);
@@ -342,7 +356,7 @@ class ClinicScheduleController extends Controller
             'break_time' => $v['break_time'] ?? null,
             'max_slots'  => $v['max_slots']  ?? 0,
             'notes'      => $v['notes']      ?? null,
-            'is_active'  => true,
+            'is_active'  => (bool) $v['is_active'],
         ];
     }
 }
