@@ -431,6 +431,10 @@ class AppointmentController extends Controller
         $diseases = Disease::orderBy('sort_order')->get();
 
         $serviceTypes = ServiceType::where('is_active_for_booking', true)
+            ->when(
+                $reservedBookingPeriod && $reservedBookingPeriod->allowed_services !== null,
+                fn ($query) => $query->whereIn('name', $reservedBookingPeriod->allowed_services)
+            )
             ->orderBy('name')
             ->get()
             ->map(function ($service) {
@@ -843,6 +847,12 @@ class AppointmentController extends Controller
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Invalid service type selected.');
+        }
+
+        if ($reservedBookingPeriod && ! $reservedBookingPeriod->allowsService($request->service_type)) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'The selected dental service is not available for this reserved booking period.');
         }
 
         $patientId =

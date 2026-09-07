@@ -773,6 +773,7 @@
                                                             'start_time' => $period->start_time,
                                                             'end_time' => $period->end_time,
                                                             'target_patient_type' => $period->target_patient_type,
+                                                            'allowed_services' => $period->allowed_services,
                                                             'program_code' => $period->program_code,
                                                             'year_level' => $period->year_level,
                                                             'section' => $period->section,
@@ -798,6 +799,10 @@
                                                         </td>
                                                         <td data-label="Purpose">
                                                             <div class="font-semibold text-gray-800">{{ $period->title }}
+                                                            </div>
+                                                            <div class="text-xs text-gray-400 mt-0.5 reserved-period-note">
+                                                                <i class="fa-solid fa-tooth" aria-hidden="true"></i>
+                                                                {{ $period->allowed_services === null ? 'All dental services' : implode(', ', $period->allowed_services) }}
                                                             </div>
                                                             @if ($period->notes)
                                                                 <div
@@ -886,6 +891,7 @@
                                                     'start_time' => $period->start_time,
                                                     'end_time' => $period->end_time,
                                                     'target_patient_type' => $period->target_patient_type,
+                                                    'allowed_services' => $period->allowed_services,
                                                     'program_code' => $period->program_code,
                                                     'year_level' => $period->year_level,
                                                     'section' => $period->section,
@@ -946,6 +952,12 @@
                                                             <strong
                                                                 class="text-[#8B0000]">{{ $period->max_capacity }}</strong>
                                                             patients
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="schedule-rule-card-label">Dental Services</div>
+                                                        <div class="schedule-rule-card-value">
+                                                            {{ $period->allowed_services === null ? 'All dental services' : implode(', ', $period->allowed_services) }}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1536,6 +1548,7 @@
                     @csrf
                     <div id="reservedPeriodMethodField"></div>
                     <input id="reservedPeriodId" type="hidden" name="reserved_period_id">
+                    <input type="hidden" name="allowed_services_present" value="1">
 
                     <div class="reserved-period-form-grid">
                         <div class="modal-section">
@@ -1804,6 +1817,45 @@
                                     @enderror
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-section mt-5" data-global-field>
+                        <div class="modal-section-head">
+                            <div class="modal-section-icon">
+                                <i class="fa-solid fa-tooth"></i>
+                            </div>
+                            <div>
+                                <div class="modal-section-title">Allowed Dental Services</div>
+                                <div class="modal-section-sub">Select every service patients may choose during this reserved period.</div>
+                            </div>
+                        </div>
+
+                        <div id="reservedAllowedServicesGroup" class="global-choice-group">
+                            @foreach ($serviceTypes as $serviceType)
+                                <label class="global-choice-card">
+                                    <input type="checkbox" name="allowed_services[]"
+                                        value="{{ $serviceType->name }}" class="global-choice-input"
+                                        data-reserved-service>
+                                    <span class="global-choice-indicator">
+                                        <i class="fa-solid fa-check"></i>
+                                    </span>
+                                    <span class="global-choice-copy">
+                                        <span class="global-choice-title">{{ $serviceType->name }}</span>
+                                        <span class="global-choice-description">
+                                            {{ $serviceType->description ?: 'Available dental service.' }}
+                                        </span>
+                                    </span>
+                                </label>
+                            @endforeach
+                        </div>
+                        <p class="field-help">Only these services will appear when an eligible patient books this period.</p>
+                        <div class="global-field-error @error('allowed_services', 'reservedPeriod') show @enderror"
+                            data-error-for="reserved-allowed-services"
+                            aria-hidden="{{ $reservedErrors->has('allowed_services') || $reservedErrors->has('allowed_services.*') ? 'false' : 'true' }}">
+                            @if ($reservedErrors->has('allowed_services') || $reservedErrors->has('allowed_services.*'))
+                                {{ $reservedErrors->first('allowed_services') ?: $reservedErrors->first('allowed_services.*') }}
+                            @endif
                         </div>
                     </div>
 
@@ -3329,6 +3381,7 @@
             const submitButton = document.getElementById('reservedPeriodSubmitButton');
             const submitText = document.getElementById('reservedPeriodSubmitText');
             const activationState = document.getElementById('reservedActivationState');
+            const serviceCheckboxes = Array.from(document.querySelectorAll('[data-reserved-service]'));
 
             if (!modal || !form || !methodField || !idField || !activationState) {
                 return;
@@ -3361,6 +3414,9 @@
             document.getElementById('reservedSlotDuration').value = '30';
             document.getElementById('reservedNewSlotTime').value = '09:00';
             reservedTimeslots = [];
+            serviceCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
 
             const values = period || {};
 
@@ -3425,6 +3481,14 @@
             setValue('reservedNewSlotTime', '09:00');
             setValue('reservedNotes', values.notes);
 
+            const allowedServices = Array.isArray(values.allowed_services)
+                ? values.allowed_services.map(service => String(service).toLowerCase())
+                : (mode === 'edit' ? serviceCheckboxes.map(checkbox => checkbox.value.toLowerCase()) : []);
+
+            serviceCheckboxes.forEach(checkbox => {
+                checkbox.checked = allowedServices.includes(checkbox.value.toLowerCase());
+            });
+
             window.initCharLimitFields?.(
                 modal
             );
@@ -3484,6 +3548,9 @@
                             'reservedBookingModeGroup'
                         );
 
+                    const allowedServicesGroup =
+                        document.getElementById('reservedAllowedServicesGroup');
+
                     const slotPrompt =
                         document.getElementById('reservedNewSlotTime');
 
@@ -3515,6 +3582,22 @@
                         slotPrompt,
                         'reserved-timeslots'
                     );
+
+                    window.clearGlobalGroupError?.(
+                        allowedServicesGroup,
+                        'reserved-allowed-services'
+                    );
+
+                    if (!allowedServicesGroup?.querySelector('input[name="allowed_services[]"]:checked')) {
+                        window.showGlobalGroupError?.(
+                            allowedServicesGroup,
+                            'reserved-allowed-services',
+                            'Select at least one dental service.'
+                        );
+
+                        valid = false;
+                        firstInvalid ||= allowedServicesGroup;
+                    }
 
                     if (!bookingMode) {
                         window.showGlobalGroupError?.(

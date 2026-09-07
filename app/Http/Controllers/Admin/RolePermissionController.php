@@ -13,6 +13,28 @@ use App\Helpers\AuditLogger;
 class RolePermissionController extends Controller
 {
     private const CORE_ROLE_SLUGS = ['admin', 'dentist', 'patient'];
+
+    private const MODULE_PRIORITY = [
+        'General Access',
+        'Patients',
+        'Appointments',
+        'Dental Records',
+        'Clinic Schedule',
+        'Document Requests',
+        'Inventory',
+        'Service Types',
+        'Reports',
+        'Document Templates',
+        'Dentist Continuity',
+        'User Management',
+        'Role Permissions',
+        'System Settings',
+        'Academic Period',
+        'Faculty Integration',
+        'CMS Integration',
+        'System Logs',
+    ];
+
     private const ADMIN_ONLY_HIDDEN_PERMISSION_SLUGS = [
         'view_roles_permissions',
         'create_custom_roles',
@@ -320,9 +342,22 @@ class RolePermissionController extends Controller
         $permissions = Permission::where('slug', '!=', 'manage_backup')
             ->whereNotIn('slug', self::REMOVED_PERMISSION_SLUGS)
             ->whereNotIn('slug', self::ADMIN_ONLY_HIDDEN_PERMISSION_SLUGS)
-            ->orderBy('module')
             ->orderBy('name')
-            ->get();
+            ->get()
+            ->sortBy(function (Permission $permission) {
+                $modulePriority = array_search(
+                    $permission->module,
+                    self::MODULE_PRIORITY,
+                    true
+                );
+
+                return [
+                    $modulePriority === false ? PHP_INT_MAX : $modulePriority,
+                    mb_strtolower($permission->module),
+                    mb_strtolower($permission->name),
+                ];
+            })
+            ->values();
         $groupedPermissions = $permissions->groupBy('module');
 
         $highlightRoleId = session('new_role_id') ?? $request->query('highlight_role');
