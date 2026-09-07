@@ -149,9 +149,10 @@
     $notifCount = $unreadNotifications->count();
     $notifTotalCount = $notifications->count();
 
-    $showMobileMenu = $showMobileMenu ?? in_array($role, ['admin', 'super_admin', 'dentist']);
-    $showSettings = $showSettings ?? in_array($role, ['admin', 'super_admin']);
-
+    $showMobileMenu = $showMobileMenu ?? in_array($role, ['admin', 'super_admin', 'dentist'], true);
+    $showSettings = $showSettings ?? in_array($role, ['admin', 'super_admin'], true);
+    $activeHeaderRole = session('impersonated_role') ?: $role;
+    $isPatientHeader = in_array($activeHeaderRole, ['patient', 'patient_role'], true);
     $clinicTitle = $clinicTitle ?? 'PUP TAGUIG DENTAL CLINIC';
 
     if ($role === 'patient') {
@@ -346,6 +347,28 @@
             <div id="userMenu" class="header-dropdown-menu header-user-menu" role="menu">
                 <div class="dropdown-menu-list">
 
+                    @if ($isPatientHeader)
+                        <label id="darkModeToggleItem" class="dropdown-menu-item patient-mobile-theme-item">
+                            <div class="dropdown-item-content">
+                                <span class="dropdown-item-icon">
+                                    <i id="themeIcon" class="fa-solid fa-moon"></i>
+                                </span>
+
+                                <span class="dropdown-item-text">
+                                    Dark Mode
+                                </span>
+                            </div>
+
+                            <span class="modern-switch">
+                                <input id="themeSwitchCheckbox" type="checkbox" class="theme-switch-input"
+                                    aria-label="Toggle dark mode">
+
+                                <span class="switch-slider"></span>
+                            </span>
+                        </label>
+                    @endif
+
+
                     @if ($showSettings && Route::has('admin.system_settings'))
                         <a href="{{ route('admin.system_settings') }}" class="dropdown-menu-item" role="menuitem">
                             <div class="dropdown-item-content">
@@ -362,9 +385,15 @@
                         </a>
                     @endif
 
+
+                    @if ($isPatientHeader && Route::has('security.sessions.index'))
+                        <div class="dropdown-menu-divider patient-mobile-theme-divider" role="separator"></div>
+                    @endif
+
                     @if ($showSettings && Route::has('admin.system_settings') && Route::has('security.sessions.index'))
                         <div class="dropdown-menu-divider" role="separator"></div>
                     @endif
+
 
                     @if (Route::has('security.sessions.index'))
                         <a href="{{ route('security.sessions.index') }}" class="dropdown-menu-item" role="menuitem">
