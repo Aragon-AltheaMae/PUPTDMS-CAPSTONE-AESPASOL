@@ -378,7 +378,7 @@
                                         <div class="three-mouse-guide" aria-label="3D model mouse controls">
                                             <div class="three-mouse-guide-item">
                                                 <span class="mouse-button-key">L</span>
-                                                <span><strong>Left mouse:</strong> Navigate and select a tooth</span>
+                                                <span><strong>Left mouse:</strong> Click a surface; drag to rotate</span>
                                             </div>
                                             <div class="three-mouse-guide-item">
                                                 <span class="mouse-button-key">R</span>
@@ -406,8 +406,7 @@
                                                         tooth
                                                         selected</h4>
                                                     <p id="surfacePickerHelperText" class="ui-muted-text">
-                                                        Step 1: Click a tooth in the 3D model. The camera will zoom in
-                                                        automatically.
+                                                        Click a surface on the model, or use the buttons below.
                                                     </p>
                                                 </div>
                                                 <div class="odontogram-surface-picker-actions">
@@ -851,9 +850,9 @@
                         <span>
                             {{ $savedVisitEditMode
                                 ? 'Are you sure you want to cancel this edit? Any unsaved changes in this saved visit may be
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        lost.'
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                lost.'
                                 : 'Are you sure you want to cancel this procedure? Any unsaved progress in this session may be
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        lost.' }}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                lost.' }}
                         </span>
                     </div>
                 </div>
@@ -1275,7 +1274,8 @@
                         onToothHover: (
                             toothNumber,
                             mesh,
-                            event
+                            event,
+                            surfaceKey
                         ) => {
 
                             if (!toothNumber) {
@@ -1292,54 +1292,36 @@
 
                             toothHoverLabel
                                 .innerText =
-                                `Tooth #${toothNumber}`;
+                                `Tooth #${toothNumber} · ${getSurfaceLabel(surfaceKey, toothNumber)}`;
 
-                            showTooltip(
-                                event,
-                                mesh
-                            );
+                            showTooltip(event, mesh, surfaceKey);
                         },
 
-                        onToothClick: (
-                            toothNumber,
-                            mesh
-                        ) => {
-                            if (
-                                !toothNumber ||
-                                !mesh
-                            ) {
-                                clear3DSurfacePickerSelection(
-                                    false
-                                );
-
+                        onToothClick: (toothNumber, mesh, event, surfaceKey) => {
+                            if (!toothNumber || !mesh) {
+                                if (!event?.shiftKey) clear3DSurfacePickerSelection(false);
                                 hideTooltip();
-
                                 return;
                             }
 
-                            selectedTooth =
-                                toothNumber;
-
-                            selectedMesh =
-                                mesh;
-
-                            if (selectedScope === 'whole') {
-                                selectedTargetType = 'whole';
-                                selectedSurfaceKey = null;
-                                selectedLegend = ensureToothState(toothNumber).status?.code || null;
-                            } else {
-                                restoreSavedSurfaceSelectionForTooth(toothNumber);
+                            const previousTooth = selectedTooth;
+                            const target = {
+                                tooth: toothNumber,
+                                targetType: selectedScope === 'whole' ? 'whole' : 'surface',
+                                surfaceKey: selectedScope === 'whole' ? null : surfaceKey
+                            };
+                            select2DTarget(target, Boolean(event?.shiftKey));
+                            if (selectedTargetType === 'surface' && selectedSurfaceKey) {
+                                ensureToothState(selectedTooth).lastSelectedSurface =
+                                    selectedSurfaceKey;
                             }
-
-                            window
-                                .Odontogram3D
-                                .focusTooth(
-                                    odontogramThreeState,
-                                    mesh
-                                );
-
+                            selectedMesh = window.Odontogram3D.getToothMesh(odontogramThreeState,
+                                selectedTooth);
+                            if (selectedMesh && previousTooth !== selectedTooth && !event?.shiftKey) {
+                                window.Odontogram3D.focusTooth(odontogramThreeState, selectedMesh);
+                            }
                             renderThreeVisuals();
-
+                            updateScopeButtons();
                             updateSelectedToothUI();
                         },
 
@@ -1373,6 +1355,9 @@
 
                     {
                         selectedTooth: selectedTooth,
+                        selectedSurfaceKey: selectedSurfaceKey,
+                        selectedTargetType: selectedTargetType,
+                        selectedTargets: Array.from(selectedTargets.values()),
 
                         dimUnselected: currentView === '3d' &&
                             Boolean(
@@ -1855,29 +1840,35 @@
                         `Tooth #${selectedTooth} - ${getToothName(selectedTooth)}`;
                     surfacePickerHelperText.textContent = selectedTargetType === 'surface' ?
                         `${getSurfaceLabel(selectedSurfaceKey, selectedTooth)} selected.` :
-                        'Camera focused on the selected tooth. Now choose one large surface button below.';
+                        'Click another surface on the tooth, or choose a button below.';
                 } else {
                     surfacePickerToothLabel.textContent = 'No tooth selected';
                     surfacePickerHelperText.textContent =
-                        'Step 1: Click a tooth in the 3D model. The camera will zoom in automatically.';
+                        'Click a surface on the model, or use the buttons below.';
                 }
 
                 surfacePickerButtons.forEach(btn => {
                     const surfaceKey = btn.dataset.surface;
                     const disabled = !selectedTooth;
-                    const isActive =
-                        selectedTooth &&
-                        selectedTargetType === 'surface' &&
-                        selectedSurfaceKey === surfaceKey;
+                    const isActive = isTargetSelected(selectedTooth, 'surface', surfaceKey);
+                    const toothState = selectedTooth ? ensureToothState(selectedTooth) : null;
+                    const treatment = toothState?.surfaces[surfaceKey] || toothState?.status;
 
                     btn.disabled = disabled;
                     btn.textContent = getSurfaceLabel(surfaceKey, selectedTooth).replace(' Surface', '');
                     btn.setAttribute('aria-label', getSurfaceLabel(surfaceKey, selectedTooth));
                     btn.classList.toggle('active', isActive);
+                    btn.classList.toggle('has-treatment', Boolean(treatment));
+                    btn.setAttribute('aria-pressed', String(isActive));
+                    btn.title =
+                        `${getSurfaceLabel(surfaceKey, selectedTooth)}${treatment ? `: ${treatment.code} - ${treatment.label}` : ': No treatment assigned'}`;
+                    if (treatment?.colorHex) btn.style.setProperty('--surface-treatment-color', treatment
+                        .colorHex);
+                    else btn.style.removeProperty('--surface-treatment-color');
                 });
             }
 
-            function selectSurfaceFrom3DPicker(surfaceKey) {
+            function selectSurfaceFrom3DPicker(surfaceKey, useMultiSelect = false) {
                 if (!selectedTooth) {
                     showProcedureToast(
                         'Select a tooth in the 3D model before choosing a surface.',
@@ -1887,14 +1878,17 @@
                     return;
                 }
 
-                selectedTargetType = 'surface';
-                selectedSurfaceKey = surfaceKey;
-
-                const state = ensureToothState(selectedTooth);
-                state.lastSelectedSurface = surfaceKey;
-                const currentSurfaceRecord = state.surfaces[surfaceKey];
-                selectedLegend = currentSurfaceRecord ? currentSurfaceRecord.code : null;
-
+                const tooth = selectedTooth;
+                select2DTarget({
+                    tooth,
+                    targetType: 'surface',
+                    surfaceKey
+                }, useMultiSelect);
+                ensureToothState(tooth).lastSelectedSurface = surfaceKey;
+                selectedMesh = window.Odontogram3D.getToothMesh(odontogramThreeState, selectedTooth);
+                if (!useMultiSelect && selectedMesh) {
+                    window.Odontogram3D.focusTooth(odontogramThreeState, selectedMesh, surfaceKey);
+                }
                 updateSelectedToothUI();
                 renderThreeVisuals();
             }
@@ -2059,7 +2053,7 @@
             }
 
             function renderSelectedToothLegendList() {
-                if (currentView === '2d' && selectedTargets.size > 1) {
+                if (selectedTargets.size > 1) {
                     const legend = selectedLegend ? getLegendByCode(selectedLegend) : null;
 
                     if (!legend) {
@@ -2113,7 +2107,6 @@
                 const hasSelectedLegend = !!selectedLegend;
 
                 const hasAssignedTreatment =
-                    currentView === '2d' &&
                     selectedTargets.size > 0 ?
                     Array.from(
                         selectedTargets.values()
@@ -2185,13 +2178,13 @@
                     return;
                 }
 
-                if (currentView === '2d' && selectedTargets.size > 1) {
+                if (selectedTargets.size > 1) {
                     const targetCount = selectedTargets.size;
 
                     selectedToothDisplay.textContent = `${targetCount} targets selected`;
                     selectedToothName.textContent = 'Shift + Click to add or remove teeth and surfaces';
                     toothHoverLabel.innerText = `${targetCount} targets selected`;
-                    selectedViewBadge.textContent = '2D View';
+                    selectedViewBadge.textContent = currentView === '2d' ? '2D View' : '3D View';
                     legendStatusNote.classList.remove('hidden');
                     legendStatusNote.textContent =
                         `Select a treatment, then apply it to all ${targetCount} selected targets.`;
@@ -2617,7 +2610,7 @@
                 if (!selectedTooth || !selectedTargetType) return;
 
                 const targets =
-                    currentView === '2d' && selectedTargets.size > 0 ?
+                    selectedTargets.size > 0 ?
                     Array.from(selectedTargets.values()) : [{
                         tooth: selectedTooth,
                         targetType: selectedTargetType,
@@ -2719,9 +2712,7 @@
                     `${getLegendDisplayCode(payload.code)} - ${payload.label}`;
 
                 if (currentView === '3d') {
-                    setTimeout(function() {
-                        clear3DSurfacePickerSelection(false);
-                    }, 120);
+                    clear3DSurfacePickerSelection(false);
                 }
             }
 
@@ -2829,7 +2820,6 @@
                 }
 
                 const targets =
-                    currentView === '2d' &&
                     selectedTargets.size > 0 ?
                     Array.from(
                         selectedTargets.values()
@@ -3193,7 +3183,7 @@
                     view2dBtn.classList.remove('active');
                     view3dBtn.classList.add('active');
                     viewInstructionText.textContent =
-                        'Select a tooth, then choose a surface';
+                        'Click a surface; Shift + Click to select multiple';
 
                     if (previousView !== '3d') {
                         selectedTargets.clear();
@@ -3229,6 +3219,7 @@
 
                 updateSelectedToothUI();
                 update3DSurfacePicker();
+                if (view === '2d') render2DOdontogram();
             }
 
             view2dBtn.addEventListener('click', () => switchView('2d'));
@@ -3269,16 +3260,19 @@
                 updateScopeButtons();
                 updateSelectedToothUI();
                 render2DOdontogram();
+                renderThreeVisuals();
             }
 
             wholeToothScopeBtn?.addEventListener('click', () => selectTargetScope('whole'));
             toothSurfaceScopeBtn?.addEventListener('click', () => selectTargetScope('surface'));
 
-            function showTooltip(event, mesh) {
+            function showTooltip(event, mesh, surfaceKey = null) {
                 const toothNumber = mesh.userData.tooth;
                 const toothName = getToothName(toothNumber);
                 const state = ensureToothState(toothNumber);
-                const treatment = state.threeD || getPreferredToothVisual(state);
+                const hasSurfaces = Object.values(state.surfaces || {}).some(item => item?.code);
+                const wholeTreatment = state.status || (!hasSurfaces ? state.threeD : null);
+                const treatment = surfaceKey ? state.surfaces[surfaceKey] || wholeTreatment : wholeTreatment;
 
                 toothTooltipContent.innerHTML = `
     <div class="tooth-tooltip-number">
@@ -3290,12 +3284,12 @@
     </div>
 
     <div class="tooth-tooltip-help">
-        Click to choose this tooth, then select a surface.
+        ${surfaceKey ? getSurfaceLabel(surfaceKey, toothNumber) : 'Whole Tooth'} · Click to select. Shift + Click to add.
     </div>
 
     <div class="tooth-tooltip-treatment ${treatment ? 'has-treatment' : ''}">
         ${treatment
-                    ? `Current visual: ${getLegendDisplayCode(treatment.code)} - ${treatment.label}`
+                    ? `Treatment: ${getLegendDisplayCode(treatment.code)} - ${treatment.label}`
                     : 'No treatment assigned'
                 }
     </div>
@@ -4629,8 +4623,8 @@
             });
 
             surfacePickerButtons.forEach(function(button) {
-                button.addEventListener('click', function() {
-                    selectSurfaceFrom3DPicker(button.dataset.surface);
+                button.addEventListener('click', function(event) {
+                    selectSurfaceFrom3DPicker(button.dataset.surface, event.shiftKey);
                 });
             });
 
