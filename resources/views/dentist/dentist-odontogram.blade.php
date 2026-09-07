@@ -850,9 +850,9 @@
                         <span>
                             {{ $savedVisitEditMode
                                 ? 'Are you sure you want to cancel this edit? Any unsaved changes in this saved visit may be
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        lost.'
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                lost.'
                                 : 'Are you sure you want to cancel this procedure? Any unsaved progress in this session may be
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        lost.' }}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                lost.' }}
                         </span>
                     </div>
                 </div>
@@ -1310,12 +1310,13 @@
                                 targetType: selectedScope === 'whole' ? 'whole' : 'surface',
                                 surfaceKey: selectedScope === 'whole' ? null : surfaceKey
                             };
-                            // Reuse the 2D selection and conflict rules, including Shift + Click.
                             select2DTarget(target, Boolean(event?.shiftKey));
                             if (selectedTargetType === 'surface' && selectedSurfaceKey) {
-                                ensureToothState(selectedTooth).lastSelectedSurface = selectedSurfaceKey;
+                                ensureToothState(selectedTooth).lastSelectedSurface =
+                                    selectedSurfaceKey;
                             }
-                            selectedMesh = window.Odontogram3D.getToothMesh(odontogramThreeState, selectedTooth);
+                            selectedMesh = window.Odontogram3D.getToothMesh(odontogramThreeState,
+                                selectedTooth);
                             if (selectedMesh && previousTooth !== selectedTooth && !event?.shiftKey) {
                                 window.Odontogram3D.focusTooth(odontogramThreeState, selectedMesh);
                             }
@@ -1859,8 +1860,10 @@
                     btn.classList.toggle('active', isActive);
                     btn.classList.toggle('has-treatment', Boolean(treatment));
                     btn.setAttribute('aria-pressed', String(isActive));
-                    btn.title = `${getSurfaceLabel(surfaceKey, selectedTooth)}${treatment ? `: ${treatment.code} - ${treatment.label}` : ': No treatment assigned'}`;
-                    if (treatment?.colorHex) btn.style.setProperty('--surface-treatment-color', treatment.colorHex);
+                    btn.title =
+                        `${getSurfaceLabel(surfaceKey, selectedTooth)}${treatment ? `: ${treatment.code} - ${treatment.label}` : ': No treatment assigned'}`;
+                    if (treatment?.colorHex) btn.style.setProperty('--surface-treatment-color', treatment
+                        .colorHex);
                     else btn.style.removeProperty('--surface-treatment-color');
                 });
             }
@@ -1876,7 +1879,11 @@
                 }
 
                 const tooth = selectedTooth;
-                select2DTarget({ tooth, targetType: 'surface', surfaceKey }, useMultiSelect);
+                select2DTarget({
+                    tooth,
+                    targetType: 'surface',
+                    surfaceKey
+                }, useMultiSelect);
                 ensureToothState(tooth).lastSelectedSurface = surfaceKey;
                 selectedMesh = window.Odontogram3D.getToothMesh(odontogramThreeState, selectedTooth);
                 if (!useMultiSelect && selectedMesh) {
