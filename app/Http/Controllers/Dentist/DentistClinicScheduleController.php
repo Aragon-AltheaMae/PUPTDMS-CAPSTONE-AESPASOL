@@ -40,11 +40,13 @@ class DentistClinicScheduleController extends Controller
             ->pluck('cnt', 'appointment_date')
             ->toArray();
 
-        $weeklyAppointments = Appointment::with('patient')
-            ->whereBetween('appointment_date', [
-                $startDate->toDateString(),
-                $endDate->toDateString(),
-            ])
+        $weeklyAppointments = Appointment::with([
+            'patient',
+            'serviceType',
+        ])->whereBetween('appointment_date', [
+            $startDate->toDateString(),
+            $endDate->toDateString(),
+        ])
             ->whereIn('status', ['upcoming', 'rescheduled'])
             ->orderBy('appointment_date')
             ->orderBy('appointment_time')
@@ -55,7 +57,7 @@ class DentistClinicScheduleController extends Controller
                     'appointment_date' => Carbon::parse($appointment->appointment_date)->toDateString(),
                     'appointment_time' => Carbon::parse($appointment->appointment_time)->format('H:i'),
                     'display_time' => Carbon::parse($appointment->appointment_time)->format('g:i A'),
-                    'service_type' => $appointment->service_type,
+                    'service_type' => $appointment->service_type_name,
                     'other_services' => $appointment->other_services,
                     'status' => $appointment->status,
                     'patient_name' => optional($appointment->patient)->name ?? 'Unknown Patient',

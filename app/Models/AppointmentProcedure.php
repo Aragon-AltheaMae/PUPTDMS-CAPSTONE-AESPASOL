@@ -11,7 +11,6 @@ class AppointmentProcedure extends Model
 
     protected $fillable = [
         'appointment_id',
-        'patient_id',
         'odontogram_data',
         'oral_examination',
         'diagnosis',
@@ -32,10 +31,5 @@ class AppointmentProcedure extends Model
     public function appointment()
     {
         return $this->belongsTo(Appointment::class);
-    }
-
-    public function patient()
-    {
-        return $this->belongsTo(Patient::class);
     }
 }

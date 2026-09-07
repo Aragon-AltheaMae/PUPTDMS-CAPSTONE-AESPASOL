@@ -13,6 +13,7 @@ use App\Models\ReservedBookingPeriod;
 use App\Models\ServiceType;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\DentistDutyService;
 use App\Services\StudentTargetOptionService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\QueryException;
@@ -767,6 +768,8 @@ class ReservedBookingPeriodFeatureTest extends TestCase
         Mail::fake();
         Notification::fake();
 
+        $dentist = $this->makeScheduleManager('dentist');
+        app(DentistDutyService::class)->clockOut($dentist, Carbon::now());
         $patientUser = $this->makePatientUser();
         $patient = $patientUser->patient;
         $period = ReservedBookingPeriod::create([
@@ -831,6 +834,7 @@ class ReservedBookingPeriodFeatureTest extends TestCase
                 'appointment_date' => '2026-09-14',
                 'appointment_time' => '4:00 PM',
                 'service_type' => 'Oral Check-up',
+                'final_confirmation' => true,
                 'contact_email' => $patient->email,
                 'contact_phone' => '09171234567',
                 'contact_address' => 'PUP Taguig Campus',
@@ -844,6 +848,7 @@ class ReservedBookingPeriodFeatureTest extends TestCase
 
         $this->assertDatabaseHas('appointments', [
             'patient_id' => $patient->id,
+            'dentist_id' => $dentist->id,
             'reserved_booking_period_id' => $period->id,
             'reserved_booking_period_slot_id' => $slot->id,
             'appointment_date' => self::RESERVED_DATE,

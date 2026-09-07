@@ -579,9 +579,15 @@ class DocumentRequestController extends Controller
                     ->orWhereHas('patient', function ($patientQuery) use ($search) {
                         $patientQuery
                             ->where('name', 'like', "%{$search}%")
-                            ->orWhere('student_no', 'like', "%{$search}%")
-                            ->orWhere('faculty_code', 'like', "%{$search}%")
-                            ->orWhere('email', 'like', "%{$search}%");
+                            ->orWhere('email', 'like', "%{$search}%")
+                            ->orWhereHas(
+                                'information',
+                                function ($informationQuery) use ($search) {
+                                    $informationQuery
+                                        ->where('student_no', 'like', "%{$search}%")
+                                        ->orWhere('faculty_code', 'like', "%{$search}%");
+                                }
+                            );
                     });
             });
         }
@@ -684,13 +690,12 @@ class DocumentRequestController extends Controller
         $patient = $documentRequest->patient;
         $createdAt = $documentRequest->created_at;
 
+        $patient?->loadMissing('information');
+
         $patientIdentifier =
-            optional($patient)->student_no
-            ?? optional($patient)->student_number
-            ?? optional($patient)->student_id
-            ?? optional($patient)->faculty_code
-            ?? optional($patient)->employee_no
-            ?? optional($patient)->id
+            $patient?->information?->student_no
+            ?? $patient?->information?->faculty_code
+            ?? $patient?->id
             ?? 'No ID set';
 
         return [

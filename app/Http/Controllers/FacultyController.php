@@ -90,7 +90,6 @@ class FacultyController extends Controller
         $middleName = trim((string) ($facultyData['middle_name'] ?? ''));
         $lastName   = trim((string) ($facultyData['last_name'] ?? ''));
         $suffixName = trim((string) ($facultyData['suffix_name'] ?? ''));
-        $code       = $facultyData['faculty_code'] ?? null;
 
         $fullName = trim(implode(' ', array_filter([
             $firstName,
@@ -118,7 +117,6 @@ class FacultyController extends Controller
                 'middle_name' => $middleName !== '' ? $middleName : null,
                 'last_name'   => $lastName !== '' ? $lastName : null,
                 'suffix_name' => $suffixName !== '' ? $suffixName : null,
-                'code'        => $code,
                 'email'       => $email,
                 'password'    => Hash::make('password123'),
                 'role_id'     => $role->id,
