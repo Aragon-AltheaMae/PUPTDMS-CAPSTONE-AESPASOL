@@ -310,8 +310,7 @@ Route::prefix('admin')
             ->middleware('permission:view_dental_records')
             ->name('admin.dental-records.index');
 
-
-        Route::get('/dental-records/{patient}', [DentalRecordController::class, 'show'])
+        Route::get('/dental-records/{appointment}', [DentalRecordController::class, 'show'])
             ->middleware('permission:view_dental_records')
             ->name('admin.dental-records.show');
 
@@ -1476,9 +1475,9 @@ Route::prefix('dentist')->middleware(['auth'])->group(function () {
         ->middleware('permission:view_dental_records,manage_dental_records')
         ->name('dentist.dental-records.index');
 
-    Route::get('/dental-records/{id}', function ($id) {
-        return redirect()->route('dentist.dental-records.index');
-    })->middleware('permission:view_dental_records,manage_dental_records')->name('dentist.dental-records.show');
+    Route::get('/dental-records/{appointment}', [DentalRecordController::class, 'show'])
+        ->middleware('permission:view_dental_records,manage_dental_records')
+        ->name('dentist.dental-records.show');
 
     Route::get('/document-template', [DocumentTemplateController::class, 'index'])
         ->middleware('permission:manage_document_templates')
