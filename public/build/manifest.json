@@ -60,7 +60,7 @@
     "src": "node_modules/flatpickr/dist/flatpickr.min.css"
   },
   "resources/css/app.css": {
-    "file": "assets/app-BxCj9szJ.css",
+    "file": "assets/app-DM_1BPCf.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -87,7 +87,7 @@
     ]
   },
   "resources/css/pages/admin/admin-shared.css": {
-    "file": "assets/admin-shared-wQol_1Vs.css",
+    "file": "assets/admin-shared-DUNNe797.css",
     "src": "resources/css/pages/admin/admin-shared.css",
     "isEntry": true,
     "name": "admin-shared",
@@ -111,15 +111,6 @@
     "name": "cms-access",
     "names": [
       "cms-access.css"
-    ]
-  },
-  "resources/css/pages/admin/dental-records.css": {
-    "file": "assets/dental-records-Cb53CWWW.css",
-    "src": "resources/css/pages/admin/dental-records.css",
-    "isEntry": true,
-    "name": "dental-records",
-    "names": [
-      "dental-records.css"
     ]
   },
   "resources/css/pages/admin/dentist-continuity.css": {
@@ -156,15 +147,6 @@
     "name": "role-permissions",
     "names": [
       "role-permissions.css"
-    ]
-  },
-  "resources/css/pages/admin/service-types.css": {
-    "file": "assets/service-types-g5H-5bTH.css",
-    "src": "resources/css/pages/admin/service-types.css",
-    "isEntry": true,
-    "name": "service-types",
-    "names": [
-      "service-types.css"
     ]
   },
   "resources/css/pages/admin/session-management.css": {
@@ -375,7 +357,7 @@
     ]
   },
   "resources/css/pages/shared/appointments.css": {
-    "file": "assets/appointments-B5i6vWSx.css",
+    "file": "assets/appointments-Bz5SbNCv.css",
     "src": "resources/css/pages/shared/appointments.css",
     "isEntry": true,
     "name": "appointments",
@@ -390,6 +372,15 @@
     "name": "clinic-schedule",
     "names": [
       "clinic-schedule.css"
+    ]
+  },
+  "resources/css/pages/shared/dental-records.css": {
+    "file": "assets/dental-records-Ce0rQKj-.css",
+    "src": "resources/css/pages/shared/dental-records.css",
+    "isEntry": true,
+    "name": "dental-records",
+    "names": [
+      "dental-records.css"
     ]
   },
   "resources/css/pages/shared/document-requests.css": {
@@ -411,7 +402,7 @@
     ]
   },
   "resources/css/pages/shared/patient-list.css": {
-    "file": "assets/patient-list-DwL1uumq.css",
+    "file": "assets/patient-list-DtO-s-2G.css",
     "src": "resources/css/pages/shared/patient-list.css",
     "isEntry": true,
     "name": "patient-list",
@@ -426,6 +417,15 @@
     "name": "reports",
     "names": [
       "reports.css"
+    ]
+  },
+  "resources/css/pages/shared/service-types.css": {
+    "file": "assets/service-types-PkVATLht.css",
+    "src": "resources/css/pages/shared/service-types.css",
+    "isEntry": true,
+    "name": "service-types",
+    "names": [
+      "service-types.css"
     ]
   },
   "resources/js/app.js": {

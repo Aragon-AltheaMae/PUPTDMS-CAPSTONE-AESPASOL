@@ -528,6 +528,100 @@ class ReservedBookingPeriodFeatureTest extends TestCase
         ]);
     }
 
+    public function test_date_only_capacity_can_be_increased_after_a_patient_books(): void
+    {
+        $admin = $this->makeScheduleManager('admin');
+        $patient = $this->makePatientUser()->patient;
+        $period = ReservedBookingPeriod::create([
+            'title' => 'Faculty Check-up Day',
+            'reserved_date' => self::RESERVED_DATE,
+            'start_time' => '09:00:00',
+            'end_time' => '13:00:00',
+            'booking_mode' => 'date_only',
+            'target_patient_type' => 'faculty',
+            'max_capacity' => 10,
+            'is_active' => true,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ]);
+
+        $appointment = Appointment::create([
+            'patient_id' => $patient->id,
+            'reserved_booking_period_id' => $period->id,
+            'service_type' => 'Oral Check-up',
+            'appointment_date' => self::RESERVED_DATE,
+            'appointment_time' => '09:00:00',
+            'status' => 'upcoming',
+        ]);
+
+        $payload = [
+            ...$this->basePayload(),
+            'title' => 'Faculty Check-up Day',
+            'max_capacity' => 15,
+        ];
+
+        $this->actingAs($admin)
+            ->withSession(['role' => 'admin'])
+            ->put(route('admin.clinic_schedule.reserved_periods.update', $period), $payload)
+            ->assertSessionHas('success');
+
+        $this->assertSame(15, $period->fresh()->max_capacity);
+    }
+
+    public function test_new_timeslots_can_be_added_after_a_patient_books(): void
+    {
+        $admin = $this->makeScheduleManager('admin');
+        $patient = $this->makePatientUser()->patient;
+        $period = ReservedBookingPeriod::create([
+            ...$this->storedStudentPayload(),
+            'max_capacity' => 2,
+            'created_by' => $admin->id,
+            'updated_by' => $admin->id,
+        ]);
+        $firstSlot = $period->slots()->create([
+            'slot_time' => '09:00:00',
+            'max_capacity' => 1,
+        ]);
+        $period->slots()->create([
+            'slot_time' => '10:00:00',
+            'max_capacity' => 1,
+        ]);
+
+        $appointment = Appointment::create([
+            'patient_id' => $patient->id,
+            'reserved_booking_period_id' => $period->id,
+            'reserved_booking_period_slot_id' => $firstSlot->id,
+            'service_type' => 'Oral Check-up',
+            'appointment_date' => self::RESERVED_DATE,
+            'appointment_time' => '09:00:00',
+            'status' => 'upcoming',
+        ]);
+
+        $payload = [
+            ...$this->studentPayload(),
+            'timeslots' => [
+                ['time' => '09:00'],
+                ['time' => '10:00'],
+                ['time' => '11:00'],
+            ],
+        ];
+
+        $this->actingAs($admin)
+            ->withSession(['role' => 'admin'])
+            ->put(route('admin.clinic_schedule.reserved_periods.update', $period), $payload)
+            ->assertSessionHas('success');
+
+        $this->assertSame(3, $period->fresh()->max_capacity);
+        $this->assertSame(
+            ['09:00:00', '10:00:00', '11:00:00'],
+            $period->slots()->pluck('slot_time')->all()
+        );
+        $this->assertDatabaseHas('appointments', [
+            'id' => $appointment->id,
+            'reserved_booking_period_slot_id' => $firstSlot->id,
+        ]);
+    }
+
     public function test_period_with_an_existing_regular_appointment_is_rejected(): void
     {
         $admin = $this->makeScheduleManager('admin');
