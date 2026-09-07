@@ -60,10 +60,11 @@ class ReservedBookingPeriodService
                 ->findOrFail($period->id);
 
             $newIsActive = $this->requestedActive($data);
+            $hasActiveAppointments = $lockedPeriod->activeAppointments()->exists();
 
             if ($lockedPeriod->is_active
                 && ! $newIsActive
-                && $lockedPeriod->activeAppointments()->exists()) {
+                && $hasActiveAppointments) {
                 $this->fail(
                     'is_active',
                     'This reserved period has active patient bookings and cannot be set to Inactive. Cancel or complete those bookings first.'
@@ -80,7 +81,7 @@ class ReservedBookingPeriodService
                 $normalized['allowed_services'] = null;
             }
 
-            if ($lockedPeriod->activeAppointments()->exists()) {
+            if ($hasActiveAppointments) {
                 $protectedFields = [
                     'reserved_date',
                     'start_time',
@@ -92,7 +93,6 @@ class ReservedBookingPeriodService
                     'program_code',
                     'year_level',
                     'section',
-                    'max_capacity',
                 ];
 
                 $scheduleChanged = collect($protectedFields)->contains(
@@ -105,9 +105,11 @@ class ReservedBookingPeriodService
                 if ($scheduleChanged) {
                     $this->fail(
                         'reserved_date',
-                        'The schedule, target, and capacity cannot be changed after patients have booked this period.'
+                        'The schedule and target cannot be changed after patients have booked this period.'
                     );
                 }
+
+                $this->validateCapacityExpansion($lockedPeriod, $normalized, $data);
             }
 
             $lockedPeriod->update([
@@ -116,8 +118,10 @@ class ReservedBookingPeriodService
                 'updated_by' => $actor->id,
             ]);
 
-            if (! $lockedPeriod->activeAppointments()->exists()) {
+            if (! $hasActiveAppointments) {
                 $this->syncSlots($lockedPeriod, $data);
+            } elseif ($lockedPeriod->booking_mode === 'timeslot') {
+                $this->addNewSlots($lockedPeriod, $data);
             }
 
             return $lockedPeriod->refresh()->load('slots');
@@ -350,6 +354,49 @@ class ReservedBookingPeriodService
                 ->values()
                 ->all()
         );
+    }
+
+    private function validateCapacityExpansion(
+        ReservedBookingPeriod $period,
+        array $normalized,
+        array $data
+    ): void {
+        if ($period->booking_mode === 'date_only') {
+            if ((int) $normalized['max_capacity'] < (int) $period->max_capacity) {
+                $this->fail(
+                    'max_capacity',
+                    'Capacity can only be increased after patients have booked this period.'
+                );
+            }
+
+            return;
+        }
+
+        $existingSlots = $period->slots()
+            ->pluck('slot_time')
+            ->map(fn ($time) => $this->normalizeTime($time))
+            ->all();
+
+        $requestedSlots = collect($data['timeslots'] ?? [])
+            ->map(fn ($slot) => $this->normalizeTime($slot['time'] ?? null))
+            ->all();
+
+        if (array_diff($existingSlots, $requestedSlots) !== []) {
+            $this->fail(
+                'timeslots',
+                'Existing timeslots cannot be removed after patients have booked. You may only add new timeslots.'
+            );
+        }
+    }
+
+    private function addNewSlots(ReservedBookingPeriod $period, array $data): void
+    {
+        foreach ($data['timeslots'] ?? [] as $slot) {
+            $period->slots()->firstOrCreate(
+                ['slot_time' => $this->normalizeTime($slot['time'])],
+                ['max_capacity' => 1]
+            );
+        }
     }
 
     private function requestedActive(array $data): bool
