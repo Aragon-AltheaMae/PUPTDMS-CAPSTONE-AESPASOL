@@ -17,6 +17,15 @@ return new class extends Migration
                 ->restrictOnDelete();
         });
 
+        if (DB::getDriverName() === 'sqlite') {
+            DB::table('appointments')->update([
+                'service_type_id' => DB::table('service_types')->select('id')
+                    ->whereColumn('service_types.name', 'appointments.service_type')->limit(1),
+            ]);
+
+            return;
+        }
+
         DB::table('appointments')
             ->join(
                 'service_types',

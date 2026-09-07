@@ -71,7 +71,7 @@ class DocumentRequestController extends Controller
 
                 'stats' => $stats,
 
-                'types' => DocumentRequest::query()
+                'types' => DocumentRequest::withStateColumns()
                     ->whereNotNull('document_type')
                     ->pluck('document_type')
                     ->filter()
@@ -91,7 +91,7 @@ class DocumentRequestController extends Controller
             ]);
         }
 
-        $refreshItems = DocumentRequest::query()
+        $refreshItems = DocumentRequest::withStateColumns()
             ->select('id')
             ->orderByDesc('id')
             ->get()
@@ -157,7 +157,7 @@ class DocumentRequestController extends Controller
             'success' => true,
             'requests' => $requests,
             'stats' => $this->getDocumentRequestStats(),
-            'types' => DocumentRequest::query()
+            'types' => DocumentRequest::withStateColumns()
                 ->whereNotNull('document_type')
                 ->pluck('document_type')
                 ->filter()
@@ -169,7 +169,7 @@ class DocumentRequestController extends Controller
 
     public function show($id)
     {
-        $documentRequest = DocumentRequest::with('patient')->findOrFail($id);
+        $documentRequest = DocumentRequest::withStateColumns()->with('patient')->findOrFail($id);
 
         return response()->json($this->formatRequestPayload($documentRequest));
     }
@@ -178,7 +178,7 @@ class DocumentRequestController extends Controller
     {
         try {
             $documentRequest = DB::transaction(function () use ($id) {
-                $requestItem = DocumentRequest::with('patient.user')->findOrFail($id);
+                $requestItem = DocumentRequest::withStateColumns()->with('patient.user')->findOrFail($id);
 
                 $requestItem->update([
                     'status' => 'approved',
@@ -251,7 +251,7 @@ class DocumentRequestController extends Controller
         ]);
 
         try {
-            $documentRequest = DocumentRequest::with('patient.user')->findOrFail($id);
+            $documentRequest = DocumentRequest::withStateColumns()->with('patient.user')->findOrFail($id);
 
             $documentRequest->update([
                 'status' => 'rejected',
@@ -372,7 +372,7 @@ class DocumentRequestController extends Controller
 
     public function printQueue()
     {
-        $requests = DocumentRequest::with('patient')
+        $requests = DocumentRequest::withStateColumns()->with('patient')
             ->whereIn(DB::raw('LOWER(status)'), array_merge(['pending'], self::LEGACY_APPROVED_STATUSES))
             ->orderBy('created_at', 'asc')
             ->get();
@@ -389,7 +389,7 @@ class DocumentRequestController extends Controller
         $dateTo   = trim((string) $request->get('date_to', ''));
         $sort     = trim((string) $request->get('sort', 'newest'));
 
-        $query = DocumentRequest::with('patient');
+        $query = DocumentRequest::withStateColumns()->with('patient');
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
@@ -509,7 +509,7 @@ class DocumentRequestController extends Controller
 
     private function getDocumentRequestStats(): array
     {
-        $counts = DocumentRequest::query()
+        $counts = DocumentRequest::withStateColumns()
             ->selectRaw('LOWER(status) as status_key, COUNT(*) as total')
             ->groupBy('status_key')
             ->pluck('total', 'status_key')

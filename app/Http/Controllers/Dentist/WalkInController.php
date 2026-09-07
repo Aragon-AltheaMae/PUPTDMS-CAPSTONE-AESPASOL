@@ -3019,11 +3019,14 @@ class WalkInController extends Controller
             'patient_id' => $patient->id,
             'dentist_id' => Auth::id(),
             'service_type_id' => $serviceType->id,
-            'service_type' => $serviceType->name,
             'appointment_date' => $now->toDateString(),
             'appointment_time' => $now->format('H:i:s'),
             'status' => 'upcoming',
         ];
+
+        if (Schema::hasColumn('appointments', 'service_type')) {
+            $appointmentData['service_type'] = $serviceType->name;
+        }
 
         if (Schema::hasColumn('appointments', 'is_walk_in')) {
             $appointmentData['is_walk_in'] = true;

@@ -125,7 +125,7 @@ class OdontogramController extends Controller
             : AppointmentProcedure::whereHas('appointment', function ($query) use ($patient) {
                 $query->where('patient_id', $patient->id);
             })
-            ->whereNotNull('odontogram_data')
+            ->whereHas('odontogram', fn ($query) => $query->where('has_data', true))
             ->latest('updated_at')
             ->latest('id')
             ->first();
@@ -972,19 +972,10 @@ class OdontogramController extends Controller
                 'diagnosis' => $validated['diagnosis'] ?? null,
                 'prescriptions' => $validated['prescriptions'] ?? null,
                 'completion_action' => $completionAction,
+                'procedure_started_at' => $procedureStartedAt,
+                'procedure_completed_at' => $procedureCompletedAt,
+                'procedure_duration_seconds' => max(0, $procedureDurationSeconds),
             ];
-
-            if (Schema::hasColumn('appointment_procedures', 'procedure_started_at')) {
-                $procedurePayload['procedure_started_at'] = $procedureStartedAt;
-            }
-
-            if (Schema::hasColumn('appointment_procedures', 'procedure_completed_at')) {
-                $procedurePayload['procedure_completed_at'] = $procedureCompletedAt;
-            }
-
-            if (Schema::hasColumn('appointment_procedures', 'procedure_duration_seconds')) {
-                $procedurePayload['procedure_duration_seconds'] = max(0, $procedureDurationSeconds);
-            }
 
             AppointmentProcedure::updateOrCreate(
                 [

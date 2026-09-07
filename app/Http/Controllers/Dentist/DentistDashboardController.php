@@ -274,16 +274,11 @@ class DentistDashboardController extends Controller
             ->limit(3)
             ->get();
 
-        $gadRaw = DB::table('daily_treatment_records')
-            ->whereYear('treatment_date', $now->year)
-            ->whereMonth('treatment_date', $now->month)
-            ->select(
-                'office_type',
-                'gender',
-                DB::raw('COUNT(*) as total')
-            )
-            ->groupBy('office_type', 'gender')
-            ->get();
+        $gadRaw = app(\App\Services\AppointmentReportRecords::class)
+            ->between($now->copy()->startOfMonth(), $now->copy()->endOfMonth())
+            ->groupBy(fn ($row) => json_encode([$row->office_type, $row->gender]))
+            ->map(fn ($rows) => (object) ['office_type' => $rows->first()->office_type,
+                'gender' => $rows->first()->gender, 'total' => $rows->count()])->values();
 
         $gadLabels = [
             'Student',
