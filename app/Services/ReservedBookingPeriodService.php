@@ -7,6 +7,7 @@ use App\Models\Appointment;
 use App\Models\BlockedDate;
 use App\Models\ClinicSchedule;
 use App\Models\ReservedBookingPeriod;
+use App\Models\ServiceType;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -72,6 +73,13 @@ class ReservedBookingPeriodService
             $this->validateScheduleRestrictions($data, $lockedPeriod->id);
             $normalized = $this->normalize($data);
 
+            // Legacy periods use NULL to mean every active booking service.
+            // Preserve that representation when an edit submits the same full set.
+            if ($lockedPeriod->allowed_services === null
+                && $this->containsEveryActiveService($normalized['allowed_services'] ?? [])) {
+                $normalized['allowed_services'] = null;
+            }
+
             if ($lockedPeriod->activeAppointments()->exists()) {
                 $protectedFields = [
                     'reserved_date',
@@ -80,6 +88,7 @@ class ReservedBookingPeriodService
                     'booking_mode',
                     'timeslot_duration_minutes',
                     'target_patient_type',
+                    'allowed_services',
                     'program_code',
                     'year_level',
                     'section',
@@ -87,8 +96,10 @@ class ReservedBookingPeriodService
                 ];
 
                 $scheduleChanged = collect($protectedFields)->contains(
-                    fn ($field) => (string) $lockedPeriod->getRawOriginal($field)
-                        !== (string) ($normalized[$field] ?? '')
+                    fn ($field) => $field === 'allowed_services'
+                        ? $lockedPeriod->allowed_services !== ($normalized[$field] ?? null)
+                        : (string) $lockedPeriod->getRawOriginal($field)
+                            !== (string) ($normalized[$field] ?? '')
                 );
 
                 if ($scheduleChanged) {
@@ -152,10 +163,10 @@ class ReservedBookingPeriodService
             );
         }
 
-        if (array_key_exists($dateString, PhilippineHolidays::recordsRange(0, 2))) {
+        if (PhilippineHolidays::isBlockedForBooking($dateString)) {
             $this->fail(
                 'reserved_date',
-                'Active reserved booking periods cannot be scheduled on a holiday.'
+                'Active reserved booking periods cannot be scheduled on a non-working holiday.'
             );
         }
 
@@ -244,6 +255,9 @@ class ReservedBookingPeriodService
                 ? (int) $data['timeslot_duration_minutes']
                 : null,
             'target_patient_type' => $data['target_patient_type'],
+            'allowed_services' => array_key_exists('allowed_services', $data)
+                ? array_values($data['allowed_services'] ?? [])
+                : null,
             'program_code' => $isStudent ? strtoupper(trim($data['program_code'])) : null,
             'year_level' => $isStudent ? (int) $data['year_level'] : null,
             'section' => $isStudent ? strtoupper(trim($data['section'])) : null,
@@ -341,6 +355,22 @@ class ReservedBookingPeriodService
     private function requestedActive(array $data): bool
     {
         return filter_var($data['is_active'] ?? false, FILTER_VALIDATE_BOOLEAN);
+    }
+
+    private function containsEveryActiveService(array $services): bool
+    {
+        $selected = collect($services)
+            ->map(fn ($service) => mb_strtolower(trim((string) $service)))
+            ->sort()
+            ->values();
+
+        $active = ServiceType::activeForBooking()
+            ->pluck('name')
+            ->map(fn ($service) => mb_strtolower(trim((string) $service)))
+            ->sort()
+            ->values();
+
+        return $selected->all() === $active->all();
     }
 
     private function normalizeTime(?string $time): string

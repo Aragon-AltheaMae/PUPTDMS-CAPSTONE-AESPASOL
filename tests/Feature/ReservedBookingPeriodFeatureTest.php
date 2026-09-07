@@ -496,6 +496,38 @@ class ReservedBookingPeriodFeatureTest extends TestCase
         $this->assertDatabaseCount('reserved_booking_periods', 0);
     }
 
+    public function test_working_holiday_can_receive_an_active_reserved_period(): void
+    {
+        $admin = $this->makeScheduleManager('admin');
+
+        ClinicSchedule::create([
+            'days_label' => 'Tue',
+            'days' => ['Tue'],
+            'status' => 'open',
+            'open_time' => '08:00',
+            'close_time' => '17:00',
+            'break_time' => 'none',
+            'max_slots' => 20,
+            'is_active' => true,
+        ]);
+
+        $payload = [
+            ...$this->basePayload(),
+            'reserved_date' => '2026-09-08',
+        ];
+
+        $this->actingAs($admin)
+            ->withSession(['role' => 'admin'])
+            ->post(route('admin.clinic_schedule.reserved_periods.store'), $payload)
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('reserved_booking_periods', [
+            'reserved_date' => '2026-09-08',
+            'active_reserved_date' => '2026-09-08',
+            'is_active' => true,
+        ]);
+    }
+
     public function test_period_with_an_existing_regular_appointment_is_rejected(): void
     {
         $admin = $this->makeScheduleManager('admin');
@@ -831,6 +863,7 @@ class ReservedBookingPeriodFeatureTest extends TestCase
                 'appointment_date' => '2026-09-14',
                 'appointment_time' => '4:00 PM',
                 'service_type' => 'Oral Check-up',
+                'final_confirmation' => '1',
                 'contact_email' => $patient->email,
                 'contact_phone' => '09171234567',
                 'contact_address' => 'PUP Taguig Campus',
@@ -930,6 +963,68 @@ class ReservedBookingPeriodFeatureTest extends TestCase
         $this->assertSame($slot->id, $appointment->fresh()->reserved_booking_period_slot_id);
     }
 
+    public function test_reserved_period_stores_and_shows_only_its_allowed_services(): void
+    {
+        $patientUser = $this->makePatientUser();
+        $admin = $this->makeScheduleManager('admin');
+
+        ServiceType::create([
+            'name' => 'Oral Check-up',
+            'description' => 'Routine oral assessment.',
+            'is_active_for_booking' => true,
+            'is_default' => true,
+        ]);
+        ServiceType::create([
+            'name' => 'Dental Surgery',
+            'description' => 'Surgical dental care.',
+            'is_active_for_booking' => true,
+            'is_default' => true,
+        ]);
+
+        $payload = [
+            ...$this->studentPayload(),
+            'is_active' => '1',
+            'allowed_services_present' => '1',
+            'allowed_services' => ['Oral Check-up'],
+        ];
+
+        $this->actingAs($admin)
+            ->withSession(['role' => 'admin'])
+            ->post(route('admin.clinic_schedule.reserved_periods.store'), $payload)
+            ->assertSessionHas('success');
+
+        $period = ReservedBookingPeriod::firstOrFail();
+
+        $this->assertSame(['Oral Check-up'], $period->allowed_services);
+
+        $this->actingAs($patientUser)
+            ->withSession([
+                'role' => 'patient',
+                'patient_id' => $patientUser->patient->id,
+            ])
+            ->get(route('book.appointment.reserved', $period))
+            ->assertOk()
+            ->assertSee('Oral Check-up')
+            ->assertDontSee('Dental Surgery');
+    }
+
+    public function test_reserved_period_rejects_an_unavailable_allowed_service(): void
+    {
+        $admin = $this->makeScheduleManager('admin');
+        $payload = [
+            ...$this->basePayload(),
+            'allowed_services_present' => '1',
+            'allowed_services' => ['Unavailable Service'],
+        ];
+
+        $this->actingAs($admin)
+            ->withSession(['role' => 'admin'])
+            ->post(route('admin.clinic_schedule.reserved_periods.store'), $payload)
+            ->assertSessionHasErrors(['allowed_services.0'], null, 'reservedPeriod');
+
+        $this->assertDatabaseCount('reserved_booking_periods', 0);
+    }
+
     private function makeScheduleManager(string $roleSlug): User
     {
         $role = Role::create([
@@ -1015,6 +1110,7 @@ class ReservedBookingPeriodFeatureTest extends TestCase
             'start_time' => '09:00',
             'end_time' => '13:00',
             'booking_mode' => 'date_only',
+            'is_active' => '1',
             'target_patient_type' => 'faculty',
             'max_capacity' => 10,
             'notes' => 'First reserved-period setup test.',

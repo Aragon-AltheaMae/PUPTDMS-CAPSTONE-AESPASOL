@@ -7,6 +7,7 @@ use App\Models\BlockedDate;
 use App\Models\ClinicSchedule;
 use App\Models\Appointment;
 use App\Models\ReservedBookingPeriod;
+use App\Models\ServiceType;
 use App\Services\StudentTargetOptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -25,6 +26,7 @@ class ClinicScheduleController extends Controller
             ->orderBy('start_time')
             ->get();
         $studentTargetOptions = $studentTargetOptionService->get();
+        $serviceTypes = ServiceType::activeForBooking()->orderBy('name')->get(['name', 'description']);
 
         $startDate = Carbon::now()->startOfMonth()->subMonth();
         $endDate   = Carbon::now()->endOfMonth()->addMonths(3);
@@ -75,6 +77,7 @@ class ClinicScheduleController extends Controller
             'blockedDates' => $blockedDates,
             'reservedBookingPeriods' => $reservedBookingPeriods,
             'studentTargetOptions' => $studentTargetOptions,
+            'serviceTypes' => $serviceTypes,
             'appointmentCountsPerDay' => $appointmentCountsPerDay,
             'weeklyAppointments' => $weeklyAppointments,
             'philippineHolidays' => $philippineHolidays,
