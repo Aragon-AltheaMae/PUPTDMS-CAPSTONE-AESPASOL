@@ -62,7 +62,9 @@ class DentistDutyService
                 ->where(function ($query) {
                     $query->whereDoesntHave('procedure')
                         ->orWhereHas('procedure', function ($procedureQuery) {
-                            $procedureQuery->whereNull('procedure_completed_at');
+                            $procedureQuery->whereDoesntHave('timing', function ($timingQuery) {
+                                $timingQuery->whereNotNull('completed_at');
+                            });
                         });
                 })
                 ->lockForUpdate()
@@ -262,7 +264,7 @@ class DentistDutyService
             $cancelledAppointments
         );
 
-        if (AuditLog::query()->where('module', 'dentist_duty')->where('description', $existingDescription)->exists()) {
+        if (AuditLog::query()->where('module', 'dentist_duty')->withDescription($existingDescription)->exists()) {
             return;
         }
 

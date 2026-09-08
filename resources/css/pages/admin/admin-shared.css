@@ -3,12 +3,6 @@
     margin-top: 1rem;
 }
 
-.admin-stack {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-}
-
 .admin-mt-4 {
     margin-top: 1rem;
 }

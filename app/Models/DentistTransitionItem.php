@@ -9,6 +9,19 @@ class DentistTransitionItem extends Model
 {
     use HasFactory;
 
+    use \App\Models\Concerns\StoresOptionalDetails;
+
+    protected function detailFields(): array
+    {
+        return ['resolution' => ['resolution_type', 'remarks', 'transferred_by', 'transferred_at']];
+    }
+
+    public function resolution()
+    {
+        return $this->hasOne(DentistTransitionItemResolution::class, 'dentist_transition_item_id');
+    }
+
+
     public const TYPES = [
         'appointment',
         'document_request',

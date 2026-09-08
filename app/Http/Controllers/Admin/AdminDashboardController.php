@@ -37,7 +37,7 @@ class AdminDashboardController extends Controller
             ->whereMonth('appointment_date', $now->month)
             ->count();
 
-        $documentsThisMonth = \App\Models\DocumentRequest::whereYear('request_date', $now->year)
+        $documentsThisMonth = \App\Models\DocumentRequest::withStateColumns()->whereYear('request_date', $now->year)
             ->whereMonth('request_date', $now->month)
             ->where('status', 'approved')
             ->count();

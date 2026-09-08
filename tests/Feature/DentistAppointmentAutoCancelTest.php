@@ -63,10 +63,7 @@ class DentistAppointmentAutoCancelTest extends TestCase
 
         $this->assertCount(1, Notification::sent($patientUser, AppointmentCancelledNotification::class));
         Mail::assertSent(AppointmentCancelledMail::class, 1);
-        $this->assertDatabaseHas('audit_logs', [
-            'module' => 'dentist_duty',
-            'actor_role' => 'dentist',
-        ]);
+        $this->assertTrue(AuditLog::where('module', 'dentist_duty')->forActorRole('dentist')->exists());
     }
 
     public function test_duty_end_cancellation_remains_persisted_and_displayed_after_sync_and_page_reload(): void
@@ -216,10 +213,7 @@ class DentistAppointmentAutoCancelTest extends TestCase
         $this->assertSame('cancelled', $appointment->fresh()->status);
         $this->assertCount(1, Notification::sent($patientUser, AppointmentCancelledNotification::class));
         Mail::assertSent(AppointmentCancelledMail::class, 1);
-        $this->assertDatabaseHas('audit_logs', [
-            'module' => 'dentist_duty',
-            'actor_role' => 'system',
-        ]);
+        $this->assertTrue(AuditLog::where('module', 'dentist_duty')->forActorRole('system')->exists());
     }
 
     public function test_automatic_process_does_not_run_before_eight_pm(): void
@@ -291,6 +285,33 @@ class DentistAppointmentAutoCancelTest extends TestCase
 
         $this->assertSame('upcoming', $appointment->fresh()->status);
         Notification::assertNothingSent();
+    }
+
+    public function test_unfinished_and_missing_timing_records_remain_eligible_for_auto_cancellation(): void
+    {
+        Carbon::setTestNow('2026-09-04 15:30:00');
+        Notification::fake();
+        $dentist = $this->makeDentist('unfinished-timing-dentist@example.com');
+        $appointments = [];
+        foreach ([false, true] as $missing) {
+            [$patient] = $this->makePatientWithUser('unfinished-timing-'.(int) $missing.'@example.com');
+            $appointment = $this->makeAppointment($dentist, $patient, ['appointment_time' => $missing ? '14:30:00' : '14:00:00']);
+            $procedure = AppointmentProcedure::create([
+                'appointment_id' => $appointment->id,
+                'procedure_started_at' => Carbon::parse('2026-09-04 14:00:00'),
+                'procedure_completed_at' => null,
+                'procedure_duration_seconds' => 0,
+            ]);
+            if ($missing) {
+                $procedure->timing()->delete();
+            }
+            $appointments[] = $appointment;
+        }
+        $this->actingAs($dentist)->withSession(['role' => 'dentist'])
+            ->postJson(route('dentist.clinic-status.update'), ['status' => 'out'])->assertOk();
+        foreach ($appointments as $appointment) {
+            $this->assertSame('cancelled', $appointment->fresh()->status);
+        }
     }
 
     private function makeDentist(string $email): User

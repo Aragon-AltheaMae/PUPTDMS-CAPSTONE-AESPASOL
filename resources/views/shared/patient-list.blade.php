@@ -284,38 +284,60 @@
 
                                 <div id="patientContainer" class="space-y-3 px-3 md:px-6 pb-6 pt-4">
 
-                                    @php
-                                        $appointments = collect($appointments)
-                                            ->sort(function ($a, $b) {
-                                                $aStatus = strtolower(trim((string) ($a->status ?? 'upcoming')));
-                                                $bStatus = strtolower(trim((string) ($b->status ?? 'upcoming')));
+                       @php
+                                    $appointments = collect($appointments)
+                                        ->sort(function ($a, $b) {
+                                            $aStatus = strtolower(
+                                                trim((string) ($a->status ?? 'upcoming'))
+                                            );
 
-                                                $activeStatuses = ['upcoming', 'rescheduled', 'pending', 'confirmed'];
-                                                $aIsActive = in_array($aStatus, $activeStatuses, true);
-                                                $bIsActive = in_array($bStatus, $activeStatuses, true);
+                                            $bStatus = strtolower(
+                                                trim((string) ($b->status ?? 'upcoming'))
+                                            );
 
-                                                if ($aIsActive !== $bIsActive) {
-                                                    return $aIsActive ? -1 : 1;
-                                                }
+                                            $activeStatuses = [
+                                                'upcoming',
+                                                'rescheduled',
+                                                'pending',
+                                                'confirmed',
+                                            ];
 
-                                                $aDateTime = Carbon::parse(
-                                                    ($a->appointment_date ?? '1970-01-01') .
-                                                        ' ' .
-                                                        ($a->appointment_time ?? '00:00:00'),
-                                                );
-                                                $bDateTime = Carbon::parse(
-                                                    ($b->appointment_date ?? '1970-01-01') .
-                                                        ' ' .
-                                                        ($b->appointment_time ?? '00:00:00'),
-                                                );
+                                            $aIsActive = in_array(
+                                                $aStatus,
+                                                $activeStatuses,
+                                                true
+                                            );
 
-                                                if ($aIsActive && $bIsActive) {
-                                                    return $aDateTime <=> $bDateTime;
-                                                }
-                                                return $bDateTime <=> $aDateTime;
-                                            })
-                                            ->values();
-                                    @endphp
+                                            $bIsActive = in_array(
+                                                $bStatus,
+                                                $activeStatuses,
+                                                true
+                                            );
+
+                                            if ($aIsActive !== $bIsActive) {
+                                                return $aIsActive ? -1 : 1;
+                                            }
+
+                                            $aDateTime = Carbon::parse(
+                                                ($a->appointment_date ?? '1970-01-01') .
+                                                    ' ' .
+                                                    ($a->appointment_time ?? '00:00:00')
+                                            );
+
+                                            $bDateTime = Carbon::parse(
+                                                ($b->appointment_date ?? '1970-01-01') .
+                                                    ' ' .
+                                                    ($b->appointment_time ?? '00:00:00')
+                                            );
+
+                                            if ($aIsActive && $bIsActive) {
+                                                return $aDateTime <=> $bDateTime;
+                                            }
+
+                                            return $bDateTime <=> $aDateTime;
+                                        })
+                                        ->values();
+                                @endphp
 
                                     @foreach ($appointments as $appt)
                                         @php
@@ -364,6 +386,7 @@
 
                                             $patientCourseCode = trim((string) ($patient?->course_code ?? ''));
                                             $patientCourseName = trim((string) ($patient?->course_name ?? ''));
+                                           
 
                                             $patientCourse =
                                                 $patientCourseCode !== ''
@@ -382,6 +405,7 @@
                                             if ($patientCourseFull === '') {
                                                 $patientCourseFull = 'No program';
                                             }
+                                           
 
                                             $patientYearLevel = $patient?->year_level ?? '';
                                             $patientSection = $patient?->section ?? '';
@@ -389,11 +413,13 @@
                                             $patientImage = $patient?->profile_image
                                                 ? asset('storage/' . $patient->profile_image)
                                                 : null;
+                                          
 
                                             $dateLabel = Carbon::parse($appt->appointment_date)->format('l, F j, Y');
 
                                             $gridDayLabel = Carbon::parse($appt->appointment_date)->format('l');
                                             $gridDateLabel = Carbon::parse($appt->appointment_date)->format('F j, Y');
+                                      
 
                                             $timeLabel = Carbon::parse($appt->appointment_time)->format('g:i A');
                                             $serviceLabel =
@@ -404,6 +430,7 @@
 
                                             $serviceLower = strtolower($serviceLabel);
                                             $badgeClass = 'service-badge-default';
+                                          
 
                                             if (str_contains($serviceLower, 'surgery')) {
                                                 $badgeClass = 'service-badge-surgery';
@@ -759,7 +786,6 @@
 
         </div>
 
-
         <x-filter-group title="Sort By">
 
             <div id="fSortGroup" class="filter-chip-row">
@@ -783,7 +809,6 @@
             </div>
 
         </x-filter-group>
-
 
         <x-filter-group title="Filter by Date Range">
 
@@ -813,7 +838,6 @@
 
         </x-filter-group>
 
-
         <x-filter-group title="Custom Date Range">
 
             <div class="filter-date-grid">
@@ -839,7 +863,6 @@
             </div>
 
         </x-filter-group>
-
 
         <x-filter-group title="Course">
 
@@ -879,7 +902,6 @@
 
         </x-filter-group>
 
-
         <div class="filter-two-column-grid">
 
             <x-filter-group title="Year Level">
@@ -907,7 +929,6 @@
 
             </x-filter-group>
 
-
             <x-filter-group title="Section">
 
                 <div class="filter-chip-row">
@@ -934,7 +955,6 @@
             </x-filter-group>
 
         </div>
-
 
         <x-filter-group title="Department" class="filter-group-last">
 
@@ -1103,7 +1123,6 @@
 
                         applyFilters();
                     };
-
 
                 window.handlePatientDirectorySearch =
                     function(value) {

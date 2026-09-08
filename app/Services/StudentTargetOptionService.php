@@ -27,10 +27,9 @@ class StudentTargetOptionService
                     'message' => $exception->getMessage(),
                 ]);
             }
-
             $localOptions = Patient::query()
                 ->with([
-                    'information' => function ($query) {
+                    'studentInformation' => function ($query) {
                         $query->select([
                             'id',
                             'patient_id',
@@ -42,7 +41,7 @@ class StudentTargetOptionService
                     },
                 ])
                 ->where('classification', 'student')
-                ->whereHas('information', function ($query) {
+                ->whereHas('studentInformation', function ($query) {
                     $query->whereNotNull('course_code');
                 })
                 ->select([
@@ -51,26 +50,26 @@ class StudentTargetOptionService
                 ])
                 ->get()
                 ->map(function (Patient $patient) {
-                    $information = $patient->information;
+                    $studentInformation = $patient->studentInformation;
 
                     return [
                         'course_code' => trim(
-                            (string) $information?->course_code
+                            (string) $studentInformation?->course_code
                         ),
 
                         'course_name' => trim(
                             (string) (
-                                $information?->course_name
-                                ?: $information?->course_code
+                                $studentInformation?->course_name
+                                ?: $studentInformation?->course_code
                             )
                         ),
 
                         'year_level' => (int) (
-                            $information?->year_level ?? 0
+                            $studentInformation?->year_level ?? 0
                         ),
 
                         'section' => trim(
-                            (string) $information?->section
+                            (string) $studentInformation?->section
                         ),
                     ];
                 });

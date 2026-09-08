@@ -118,7 +118,7 @@ class DentistTransitionService
                 ->with(['patient', 'dentist'])
                 ->get();
 
-            $documentRequests = DocumentRequest::query()
+            $documentRequests = DocumentRequest::withStateColumns()
                 ->where('status', 'pending')
                 ->with('patient')
                 ->get();

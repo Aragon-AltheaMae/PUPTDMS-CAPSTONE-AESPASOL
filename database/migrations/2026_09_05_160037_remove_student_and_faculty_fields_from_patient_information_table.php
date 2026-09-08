@@ -10,6 +10,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('patient_information', function (Blueprint $table) {
+            $table->dropIndex(['faculty_code']);
+            $table->dropIndex(['student_no']);
+            $table->dropIndex(['course_code']);
+            $table->dropIndex('patient_information_student_target_index');
+        });
+
+        Schema::table('patient_information', function (Blueprint $table) {
             $table->dropColumn([
                 'faculty_code',
                 'student_no',
@@ -26,14 +33,17 @@ return new class extends Migration
         Schema::table('patient_information', function (Blueprint $table) {
             $table->string('faculty_code')
                 ->nullable()
+                ->index()
                 ->after('weight_kg');
 
             $table->string('student_no')
                 ->nullable()
+                ->index()
                 ->after('faculty_code');
 
             $table->string('course_code')
                 ->nullable()
+                ->index()
                 ->after('student_no');
 
             $table->string('course_name')
@@ -47,6 +57,8 @@ return new class extends Migration
             $table->string('section')
                 ->nullable()
                 ->after('year_level');
+
+            $table->index(['course_code', 'year_level', 'section'], 'patient_information_student_target_index');
         });
 
 

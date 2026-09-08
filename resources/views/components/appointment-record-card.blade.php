@@ -8,11 +8,13 @@
 'compact' => false,
 'recordEditUrl' => null,
 'showReserved' => false,
+'previousOdontogram' => [],
 ])
 
 @php
 use Carbon\Carbon;
 use App\Support\OdontogramTreatmentDisplay;
+use App\Services\AppointmentOdontogramSnapshotService;
 use Illuminate\Support\Str;
 
 $get = function ($key, $fallback = null) use ($appointment) {
@@ -115,8 +117,35 @@ $diagnosis = data_get($procedure, 'diagnosis') ?? $get('diagnosis');
 
 $prescription = data_get($procedure, 'prescriptions') ?? ($get('prescription') ?? $get('prescriptions'));
 
-$odontogram = data_get($procedure, 'odontogram_data') ?? ($get('odontogram') ?? ($get('odontogram_data') ?? []));
-$treatmentItems = OdontogramTreatmentDisplay::items($odontogram);
+$currentOdontogram =
+    data_get(
+        $procedure,
+        'odontogram_data'
+    )
+    ?? (
+        $get('odontogram')
+        ?? (
+            $get('odontogram_data')
+            ?? []
+        )
+    );
+
+$odontogramSnapshotService =
+    app(
+        AppointmentOdontogramSnapshotService::class
+    );
+
+$odontogram =
+    $odontogramSnapshotService
+        ->appointmentSnapshot(
+            $currentOdontogram,
+            $previousOdontogram
+        );
+
+$treatmentItems =
+    OdontogramTreatmentDisplay::items(
+        $odontogram
+    );
 
 $followUp = $get('follow_up') ?? $get('followUp');
 

@@ -39,6 +39,14 @@ class ReservedBookingPeriodRequest extends FormRequest
                 ? trim((string) $this->input('notes'))
                 : null,
             'timeslots' => $timeslots,
+            'allowed_services' => $this->boolean('allowed_services_present')
+                ? collect($this->input('allowed_services', []))
+                    ->map(fn ($service) => trim((string) $service))
+                    ->filter()
+                    ->unique(fn ($service) => mb_strtolower($service))
+                    ->values()
+                    ->all()
+                : null,
         ]);
     }
 
@@ -73,6 +81,15 @@ class ReservedBookingPeriodRequest extends FormRequest
             'target_patient_type' => [
                 'required',
                 Rule::in(ReservedBookingPeriod::PATIENT_TYPES),
+            ],
+            'allowed_services' => ['nullable', 'array', 'min:1'],
+            'allowed_services.*' => [
+                'required',
+                'string',
+                'distinct:ignore_case',
+                Rule::exists('service_types', 'name')->where(
+                    fn ($query) => $query->where('is_active_for_booking', true)
+                ),
             ],
             'program_code' => [
                 Rule::requiredIf($isStudent),
@@ -140,6 +157,8 @@ class ReservedBookingPeriodRequest extends FormRequest
             'timeslots.*.time.required' => 'Each timeslot must have a time.',
             'timeslot_duration_minutes.required' => 'Set how long each timeslot should last.',
             'timeslot_duration_minutes.multiple_of' => 'Timeslot duration must use 5-minute increments.',
+            'allowed_services.min' => 'Select at least one dental service for this reserved period.',
+            'allowed_services.*.exists' => 'One of the selected dental services is no longer available for booking.',
         ];
     }
 }

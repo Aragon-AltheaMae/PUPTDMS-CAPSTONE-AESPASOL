@@ -3195,3 +3195,25 @@ body:has(#mainContent.odontogram-page) #toastContainer .toast-item.odontogram-ti
         animation: none;
     }
 }
+
+#surfacePicker3D .surface-picker-btn {
+    position: relative;
+}
+
+#surfacePicker3D .surface-picker-btn.has-treatment::after {
+    content: '';
+    position: absolute;
+    right: 3px;
+    bottom: 3px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--surface-treatment-color);
+    box-shadow: 0 0 0 1px var(--card);
+    pointer-events: none;
+}
+
+#surfacePicker3D .surface-picker-btn:focus-visible {
+    outline: 2px solid var(--crimson);
+    outline-offset: 2px;
+}

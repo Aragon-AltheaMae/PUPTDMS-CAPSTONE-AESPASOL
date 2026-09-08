@@ -102,7 +102,7 @@ class AppointmentController extends Controller
                         $q2->whereDate('appointment_date', '=', $today)
                             ->where(function ($sameDay) use ($nowTime) {
                                 $sameDay->where(function ($regular) use ($nowTime) {
-                                    $regular->whereNull('reserved_booking_period_id')
+                                    $regular->regularBooking()
                                         ->whereTime('appointment_time', '>=', $nowTime);
                                 })->orWhereHas('reservedBookingPeriod', function ($period) use ($nowTime) {
                                     $period->withTrashed()->whereTime('end_time', '>=', $nowTime);
@@ -129,7 +129,7 @@ class AppointmentController extends Controller
                         $q2->whereDate('appointment_date', '=', $today)
                             ->where(function ($sameDay) use ($nowTime) {
                                 $sameDay->where(function ($regular) use ($nowTime) {
-                                    $regular->whereNull('reserved_booking_period_id')
+                                    $regular->regularBooking()
                                         ->whereTime('appointment_time', '<', $nowTime);
                                 })->orWhereHas('reservedBookingPeriod', function ($period) use ($nowTime) {
                                     $period->withTrashed()->whereTime('end_time', '<', $nowTime);
@@ -152,7 +152,7 @@ class AppointmentController extends Controller
         ]);
 
         $appointmentCountsPerDay = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
-            ->whereNull('reserved_booking_period_id')
+            ->regularBooking()
             ->selectRaw('appointment_date, COUNT(*) as count')
             ->groupBy('appointment_date')
             ->pluck('count', 'appointment_date')
@@ -412,14 +412,14 @@ class AppointmentController extends Controller
         }
 
         $appointmentCountsPerDay = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
-            ->whereNull('reserved_booking_period_id')
+            ->regularBooking()
             ->selectRaw('appointment_date, COUNT(*) as count')
             ->groupBy('appointment_date')
             ->pluck('count', 'appointment_date')
             ->toArray();
 
         $appointmentCountsPerSlot = Appointment::whereIn('status', ['upcoming', 'rescheduled'])
-            ->whereNull('reserved_booking_period_id')
+            ->regularBooking()
             ->selectRaw('appointment_date, appointment_time, COUNT(*) as count')
             ->groupBy('appointment_date', 'appointment_time')
             ->get()
@@ -440,6 +440,10 @@ class AppointmentController extends Controller
         $diseases = Disease::orderBy('sort_order')->get();
 
         $serviceTypes = ServiceType::where('is_active_for_booking', true)
+            ->when(
+                $reservedBookingPeriod && $reservedBookingPeriod->allowed_services !== null,
+                fn ($query) => $query->whereIn('name', $reservedBookingPeriod->allowed_services)
+            )
             ->orderBy('name')
             ->get()
             ->map(function ($service) {
@@ -856,17 +860,10 @@ class AppointmentController extends Controller
                 ->with('error', 'Invalid service type selected.');
         }
 
-        $patientId =
-            session('impersonated_patient_id')
-            ?: session('patient_id');
-
-        if (! $patientId) {
-            return redirect()
-                ->route('login')
-                ->with(
-                    'error',
-                    'Please login first!'
-                );
+        if ($reservedBookingPeriod && ! $reservedBookingPeriod->allowsService($request->service_type)) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'The selected dental service is not available for this reserved booking period.');
         }
 
         $isFemalePatient = strtolower($patient->gender ?? '') === 'female';
@@ -969,7 +966,7 @@ class AppointmentController extends Controller
         }
 
         $appointmentCount = Appointment::where('appointment_date', $request->appointment_date)
-            ->whereNull('reserved_booking_period_id')
+            ->regularBooking()
             ->whereIn('status', ['upcoming', 'rescheduled'])
             ->count();
 
@@ -1141,7 +1138,7 @@ class AppointmentController extends Controller
                 }
 
                 $bookedCount = Appointment::query()
-                    ->where('reserved_booking_period_id', $lockedReservedPeriod->id)
+                    ->forReservedPeriod($lockedReservedPeriod->id)
                     ->whereIn('status', ['upcoming', 'rescheduled'])
                     ->count();
 
@@ -1158,7 +1155,7 @@ class AppointmentController extends Controller
                         ->find($reservedSlot?->id);
 
                     $slotTaken = $lockedSlot && Appointment::query()
-                        ->where('reserved_booking_period_slot_id', $lockedSlot->id)
+                        ->forReservedSlot($lockedSlot->id)
                         ->whereIn('status', ['upcoming', 'rescheduled'])
                         ->exists();
 
@@ -1171,7 +1168,7 @@ class AppointmentController extends Controller
 
                 if (Appointment::query()
                     ->where('patient_id', $patientId)
-                    ->where('reserved_booking_period_id', $lockedReservedPeriod->id)
+                    ->forReservedPeriod($lockedReservedPeriod->id)
                     ->exists()
                 ) {
                     throw \Illuminate\Validation\ValidationException::withMessages([
@@ -1603,7 +1600,7 @@ class AppointmentController extends Controller
         }
 
         $bookedSlotCounts = Appointment::where('appointment_date', $iso)
-            ->whereNull('reserved_booking_period_id')
+            ->regularBooking()
             ->whereIn('status', ['upcoming', 'rescheduled'])
             ->selectRaw('appointment_time, COUNT(*) as cnt')
             ->groupBy('appointment_time')

@@ -294,7 +294,6 @@
                         </span>
                     </div>
 
-
                     <div class="today-snapshot-content">
 
                         <div class="today-snapshot-primary">
@@ -335,9 +334,7 @@
                             </div>
                         </div>
 
-
                         <div class="today-snapshot-divider"></div>
-
 
                         <div class="today-snapshot-next-block">
                             <div class="today-snapshot-next-heading">
@@ -457,10 +454,17 @@
                                 {{ $monthLabel }}
                             </span>
 
-                            <span class="month-count-pill" data-month-count data-show-more-count
-                                data-show-more-count-label="appointments" data-show-more-count-singular="appointment">
-                                {{ $items->count() }}
-                                {{ Str::plural('appointment', $items->count()) }}
+                            <span class="global-info-group">
+                                <span class="appt-type-icon" aria-hidden="true">
+                                    <i class="fa-solid fa-calendar-check"></i>
+                                </span>
+
+                                <span class="global-info-subvalue" data-month-count data-show-more-count
+                                    data-show-more-count-label="appointments" data-show-more-count-singular="appointment">
+
+                                    {{ $items->count() }}
+                                    {{ Str::plural('appointment', $items->count()) }}
+                                </span>
                             </span>
                         </span>
 
@@ -716,7 +720,7 @@
                                                     )
                                                     : 'N/A',
 
-                                                'service' => $nextAppt->service_type_name ?? 'Follow-up',
+                                                'service' => $recordFollowUp->service_type_name ?? 'Follow-up',
 
                                                 'status' => $recordFollowUp->status ?? 'upcoming',
 
@@ -927,7 +931,8 @@
                                                         id: '{{ $appt->id }}',
                                                         name: @js($patientName),
                                                         datetime: @js($modalDatetime),
-serviceType: @js($appt->service_type_name),                                                        updateUrl: '{{ route('dentist.dentist.appointments.reschedule.update', $appt->id) }}'
+                                                        serviceType: @js($appt->service_type_name),
+                                                        updateUrl: '{{ route('dentist.dentist.appointments.reschedule.update', $appt->id) }}'
                                                     }) @endif">
                                                         <i class="fa-solid fa-rotate-right"></i>
                                                     </button>
@@ -1138,7 +1143,7 @@ serviceType: @js($appt->service_type_name),                                     
                                                 )
                                                 : 'N/A',
 
-                                            'service' => $nextAppt->service_type_name ?? 'Follow-up',
+                                            'service' => $recordFollowUp->service_type_name ?? 'Follow-up',
 
                                             'status' => $recordFollowUp->status ?? 'upcoming',
 
@@ -1327,7 +1332,8 @@ serviceType: @js($appt->service_type_name),                                     
                                                 id: '{{ $appt->id }}',
                                                 name: @js($patientName),
                                                 datetime: @js($modalDatetime),
-$appt->service_type_name                                                updateUrl: '{{ route('dentist.dentist.appointments.reschedule.update', $appt->id) }}'
+                                                serviceType: @js($appt->service_type_name),
+                                                updateUrl: '{{ route('dentist.dentist.appointments.reschedule.update', $appt->id) }}'
                                             }) @endif">
                                                 <i class="fa-solid fa-rotate-right"></i>
                                             </button>
@@ -1686,7 +1692,6 @@ $appt->service_type_name                                                updateUr
 
             appointmentStatusFilterSource =
                 source;
-
 
             if (source === 'dropdown') {
                 appointmentPeriodFilter =

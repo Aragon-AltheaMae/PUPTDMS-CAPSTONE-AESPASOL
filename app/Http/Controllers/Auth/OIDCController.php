@@ -249,8 +249,7 @@ class OIDCController extends Controller
             }
         }
 
-        $assignedAccess = ExternalAdminAccess::where('email', $email)
-            ->orWhere('external_admin_id', (string) $ssoUserId)
+        $assignedAccess = ExternalAdminAccess::forIdentity($email, (string) $ssoUserId)
             ->first();
 
         $facultyAccess = null;

@@ -366,7 +366,7 @@
     background: #ffffff;
 }
 
-header-notif-item:hover {
+.header-notif-item:hover {
     border-color: rgba(139, 0, 0, 0.22);
     transform: translateY(-1px);
 }
@@ -631,6 +631,72 @@ header-notif-item:hover {
 
 .header-user-btn.active .mobile-chevron-badge i {
     transform: rotate(180deg);
+}
+
+.modern-switch {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    flex: 0 0 auto;
+}
+
+.theme-switch-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.switch-slider {
+    position: absolute;
+    inset: 0;
+
+    border: 1px solid var(--border);
+    border-radius: 999px;
+
+    background: var(--surface);
+    cursor: pointer;
+
+    transition:
+        background-color .2s ease,
+        border-color .2s ease;
+}
+
+.switch-slider::after {
+    content: '';
+
+    position: absolute;
+    top: 2px;
+    left: 2px;
+
+    width: 14px;
+    height: 14px;
+
+    border-radius: 50%;
+    background: var(--text-3);
+
+    transition:
+        transform .2s ease,
+        background-color .2s ease;
+}
+
+.theme-switch-input:checked+.switch-slider {
+    background: var(--sidebar-hover-surface);
+    border-color: var(--sidebar-hover-icon-border);
+}
+
+.theme-switch-input:checked+.switch-slider::after {
+    transform: translateX(16px);
+    background: var(--sidebar-hover-text);
+}
+
+@media (min-width: 1200px) {
+
+    .patient-mobile-theme-item,
+    .patient-mobile-theme-divider {
+        display: none;
+    }
 }
 
 @media (max-width: 768px) {

@@ -405,7 +405,7 @@ class AdminReportController extends Controller
         $docStart = now()->copy()->startOfMonth()->toDateString();
         $docEnd = now()->copy()->endOfMonth()->toDateString();
 
-        $docBaseQuery = DocumentRequest::query()
+        $docBaseQuery = DocumentRequest::withStateColumns()
             ->whereBetween('request_date', [$docStart, $docEnd]);
 
         $docTotal = (clone $docBaseQuery)->count();
@@ -624,7 +624,7 @@ class AdminReportController extends Controller
         $docStart = $now->copy()->startOfMonth()->toDateString();
         $docEnd = $now->copy()->endOfMonth()->toDateString();
 
-        $docBaseQuery = DocumentRequest::query()
+        $docBaseQuery = DocumentRequest::withStateColumns()
             ->whereBetween('request_date', [$docStart, $docEnd]);
 
         $docTotal = (clone $docBaseQuery)->count();
